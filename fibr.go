@@ -60,7 +60,7 @@ func handler() http.Handler {
 func main() {
 	port := flag.String(`port`, `1080`, `Listening port`)
 	tls := flag.Bool(`tls`, true, `Serve TLS content`)
-	directory := flag.String(`directory`, `/data`, `Directory to serve`)
+	directory := flag.String(`directory`, `/data/`, `Directory to serve`)
 	alcotestConfig := alcotest.Flags(``)
 	certConfig := cert.Flags(`tls`)
 	prometheusConfig := prometheus.Flags(`prometheus`)
