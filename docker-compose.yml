@@ -1,0 +1,30 @@
+version: '2'
+
+services:
+  site:
+    image: vibioh/fibr
+    command:
+    - -prometheusMetricsHost
+    - fibr:1080
+    labels:
+      traefik.frontend.passHostHeader: 'true'
+      traefik.frontend.rule: 'Host: fibr.vibioh.fr'
+      traefik.protoco: 'https'
+      traefik.port: '1080'
+    volumes:
+    - ${DATA_DIR}:/data/
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+    restart: on-failure:5
+    read_only: true
+    cpu_shares: 128
+    mem_limit: 67108864
+    security_opt:
+    - no-new-privileges
+
+networks:
+  default:
+    external:
+      name: traefik

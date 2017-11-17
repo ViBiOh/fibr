@@ -1,0 +1,27 @@
+language: go
+sudo: required
+services:
+- docker
+go: 1.9
+install:
+- make
+script: |
+  docker build -t ${DOCKER_USER}/fibr .
+after_success: |
+  if [ "${TRAVIS_BRANCH}" == "master" ]; then
+    bash <(curl -s https://codecov.io/bash) && \
+    docker login -u ${DOCKER_USER} -p ${DOCKER_PASS} && \
+    docker push ${DOCKER_USER}/fibr
+
+    sed \
+      -e "s|\${DATA_DIR}|${DATA_DIR}|g" \
+      docker-compose.yml > docker-compose-env.yml
+  fi
+notifications:
+  email: false
+deploy:
+  provider: script
+  skip_cleanup: true
+  script: "curl -H 'Authorization: GitHub ${GITHUB_OAUTH_TOKEN}' -X POST https://dashboard-api.vibioh.fr/containers/fibr/ --data-binary @docker-compose-env.yml"
+  on:
+    branch: master

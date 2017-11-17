@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+
+set -e
+
+MODE="mode: atomic"
+
+echo "${MODE}" > coverage.txt
+
+for pkg in $(go list ./... | grep -v vendor); do
+    go test -covermode=atomic -coverprofile=profile.out $pkg
+
+    if [ -f profile.out ]; then
+        cat profile.out | grep --invert-match "${MODE}" >> coverage.txt
+        rm profile.out
+    fi
+done
+
+go tool cover -func=coverage.txt
