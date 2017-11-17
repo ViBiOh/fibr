@@ -36,9 +36,15 @@ func filesHandler(directory string, authConfig map[string]*string) http.Handler 
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if _, err := auth.IsAuthenticated(authURL, authUsers, r); err != nil {
-			if _, _, ok := r.BasicAuth(); ok {
+			if auth.IsForbiddenErr(err) {
+				httputils.Forbidden(w)
+				return
+			}
+
+			if err == auth.ErrEmptyAuthorization {
 				w.Header().Add(`WWW-Authenticate`, `Basic`)
 			}
+
 			httputils.Unauthorized(w, err)
 			return
 		}
