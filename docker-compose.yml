@@ -9,7 +9,7 @@ services:
     labels:
       traefik.frontend.passHostHeader: 'true'
       traefik.frontend.rule: 'Host: fibr.vibioh.fr'
-      traefik.protoco: 'https'
+      traefik.protocol: 'https'
       traefik.port: '1080'
     volumes:
     - ${DATA_DIR}:/data
