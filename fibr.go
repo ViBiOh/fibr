@@ -16,23 +16,14 @@ import (
 	"github.com/ViBiOh/httputils/rate"
 )
 
-const indexFilename = `index.html`
-
 var browserHandler http.Handler
 var apiHandler http.Handler
 
 func isFileExist(parts ...string) *string {
 	fullPath := path.Join(parts...)
-	info, err := os.Stat(fullPath)
 
-	if err != nil {
+	if _, err := os.Stat(fullPath); err != nil {
 		return nil
-	}
-
-	if info.IsDir() {
-		if isFileExist(append(parts, indexFilename)...) == nil {
-			return nil
-		}
 	}
 
 	return &fullPath
@@ -69,7 +60,7 @@ func handler() http.Handler {
 func main() {
 	port := flag.String(`port`, `1080`, `Listening port`)
 	tls := flag.Bool(`tls`, true, `Serve TLS content`)
-	directory := flag.String(`directory`, `/data/`, `Directory to serve`)
+	directory := flag.String(`directory`, `/data`, `Directory to serve`)
 	alcotestConfig := alcotest.Flags(``)
 	certConfig := cert.Flags(`tls`)
 	prometheusConfig := prometheus.Flags(`prometheus`)
