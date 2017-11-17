@@ -31,24 +31,7 @@ func isFileExist(parts ...string) *string {
 }
 
 func filesHandler(directory string, authConfig map[string]*string) http.Handler {
-	authURL := *authConfig[`url`]
-	authUsers := auth.LoadUsersProfiles(*authConfig[`users`])
-
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if _, err := auth.IsAuthenticated(authURL, authUsers, r); err != nil {
-			if auth.IsForbiddenErr(err) {
-				httputils.Forbidden(w)
-				return
-			}
-
-			if err == auth.ErrEmptyAuthorization {
-				w.Header().Add(`WWW-Authenticate`, `Basic`)
-			}
-
-			httputils.Unauthorized(w, err)
-			return
-		}
-
+	return auth.Handler(*authConfig[`url`], auth.LoadUsersProfiles(*authConfig[`users`]), func(w http.ResponseWriter, r *http.Request, user *auth.User) {
 		if filename := isFileExist(directory, r.URL.Path); filename != nil {
 			http.ServeFile(w, r, *filename)
 		} else {
