@@ -1,11 +1,41 @@
 version: '2'
 
 services:
+  auth:
+    image: vibioh/auth
+    command:
+    - -corsHeaders
+    - Authorization
+    - -corsCredentials
+    - -prometheusMetricsHost
+    - fibr-auth:1080
+    - -basicUsers
+    - 1:vibioh:$$2a$12$$CTmdj1LZIt/5fYYC/xxS4u7iwGA/FBEp2q3ewCzySbV4P4o4Yjc0W
+    labels:
+      traefik.frontend.passHostHeader: 'true'
+      traefik.frontend.rule: 'Host: fibr-auth.vibioh.fr'
+      traefik.protocol: 'https'
+      traefik.port: '1080'
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+    restart: on-failure:5
+    read_only: true
+    cpu_shares: 128
+    mem_limit: 67108864
+    security_opt:
+    - no-new-privileges
+
   site:
     image: vibioh/fibr
     command:
     - -prometheusMetricsHost
     - fibr:1080
+    - -authUrl
+    - https://fibr-auth.vibioh.fr
+    - -authUsers
+    - vibioh:admin
     labels:
       traefik.frontend.passHostHeader: 'true'
       traefik.frontend.rule: 'Host: fibr.vibioh.fr'

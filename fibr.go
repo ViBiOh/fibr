@@ -9,6 +9,7 @@ import (
 
 	"github.com/NYTimes/gziphandler"
 	"github.com/ViBiOh/alcotest/alcotest"
+	"github.com/ViBiOh/auth/auth"
 	"github.com/ViBiOh/httputils"
 	"github.com/ViBiOh/httputils/cert"
 	"github.com/ViBiOh/httputils/owasp"
@@ -29,8 +30,16 @@ func isFileExist(parts ...string) *string {
 	return &fullPath
 }
 
-func filesHandler(directory string) http.Handler {
+func filesHandler(directory string, authConfig map[string]*string) http.Handler {
+	authURL := *authConfig[`url`]
+	authUsers := auth.LoadUsersProfiles(*authConfig[`users`])
+
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if _, err := auth.IsAuthenticated(authURL, authUsers, r); err != nil {
+			httputils.Unauthorized(w, err)
+			return
+		}
+
 		if filename := isFileExist(directory, r.URL.Path); filename != nil {
 			http.ServeFile(w, r, *filename)
 		} else {
@@ -60,6 +69,7 @@ func handler() http.Handler {
 func main() {
 	port := flag.String(`port`, `1080`, `Listening port`)
 	tls := flag.Bool(`tls`, true, `Serve TLS content`)
+	authConfig := auth.Flags(`auth`)
 	directory := flag.String(`directory`, `/data/`, `Directory to serve`)
 	alcotestConfig := alcotest.Flags(``)
 	certConfig := cert.Flags(`tls`)
@@ -77,7 +87,7 @@ func main() {
 	log.Printf(`Starting server on port %s`, *port)
 	log.Printf(`Serving file from %s`, *directory)
 
-	browserHandler = owasp.Handler(owaspConfig, filesHandler(*directory))
+	browserHandler = owasp.Handler(owaspConfig, filesHandler(*directory, authConfig))
 	apiHandler = prometheus.Handler(prometheusConfig, rate.Handler(rateConfig, gziphandler.GzipHandler(handler())))
 
 	server := &http.Server{
