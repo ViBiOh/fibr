@@ -1,4 +1,6 @@
-default: deps dev docker
+default: go docker
+
+go: deps dev
 
 dev: format lint tst bench build
 
@@ -38,3 +40,7 @@ docker-deps:
 
 docker-build:
 	docker build -t ${DOCKER_USER}/fibr .
+
+docker-push:
+	docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
+	docker push ${DOCKER_USER}/fibr
