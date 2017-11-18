@@ -2,6 +2,8 @@ default: deps dev docker
 
 dev: format lint tst bench build
 
+docker: docker-deps docker-build
+
 deps:
 	go get -u github.com/golang/lint/golint
 	go get -u github.com/NYTimes/gziphandler
@@ -30,8 +32,6 @@ bench:
 
 build:
 	CGO_ENABLED=0 go build -ldflags="-s -w" -installsuffix nocgo -o bin/fibr fibr.go
-
-docker: docker-deps docker-build
 
 docker-deps:
 	curl -s -o cacert.pem https://curl.haxx.se/ca/cacert.pem
