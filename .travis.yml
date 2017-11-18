@@ -6,8 +6,7 @@ go: 1.9
 after_success: |
   if [ "${TRAVIS_BRANCH}" == "master" ]; then
     bash <(curl -s https://codecov.io/bash) && \
-    docker login -u ${DOCKER_USER} -p ${DOCKER_PASS} && \
-    docker push ${DOCKER_USER}/fibr
+    make docker-push
 
     sed \
       -e "s|\${DATA_DIR}|${DATA_DIR}|g" \
