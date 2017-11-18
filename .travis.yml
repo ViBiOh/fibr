@@ -3,10 +3,6 @@ sudo: required
 services:
 - docker
 go: 1.9
-install:
-- make
-script: |
-  docker build -t ${DOCKER_USER}/fibr .
 after_success: |
   if [ "${TRAVIS_BRANCH}" == "master" ]; then
     bash <(curl -s https://codecov.io/bash) && \
