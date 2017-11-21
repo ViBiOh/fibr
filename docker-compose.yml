@@ -13,6 +13,12 @@ services:
     - '60'
     - -basicUsers
     - 1:vibioh:$$2a$12$$CTmdj1LZIt/5fYYC/xxS4u7iwGA/FBEp2q3ewCzySbV4P4o4Yjc0W
+    - -githubState
+    - ${GITHUB_OAUTH_STATE}
+    - -githubClientId
+    - ${GITHUB_OAUTH_CLIENT_ID}
+    - -githubClientSecret
+    - ${GITHUB_OAUTH_CLIENT_SECRET}
     labels:
       traefik.frontend.passHostHeader: 'true'
       traefik.frontend.rule: 'Host: fibr-auth.vibioh.fr'
