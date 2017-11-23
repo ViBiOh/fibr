@@ -7,15 +7,8 @@ dev: format lint tst bench build
 docker: docker-deps docker-build
 
 deps:
+	go get -u ./...
 	go get -u github.com/golang/lint/golint
-	go get -u github.com/NYTimes/gziphandler
-	go get -u github.com/ViBiOh/alcotest/alcotest
-	go get -u github.com/ViBiOh/auth/auth
-	go get -u github.com/ViBiOh/httputils
-	go get -u github.com/ViBiOh/httputils/cert
-	go get -u github.com/ViBiOh/httputils/owasp
-	go get -u github.com/ViBiOh/httputils/prometheus
-	go get -u github.com/ViBiOh/httputils/rate
 	go get -u golang.org/x/tools/cmd/goimports
 
 format:
@@ -44,3 +37,22 @@ docker-build:
 docker-push:
 	docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
 	docker push ${DOCKER_USER}/fibr
+
+start-deps:
+	go get -u github.com/ViBiOh/auth
+	go get -u github.com/ViBiOh/auth/bcrypt
+
+start-auth:
+	auth \
+	  -tls=false \
+	  -basicUsers "1:admin:`bcrypt admin`" \
+	  -corsHeaders Content-Type,Authorization \
+	  -port 1081 \
+	  -corsCredentials
+
+start-api:
+	go run fibr.go \
+	  -tls=false \
+	  -directory `pwd` \
+	  -authUrl http://localhost:1081 \
+	  -authUsers admin:admin

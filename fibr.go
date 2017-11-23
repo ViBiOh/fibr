@@ -1,11 +1,14 @@
 package main
 
 import (
+	"bytes"
 	"flag"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
 	"path"
+	"strings"
 
 	"github.com/NYTimes/gziphandler"
 	"github.com/ViBiOh/alcotest/alcotest"
@@ -15,10 +18,20 @@ import (
 	"github.com/ViBiOh/httputils/owasp"
 	"github.com/ViBiOh/httputils/prometheus"
 	"github.com/ViBiOh/httputils/rate"
+	"github.com/tdewolff/minify"
+	"github.com/tdewolff/minify/html"
 )
 
-var browserHandler http.Handler
+var serviceHandler http.Handler
 var apiHandler http.Handler
+var tpl *template.Template
+var minifier *minify.M
+
+func init() {
+	tpl = template.Must(template.ParseGlob(`./web/*.html`))
+	minifier = minify.New()
+	minifier.AddFunc("text/html", html.Minify)
+}
 
 func isFileExist(parts ...string) *string {
 	fullPath := path.Join(parts...)
@@ -30,13 +43,29 @@ func isFileExist(parts ...string) *string {
 	return &fullPath
 }
 
-func filesHandler(directory string, authConfig map[string]*string) http.Handler {
+func webHandler(w http.ResponseWriter, r *http.Request, user *auth.User, directory string) {
+	templateBuffer := &bytes.Buffer{}
+	if err := tpl.ExecuteTemplate(templateBuffer, `page`, nil); err != nil {
+		httputils.InternalServerError(w, err)
+	}
+
+	minifier.Minify(`text/html`, w, templateBuffer)
+}
+
+func filesHandler(w http.ResponseWriter, r *http.Request, user *auth.User, directory string) {
+	if filename := isFileExist(directory, r.URL.Path); filename != nil {
+		http.ServeFile(w, r, *filename)
+	} else {
+		httputils.NotFound(w)
+	}
+}
+
+func browserHandler(directory string, authConfig map[string]*string) http.Handler {
 	return auth.Handler(*authConfig[`url`], auth.LoadUsersProfiles(*authConfig[`users`]), func(w http.ResponseWriter, r *http.Request, user *auth.User) {
-		if filename := isFileExist(directory, r.URL.Path); filename != nil {
-			http.ServeFile(w, r, *filename)
-		} else {
-			httputils.NotFound(w)
+		if strings.HasPrefix(r.URL.Path, `/files`) {
+			filesHandler(w, r, user, directory)
 		}
+		webHandler(w, r, user, directory)
 	})
 }
 
@@ -53,7 +82,7 @@ func handler() http.Handler {
 		if r.URL.Path == `/health` {
 			healthHandler(w, r)
 		} else {
-			browserHandler.ServeHTTP(w, r)
+			serviceHandler.ServeHTTP(w, r)
 		}
 	})
 }
@@ -79,7 +108,7 @@ func main() {
 	log.Printf(`Starting server on port %s`, *port)
 	log.Printf(`Serving file from %s`, *directory)
 
-	browserHandler = owasp.Handler(owaspConfig, filesHandler(*directory, authConfig))
+	serviceHandler = owasp.Handler(owaspConfig, browserHandler(*directory, authConfig))
 	apiHandler = prometheus.Handler(prometheusConfig, rate.Handler(rateConfig, gziphandler.GzipHandler(handler())))
 
 	server := &http.Server{
