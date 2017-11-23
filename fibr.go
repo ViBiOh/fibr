@@ -52,8 +52,8 @@ func webHandler(w http.ResponseWriter, r *http.Request, user *auth.User, directo
 	minifier.Minify(`text/html`, w, templateBuffer)
 }
 
-func filesHandler(w http.ResponseWriter, r *http.Request, user *auth.User, directory string) {
-	if filename := isFileExist(directory, r.URL.Path); filename != nil {
+func filesHandler(w http.ResponseWriter, r *http.Request, user *auth.User, directory string, path string) {
+	if filename := isFileExist(directory, path); filename != nil {
 		http.ServeFile(w, r, *filename)
 	} else {
 		httputils.NotFound(w)
@@ -63,7 +63,8 @@ func filesHandler(w http.ResponseWriter, r *http.Request, user *auth.User, direc
 func browserHandler(directory string, authConfig map[string]*string) http.Handler {
 	return auth.Handler(*authConfig[`url`], auth.LoadUsersProfiles(*authConfig[`users`]), func(w http.ResponseWriter, r *http.Request, user *auth.User) {
 		if strings.HasPrefix(r.URL.Path, `/files`) {
-			filesHandler(w, r, user, directory)
+			filesHandler(w, r, user, directory, strings.TrimPrefix(r.URL.Path, `/files`)
+      return
 		}
 		webHandler(w, r, user, directory)
 	})
