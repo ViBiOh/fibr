@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"flag"
 	"html/template"
+	"io"
 	"log"
 	"net/http"
 	"os"
 	"path"
-	"strings"
 
 	"github.com/NYTimes/gziphandler"
 	"github.com/ViBiOh/alcotest/alcotest"
@@ -33,41 +33,40 @@ func init() {
 	minifier.AddFunc("text/html", html.Minify)
 }
 
-func isFileExist(parts ...string) *string {
+func getPathInfo(parts ...string) (string, os.FileInfo) {
 	fullPath := path.Join(parts...)
+	info, err := os.Stat(fullPath)
 
-	if _, err := os.Stat(fullPath); err != nil {
-		return nil
+	if err != nil {
+		return fullPath, nil
 	}
-
-	return &fullPath
+	return fullPath, info
 }
 
-func webHandler(w http.ResponseWriter, r *http.Request, user *auth.User, directory string) {
+func writePageTemplate(w io.Writer) error {
 	templateBuffer := &bytes.Buffer{}
 	if err := tpl.ExecuteTemplate(templateBuffer, `page`, nil); err != nil {
-		httputils.InternalServerError(w, err)
+		return err
 	}
 
-	w.Header().Add(`Content-Type`, `text/html`)
 	minifier.Minify(`text/html`, w, templateBuffer)
-}
-
-func filesHandler(w http.ResponseWriter, r *http.Request, user *auth.User, directory string, path string) {
-	if filename := isFileExist(directory, path); filename != nil {
-		http.ServeFile(w, r, *filename)
-	} else {
-		httputils.NotFound(w)
-	}
+	return nil
 }
 
 func browserHandler(directory string, authConfig map[string]*string) http.Handler {
 	return auth.Handler(*authConfig[`url`], auth.LoadUsersProfiles(*authConfig[`users`]), func(w http.ResponseWriter, r *http.Request, user *auth.User) {
-		if strings.HasPrefix(r.URL.Path, `/files`) {
-			filesHandler(w, r, user, directory, strings.TrimPrefix(r.URL.Path, `/files`))
-			return
+		filename, info := getPathInfo(directory, r.URL.Path)
+
+		if info == nil {
+			httputils.NotFound(w)
+		} else if info.IsDir() {
+			if err := writePageTemplate(w); err != nil {
+				httputils.InternalServerError(w, err)
+			}
+			w.Header().Add(`Content-Type`, `text/html`)
+		} else {
+			http.ServeFile(w, r, filename)
 		}
-		webHandler(w, r, user, directory)
 	})
 }
 
@@ -103,7 +102,7 @@ func main() {
 
 	alcotest.DoAndExit(alcotestConfig)
 
-	if isFileExist(*directory) == nil {
+	if _, info := getPathInfo(*directory); info == nil || !info.IsDir() {
 		log.Fatalf(`Directory %s is unreachable`, *directory)
 	}
 
