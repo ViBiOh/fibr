@@ -49,6 +49,7 @@ func webHandler(w http.ResponseWriter, r *http.Request, user *auth.User, directo
 		httputils.InternalServerError(w, err)
 	}
 
+	w.Header().Add(`Content-Type`, `text/html`)
 	minifier.Minify(`text/html`, w, templateBuffer)
 }
 
