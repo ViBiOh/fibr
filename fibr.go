@@ -63,8 +63,8 @@ func filesHandler(w http.ResponseWriter, r *http.Request, user *auth.User, direc
 func browserHandler(directory string, authConfig map[string]*string) http.Handler {
 	return auth.Handler(*authConfig[`url`], auth.LoadUsersProfiles(*authConfig[`users`]), func(w http.ResponseWriter, r *http.Request, user *auth.User) {
 		if strings.HasPrefix(r.URL.Path, `/files`) {
-			filesHandler(w, r, user, directory, strings.TrimPrefix(r.URL.Path, `/files`)
-      return
+			filesHandler(w, r, user, directory, strings.TrimPrefix(r.URL.Path, `/files`))
+			return
 		}
 		webHandler(w, r, user, directory)
 	})
