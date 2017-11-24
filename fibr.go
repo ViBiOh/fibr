@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"flag"
 	"html/template"
-	"io"
 	"log"
 	"net/http"
 	"os"
@@ -43,12 +42,13 @@ func getPathInfo(parts ...string) (string, os.FileInfo) {
 	return fullPath, info
 }
 
-func writePageTemplate(w io.Writer) error {
+func writePageTemplate(w http.ResponseWriter) error {
 	templateBuffer := &bytes.Buffer{}
 	if err := tpl.ExecuteTemplate(templateBuffer, `page`, nil); err != nil {
 		return err
 	}
 
+	w.Header().Add(`Content-Type`, `text/html`)
 	minifier.Minify(`text/html`, w, templateBuffer)
 	return nil
 }
@@ -63,7 +63,6 @@ func browserHandler(directory string, authConfig map[string]*string) http.Handle
 			if err := writePageTemplate(w); err != nil {
 				httputils.InternalServerError(w, err)
 			}
-			w.Header().Add(`Content-Type`, `text/html`)
 		} else {
 			http.ServeFile(w, r, filename)
 		}
