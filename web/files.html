@@ -1,0 +1,7 @@
+{{- define "files" }}
+  <ul>
+    {{- range . }}
+      <li><a href="{{ filename . }}">{{ filename . }}</a></li>
+    {{- end }}
+  </ul>
+{{- end }}

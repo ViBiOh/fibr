@@ -3,7 +3,9 @@ package main
 import (
 	"bytes"
 	"flag"
+	"fmt"
 	"html/template"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -26,8 +28,17 @@ var apiHandler http.Handler
 var tpl *template.Template
 var minifier *minify.M
 
+var funcs = template.FuncMap{
+	`filename`: func(file os.FileInfo) string {
+		if file.IsDir() {
+			return fmt.Sprintf(`%s/`, file.Name())
+		}
+		return file.Name()
+	},
+}
+
 func init() {
-	tpl = template.Must(template.ParseGlob(`./web/*.html`))
+	tpl = template.Must(template.New(`page.html`).Funcs(funcs).ParseGlob(`./web/*.html`))
 	minifier = minify.New()
 	minifier.AddFunc("text/html", html.Minify)
 }
@@ -42,9 +53,9 @@ func getPathInfo(parts ...string) (string, os.FileInfo) {
 	return fullPath, info
 }
 
-func writePageTemplate(w http.ResponseWriter) error {
+func writePageTemplate(w http.ResponseWriter, files []os.FileInfo) error {
 	templateBuffer := &bytes.Buffer{}
-	if err := tpl.ExecuteTemplate(templateBuffer, `page`, nil); err != nil {
+	if err := tpl.ExecuteTemplate(templateBuffer, `page`, files); err != nil {
 		return err
 	}
 
@@ -60,7 +71,13 @@ func browserHandler(directory string, authConfig map[string]*string) http.Handle
 		if info == nil {
 			httputils.NotFound(w)
 		} else if info.IsDir() {
-			if err := writePageTemplate(w); err != nil {
+			files, err := ioutil.ReadDir(filename)
+			if err != nil {
+				httputils.InternalServerError(w, err)
+				return
+			}
+
+			if err := writePageTemplate(w, files); err != nil {
 				httputils.InternalServerError(w, err)
 			}
 		} else {
