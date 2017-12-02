@@ -37,7 +37,7 @@ services:
     security_opt:
     - no-new-privileges
 
-  site:
+  static:
     image: vibioh/fibr-static
     labels:
       traefik.frontend.passHostHeader: 'true'
