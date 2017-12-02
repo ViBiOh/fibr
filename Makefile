@@ -59,4 +59,4 @@ start-api:
 	  -directory `pwd` \
 	  -authUrl http://localhost:1081 \
 	  -authUsers admin:admin \
-	  -csp "default-src 'self'; style-src 'self' 'unsafe-inline'"
+	  -csp "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' fibr-static.vibioh.fr"
