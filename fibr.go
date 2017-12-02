@@ -46,7 +46,7 @@ type page struct {
 }
 
 func init() {
-	tpl = template.Must(template.New(`page.html`).Funcs(template.FuncMap{
+	tpl = template.Must(template.New(`fibr`).Funcs(template.FuncMap{
 		`filename`: func(file os.FileInfo) string {
 			if file.IsDir() {
 				return fmt.Sprintf(`%s/`, file.Name())
@@ -57,6 +57,8 @@ func init() {
 			return strings.TrimSuffix(fullPath, file.Name()+`/`)
 		},
 	}).ParseGlob(`./web/*.html`))
+	tpl = template.Must(tpl.ParseGlob(`./web/svg/*.html`))
+
 	minifier = minify.New()
 	minifier.AddFunc("text/html", html.Minify)
 }

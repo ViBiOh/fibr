@@ -7,6 +7,8 @@ Web File Browser and Manager
 [![Build Status](https://travis-ci.org/ViBiOh/fibr.svg?branch=master)](https://travis-ci.org/ViBiOh/fibr)
 [![Go Report Card](https://goreportcard.com/badge/github.com/ViBiOh/fibr)](https://goreportcard.com/report/github.com/ViBiOh/fibr)
 
+Thanks to [Twemoji](https://github.com/twitter/twemoji) for providing awesome svg emojis.
+
 ## Installation
 
 ```bash
