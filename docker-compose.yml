@@ -46,6 +46,8 @@ services:
     - https://fibr-auth.vibioh.fr
     - -authUsers
     - vibioh:admin
+    - -csp
+    - default-src 'self'; style-src 'self' 'unsafe-inline'
     labels:
       traefik.frontend.passHostHeader: 'true'
       traefik.frontend.rule: 'Host: fibr.vibioh.fr'
