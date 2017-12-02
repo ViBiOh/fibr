@@ -34,10 +34,12 @@ docker-deps:
 
 docker-build:
 	docker build -t ${DOCKER_USER}/fibr .
+	docker build -t ${DOCKER_USER}/fibr-static -f Dockerfile_static .
 
 docker-push:
 	docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
 	docker push ${DOCKER_USER}/fibr
+	docker push ${DOCKER_USER}/fibr-static
 
 start-deps:
 	go get -u github.com/ViBiOh/auth

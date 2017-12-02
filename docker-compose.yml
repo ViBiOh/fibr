@@ -38,6 +38,23 @@ services:
     - no-new-privileges
 
   site:
+    image: vibioh/fibr-static
+    labels:
+      traefik.frontend.passHostHeader: 'true'
+      traefik.frontend.rule: 'Host: fibr-static.vibioh.fr'
+      traefik.port: '1080'
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+    restart: on-failure:5
+    read_only: true
+    cpu_shares: 128
+    mem_limit: 67108864
+    security_opt:
+    - no-new-privileges
+
+  site:
     image: vibioh/fibr
     command:
     - -prometheusMetricsHost

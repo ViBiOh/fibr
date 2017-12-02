@@ -1,0 +1,3 @@
+FROM vibioh/viws
+
+COPY static/ www/
