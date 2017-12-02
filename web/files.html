@@ -1,7 +1,14 @@
 {{- define "files" }}
-  <ul>
-    {{- range . }}
-      <li><a href="{{ filename . }}">{{ filename . }}</a></li>
+  <ul class="files">
+    {{- if ne .Seo.URL "/" }}
+      <li class="padding">
+        <a href="{{ parent .Seo.URL .Current }}">../</a>
+      </li>
+    {{- end }}
+    {{- range .Files }}
+      <li class="padding">
+        <a href="{{ filename . }}">{{ filename . }}</a>
+      </li>
     {{- end }}
   </ul>
 {{- end }}

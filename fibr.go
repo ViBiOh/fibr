@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"strings"
 
 	"github.com/NYTimes/gziphandler"
 	"github.com/ViBiOh/alcotest/alcotest"
@@ -39,8 +40,9 @@ type seo struct {
 }
 
 type page struct {
-	Seo   seo
-	Files []os.FileInfo
+	Seo     seo
+	Current os.FileInfo
+	Files   []os.FileInfo
 }
 
 func init() {
@@ -50,6 +52,9 @@ func init() {
 				return fmt.Sprintf(`%s/`, file.Name())
 			}
 			return file.Name()
+		},
+		`parent`: func(fullPath string, file os.FileInfo) string {
+			return strings.TrimSuffix(fullPath, file.Name()+`/`)
 		},
 	}).ParseGlob(`./web/*.html`))
 	minifier = minify.New()
@@ -96,7 +101,8 @@ func browserHandler(directory string, authConfig map[string]*string) http.Handle
 					Description: fmt.Sprintf(`FIle BRowser of directory %s on the server`, r.URL.Path),
 					URL:         r.URL.Path,
 				},
-				Files: files,
+				Current: info,
+				Files:   files,
 			}
 
 			if err := writePageTemplate(w, &content); err != nil {

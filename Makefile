@@ -56,4 +56,5 @@ start-api:
 	  -tls=false \
 	  -directory `pwd` \
 	  -authUrl http://localhost:1081 \
-	  -authUsers admin:admin
+	  -authUsers admin:admin \
+	  -csp "default-src 'self'; style-src 'self' 'unsafe-inline'"

@@ -1,5 +1,8 @@
 {{- define "body" }}
   <body>
-    {{- template "files" .Files }}
+    <header class="header padding">
+      <h1 class="title">Content of directory {{ .Seo.URL }}</h1>
+    </header>
+    {{- template "files" . }}
   </body>
 {{- end }}

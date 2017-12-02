@@ -1,0 +1,64 @@
+{{- define "style" }}
+  <style type="text/css">
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      font-size: 62.5%;
+    }
+
+    body {
+      -webkit-overflow-scrolling: touch;
+      margin: 0;
+    }
+
+    body,
+    button,
+    input {
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        'Segoe UI',
+        'Roboto',
+        'Oxygen-Sans',
+        'Ubuntu',
+        'Cantarell',
+        'Helvetica Nue',
+        sans-serif;
+      font-size: 1.6rem;
+      font-style: normal;
+      font-weight: 400;
+    }
+
+    .padding {
+      padding: 5px 10px;
+    }
+
+    .header {
+      background-color: #3a3a3a;
+      color: #f8f8f8;
+    }
+
+    .title {
+      margin: 0;
+      padding: 0;
+    }
+
+    .files {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    @media print {
+      body::after {
+        content: 'Save ink, share link.';
+      }
+
+      body > * {
+        display: none;
+      }
+    }
+  </style>
+{{- end }}
