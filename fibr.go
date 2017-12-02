@@ -28,17 +28,30 @@ var apiHandler http.Handler
 var tpl *template.Template
 var minifier *minify.M
 
-var funcs = template.FuncMap{
-	`filename`: func(file os.FileInfo) string {
-		if file.IsDir() {
-			return fmt.Sprintf(`%s/`, file.Name())
-		}
-		return file.Name()
-	},
+type seo struct {
+	Title       string
+	Description string
+	URL         string
+	Img         string
+	ImgHeight   uint
+	ImgWidth    uint
+	Version     string
+}
+
+type page struct {
+	Seo   seo
+	Files []os.FileInfo
 }
 
 func init() {
-	tpl = template.Must(template.New(`page.html`).Funcs(funcs).ParseGlob(`./web/*.html`))
+	tpl = template.Must(template.New(`page.html`).Funcs(template.FuncMap{
+		`filename`: func(file os.FileInfo) string {
+			if file.IsDir() {
+				return fmt.Sprintf(`%s/`, file.Name())
+			}
+			return file.Name()
+		},
+	}).ParseGlob(`./web/*.html`))
 	minifier = minify.New()
 	minifier.AddFunc("text/html", html.Minify)
 }
@@ -53,9 +66,9 @@ func getPathInfo(parts ...string) (string, os.FileInfo) {
 	return fullPath, info
 }
 
-func writePageTemplate(w http.ResponseWriter, files []os.FileInfo) error {
+func writePageTemplate(w http.ResponseWriter, content *page) error {
 	templateBuffer := &bytes.Buffer{}
-	if err := tpl.ExecuteTemplate(templateBuffer, `page`, files); err != nil {
+	if err := tpl.ExecuteTemplate(templateBuffer, `page`, content); err != nil {
 		return err
 	}
 
@@ -77,7 +90,16 @@ func browserHandler(directory string, authConfig map[string]*string) http.Handle
 				return
 			}
 
-			if err := writePageTemplate(w, files); err != nil {
+			content := page{
+				Seo: seo{
+					Title:       fmt.Sprintf(`fibr - %s`, r.URL.Path),
+					Description: fmt.Sprintf(`FIle BRowser of directory %s on the server`, r.URL.Path),
+					URL:         r.URL.Path,
+				},
+				Files: files,
+			}
+
+			if err := writePageTemplate(w, &content); err != nil {
 				httputils.InternalServerError(w, err)
 			}
 		} else {
