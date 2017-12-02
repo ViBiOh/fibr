@@ -1,20 +1,20 @@
-{{- define "files" }}
+{{- define "files" -}}
   <ul class="files">
-    {{- if ne .Seo.URL "/" }}
+    {{- if ne .Seo.URL "/" -}}
       <li class="file">
-        {{- template "icon_folder" }}
+        {{- template "icon_folder" -}}
         <a href="{{ parent .Seo.URL .Current }}">../</a>
       </li>
-    {{- end }}
-    {{- range .Files }}
+    {{- end -}}
+    {{- range .Files -}}
       <li class="file">
-        {{- if .IsDir }}
-          {{- template "icon_folder" }}
-        {{- else }}
-          {{- template "icon_file" }}
-        {{- end }}
+        {{- if .IsDir -}}
+          {{- template "icon_folder" -}}
+        {{- else -}}
+          {{- template "icon_file" -}}
+        {{- end -}}
         <a href="{{ filename . }}">{{ filename . }}</a>
       </li>
-    {{- end }}
+    {{- end -}}
   </ul>
-{{- end }}
+{{- end -}}
