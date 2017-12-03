@@ -1,8 +1,13 @@
 {{- define "login" -}}
-  <a href="{{ .Config.AuthURL }}/redirect/basic">
-    <img class="icon" src="{{ .Config.StaticURL }}/lock_with_key.svg" alt="github" />
-  </a>
-  <a href="{{ .Config.AuthURL }}/redirect/github">
-    <img class="icon" src="{{ .Config.StaticURL }}/github.svg" alt="github" />
-  </a>
+  <header class="header center">
+    <h1 class="title">fibr</h1>
+  </header>
+  <p class="center">
+    <a href="{{ .Config.AuthURL }}/redirect/basic">
+      <img class="icon--button" src="{{ .Config.StaticURL }}/lock_with_key.svg" alt="github" />
+    </a>
+    <a href="{{ .Config.AuthURL }}/redirect/github">
+      <img class="icon--button" src="{{ .Config.StaticURL }}/github.svg" alt="github" />
+    </a>
+  </p>
 {{- end -}}
