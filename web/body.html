@@ -1,5 +1,7 @@
 {{- define "body" -}}
   <body>
-    {{- template "files" . -}}
+    {{- if .Files -}}
+      {{- template "files" . -}}
+    {{- end -}}
   </body>
 {{- end -}}
