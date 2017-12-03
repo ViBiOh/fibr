@@ -21,7 +21,10 @@ import (
 	"github.com/ViBiOh/httputils/prometheus"
 	"github.com/ViBiOh/httputils/rate"
 	"github.com/tdewolff/minify"
+	"github.com/tdewolff/minify/css"
 	"github.com/tdewolff/minify/html"
+	"github.com/tdewolff/minify/js"
+	"github.com/tdewolff/minify/svg"
 )
 
 var serviceHandler http.Handler
@@ -60,7 +63,10 @@ func init() {
 	tpl = template.Must(tpl.ParseGlob(`./web/svg/*.html`))
 
 	minifier = minify.New()
+	minifier.AddFunc("text/css", css.Minify)
 	minifier.AddFunc("text/html", html.Minify)
+	minifier.AddFunc("text/javascript", js.Minify)
+	minifier.AddFunc("image/svg+xml", svg.Minify)
 }
 
 func getPathInfo(parts ...string) (string, os.FileInfo) {
