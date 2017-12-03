@@ -3,5 +3,8 @@
     {{- if .Files -}}
       {{- template "files" . -}}
     {{- end -}}
+    {{- if .Login -}}
+      {{- template "login" -}}
+    {{- end -}}
   </body>
 {{- end -}}

@@ -32,6 +32,12 @@ var apiHandler http.Handler
 var tpl *template.Template
 var minifier *minify.M
 
+type config struct {
+	StaticURL string
+	AuthURL   string
+	Version   string
+}
+
 type seo struct {
 	Title       string
 	Description string
@@ -39,13 +45,14 @@ type seo struct {
 	Img         string
 	ImgHeight   uint
 	ImgWidth    uint
-	Version     string
 }
 
 type page struct {
-	Seo     seo
+	Config  *config
+	Seo     *seo
 	Current os.FileInfo
 	Files   []os.FileInfo
+	Login   bool
 }
 
 func init() {
@@ -90,7 +97,12 @@ func writePageTemplate(w http.ResponseWriter, content *page) error {
 	return nil
 }
 
-func browserHandler(directory string, authConfig map[string]*string) http.Handler {
+func browserHandler(directory string, staticURL string, authConfig map[string]*string) http.Handler {
+	templateConfig := config{
+		StaticURL: staticURL,
+		AuthURL:   *authConfig[`url`],
+	}
+
 	return auth.Handler(*authConfig[`url`], auth.LoadUsersProfiles(*authConfig[`users`]), func(w http.ResponseWriter, r *http.Request, user *auth.User) {
 		filename, info := getPathInfo(directory, r.URL.Path)
 
@@ -104,10 +116,14 @@ func browserHandler(directory string, authConfig map[string]*string) http.Handle
 			}
 
 			content := page{
-				Seo: seo{
+				Config: &templateConfig,
+				Seo: &seo{
 					Title:       fmt.Sprintf(`fibr - %s`, r.URL.Path),
 					Description: fmt.Sprintf(`FIle BRowser of directory %s on the server`, r.URL.Path),
 					URL:         r.URL.Path,
+					Img:         staticURL + `/favicon/android-chrome-512x512.png`,
+					ImgHeight:   512,
+					ImgWidth:    512,
 				},
 				Current: info,
 				Files:   files,
@@ -143,8 +159,9 @@ func handler() http.Handler {
 func main() {
 	port := flag.String(`port`, `1080`, `Listening port`)
 	tls := flag.Bool(`tls`, true, `Serve TLS content`)
-	authConfig := auth.Flags(`auth`)
 	directory := flag.String(`directory`, `/data/`, `Directory to serve`)
+	staticURL := flag.String(`staticURL`, `https://fibr-static.vibioh.fr`, `Static Server URL`)
+	authConfig := auth.Flags(`auth`)
 	alcotestConfig := alcotest.Flags(``)
 	certConfig := cert.Flags(`tls`)
 	prometheusConfig := prometheus.Flags(`prometheus`)
@@ -161,7 +178,7 @@ func main() {
 	log.Printf(`Starting server on port %s`, *port)
 	log.Printf(`Serving file from %s`, *directory)
 
-	serviceHandler = owasp.Handler(owaspConfig, browserHandler(*directory, authConfig))
+	serviceHandler = owasp.Handler(owaspConfig, browserHandler(*directory, *staticURL, authConfig))
 	apiHandler = prometheus.Handler(prometheusConfig, rate.Handler(rateConfig, gziphandler.GzipHandler(handler())))
 
 	server := &http.Server{

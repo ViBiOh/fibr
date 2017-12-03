@@ -1,8 +1,8 @@
 {{- define "favicon" -}}
-  <link rel="apple-touch-icon" sizes="180x180" href="//fibr-static.vibioh.fr/favicon/apple-touch-icon.png?v={{ .Version }}">
-  <link rel="icon" type="image/png" sizes="32x32" href="//fibr-static.vibioh.fr/favicon/favicon-32x32.png?v={{ .Version }}">
-  <link rel="icon" type="image/png" sizes="16x16" href="//fibr-static.vibioh.fr/favicon/favicon-16x16.png?v={{ .Version }}">
-  <link rel="manifest" href="//fibr-static.vibioh.fr/favicon/manifest.json?v={{ .Version }}">
-  <link rel="mask-icon" href="//fibr-static.vibioh.fr/favicon/safari-pinned-tab.svg?v={{ .Version }}" color="#5bbad5">
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ .Config.StaticURL }}/favicon/apple-touch-icon.png?v={{ .Config.Version }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ .Config.StaticURL }}/favicon/favicon-32x32.png?v={{ .Config.Version }}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ .Config.StaticURL }}/favicon/favicon-16x16.png?v={{ .Config.Version }}">
+  <link rel="manifest" href="{{ .Config.StaticURL }}/favicon/manifest.json?v={{ .Config.Version }}">
+  <link rel="mask-icon" href="{{ .Config.StaticURL }}/favicon/safari-pinned-tab.svg?v={{ .Config.Version }}" color="#5bbad5">
   <meta name="theme-color" content="#ffffff">
 {{- end -}}

@@ -1,0 +1,8 @@
+{{- define "login" -}}
+  <a href="{{ .Config.AuthURL }}/redirect/basic">
+    <img class="icon" src="{{ .Config.StaticURL }}/lock_with_keys.svg" alt="github" />
+  </a>
+  <a href="{{ .Config.AuthURL }}/redirect/github">
+    <img class="icon" src="{{ .Config.StaticURL }}/github.svg" alt="github" />
+  </a>
+{{- end -}}
