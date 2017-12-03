@@ -11,13 +11,13 @@
   branch = "master"
   name = "github.com/ViBiOh/alcotest"
   packages = ["alcotest","httpclient"]
-  revision = "7b22ec944b1338c0a0b3f68c7a07f5ba8648ae58"
+  revision = "99e8506061b4d48c6583ae2af977bc48f1a7058a"
 
 [[projects]]
   branch = "master"
   name = "github.com/ViBiOh/auth"
   packages = ["auth","cookie"]
-  revision = "f71d9cfa21e696f13f874bbbddbd2b234239f438"
+  revision = "90c3e57dc3080f9fbd5183c0b68a3a3ae7a855b6"
 
 [[projects]]
   branch = "master"
@@ -47,7 +47,7 @@
   branch = "master"
   name = "github.com/prometheus/client_golang"
   packages = ["prometheus","prometheus/promhttp"]
-  revision = "1cdba8fdde81f444626530cce66e138d2f68ae1c"
+  revision = "661e31bf844dfca9aeba15f27ea8aa0d485ad212"
 
 [[projects]]
   branch = "master"
@@ -69,19 +69,19 @@
 
 [[projects]]
   name = "github.com/tdewolff/minify"
-  packages = [".","html"]
-  revision = "90df1aae5028a7cbb441bde86e86a55df6b5aa34"
-  version = "v2.3.3"
+  packages = [".","css","html","js","svg"]
+  revision = "222672169d634c440a73abc47685074e1a9daa60"
+  version = "v2.3.4"
 
 [[projects]]
   name = "github.com/tdewolff/parse"
-  packages = [".","buffer","html","strconv"]
-  revision = "bace4cf682c41e03b154044b561575ff541b83e8"
-  version = "v2.3.1"
+  packages = [".","buffer","css","html","js","strconv","svg","xml"]
+  revision = "639f6272aec6b52094db77b9ec488214b0b4b1a1"
+  version = "v2.3.2"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "b9ae716076c384448d52dc3031b781ee2f6d14c1e436844f636482ef4f55c766"
+  inputs-digest = "218a77afc4e335186d52db25886a0722e7a454c01a4c2fd84f6cc25b1db040f2"
   solver-name = "gps-cdcl"
   solver-version = 1

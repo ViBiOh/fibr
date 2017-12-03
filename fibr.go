@@ -100,7 +100,7 @@ func writePageTemplate(w http.ResponseWriter, content *page) error {
 	return nil
 }
 
-func createPage(path string, current os.FileInfo, files []os.FileInfo) *page {
+func createPage(path string, current os.FileInfo, files []os.FileInfo, login bool) *page {
 	return &page{
 		Config: templateConfig,
 		Seo: &seo{
@@ -113,11 +113,12 @@ func createPage(path string, current os.FileInfo, files []os.FileInfo) *page {
 		},
 		Current: current,
 		Files:   files,
+		Login:   login,
 	}
 }
 
 func browserHandler(directory string, authConfig map[string]*string) http.Handler {
-	return auth.Handler(*authConfig[`url`], auth.LoadUsersProfiles(*authConfig[`users`]), func(w http.ResponseWriter, r *http.Request, user *auth.User) {
+	return auth.HandlerWithFail(*authConfig[`url`], auth.LoadUsersProfiles(*authConfig[`users`]), func(w http.ResponseWriter, r *http.Request, user *auth.User) {
 		filename, info := getPathInfo(directory, r.URL.Path)
 
 		if info == nil {
@@ -129,11 +130,19 @@ func browserHandler(directory string, authConfig map[string]*string) http.Handle
 				return
 			}
 
-			if err := writePageTemplate(w, createPage(r.URL.Path, info, files)); err != nil {
+			if err := writePageTemplate(w, createPage(r.URL.Path, info, files, false)); err != nil {
 				httputils.InternalServerError(w, err)
 			}
 		} else {
 			http.ServeFile(w, r, filename)
+		}
+	}, func(w http.ResponseWriter, r *http.Request, err error) {
+		if auth.IsForbiddenErr(err) {
+			httputils.Forbidden(w)
+		} else {
+			if err := writePageTemplate(w, createPage(r.URL.Path, nil, nil, true)); err != nil {
+				httputils.InternalServerError(w, err)
+			}
 		}
 	})
 }
