@@ -55,6 +55,9 @@ type page struct {
 	Login   bool
 }
 
+var templateConfig *config
+var seoConfig *seo
+
 func init() {
 	tpl = template.Must(template.New(`fibr`).Funcs(template.FuncMap{
 		`filename`: func(file os.FileInfo) string {
@@ -97,12 +100,23 @@ func writePageTemplate(w http.ResponseWriter, content *page) error {
 	return nil
 }
 
-func browserHandler(directory string, staticURL string, authConfig map[string]*string) http.Handler {
-	templateConfig := config{
-		StaticURL: staticURL,
-		AuthURL:   *authConfig[`url`],
+func createPage(path string, current os.FileInfo, files []os.FileInfo) *page {
+	return &page{
+		Config: templateConfig,
+		Seo: &seo{
+			Title:       fmt.Sprintf(`fibr - %s`, path),
+			Description: fmt.Sprintf(`FIle BRowser of directory %s on the server`, path),
+			URL:         path,
+			Img:         seoConfig.Img,
+			ImgHeight:   seoConfig.ImgHeight,
+			ImgWidth:    seoConfig.ImgWidth,
+		},
+		Current: current,
+		Files:   files,
 	}
+}
 
+func browserHandler(directory string, authConfig map[string]*string) http.Handler {
 	return auth.Handler(*authConfig[`url`], auth.LoadUsersProfiles(*authConfig[`users`]), func(w http.ResponseWriter, r *http.Request, user *auth.User) {
 		filename, info := getPathInfo(directory, r.URL.Path)
 
@@ -115,21 +129,7 @@ func browserHandler(directory string, staticURL string, authConfig map[string]*s
 				return
 			}
 
-			content := page{
-				Config: &templateConfig,
-				Seo: &seo{
-					Title:       fmt.Sprintf(`fibr - %s`, r.URL.Path),
-					Description: fmt.Sprintf(`FIle BRowser of directory %s on the server`, r.URL.Path),
-					URL:         r.URL.Path,
-					Img:         staticURL + `/favicon/android-chrome-512x512.png`,
-					ImgHeight:   512,
-					ImgWidth:    512,
-				},
-				Current: info,
-				Files:   files,
-			}
-
-			if err := writePageTemplate(w, &content); err != nil {
+			if err := writePageTemplate(w, createPage(r.URL.Path, info, files)); err != nil {
 				httputils.InternalServerError(w, err)
 			}
 		} else {
@@ -156,6 +156,21 @@ func handler() http.Handler {
 	})
 }
 
+func initTemplateConfiguration(staticURL string, authURL string) {
+	templateConfig = &config{
+		StaticURL: staticURL,
+		AuthURL:   authURL,
+	}
+
+	seoConfig = &seo{
+		Title:     `fibr`,
+		URL:       `/`,
+		Img:       staticURL + `/favicon/android-chrome-512x512.png`,
+		ImgHeight: 512,
+		ImgWidth:  512,
+	}
+}
+
 func main() {
 	port := flag.String(`port`, `1080`, `Listening port`)
 	tls := flag.Bool(`tls`, true, `Serve TLS content`)
@@ -178,7 +193,9 @@ func main() {
 	log.Printf(`Starting server on port %s`, *port)
 	log.Printf(`Serving file from %s`, *directory)
 
-	serviceHandler = owasp.Handler(owaspConfig, browserHandler(*directory, *staticURL, authConfig))
+	initTemplateConfiguration(*staticURL, *authConfig[`url`])
+
+	serviceHandler = owasp.Handler(owaspConfig, browserHandler(*directory, authConfig))
 	apiHandler = prometheus.Handler(prometheusConfig, rate.Handler(rateConfig, gziphandler.GzipHandler(handler())))
 
 	server := &http.Server{
