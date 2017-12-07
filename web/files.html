@@ -1,15 +1,14 @@
 {{- define "files" -}}
   {{- $root := . -}}
   <header class="header">
-    <h1 class="title">Directory {{ .Seo.URL }}</h1>
+    <h1 class="title">Directory
+      <a href="/">root</a>
+      {{- range $index, $path := .PathParts -}}
+         / <a href="/{{- rebuildPaths $root.PathParts $index -}}/">{{- $path -}}</a>
+      {{- end -}}
+    </h1>
   </header>
   <ul class="files">
-    {{- if ne .Seo.URL "/" -}}
-      <li class="file">
-        {{- template "icon_folder" $root -}}
-        <a href="{{ parent .Seo.URL .Current }}">../</a>
-      </li>
-    {{- end -}}
     {{- range .Files -}}
       <li class="file">
         {{- if .IsDir -}}

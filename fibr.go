@@ -48,11 +48,12 @@ type seo struct {
 }
 
 type page struct {
-	Config  *config
-	Seo     *seo
-	Current os.FileInfo
-	Files   []os.FileInfo
-	Login   bool
+	Config    *config
+	Seo       *seo
+	Current   os.FileInfo
+	PathParts []string
+	Files     []os.FileInfo
+	Login     bool
 }
 
 var templateConfig *config
@@ -66,8 +67,8 @@ func init() {
 			}
 			return file.Name()
 		},
-		`parent`: func(fullPath string, file os.FileInfo) string {
-			return strings.TrimSuffix(fullPath, file.Name()+`/`)
+		`rebuildPaths`: func(parts []string, index int) string {
+			return path.Join(parts[:index+1]...)
 		},
 	}).ParseGlob(`./web/*.html`))
 	tpl = template.Must(tpl.ParseGlob(`./web/svg/*.html`))
@@ -101,6 +102,11 @@ func writePageTemplate(w http.ResponseWriter, content *page) error {
 }
 
 func createPage(path string, current os.FileInfo, files []os.FileInfo, login bool) *page {
+	pathParts := strings.Split(strings.Trim(path, `/`), `/`)
+	if pathParts[0] == `` {
+		pathParts = nil
+	}
+
 	return &page{
 		Config: templateConfig,
 		Seo: &seo{
@@ -111,9 +117,10 @@ func createPage(path string, current os.FileInfo, files []os.FileInfo, login boo
 			ImgHeight:   seoConfig.ImgHeight,
 			ImgWidth:    seoConfig.ImgWidth,
 		},
-		Current: current,
-		Files:   files,
-		Login:   login,
+		PathParts: pathParts,
+		Current:   current,
+		Files:     files,
+		Login:     login,
 	}
 }
 
