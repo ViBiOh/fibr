@@ -15,8 +15,6 @@ services:
     - vibioh.fr
     - -authRedirect
     - https://fibr.vibioh.fr
-    - -basicUsers
-    - 1:vibioh:$$2a$12$$CTmdj1LZIt/5fYYC/xxS4u7iwGA/FBEp2q3ewCzySbV4P4o4Yjc0W
     - -githubClientId
     - ${GITHUB_OAUTH_CLIENT_ID}
     - -githubClientSecret
