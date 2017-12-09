@@ -37,6 +37,9 @@ services:
 
   static:
     image: vibioh/fibr-static
+    command:
+    - -prometheusMetricsHost
+    - fibr-static:1080
     labels:
       traefik.frontend.passHostHeader: 'true'
       traefik.frontend.rule: 'Host: fibr-static.vibioh.fr'
