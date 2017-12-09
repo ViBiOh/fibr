@@ -19,6 +19,8 @@ services:
     - ${GITHUB_OAUTH_CLIENT_ID}
     - -githubClientSecret
     - ${GITHUB_OAUTH_CLIENT_SECRET}
+    - -version
+    - ${VERSION}
     labels:
       traefik.frontend.passHostHeader: 'true'
       traefik.frontend.rule: 'Host: fibr-auth.vibioh.fr'

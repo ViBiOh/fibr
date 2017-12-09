@@ -24,7 +24,6 @@ import (
 	"github.com/tdewolff/minify/css"
 	"github.com/tdewolff/minify/html"
 	"github.com/tdewolff/minify/js"
-	"github.com/tdewolff/minify/svg"
 )
 
 var serviceHandler http.Handler
@@ -71,13 +70,11 @@ func init() {
 			return path.Join(parts[:index+1]...)
 		},
 	}).ParseGlob(`./web/*.html`))
-	tpl = template.Must(tpl.ParseGlob(`./web/svg/*.html`))
 
 	minifier = minify.New()
 	minifier.AddFunc("text/css", css.Minify)
 	minifier.AddFunc("text/html", html.Minify)
 	minifier.AddFunc("text/javascript", js.Minify)
-	minifier.AddFunc("image/svg+xml", svg.Minify)
 }
 
 func getPathInfo(parts ...string) (string, os.FileInfo) {
@@ -172,10 +169,11 @@ func handler() http.Handler {
 	})
 }
 
-func initTemplateConfiguration(staticURL string, authURL string) {
+func initTemplateConfiguration(staticURL string, authURL string, version string) {
 	templateConfig = &config{
 		StaticURL: staticURL,
 		AuthURL:   authURL,
+		Version:   version,
 	}
 
 	seoConfig = &seo{
@@ -192,6 +190,7 @@ func main() {
 	tls := flag.Bool(`tls`, true, `Serve TLS content`)
 	directory := flag.String(`directory`, `/data/`, `Directory to serve`)
 	staticURL := flag.String(`staticURL`, `https://fibr-static.vibioh.fr`, `Static Server URL`)
+	version := flag.String(`version`, ``, `Version (used mainly as a cache-buster)`)
 	authConfig := auth.Flags(`auth`)
 	alcotestConfig := alcotest.Flags(``)
 	certConfig := cert.Flags(`tls`)
@@ -209,7 +208,7 @@ func main() {
 	log.Printf(`Starting server on port %s`, *port)
 	log.Printf(`Serving file from %s`, *directory)
 
-	initTemplateConfiguration(*staticURL, *authConfig[`url`])
+	initTemplateConfiguration(*staticURL, *authConfig[`url`], *version)
 
 	serviceHandler = owasp.Handler(owaspConfig, browserHandler(*directory, authConfig))
 	apiHandler = prometheus.Handler(prometheusConfig, rate.Handler(rateConfig, gziphandler.GzipHandler(handler())))

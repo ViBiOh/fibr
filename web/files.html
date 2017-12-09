@@ -12,9 +12,9 @@
     {{- range .Files -}}
       <li class="file">
         {{- if .IsDir -}}
-          {{- template "icon_folder" $root -}}
+          <img class="icon" src="{{ .Config.StaticURL }}/folder.svg?v={{ .Config.Version }}" alt="folder" />
         {{- else -}}
-          {{- template "icon_file" $root -}}
+          <img class="icon" src="{{ .Config.StaticURL }}/file.svg?v={{ .Config.Version }}" alt="file" />
         {{- end -}}
         <a href="{{ filename . }}">{{ filename . }}</a>
       </li>

@@ -4,7 +4,7 @@
       {{- template "login" . -}}
     {{- else -}}
       <a id="logout" href="{{ .Config.AuthURL }}/logout">
-        <img class="icon" src="{{ .Config.StaticURL }}/sign-out-alt.svg" alt="signout" />
+        <img class="icon icon-large" src="{{ .Config.StaticURL }}/sign-out-alt.svg?v={{ .Config.Version }}" alt="signout" />
       </a>
       {{- if .Files -}}
         {{- template "files" . -}}
