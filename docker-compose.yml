@@ -19,8 +19,6 @@ services:
     - ${GITHUB_OAUTH_CLIENT_ID}
     - -githubClientSecret
     - ${GITHUB_OAUTH_CLIENT_SECRET}
-    - -version
-    - ${VERSION}
     labels:
       traefik.frontend.passHostHeader: 'true'
       traefik.frontend.rule: 'Host: fibr-auth.vibioh.fr'
@@ -63,6 +61,8 @@ services:
     - https://fibr-auth.vibioh.fr
     - -authUsers
     - vibioh:admin
+    - -version
+    - ${VERSION}
     - -csp
     - default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' fibr-static.vibioh.fr
     labels:
