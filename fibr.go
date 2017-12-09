@@ -101,8 +101,6 @@ func init() {
 			default:
 				return ``
 			}
-
-			return ``
 		},
 	}).ParseGlob(`./web/*.html`))
 
