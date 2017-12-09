@@ -1,10 +1,14 @@
 {{- define "body" -}}
   <body>
-    {{- if .Files -}}
-      {{- template "files" . -}}
-    {{- end -}}
     {{- if .Login -}}
       {{- template "login" . -}}
+    {{- else -}}
+      <a id="logout" href="{{ .Config.AuthURL }}/logout">
+        <img class="icon" src="{{ .Config.StaticURL }}/sign-out-alt.svg" alt="signout" />
+      </a>
+      {{- if .Files -}}
+        {{- template "files" . -}}
+      {{- end -}}
     {{- end -}}
   </body>
 {{- end -}}
