@@ -14,7 +14,7 @@
         {{- if .IsDir -}}
           <img class="icon" src="{{ $root.Config.StaticURL }}/folder.svg?v={{ $root.Config.Version }}" alt="folder" />
         {{- else -}}
-          <img class="icon" src="{{ $root.Config.StaticURL }}/file.svg?v={{ $root.Config.Version }}" alt="file" />
+          <img class="icon" src="{{ $root.Config.StaticURL }}/file{{ typeFromExtension . }}.svg?v={{ $root.Config.Version }}" alt="file" />
         {{- end -}}
         <a href="{{ filename . }}">{{ filename . }}</a>
       </li>

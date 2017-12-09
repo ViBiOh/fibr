@@ -26,6 +26,15 @@ import (
 	"github.com/tdewolff/minify/js"
 )
 
+var archiveExtension = map[string]bool{`.zip`: true, `.tar`: true, `.gz`: true}
+var audioExtension = map[string]bool{`.mp3`: true}
+var codeExtension = map[string]bool{`.html`: true, `.css`: true, `.js`: true, `.jsx`: true, `.json`: true, `.yml`: true, `.yaml`: true, `.toml`: true, `.md`: true, `.go`: true}
+var excelExtension = map[string]bool{`.xls`: true, `.xlsx`: true, `.xlsm`: true}
+var imageExtension = map[string]bool{`.jpg`: true, `.jpeg`: true, `.png`: true, `.gif`: true, `.svg`: true, `.tiff`: true}
+var pdfExtension = map[string]bool{`.pdf`: true}
+var videoExtension = map[string]bool{`.mp4`: true, `.mov`: true, `.avi`: true}
+var wordExtension = map[string]bool{`.doc`: true, `.docx`: true}
+
 var serviceHandler http.Handler
 var apiHandler http.Handler
 var tpl *template.Template
@@ -68,6 +77,32 @@ func init() {
 		},
 		`rebuildPaths`: func(parts []string, index int) string {
 			return path.Join(parts[:index+1]...)
+		},
+		`typeFromExtension`: func(file os.FileInfo) string {
+			extension := path.Ext(file.Name())
+
+			switch {
+			case archiveExtension[extension]:
+				return `-archive`
+			case audioExtension[extension]:
+				return `-audio`
+			case codeExtension[extension]:
+				return `-code`
+			case excelExtension[extension]:
+				return `-excel`
+			case imageExtension[extension]:
+				return `-image`
+			case pdfExtension[extension]:
+				return `-pdf`
+			case videoExtension[extension]:
+				return `-video`
+			case wordExtension[extension]:
+				return `-word`
+			default:
+				return ``
+			}
+
+			return ``
 		},
 	}).ParseGlob(`./web/*.html`))
 
