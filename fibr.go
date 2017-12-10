@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"html/template"
@@ -26,19 +27,15 @@ import (
 	"github.com/tdewolff/minify/js"
 )
 
-var archiveExtension = map[string]bool{`.zip`: true, `.tar`: true, `.gz`: true}
-var audioExtension = map[string]bool{`.mp3`: true}
-var codeExtension = map[string]bool{`.html`: true, `.css`: true, `.js`: true, `.jsx`: true, `.json`: true, `.yml`: true, `.yaml`: true, `.toml`: true, `.md`: true, `.go`: true}
-var excelExtension = map[string]bool{`.xls`: true, `.xlsx`: true, `.xlsm`: true}
-var imageExtension = map[string]bool{`.jpg`: true, `.jpeg`: true, `.png`: true, `.gif`: true, `.svg`: true, `.tiff`: true}
-var pdfExtension = map[string]bool{`.pdf`: true}
-var videoExtension = map[string]bool{`.mp4`: true, `.mov`: true, `.avi`: true}
-var wordExtension = map[string]bool{`.doc`: true, `.docx`: true}
+type share struct {
+	id     string
+	path   string
+	public bool
+}
 
-var serviceHandler http.Handler
-var apiHandler http.Handler
-var tpl *template.Template
-var minifier *minify.M
+type metadata struct {
+	shared map[string]share
+}
 
 type config struct {
 	StaticURL string
@@ -64,8 +61,25 @@ type page struct {
 	Login     bool
 }
 
+const metadataFileName = `.fibr_meta`
+
+var archiveExtension = map[string]bool{`.zip`: true, `.tar`: true, `.gz`: true}
+var audioExtension = map[string]bool{`.mp3`: true}
+var codeExtension = map[string]bool{`.html`: true, `.css`: true, `.js`: true, `.jsx`: true, `.json`: true, `.yml`: true, `.yaml`: true, `.toml`: true, `.md`: true, `.go`: true}
+var excelExtension = map[string]bool{`.xls`: true, `.xlsx`: true, `.xlsm`: true}
+var imageExtension = map[string]bool{`.jpg`: true, `.jpeg`: true, `.png`: true, `.gif`: true, `.svg`: true, `.tiff`: true}
+var pdfExtension = map[string]bool{`.pdf`: true}
+var videoExtension = map[string]bool{`.mp4`: true, `.mov`: true, `.avi`: true}
+var wordExtension = map[string]bool{`.doc`: true, `.docx`: true}
+
+var serviceHandler http.Handler
+var apiHandler http.Handler
+var tpl *template.Template
+var minifier *minify.M
+
 var templateConfig *config
 var seoConfig *seo
+var meta metadata
 
 func init() {
 	tpl = template.Must(template.New(`fibr`).Funcs(template.FuncMap{
@@ -218,6 +232,18 @@ func initTemplateConfiguration(staticURL string, authURL string, version string)
 	}
 }
 
+func loadMetadata() {
+	rawMeta, err := ioutil.ReadFile(metadataFileName)
+	if err != nil {
+		log.Printf(`Error while reading metadata: %v`, err)
+		return
+	}
+
+	if err = json.Unmarshal(rawMeta, &meta); err != nil {
+		log.Printf(`Error while unmarshalling metadata: %v`, err)
+	}
+}
+
 func main() {
 	port := flag.String(`port`, `1080`, `Listening port`)
 	tls := flag.Bool(`tls`, true, `Serve TLS content`)
@@ -237,6 +263,8 @@ func main() {
 	if _, info := getPathInfo(*directory); info == nil || !info.IsDir() {
 		log.Fatalf(`Directory %s is unreachable`, *directory)
 	}
+
+	loadMetadata()
 
 	log.Printf(`Starting server on port %s`, *port)
 	log.Printf(`Serving file from %s`, *directory)
