@@ -1,3 +1,5 @@
 FROM vibioh/viws
 
+HEALTHCHECK --retries=10 CMD https://localhost:1080/health
+
 COPY static/ www/
