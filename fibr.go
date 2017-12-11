@@ -179,7 +179,7 @@ func browserHandler(directory string, authConfig map[string]*string) http.Handle
 			if auth.IsForbiddenErr(err) {
 				httputils.Forbidden(w)
 			} else if r.URL.Path == `/robots.txt` || r.URL.Path == `/sitemap.xml` {
-				http.ServeFile(w, r, path.Join(directory, `/web/static/`+r.URL.Path))
+				http.ServeFile(w, r, path.Join(directory, `/web/static`, r.URL.Path))
 			} else if err := writePageTemplate(w, createPage(r.URL.Path, nil, nil, true)); err != nil {
 				httputils.InternalServerError(w, err)
 			}
