@@ -69,19 +69,19 @@
 
 [[projects]]
   name = "github.com/tdewolff/minify"
-  packages = [".","css","html","js","svg"]
+  packages = [".","css","html","js"]
   revision = "222672169d634c440a73abc47685074e1a9daa60"
   version = "v2.3.4"
 
 [[projects]]
   name = "github.com/tdewolff/parse"
-  packages = [".","buffer","css","html","js","strconv","svg","xml"]
+  packages = [".","buffer","css","html","js","strconv"]
   revision = "639f6272aec6b52094db77b9ec488214b0b4b1a1"
   version = "v2.3.2"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "218a77afc4e335186d52db25886a0722e7a454c01a4c2fd84f6cc25b1db040f2"
+  inputs-digest = "207078db6c82e4790f91736c36f02ffe045f93f0ed0a17dee4c5e826e79eee01"
   solver-name = "gps-cdcl"
   solver-version = 1

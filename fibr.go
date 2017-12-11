@@ -62,6 +62,7 @@ type page struct {
 }
 
 const metadataFileName = `.fibr_meta`
+const robotsFileName = `web/robots.txt`
 
 var archiveExtension = map[string]bool{`.zip`: true, `.tar`: true, `.gz`: true}
 var audioExtension = map[string]bool{`.mp3`: true}
@@ -169,9 +170,26 @@ func createPage(path string, current os.FileInfo, files []os.FileInfo, login boo
 }
 
 func browserHandler(directory string, authConfig map[string]*string) http.Handler {
-	return auth.HandlerWithFail(*authConfig[`url`], auth.LoadUsersProfiles(*authConfig[`users`]), func(w http.ResponseWriter, r *http.Request, user *auth.User) {
-		filename, info := getPathInfo(directory, r.URL.Path)
+	url := *authConfig[`url`]
+	profiles := auth.LoadUsersProfiles(*authConfig[`users`])
 
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, err := auth.IsAuthenticated(url, profiles, r)
+		if err != nil {
+			if auth.IsForbiddenErr(err) {
+				httputils.Forbidden(w)
+			} else if r.URL.Path == `/robots.txt` {
+				if robots, err := ioutil.ReadFile(robotsFileName); err == nil {
+					w.Write(robots)
+				}
+			} else if err := writePageTemplate(w, createPage(r.URL.Path, nil, nil, true)); err != nil {
+				httputils.InternalServerError(w, err)
+			}
+
+			return
+		}
+
+		filename, info := getPathInfo(directory, r.URL.Path)
 		if info == nil {
 			httputils.NotFound(w)
 		} else if info.IsDir() {
@@ -186,14 +204,6 @@ func browserHandler(directory string, authConfig map[string]*string) http.Handle
 			}
 		} else {
 			http.ServeFile(w, r, filename)
-		}
-	}, func(w http.ResponseWriter, r *http.Request, err error) {
-		if auth.IsForbiddenErr(err) {
-			httputils.Forbidden(w)
-		} else {
-			if err := writePageTemplate(w, createPage(r.URL.Path, nil, nil, true)); err != nil {
-				httputils.InternalServerError(w, err)
-			}
 		}
 	})
 }
