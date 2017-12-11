@@ -140,7 +140,7 @@ func writePageTemplate(w http.ResponseWriter, content *page) error {
 		return err
 	}
 
-	w.Header().Add(`Content-Type`, `text/html`)
+	w.Header().Add(`Content-Type`, `text/html; charset=UTF-8`)
 	minifier.Minify(`text/html`, w, templateBuffer)
 	return nil
 }
