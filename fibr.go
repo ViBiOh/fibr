@@ -168,6 +168,47 @@ func createPage(path string, current os.FileInfo, files []os.FileInfo, login boo
 	}
 }
 
+func checkAndServeStatic(w http.ResponseWriter, r *http.Request) bool {
+	if r.URL.Path == `/robots.txt` || r.URL.Path == `/sitemap.xml` || strings.HasPrefix(r.URL.Path, `/static/`) {
+		http.ServeFile(w, r, path.Join(`web/static`, strings.TrimPrefix(r.URL.Path, `/static`)))
+		return true
+	}
+
+	return false
+}
+
+func handleAnonymousRequest(w http.ResponseWriter, r *http.Request, err error) {
+	if auth.IsForbiddenErr(err) {
+		httputils.Forbidden(w)
+	} else if !checkAndServeStatic(w, r) {
+		if err := writePageTemplate(w, createPage(r.URL.Path, nil, nil, true)); err != nil {
+			httputils.InternalServerError(w, err)
+		}
+	}
+}
+
+func handleLoggedRequest(w http.ResponseWriter, r *http.Request, directory string) {
+	filename, info := getPathInfo(directory, r.URL.Path)
+
+	if info == nil {
+		if !checkAndServeStatic(w, r) {
+			httputils.NotFound(w)
+		}
+	} else if info.IsDir() {
+		files, err := ioutil.ReadDir(filename)
+		if err != nil {
+			httputils.InternalServerError(w, err)
+			return
+		}
+
+		if err := writePageTemplate(w, createPage(r.URL.Path, info, files, false)); err != nil {
+			httputils.InternalServerError(w, err)
+		}
+	} else {
+		http.ServeFile(w, r, filename)
+	}
+}
+
 func browserHandler(directory string, authConfig map[string]*string) http.Handler {
 	url := *authConfig[`url`]
 	profiles := auth.LoadUsersProfiles(*authConfig[`users`])
@@ -176,33 +217,9 @@ func browserHandler(directory string, authConfig map[string]*string) http.Handle
 		_, err := auth.IsAuthenticated(url, profiles, r)
 
 		if err != nil {
-			if auth.IsForbiddenErr(err) {
-				httputils.Forbidden(w)
-			} else if r.URL.Path == `/robots.txt` || r.URL.Path == `/sitemap.xml` {
-				http.ServeFile(w, r, path.Join(directory, `/web/static`, r.URL.Path))
-			} else if err := writePageTemplate(w, createPage(r.URL.Path, nil, nil, true)); err != nil {
-				httputils.InternalServerError(w, err)
-			}
-
-			return
-		}
-
-		filename, info := getPathInfo(directory, r.URL.Path)
-
-		if info == nil {
-			httputils.NotFound(w)
-		} else if info.IsDir() {
-			files, err := ioutil.ReadDir(filename)
-			if err != nil {
-				httputils.InternalServerError(w, err)
-				return
-			}
-
-			if err := writePageTemplate(w, createPage(r.URL.Path, info, files, false)); err != nil {
-				httputils.InternalServerError(w, err)
-			}
+			handleAnonymousRequest(w, r, err)
 		} else {
-			http.ServeFile(w, r, filename)
+			handleLoggedRequest(w, r, directory)
 		}
 	})
 }
@@ -225,9 +242,9 @@ func handler() http.Handler {
 	})
 }
 
-func initTemplateConfiguration(staticURL string, authURL string, version string) {
+func initTemplateConfiguration(authURL string, version string) {
 	templateConfig = &config{
-		StaticURL: staticURL,
+		StaticURL: `/static`,
 		AuthURL:   authURL,
 		Version:   version,
 	}
@@ -235,7 +252,7 @@ func initTemplateConfiguration(staticURL string, authURL string, version string)
 	seoConfig = &seo{
 		Title:     `fibr`,
 		URL:       `/`,
-		Img:       staticURL + `/favicon/android-chrome-512x512.png`,
+		Img:       path.Join(`/static`, `/favicon/android-chrome-512x512.png`),
 		ImgHeight: 512,
 		ImgWidth:  512,
 	}
@@ -257,7 +274,6 @@ func main() {
 	port := flag.String(`port`, `1080`, `Listening port`)
 	tls := flag.Bool(`tls`, true, `Serve TLS content`)
 	directory := flag.String(`directory`, `/data/`, `Directory to serve`)
-	staticURL := flag.String(`staticURL`, `https://fibr-static.vibioh.fr`, `Static Server URL`)
 	version := flag.String(`version`, ``, `Version (used mainly as a cache-buster)`)
 	authConfig := auth.Flags(`auth`)
 	alcotestConfig := alcotest.Flags(``)
@@ -278,7 +294,7 @@ func main() {
 	log.Printf(`Starting server on port %s`, *port)
 	log.Printf(`Serving file from %s`, *directory)
 
-	initTemplateConfiguration(*staticURL, *authConfig[`url`], *version)
+	initTemplateConfiguration(*authConfig[`url`], *version)
 
 	serviceHandler = owasp.Handler(owaspConfig, browserHandler(*directory, authConfig))
 	apiHandler = prometheus.Handler(prometheusConfig, rate.Handler(rateConfig, gziphandler.GzipHandler(handler())))
