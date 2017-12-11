@@ -62,7 +62,7 @@ type page struct {
 }
 
 const metadataFileName = `.fibr_meta`
-const robotsFileName = `web/robots.txt`
+const robotsFileName = `web/static/robots.txt`
 
 var archiveExtension = map[string]bool{`.zip`: true, `.tar`: true, `.gz`: true}
 var audioExtension = map[string]bool{`.mp3`: true}
@@ -175,13 +175,12 @@ func browserHandler(directory string, authConfig map[string]*string) http.Handle
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		_, err := auth.IsAuthenticated(url, profiles, r)
+
 		if err != nil {
 			if auth.IsForbiddenErr(err) {
 				httputils.Forbidden(w)
 			} else if r.URL.Path == `/robots.txt` {
-				if robots, err := ioutil.ReadFile(robotsFileName); err == nil {
-					w.Write(robots)
-				}
+				http.ServeFile(w, r, path.Join(directory, r.URL.Path))
 			} else if err := writePageTemplate(w, createPage(r.URL.Path, nil, nil, true)); err != nil {
 				httputils.InternalServerError(w, err)
 			}
@@ -190,6 +189,7 @@ func browserHandler(directory string, authConfig map[string]*string) http.Handle
 		}
 
 		filename, info := getPathInfo(directory, r.URL.Path)
+
 		if info == nil {
 			httputils.NotFound(w)
 		} else if info.IsDir() {
