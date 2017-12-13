@@ -116,7 +116,7 @@ func init() {
 				return ``
 			}
 		},
-	}).ParseGlob(`./web/*.html`))
+	}).ParseGlob(`./web/*.html.go`))
 
 	minifier = minify.New()
 	minifier.AddFunc(`text/css`, css.Minify)
