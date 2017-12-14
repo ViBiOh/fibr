@@ -6,8 +6,10 @@ import (
 	"flag"
 	"fmt"
 	"html/template"
+	"io"
 	"io/ioutil"
 	"log"
+	"mime/multipart"
 	"net/http"
 	"os"
 	"path"
@@ -62,6 +64,7 @@ type page struct {
 }
 
 const metadataFileName = `.fibr_meta`
+const maxUploadSize = 32 * 1024 * 2014 // 32 MB
 
 var archiveExtension = map[string]bool{`.zip`: true, `.tar`: true, `.gz`: true}
 var audioExtension = map[string]bool{`.mp3`: true}
@@ -116,7 +119,7 @@ func init() {
 				return ``
 			}
 		},
-	}).ParseGlob(`./web/*.html.go`))
+	}).ParseGlob(`./web/*.gohtml`))
 
 	minifier = minify.New()
 	minifier.AddFunc(`text/css`, css.Minify)
@@ -209,17 +212,65 @@ func handleLoggedRequest(w http.ResponseWriter, r *http.Request, directory strin
 	}
 }
 
+func handleUploadRequest(w http.ResponseWriter, r *http.Request, directory string) {
+	var uploadedFile multipart.File
+	var hostFile *os.File
+	var err error
+
+	r.Body = http.MaxBytesReader(w, r.Body, maxUploadSize)
+
+	uploadedFile, _, err = r.FormFile(`file`)
+	if uploadedFile != nil {
+		defer uploadedFile.Close()
+	}
+	if err != nil {
+		http.Error(w, fmt.Errorf(`Error while extracting file: %v`, err).Error(), http.StatusBadRequest)
+		return
+	}
+
+	filename, info := getPathInfo(directory, r.URL.Path)
+
+	if info == nil {
+		hostFile, err = os.Create(filename)
+	} else {
+		hostFile, err = os.Open(filename)
+	}
+
+	if hostFile != nil {
+		defer hostFile.Close()
+	}
+	if err != nil {
+		http.Error(w, fmt.Errorf(`Error while creating/opening file: %v`, err).Error(), http.StatusInternalServerError)
+		return
+	}
+
+	_, err = io.Copy(hostFile, uploadedFile)
+	if err != nil {
+		http.Error(w, fmt.Errorf(`Error while writing file: %v`, err).Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
 func browserHandler(directory string, authConfig map[string]*string) http.Handler {
 	url := *authConfig[`url`]
 	profiles := auth.LoadUsersProfiles(*authConfig[`users`])
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet && r.Method != http.MethodPost {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+
 		_, err := auth.IsAuthenticated(url, profiles, r)
 
 		if err != nil {
 			handleAnonymousRequest(w, r, err)
-		} else {
+		} else if r.Method == http.MethodPost {
 			handleLoggedRequest(w, r, directory)
+		} else if r.Method == http.MethodPost {
+			handleUploadRequest(w, r, directory)
+		} else {
+			httputils.NotFound(w)
 		}
 	})
 }
