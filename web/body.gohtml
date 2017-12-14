@@ -3,9 +3,14 @@
     {{- if .Login -}}
       {{- template "login" . -}}
     {{- else -}}
-      <a id="logout" href="{{ .Config.AuthURL }}/logout">
-        <img class="icon icon-large" src="{{ .Config.StaticURL }}/sign-out-alt.svg?v={{ .Config.Version }}" alt="signout" />
-      </a>
+      <div id="tools">
+        <a href="#">
+          <img class="icon icon-large" src="{{ .Config.StaticURL }}/svg/share-alt-square.svg?v={{ .Config.Version }}" alt="signout" />
+        </a>
+        <a href="{{ .Config.AuthURL }}/logout">
+          <img class="icon icon-large" src="{{ .Config.StaticURL }}/svg/sign-out-alt.svg?v={{ .Config.Version }}" alt="signout" />
+        </a>
+      </div>
       {{- if .Files -}}
         {{- template "files" . -}}
       {{- end -}}

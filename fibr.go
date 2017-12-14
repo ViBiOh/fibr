@@ -265,7 +265,7 @@ func browserHandler(directory string, authConfig map[string]*string) http.Handle
 
 		if err != nil {
 			handleAnonymousRequest(w, r, err)
-		} else if r.Method == http.MethodPost {
+		} else if r.Method == http.MethodGet {
 			handleLoggedRequest(w, r, directory)
 		} else if r.Method == http.MethodPost {
 			handleUploadRequest(w, r, directory)
