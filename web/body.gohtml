@@ -4,6 +4,9 @@
       {{- template "login" . -}}
     {{- else -}}
       <div id="tools">
+        <a href="#" data-upload-form>
+          <img class="icon icon-large" src="{{ .Config.StaticURL }}/svg/cloud-upload-alt.svg?v={{ .Config.Version }}" alt="signout" />
+        </form>
         <a href="#">
           <img class="icon icon-large" src="{{ .Config.StaticURL }}/svg/share-alt-square.svg?v={{ .Config.Version }}" alt="signout" />
         </a>
