@@ -43,6 +43,7 @@ type config struct {
 	StaticURL string
 	AuthURL   string
 	Version   string
+	Root      string
 }
 
 type seo struct {
@@ -148,8 +149,8 @@ func writePageTemplate(w http.ResponseWriter, content *page) error {
 	return nil
 }
 
-func createPage(path string, current os.FileInfo, files []os.FileInfo, login bool) *page {
-	pathParts := strings.Split(strings.Trim(path, `/`), `/`)
+func createPage(currentPath string, current os.FileInfo, files []os.FileInfo, login bool) *page {
+	pathParts := strings.Split(strings.Trim(currentPath, `/`), `/`)
 	if pathParts[0] == `` {
 		pathParts = nil
 	}
@@ -157,9 +158,9 @@ func createPage(path string, current os.FileInfo, files []os.FileInfo, login boo
 	return &page{
 		Config: templateConfig,
 		Seo: &seo{
-			Title:       fmt.Sprintf(`fibr - %s`, path),
-			Description: fmt.Sprintf(`FIle BRowser of directory %s on the server`, path),
-			URL:         path,
+			Title:       fmt.Sprintf(`fibr - %s`, currentPath),
+			Description: fmt.Sprintf(`FIle BRowser of directory %s on the server`, currentPath),
+			URL:         currentPath,
 			Img:         seoConfig.Img,
 			ImgHeight:   seoConfig.ImgHeight,
 			ImgWidth:    seoConfig.ImgWidth,
@@ -293,11 +294,12 @@ func handler() http.Handler {
 	})
 }
 
-func initTemplateConfiguration(staticURL string, authURL string, version string) {
+func initTemplateConfiguration(staticURL string, authURL string, version string, root string) {
 	templateConfig = &config{
 		StaticURL: staticURL,
 		AuthURL:   authURL,
 		Version:   version,
+		Root:      root,
 	}
 
 	seoConfig = &seo{
@@ -337,7 +339,8 @@ func main() {
 
 	alcotest.DoAndExit(alcotestConfig)
 
-	if _, info := getPathInfo(*directory); info == nil || !info.IsDir() {
+	_, info := getPathInfo(*directory)
+	if info == nil || !info.IsDir() {
 		log.Fatalf(`Directory %s is unreachable`, *directory)
 	}
 
@@ -346,7 +349,7 @@ func main() {
 	log.Printf(`Starting server on port %s`, *port)
 	log.Printf(`Serving file from %s`, *directory)
 
-	initTemplateConfiguration(*staticURL, *authConfig[`url`], *version)
+	initTemplateConfiguration(*staticURL, *authConfig[`url`], *version, info.Name())
 
 	serviceHandler = owasp.Handler(owaspConfig, browserHandler(*directory, authConfig))
 	apiHandler = prometheus.Handler(prometheusConfig, rate.Handler(rateConfig, gziphandler.GzipHandler(handler())))
