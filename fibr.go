@@ -27,6 +27,7 @@ import (
 	"github.com/tdewolff/minify/css"
 	"github.com/tdewolff/minify/html"
 	"github.com/tdewolff/minify/js"
+	"github.com/tdewolff/minify/xml"
 )
 
 type share struct {
@@ -40,6 +41,7 @@ type metadata struct {
 }
 
 type config struct {
+	PublicURL string
 	StaticURL string
 	AuthURL   string
 	Version   string
@@ -67,14 +69,14 @@ type page struct {
 const metadataFileName = `.fibr_meta`
 const maxUploadSize = 32 * 1024 * 2014 // 32 MB
 
-var archiveExtension = map[string]bool{`.zip`: true, `.tar`: true, `.gz`: true}
+var archiveExtension = map[string]bool{`.zip`: true, `.tar`: true, `.gz`: true, `.rar`: true}
 var audioExtension = map[string]bool{`.mp3`: true}
-var codeExtension = map[string]bool{`.html`: true, `.css`: true, `.js`: true, `.jsx`: true, `.json`: true, `.yml`: true, `.yaml`: true, `.toml`: true, `.md`: true, `.go`: true}
+var codeExtension = map[string]bool{`.html`: true, `.css`: true, `.js`: true, `.jsx`: true, `.json`: true, `.yml`: true, `.yaml`: true, `.toml`: true, `.md`: true, `.go`: true, `.py`: true, `.java`: true, `.xml`: true}
 var excelExtension = map[string]bool{`.xls`: true, `.xlsx`: true, `.xlsm`: true}
 var imageExtension = map[string]bool{`.jpg`: true, `.jpeg`: true, `.png`: true, `.gif`: true, `.svg`: true, `.tiff`: true}
 var pdfExtension = map[string]bool{`.pdf`: true}
 var videoExtension = map[string]bool{`.mp4`: true, `.mov`: true, `.avi`: true}
-var wordExtension = map[string]bool{`.doc`: true, `.docx`: true}
+var wordExtension = map[string]bool{`.doc`: true, `.docx`: true, `.docm`: true}
 
 var serviceHandler http.Handler
 var apiHandler http.Handler
@@ -126,6 +128,7 @@ func init() {
 	minifier.AddFunc(`text/css`, css.Minify)
 	minifier.AddFunc(`text/html`, html.Minify)
 	minifier.AddFunc(`text/javascript`, js.Minify)
+	minifier.AddFunc(`text/xml`, xml.Minify)
 }
 
 func getPathInfo(parts ...string) (string, os.FileInfo) {
@@ -146,6 +149,18 @@ func writePageTemplate(w http.ResponseWriter, content *page) error {
 
 	w.Header().Add(`Content-Type`, `text/html; charset=UTF-8`)
 	minifier.Minify(`text/html`, w, templateBuffer)
+	return nil
+}
+
+func writeSitemapTemplate(w http.ResponseWriter, content *config) error {
+	templateBuffer := &bytes.Buffer{}
+	templateBuffer.WriteString(`<?xml version="1.0" encoding="UTF-8"?>`)
+	if err := tpl.ExecuteTemplate(templateBuffer, `sitemap`, content); err != nil {
+		return err
+	}
+
+	w.Header().Add(`Content-Type`, `text/xml; charset=UTF-8`)
+	minifier.Minify(`text/xml`, w, templateBuffer)
 	return nil
 }
 
@@ -172,9 +187,14 @@ func createPage(currentPath string, current os.FileInfo, files []os.FileInfo, lo
 	}
 }
 
-func checkAndServeStatic(w http.ResponseWriter, r *http.Request) bool {
-	if r.URL.Path == `/robots.txt` || r.URL.Path == `/sitemap.xml` {
+func checkAndServeSEO(w http.ResponseWriter, r *http.Request) bool {
+	if r.URL.Path == `/robots.txt` {
 		http.ServeFile(w, r, path.Join(`web/static`, r.URL.Path))
+		return true
+	} else if r.URL.Path == `/sitemap.xml` {
+		if err := writeSitemapTemplate(w, templateConfig); err != nil {
+			httputils.InternalServerError(w, err)
+		}
 		return true
 	}
 
@@ -184,7 +204,7 @@ func checkAndServeStatic(w http.ResponseWriter, r *http.Request) bool {
 func handleAnonymousRequest(w http.ResponseWriter, r *http.Request, err error) {
 	if auth.IsForbiddenErr(err) {
 		httputils.Forbidden(w)
-	} else if !checkAndServeStatic(w, r) {
+	} else if !checkAndServeSEO(w, r) {
 		if err := writePageTemplate(w, createPage(r.URL.Path, nil, nil, true)); err != nil {
 			httputils.InternalServerError(w, err)
 		}
@@ -195,7 +215,7 @@ func handleLoggedRequest(w http.ResponseWriter, r *http.Request, directory strin
 	filename, info := getPathInfo(directory, r.URL.Path)
 
 	if info == nil {
-		if !checkAndServeStatic(w, r) {
+		if !checkAndServeSEO(w, r) {
 			httputils.NotFound(w)
 		}
 	} else if info.IsDir() {
@@ -294,8 +314,9 @@ func handler() http.Handler {
 	})
 }
 
-func initTemplateConfiguration(staticURL string, authURL string, version string, root string) {
+func initTemplateConfiguration(publicURL string, staticURL string, authURL string, version string, root string) {
 	templateConfig = &config{
+		PublicURL: publicURL,
 		StaticURL: staticURL,
 		AuthURL:   authURL,
 		Version:   version,
@@ -311,22 +332,37 @@ func initTemplateConfiguration(staticURL string, authURL string, version string,
 	}
 }
 
-func loadMetadata() {
+func loadMetadata() error {
 	rawMeta, err := ioutil.ReadFile(metadataFileName)
 	if err != nil {
-		log.Printf(`Error while reading metadata: %v`, err)
-		return
+		return fmt.Errorf(`Error while reading metadata: %v`, err)
 	}
 
 	if err = json.Unmarshal(rawMeta, &meta); err != nil {
-		log.Printf(`Error while unmarshalling metadata: %v`, err)
+		return fmt.Errorf(`Error while unmarshalling metadata: %v`, err)
 	}
+
+	return nil
+}
+
+func saveMetadata() error {
+	content, err := json.Marshal(&meta)
+	if err != nil {
+		return fmt.Errorf(`Error while marshalling metadata: %v`, err)
+	}
+
+	if err := ioutil.WriteFile(metadataFileName, content, 0600); err != nil {
+		return fmt.Errorf(`Error while writing metadata: %v`, err)
+	}
+
+	return nil
 }
 
 func main() {
 	port := flag.String(`port`, `1080`, `Listening port`)
 	tls := flag.Bool(`tls`, true, `Serve TLS content`)
 	directory := flag.String(`directory`, `/data/`, `Directory to serve`)
+	publicURL := flag.String(`publicURL`, `https://fibr.vibioh.fr`, `Public Server URL`)
 	staticURL := flag.String(`staticURL`, `https://fibr-static.vibioh.fr`, `Static Server URL`)
 	version := flag.String(`version`, ``, `Version (used mainly as a cache-buster)`)
 	authConfig := auth.Flags(`auth`)
@@ -344,12 +380,14 @@ func main() {
 		log.Fatalf(`Directory %s is unreachable`, *directory)
 	}
 
-	loadMetadata()
+	if err := loadMetadata(); err != nil {
+		log.Printf(`Error while loading metadata: %v`, err)
+	}
+
+	initTemplateConfiguration(*publicURL, *staticURL, *authConfig[`url`], *version, info.Name())
 
 	log.Printf(`Starting server on port %s`, *port)
 	log.Printf(`Serving file from %s`, *directory)
-
-	initTemplateConfiguration(*staticURL, *authConfig[`url`], *version, info.Name())
 
 	serviceHandler = owasp.Handler(owaspConfig, browserHandler(*directory, authConfig))
 	apiHandler = prometheus.Handler(prometheusConfig, rate.Handler(rateConfig, gziphandler.GzipHandler(handler())))
