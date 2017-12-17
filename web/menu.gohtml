@@ -1,13 +1,13 @@
 {{- define "menu" -}}
   <div id="tools">
     <a href="#" data-upload-form>
-      <object type="image/svg+xml" class="icon icon-large" data="{{ .Config.StaticURL }}/svg/cloud-upload-alt.svg?v={{ .Config.Version }}">upload</object>
+      <img class="icon icon-large" src="{{ .Config.StaticURL }}/svg/cloud-upload-alt.svg?v={{ .Config.Version }}" alt="upload" />
     </form>
     <a href="#">
-      <object type="image/svg+xml" class="icon icon-large" data="{{ .Config.StaticURL }}/svg/share-alt-square.svg?v={{ .Config.Version }}">share</object>
+      <img class="icon icon-large" src="{{ .Config.StaticURL }}/svg/share-alt-square.svg?v={{ .Config.Version }}" alt="share" />
     </a>
     <a href="{{ .Config.AuthURL }}/logout">
-      <object type="image/svg+xml" class="icon icon-large" data="{{ .Config.StaticURL }}/svg/sign-out-alt.svg?v={{ .Config.Version }}">signout</object>
+      <img class="icon icon-large" src="{{ .Config.StaticURL }}/svg/sign-out-alt.svg?v={{ .Config.Version }}" alt="signout" />
     </a>
   </div>
 {{- end -}}

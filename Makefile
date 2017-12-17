@@ -42,6 +42,7 @@ docker-push:
 	docker push ${DOCKER_USER}/fibr-static
 
 start-deps:
+	go get -u github.com/ViBiOh/viws
 	go get -u github.com/ViBiOh/auth
 	go get -u github.com/ViBiOh/auth/bcrypt
 
@@ -53,10 +54,16 @@ start-auth:
 	  -port 1081 \
 	  -corsCredentials
 
+start-static:
+	viws \
+		-directory `pwd`/web/static/ \
+		-port 1082
+
 start-api:
 	go run fibr.go \
 	  -tls=false \
 	  -directory `pwd` \
+	  -staticURL http://localhost:1082 \
 	  -authUrl http://localhost:1081 \
 	  -authUsers admin:admin \
-	  -csp "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' fibr-static.vibioh.fr; object-src 'self' fibr-static.vibioh.fr"
+	  -csp "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' localhost:1082"
