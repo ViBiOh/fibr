@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -18,16 +17,12 @@ import (
 	"github.com/NYTimes/gziphandler"
 	"github.com/ViBiOh/alcotest/alcotest"
 	"github.com/ViBiOh/auth/auth"
+	"github.com/ViBiOh/fibr/utils"
 	"github.com/ViBiOh/httputils"
 	"github.com/ViBiOh/httputils/cert"
 	"github.com/ViBiOh/httputils/owasp"
 	"github.com/ViBiOh/httputils/prometheus"
 	"github.com/ViBiOh/httputils/rate"
-	"github.com/tdewolff/minify"
-	"github.com/tdewolff/minify/css"
-	"github.com/tdewolff/minify/html"
-	"github.com/tdewolff/minify/js"
-	"github.com/tdewolff/minify/xml"
 )
 
 type share struct {
@@ -63,7 +58,6 @@ type page struct {
 	Current   os.FileInfo
 	PathParts []string
 	Files     []os.FileInfo
-	Login     bool
 }
 
 const metadataFileName = `.fibr_meta`
@@ -81,7 +75,6 @@ var wordExtension = map[string]bool{`.doc`: true, `.docx`: true, `.docm`: true}
 var serviceHandler http.Handler
 var apiHandler http.Handler
 var tpl *template.Template
-var minifier *minify.M
 
 var templateConfig *config
 var seoConfig *seo
@@ -123,12 +116,6 @@ func init() {
 			}
 		},
 	}).ParseGlob(`./web/*.gohtml`))
-
-	minifier = minify.New()
-	minifier.AddFunc(`text/css`, css.Minify)
-	minifier.AddFunc(`text/html`, html.Minify)
-	minifier.AddFunc(`text/javascript`, js.Minify)
-	minifier.AddFunc(`text/xml`, xml.Minify)
 }
 
 func getPathInfo(parts ...string) (string, os.FileInfo) {
@@ -141,30 +128,7 @@ func getPathInfo(parts ...string) (string, os.FileInfo) {
 	return fullPath, info
 }
 
-func writePageTemplate(w http.ResponseWriter, content *page) error {
-	templateBuffer := &bytes.Buffer{}
-	if err := tpl.ExecuteTemplate(templateBuffer, `page`, content); err != nil {
-		return err
-	}
-
-	w.Header().Add(`Content-Type`, `text/html; charset=UTF-8`)
-	minifier.Minify(`text/html`, w, templateBuffer)
-	return nil
-}
-
-func writeSitemapTemplate(w http.ResponseWriter, content *config) error {
-	templateBuffer := &bytes.Buffer{}
-	templateBuffer.WriteString(`<?xml version="1.0" encoding="UTF-8"?>`)
-	if err := tpl.ExecuteTemplate(templateBuffer, `sitemap`, content); err != nil {
-		return err
-	}
-
-	w.Header().Add(`Content-Type`, `text/xml; charset=UTF-8`)
-	minifier.Minify(`text/xml`, w, templateBuffer)
-	return nil
-}
-
-func createPage(currentPath string, current os.FileInfo, files []os.FileInfo, login bool) *page {
+func createPage(currentPath string, current os.FileInfo, files []os.FileInfo) *page {
 	pathParts := strings.Split(strings.Trim(currentPath, `/`), `/`)
 	if pathParts[0] == `` {
 		pathParts = nil
@@ -183,7 +147,6 @@ func createPage(currentPath string, current os.FileInfo, files []os.FileInfo, lo
 		PathParts: pathParts,
 		Current:   current,
 		Files:     files,
-		Login:     login,
 	}
 }
 
@@ -192,7 +155,7 @@ func checkAndServeSEO(w http.ResponseWriter, r *http.Request) bool {
 		http.ServeFile(w, r, path.Join(`web/static`, r.URL.Path))
 		return true
 	} else if r.URL.Path == `/sitemap.xml` {
-		if err := writeSitemapTemplate(w, templateConfig); err != nil {
+		if err := utils.WriteXMLTemplate(tpl, w, `sitemap`, templateConfig); err != nil {
 			httputils.InternalServerError(w, err)
 		}
 		return true
@@ -205,7 +168,7 @@ func handleAnonymousRequest(w http.ResponseWriter, r *http.Request, err error) {
 	if auth.IsForbiddenErr(err) {
 		httputils.Forbidden(w)
 	} else if !checkAndServeSEO(w, r) {
-		if err := writePageTemplate(w, createPage(r.URL.Path, nil, nil, true)); err != nil {
+		if err := utils.WriteHTMLTemplate(tpl, w, `login`, createPage(r.URL.Path, nil, nil)); err != nil {
 			httputils.InternalServerError(w, err)
 		}
 	}
@@ -225,7 +188,7 @@ func handleLoggedRequest(w http.ResponseWriter, r *http.Request, directory strin
 			return
 		}
 
-		if err := writePageTemplate(w, createPage(r.URL.Path, info, files, false)); err != nil {
+		if err := utils.WriteHTMLTemplate(tpl, w, `files`, createPage(r.URL.Path, info, files)); err != nil {
 			httputils.InternalServerError(w, err)
 		}
 	} else {
@@ -274,7 +237,7 @@ func handleUploadRequest(w http.ResponseWriter, r *http.Request, directory strin
 
 func browserHandler(directory string, authConfig map[string]*string) http.Handler {
 	url := *authConfig[`url`]
-	profiles := auth.LoadUsersProfiles(*authConfig[`users`])
+	users := auth.LoadUsersProfiles(*authConfig[`users`])
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet && r.Method != http.MethodPost {
@@ -282,7 +245,7 @@ func browserHandler(directory string, authConfig map[string]*string) http.Handle
 			return
 		}
 
-		_, err := auth.IsAuthenticated(url, profiles, r)
+		_, err := auth.IsAuthenticated(url, users, r)
 
 		if err != nil {
 			handleAnonymousRequest(w, r, err)

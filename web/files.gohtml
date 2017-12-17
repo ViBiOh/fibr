@@ -1,4 +1,7 @@
 {{- define "files" -}}
+  {{- template "header" . -}}
+  {{- template "menu" . -}}
+
   {{- $root := . -}}
   <header class="header">
     <h1 class="title">Directory
@@ -8,6 +11,7 @@
       {{- end -}}
     </h1>
   </header>
+
   <ul class="files">
     {{- range .Files -}}
       <li class="file">
@@ -20,4 +24,6 @@
       </li>
     {{- end -}}
   </ul>
+
+  {{- template "footer" . -}}
 {{- end -}}
