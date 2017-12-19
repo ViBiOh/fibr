@@ -35,21 +35,23 @@ type metadata struct {
 
 const metadataFileName = `.fibr_meta`
 
-var archiveExtension = map[string]bool{`.zip`: true, `.tar`: true, `.gz`: true, `.rar`: true}
-var audioExtension = map[string]bool{`.mp3`: true}
-var codeExtension = map[string]bool{`.html`: true, `.css`: true, `.js`: true, `.jsx`: true, `.json`: true, `.yml`: true, `.yaml`: true, `.toml`: true, `.md`: true, `.go`: true, `.py`: true, `.java`: true, `.xml`: true}
-var excelExtension = map[string]bool{`.xls`: true, `.xlsx`: true, `.xlsm`: true}
-var imageExtension = map[string]bool{`.jpg`: true, `.jpeg`: true, `.png`: true, `.gif`: true, `.svg`: true, `.tiff`: true}
-var pdfExtension = map[string]bool{`.pdf`: true}
-var videoExtension = map[string]bool{`.mp4`: true, `.mov`: true, `.avi`: true}
-var wordExtension = map[string]bool{`.doc`: true, `.docx`: true, `.docm`: true}
+var (
+	archiveExtension = map[string]bool{`.zip`: true, `.tar`: true, `.gz`: true, `.rar`: true}
+	audioExtension   = map[string]bool{`.mp3`: true}
+	codeExtension    = map[string]bool{`.html`: true, `.css`: true, `.js`: true, `.jsx`: true, `.json`: true, `.yml`: true, `.yaml`: true, `.toml`: true, `.md`: true, `.go`: true, `.py`: true, `.java`: true, `.xml`: true}
+	excelExtension   = map[string]bool{`.xls`: true, `.xlsx`: true, `.xlsm`: true}
+	imageExtension   = map[string]bool{`.jpg`: true, `.jpeg`: true, `.png`: true, `.gif`: true, `.svg`: true, `.tiff`: true}
+	pdfExtension     = map[string]bool{`.pdf`: true}
+	videoExtension   = map[string]bool{`.mp4`: true, `.mov`: true, `.avi`: true}
+	wordExtension    = map[string]bool{`.doc`: true, `.docx`: true, `.docm`: true}
+)
 
 var serviceHandler http.Handler
 var apiHandler http.Handler
 var tpl *template.Template
+var meta metadata
 
 var templateConfig map[string]interface{}
-var meta metadata
 
 func init() {
 	tpl = template.Must(template.New(`fibr`).Funcs(template.FuncMap{
@@ -145,11 +147,13 @@ func handler() http.Handler {
 
 func initTemplateConfiguration(publicURL string, staticURL string, authURL string, version string, root string) {
 	templateConfig = map[string]interface{}{
-		`PublicURL`: publicURL,
-		`StaticURL`: staticURL,
-		`AuthURL`:   authURL,
-		`Version`:   version,
-		`Root`:      root,
+		`Config`: map[string]interface{}{
+			`PublicURL`: publicURL,
+			`StaticURL`: staticURL,
+			`AuthURL`:   authURL,
+			`Version`:   version,
+			`Root`:      root,
+		},
 		`Seo`: map[string]interface{}{
 			`Title`:       `fibr`,
 			`Description`: fmt.Sprintf(`FIle BRowser on the server`),

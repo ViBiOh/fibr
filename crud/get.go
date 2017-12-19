@@ -20,21 +20,23 @@ func generatePageContent(baseContent map[string]interface{}, currentPath string,
 	}
 
 	seo := baseContent[`Seo`].(map[string]interface{})
-
-	return map[string]interface{}{
-		`Config`:    baseContent,
-		`PathParts`: pathParts,
-		`Current`:   current,
-		`Files`:     files,
-		`Seo`: map[string]interface{}{
-			`Title`:       fmt.Sprintf(`fibr - %s`, currentPath),
-			`Description`: fmt.Sprintf(`FIle BRowser of directory %s on the server`, currentPath),
-			`URL`:         currentPath,
-			`Img`:         seo[`Img`],
-			`ImgHeight`:   seo[`ImgHeight`],
-			`ImgWidth`:    seo[`ImgWidth`],
-		},
+	pageContent := map[string]interface{}{
+		`Config`: baseContent[`Config`],
 	}
+
+	pageContent[`PathParts`] = pathParts
+	pageContent[`Current`] = current
+	pageContent[`Files`] = files
+	pageContent[`Seo`] = map[string]interface{}{
+		`Title`:       fmt.Sprintf(`fibr - %s`, currentPath),
+		`Description`: fmt.Sprintf(`FIle BRowser of directory %s on the server`, currentPath),
+		`URL`:         currentPath,
+		`Img`:         seo[`Img`],
+		`ImgHeight`:   seo[`ImgHeight`],
+		`ImgWidth`:    seo[`ImgWidth`],
+	}
+
+	return pageContent
 }
 
 // CheckAndServeSEO check if filename match SEO and serve it, or not
