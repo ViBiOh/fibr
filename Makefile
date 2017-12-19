@@ -63,7 +63,6 @@ start-api:
 	go run fibr.go \
 	  -tls=false \
 	  -directory `pwd` \
-	  -staticURL http://localhost:1082 \
 	  -authUrl http://localhost:1081 \
 	  -authUsers admin:admin \
-	  -csp "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' localhost:1082"
+	  -csp "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' fibr-static.vibioh.fr"

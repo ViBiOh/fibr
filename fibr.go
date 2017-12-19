@@ -5,18 +5,16 @@ import (
 	"flag"
 	"fmt"
 	"html/template"
-	"io"
 	"io/ioutil"
 	"log"
-	"mime/multipart"
 	"net/http"
 	"os"
 	"path"
-	"strings"
 
 	"github.com/NYTimes/gziphandler"
 	"github.com/ViBiOh/alcotest/alcotest"
 	"github.com/ViBiOh/auth/auth"
+	"github.com/ViBiOh/fibr/crud"
 	"github.com/ViBiOh/fibr/utils"
 	"github.com/ViBiOh/httputils"
 	"github.com/ViBiOh/httputils/cert"
@@ -35,33 +33,7 @@ type metadata struct {
 	shared map[string]share
 }
 
-type config struct {
-	PublicURL string
-	StaticURL string
-	AuthURL   string
-	Version   string
-	Root      string
-}
-
-type seo struct {
-	Title       string
-	Description string
-	URL         string
-	Img         string
-	ImgHeight   uint
-	ImgWidth    uint
-}
-
-type page struct {
-	Config    *config
-	Seo       *seo
-	Current   os.FileInfo
-	PathParts []string
-	Files     []os.FileInfo
-}
-
 const metadataFileName = `.fibr_meta`
-const maxUploadSize = 32 * 1024 * 2014 // 32 MB
 
 var archiveExtension = map[string]bool{`.zip`: true, `.tar`: true, `.gz`: true, `.rar`: true}
 var audioExtension = map[string]bool{`.mp3`: true}
@@ -76,8 +48,7 @@ var serviceHandler http.Handler
 var apiHandler http.Handler
 var tpl *template.Template
 
-var templateConfig *config
-var seoConfig *seo
+var templateConfig map[string]interface{}
 var meta metadata
 
 func init() {
@@ -118,120 +89,13 @@ func init() {
 	}).ParseGlob(`./web/*.gohtml`))
 }
 
-func getPathInfo(parts ...string) (string, os.FileInfo) {
-	fullPath := path.Join(parts...)
-	info, err := os.Stat(fullPath)
-
-	if err != nil {
-		return fullPath, nil
-	}
-	return fullPath, info
-}
-
-func createPage(currentPath string, current os.FileInfo, files []os.FileInfo) *page {
-	pathParts := strings.Split(strings.Trim(currentPath, `/`), `/`)
-	if pathParts[0] == `` {
-		pathParts = nil
-	}
-
-	return &page{
-		Config: templateConfig,
-		Seo: &seo{
-			Title:       fmt.Sprintf(`fibr - %s`, currentPath),
-			Description: fmt.Sprintf(`FIle BRowser of directory %s on the server`, currentPath),
-			URL:         currentPath,
-			Img:         seoConfig.Img,
-			ImgHeight:   seoConfig.ImgHeight,
-			ImgWidth:    seoConfig.ImgWidth,
-		},
-		PathParts: pathParts,
-		Current:   current,
-		Files:     files,
-	}
-}
-
-func checkAndServeSEO(w http.ResponseWriter, r *http.Request) bool {
-	if r.URL.Path == `/robots.txt` {
-		http.ServeFile(w, r, path.Join(`web/static`, r.URL.Path))
-		return true
-	} else if r.URL.Path == `/sitemap.xml` {
-		if err := utils.WriteXMLTemplate(tpl, w, `sitemap`, templateConfig); err != nil {
-			httputils.InternalServerError(w, err)
-		}
-		return true
-	}
-
-	return false
-}
-
 func handleAnonymousRequest(w http.ResponseWriter, r *http.Request, err error) {
 	if auth.IsForbiddenErr(err) {
 		httputils.Forbidden(w)
-	} else if !checkAndServeSEO(w, r) {
-		if err := utils.WriteHTMLTemplate(tpl, w, `login`, createPage(r.URL.Path, nil, nil)); err != nil {
+	} else if !crud.CheckAndServeSEO(w, r, tpl, templateConfig) {
+		if err := utils.WriteHTMLTemplate(tpl, w, `login`, templateConfig); err != nil {
 			httputils.InternalServerError(w, err)
 		}
-	}
-}
-
-func handleLoggedRequest(w http.ResponseWriter, r *http.Request, directory string) {
-	filename, info := getPathInfo(directory, r.URL.Path)
-
-	if info == nil {
-		if !checkAndServeSEO(w, r) {
-			httputils.NotFound(w)
-		}
-	} else if info.IsDir() {
-		files, err := ioutil.ReadDir(filename)
-		if err != nil {
-			httputils.InternalServerError(w, err)
-			return
-		}
-
-		if err := utils.WriteHTMLTemplate(tpl, w, `files`, createPage(r.URL.Path, info, files)); err != nil {
-			httputils.InternalServerError(w, err)
-		}
-	} else {
-		http.ServeFile(w, r, filename)
-	}
-}
-
-func handleUploadRequest(w http.ResponseWriter, r *http.Request, directory string) {
-	var uploadedFile multipart.File
-	var hostFile *os.File
-	var err error
-
-	r.Body = http.MaxBytesReader(w, r.Body, maxUploadSize)
-
-	uploadedFile, _, err = r.FormFile(`file`)
-	if uploadedFile != nil {
-		defer uploadedFile.Close()
-	}
-	if err != nil {
-		http.Error(w, fmt.Errorf(`Error while extracting file: %v`, err).Error(), http.StatusBadRequest)
-		return
-	}
-
-	filename, info := getPathInfo(directory, r.URL.Path)
-
-	if info == nil {
-		hostFile, err = os.Create(filename)
-	} else {
-		hostFile, err = os.Open(filename)
-	}
-
-	if hostFile != nil {
-		defer hostFile.Close()
-	}
-	if err != nil {
-		http.Error(w, fmt.Errorf(`Error while creating/opening file: %v`, err).Error(), http.StatusInternalServerError)
-		return
-	}
-
-	_, err = io.Copy(hostFile, uploadedFile)
-	if err != nil {
-		http.Error(w, fmt.Errorf(`Error while writing file: %v`, err).Error(), http.StatusInternalServerError)
-		return
 	}
 }
 
@@ -240,7 +104,7 @@ func browserHandler(directory string, authConfig map[string]*string) http.Handle
 	users := auth.LoadUsersProfiles(*authConfig[`users`])
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet && r.Method != http.MethodPost {
+		if r.Method != http.MethodGet && r.Method != http.MethodPost && r.Method != http.MethodDelete {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			return
 		}
@@ -250,9 +114,11 @@ func browserHandler(directory string, authConfig map[string]*string) http.Handle
 		if err != nil {
 			handleAnonymousRequest(w, r, err)
 		} else if r.Method == http.MethodGet {
-			handleLoggedRequest(w, r, directory)
+			crud.Get(w, r, directory, tpl, templateConfig)
 		} else if r.Method == http.MethodPost {
-			handleUploadRequest(w, r, directory)
+			crud.Save(w, r, directory)
+		} else if r.Method == http.MethodDelete {
+			crud.Delete(w, r, directory)
 		} else {
 			httputils.NotFound(w)
 		}
@@ -278,20 +144,20 @@ func handler() http.Handler {
 }
 
 func initTemplateConfiguration(publicURL string, staticURL string, authURL string, version string, root string) {
-	templateConfig = &config{
-		PublicURL: publicURL,
-		StaticURL: staticURL,
-		AuthURL:   authURL,
-		Version:   version,
-		Root:      root,
-	}
-
-	seoConfig = &seo{
-		Title:     `fibr`,
-		URL:       `/`,
-		Img:       path.Join(staticURL, `/favicon/android-chrome-512x512.png`),
-		ImgHeight: 512,
-		ImgWidth:  512,
+	templateConfig = map[string]interface{}{
+		`PublicURL`: publicURL,
+		`StaticURL`: staticURL,
+		`AuthURL`:   authURL,
+		`Version`:   version,
+		`Root`:      root,
+		`Seo`: map[string]interface{}{
+			`Title`:       `fibr`,
+			`Description`: fmt.Sprintf(`FIle BRowser on the server`),
+			`URL`:         `/`,
+			`Img`:         path.Join(staticURL, `/favicon/android-chrome-512x512.png`),
+			`ImgHeight`:   512,
+			`ImgWidth`:    512,
+		},
 	}
 }
 
@@ -338,7 +204,7 @@ func main() {
 
 	alcotest.DoAndExit(alcotestConfig)
 
-	_, info := getPathInfo(*directory)
+	_, info := utils.GetPathInfo(*directory)
 	if info == nil || !info.IsDir() {
 		log.Fatalf(`Directory %s is unreachable`, *directory)
 	}
