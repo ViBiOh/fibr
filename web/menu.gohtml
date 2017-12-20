@@ -1,8 +1,14 @@
 {{- define "menu" -}}
   <div id="tools">
-    <a href="#" data-upload-form>
+    <label>
       <img class="icon icon-large" src="{{ .Config.StaticURL }}/svg/cloud-upload-alt.svg?v={{ .Config.Version }}" alt="upload" />
-    </form>
+      <input type="checkbox" class="toggler" />
+      <div>
+        <div class="modal flex flex-center">
+          {{- template "upload-form" -}}
+        </div>
+      </div>
+    </label>
     <a href="#">
       <img class="icon icon-large" src="{{ .Config.StaticURL }}/svg/share-alt-square.svg?v={{ .Config.Version }}" alt="share" />
     </a>

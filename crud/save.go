@@ -3,6 +3,7 @@ package crud
 import (
 	"fmt"
 	"io"
+	"mime/multipart"
 	"net/http"
 	"os"
 	"strings"
@@ -13,15 +14,15 @@ import (
 
 const maxUploadSize = 32 * 1024 * 2014 // 32 MB
 
-func getFileForm(w http.ResponseWriter, r *http.Request) (io.ReadCloser, error) {
+func getFileForm(w http.ResponseWriter, r *http.Request) (io.ReadCloser, *multipart.FileHeader, error) {
 	r.Body = http.MaxBytesReader(w, r.Body, maxUploadSize)
 
-	uploadedFile, _, err := r.FormFile(`file`)
+	uploadedFile, uploadedFileHeader, err := r.FormFile(`file`)
 	if err != nil {
-		return uploadedFile, fmt.Errorf(`Error while reading file form: %v`, err)
+		return uploadedFile, uploadedFileHeader, fmt.Errorf(`Error while reading file form: %v`, err)
 	}
 
-	return uploadedFile, nil
+	return uploadedFile, uploadedFileHeader, nil
 }
 
 func createOrOpenFile(filename string, info os.FileInfo) (io.WriteCloser, error) {
@@ -31,16 +32,24 @@ func createOrOpenFile(filename string, info os.FileInfo) (io.WriteCloser, error)
 	return os.Open(filename)
 }
 
-func saveDir(w http.ResponseWriter, r *http.Request, filename string) {
-	if err := os.MkdirAll(filename, 0700); err != nil {
-		httputils.InternalServerError(w, fmt.Errorf(`Error while creating directory: %v`, err))
+// Create given path directory to filesystem
+func CreateDir(w http.ResponseWriter, r *http.Request, directory string) {
+	if strings.HasSuffix(r.URL.Path, `/`) {
+		filename, _ := utils.GetPathInfo(directory, r.URL.Path)
+
+		if err := os.MkdirAll(filename, 0700); err != nil {
+			httputils.InternalServerError(w, fmt.Errorf(`Error while creating directory: %v`, err))
+		} else {
+			w.WriteHeader(http.StatusCreated)
+		}
 	} else {
-		w.WriteHeader(http.StatusCreated)
+		httputils.Forbidden(w)
 	}
 }
 
-func saveFile(w http.ResponseWriter, r *http.Request, filename string, info os.FileInfo) {
-	uploadedFile, err := getFileForm(w, r)
+// Save form file to filesystem
+func SaveFile(w http.ResponseWriter, r *http.Request, directory string) {
+	uploadedFile, uploadedFileHeader, err := getFileForm(w, r)
 	if uploadedFile != nil {
 		defer uploadedFile.Close()
 	}
@@ -49,7 +58,7 @@ func saveFile(w http.ResponseWriter, r *http.Request, filename string, info os.F
 		return
 	}
 
-	hostFile, err := createOrOpenFile(filename, info)
+	hostFile, err := createOrOpenFile(utils.GetPathInfo(directory, r.URL.Path, uploadedFileHeader.Filename))
 	if hostFile != nil {
 		defer hostFile.Close()
 	}
@@ -64,19 +73,4 @@ func saveFile(w http.ResponseWriter, r *http.Request, filename string, info os.F
 	}
 
 	w.WriteHeader(http.StatusCreated)
-}
-
-// Save given path to filesystem (create directory or file given on Path)
-func Save(w http.ResponseWriter, r *http.Request, directory string) {
-	filename, info := utils.GetPathInfo(directory, r.URL.Path)
-
-	if strings.HasSuffix(r.URL.Path, `/`) {
-		saveDir(w, r, filename)
-		return
-	} else if info != nil && info.IsDir() {
-		httputils.Forbidden(w)
-		return
-	}
-
-	saveFile(w, r, filename, info)
 }

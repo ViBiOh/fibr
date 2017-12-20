@@ -31,20 +31,27 @@
       font-weight: 400;
     }
 
-    #tools {
-      bottom: 10px;
-      position: fixed;
-      right: 10px;
-    }
-
     .center {
       text-align: center;
+    }
+
+    .full {
+      width: 100%;
+    }
+
+    .flex {
+      display: flex;
+    }
+
+    .flex-center {
+      align-items: center;
+      justify-content: center;
     }
 
     .header {
       background-color: whitesmoke;
       color: dimgray;
-      padding: 5px 10px;
+      padding: 0.5rem 1rem;
     }
 
     .title {
@@ -59,26 +66,83 @@
     }
 
     .file {
-      line-height: 20px;
-      padding: 5px 0 0 10px;
+      line-height: 2rem;
+      padding: 0.5rem 0 0 1rem;
     }
 
     .icon {
-      height: 20px;
-      margin-right: 5px;
+      height: 2rem;
+      margin-right: 0.5rem;
       vertical-align: middle;
-      width: 20px;
+      width: 2rem;
     }
 
     .icon-large {
-      height: 40px;
-      width: 40px;
+      height: 4rem;
+      width: 4rem;
     }
 
-    .icon--button {
-      height: 100px;
-      margin-right: 20px;
-      width: 100px;
+    .icon-xlarge {
+      height: 10rem;
+      margin-right: 2rem;
+      width: 10rem;
+    }
+
+    .fields {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    .button {
+      border-radius: 4px;
+      border: 0;
+      padding: 1rem;
+    }
+
+    .bg-important {
+      background-color: royalblue;
+      color: ghostwhite;
+    }
+
+    .bg-success {
+      background-color: yellowgreen;
+      color: ghostwhite;
+    }
+
+    .bg-danger {
+      background-color: tomato;
+      color: ghostwhite;
+    }
+
+    .modal {
+      background-color: rgba(105, 105, 105, 0.75);
+      height: 100%;
+      left: 0;
+      pointer-events: none;
+      position: fixed;
+      top: 0;
+      width: 100%;
+    }
+
+    .toggler,
+    .toggler + * {
+      display: none;
+      text-decoration: none;
+    }
+
+    .toggler:checked + * {
+      display: inherit;
+    }
+
+    #tools {
+      bottom: 1rem;
+      position: fixed;
+      right: 1rem;
+    }
+
+    #upload-form {
+      background-color: whitesmoke;
+      pointer-events: auto;
     }
 
     @media print {

@@ -106,7 +106,7 @@ func browserHandler(directory string, authConfig map[string]*string) http.Handle
 	users := auth.LoadUsersProfiles(*authConfig[`users`])
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet && r.Method != http.MethodPost && r.Method != http.MethodDelete {
+		if r.Method != http.MethodGet && r.Method != http.MethodPut && r.Method != http.MethodPost && r.Method != http.MethodDelete {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			return
 		}
@@ -117,8 +117,10 @@ func browserHandler(directory string, authConfig map[string]*string) http.Handle
 			handleAnonymousRequest(w, r, err)
 		} else if r.Method == http.MethodGet {
 			crud.Get(w, r, directory, tpl, templateConfig)
+		} else if r.Method == http.MethodPut {
+			crud.CreateDir(w, r, directory)
 		} else if r.Method == http.MethodPost {
-			crud.Save(w, r, directory)
+			crud.SaveFile(w, r, directory)
 		} else if r.Method == http.MethodDelete {
 			crud.Delete(w, r, directory)
 		} else {

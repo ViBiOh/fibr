@@ -1,0 +1,13 @@
+{{- define "upload-form" -}}
+  <form id="upload-form" method="POST" enctype="multipart/form-data">
+    <h2 class="header">Upload a file</h2>
+    <p class="fields">
+      <input type="file" name="file" class="full" />
+    </p>
+    <p class="center">
+      <button type="submit" class="button bg-important">
+        Submit
+      </button>
+    </p>
+  </form>
+{{- end -}}
