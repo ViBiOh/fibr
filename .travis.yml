@@ -3,6 +3,9 @@ sudo: required
 services:
 - docker
 go: 1.9
+cache:
+  directories:
+    - ${TRAVIS_BUILD_DIR}/vendor
 after_success: |
   bash <(curl -s https://codecov.io/bash)
 
