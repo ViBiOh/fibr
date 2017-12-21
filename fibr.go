@@ -27,6 +27,7 @@ type share struct {
 	id     string
 	path   string
 	public bool
+	edit   bool
 }
 
 type metadata struct {
@@ -46,12 +47,13 @@ var (
 	wordExtension    = map[string]bool{`.doc`: true, `.docx`: true, `.docm`: true}
 )
 
-var serviceHandler http.Handler
-var apiHandler http.Handler
-var tpl *template.Template
-var meta metadata
-
-var templateConfig map[string]interface{}
+var (
+	serviceHandler http.Handler
+	apiHandler     http.Handler
+	tpl            *template.Template
+	meta           metadata
+	baseContent    map[string]interface{}
+)
 
 func init() {
 	tpl = template.Must(template.New(`fibr`).Funcs(template.FuncMap{
@@ -94,8 +96,8 @@ func init() {
 func handleAnonymousRequest(w http.ResponseWriter, r *http.Request, err error) {
 	if auth.IsForbiddenErr(err) {
 		httputils.Forbidden(w)
-	} else if !crud.CheckAndServeSEO(w, r, tpl, templateConfig) {
-		if err := utils.WriteHTMLTemplate(tpl, w, `login`, templateConfig); err != nil {
+	} else if !crud.CheckAndServeSEO(w, r, tpl, baseContent) {
+		if err := utils.WriteHTMLTemplate(tpl, w, `login`, baseContent); err != nil {
 			httputils.InternalServerError(w, err)
 		}
 	}
@@ -116,7 +118,7 @@ func browserHandler(directory string, authConfig map[string]*string) http.Handle
 		if err != nil {
 			handleAnonymousRequest(w, r, err)
 		} else if r.Method == http.MethodGet {
-			crud.Get(w, r, directory, tpl, templateConfig)
+			crud.Get(w, r, directory, tpl, baseContent)
 		} else if r.Method == http.MethodPut {
 			crud.CreateDir(w, r, directory)
 		} else if r.Method == http.MethodPost {
@@ -147,8 +149,8 @@ func handler() http.Handler {
 	})
 }
 
-func initTemplateConfiguration(publicURL string, staticURL string, authURL string, version string, root string) {
-	templateConfig = map[string]interface{}{
+func initBaseContent(publicURL string, staticURL string, authURL string, version string, root string) {
+	baseContent = map[string]interface{}{
 		`Config`: map[string]interface{}{
 			`PublicURL`: publicURL,
 			`StaticURL`: staticURL,
@@ -219,7 +221,7 @@ func main() {
 		log.Printf(`Error while loading metadata: %v`, err)
 	}
 
-	initTemplateConfiguration(*publicURL, *staticURL, *authConfig[`url`], *version, info.Name())
+	initBaseContent(*publicURL, *staticURL, *authConfig[`url`], *version, info.Name())
 
 	log.Printf(`Starting server on port %s`, *port)
 	log.Printf(`Serving file from %s`, *directory)

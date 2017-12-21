@@ -1,0 +1,7 @@
+{{- define "message" -}}
+  {{- if . -}}
+    <p class="message full {{ if eq .Level "success" -}}bg-success{{- else if eq .Level "error" -}}bg-danger{{- end -}}">
+      {{ .Content }}
+    </p>
+  {{- end -}}
+{{- end -}}

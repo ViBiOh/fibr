@@ -3,6 +3,7 @@
   {{- template "menu" . -}}
 
   {{- $root := . -}}
+
   <header class="header">
     <h1 class="title">Directory
       <a href="/">{{ .Config.Root }}</a>
@@ -11,6 +12,8 @@
       {{- end -}}
     </h1>
   </header>
+
+  {{- template "message" .Message -}}
 
   <ul class="files">
     {{- range .Files -}}
