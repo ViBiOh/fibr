@@ -97,7 +97,7 @@ func handleAnonymousRequest(w http.ResponseWriter, r *http.Request, err error) {
 	if auth.IsForbiddenErr(err) {
 		httputils.Forbidden(w)
 	} else if !crud.CheckAndServeSEO(w, r, tpl, baseContent) {
-		if err := utils.WriteHTMLTemplate(tpl, w, `login`, baseContent); err != nil {
+		if err := httputils.WriteHTMLTemplate(tpl.Lookup(`login`), w, baseContent); err != nil {
 			httputils.InternalServerError(w, err)
 		}
 	}

@@ -2,28 +2,28 @@
 
 
 [[projects]]
-  branch = "master"
   name = "github.com/NYTimes/gziphandler"
   packages = ["."]
   revision = "d6f46609c7629af3a02d791a4666866eed3cbd3e"
+  version = "v1.0.0"
 
 [[projects]]
   branch = "master"
   name = "github.com/ViBiOh/alcotest"
   packages = ["alcotest","httpclient"]
-  revision = "99e8506061b4d48c6583ae2af977bc48f1a7058a"
+  revision = "7187d04caa2bfd06fc89ca52092c0ff924ff39bc"
 
 [[projects]]
   branch = "master"
   name = "github.com/ViBiOh/auth"
   packages = ["auth","cookie"]
-  revision = "90c3e57dc3080f9fbd5183c0b68a3a3ae7a855b6"
+  revision = "e99d49be358db8d7a1be89503e5cee72b42f27e5"
 
 [[projects]]
   branch = "master"
   name = "github.com/ViBiOh/httputils"
   packages = [".","cert","owasp","prometheus","rate","tools"]
-  revision = "a6b4cec81a40786b75c67462cb80e4587cfb5aa1"
+  revision = "4e93594d7beb0c2661becfd3c0c2d2eaa2496147"
 
 [[projects]]
   branch = "master"
@@ -65,23 +65,23 @@
   branch = "master"
   name = "github.com/prometheus/procfs"
   packages = [".","xfs"]
-  revision = "a6e9df898b1336106c743392c48ee0b71f5c4efa"
+  revision = "8f918ac9ab4be3a790338bda8624fec5d71260b3"
 
 [[projects]]
   name = "github.com/tdewolff/minify"
-  packages = [".","css","html","js"]
+  packages = [".","css","html","js","xml"]
   revision = "222672169d634c440a73abc47685074e1a9daa60"
   version = "v2.3.4"
 
 [[projects]]
   name = "github.com/tdewolff/parse"
-  packages = [".","buffer","css","html","js","strconv"]
+  packages = [".","buffer","css","html","js","strconv","xml"]
   revision = "639f6272aec6b52094db77b9ec488214b0b4b1a1"
   version = "v2.3.2"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "207078db6c82e4790f91736c36f02ffe045f93f0ed0a17dee4c5e826e79eee01"
+  inputs-digest = "6578358d31efa6e161a67de564bac28b31c0d90d622fb636352f739eb5a918f9"
   solver-name = "gps-cdcl"
   solver-version = 1

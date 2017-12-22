@@ -17,7 +17,7 @@ func CheckAndServeSEO(w http.ResponseWriter, r *http.Request, tpl *template.Temp
 		http.ServeFile(w, r, path.Join(`web/static`, r.URL.Path))
 		return true
 	} else if r.URL.Path == `/sitemap.xml` {
-		if err := utils.WriteXMLTemplate(tpl, w, `sitemap`, content); err != nil {
+		if err := httputils.WriteXMLTemplate(tpl.Lookup(`sitemap`), w, content); err != nil {
 			httputils.InternalServerError(w, err)
 		}
 		return true
@@ -41,7 +41,7 @@ func Get(w http.ResponseWriter, r *http.Request, directory string, tpl *template
 			return
 		}
 
-		if err := utils.WriteHTMLTemplate(tpl, w, `files`, ui.GeneratePageContent(content, r, info, files)); err != nil {
+		if err := httputils.WriteHTMLTemplate(tpl.Lookup(`files`), w, ui.GeneratePageContent(content, r, info, files)); err != nil {
 			httputils.InternalServerError(w, err)
 		}
 	} else {
