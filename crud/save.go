@@ -65,13 +65,9 @@ func SaveFile(w http.ResponseWriter, r *http.Request, directory string) {
 	}
 	if err != nil {
 		ui.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while creating or opening file: %v`, err))
-		return
-	}
-
-	if _, err = io.Copy(hostFile, uploadedFile); err != nil {
+	} else if _, err = io.Copy(hostFile, uploadedFile); err != nil {
 		ui.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while writing file: %v`, err))
-		return
+	} else {
+		w.WriteHeader(http.StatusCreated)
 	}
-
-	w.WriteHeader(http.StatusCreated)
 }
