@@ -15,6 +15,7 @@ import (
 	"github.com/ViBiOh/alcotest/alcotest"
 	"github.com/ViBiOh/auth/auth"
 	"github.com/ViBiOh/fibr/crud"
+	"github.com/ViBiOh/fibr/ui"
 	"github.com/ViBiOh/fibr/utils"
 	"github.com/ViBiOh/httputils"
 	"github.com/ViBiOh/httputils/cert"
@@ -55,7 +56,8 @@ var (
 	baseContent    map[string]interface{}
 )
 
-func init() {
+// Init init variables
+func Init() {
 	tpl = template.Must(template.New(`fibr`).Funcs(template.FuncMap{
 		`filename`: func(file os.FileInfo) string {
 			if file.IsDir() {
@@ -96,10 +98,8 @@ func init() {
 func handleAnonymousRequest(w http.ResponseWriter, r *http.Request, err error) {
 	if auth.IsForbiddenErr(err) {
 		httputils.Forbidden(w)
-	} else if !crud.CheckAndServeSEO(w, r, tpl, baseContent) {
-		if err := httputils.WriteHTMLTemplate(tpl.Lookup(`login`), w, baseContent); err != nil {
-			httputils.InternalServerError(w, err)
-		}
+	} else if !crud.CheckAndServeSEO(w, r) {
+		ui.Login(w, nil)
 	}
 }
 
@@ -118,7 +118,7 @@ func browserHandler(directory string, authConfig map[string]*string) http.Handle
 		if err != nil {
 			handleAnonymousRequest(w, r, err)
 		} else if r.Method == http.MethodGet {
-			crud.Get(w, r, directory, tpl, baseContent)
+			crud.Get(w, r, directory)
 		} else if r.Method == http.MethodPut {
 			crud.CreateDir(w, r, directory)
 		} else if r.Method == http.MethodPost {
@@ -147,26 +147,6 @@ func handler() http.Handler {
 			serviceHandler.ServeHTTP(w, r)
 		}
 	})
-}
-
-func initBaseContent(publicURL string, staticURL string, authURL string, version string, root string) {
-	baseContent = map[string]interface{}{
-		`Config`: map[string]interface{}{
-			`PublicURL`: publicURL,
-			`StaticURL`: staticURL,
-			`AuthURL`:   authURL,
-			`Version`:   version,
-			`Root`:      root,
-		},
-		`Seo`: map[string]interface{}{
-			`Title`:       `fibr`,
-			`Description`: fmt.Sprintf(`FIle BRowser on the server`),
-			`URL`:         `/`,
-			`Img`:         path.Join(staticURL, `/favicon/android-chrome-512x512.png`),
-			`ImgHeight`:   512,
-			`ImgWidth`:    512,
-		},
-	}
 }
 
 func loadMetadata() error {
@@ -221,7 +201,8 @@ func main() {
 		log.Printf(`Error while loading metadata: %v`, err)
 	}
 
-	initBaseContent(*publicURL, *staticURL, *authConfig[`url`], *version, info.Name())
+	Init()
+	ui.Init(tpl, *publicURL, *staticURL, *authConfig[`url`], *version, info.Name())
 
 	log.Printf(`Starting server on port %s`, *port)
 	log.Printf(`Serving file from %s`, *directory)
