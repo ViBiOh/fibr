@@ -34,7 +34,7 @@ func Init(baseTpl *template.Template, publicURL string, staticURL string, authUR
 		},
 		`Seo`: map[string]interface{}{
 			`Title`:       `fibr`,
-			`Description`: fmt.Sprintf(`FIle BRowser on the server`),
+			`Description`: fmt.Sprintf(`FIle BRowser`),
 			`URL`:         `/`,
 			`Img`:         path.Join(staticURL, `/favicon/android-chrome-512x512.png`),
 			`ImgHeight`:   512,
@@ -50,6 +50,20 @@ func cloneContent(content map[string]interface{}) map[string]interface{} {
 	}
 
 	return clone
+}
+
+// Error render error page with given status
+func Error(w http.ResponseWriter, status int, err error) {
+	errorContent := cloneContent(base)
+	errorContent[`Status`] = status
+	if err != nil {
+		errorContent[`Error`] = err.Error()
+	}
+
+	w.WriteHeader(status)
+	if err := httputils.WriteHTMLTemplate(tpl.Lookup(`error`), w, errorContent); err != nil {
+		httputils.InternalServerError(w, err)
+	}
 }
 
 // Login render login page
@@ -71,7 +85,7 @@ func Sitemap(w http.ResponseWriter) {
 	}
 }
 
-// Directory render Dir content
+// Directory render directory listing
 func Directory(w http.ResponseWriter, path string, info os.FileInfo, files []os.FileInfo, message *Message) {
 	pathParts := strings.Split(strings.Trim(path, `/`), `/`)
 	if pathParts[0] == `` {
@@ -90,7 +104,7 @@ func Directory(w http.ResponseWriter, path string, info os.FileInfo, files []os.
 	pageContent[`Files`] = files
 	pageContent[`Seo`] = map[string]interface{}{
 		`Title`:       fmt.Sprintf(`fibr - %s`, path),
-		`Description`: fmt.Sprintf(`FIle BRowser of directory %s on the server`, path),
+		`Description`: fmt.Sprintf(`FIle BRowser of directory %s`, path),
 		`URL`:         path,
 		`Img`:         seo[`Img`],
 		`ImgHeight`:   seo[`ImgHeight`],

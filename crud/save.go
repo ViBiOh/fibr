@@ -1,6 +1,7 @@
 package crud
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -8,8 +9,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/ViBiOh/fibr/ui"
 	"github.com/ViBiOh/fibr/utils"
-	"github.com/ViBiOh/httputils"
 )
 
 const maxUploadSize = 32 * 1024 * 2014 // 32 MB
@@ -38,12 +39,12 @@ func CreateDir(w http.ResponseWriter, r *http.Request, directory string) {
 		filename, _ := utils.GetPathInfo(directory, r.URL.Path)
 
 		if err := os.MkdirAll(filename, 0700); err != nil {
-			httputils.InternalServerError(w, fmt.Errorf(`Error while creating directory: %v`, err))
+			ui.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while creating directory: %v`, err))
 		} else {
 			w.WriteHeader(http.StatusCreated)
 		}
 	} else {
-		httputils.Forbidden(w)
+		ui.Error(w, http.StatusForbidden, errors.New(`You're not authorized to do this`))
 	}
 }
 
@@ -54,7 +55,7 @@ func SaveFile(w http.ResponseWriter, r *http.Request, directory string) {
 		defer uploadedFile.Close()
 	}
 	if err != nil {
-		httputils.BadRequest(w, fmt.Errorf(`Error while getting file from form: %v`, err))
+		ui.Error(w, http.StatusBadRequest, fmt.Errorf(`Error while getting file from form: %v`, err))
 		return
 	}
 
@@ -63,12 +64,12 @@ func SaveFile(w http.ResponseWriter, r *http.Request, directory string) {
 		defer hostFile.Close()
 	}
 	if err != nil {
-		httputils.InternalServerError(w, fmt.Errorf(`Error while creating or opening file: %v`, err))
+		ui.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while creating or opening file: %v`, err))
 		return
 	}
 
 	if _, err = io.Copy(hostFile, uploadedFile); err != nil {
-		httputils.InternalServerError(w, fmt.Errorf(`Error while writing file: %v`, err))
+		ui.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while writing file: %v`, err))
 		return
 	}
 

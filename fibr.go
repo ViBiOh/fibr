@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"html/template"
@@ -97,7 +98,7 @@ func Init() {
 
 func handleAnonymousRequest(w http.ResponseWriter, r *http.Request, err error) {
 	if auth.IsForbiddenErr(err) {
-		httputils.Forbidden(w)
+		ui.Error(w, http.StatusForbidden, errors.New(`You're not authorized to do this`))
 	} else if !crud.CheckAndServeSEO(w, r) {
 		ui.Login(w, nil)
 	}
@@ -109,7 +110,7 @@ func browserHandler(directory string, authConfig map[string]*string) http.Handle
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet && r.Method != http.MethodPut && r.Method != http.MethodPost && r.Method != http.MethodDelete {
-			w.WriteHeader(http.StatusMethodNotAllowed)
+			ui.Error(w, http.StatusMethodNotAllowed, errors.New(`We don't understand what you want from us`))
 			return
 		}
 

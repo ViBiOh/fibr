@@ -1,13 +1,13 @@
 package crud
 
 import (
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"path"
 
 	"github.com/ViBiOh/fibr/ui"
 	"github.com/ViBiOh/fibr/utils"
-	"github.com/ViBiOh/httputils"
 )
 
 // CheckAndServeSEO check if filename match SEO and serve it, or not
@@ -29,12 +29,12 @@ func Get(w http.ResponseWriter, r *http.Request, directory string) {
 
 	if info == nil {
 		if !CheckAndServeSEO(w, r) {
-			httputils.NotFound(w)
+			ui.Error(w, http.StatusNotFound, errors.New(`Requested path does not exist`))
 		}
 	} else if info.IsDir() {
 		files, err := ioutil.ReadDir(filename)
 		if err != nil {
-			httputils.InternalServerError(w, err)
+			ui.Error(w, http.StatusInternalServerError, err)
 			return
 		}
 
