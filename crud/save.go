@@ -7,6 +7,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
+	"path"
 	"strings"
 
 	"github.com/ViBiOh/fibr/ui"
@@ -59,7 +60,8 @@ func SaveFile(w http.ResponseWriter, r *http.Request, directory string) {
 		return
 	}
 
-	hostFile, err := createOrOpenFile(utils.GetPathInfo(directory, r.URL.Path, uploadedFileHeader.Filename))
+	filename, info := utils.GetPathInfo(directory, r.URL.Path, uploadedFileHeader.Filename)
+	hostFile, err := createOrOpenFile(filename, info)
 	if hostFile != nil {
 		defer hostFile.Close()
 	}
@@ -68,6 +70,6 @@ func SaveFile(w http.ResponseWriter, r *http.Request, directory string) {
 	} else if _, err = io.Copy(hostFile, uploadedFile); err != nil {
 		ui.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while writing file: %v`, err))
 	} else {
-		w.WriteHeader(http.StatusCreated)
+		GetDir(w, path.Dir(filename), &ui.Message{Level: `success`, Content: fmt.Sprintf(`File %s successfully uploaded`, uploadedFileHeader.Filename)})
 	}
 }

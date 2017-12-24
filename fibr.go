@@ -203,7 +203,7 @@ func main() {
 	}
 
 	Init()
-	ui.Init(tpl, *publicURL, *staticURL, *authConfig[`url`], *version, info.Name())
+	ui.Init(tpl, *publicURL, *staticURL, *authConfig[`url`], *version, *directory, info.Name())
 
 	log.Printf(`Starting server on port %s`, *port)
 	log.Printf(`Serving file from %s`, *directory)

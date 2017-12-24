@@ -23,7 +23,18 @@ func CheckAndServeSEO(w http.ResponseWriter, r *http.Request) bool {
 	return false
 }
 
-// Get service given path from filesystem
+// GetDir render directory web view of given dirPath
+func GetDir(w http.ResponseWriter, dirPath string, message *ui.Message) {
+	files, err := ioutil.ReadDir(dirPath)
+	if err != nil {
+		ui.Error(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	ui.Directory(w, dirPath, files, message)
+}
+
+// Get write given path from filesystem
 func Get(w http.ResponseWriter, r *http.Request, directory string) {
 	filename, info := utils.GetPathInfo(directory, r.URL.Path)
 
@@ -32,13 +43,7 @@ func Get(w http.ResponseWriter, r *http.Request, directory string) {
 			ui.Error(w, http.StatusNotFound, errors.New(`Requested path does not exist`))
 		}
 	} else if info.IsDir() {
-		files, err := ioutil.ReadDir(filename)
-		if err != nil {
-			ui.Error(w, http.StatusInternalServerError, err)
-			return
-		}
-
-		ui.Directory(w, r.URL.Path, info, files, nil)
+		GetDir(w, filename, nil)
 	} else {
 		http.ServeFile(w, r, filename)
 	}

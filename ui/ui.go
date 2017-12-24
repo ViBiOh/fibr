@@ -17,20 +17,22 @@ type Message struct {
 	Content string
 }
 
+var rootDir string
 var base map[string]interface{}
 var tpl *template.Template
 
 // Init initialize ui
-func Init(baseTpl *template.Template, publicURL string, staticURL string, authURL string, version string, root string) {
+func Init(baseTpl *template.Template, publicURL string, staticURL string, authURL string, version string, rootDirectory string, rootName string) {
 	tpl = baseTpl
 
+	rootDir = rootDirectory
 	base = map[string]interface{}{
 		`Config`: map[string]interface{}{
 			`PublicURL`: publicURL,
 			`StaticURL`: staticURL,
 			`AuthURL`:   authURL,
 			`Version`:   version,
-			`Root`:      root,
+			`Root`:      rootName,
 		},
 		`Seo`: map[string]interface{}{
 			`Title`:       `fibr`,
@@ -86,22 +88,13 @@ func Sitemap(w http.ResponseWriter) {
 }
 
 // Directory render directory listing
-func Directory(w http.ResponseWriter, path string, info os.FileInfo, files []os.FileInfo, message *Message) {
-	pathParts := strings.Split(strings.Trim(path, `/`), `/`)
-	if pathParts[0] == `` {
-		pathParts = nil
-	}
-
+func Directory(w http.ResponseWriter, path string, files []os.FileInfo, message *Message) {
 	pageContent := cloneContent(base)
 	if message != nil {
 		pageContent[`Message`] = message
 	}
 
 	seo := base[`Seo`].(map[string]interface{})
-
-	pageContent[`PathParts`] = pathParts
-	pageContent[`Current`] = info
-	pageContent[`Files`] = files
 	pageContent[`Seo`] = map[string]interface{}{
 		`Title`:       fmt.Sprintf(`fibr - %s`, path),
 		`Description`: fmt.Sprintf(`FIle BRowser of directory %s`, path),
@@ -110,6 +103,14 @@ func Directory(w http.ResponseWriter, path string, info os.FileInfo, files []os.
 		`ImgHeight`:   seo[`ImgHeight`],
 		`ImgWidth`:    seo[`ImgWidth`],
 	}
+
+	pageContent[`Files`] = files
+
+	pathParts := strings.Split(strings.Trim(strings.TrimPrefix(path, rootDir), `/`), `/`)
+	if pathParts[0] == `` {
+		pathParts = nil
+	}
+	pageContent[`PathParts`] = pathParts
 
 	if err := httputils.WriteHTMLTemplate(tpl.Lookup(`files`), w, pageContent); err != nil {
 		httputils.InternalServerError(w, err)
