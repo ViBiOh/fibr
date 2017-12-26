@@ -77,7 +77,7 @@ services:
       traefik.port: '1080'
     volumes:
     - ${DATA_DIR}:/data
-    user: vibioh
+    user: '1000'
     logging:
       driver: json-file
       options:
