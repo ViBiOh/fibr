@@ -17,13 +17,13 @@
   branch = "master"
   name = "github.com/ViBiOh/auth"
   packages = ["auth","cookie"]
-  revision = "e99d49be358db8d7a1be89503e5cee72b42f27e5"
+  revision = "19a25c5d4b9c8c030f9ad8984b3004e1109529d8"
 
 [[projects]]
   branch = "master"
   name = "github.com/ViBiOh/httputils"
   packages = [".","cert","owasp","prometheus","rate","tools"]
-  revision = "4e93594d7beb0c2661becfd3c0c2d2eaa2496147"
+  revision = "9fd4592770314325d7d81c1e926689d3ea7598ca"
 
 [[projects]]
   branch = "master"
@@ -47,7 +47,7 @@
   branch = "master"
   name = "github.com/prometheus/client_golang"
   packages = ["prometheus","prometheus/promhttp"]
-  revision = "661e31bf844dfca9aeba15f27ea8aa0d485ad212"
+  revision = "180b8fdc22b4ea7750bcb43c925277654a1ea2f3"
 
 [[projects]]
   branch = "master"
@@ -65,7 +65,7 @@
   branch = "master"
   name = "github.com/prometheus/procfs"
   packages = [".","xfs"]
-  revision = "8f918ac9ab4be3a790338bda8624fec5d71260b3"
+  revision = "b15cd069a83443be3154b719d0cc9fe8117f09fb"
 
 [[projects]]
   name = "github.com/tdewolff/minify"
