@@ -17,33 +17,23 @@ type Message struct {
 	Content string
 }
 
-var rootDir string
-var base map[string]interface{}
-var tpl *template.Template
-
-// Init initialize ui
-func Init(baseTpl *template.Template, publicURL string, staticURL string, authURL string, version string, rootDirectory string, rootName string) {
-	tpl = baseTpl
-
-	rootDir = rootDirectory
-	base = map[string]interface{}{
-		`Config`: map[string]interface{}{
-			`PublicURL`: publicURL,
-			`StaticURL`: staticURL,
-			`AuthURL`:   authURL,
-			`Version`:   version,
-			`Root`:      rootName,
-		},
-		`Seo`: map[string]interface{}{
-			`Title`:       `fibr`,
-			`Description`: fmt.Sprintf(`FIle BRowser`),
-			`URL`:         `/`,
-			`Img`:         path.Join(staticURL, `/favicon/android-chrome-512x512.png`),
-			`ImgHeight`:   512,
-			`ImgWidth`:    512,
-		},
-	}
+// Config for rendering UI
+type Config struct {
+	rootDir string
+	base    map[string]interface{}
+	tpl     *template.Template
 }
+
+var (
+	archiveExtension = map[string]bool{`.zip`: true, `.tar`: true, `.gz`: true, `.rar`: true}
+	audioExtension   = map[string]bool{`.mp3`: true}
+	codeExtension    = map[string]bool{`.html`: true, `.css`: true, `.js`: true, `.jsx`: true, `.json`: true, `.yml`: true, `.yaml`: true, `.toml`: true, `.md`: true, `.go`: true, `.py`: true, `.java`: true, `.xml`: true}
+	excelExtension   = map[string]bool{`.xls`: true, `.xlsx`: true, `.xlsm`: true}
+	imageExtension   = map[string]bool{`.jpg`: true, `.jpeg`: true, `.png`: true, `.gif`: true, `.svg`: true, `.tiff`: true}
+	pdfExtension     = map[string]bool{`.pdf`: true}
+	videoExtension   = map[string]bool{`.mp4`: true, `.mov`: true, `.avi`: true}
+	wordExtension    = map[string]bool{`.doc`: true, `.docx`: true, `.docm`: true}
+)
 
 func cloneContent(content map[string]interface{}) map[string]interface{} {
 	clone := make(map[string]interface{})
@@ -54,47 +44,107 @@ func cloneContent(content map[string]interface{}) map[string]interface{} {
 	return clone
 }
 
+// NewUI create ui from given config
+func NewUI(publicURL string, staticURL string, authURL string, version string, rootDirectory string, rootName string) *Config {
+	return &Config{
+		tpl: template.Must(template.New(`fibr`).Funcs(template.FuncMap{
+			`filename`: func(file os.FileInfo) string {
+				if file.IsDir() {
+					return fmt.Sprintf(`%s/`, file.Name())
+				}
+				return file.Name()
+			},
+			`rebuildPaths`: func(parts []string, index int) string {
+				return path.Join(parts[:index+1]...)
+			},
+			`typeFromExtension`: func(file os.FileInfo) string {
+				extension := path.Ext(file.Name())
+
+				switch {
+				case archiveExtension[extension]:
+					return `-archive`
+				case audioExtension[extension]:
+					return `-audio`
+				case codeExtension[extension]:
+					return `-code`
+				case excelExtension[extension]:
+					return `-excel`
+				case imageExtension[extension]:
+					return `-image`
+				case pdfExtension[extension]:
+					return `-pdf`
+				case videoExtension[extension]:
+					return `-video`
+				case wordExtension[extension]:
+					return `-word`
+				default:
+					return ``
+				}
+			},
+		}).ParseGlob(`./web/*.gohtml`)),
+
+		rootDir: rootDirectory,
+		base: map[string]interface{}{
+			`Config`: map[string]interface{}{
+				`PublicURL`: publicURL,
+				`StaticURL`: staticURL,
+				`AuthURL`:   authURL,
+				`Version`:   version,
+				`Root`:      rootName,
+			},
+			`Seo`: map[string]interface{}{
+				`Title`:       `fibr`,
+				`Description`: fmt.Sprintf(`FIle BRowser`),
+				`URL`:         `/`,
+				`Img`:         path.Join(staticURL, `/favicon/android-chrome-512x512.png`),
+				`ImgHeight`:   512,
+				`ImgWidth`:    512,
+			},
+		},
+	}
+}
+
 // Error render error page with given status
-func Error(w http.ResponseWriter, status int, err error) {
-	errorContent := cloneContent(base)
+func (c *Config) Error(w http.ResponseWriter, status int, err error) {
+	errorContent := cloneContent(c.base)
 	errorContent[`Status`] = status
 	if err != nil {
 		errorContent[`Error`] = err.Error()
 	}
 
 	w.WriteHeader(status)
-	if err := httputils.WriteHTMLTemplate(tpl.Lookup(`error`), w, errorContent); err != nil {
+	if err := httputils.WriteHTMLTemplate(c.tpl.Lookup(`error`), w, errorContent); err != nil {
 		httputils.InternalServerError(w, err)
 	}
 }
 
 // Login render login page
-func Login(w http.ResponseWriter, message *Message) {
-	loginContent := cloneContent(base)
+func (c *Config) Login(w http.ResponseWriter, message *Message) {
+	loginContent := cloneContent(c.base)
 	if message != nil {
 		loginContent[`Message`] = message
 	}
 
-	if err := httputils.WriteHTMLTemplate(tpl.Lookup(`login`), w, loginContent); err != nil {
+	if err := httputils.WriteHTMLTemplate(c.tpl.Lookup(`login`), w, loginContent); err != nil {
 		httputils.InternalServerError(w, err)
 	}
 }
 
 // Sitemap render sitemap.xml
-func Sitemap(w http.ResponseWriter) {
-	if err := httputils.WriteHTMLTemplate(tpl.Lookup(`sitemap`), w, base); err != nil {
+func (c *Config) Sitemap(w http.ResponseWriter) {
+	if err := httputils.WriteHTMLTemplate(c.tpl.Lookup(`sitemap`), w, c.base); err != nil {
 		httputils.InternalServerError(w, err)
 	}
 }
 
 // Directory render directory listing
-func Directory(w http.ResponseWriter, path string, files []os.FileInfo, message *Message) {
-	pageContent := cloneContent(base)
+func (c *Config) Directory(w http.ResponseWriter, path string, files []os.FileInfo, message *Message) {
+	pageContent := cloneContent(c.base)
 	if message != nil {
 		pageContent[`Message`] = message
 	}
 
-	seo := base[`Seo`].(map[string]interface{})
+	seo := c.base[`Seo`].(map[string]interface{})
 	pageContent[`Seo`] = map[string]interface{}{
 		`Title`:       fmt.Sprintf(`fibr - %s`, path),
 		`Description`: fmt.Sprintf(`FIle BRowser of directory %s`, path),
@@ -106,13 +156,13 @@ func Directory(w http.ResponseWriter, path string, files []os.FileInfo, message 
 
 	pageContent[`Files`] = files
 
-	pathParts := strings.Split(strings.Trim(strings.TrimPrefix(path, rootDir), `/`), `/`)
+	pathParts := strings.Split(strings.Trim(strings.TrimPrefix(path, c.rootDir+`/`), `/`), `/`)
 	if pathParts[0] == `` {
 		pathParts = nil
 	}
 	pageContent[`PathParts`] = pathParts
 
-	if err := httputils.WriteHTMLTemplate(tpl.Lookup(`files`), w, pageContent); err != nil {
+	if err := httputils.WriteHTMLTemplate(c.tpl.Lookup(`files`), w, pageContent); err != nil {
 		httputils.InternalServerError(w, err)
 	}
 }

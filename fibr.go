@@ -5,12 +5,9 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"html/template"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
-	"path"
 
 	"github.com/NYTimes/gziphandler"
 	"github.com/ViBiOh/alcotest/alcotest"
@@ -25,6 +22,8 @@ import (
 	"github.com/ViBiOh/httputils/rate"
 )
 
+const metadataFileName = `.fibr_meta`
+
 type share struct {
 	id     string
 	path   string
@@ -36,96 +35,42 @@ type metadata struct {
 	shared map[string]share
 }
 
-const metadataFileName = `.fibr_meta`
-
-var (
-	archiveExtension = map[string]bool{`.zip`: true, `.tar`: true, `.gz`: true, `.rar`: true}
-	audioExtension   = map[string]bool{`.mp3`: true}
-	codeExtension    = map[string]bool{`.html`: true, `.css`: true, `.js`: true, `.jsx`: true, `.json`: true, `.yml`: true, `.yaml`: true, `.toml`: true, `.md`: true, `.go`: true, `.py`: true, `.java`: true, `.xml`: true}
-	excelExtension   = map[string]bool{`.xls`: true, `.xlsx`: true, `.xlsm`: true}
-	imageExtension   = map[string]bool{`.jpg`: true, `.jpeg`: true, `.png`: true, `.gif`: true, `.svg`: true, `.tiff`: true}
-	pdfExtension     = map[string]bool{`.pdf`: true}
-	videoExtension   = map[string]bool{`.mp4`: true, `.mov`: true, `.avi`: true}
-	wordExtension    = map[string]bool{`.doc`: true, `.docx`: true, `.docm`: true}
-)
-
 var (
 	serviceHandler http.Handler
 	apiHandler     http.Handler
-	tpl            *template.Template
 	meta           metadata
-	baseContent    map[string]interface{}
 )
 
-// Init init variables
-func Init() {
-	tpl = template.Must(template.New(`fibr`).Funcs(template.FuncMap{
-		`filename`: func(file os.FileInfo) string {
-			if file.IsDir() {
-				return fmt.Sprintf(`%s/`, file.Name())
-			}
-			return file.Name()
-		},
-		`rebuildPaths`: func(parts []string, index int) string {
-			return path.Join(parts[:index+1]...)
-		},
-		`typeFromExtension`: func(file os.FileInfo) string {
-			extension := path.Ext(file.Name())
-
-			switch {
-			case archiveExtension[extension]:
-				return `-archive`
-			case audioExtension[extension]:
-				return `-audio`
-			case codeExtension[extension]:
-				return `-code`
-			case excelExtension[extension]:
-				return `-excel`
-			case imageExtension[extension]:
-				return `-image`
-			case pdfExtension[extension]:
-				return `-pdf`
-			case videoExtension[extension]:
-				return `-video`
-			case wordExtension[extension]:
-				return `-word`
-			default:
-				return ``
-			}
-		},
-	}).ParseGlob(`./web/*.gohtml`))
-}
-
-func handleAnonymousRequest(w http.ResponseWriter, r *http.Request, err error) {
+func handleAnonymousRequest(w http.ResponseWriter, r *http.Request, err error, uiConfig *ui.Config) {
 	if auth.IsForbiddenErr(err) {
-		ui.Error(w, http.StatusForbidden, errors.New(`You're not authorized to do this`))
-	} else if !crud.CheckAndServeSEO(w, r) {
-		ui.Login(w, nil)
+		uiConfig.Error(w, http.StatusForbidden, errors.New(`You're not authorized to do this`))
+	} else if !crud.CheckAndServeSEO(w, r, uiConfig) {
+		uiConfig.Login(w, nil)
 	}
 }
 
-func browserHandler(directory string, authConfig map[string]*string) http.Handler {
+func browserHandler(directory string, uiConfig *ui.Config, authConfig map[string]*string) http.Handler {
 	url := *authConfig[`url`]
 	users := auth.LoadUsersProfiles(*authConfig[`users`])
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet && r.Method != http.MethodPut && r.Method != http.MethodPost && r.Method != http.MethodDelete {
-			ui.Error(w, http.StatusMethodNotAllowed, errors.New(`We don't understand what you want from us`))
+			uiConfig.Error(w, http.StatusMethodNotAllowed, errors.New(`We don't understand what you want from us`))
 			return
 		}
 
 		_, err := auth.IsAuthenticated(url, users, r)
 
 		if err != nil {
-			handleAnonymousRequest(w, r, err)
+			handleAnonymousRequest(w, r, err, uiConfig)
 		} else if r.Method == http.MethodGet {
-			crud.Get(w, r, directory)
+			crud.Get(w, r, directory, uiConfig)
 		} else if r.Method == http.MethodPut {
-			crud.CreateDir(w, r, directory)
+			crud.CreateDir(w, r, directory, uiConfig)
 		} else if r.Method == http.MethodPost {
-			crud.SaveFile(w, r, directory)
+			crud.SaveFile(w, r, directory, uiConfig)
 		} else if r.Method == http.MethodDelete {
-			crud.Delete(w, r, directory)
+			crud.Delete(w, r, directory, uiConfig)
 		} else {
 			httputils.NotFound(w)
 		}
@@ -202,13 +147,12 @@ func main() {
 		log.Printf(`Error while loading metadata: %v`, err)
 	}
 
-	Init()
-	ui.Init(tpl, *publicURL, *staticURL, *authConfig[`url`], *version, *directory, info.Name())
+	uiConfig := ui.NewUI(*publicURL, *staticURL, *authConfig[`url`], *version, *directory, info.Name())
 
 	log.Printf(`Starting server on port %s`, *port)
 	log.Printf(`Serving file from %s`, *directory)
 
-	serviceHandler = owasp.Handler(owaspConfig, browserHandler(*directory, authConfig))
+	serviceHandler = owasp.Handler(owaspConfig, browserHandler(*directory, uiConfig, authConfig))
 	apiHandler = prometheus.Handler(prometheusConfig, rate.Handler(rateConfig, gziphandler.GzipHandler(handler())))
 
 	server := &http.Server{

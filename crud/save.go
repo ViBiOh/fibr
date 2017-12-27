@@ -35,28 +35,28 @@ func createOrOpenFile(filename string, info os.FileInfo) (io.WriteCloser, error)
 }
 
 // CreateDir creates given path directory to filesystem
-func CreateDir(w http.ResponseWriter, r *http.Request, directory string) {
+func CreateDir(w http.ResponseWriter, r *http.Request, directory string, uiConfig *ui.Config) {
 	if strings.HasSuffix(r.URL.Path, `/`) {
 		filename, _ := utils.GetPathInfo(directory, r.URL.Path)
 
 		if err := os.MkdirAll(filename, 0700); err != nil {
-			ui.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while creating directory: %v`, err))
+			uiConfig.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while creating directory: %v`, err))
 		} else {
 			w.WriteHeader(http.StatusCreated)
 		}
 	} else {
-		ui.Error(w, http.StatusForbidden, errors.New(`You're not authorized to do this`))
+		uiConfig.Error(w, http.StatusForbidden, errors.New(`You're not authorized to do this`))
 	}
 }
 
 // SaveFile saves form file to filesystem
-func SaveFile(w http.ResponseWriter, r *http.Request, directory string) {
+func SaveFile(w http.ResponseWriter, r *http.Request, directory string, uiConfig *ui.Config) {
 	uploadedFile, uploadedFileHeader, err := getFileForm(w, r)
 	if uploadedFile != nil {
 		defer uploadedFile.Close()
 	}
 	if err != nil {
-		ui.Error(w, http.StatusBadRequest, fmt.Errorf(`Error while getting file from form: %v`, err))
+		uiConfig.Error(w, http.StatusBadRequest, fmt.Errorf(`Error while getting file from form: %v`, err))
 		return
 	}
 
@@ -66,10 +66,10 @@ func SaveFile(w http.ResponseWriter, r *http.Request, directory string) {
 		defer hostFile.Close()
 	}
 	if err != nil {
-		ui.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while creating or opening file: %v`, err))
+		uiConfig.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while creating or opening file: %v`, err))
 	} else if _, err = io.Copy(hostFile, uploadedFile); err != nil {
-		ui.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while writing file: %v`, err))
+		uiConfig.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while writing file: %v`, err))
 	} else {
-		GetDir(w, path.Dir(filename), &ui.Message{Level: `success`, Content: fmt.Sprintf(`File %s successfully uploaded`, uploadedFileHeader.Filename)})
+		GetDir(w, path.Dir(filename), uiConfig, &ui.Message{Level: `success`, Content: fmt.Sprintf(`File %s successfully uploaded`, uploadedFileHeader.Filename)})
 	}
 }

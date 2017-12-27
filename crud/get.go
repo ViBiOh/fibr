@@ -11,12 +11,12 @@ import (
 )
 
 // CheckAndServeSEO check if filename match SEO and serve it, or not
-func CheckAndServeSEO(w http.ResponseWriter, r *http.Request) bool {
+func CheckAndServeSEO(w http.ResponseWriter, r *http.Request, uiConfig *ui.Config) bool {
 	if r.URL.Path == `/robots.txt` {
 		http.ServeFile(w, r, path.Join(`web/static`, r.URL.Path))
 		return true
 	} else if r.URL.Path == `/sitemap.xml` {
-		ui.Sitemap(w)
+		uiConfig.Sitemap(w)
 		return true
 	}
 
@@ -24,26 +24,26 @@ func CheckAndServeSEO(w http.ResponseWriter, r *http.Request) bool {
 }
 
 // GetDir render directory web view of given dirPath
-func GetDir(w http.ResponseWriter, dirPath string, message *ui.Message) {
+func GetDir(w http.ResponseWriter, dirPath string, uiConfig *ui.Config, message *ui.Message) {
 	files, err := ioutil.ReadDir(dirPath)
 	if err != nil {
-		ui.Error(w, http.StatusInternalServerError, err)
+		uiConfig.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	ui.Directory(w, dirPath, files, message)
+	uiConfig.Directory(w, dirPath, files, message)
 }
 
 // Get write given path from filesystem
-func Get(w http.ResponseWriter, r *http.Request, directory string) {
+func Get(w http.ResponseWriter, r *http.Request, directory string, uiConfig *ui.Config) {
 	filename, info := utils.GetPathInfo(directory, r.URL.Path)
 
 	if info == nil {
-		if !CheckAndServeSEO(w, r) {
-			ui.Error(w, http.StatusNotFound, errors.New(`Requested path does not exist`))
+		if !CheckAndServeSEO(w, r, uiConfig) {
+			uiConfig.Error(w, http.StatusNotFound, errors.New(`Requested path does not exist`))
 		}
 	} else if info.IsDir() {
-		GetDir(w, filename, nil)
+		GetDir(w, filename, uiConfig, nil)
 	} else {
 		http.ServeFile(w, r, filename)
 	}
