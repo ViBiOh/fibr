@@ -112,8 +112,7 @@ func (c *Config) Error(w http.ResponseWriter, status int, err error) {
 		errorContent[`Error`] = err.Error()
 	}
 
-	w.WriteHeader(status)
-	if err := httputils.WriteHTMLTemplate(c.tpl.Lookup(`error`), w, errorContent); err != nil {
+	if err := httputils.WriteHTMLTemplate(c.tpl.Lookup(`error`), w, errorContent, status); err != nil {
 		httputils.InternalServerError(w, err)
 	}
 }
@@ -125,14 +124,14 @@ func (c *Config) Login(w http.ResponseWriter, message *Message) {
 		loginContent[`Message`] = message
 	}
 
-	if err := httputils.WriteHTMLTemplate(c.tpl.Lookup(`login`), w, loginContent); err != nil {
+	if err := httputils.WriteHTMLTemplate(c.tpl.Lookup(`login`), w, loginContent, http.StatusOK); err != nil {
 		httputils.InternalServerError(w, err)
 	}
 }
 
 // Sitemap render sitemap.xml
 func (c *Config) Sitemap(w http.ResponseWriter) {
-	if err := httputils.WriteHTMLTemplate(c.tpl.Lookup(`sitemap`), w, c.base); err != nil {
+	if err := httputils.WriteHTMLTemplate(c.tpl.Lookup(`sitemap`), w, c.base, http.StatusOK); err != nil {
 		httputils.InternalServerError(w, err)
 	}
 }
@@ -162,7 +161,7 @@ func (c *Config) Directory(w http.ResponseWriter, path string, files []os.FileIn
 	}
 	pageContent[`PathParts`] = pathParts
 
-	if err := httputils.WriteHTMLTemplate(c.tpl.Lookup(`files`), w, pageContent); err != nil {
+	if err := httputils.WriteHTMLTemplate(c.tpl.Lookup(`files`), w, pageContent, http.StatusOK); err != nil {
 		httputils.InternalServerError(w, err)
 	}
 }
