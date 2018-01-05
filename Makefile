@@ -48,11 +48,11 @@ start-deps:
 
 start-auth:
 	auth \
-	  -tls=false \
-	  -basicUsers "1:admin:`bcrypt admin`" \
-	  -corsHeaders Content-Type,Authorization \
-	  -port 1081 \
-	  -corsCredentials
+		-tls=false \
+		-basicUsers "1:admin:`bcrypt admin`" \
+		-corsHeaders Content-Type,Authorization \
+		-port 1081 \
+		-corsCredentials
 
 start-static:
 	viws \
@@ -61,8 +61,8 @@ start-static:
 
 start-api:
 	go run fibr.go \
-	  -tls=false \
-	  -directory `pwd` \
-	  -authUrl http://localhost:1081 \
-	  -authUsers admin:admin \
-	  -csp "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' fibr-static.vibioh.fr"
+		-tls=false \
+		-directory `pwd` \
+		-authUrl http://localhost:1081 \
+		-authUsers admin:admin \
+		-csp "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' fibr-static.vibioh.fr"

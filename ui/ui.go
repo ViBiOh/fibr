@@ -155,7 +155,7 @@ func (c *Config) Directory(w http.ResponseWriter, path string, files []os.FileIn
 
 	pageContent[`Files`] = files
 
-	pathParts := strings.Split(strings.Trim(strings.TrimPrefix(path, c.rootDir+`/`), `/`), `/`)
+	pathParts := strings.Split(strings.Trim(strings.TrimPrefix(path, c.rootDir), `/`), `/`)
 	if pathParts[0] == `` {
 		pathParts = nil
 	}
