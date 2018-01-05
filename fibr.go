@@ -124,7 +124,7 @@ func saveMetadata() error {
 func main() {
 	port := flag.String(`port`, `1080`, `Listening port`)
 	tls := flag.Bool(`tls`, true, `Serve TLS content`)
-	directory := flag.String(`directory`, `/data/`, `Directory to serve`)
+	directory := flag.String(`directory`, `/data`, `Directory to serve`)
 	publicURL := flag.String(`publicURL`, `https://fibr.vibioh.fr`, `Public Server URL`)
 	staticURL := flag.String(`staticURL`, `https://fibr-static.vibioh.fr`, `Static Server URL`)
 	version := flag.String(`version`, ``, `Version (used mainly as a cache-buster)`)
