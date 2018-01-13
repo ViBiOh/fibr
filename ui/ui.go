@@ -17,8 +17,8 @@ type Message struct {
 	Content string
 }
 
-// Config for rendering UI
-type Config struct {
+// App for rendering UI
+type App struct {
 	rootDir string
 	base    map[string]interface{}
 	tpl     *template.Template
@@ -44,9 +44,9 @@ func cloneContent(content map[string]interface{}) map[string]interface{} {
 	return clone
 }
 
-// NewUI create ui from given config
-func NewUI(publicURL string, staticURL string, authURL string, version string, rootDirectory string, rootName string) *Config {
-	return &Config{
+// NewApp create ui from given config
+func NewApp(publicURL string, staticURL string, authURL string, version string, rootDirectory string, rootName string) *App {
+	return &App{
 		tpl: template.Must(template.New(`fibr`).Funcs(template.FuncMap{
 			`filename`: func(file os.FileInfo) string {
 				if file.IsDir() {
@@ -105,45 +105,45 @@ func NewUI(publicURL string, staticURL string, authURL string, version string, r
 }
 
 // Error render error page with given status
-func (c *Config) Error(w http.ResponseWriter, status int, err error) {
-	errorContent := cloneContent(c.base)
+func (a *App) Error(w http.ResponseWriter, status int, err error) {
+	errorContent := cloneContent(a.base)
 	errorContent[`Status`] = status
 	if err != nil {
 		errorContent[`Error`] = err.Error()
 	}
 
-	if err := httputils.WriteHTMLTemplate(c.tpl.Lookup(`error`), w, errorContent, status); err != nil {
+	if err := httputils.WriteHTMLTemplate(a.tpl.Lookup(`error`), w, errorContent, status); err != nil {
 		httputils.InternalServerError(w, err)
 	}
 }
 
 // Login render login page
-func (c *Config) Login(w http.ResponseWriter, message *Message) {
-	loginContent := cloneContent(c.base)
+func (a *App) Login(w http.ResponseWriter, message *Message) {
+	loginContent := cloneContent(a.base)
 	if message != nil {
 		loginContent[`Message`] = message
 	}
 
-	if err := httputils.WriteHTMLTemplate(c.tpl.Lookup(`login`), w, loginContent, http.StatusOK); err != nil {
+	if err := httputils.WriteHTMLTemplate(a.tpl.Lookup(`login`), w, loginContent, http.StatusOK); err != nil {
 		httputils.InternalServerError(w, err)
 	}
 }
 
 // Sitemap render sitemap.xml
-func (c *Config) Sitemap(w http.ResponseWriter) {
-	if err := httputils.WriteHTMLTemplate(c.tpl.Lookup(`sitemap`), w, c.base, http.StatusOK); err != nil {
+func (a *App) Sitemap(w http.ResponseWriter) {
+	if err := httputils.WriteHTMLTemplate(a.tpl.Lookup(`sitemap`), w, a.base, http.StatusOK); err != nil {
 		httputils.InternalServerError(w, err)
 	}
 }
 
 // Directory render directory listing
-func (c *Config) Directory(w http.ResponseWriter, path string, files []os.FileInfo, message *Message) {
-	pageContent := cloneContent(c.base)
+func (a *App) Directory(w http.ResponseWriter, path string, files []os.FileInfo, message *Message) {
+	pageContent := cloneContent(a.base)
 	if message != nil {
 		pageContent[`Message`] = message
 	}
 
-	seo := c.base[`Seo`].(map[string]interface{})
+	seo := a.base[`Seo`].(map[string]interface{})
 	pageContent[`Seo`] = map[string]interface{}{
 		`Title`:       fmt.Sprintf(`fibr - %s`, path),
 		`Description`: fmt.Sprintf(`FIle BRowser of directory %s`, path),
@@ -155,13 +155,13 @@ func (c *Config) Directory(w http.ResponseWriter, path string, files []os.FileIn
 
 	pageContent[`Files`] = files
 
-	pathParts := strings.Split(strings.Trim(strings.TrimPrefix(path, c.rootDir), `/`), `/`)
+	pathParts := strings.Split(strings.Trim(strings.TrimPrefix(path, a.rootDir), `/`), `/`)
 	if pathParts[0] == `` {
 		pathParts = nil
 	}
 	pageContent[`PathParts`] = pathParts
 
-	if err := httputils.WriteHTMLTemplate(c.tpl.Lookup(`files`), w, pageContent, http.StatusOK); err != nil {
+	if err := httputils.WriteHTMLTemplate(a.tpl.Lookup(`files`), w, pageContent, http.StatusOK); err != nil {
 		httputils.InternalServerError(w, err)
 	}
 }

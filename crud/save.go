@@ -35,7 +35,7 @@ func createOrOpenFile(filename string, info os.FileInfo) (io.WriteCloser, error)
 }
 
 // CreateDir creates given path directory to filesystem
-func CreateDir(w http.ResponseWriter, r *http.Request, directory string, uiConfig *ui.Config) {
+func CreateDir(w http.ResponseWriter, r *http.Request, directory string, uiConfig *ui.App) {
 	if strings.HasSuffix(r.URL.Path, `/`) {
 		filename, _ := utils.GetPathInfo(directory, r.URL.Path)
 
@@ -50,7 +50,7 @@ func CreateDir(w http.ResponseWriter, r *http.Request, directory string, uiConfi
 }
 
 // SaveFile saves form file to filesystem
-func SaveFile(w http.ResponseWriter, r *http.Request, directory string, uiConfig *ui.Config) {
+func SaveFile(w http.ResponseWriter, r *http.Request, directory string, uiConfig *ui.App) {
 	uploadedFile, uploadedFileHeader, err := getFileForm(w, r)
 	if uploadedFile != nil {
 		defer uploadedFile.Close()

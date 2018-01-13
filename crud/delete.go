@@ -11,7 +11,7 @@ import (
 )
 
 // Delete given path from filesystem
-func Delete(w http.ResponseWriter, r *http.Request, directory string, uiConfig *ui.Config) {
+func Delete(w http.ResponseWriter, r *http.Request, directory string, uiConfig *ui.App) {
 	if r.URL.Path == `/` {
 		uiConfig.Error(w, http.StatusForbidden, errors.New(`You're not authorized to do this ⛔`))
 	} else if filename, info := utils.GetPathInfo(directory, r.URL.Path); info == nil {

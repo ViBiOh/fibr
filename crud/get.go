@@ -11,7 +11,7 @@ import (
 )
 
 // CheckAndServeSEO check if filename match SEO and serve it, or not
-func CheckAndServeSEO(w http.ResponseWriter, r *http.Request, uiConfig *ui.Config) bool {
+func CheckAndServeSEO(w http.ResponseWriter, r *http.Request, uiConfig *ui.App) bool {
 	if r.URL.Path == `/robots.txt` {
 		http.ServeFile(w, r, path.Join(`web/static`, r.URL.Path))
 		return true
@@ -24,7 +24,7 @@ func CheckAndServeSEO(w http.ResponseWriter, r *http.Request, uiConfig *ui.Confi
 }
 
 // GetDir render directory web view of given dirPath
-func GetDir(w http.ResponseWriter, dirPath string, uiConfig *ui.Config, message *ui.Message) {
+func GetDir(w http.ResponseWriter, dirPath string, uiConfig *ui.App, message *ui.Message) {
 	files, err := ioutil.ReadDir(dirPath)
 	if err != nil {
 		uiConfig.Error(w, http.StatusInternalServerError, err)
@@ -35,7 +35,7 @@ func GetDir(w http.ResponseWriter, dirPath string, uiConfig *ui.Config, message 
 }
 
 // Get write given path from filesystem
-func Get(w http.ResponseWriter, r *http.Request, directory string, uiConfig *ui.Config) {
+func Get(w http.ResponseWriter, r *http.Request, directory string, uiConfig *ui.App) {
 	filename, info := utils.GetPathInfo(directory, r.URL.Path)
 
 	if info == nil {
