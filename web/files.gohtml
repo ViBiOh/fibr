@@ -6,9 +6,9 @@
 
   <header class="header">
     <h1 class="title">Directory
-      <a href="/">{{ .Config.Root }}</a>
-      {{- range $index, $path := .PathParts -}}
-         / <a href="/{{- rebuildPaths $root.PathParts $index -}}/">{{- $path -}}</a>
+      <a href="/">{{ .RootName }}</a>
+      {{- range $index, $path := .Paths -}}
+         / <a href="/{{- rebuildPaths $root.Paths $index -}}/">{{- $path -}}</a>
       {{- end -}}
     </h1>
   </header>

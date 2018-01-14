@@ -5,18 +5,19 @@ import (
 	"io/ioutil"
 	"net/http"
 	"path"
+	"strings"
 
 	"github.com/ViBiOh/fibr/ui"
 	"github.com/ViBiOh/fibr/utils"
 )
 
 // CheckAndServeSEO check if filename match SEO and serve it, or not
-func CheckAndServeSEO(w http.ResponseWriter, r *http.Request, uiConfig *ui.App) bool {
+func (a *App) CheckAndServeSEO(w http.ResponseWriter, r *http.Request) bool {
 	if r.URL.Path == `/robots.txt` {
 		http.ServeFile(w, r, path.Join(`web/static`, r.URL.Path))
 		return true
 	} else if r.URL.Path == `/sitemap.xml` {
-		uiConfig.Sitemap(w)
+		a.uiApp.Sitemap(w)
 		return true
 	}
 
@@ -24,26 +25,26 @@ func CheckAndServeSEO(w http.ResponseWriter, r *http.Request, uiConfig *ui.App) 
 }
 
 // GetDir render directory web view of given dirPath
-func GetDir(w http.ResponseWriter, dirPath string, uiConfig *ui.App, message *ui.Message) {
-	files, err := ioutil.ReadDir(dirPath)
+func (a *App) GetDir(w http.ResponseWriter, url string, rootDirectory string, pathDirectory string, message *ui.Message) {
+	files, err := ioutil.ReadDir(pathDirectory)
 	if err != nil {
-		uiConfig.Error(w, http.StatusInternalServerError, err)
+		a.uiApp.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	uiConfig.Directory(w, dirPath, files, message)
+	a.uiApp.Directory(w, url, path.Base(rootDirectory), strings.TrimPrefix(pathDirectory, rootDirectory), files, message)
 }
 
 // Get write given path from filesystem
-func Get(w http.ResponseWriter, r *http.Request, directory string, uiConfig *ui.App) {
-	filename, info := utils.GetPathInfo(directory, r.URL.Path)
+func (a *App) Get(w http.ResponseWriter, r *http.Request, rootDirectory string) {
+	filename, info := utils.GetPathInfo(rootDirectory, r.URL.Path)
 
 	if info == nil {
-		if !CheckAndServeSEO(w, r, uiConfig) {
-			uiConfig.Error(w, http.StatusNotFound, errors.New(`Requested path does not exist`))
+		if !a.CheckAndServeSEO(w, r) {
+			a.uiApp.Error(w, http.StatusNotFound, errors.New(`Requested path does not exist`))
 		}
 	} else if info.IsDir() {
-		GetDir(w, filename, uiConfig, nil)
+		a.GetDir(w, r.URL.Path, rootDirectory, filename, nil)
 	} else {
 		http.ServeFile(w, r, filename)
 	}

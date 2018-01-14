@@ -1,8 +1,7 @@
-[
-  {
-    "id": "test",
+{
+  "test": {
     "path": "/ui",
     "public": true,
-    "edit": false,
+    "edit": false
   }
-]
+}

@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"flag"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -9,19 +10,13 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/httputils"
+	"github.com/ViBiOh/httputils/tools"
 )
 
 // Message rendered to user
 type Message struct {
 	Level   string
 	Content string
-}
-
-// App for rendering UI
-type App struct {
-	rootDir string
-	base    map[string]interface{}
-	tpl     *template.Template
 }
 
 var (
@@ -44,8 +39,23 @@ func cloneContent(content map[string]interface{}) map[string]interface{} {
 	return clone
 }
 
+// App for rendering UI
+type App struct {
+	base map[string]interface{}
+	tpl  *template.Template
+}
+
+// Flags add flags for given prefix
+func Flags(prefix string) map[string]*string {
+	return map[string]*string{
+		`publicURL`: flag.String(tools.ToCamel(fmt.Sprintf(`%sPublicURL`, prefix)), `https://fibr.vibioh.fr`, `Public Server URL`),
+		`staticURL`: flag.String(tools.ToCamel(fmt.Sprintf(`%sStaticURL`, prefix)), `https://fibr-static.vibioh.fr`, `Static Server URL`),
+		`version`:   flag.String(tools.ToCamel(fmt.Sprintf(`%sVersion`, prefix)), ``, `Version (used mainly as a cache-buster)`),
+	}
+}
+
 // NewApp create ui from given config
-func NewApp(publicURL string, staticURL string, authURL string, version string, rootDirectory string, rootName string) *App {
+func NewApp(config map[string]*string, authURL string) *App {
 	return &App{
 		tpl: template.Must(template.New(`fibr`).Funcs(template.FuncMap{
 			`filename`: func(file os.FileInfo) string {
@@ -83,20 +93,18 @@ func NewApp(publicURL string, staticURL string, authURL string, version string, 
 			},
 		}).ParseGlob(`./web/*.gohtml`)),
 
-		rootDir: rootDirectory,
 		base: map[string]interface{}{
 			`Config`: map[string]interface{}{
-				`PublicURL`: publicURL,
-				`StaticURL`: staticURL,
+				`PublicURL`: *config[`publicURL`],
+				`StaticURL`: *config[`staticURL`],
 				`AuthURL`:   authURL,
-				`Version`:   version,
-				`Root`:      rootName,
+				`Version`:   *config[`version`],
 			},
 			`Seo`: map[string]interface{}{
 				`Title`:       `fibr`,
 				`Description`: fmt.Sprintf(`FIle BRowser`),
 				`URL`:         `/`,
-				`Img`:         path.Join(staticURL, `/favicon/android-chrome-512x512.png`),
+				`Img`:         path.Join(*config[`staticURL`], `/favicon/android-chrome-512x512.png`),
 				`ImgHeight`:   512,
 				`ImgWidth`:    512,
 			},
@@ -112,6 +120,7 @@ func (a *App) Error(w http.ResponseWriter, status int, err error) {
 		errorContent[`Error`] = err.Error()
 	}
 
+	w.Header().Add(`Cache-Control`, `no-cache`)
 	if err := httputils.WriteHTMLTemplate(a.tpl.Lookup(`error`), w, errorContent, status); err != nil {
 		httputils.InternalServerError(w, err)
 	}
@@ -124,20 +133,21 @@ func (a *App) Login(w http.ResponseWriter, message *Message) {
 		loginContent[`Message`] = message
 	}
 
+	w.Header().Add(`Cache-Control`, `no-cache`)
 	if err := httputils.WriteHTMLTemplate(a.tpl.Lookup(`login`), w, loginContent, http.StatusOK); err != nil {
-		httputils.InternalServerError(w, err)
+		a.Error(w, http.StatusInternalServerError, err)
 	}
 }
 
 // Sitemap render sitemap.xml
 func (a *App) Sitemap(w http.ResponseWriter) {
-	if err := httputils.WriteHTMLTemplate(a.tpl.Lookup(`sitemap`), w, a.base, http.StatusOK); err != nil {
+	if err := httputils.WriteXMLTemplate(a.tpl.Lookup(`sitemap`), w, a.base, http.StatusOK); err != nil {
 		httputils.InternalServerError(w, err)
 	}
 }
 
 // Directory render directory listing
-func (a *App) Directory(w http.ResponseWriter, path string, files []os.FileInfo, message *Message) {
+func (a *App) Directory(w http.ResponseWriter, url string, rootName string, pathName string, files []os.FileInfo, message *Message) {
 	pageContent := cloneContent(a.base)
 	if message != nil {
 		pageContent[`Message`] = message
@@ -145,9 +155,9 @@ func (a *App) Directory(w http.ResponseWriter, path string, files []os.FileInfo,
 
 	seo := a.base[`Seo`].(map[string]interface{})
 	pageContent[`Seo`] = map[string]interface{}{
-		`Title`:       fmt.Sprintf(`fibr - %s`, path),
-		`Description`: fmt.Sprintf(`FIle BRowser of directory %s`, path),
-		`URL`:         path,
+		`Title`:       fmt.Sprintf(`fibr - %s`, pathName),
+		`Description`: fmt.Sprintf(`FIle BRowser of directory %s`, pathName),
+		`URL`:         url,
 		`Img`:         seo[`Img`],
 		`ImgHeight`:   seo[`ImgHeight`],
 		`ImgWidth`:    seo[`ImgWidth`],
@@ -155,13 +165,15 @@ func (a *App) Directory(w http.ResponseWriter, path string, files []os.FileInfo,
 
 	pageContent[`Files`] = files
 
-	pathParts := strings.Split(strings.Trim(strings.TrimPrefix(path, a.rootDir), `/`), `/`)
-	if pathParts[0] == `` {
-		pathParts = nil
+	paths := strings.Split(strings.Trim(strings.TrimPrefix(pathName, rootName), `/`), `/`)
+	if paths[0] == `` {
+		paths = nil
 	}
-	pageContent[`PathParts`] = pathParts
+	pageContent[`RootName`] = rootName
+	pageContent[`Paths`] = paths
 
+	w.Header().Add(`Cache-Control`, `no-cache`)
 	if err := httputils.WriteHTMLTemplate(a.tpl.Lookup(`files`), w, pageContent, http.StatusOK); err != nil {
-		httputils.InternalServerError(w, err)
+		a.Error(w, http.StatusInternalServerError, err)
 	}
 }

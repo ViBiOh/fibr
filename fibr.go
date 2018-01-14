@@ -23,15 +23,15 @@ var (
 	apiHandler     http.Handler
 )
 
-func handleAnonymousRequest(w http.ResponseWriter, r *http.Request, err error, uiApp *ui.App) {
+func handleAnonymousRequest(w http.ResponseWriter, r *http.Request, err error, crudApp *crud.App, uiApp *ui.App) {
 	if auth.IsForbiddenErr(err) {
 		uiApp.Error(w, http.StatusForbidden, errors.New(`You're not authorized to do this`))
-	} else if !crud.CheckAndServeSEO(w, r, uiApp) {
+	} else if !crudApp.CheckAndServeSEO(w, r) {
 		uiApp.Login(w, nil)
 	}
 }
 
-func browserHandler(directory string, uiApp *ui.App, authConfig map[string]*string) http.Handler {
+func browserHandler(crudApp *crud.App, uiApp *ui.App, authConfig map[string]*string) http.Handler {
 	url := *authConfig[`url`]
 	users := auth.LoadUsersProfiles(*authConfig[`users`])
 
@@ -43,16 +43,18 @@ func browserHandler(directory string, uiApp *ui.App, authConfig map[string]*stri
 
 		_, err := auth.IsAuthenticated(url, users, r)
 
+		rootDirectory := crudApp.GetRootDirectory()
+
 		if err != nil {
-			handleAnonymousRequest(w, r, err, uiApp)
+			handleAnonymousRequest(w, r, err, crudApp, uiApp)
 		} else if r.Method == http.MethodGet {
-			crud.Get(w, r, directory, uiApp)
+			crudApp.Get(w, r, rootDirectory)
 		} else if r.Method == http.MethodPut {
-			crud.CreateDir(w, r, directory, uiApp)
+			crudApp.CreateDir(w, r, rootDirectory)
 		} else if r.Method == http.MethodPost {
-			crud.SaveFile(w, r, directory, uiApp)
+			crudApp.SaveFile(w, r, rootDirectory)
 		} else if r.Method == http.MethodDelete {
-			crud.Delete(w, r, directory, uiApp)
+			crudApp.Delete(w, r, rootDirectory)
 		} else {
 			httputils.NotFound(w)
 		}
@@ -80,27 +82,26 @@ func handler() http.Handler {
 func main() {
 	port := flag.String(`port`, `1080`, `Listening port`)
 	tls := flag.Bool(`tls`, true, `Serve TLS content`)
-	publicURL := flag.String(`publicURL`, `https://fibr.vibioh.fr`, `Public Server URL`)
-	staticURL := flag.String(`staticURL`, `https://fibr-static.vibioh.fr`, `Static Server URL`)
-	version := flag.String(`version`, ``, `Version (used mainly as a cache-buster)`)
 	authConfig := auth.Flags(`auth`)
 	alcotestConfig := alcotest.Flags(``)
 	certConfig := cert.Flags(`tls`)
 	prometheusConfig := prometheus.Flags(`prometheus`)
 	rateConfig := rate.Flags(`rate`)
 	owaspConfig := owasp.Flags(``)
+
 	crudConfig := crud.Flags(``)
+	uiConfig := ui.Flags(``)
+
 	flag.Parse()
 
 	alcotest.DoAndExit(alcotestConfig)
 
-	crudApp := crud.NewApp(crudConfig)
-	uiApp := ui.NewApp(*publicURL, *staticURL, *authConfig[`url`], *version, crudApp.GetRootAbsName(), crudApp.GetRootName())
+	uiApp := ui.NewApp(uiConfig, *authConfig[`url`])
+	crudApp := crud.NewApp(crudConfig, uiApp)
 
 	log.Printf(`Starting server on port %s`, *port)
-	log.Printf(`Serving file from %s`, crudApp.GetRootAbsName())
 
-	serviceHandler = owasp.Handler(owaspConfig, browserHandler(crudApp.GetRootAbsName(), uiApp, authConfig))
+	serviceHandler = owasp.Handler(owaspConfig, browserHandler(crudApp, uiApp, authConfig))
 	apiHandler = prometheus.Handler(prometheusConfig, rate.Handler(rateConfig, gziphandler.GzipHandler(handler())))
 
 	server := &http.Server{
