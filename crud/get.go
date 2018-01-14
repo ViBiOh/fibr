@@ -1,8 +1,9 @@
 package crud
 
 import (
-	"fmt"
+	"errors"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"path"
 	"strings"
@@ -41,9 +42,11 @@ func (a *App) GetDir(w http.ResponseWriter, config *provider.RequestConfig, file
 func (a *App) Get(w http.ResponseWriter, r *http.Request, config *provider.RequestConfig) {
 	filename, info := utils.GetPathInfo(config.Root, config.Path)
 
+	log.Print(filename)
+
 	if info == nil {
 		if !a.CheckAndServeSEO(w, r) {
-			a.renderer.Error(w, http.StatusNotFound, fmt.Errorf(`Requested path does not exist: %s`, filename))
+			a.renderer.Error(w, http.StatusNotFound, errors.New(`Requested path does not exist`))
 		}
 	} else if info.IsDir() {
 		a.GetDir(w, config, filename, nil)
