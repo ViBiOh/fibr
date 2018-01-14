@@ -3,7 +3,6 @@ package crud
 import (
 	"errors"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"path"
 	"strings"
@@ -41,8 +40,6 @@ func (a *App) GetDir(w http.ResponseWriter, config *provider.RequestConfig, file
 // Get write given path from filesystem
 func (a *App) Get(w http.ResponseWriter, r *http.Request, config *provider.RequestConfig) {
 	filename, info := utils.GetPathInfo(config.Root, config.Path)
-
-	log.Print(filename)
 
 	if info == nil {
 		if !a.CheckAndServeSEO(w, r) {
