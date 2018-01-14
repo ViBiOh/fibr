@@ -7,7 +7,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/ViBiOh/fibr/ui"
+	"github.com/ViBiOh/fibr/provider"
 	"github.com/ViBiOh/fibr/utils"
 )
 
@@ -17,7 +17,7 @@ func (a *App) CheckAndServeSEO(w http.ResponseWriter, r *http.Request) bool {
 		http.ServeFile(w, r, path.Join(`web/static`, r.URL.Path))
 		return true
 	} else if r.URL.Path == `/sitemap.xml` {
-		a.uiApp.Sitemap(w)
+		a.renderer.Sitemap(w)
 		return true
 	}
 
@@ -25,26 +25,28 @@ func (a *App) CheckAndServeSEO(w http.ResponseWriter, r *http.Request) bool {
 }
 
 // GetDir render directory web view of given dirPath
-func (a *App) GetDir(w http.ResponseWriter, url string, rootDirectory string, pathDirectory string, message *ui.Message) {
-	files, err := ioutil.ReadDir(pathDirectory)
+func (a *App) GetDir(w http.ResponseWriter, config *provider.RequestConfig, filename string, message *provider.Message) {
+	files, err := ioutil.ReadDir(filename)
 	if err != nil {
-		a.uiApp.Error(w, http.StatusInternalServerError, err)
+		a.renderer.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	a.uiApp.Directory(w, url, path.Base(rootDirectory), strings.TrimPrefix(pathDirectory, rootDirectory), files, message)
+	config.Path = strings.TrimPrefix(filename, config.Root)
+
+	a.renderer.Directory(w, config, files, message)
 }
 
 // Get write given path from filesystem
-func (a *App) Get(w http.ResponseWriter, r *http.Request, rootDirectory string) {
-	filename, info := utils.GetPathInfo(rootDirectory, r.URL.Path)
+func (a *App) Get(w http.ResponseWriter, r *http.Request, config *provider.RequestConfig) {
+	filename, info := utils.GetPathInfo(config.Root, config.Path)
 
 	if info == nil {
 		if !a.CheckAndServeSEO(w, r) {
-			a.uiApp.Error(w, http.StatusNotFound, errors.New(`Requested path does not exist`))
+			a.renderer.Error(w, http.StatusNotFound, errors.New(`Requested path does not exist`))
 		}
 	} else if info.IsDir() {
-		a.GetDir(w, r.URL.Path, rootDirectory, filename, nil)
+		a.GetDir(w, config, filename, nil)
 	} else {
 		http.ServeFile(w, r, filename)
 	}

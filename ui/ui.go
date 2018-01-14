@@ -9,15 +9,10 @@ import (
 	"path"
 	"strings"
 
+	"github.com/ViBiOh/fibr/provider"
 	"github.com/ViBiOh/httputils"
 	"github.com/ViBiOh/httputils/tools"
 )
-
-// Message rendered to user
-type Message struct {
-	Level   string
-	Content string
-}
 
 var (
 	archiveExtension = map[string]bool{`.zip`: true, `.tar`: true, `.gz`: true, `.rar`: true}
@@ -127,7 +122,7 @@ func (a *App) Error(w http.ResponseWriter, status int, err error) {
 }
 
 // Login render login page
-func (a *App) Login(w http.ResponseWriter, message *Message) {
+func (a *App) Login(w http.ResponseWriter, message *provider.Message) {
 	loginContent := cloneContent(a.base)
 	if message != nil {
 		loginContent[`Message`] = message
@@ -147,17 +142,19 @@ func (a *App) Sitemap(w http.ResponseWriter) {
 }
 
 // Directory render directory listing
-func (a *App) Directory(w http.ResponseWriter, url string, rootName string, pathName string, files []os.FileInfo, message *Message) {
+func (a *App) Directory(w http.ResponseWriter, config *provider.RequestConfig, files []os.FileInfo, message *provider.Message) {
 	pageContent := cloneContent(a.base)
 	if message != nil {
 		pageContent[`Message`] = message
 	}
 
+	currentPath := strings.Trim(strings.TrimPrefix(config.Path, config.Root), `/`)
+
 	seo := a.base[`Seo`].(map[string]interface{})
 	pageContent[`Seo`] = map[string]interface{}{
-		`Title`:       fmt.Sprintf(`fibr - %s`, pathName),
-		`Description`: fmt.Sprintf(`FIle BRowser of directory %s`, pathName),
-		`URL`:         url,
+		`Title`:       fmt.Sprintf(`fibr - %s`, path.Join(path.Base(config.Root), currentPath)),
+		`Description`: fmt.Sprintf(`FIle BRowser of directory %s`, path.Join(path.Base(config.Root), currentPath)),
+		`URL`:         config.URL,
 		`Img`:         seo[`Img`],
 		`ImgHeight`:   seo[`ImgHeight`],
 		`ImgWidth`:    seo[`ImgWidth`],
@@ -165,12 +162,14 @@ func (a *App) Directory(w http.ResponseWriter, url string, rootName string, path
 
 	pageContent[`Files`] = files
 
-	paths := strings.Split(strings.Trim(strings.TrimPrefix(pathName, rootName), `/`), `/`)
+	paths := strings.Split(currentPath, `/`)
 	if paths[0] == `` {
 		paths = nil
 	}
-	pageContent[`RootName`] = rootName
+	pageContent[`RootName`] = path.Base(config.Root)
 	pageContent[`Paths`] = paths
+	pageContent[`PathPrefix`] = fmt.Sprintf(`%s/`, config.PathPrefix)
+	pageContent[`CanEdit`] = config.CanEdit
 
 	w.Header().Add(`Cache-Control`, `no-cache`)
 	if err := httputils.WriteHTMLTemplate(a.tpl.Lookup(`files`), w, pageContent, http.StatusOK); err != nil {

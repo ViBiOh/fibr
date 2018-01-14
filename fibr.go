@@ -3,13 +3,17 @@ package main
 import (
 	"errors"
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
+	"path"
+	"strings"
 
 	"github.com/NYTimes/gziphandler"
 	"github.com/ViBiOh/alcotest/alcotest"
 	"github.com/ViBiOh/auth/auth"
 	"github.com/ViBiOh/fibr/crud"
+	"github.com/ViBiOh/fibr/provider"
 	"github.com/ViBiOh/fibr/ui"
 	"github.com/ViBiOh/httputils"
 	"github.com/ViBiOh/httputils/cert"
@@ -44,17 +48,35 @@ func browserHandler(crudApp *crud.App, uiApp *ui.App, authConfig map[string]*str
 		_, err := auth.IsAuthenticated(url, users, r)
 
 		rootDirectory := crudApp.GetRootDirectory()
+		config := &provider.RequestConfig{
+			URL:        r.URL.Path,
+			Root:       rootDirectory,
+			PathPrefix: ``,
+			Path:       r.URL.Path,
+			CanEdit:    true,
+		}
+
+		if err != nil {
+			if share := crudApp.GetSharedPath(r.URL.Path); share != nil {
+				config.Root = path.Join(config.Root, share.Path)
+				config.Path = strings.TrimPrefix(config.Path, fmt.Sprintf(`/%s`, share.ID))
+				config.PathPrefix = share.ID
+				config.CanEdit = share.Edit
+
+				err = nil
+			}
+		}
 
 		if err != nil {
 			handleAnonymousRequest(w, r, err, crudApp, uiApp)
 		} else if r.Method == http.MethodGet {
-			crudApp.Get(w, r, rootDirectory)
+			crudApp.Get(w, r, config)
 		} else if r.Method == http.MethodPut {
-			crudApp.CreateDir(w, r, rootDirectory)
+			crudApp.CreateDir(w, r, config)
 		} else if r.Method == http.MethodPost {
-			crudApp.SaveFile(w, r, rootDirectory)
+			crudApp.SaveFile(w, r, config)
 		} else if r.Method == http.MethodDelete {
-			crudApp.Delete(w, r, rootDirectory)
+			crudApp.Delete(w, r, config)
 		} else {
 			httputils.NotFound(w)
 		}

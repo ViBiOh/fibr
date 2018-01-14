@@ -1,17 +1,19 @@
 {{- define "menu" -}}
   <div id="tools">
-    <label>
-      <img class="icon icon-large" src="{{ .Config.StaticURL }}/svg/cloud-upload-alt.svg?v={{ .Config.Version }}" alt="upload" />
-      <input type="checkbox" class="toggler" />
-      <div>
-        <div class="modal full flex flex-center">
-          {{- template "upload-form" -}}
+    {{- if .CanEdit -}}
+      <label>
+        <img class="icon icon-large" src="{{ .Config.StaticURL }}/svg/cloud-upload-alt.svg?v={{ .Config.Version }}" alt="upload" />
+        <input type="checkbox" class="toggler" />
+        <div>
+          <div class="modal full flex flex-center">
+            {{- template "upload-form" -}}
+          </div>
         </div>
-      </div>
-    </label>
-    <a href="#">
-      <img class="icon icon-large" src="{{ .Config.StaticURL }}/svg/share-alt-square.svg?v={{ .Config.Version }}" alt="share" />
-    </a>
+      </label>
+      <a href="#">
+        <img class="icon icon-large" src="{{ .Config.StaticURL }}/svg/share-alt-square.svg?v={{ .Config.Version }}" alt="share" />
+      </a>
+    {{- end -}}
     <a href="{{ .Config.AuthURL }}/logout">
       <img class="icon icon-large" src="{{ .Config.StaticURL }}/svg/sign-out-alt.svg?v={{ .Config.Version }}" alt="signout" />
     </a>

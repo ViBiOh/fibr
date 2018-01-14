@@ -6,31 +6,33 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"strings"
 
-	"github.com/ViBiOh/fibr/ui"
+	"github.com/ViBiOh/fibr/provider"
 	"github.com/ViBiOh/fibr/utils"
 	"github.com/ViBiOh/httputils/tools"
 )
 
-type share struct {
-	Path   string `json:"path"`
-	Public bool   `json:"public"`
-	Edit   bool   `json:"edit"`
+// Share stores informations about shared paths
+type Share struct {
+	ID   string `json:"id"`
+	Path string `json:"path"`
+	Edit bool   `json:"edit"`
 }
 
 // App stores informations and secret of API
 type App struct {
 	rootDirectory    string
 	metadataFilename string
-	metadata         map[string]share
-	uiApp            *ui.App
+	metadatas        []*Share
+	renderer         provider.Renderer
 }
 
 // NewApp creates new App from Flags' config
-func NewApp(config map[string]*string, uiApp *ui.App) *App {
+func NewApp(config map[string]*string, renderer provider.Renderer) *App {
 	app := &App{
 		rootDirectory: *config[`directory`],
-		uiApp:         uiApp,
+		renderer:      renderer,
 	}
 
 	log.Printf(`Serving file from %s`, app.rootDirectory)
@@ -59,6 +61,19 @@ func (a *App) GetRootDirectory() string {
 	return a.rootDirectory
 }
 
+// GetSharedPath returns share configurion if request path match
+func (a *App) GetSharedPath(requestPath string) *Share {
+	cleanPath := strings.TrimPrefix(requestPath, `/`)
+
+	for _, share := range a.metadatas {
+		if strings.HasPrefix(cleanPath, share.ID) {
+			return share
+		}
+	}
+
+	return nil
+}
+
 func (a *App) loadMetadata() error {
 	filename, info := utils.GetPathInfo(a.rootDirectory, `.fibr.json`)
 	if info == nil {
@@ -70,7 +85,7 @@ func (a *App) loadMetadata() error {
 		return fmt.Errorf(`Error while reading metadata: %v`, err)
 	}
 
-	if err = json.Unmarshal(rawMeta, &a.metadata); err != nil {
+	if err = json.Unmarshal(rawMeta, &a.metadatas); err != nil {
 		return fmt.Errorf(`Error while unmarshalling metadata: %v`, err)
 	}
 
@@ -84,7 +99,7 @@ func (a *App) saveMetadata() error {
 		return fmt.Errorf(`No metadata file loaded`)
 	}
 
-	content, err := json.Marshal(&a.metadata)
+	content, err := json.Marshal(&a.metadatas)
 	if err != nil {
 		return fmt.Errorf(`Error while marshalling metadata: %v`, err)
 	}
