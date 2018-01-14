@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"html/template"
+	"log"
 	"net/http"
 	"os"
 	"path"
@@ -119,6 +120,8 @@ func (a *App) Error(w http.ResponseWriter, status int, err error) {
 	if err := httputils.WriteHTMLTemplate(a.tpl.Lookup(`error`), w, errorContent, status); err != nil {
 		httputils.InternalServerError(w, err)
 	}
+
+	log.Print(err)
 }
 
 // Login render login page
