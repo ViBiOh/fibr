@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -14,11 +15,7 @@ import (
 	"github.com/ViBiOh/fibr/utils"
 )
 
-const maxUploadSize = 32 * 1024 * 2014 // 32 MB
-
 func getFileForm(w http.ResponseWriter, r *http.Request) (io.ReadCloser, *multipart.FileHeader, error) {
-	r.Body = http.MaxBytesReader(w, r.Body, maxUploadSize)
-
 	uploadedFile, uploadedFileHeader, err := r.FormFile(`file`)
 	if err != nil {
 		return uploadedFile, uploadedFileHeader, fmt.Errorf(`Error while reading file form: %v`, err)
@@ -36,8 +33,8 @@ func createOrOpenFile(filename string, info os.FileInfo) (io.WriteCloser, error)
 
 // CreateDir creates given path directory to filesystem
 func (a *App) CreateDir(w http.ResponseWriter, r *http.Request, config *provider.RequestConfig) {
-	if strings.HasSuffix(r.URL.Path, `/`) {
-		filename, _ := utils.GetPathInfo(config.Root, r.URL.Path)
+	if strings.HasSuffix(config.Path, `/`) {
+		filename, _ := utils.GetPathInfo(config.Root, config.Path)
 
 		if err := os.MkdirAll(filename, 0700); err != nil {
 			a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while creating directory: %v`, err))
@@ -60,7 +57,9 @@ func (a *App) SaveFile(w http.ResponseWriter, r *http.Request, config *provider.
 		return
 	}
 
-	filename, info := utils.GetPathInfo(config.Root, r.URL.Path, uploadedFileHeader.Filename)
+	log.Printf(`%+v`, *config)
+
+	filename, info := utils.GetPathInfo(config.Root, config.Path, uploadedFileHeader.Filename)
 	hostFile, err := createOrOpenFile(filename, info)
 	if hostFile != nil {
 		defer hostFile.Close()

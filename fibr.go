@@ -40,7 +40,7 @@ func browserHandler(crudApp *crud.App, uiApp *ui.App, authConfig map[string]*str
 	users := auth.LoadUsersProfiles(*authConfig[`users`])
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet && r.Method != http.MethodPut && r.Method != http.MethodPost && r.Method != http.MethodDelete {
+		if r.Method != http.MethodGet && r.Method != http.MethodPost && r.Method != http.MethodPut && r.Method != http.MethodDelete {
 			uiApp.Error(w, http.StatusMethodNotAllowed, errors.New(`We don't understand what you want from us`))
 			return
 		}
@@ -54,14 +54,16 @@ func browserHandler(crudApp *crud.App, uiApp *ui.App, authConfig map[string]*str
 			PathPrefix: ``,
 			Path:       r.URL.Path,
 			CanEdit:    true,
+			CanShare:   true,
 		}
 
 		if err != nil {
-			if share := crudApp.GetSharedPath(r.URL.Path); share != nil {
+			if share := crudApp.GetSharedPath(config.Path); share != nil {
 				config.Root = path.Join(config.Root, share.Path)
 				config.Path = strings.TrimPrefix(config.Path, fmt.Sprintf(`/%s`, share.ID))
 				config.PathPrefix = share.ID
 				config.CanEdit = share.Edit
+				config.CanShare = false
 
 				err = nil
 			}
@@ -70,11 +72,11 @@ func browserHandler(crudApp *crud.App, uiApp *ui.App, authConfig map[string]*str
 		if err != nil {
 			handleAnonymousRequest(w, r, err, crudApp, uiApp)
 		} else if r.Method == http.MethodGet {
-			crudApp.Get(w, r, config)
+			crudApp.Get(w, r, config, nil)
+		} else if r.Method == http.MethodPost {
+			crudApp.Post(w, r, config)
 		} else if r.Method == http.MethodPut {
 			crudApp.CreateDir(w, r, config)
-		} else if r.Method == http.MethodPost {
-			crudApp.SaveFile(w, r, config)
 		} else if r.Method == http.MethodDelete {
 			crudApp.Delete(w, r, config)
 		} else {

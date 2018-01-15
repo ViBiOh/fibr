@@ -10,6 +10,8 @@
           </div>
         </div>
       </label>
+    {{- end -}}
+    {{- if .CanShare -}}
       <label>
         <img class="icon icon-large" src="{{ .Config.StaticURL }}/svg/share-alt-square.svg?v={{ .Config.Version }}" alt="share" />
         <input type="checkbox" class="toggler" />
@@ -19,9 +21,9 @@
           </div>
         </div>
       </label>
+      <a href="{{ .Config.AuthURL }}/logout">
+        <img class="icon icon-large" src="{{ .Config.StaticURL }}/svg/sign-out-alt.svg?v={{ .Config.Version }}" alt="signout" />
+      </a>
     {{- end -}}
-    <a href="{{ .Config.AuthURL }}/logout">
-      <img class="icon icon-large" src="{{ .Config.StaticURL }}/svg/sign-out-alt.svg?v={{ .Config.Version }}" alt="signout" />
-    </a>
   </div>
 {{- end -}}

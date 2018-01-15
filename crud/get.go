@@ -38,7 +38,7 @@ func (a *App) GetDir(w http.ResponseWriter, config *provider.RequestConfig, file
 }
 
 // Get write given path from filesystem
-func (a *App) Get(w http.ResponseWriter, r *http.Request, config *provider.RequestConfig) {
+func (a *App) Get(w http.ResponseWriter, r *http.Request, config *provider.RequestConfig, message *provider.Message) {
 	filename, info := utils.GetPathInfo(config.Root, config.Path)
 
 	if info == nil {
@@ -46,7 +46,7 @@ func (a *App) Get(w http.ResponseWriter, r *http.Request, config *provider.Reque
 			a.renderer.Error(w, http.StatusNotFound, fmt.Errorf(`Requested path does not exist: %s`, config.Path))
 		}
 	} else if info.IsDir() {
-		a.GetDir(w, config, filename, nil)
+		a.GetDir(w, config, filename, message)
 	} else {
 		http.ServeFile(w, r, filename)
 	}

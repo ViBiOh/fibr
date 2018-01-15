@@ -1,7 +1,1 @@
-[
-  {
-    "id": "test",
-    "path": "/vendor",
-    "edit": false
-  }
-]
+[{"id":"test","path":"/vendor","edit":false},{"id":"0e73323a-37c1-4efe-81bc-b12511686c0f","path":"/web/static/","edit":true},{"id":"ac3203e6-02e6-4786-aff0-3bde0d15e79a","path":"/web/static/","edit":false}]

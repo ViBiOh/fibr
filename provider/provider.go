@@ -12,6 +12,7 @@ type RequestConfig struct {
 	PathPrefix string
 	Path       string
 	CanEdit    bool
+	CanShare   bool
 }
 
 // Message rendered to user

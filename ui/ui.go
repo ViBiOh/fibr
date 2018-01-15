@@ -172,6 +172,7 @@ func (a *App) Directory(w http.ResponseWriter, config *provider.RequestConfig, f
 	pageContent[`RootName`] = path.Base(config.Root)
 	pageContent[`Paths`] = paths
 	pageContent[`CanEdit`] = config.CanEdit
+	pageContent[`CanShare`] = config.CanShare
 
 	pageContent[`PathPrefix`] = config.PathPrefix
 	if config.PathPrefix != `` {

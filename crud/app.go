@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"strings"
+	"sync"
 
 	"github.com/ViBiOh/fibr/provider"
 	"github.com/ViBiOh/fibr/utils"
@@ -25,6 +26,7 @@ type App struct {
 	rootDirectory    string
 	metadataFilename string
 	metadatas        []*Share
+	metadataLock     sync.Mutex
 	renderer         provider.Renderer
 }
 
@@ -33,6 +35,7 @@ func NewApp(config map[string]*string, renderer provider.Renderer) *App {
 	app := &App{
 		rootDirectory: *config[`directory`],
 		renderer:      renderer,
+		metadataLock:  sync.Mutex{},
 	}
 
 	log.Printf(`Serving file from %s`, app.rootDirectory)
@@ -104,8 +107,10 @@ func (a *App) saveMetadata() error {
 		return fmt.Errorf(`Error while marshalling metadata: %v`, err)
 	}
 
+	log.Printf(`%s`, content)
+
 	if err := ioutil.WriteFile(a.metadataFilename, content, 0600); err != nil {
-		return fmt.Errorf(`Error while writing metadata: %v`, err)
+		return fmt.Errorf(`Error while writing metadatas: %v`, err)
 	}
 
 	return nil
