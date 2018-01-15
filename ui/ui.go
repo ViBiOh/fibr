@@ -171,8 +171,12 @@ func (a *App) Directory(w http.ResponseWriter, config *provider.RequestConfig, f
 	}
 	pageContent[`RootName`] = path.Base(config.Root)
 	pageContent[`Paths`] = paths
-	pageContent[`PathPrefix`] = fmt.Sprintf(`%s/`, config.PathPrefix)
 	pageContent[`CanEdit`] = config.CanEdit
+
+	pageContent[`PathPrefix`] = config.PathPrefix
+	if config.PathPrefix != `` {
+		pageContent[`PathPrefix`] = fmt.Sprintf(`%s/`, config.PathPrefix)
+	}
 
 	w.Header().Add(`Cache-Control`, `no-cache`)
 	if err := httputils.WriteHTMLTemplate(a.tpl.Lookup(`files`), w, pageContent, http.StatusOK); err != nil {
