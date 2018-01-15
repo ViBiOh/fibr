@@ -43,6 +43,10 @@
       width: 100%;
     }
 
+    .half {
+      width: 50%;
+    }
+
     .flex {
       display: flex;
     }
@@ -93,6 +97,7 @@
     }
 
     .fields {
+      display: flex;
       padding-left: 1rem;
       padding-right: 1rem;
     }
@@ -100,7 +105,7 @@
     .button {
       border-radius: 4px;
       border: 0;
-      padding: 1rem;  
+      padding: 1rem;
     }
 
     .bg-important {
@@ -127,6 +132,11 @@
       top: 0;
     }
 
+    .modal-content {
+      background-color: whitesmoke;
+      pointer-events: auto;
+    }
+
     .message {
       margin: 0;
       padding: 1rem 2rem;
@@ -147,11 +157,6 @@
       bottom: 1rem;
       position: fixed;
       right: 1rem;
-    }
-
-    #upload-form {
-      background-color: whitesmoke;
-      pointer-events: auto;
     }
 
     @media print {

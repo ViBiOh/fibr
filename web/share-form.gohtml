@@ -1,0 +1,14 @@
+{{- define "share-form" -}}
+  <form class="modal-content" method="POST">
+    <h2 class="header">Share folder access</h2>
+    <p class="fields">
+      <label for="public" class="half">Public</label>
+      <input id="public" type="checkbox" name="public" class="half" />
+    </p>
+    <p class="center">
+      <button type="submit" class="button bg-important">
+        Share
+      </button>
+    </p>
+  </form>
+{{- end -}}

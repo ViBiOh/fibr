@@ -121,7 +121,7 @@ func (a *App) Error(w http.ResponseWriter, status int, err error) {
 		httputils.InternalServerError(w, err)
 	}
 
-	log.Print(err)
+	log.Printf(`[error] %v`, err)
 }
 
 // Login render login page
