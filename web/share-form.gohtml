@@ -1,35 +1,49 @@
 {{- define "share-form" -}}
   <div class="modal-content">
+    <h2 class="header">Shared folders</h2>
+
+    {{- $root := . -}}
+
     {{- if len .Shares -}}
-      <table>
+      <table id="shares" cellpadding="10" cellspacing="0">
           <thead>
-              <tr>
-                  <td>ID</td>
-                  <td>Path</td>
-                  <td>Edit</td>
-              </tr>
+            <tr class="share-content">
+                <td>ID</td>
+                <td>Path</td>
+                <td>
+                  <img class="icon" src="{{ .Config.StaticURL }}/svg/edit.svg?v={{ .Config.Version }}" alt="edit" />
+                </td>
+            </tr>
           </thead>
           <tbody>
             {{- range .Shares -}}
-              <tr>
-                  <td>{{ .ID }}</td>
-                  <td>{{ .Path }}</td>
-                  <td>{{ .Edit }}</td>
+              <tr class="share-content">
+                  <td>
+                    <code>{{ .ID }}</code>
+                  </td>
+                  <td>
+                    <code>{{ .Path }}</code>
+                  </td>
+                  <td>
+                    {{- if .Edit -}}
+                      <img class="icon" src="{{ $root.Config.StaticURL }}/svg/check.svg?v={{ $root.Config.Version }}" alt="edit" />
+                    {{- end -}}
+                  </td>
               </tr>
             {{- end -}}
           </tbody>
       </table>
     {{- end -}}
 
-    <form method="POST">
-      <h2 class="header">Share folder access</h2>
-      <p class="fields center">
-        <input id="edit" type="checkbox" name="edit" value="true" />
-        <label for="edit">Edit</label>
-      </p>
+    <form method="post">
       <p class="center">
+        Share this directory,
+        <label for="edit">
+          <strong>with edition </strong>
+        </label>
+        <input id="edit" type="checkbox" name="edit" value="true" />
         <button type="submit" class="button bg-important">
-          Share
+          <img class="icon" src="{{ $root.Config.StaticURL }}/svg/check.svg?v={{ $root.Config.Version }}" alt="submit" />
         </button>
       </p>
     </form>

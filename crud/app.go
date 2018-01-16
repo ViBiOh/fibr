@@ -107,8 +107,6 @@ func (a *App) saveMetadata() error {
 		return fmt.Errorf(`Error while marshalling metadata: %v`, err)
 	}
 
-	log.Printf(`%s`, content)
-
 	if err := ioutil.WriteFile(a.metadataFilename, content, 0600); err != nil {
 		return fmt.Errorf(`Error while writing metadatas: %v`, err)
 	}

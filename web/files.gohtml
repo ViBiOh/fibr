@@ -15,7 +15,7 @@
 
   {{- template "message" .Message -}}
 
-  <ul class="files">
+  <ul id="files">
     {{- range .Files -}}
       <li class="file">
         {{- if .IsDir -}}
