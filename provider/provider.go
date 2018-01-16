@@ -2,7 +2,6 @@ package provider
 
 import (
 	"net/http"
-	"os"
 )
 
 // RequestConfig stores informations
@@ -26,5 +25,5 @@ type Renderer interface {
 	Error(http.ResponseWriter, int, error)
 	Login(http.ResponseWriter, *Message)
 	Sitemap(http.ResponseWriter)
-	Directory(http.ResponseWriter, *RequestConfig, []os.FileInfo, *Message)
+	Directory(http.ResponseWriter, *RequestConfig, map[string]interface{}, *Message)
 }

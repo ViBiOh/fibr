@@ -145,7 +145,7 @@ func (a *App) Sitemap(w http.ResponseWriter) {
 }
 
 // Directory render directory listing
-func (a *App) Directory(w http.ResponseWriter, config *provider.RequestConfig, files []os.FileInfo, message *provider.Message) {
+func (a *App) Directory(w http.ResponseWriter, config *provider.RequestConfig, content map[string]interface{}, message *provider.Message) {
 	pageContent := cloneContent(a.base)
 	if message != nil {
 		pageContent[`Message`] = message
@@ -163,8 +163,6 @@ func (a *App) Directory(w http.ResponseWriter, config *provider.RequestConfig, f
 		`ImgWidth`:    seo[`ImgWidth`],
 	}
 
-	pageContent[`Files`] = files
-
 	paths := strings.Split(currentPath, `/`)
 	if paths[0] == `` {
 		paths = nil
@@ -177,6 +175,10 @@ func (a *App) Directory(w http.ResponseWriter, config *provider.RequestConfig, f
 	pageContent[`PathPrefix`] = config.PathPrefix
 	if config.PathPrefix != `` {
 		pageContent[`PathPrefix`] = fmt.Sprintf(`%s/`, config.PathPrefix)
+	}
+
+	for key, value := range content {
+		pageContent[key] = value
 	}
 
 	w.Header().Add(`Cache-Control`, `no-cache`)

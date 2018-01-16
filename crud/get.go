@@ -34,7 +34,15 @@ func (a *App) GetDir(w http.ResponseWriter, config *provider.RequestConfig, file
 
 	config.Path = strings.TrimPrefix(filename, config.Root)
 
-	a.renderer.Directory(w, config, files, message)
+	content := map[string]interface{}{
+		`Files`: files,
+	}
+
+	if config.CanShare {
+		content[`Shares`] = a.getShareOfPath(config.Path)
+	}
+
+	a.renderer.Directory(w, config, content, message)
 }
 
 // Get write given path from filesystem
