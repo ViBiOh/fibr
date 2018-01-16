@@ -1,14 +1,37 @@
 {{- define "share-form" -}}
-  <form class="modal-content" method="POST">
-    <h2 class="header">Share folder access</h2>
-    <p class="fields">
-      <label for="edit" class="half">Edit</label>
-      <input id="edit" type="checkbox" name="edit" class="half" value="true" />
-    </p>
-    <p class="center">
-      <button type="submit" class="button bg-important">
-        Share
-      </button>
-    </p>
-  </form>
+  <div class="modal-content">
+    {{- if len .Shares -}}
+      <table>
+          <thead>
+              <tr>
+                  <td>ID</td>
+                  <td>Path</td>
+                  <td>Edit</td>
+              </tr>
+          </thead>
+          <tbody>
+            {{- range .Shares -}}
+              <tr>
+                  <td>{{ .ID }}</td>
+                  <td>{{ .Path }}</td>
+                  <td>{{ .Edit }}</td>
+              </tr>
+            {{- end -}}
+          </tbody>
+      </table>
+    {{- end -}}
+
+    <form method="POST">
+      <h2 class="header">Share folder access</h2>
+      <p class="fields center">
+        <input id="edit" type="checkbox" name="edit" value="true" />
+        <label for="edit">Edit</label>
+      </p>
+      <p class="center">
+        <button type="submit" class="button bg-important">
+          Share
+        </button>
+      </p>
+    </form>
+  </div>
 {{- end -}}

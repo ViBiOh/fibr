@@ -10,18 +10,6 @@ import (
 	"github.com/ViBiOh/httputils/uuid"
 )
 
-func (a *App) getShareOfPath(pathname string) []*Share {
-	shares := make([]*Share, 0)
-
-	for _, share := range a.metadatas {
-		if share.Path == pathname {
-			shares = append(shares, share)
-		}
-	}
-
-	return shares
-}
-
 // CreateShare create a share for given URL
 func (a *App) CreateShare(w http.ResponseWriter, r *http.Request, config *provider.RequestConfig) {
 	if !config.CanShare {

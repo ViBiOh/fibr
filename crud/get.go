@@ -39,7 +39,7 @@ func (a *App) GetDir(w http.ResponseWriter, config *provider.RequestConfig, file
 	}
 
 	if config.CanShare {
-		content[`Shares`] = a.getShareOfPath(config.Path)
+		content[`Shares`] = a.metadatas
 	}
 
 	a.renderer.Directory(w, config, content, message)
