@@ -5,7 +5,7 @@
   {{- $root := . -}}
 
   <header class="header">
-    <h1 class="title">Directory
+    <h1 class="title">
       <a href="/{{ .PathPrefix }}">{{ .RootName }}</a>
       {{- range $index, $path := .Paths -}}
          / <a href="/{{ $root.PathPrefix }}{{- rebuildPaths $root.Paths $index -}}/">{{- $path -}}</a>

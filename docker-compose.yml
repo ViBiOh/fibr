@@ -69,7 +69,7 @@ services:
     - -version
     - ${VERSION}
     - -csp
-    - default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' fibr-static.vibioh.fr
+    - default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' fibr-static.vibioh.fr; base-uri 'self'
     labels:
       traefik.frontend.passHostHeader: 'true'
       traefik.frontend.rule: 'Host: fibr.vibioh.fr'
