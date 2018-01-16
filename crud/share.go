@@ -1,6 +1,7 @@
 package crud
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -11,6 +12,10 @@ import (
 
 // CreateShare create a share for given URL
 func (a *App) CreateShare(w http.ResponseWriter, r *http.Request, config *provider.RequestConfig) {
+	if !config.CanShare {
+		a.renderer.Error(w, http.StatusForbidden, errors.New(`You're not authorized to do this ⛔`))
+	}
+
 	var edit bool
 	var err error
 

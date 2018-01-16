@@ -13,7 +13,7 @@ import (
 
 // Delete given path from filesystem
 func (a *App) Delete(w http.ResponseWriter, r *http.Request, config *provider.RequestConfig) {
-	if path.Join(config.Root, config.Path) == `/` {
+	if !config.CanEdit || path.Join(config.Root, config.Path) == `/` {
 		a.renderer.Error(w, http.StatusForbidden, errors.New(`You're not authorized to do this ⛔`))
 	} else if filename, info := utils.GetPathInfo(config.Root, config.Path); info == nil {
 		a.renderer.Error(w, http.StatusNotFound, errors.New(`Requested path does not exist`))

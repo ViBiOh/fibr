@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -33,6 +32,10 @@ func createOrOpenFile(filename string, info os.FileInfo) (io.WriteCloser, error)
 
 // CreateDir creates given path directory to filesystem
 func (a *App) CreateDir(w http.ResponseWriter, r *http.Request, config *provider.RequestConfig) {
+	if !config.CanEdit {
+		a.renderer.Error(w, http.StatusForbidden, errors.New(`You're not authorized to do this ⛔`))
+	}
+
 	if strings.HasSuffix(config.Path, `/`) {
 		filename, _ := utils.GetPathInfo(config.Root, config.Path)
 
@@ -48,6 +51,10 @@ func (a *App) CreateDir(w http.ResponseWriter, r *http.Request, config *provider
 
 // SaveFile saves form file to filesystem
 func (a *App) SaveFile(w http.ResponseWriter, r *http.Request, config *provider.RequestConfig) {
+	if !config.CanEdit {
+		a.renderer.Error(w, http.StatusForbidden, errors.New(`You're not authorized to do this ⛔`))
+	}
+
 	uploadedFile, uploadedFileHeader, err := getFileForm(w, r)
 	if uploadedFile != nil {
 		defer uploadedFile.Close()
@@ -56,8 +63,6 @@ func (a *App) SaveFile(w http.ResponseWriter, r *http.Request, config *provider.
 		a.renderer.Error(w, http.StatusBadRequest, fmt.Errorf(`Error while getting file from form: %v`, err))
 		return
 	}
-
-	log.Printf(`%+v`, *config)
 
 	filename, info := utils.GetPathInfo(config.Root, config.Path, uploadedFileHeader.Filename)
 	hostFile, err := createOrOpenFile(filename, info)
