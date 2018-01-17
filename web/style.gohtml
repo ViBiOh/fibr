@@ -63,10 +63,6 @@
       padding: 0;
     }
 
-    .filename {
-      margin-left: 2rem;
-    }
-
     .icon {
       height: 2rem;
       vertical-align: middle;
@@ -106,6 +102,19 @@
       color: ghostwhite;
     }
 
+    .modifier {
+      display: none;
+    }
+
+    .modifier + label {
+      display: inline-block;
+      padding: 1rem;
+    }
+
+    .modifier:checked + label {
+      background-color: lightgreen;
+    }
+
     .modal {
       background-color: rgba(105, 105, 105, 0.75);
       height: 100%;
@@ -139,11 +148,6 @@
       padding: 0;
     }
 
-    .file {
-      line-height: 2rem;
-      padding: 0.5rem 0 0 1rem;
-    }
-
     #shares {
       padding: 1rem;
       width: 100%;
@@ -165,6 +169,15 @@
     #upload-modal:target,
     #share-modal:target {
       display: flex;
+    }
+
+    #list-display:checked ~ #files .file {
+      line-height: 2rem;
+      padding: 0.5rem 0 0 1rem;
+    }
+
+    #list-display:checked ~ #files .filename img {
+      margin-right: 1rem;
     }
 
     @media print {

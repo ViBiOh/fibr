@@ -2,21 +2,22 @@
   <div id="tools">
     {{- if .CanEdit -}}
       <a href="#upload-modal">
-        <img class="icon icon-large" src="{{ .Config.StaticURL }}/svg/cloud-upload-alt.svg?v={{ .Config.Version }}" alt="upload" />
+        <img class="icon icon-large" src="{{- .Config.StaticURL -}}/svg/cloud-upload-alt.svg?v={{- .Config.Version -}}" alt="upload" />
       </a>
       <div id="upload-modal" class="modal full flex flex-center">
         {{- template "upload-form" . -}}
       </div>
     {{- end -}}
+
     {{- if .CanShare -}}
       <a href="#share-modal">
-        <img class="icon icon-large" src="{{ .Config.StaticURL }}/svg/share-alt-square.svg?v={{ .Config.Version }}" alt="share" />
+        <img class="icon icon-large" src="{{- .Config.StaticURL -}}/svg/share-alt-square.svg?v={{- .Config.Version -}}" alt="share" />
       </a>
       <div id="share-modal" class="modal full flex flex-center">
         {{- template "share-form" . -}}
       </div>
-      <a href="{{ .Config.AuthURL }}/logout">
-        <img class="icon icon-large" src="{{ .Config.StaticURL }}/svg/sign-out-alt.svg?v={{ .Config.Version }}" alt="signout" />
+      <a href="{{- .Config.AuthURL -}}/logout">
+        <img class="icon icon-large" src="{{- .Config.StaticURL -}}/svg/sign-out-alt.svg?v={{- .Config.Version -}}" alt="signout" />
       </a>
     {{- end -}}
   </div>

@@ -7,14 +7,14 @@
   <header class="header">
     <h1 class="title" itemscope itemtype="http://schema.org/BreadcrumbList">
       <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
-        <a href="/{{ .PathPrefix }}" itemprop="item">
-          <span itemprop="name">{{ .RootName }}</span>
+        <a href="/{{- .PathPrefix -}}" itemprop="item">
+          <span itemprop="name">{{- .RootName -}}</span>
         </a>
       </span>
       {{- range $index, $path := .Paths -}}
         <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
            / 
-          <a href="/{{ $root.PathPrefix }}{{- rebuildPaths $root.Paths $index -}}/" itemprop="item">
+          <a href="/{{- $root.PathPrefix -}}{{- rebuildPaths $root.Paths $index -}}/" itemprop="item">
             <span itemprop="name">{{- $path -}}</span>
           </a>
         </span>
@@ -24,18 +24,25 @@
 
   {{- template "message" .Message -}}
 
-  <ul id="files">
-    {{- range .Files -}}
-      <li class="file">
-        {{- if .IsDir -}}
-          <img class="icon" src="{{ $root.Config.StaticURL }}/svg/folder.svg?v={{ $root.Config.Version }}" alt="folder" />
-        {{- else -}}
-          <img class="icon" src="{{ $root.Config.StaticURL }}/svg/file{{ typeFromExtension . }}.svg?v={{ $root.Config.Version }}" alt="file" />
-        {{- end -}}
-        <a class="filename" href="{{ filename . }}">{{ filename . }}</a>
-      </li>
-    {{- end -}}
-  </ul>
+  <div>
+    {{- template "modifiers" . -}}
+
+    <ul id="files">
+      {{- range .Files -}}
+        <li class="file">
+          <a class="filename" href="{{- filename . -}}" title="{{- filename . -}}">
+            {{- if .IsDir -}}
+              <img class="icon" src="{{- $root.Config.StaticURL -}}/svg/folder.svg?v={{- $root.Config.Version -}}" alt="folder" />
+            {{- else -}}
+              <img class="icon" src="{{- $root.Config.StaticURL -}}/svg/file{{- typeFromExtension . -}}.svg?v={{- $root.Config.Version -}}" alt="file" />
+            {{- end -}}
+
+            {{- filename . -}}
+          </a>
+        </li>
+      {{- end -}}
+    </ul>
+  </div>
 
   {{- template "footer" . -}}
 {{- end -}}

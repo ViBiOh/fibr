@@ -11,7 +11,7 @@
                 <td>ID</td>
                 <td>Path</td>
                 <td class="icon">
-                  <img class="icon" src="{{ .Config.StaticURL }}/svg/edit.svg?v={{ .Config.Version }}" alt="edit" />
+                  <img class="icon" src="{{- .Config.StaticURL -}}/svg/edit.svg?v={{- .Config.Version -}}" alt="edit" />
                 </td>
             </tr>
           </thead>
@@ -19,14 +19,14 @@
             {{- range .Shares -}}
               <tr class="share-content">
                   <td>
-                    <code>{{ .ID }}</code>
+                    <code>{{- .ID -}}</code>
                   </td>
                   <td>
-                    <code>{{ .Path }}</code>
+                    <code>{{- .Path -}}</code>
                   </td>
                   <td>
                     {{- if .Edit -}}
-                      <img class="icon" src="{{ $root.Config.StaticURL }}/svg/check.svg?v={{ $root.Config.Version }}" alt="edit" />
+                      <img class="icon" src="{{- $root.Config.StaticURL -}}/svg/check.svg?v={{- $root.Config.Version -}}" alt="edit" />
                     {{- end -}}
                   </td>
               </tr>
@@ -43,7 +43,7 @@
         </label>
         <input id="edit" type="checkbox" name="edit" value="true" />
         <button type="submit" class="button bg-important">
-          <img class="icon" src="{{ $root.Config.StaticURL }}/svg/check.svg?v={{ $root.Config.Version }}" alt="submit" />
+          <img class="icon" src="{{- $root.Config.StaticURL -}}/svg/check.svg?v={{- $root.Config.Version -}}" alt="submit" />
         </button>
       </p>
       <p class="center">

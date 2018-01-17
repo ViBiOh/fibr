@@ -1,0 +1,10 @@
+{{- define "modifiers" -}}
+  <input id="list-display" class="modifier" type="radio" name="modifier" checked>
+  <label for="list-display">
+    <img class="icon" src="{{- .Config.StaticURL -}}/svg/list.svg?v={{- .Config.Version -}}" alt="list" />
+  </label>
+  <input id="grid-display" class="modifier" type="radio" name="modifier">
+  <label for="grid-display">
+    <img class="icon" src="{{- .Config.StaticURL -}}/svg/th.svg?v={{- .Config.Version -}}" alt="grid" />
+  </label>
+{{- end -}}
