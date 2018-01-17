@@ -116,7 +116,6 @@ func (a *App) Error(w http.ResponseWriter, status int, err error) {
 		errorContent[`Error`] = err.Error()
 	}
 
-	w.Header().Add(`Cache-Control`, `no-cache`)
 	if err := httputils.WriteHTMLTemplate(a.tpl.Lookup(`error`), w, errorContent, status); err != nil {
 		httputils.InternalServerError(w, err)
 	}
@@ -131,7 +130,6 @@ func (a *App) Login(w http.ResponseWriter, message *provider.Message) {
 		loginContent[`Message`] = message
 	}
 
-	w.Header().Add(`Cache-Control`, `no-cache`)
 	if err := httputils.WriteHTMLTemplate(a.tpl.Lookup(`login`), w, loginContent, http.StatusOK); err != nil {
 		a.Error(w, http.StatusInternalServerError, err)
 	}
@@ -181,7 +179,6 @@ func (a *App) Directory(w http.ResponseWriter, config *provider.RequestConfig, c
 		pageContent[key] = value
 	}
 
-	w.Header().Add(`Cache-Control`, `no-cache`)
 	if err := httputils.WriteHTMLTemplate(a.tpl.Lookup(`files`), w, pageContent, http.StatusOK); err != nil {
 		a.Error(w, http.StatusInternalServerError, err)
 	}
