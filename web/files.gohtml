@@ -32,7 +32,7 @@
         {{- else -}}
           <img class="icon" src="{{ $root.Config.StaticURL }}/svg/file{{ typeFromExtension . }}.svg?v={{ $root.Config.Version }}" alt="file" />
         {{- end -}}
-        <a href="{{ filename . }}">{{ filename . }}</a>
+        <a class="filename" href="{{ filename . }}">{{ filename . }}</a>
       </li>
     {{- end -}}
   </ul>
