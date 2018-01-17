@@ -57,16 +57,17 @@ func browserHandler(crudApp *crud.App, uiApp *ui.App, authConfig map[string]*str
 			CanShare:   true,
 		}
 
-		if err != nil {
-			if share := crudApp.GetSharedPath(config.Path); share != nil {
-				config.Root = path.Join(config.Root, share.Path)
-				config.Path = strings.TrimPrefix(config.Path, fmt.Sprintf(`/%s`, share.ID))
-				config.PathPrefix = share.ID
+		if share := crudApp.GetSharedPath(config.Path); share != nil {
+			config.Root = path.Join(config.Root, share.Path)
+			config.Path = strings.TrimPrefix(config.Path, fmt.Sprintf(`/%s`, share.ID))
+			config.PathPrefix = share.ID
+
+			if err != nil {
 				config.CanEdit = share.Edit
 				config.CanShare = false
-
-				err = nil
 			}
+
+			err = nil
 		}
 
 		if err != nil {

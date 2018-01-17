@@ -1,6 +1,8 @@
 package crud
 
 import (
+	"crypto/sha1"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"net/http"
@@ -35,11 +37,15 @@ func (a *App) CreateShare(w http.ResponseWriter, r *http.Request, config *provid
 		return
 	}
 
+	hasher := sha1.New()
+	hasher.Write([]byte(uuid))
+	id := hex.EncodeToString(hasher.Sum(nil))
+
 	a.metadataLock.Lock()
 	defer a.metadataLock.Unlock()
 
 	a.metadatas = append(a.metadatas, &Share{
-		ID:   uuid,
+		ID:   id,
 		Path: r.URL.Path,
 		Edit: edit,
 	})
@@ -51,6 +57,6 @@ func (a *App) CreateShare(w http.ResponseWriter, r *http.Request, config *provid
 
 	a.Get(w, r, config, &provider.Message{
 		Level:   `success`,
-		Content: fmt.Sprintf(`Share successfully created with ID: %s`, uuid),
+		Content: fmt.Sprintf(`Share successfully created with ID: %s`, id),
 	})
 }
