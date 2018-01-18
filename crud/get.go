@@ -12,6 +12,7 @@ import (
 	"github.com/ViBiOh/fibr/provider"
 	"github.com/ViBiOh/fibr/thumbnail"
 	"github.com/ViBiOh/fibr/utils"
+	"github.com/ViBiOh/httputils"
 )
 
 // CheckAndServeSEO check if filename match SEO and serve it, or not
@@ -69,24 +70,24 @@ func (a *App) Get(w http.ResponseWriter, r *http.Request, config *provider.Reque
 
 		parts := strings.Split(size, `x`)
 		if len(parts) != 2 {
-			a.renderer.Error(w, http.StatusBadRequest, errors.New(`Invalid size format, expected 'size=[width]x[height]`))
+			httputils.BadRequest(w, errors.New(`Invalid size format, expected 'size=[width]x[height]`))
 			return
 		}
 
 		width, err := strconv.Atoi(parts[0])
 		if err != nil {
-			a.renderer.Error(w, http.StatusBadRequest, fmt.Errorf(`Invalid width for image size: %v`, err))
+			httputils.BadRequest(w, fmt.Errorf(`Invalid width for image size: %v`, err))
 			return
 		}
 
 		height, err := strconv.Atoi(parts[1])
 		if err != nil {
-			a.renderer.Error(w, http.StatusBadRequest, fmt.Errorf(`Invalid height for image size: %v`, err))
+			httputils.BadRequest(w, fmt.Errorf(`Invalid height for image size: %v`, err))
 			return
 		}
 
 		if err := thumbnail.ServeThumbnail(w, filename, uint(width), uint(height)); err != nil {
-			a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while serving thumbnail: %v`, err))
+			httputils.InternalServerError(w, fmt.Errorf(`Error while serving thumbnail: %v`, err))
 		}
 	}
 }

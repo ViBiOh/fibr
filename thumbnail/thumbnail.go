@@ -12,7 +12,7 @@ import (
 	"github.com/nfnt/resize"
 )
 
-var tokenPool = make(chan int, 2)
+var tokenPool = make(chan int, 4)
 
 func getToken() {
 	tokenPool <- 1
@@ -32,11 +32,6 @@ func getThumbnail(filename string, width, height uint) (*image.Image, string, er
 	}
 
 	img, imgType, err := image.Decode(reader)
-	if img != nil {
-		defer func() {
-			img = nil
-		}()
-	}
 	if err != nil {
 		return nil, ``, fmt.Errorf(`Error while decoding image: %v`, err)
 	}
@@ -46,17 +41,12 @@ func getThumbnail(filename string, width, height uint) (*image.Image, string, er
 	return &thumbnail, imgType, nil
 }
 
-// ServeThumbnail service thumbnail image of given filename
+// ServeThumbnail render thumbnail image of given filename
 func ServeThumbnail(w http.ResponseWriter, filename string, width, height uint) error {
 	getToken()
 	defer releaseToken()
 
 	thumbnail, imgType, err := getThumbnail(filename, width, height)
-	if thumbnail != nil {
-		defer func() {
-			thumbnail = nil
-		}()
-	}
 	if err != nil {
 		return fmt.Errorf(`Error while generating thumbnail: %s`, err)
 	}
