@@ -1,13 +1,16 @@
 package crud
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"path"
+	"strconv"
 	"strings"
 
 	"github.com/ViBiOh/fibr/provider"
+	"github.com/ViBiOh/fibr/thumbnail"
 	"github.com/ViBiOh/fibr/utils"
 )
 
@@ -25,7 +28,7 @@ func (a *App) CheckAndServeSEO(w http.ResponseWriter, r *http.Request) bool {
 }
 
 // GetDir render directory web view of given dirPath
-func (a *App) GetDir(w http.ResponseWriter, config *provider.RequestConfig, filename string, message *provider.Message) {
+func (a *App) GetDir(w http.ResponseWriter, config *provider.RequestConfig, filename string, display string, message *provider.Message) {
 	files, err := ioutil.ReadDir(filename)
 	if err != nil {
 		a.renderer.Error(w, http.StatusInternalServerError, err)
@@ -42,7 +45,7 @@ func (a *App) GetDir(w http.ResponseWriter, config *provider.RequestConfig, file
 		content[`Shares`] = a.metadatas
 	}
 
-	a.renderer.Directory(w, config, content, message)
+	a.renderer.Directory(w, config, content, display, message)
 }
 
 // Get write given path from filesystem
@@ -54,8 +57,36 @@ func (a *App) Get(w http.ResponseWriter, r *http.Request, config *provider.Reque
 			a.renderer.Error(w, http.StatusNotFound, fmt.Errorf(`Requested path does not exist: %s`, config.Path))
 		}
 	} else if info.IsDir() {
-		a.GetDir(w, config, filename, message)
+		a.GetDir(w, config, filename, r.URL.Query().Get(`d`), message)
 	} else {
-		http.ServeFile(w, r, filename)
+		values := r.URL.Query()
+		size := values.Get(`size`)
+
+		if !provider.ImageExtensions[path.Ext(info.Name())] || size == `` {
+			http.ServeFile(w, r, filename)
+			return
+		}
+
+		parts := strings.Split(size, `x`)
+		if len(parts) != 2 {
+			a.renderer.Error(w, http.StatusBadRequest, errors.New(`Invalid size format, expected 'size=[width]x[height]`))
+			return
+		}
+
+		width, err := strconv.Atoi(parts[0])
+		if err != nil {
+			a.renderer.Error(w, http.StatusBadRequest, fmt.Errorf(`Invalid width for image size: %v`, err))
+			return
+		}
+
+		height, err := strconv.Atoi(parts[1])
+		if err != nil {
+			a.renderer.Error(w, http.StatusBadRequest, fmt.Errorf(`Invalid height for image size: %v`, err))
+			return
+		}
+
+		if err := thumbnail.ServeThumbnail(w, filename, uint(width), uint(height)); err != nil {
+			a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while serving thumbnail: %v`, err))
+		}
 	}
 }

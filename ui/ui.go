@@ -15,17 +15,6 @@ import (
 	"github.com/ViBiOh/httputils/tools"
 )
 
-var (
-	archiveExtension = map[string]bool{`.zip`: true, `.tar`: true, `.gz`: true, `.rar`: true}
-	audioExtension   = map[string]bool{`.mp3`: true}
-	codeExtension    = map[string]bool{`.html`: true, `.css`: true, `.js`: true, `.jsx`: true, `.json`: true, `.yml`: true, `.yaml`: true, `.toml`: true, `.md`: true, `.go`: true, `.py`: true, `.java`: true, `.xml`: true}
-	excelExtension   = map[string]bool{`.xls`: true, `.xlsx`: true, `.xlsm`: true}
-	imageExtension   = map[string]bool{`.jpg`: true, `.jpeg`: true, `.png`: true, `.gif`: true, `.svg`: true, `.tiff`: true}
-	pdfExtension     = map[string]bool{`.pdf`: true}
-	videoExtension   = map[string]bool{`.mp4`: true, `.mov`: true, `.avi`: true}
-	wordExtension    = map[string]bool{`.doc`: true, `.docx`: true, `.docm`: true}
-)
-
 func cloneContent(content map[string]interface{}) map[string]interface{} {
 	clone := make(map[string]interface{})
 	for key, value := range content {
@@ -67,25 +56,28 @@ func NewApp(config map[string]*string, authURL string) *App {
 				extension := path.Ext(file.Name())
 
 				switch {
-				case archiveExtension[extension]:
+				case provider.ArchiveExtensions[extension]:
 					return `-archive`
-				case audioExtension[extension]:
+				case provider.AudioExtensions[extension]:
 					return `-audio`
-				case codeExtension[extension]:
+				case provider.CodeExtensions[extension]:
 					return `-code`
-				case excelExtension[extension]:
+				case provider.ExcelExtensions[extension]:
 					return `-excel`
-				case imageExtension[extension]:
+				case provider.ImageExtensions[extension]:
 					return `-image`
-				case pdfExtension[extension]:
+				case provider.PdfExtensions[extension]:
 					return `-pdf`
-				case videoExtension[extension]:
+				case provider.VideoExtensions[extension]:
 					return `-video`
-				case wordExtension[extension]:
+				case provider.WordExtensions[extension]:
 					return `-word`
 				default:
 					return ``
 				}
+			},
+			`isImage`: func(file os.FileInfo) bool {
+				return provider.ImageExtensions[path.Ext(file.Name())]
 			},
 		}).ParseGlob(`./web/*.gohtml`)),
 
@@ -143,7 +135,7 @@ func (a *App) Sitemap(w http.ResponseWriter) {
 }
 
 // Directory render directory listing
-func (a *App) Directory(w http.ResponseWriter, config *provider.RequestConfig, content map[string]interface{}, message *provider.Message) {
+func (a *App) Directory(w http.ResponseWriter, config *provider.RequestConfig, content map[string]interface{}, display string, message *provider.Message) {
 	pageContent := cloneContent(a.base)
 	if message != nil {
 		pageContent[`Message`] = message
@@ -169,6 +161,11 @@ func (a *App) Directory(w http.ResponseWriter, config *provider.RequestConfig, c
 	pageContent[`Paths`] = paths
 	pageContent[`CanEdit`] = config.CanEdit
 	pageContent[`CanShare`] = config.CanShare
+
+	pageContent[`Display`] = `list`
+	if display != `` {
+		pageContent[`Display`] = display
+	}
 
 	pageContent[`PathPrefix`] = config.PathPrefix
 	if config.PathPrefix != `` {

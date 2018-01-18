@@ -2,10 +2,10 @@
 
 
 [[projects]]
+  branch = "master"
   name = "github.com/NYTimes/gziphandler"
   packages = ["."]
-  revision = "d6f46609c7629af3a02d791a4666866eed3cbd3e"
-  version = "v1.0.0"
+  revision = "47ca22a0aeea4c9ceddfb935d818d636d934c312"
 
 [[projects]]
   branch = "master"
@@ -14,7 +14,7 @@
     "alcotest",
     "httpclient"
   ]
-  revision = "7187d04caa2bfd06fc89ca52092c0ff924ff39bc"
+  revision = "10d38c99a86257c343dd2abaf4f6a6192e7aa3f8"
 
 [[projects]]
   branch = "master"
@@ -23,7 +23,7 @@
     "auth",
     "cookie"
   ]
-  revision = "7b63807fdfe5b3bb2140a89f89717a500fb5340c"
+  revision = "eaa068aebe20a4feedfb4de5f33f0a20034d3719"
 
 [[projects]]
   branch = "master"
@@ -34,9 +34,10 @@
     "owasp",
     "prometheus",
     "rate",
-    "tools"
+    "tools",
+    "uuid"
   ]
-  revision = "aa8c1e9b12ee01cb4ae60f9fc34f22b7b8e9478b"
+  revision = "d9e777753ee5ba376805fcc97fe07d1d76d22dad"
 
 [[projects]]
   branch = "master"
@@ -58,12 +59,18 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/nfnt/resize"
+  packages = ["."]
+  revision = "891127d8d1b52734debe1b3c3d7e747502b6c366"
+
+[[projects]]
+  branch = "master"
   name = "github.com/prometheus/client_golang"
   packages = [
     "prometheus",
     "prometheus/promhttp"
   ]
-  revision = "180b8fdc22b4ea7750bcb43c925277654a1ea2f3"
+  revision = "f02bfc3484a6b03d1fc00d72d86add103ef9567b"
 
 [[projects]]
   branch = "master"
@@ -79,7 +86,7 @@
     "internal/bitbucket.org/ww/goautoneg",
     "model"
   ]
-  revision = "2e54d0b93cba2fd133edc32211dcc32c06ef72ca"
+  revision = "89604d197083d4781071d3c65855d24ecfb0a563"
 
 [[projects]]
   branch = "master"
@@ -119,6 +126,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "6578358d31efa6e161a67de564bac28b31c0d90d622fb636352f739eb5a918f9"
+  inputs-digest = "f4033c3e57ba4672c3e353ec02f513026a437335906a004a97dacaec88163ac5"
   solver-name = "gps-cdcl"
   solver-version = 1
