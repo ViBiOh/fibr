@@ -29,19 +29,22 @@
 
     <ul id="files">
       {{- range .Files -}}
-        <li class="file">
+        {{- if and (isImage .) (eq $root.Display "grid") -}}
+          <li class="image">
+        {{- else -}}
+          <li class="file">
+        {{- end -}}
           <a class="filelink" href="{{- filename . -}}" title="{{- filename . -}}">
-            {{- if .IsDir -}}
-              <img class="icon" src="{{- $root.Config.StaticURL -}}/svg/folder.svg?v={{- $root.Config.Version -}}" alt="folder" />
+            {{- if and (isImage .) (eq $root.Display "grid") -}}
+                <img class="thumbnail" src="{{- filename . -}}?size=148x148" alt="thumbnail" />
             {{- else -}}
-              {{- if and (isImage .) (eq $root.Display "grid") -}}
-                <img class="icon" src="{{- filename . -}}?size=150x100" alt="preview" />
+              {{- if .IsDir -}}
+                <img class="icon" src="{{- $root.Config.StaticURL -}}/svg/folder.svg?v={{- $root.Config.Version -}}" alt="folder" />
               {{- else -}}
                 <img class="icon" src="{{- $root.Config.StaticURL -}}/svg/file{{- typeFromExtension . -}}.svg?v={{- $root.Config.Version -}}" alt="file" />
               {{- end -}}
+              <span class="filename">{{- filename . -}}</span>
             {{- end -}}
-
-            <span class="filename">{{- filename . -}}</span>
           </a>
         </li>
       {{- end -}}

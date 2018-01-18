@@ -1,7 +1,6 @@
 package thumbnail
 
 import (
-	"bytes"
 	"fmt"
 	"image"
 	"image/gif"
@@ -9,12 +8,11 @@ import (
 	"image/png"
 	"net/http"
 	"os"
-	"strconv"
 
 	"github.com/nfnt/resize"
 )
 
-var tokenPool = make(chan int, 4)
+var tokenPool = make(chan int, 2)
 
 func getToken() {
 	tokenPool <- 1
@@ -26,17 +24,24 @@ func releaseToken() {
 
 func getThumbnail(filename string, width, height uint) (*image.Image, string, error) {
 	reader, err := os.Open(filename)
+	if reader != nil {
+		defer reader.Close()
+	}
 	if err != nil {
 		return nil, ``, fmt.Errorf(`Error while reading image: %v`, err)
 	}
-	defer reader.Close()
 
 	img, imgType, err := image.Decode(reader)
+	if img != nil {
+		defer func() {
+			img = nil
+		}()
+	}
 	if err != nil {
 		return nil, ``, fmt.Errorf(`Error while decoding image: %v`, err)
 	}
 
-	thumbnail := resize.Thumbnail(width, height, img, resize.MitchellNetravali)
+	thumbnail := resize.Thumbnail(width, height, img, resize.Bilinear)
 
 	return &thumbnail, imgType, nil
 }
@@ -47,29 +52,28 @@ func ServeThumbnail(w http.ResponseWriter, filename string, width, height uint) 
 	defer releaseToken()
 
 	thumbnail, imgType, err := getThumbnail(filename, width, height)
+	if thumbnail != nil {
+		defer func() {
+			thumbnail = nil
+		}()
+	}
 	if err != nil {
 		return fmt.Errorf(`Error while generating thumbnail: %s`, err)
 	}
 
-	buffer := new(bytes.Buffer)
+	w.Header().Set(`Content-Type`, fmt.Sprintf(`image/%s`, imgType))
 	if imgType == `jpeg` {
-		if err := jpeg.Encode(buffer, *thumbnail, nil); err != nil {
+		if err := jpeg.Encode(w, *thumbnail, nil); err != nil {
 			return fmt.Errorf(`Error while encoding thumbnail: %v`, err)
 		}
 	} else if imgType == `png` {
-		if err := png.Encode(buffer, *thumbnail); err != nil {
+		if err := png.Encode(w, *thumbnail); err != nil {
 			return fmt.Errorf(`Error while encoding thumbnail: %v`, err)
 		}
 	} else if imgType == `gif` {
-		if err := gif.Encode(buffer, *thumbnail, nil); err != nil {
+		if err := gif.Encode(w, *thumbnail, nil); err != nil {
 			return fmt.Errorf(`Error while encoding thumbnail: %v`, err)
 		}
-	}
-
-	w.Header().Set(`Content-Type`, fmt.Sprintf(`image/%s`, imgType))
-	w.Header().Set(`Content-Length`, strconv.Itoa(len(buffer.Bytes())))
-	if _, err := w.Write(buffer.Bytes()); err != nil {
-		return fmt.Errorf(`Error while writing thumbnail: %s`, err)
 	}
 
 	return nil
