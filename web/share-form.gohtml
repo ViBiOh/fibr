@@ -19,7 +19,9 @@
             {{- range .Shares -}}
               <tr class="share-content">
                   <td>
-                    <code>{{- .ID -}}</code>
+                    <a href="/{{- .ID -}}/">
+                      <code>{{- .ID -}}</code>
+                    </a>
                   </td>
                   <td>
                     <code>{{- .Path -}}</code>
