@@ -30,14 +30,14 @@
     <ul id="files">
       {{- range .Files -}}
         <li class="file">
-          <a class="filename" href="{{- filename . -}}" title="{{- filename . -}}">
+          <a class="filelink" href="{{- filename . -}}" title="{{- filename . -}}">
             {{- if .IsDir -}}
               <img class="icon" src="{{- $root.Config.StaticURL -}}/svg/folder.svg?v={{- $root.Config.Version -}}" alt="folder" />
             {{- else -}}
               <img class="icon" src="{{- $root.Config.StaticURL -}}/svg/file{{- typeFromExtension . -}}.svg?v={{- $root.Config.Version -}}" alt="file" />
             {{- end -}}
 
-            {{- filename . -}}
+            <span class="filename">{{- filename . -}}</span>
           </a>
         </li>
       {{- end -}}

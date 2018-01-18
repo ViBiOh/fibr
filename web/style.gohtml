@@ -176,8 +176,44 @@
       padding: 0.5rem 0 0 1rem;
     }
 
-    #list-display:checked ~ #files .filename img {
+    #list-display:checked ~ #files .filelink .icon {
       margin-right: 1rem;
+    }
+
+    #grid-display:checked ~ #files {
+      align-items: center;
+      display: inline-flex;
+      flex-wrap: wrap;
+    }
+
+    #grid-display:checked ~ #files .file {
+      border: 1px solid whitesmoke;
+      height: 15rem;
+      margin: 0.5rem;
+      padding: 0.5rem;
+      width: 15rem;
+    }
+
+    #grid-display:checked ~ #files .filelink {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      align-items: center;
+      height: 100%;
+    }
+
+    #grid-display:checked ~ #files .filelink .filename {
+      display: inline-block;
+      overflow: hidden;
+      text-align: left;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      width: 100%;
+    }
+
+    #grid-display:checked ~ #files .filelink .icon {
+      height: 10rem;
+      width: auto;
     }
 
     @media print {
