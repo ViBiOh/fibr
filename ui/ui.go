@@ -82,6 +82,7 @@ func NewApp(config map[string]*string, authURL string) *App {
 		}).ParseGlob(`./web/*.gohtml`)),
 
 		base: map[string]interface{}{
+			`Display`: ``,
 			`Config`: map[string]interface{}{
 				`PublicURL`: *config[`publicURL`],
 				`StaticURL`: *config[`staticURL`],
