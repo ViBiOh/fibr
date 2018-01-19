@@ -12,7 +12,7 @@ import (
 	"github.com/nfnt/resize"
 )
 
-var tokenPool = make(chan int, 1)
+var tokenPool = make(chan int, 2)
 
 func getToken() {
 	tokenPool <- 1

@@ -10,15 +10,13 @@ services:
     - -prometheusMetricsHost
     - fibr-auth:1080
     - -rateCount
-    - '60'
+    - '240'
     - -cookieDomain
     - vibioh.fr
     - -authRedirect
     - https://fibr.vibioh.fr
-    - -githubClientId
-    - ${GITHUB_OAUTH_CLIENT_ID}
-    - -githubClientSecret
-    - ${GITHUB_OAUTH_CLIENT_SECRET}
+    - -basicUsers
+    - ${BASIC_USERS}
     labels:
       traefik.frontend.passHostHeader: 'true'
       traefik.frontend.rule: 'Host: fibr-auth.vibioh.fr'
