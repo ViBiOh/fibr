@@ -8,6 +8,7 @@ import (
 	"image/png"
 	"net/http"
 	"os"
+	"runtime"
 
 	"github.com/nfnt/resize"
 )
@@ -20,6 +21,7 @@ func getToken() {
 
 func releaseToken() {
 	<-tokenPool
+	runtime.GC()
 }
 
 func getThumbnail(filename string, width, height uint) (*image.Image, string, error) {
