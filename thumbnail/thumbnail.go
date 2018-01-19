@@ -45,7 +45,7 @@ func ServeThumbnail(w http.ResponseWriter, filename string, width, height int) e
 	imgType := strings.TrimPrefix(path.Ext(filename), `.`)
 
 	w.Header().Set(`Content-Type`, fmt.Sprintf(`image/%s`, imgType))
-	if imgType == `jpeg` {
+	if imgType == `jpeg` || imgType == `jpg` {
 		if err := jpeg.Encode(w, thumbnail, nil); err != nil {
 			return fmt.Errorf(`Error while encoding thumbnail: %v`, err)
 		}
