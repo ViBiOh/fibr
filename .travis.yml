@@ -15,8 +15,7 @@ after_success: |
 
     sed \
       -e "s|\${DATA_DIR}|${DATA_DIR}|g" \
-      -e "s|\${GITHUB_OAUTH_CLIENT_ID}|${GITHUB_OAUTH_CLIENT_ID}|g" \
-      -e "s|\${GITHUB_OAUTH_CLIENT_SECRET}|${GITHUB_OAUTH_CLIENT_SECRET}|g" \
+      -e "s|\${BASIC_USERS}|${BASIC_USERS}|g" \
       -e "s|\${VERSION}|${TRAVIS_COMMIT}|g" \
       docker-compose.yml > docker-compose-env.yml
   fi
