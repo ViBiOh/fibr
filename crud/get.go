@@ -86,7 +86,7 @@ func (a *App) Get(w http.ResponseWriter, r *http.Request, config *provider.Reque
 			return
 		}
 
-		if err := thumbnail.ServeThumbnail(w, filename, uint(width), uint(height)); err != nil {
+		if err := thumbnail.ServeThumbnail(w, filename, width, height); err != nil {
 			httputils.InternalServerError(w, fmt.Errorf(`Error while serving thumbnail: %v`, err))
 		}
 	}

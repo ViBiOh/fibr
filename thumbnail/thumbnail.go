@@ -7,10 +7,10 @@ import (
 	"image/jpeg"
 	"image/png"
 	"net/http"
-	"os"
-	"runtime"
+	"path"
+	"strings"
 
-	"github.com/nfnt/resize"
+	"github.com/disintegration/imaging"
 )
 
 var tokenPool = make(chan int, 2)
@@ -23,46 +23,38 @@ func releaseToken() {
 	<-tokenPool
 }
 
-func getThumbnail(filename string, width, height uint) (*image.Image, string, error) {
-	reader, err := os.Open(filename)
-	if reader != nil {
-		defer reader.Close()
-	}
+func getThumbnail(filename string, width, height int) (image.Image, error) {
+	src, err := imaging.Open(filename)
 	if err != nil {
-		return nil, ``, fmt.Errorf(`Error while reading image: %v`, err)
+		return nil, fmt.Errorf(`Error while reading image: %v`, err)
 	}
 
-	img, imgType, err := image.Decode(reader)
-	if err != nil {
-		return nil, ``, fmt.Errorf(`Error while decoding image: %v`, err)
-	}
-
-	thumbnail := resize.Thumbnail(width, height, img, resize.Bilinear)
-
-	return &thumbnail, imgType, nil
+	return imaging.Thumbnail(src, width, height, imaging.Box), nil
 }
 
 // ServeThumbnail render thumbnail image of given filename
-func ServeThumbnail(w http.ResponseWriter, filename string, width, height uint) error {
+func ServeThumbnail(w http.ResponseWriter, filename string, width, height int) error {
 	getToken()
 	defer releaseToken()
 
-	thumbnail, imgType, err := getThumbnail(filename, width, height)
+	thumbnail, err := getThumbnail(filename, width, height)
 	if err != nil {
 		return fmt.Errorf(`Error while generating thumbnail: %s`, err)
 	}
 
+	imgType := strings.TrimPrefix(path.Ext(filename), `.`)
+
 	w.Header().Set(`Content-Type`, fmt.Sprintf(`image/%s`, imgType))
 	if imgType == `jpeg` {
-		if err := jpeg.Encode(w, *thumbnail, nil); err != nil {
+		if err := jpeg.Encode(w, thumbnail, nil); err != nil {
 			return fmt.Errorf(`Error while encoding thumbnail: %v`, err)
 		}
 	} else if imgType == `png` {
-		if err := png.Encode(w, *thumbnail); err != nil {
+		if err := png.Encode(w, thumbnail); err != nil {
 			return fmt.Errorf(`Error while encoding thumbnail: %v`, err)
 		}
 	} else if imgType == `gif` {
-		if err := gif.Encode(w, *thumbnail, nil); err != nil {
+		if err := gif.Encode(w, thumbnail, nil); err != nil {
 			return fmt.Errorf(`Error while encoding thumbnail: %v`, err)
 		}
 	}

@@ -23,7 +23,7 @@
     "auth",
     "cookie"
   ]
-  revision = "eaa068aebe20a4feedfb4de5f33f0a20034d3719"
+  revision = "e6f2613c7505af63be78eb31a75e4cd14dd371f1"
 
 [[projects]]
   branch = "master"
@@ -46,6 +46,12 @@
   revision = "4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9"
 
 [[projects]]
+  name = "github.com/disintegration/imaging"
+  packages = ["."]
+  revision = "1884593a19ddc6f2ea050403430d02c1d0fc1283"
+  version = "v1.3.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
@@ -59,18 +65,12 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/nfnt/resize"
-  packages = ["."]
-  revision = "891127d8d1b52734debe1b3c3d7e747502b6c366"
-
-[[projects]]
-  branch = "master"
   name = "github.com/prometheus/client_golang"
   packages = [
     "prometheus",
     "prometheus/promhttp"
   ]
-  revision = "f02bfc3484a6b03d1fc00d72d86add103ef9567b"
+  revision = "b49b54cdb5f9850eb4c0090e5f9a8b3fc5113d5d"
 
 [[projects]]
   branch = "master"
@@ -123,9 +123,19 @@
   revision = "639f6272aec6b52094db77b9ec488214b0b4b1a1"
   version = "v2.3.2"
 
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/image"
+  packages = [
+    "bmp",
+    "tiff",
+    "tiff/lzw"
+  ]
+  revision = "12117c17ca67ffa1ce22e9409f3b0b0a93ac08c7"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "f4033c3e57ba4672c3e353ec02f513026a437335906a004a97dacaec88163ac5"
+  inputs-digest = "4ed18e41e9a8d03e0872ef7821e0636c62ec296bf79590f4ddbf39a3adffcac5"
   solver-name = "gps-cdcl"
   solver-version = 1
