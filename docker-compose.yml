@@ -9,8 +9,6 @@ services:
     - -corsCredentials
     - -prometheusMetricsHost
     - fibr-auth:1080
-    - -rateCount
-    - '240'
     - -cookieDomain
     - vibioh.fr
     - -authRedirect
