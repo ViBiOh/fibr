@@ -12,6 +12,9 @@ import (
 	"github.com/NYTimes/gziphandler"
 	"github.com/ViBiOh/alcotest/alcotest"
 	"github.com/ViBiOh/auth/auth"
+	authProvider "github.com/ViBiOh/auth/provider"
+	"github.com/ViBiOh/auth/provider/basic"
+	"github.com/ViBiOh/auth/service"
 	"github.com/ViBiOh/fibr/crud"
 	"github.com/ViBiOh/fibr/provider"
 	"github.com/ViBiOh/fibr/ui"
@@ -43,6 +46,17 @@ func browserHandler(crudApp *crud.App, uiApp *ui.App, authApp *auth.App) http.Ha
 		}
 
 		_, err := authApp.IsAuthenticated(r)
+
+		if err != nil {
+			if err == authProvider.ErrMalformedAuth || err == authProvider.ErrUnknownAuthType {
+				httputils.BadRequest(w, err)
+			} else {
+				w.Header().Add(`WWW-Authenticate`, `Basic`)
+				httputils.Unauthorized(w, err)
+			}
+
+			return
+		}
 
 		rootDirectory := crudApp.GetRootDirectory()
 		config := &provider.RequestConfig{
@@ -104,12 +118,15 @@ func handler() http.Handler {
 func main() {
 	port := flag.String(`port`, `1080`, `Listening port`)
 	tls := flag.Bool(`tls`, true, `Serve TLS content`)
-	authConfig := auth.Flags(`auth`)
 	alcotestConfig := alcotest.Flags(``)
 	certConfig := cert.Flags(`tls`)
 	prometheusConfig := prometheus.Flags(`prometheus`)
 	rateConfig := rate.Flags(`rate`)
 	owaspConfig := owasp.Flags(``)
+
+	authConfig := auth.Flags(`auth`)
+	serviceAuthConfig := service.Flags(`authService`)
+	basicConfig := basic.Flags(`basic`)
 
 	crudConfig := crud.Flags(``)
 	uiConfig := ui.Flags(``)
@@ -120,7 +137,7 @@ func main() {
 
 	log.Printf(`Starting server on port %s`, *port)
 
-	authApp := auth.NewApp(authConfig)
+	authApp := auth.NewApp(authConfig, service.NewApp(serviceAuthConfig, basicConfig, nil))
 	uiApp := ui.NewApp(uiConfig, authApp.URL)
 	crudApp := crud.NewApp(crudConfig, uiApp)
 

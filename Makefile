@@ -43,16 +43,7 @@ docker-push:
 
 start-deps:
 	go get -u github.com/ViBiOh/viws
-	go get -u github.com/ViBiOh/auth
 	go get -u github.com/ViBiOh/auth/bcrypt
-
-start-auth:
-	auth \
-		-tls=false \
-		-basicUsers "1:admin:`bcrypt admin`" \
-		-corsHeaders Content-Type,Authorization \
-		-port 1081 \
-		-corsCredentials
 
 start-static:
 	viws \
@@ -63,6 +54,7 @@ start-api:
 	go run fibr.go \
 		-tls=false \
 		-directory `pwd` \
-		-authUrl http://localhost:1081 \
+		-publicURL http://localhost:1080 \
 		-authUsers admin:admin \
+		-basicUsers 1:admin:`bcrypt password` \
 		-csp "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' fibr-static.vibioh.fr"

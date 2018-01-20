@@ -22,7 +22,11 @@
       <div id="share-modal" class="modal full flex flex-center">
         {{- template "share-form" . -}}
       </div>
-      <a href="{{- .Config.AuthURL -}}/logout">
+      {{- if len .Config.AuthURL -}}
+        <a href="{{- .Config.AuthURL -}}/logout">
+      {{- else -}}
+        <a href="{{- .Config.LogoutURL -}}">
+      {{- end -}}
         <img class="icon icon-large" src="{{- .Config.StaticURL -}}/svg/sign-out-alt.svg?v={{- .Config.Version -}}" alt="signout" />
       </a>
     {{- end -}}

@@ -21,9 +21,13 @@
   name = "github.com/ViBiOh/auth"
   packages = [
     "auth",
-    "cookie"
+    "cookie",
+    "provider",
+    "provider/basic",
+    "provider/github",
+    "service"
   ]
-  revision = "241cd9c1fe9bbb1528da9f2e926503a145a3e92f"
+  revision = "444a0422bb9092ab12a3694d966ca074b4276e85"
 
 [[projects]]
   branch = "master"
@@ -125,6 +129,15 @@
 
 [[projects]]
   branch = "master"
+  name = "golang.org/x/crypto"
+  packages = [
+    "bcrypt",
+    "blowfish"
+  ]
+  revision = "a6600008915114d9c087fad9f03d75087b1a74df"
+
+[[projects]]
+  branch = "master"
   name = "golang.org/x/image"
   packages = [
     "bmp",
@@ -133,9 +146,42 @@
   ]
   revision = "12117c17ca67ffa1ce22e9409f3b0b0a93ac08c7"
 
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/net"
+  packages = [
+    "context",
+    "context/ctxhttp"
+  ]
+  revision = "5ccada7d0a7ba9aeb5d3aca8d3501b4c2a509fec"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/oauth2"
+  packages = [
+    ".",
+    "github",
+    "internal"
+  ]
+  revision = "b28fcf2b08a19742b43084fb40ab78ac6c3d8067"
+
+[[projects]]
+  name = "google.golang.org/appengine"
+  packages = [
+    "internal",
+    "internal/base",
+    "internal/datastore",
+    "internal/log",
+    "internal/remote_api",
+    "internal/urlfetch",
+    "urlfetch"
+  ]
+  revision = "150dc57a1b433e64154302bdc40b6bb8aefa313a"
+  version = "v1.0.0"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "4ed18e41e9a8d03e0872ef7821e0636c62ec296bf79590f4ddbf39a3adffcac5"
+  inputs-digest = "ad6d7c2044e299e56355092fa347abaa22cfb3f58bbc7923787e149033aa0548"
   solver-name = "gps-cdcl"
   solver-version = 1
