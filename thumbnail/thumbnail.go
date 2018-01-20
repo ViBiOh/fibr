@@ -13,7 +13,7 @@ import (
 	"github.com/disintegration/imaging"
 )
 
-var tokenPool = make(chan int, 4)
+var tokenPool = make(chan int, 8)
 
 func getToken() {
 	tokenPool <- 1
