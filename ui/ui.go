@@ -121,18 +121,6 @@ func (a *App) Error(w http.ResponseWriter, status int, err error) {
 	log.Printf(`[error] %v`, err)
 }
 
-// Login render login page
-func (a *App) Login(w http.ResponseWriter, message *provider.Message) {
-	loginContent := cloneContent(a.base)
-	if message != nil {
-		loginContent[`Message`] = message
-	}
-
-	if err := httputils.WriteHTMLTemplate(a.tpl.Lookup(`login`), w, loginContent, http.StatusOK); err != nil {
-		a.Error(w, http.StatusInternalServerError, err)
-	}
-}
-
 // Sitemap render sitemap.xml
 func (a *App) Sitemap(w http.ResponseWriter) {
 	if err := httputils.WriteXMLTemplate(a.tpl.Lookup(`sitemap`), w, a.base, http.StatusOK); err != nil {

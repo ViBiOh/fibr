@@ -34,7 +34,12 @@ func handleAnonymousRequest(w http.ResponseWriter, r *http.Request, err error, c
 	if auth.IsForbiddenErr(err) {
 		uiApp.Error(w, http.StatusForbidden, errors.New(`You're not authorized to do this`))
 	} else if !crudApp.CheckAndServeSEO(w, r) {
-		uiApp.Login(w, nil)
+		if err == authProvider.ErrMalformedAuth || err == authProvider.ErrUnknownAuthType {
+			uiApp.Error(w, http.StatusBadRequest, err)
+		} else {
+			w.Header().Add(`WWW-Authenticate`, `Basic`)
+			uiApp.Error(w, http.StatusUnauthorized, err)
+		}
 	}
 }
 
@@ -46,17 +51,6 @@ func browserHandler(crudApp *crud.App, uiApp *ui.App, authApp *auth.App) http.Ha
 		}
 
 		_, err := authApp.IsAuthenticated(r)
-
-		if err != nil {
-			if err == authProvider.ErrMalformedAuth || err == authProvider.ErrUnknownAuthType {
-				httputils.BadRequest(w, err)
-			} else {
-				w.Header().Add(`WWW-Authenticate`, `Basic`)
-				httputils.Unauthorized(w, err)
-			}
-
-			return
-		}
 
 		rootDirectory := crudApp.GetRootDirectory()
 		config := &provider.RequestConfig{

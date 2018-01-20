@@ -42,7 +42,6 @@ type Message struct {
 // Renderer interface for return rich content to user
 type Renderer interface {
 	Error(http.ResponseWriter, int, error)
-	Login(http.ResponseWriter, *Message)
 	Sitemap(http.ResponseWriter)
 	Directory(http.ResponseWriter, *RequestConfig, map[string]interface{}, string, *Message)
 }
