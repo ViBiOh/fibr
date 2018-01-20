@@ -7,6 +7,9 @@
       <div id="upload-modal" class="modal full flex flex-center">
         {{- template "upload-form" . -}}
       </div>
+      <a href="#folder-modal">
+        <img class="icon icon-large" src="{{- .Config.StaticURL -}}/svg/folder.svg?v={{- .Config.Version -}}" alt="folder" />
+      </a>
     {{- end -}}
 
     {{- if .CanShare -}}

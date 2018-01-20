@@ -60,3 +60,32 @@ func (a *App) CreateShare(w http.ResponseWriter, r *http.Request, config *provid
 		Content: fmt.Sprintf(`Share successfully created with ID: %s`, id),
 	})
 }
+
+// DeleteShare delete a share from given ID
+func (a *App) DeleteShare(w http.ResponseWriter, r *http.Request, config *provider.RequestConfig) {
+	if !config.CanShare {
+		a.renderer.Error(w, http.StatusForbidden, errors.New(`You're not authorized to do this ⛔`))
+	}
+
+	id := r.FormValue(`id`)
+
+	a.metadataLock.Lock()
+	defer a.metadataLock.Unlock()
+
+	for i, metadata := range a.metadatas {
+		if metadata.ID == id {
+			a.metadatas = append(a.metadatas[:i], a.metadatas[i+1:]...)
+			break
+		}
+	}
+
+	if err := a.saveMetadata(); err != nil {
+		a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while saving share: %v`, err))
+		return
+	}
+
+	a.Get(w, r, config, &provider.Message{
+		Level:   `success`,
+		Content: fmt.Sprintf(`Share with id %s successfully deleted`, id),
+	})
+}

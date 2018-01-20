@@ -13,6 +13,7 @@
                 <td class="icon">
                   <img class="icon" src="{{- .Config.StaticURL -}}/svg/edit.svg?v={{- .Config.Version -}}" alt="edit" />
                 </td>
+                <td></td>
             </tr>
           </thead>
           <tbody>
@@ -31,6 +32,16 @@
                       <img class="icon" src="{{- $root.Config.StaticURL -}}/svg/check.svg?v={{- $root.Config.Version -}}" alt="edit" />
                     {{- end -}}
                   </td>
+                  <td>
+                    <form method="post">
+                      <input type="hidden" name="type" value="share" />
+                      <input type="hidden" name="method" value="DELETE" />
+                      <input type="hidden" name="id" value="{{- .ID -}}" />
+                      <button type="submit" onclick="javascript:return confirm('Are you sure you want to delete share for {{ .Path }} ?')" class="button-icon">
+                        <img class="icon" src="{{- $root.Config.StaticURL -}}/svg/times.svg?v={{- $root.Config.Version -}}" alt="delete" />
+                      </input>
+                    </form>
+                  </td>
               </tr>
             {{- end -}}
           </tbody>
@@ -38,7 +49,8 @@
     {{- end -}}
 
     <form method="post">
-      <input type="hidden" name="method" value="PUT" />
+      <input type="hidden" name="type" value="share" />
+      <input type="hidden" name="method" value="POST" />
       <p class="center">
         Share this directory,
         <label for="edit">
