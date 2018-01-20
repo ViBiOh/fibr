@@ -23,7 +23,7 @@
     "auth",
     "cookie"
   ]
-  revision = "e6f2613c7505af63be78eb31a75e4cd14dd371f1"
+  revision = "241cd9c1fe9bbb1528da9f2e926503a145a3e92f"
 
 [[projects]]
   branch = "master"
@@ -70,7 +70,7 @@
     "prometheus",
     "prometheus/promhttp"
   ]
-  revision = "b49b54cdb5f9850eb4c0090e5f9a8b3fc5113d5d"
+  revision = "06bc6e01f4baf4ee783ffcd23abfcb0b0f9dfada"
 
 [[projects]]
   branch = "master"

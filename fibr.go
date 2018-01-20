@@ -35,17 +35,14 @@ func handleAnonymousRequest(w http.ResponseWriter, r *http.Request, err error, c
 	}
 }
 
-func browserHandler(crudApp *crud.App, uiApp *ui.App, authConfig map[string]*string) http.Handler {
-	url := *authConfig[`url`]
-	users := auth.LoadUsersProfiles(*authConfig[`users`])
-
+func browserHandler(crudApp *crud.App, uiApp *ui.App, authApp *auth.App) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet && r.Method != http.MethodPost && r.Method != http.MethodPut && r.Method != http.MethodDelete {
 			uiApp.Error(w, http.StatusMethodNotAllowed, errors.New(`We don't understand what you want from us`))
 			return
 		}
 
-		_, err := auth.IsAuthenticated(url, users, r)
+		_, err := authApp.IsAuthenticated(r)
 
 		rootDirectory := crudApp.GetRootDirectory()
 		config := &provider.RequestConfig{
@@ -121,12 +118,13 @@ func main() {
 
 	alcotest.DoAndExit(alcotestConfig)
 
-	uiApp := ui.NewApp(uiConfig, *authConfig[`url`])
-	crudApp := crud.NewApp(crudConfig, uiApp)
-
 	log.Printf(`Starting server on port %s`, *port)
 
-	serviceHandler = owasp.Handler(owaspConfig, browserHandler(crudApp, uiApp, authConfig))
+	authApp := auth.NewApp(authConfig)
+	uiApp := ui.NewApp(uiConfig, authApp.URL)
+	crudApp := crud.NewApp(crudConfig, uiApp)
+
+	serviceHandler = owasp.Handler(owaspConfig, browserHandler(crudApp, uiApp, authApp))
 	apiHandler = prometheus.Handler(prometheusConfig, rate.Handler(rateConfig, gziphandler.GzipHandler(handler())))
 
 	server := &http.Server{
