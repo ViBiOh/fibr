@@ -42,7 +42,7 @@ func ServeThumbnail(w http.ResponseWriter, filename string, width, height int) e
 		return fmt.Errorf(`Error while generating thumbnail: %s`, err)
 	}
 
-	imgType := strings.TrimPrefix(path.Ext(filename), `.`)
+	imgType := strings.ToLower(strings.TrimPrefix(path.Ext(filename), `.`))
 
 	w.Header().Set(`Content-Type`, fmt.Sprintf(`image/%s`, imgType))
 	if imgType == `jpeg` || imgType == `jpg` {
