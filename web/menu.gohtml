@@ -10,6 +10,9 @@
       <a href="#folder-modal">
         <img class="icon icon-large" src="{{- .Config.StaticURL -}}/svg/folder.svg?v={{- .Config.Version -}}" alt="folder" />
       </a>
+      <div id="folder-modal" class="modal full flex flex-center">
+        {{- template "folder-form" . -}}
+      </div>
     {{- end -}}
 
     {{- if .CanShare -}}

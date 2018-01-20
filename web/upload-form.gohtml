@@ -1,19 +1,23 @@
 {{- define "upload-form" -}}
   <div class="modal-content">
     <h2 class="header">Upload a file</h2>
+
     <form method="post" enctype="multipart/form-data">
       <input type="hidden" name="method" value="POST" />
       <p class="center">
         <input type="file" name="file" />
       </p>
       <p class="center">
-        <a href="#" class="button">
-          Cancel
-        </a>
         <button type="submit" class="button bg-important">
           Upload
         </button>
       </p>
     </form>
+
+    <p class="center">
+      <a href="#" class="button">
+        Cancel
+      </a>
+    </p>
   </div>
 {{- end -}}

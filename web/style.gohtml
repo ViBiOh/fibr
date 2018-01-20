@@ -65,12 +65,14 @@
 
     .icon {
       height: 2rem;
+      text-decoration: none;
       vertical-align: middle;
       width: 2rem;
     }
 
     .icon-large {
       height: 4rem;
+      margin-left: 1rem;
       width: 4rem;
     }
 
@@ -164,11 +166,13 @@
     }
 
     #upload-modal,
+    #folder-modal,
     #share-modal {
       display: none;
     }
 
     #upload-modal:target,
+    #folder-modal:target,
     #share-modal:target {
       display: flex;
     }
