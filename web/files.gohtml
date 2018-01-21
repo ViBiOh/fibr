@@ -45,6 +45,12 @@
               {{- end -}}
               <span class="filename">{{- filename . -}}</span>
             {{- end -}}
+            <form class="file-delete" method="post" action="{{- filename . -}}">
+              <input type="hidden" name="method" value="DELETE" />
+              <button type="submit" onclick="javascript:return confirm('Are you sure you want to delete {{ filename . }} ?')" class="button-icon">
+                <img class="icon" src="{{- $root.Config.StaticURL -}}/svg/times.svg?v={{- $root.Config.Version -}}" alt="delete" />
+              </button>
+            </form>
           </a>
         </li>
       {{- end -}}

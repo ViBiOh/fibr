@@ -97,6 +97,8 @@
     .button-icon {
       background-color: transparent;
       border: 0;
+      margin: 0;
+      padding: 0;
     }
 
     .bg-important {
@@ -183,12 +185,39 @@
       }
 
       .file {
-        line-height: 2rem;
-        padding: 0.5rem 0 0 1rem;
+        margin-left: 1rem;
+        margin-top: 0.5rem;
+      }
+
+      .filelink {
+        align-items: center;
+        display: inline-flex;
+        height: 2.5rem;
+      }
+
+      .filename {
+        display: inline-block;
+        overflow: hidden;
+        text-align: left;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        width: 30rem;
       }
 
       .filelink .icon {
         margin-right: 1rem;
+      }
+
+      .file-delete {
+        display: none;
+      }
+
+      .file-delete .icon {
+        margin: 0;
+      }
+
+      .filelink:hover .file-delete {
+        display: inline-block;
       }
     {{- end -}}
 
@@ -233,6 +262,10 @@
         text-overflow: ellipsis;
         white-space: nowrap;
         width: 100%;
+      }
+
+      .file-delete {
+        display: none;
       }
 
       .filelink .icon {
