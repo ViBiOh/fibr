@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/fibr/provider"
+	"github.com/ViBiOh/fibr/utils"
 	"github.com/ViBiOh/httputils"
 	"github.com/ViBiOh/httputils/tools"
 )
@@ -83,6 +84,10 @@ func NewApp(config map[string]*string, authURL string) *App {
 			`isImage`: func(file os.FileInfo) bool {
 				return provider.ImageExtensions[path.Ext(file.Name())]
 			},
+			`hasThumbnail`: func(root, path string, file os.FileInfo) bool {
+				_, info := utils.GetPathInfo(root, provider.MetadataDirectoryName, path, file.Name())
+				return info != nil
+			},
 		}).ParseGlob(`./web/*.gohtml`)),
 
 		base: map[string]interface{}{
@@ -152,6 +157,8 @@ func (a *App) Directory(w http.ResponseWriter, config *provider.RequestConfig, c
 		paths = nil
 	}
 	pageContent[`RootName`] = path.Base(config.Root)
+	pageContent[`Root`] = config.Root
+	pageContent[`Path`] = config.Path
 	pageContent[`Paths`] = paths
 	pageContent[`CanEdit`] = config.CanEdit
 	pageContent[`CanShare`] = config.CanShare

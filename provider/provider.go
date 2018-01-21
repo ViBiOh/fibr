@@ -4,6 +4,9 @@ import (
 	"net/http"
 )
 
+// MetadataDirectoryName directory when metadata are stored
+const MetadataDirectoryName = `.fibr`
+
 var (
 	// ArchiveExtensions contains extensions of Archive
 	ArchiveExtensions = map[string]bool{`.zip`: true, `.tar`: true, `.gz`: true, `.rar`: true}

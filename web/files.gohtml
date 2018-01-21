@@ -35,8 +35,8 @@
           <li class="file">
         {{- end -}}
           <a class="filelink" href="{{- filename . -}}" title="{{- filename . -}}">
-            {{- if and (isImage .) (eq $root.Display "grid") -}}
-                <img class="thumbnail" src="{{- filename . -}}?size=148x148" alt="thumbnail" />
+            {{- if and (isImage .) (eq $root.Display "grid") (hasThumbnail $root.Root $root.Path .) -}}
+                <img class="thumbnail" src="{{- filename . -}}?thumbnail&v={{- $root.Config.Version -}}" alt="thumbnail" />
             {{- else -}}
               {{- if .IsDir -}}
                 <img class="icon" src="{{- $root.Config.StaticURL -}}/svg/folder.svg?v={{- $root.Config.Version -}}" alt="folder" />
