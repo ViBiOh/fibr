@@ -20,6 +20,6 @@ func (a *App) Delete(w http.ResponseWriter, r *http.Request, config *provider.Re
 	} else if err := os.RemoveAll(filename); err != nil {
 		a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while deleting: %v`, err))
 	} else {
-		w.WriteHeader(http.StatusNoContent)
+		a.GetDir(w, config, path.Dir(filename), r.URL.Query().Get(`d`), &provider.Message{Level: `success`, Content: fmt.Sprintf(`%s successfully deleted`, config.Path)})
 	}
 }

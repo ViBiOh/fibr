@@ -110,7 +110,7 @@ func handler() http.Handler {
 }
 
 func main() {
-	port := flag.String(`port`, `1080`, `Listening port`)
+	port := flag.Int(`port`, 1080, `Listening port`)
 	tls := flag.Bool(`tls`, true, `Serve TLS content`)
 	alcotestConfig := alcotest.Flags(``)
 	certConfig := cert.Flags(`tls`)
@@ -129,7 +129,7 @@ func main() {
 
 	alcotest.DoAndExit(alcotestConfig)
 
-	log.Printf(`Starting server on port %s`, *port)
+	log.Printf(`Starting server on port %d`, *port)
 
 	authApp := auth.NewApp(authConfig, service.NewApp(serviceAuthConfig, basicConfig, nil))
 	uiApp := ui.NewApp(uiConfig, authApp.URL)
@@ -139,7 +139,7 @@ func main() {
 	apiHandler = prometheus.Handler(prometheusConfig, rate.Handler(rateConfig, gziphandler.GzipHandler(handler())))
 
 	server := &http.Server{
-		Addr:    `:` + *port,
+		Addr:    fmt.Sprintf(`:%d`, *port),
 		Handler: apiHandler,
 	}
 
