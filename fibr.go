@@ -32,7 +32,7 @@ var (
 
 func handleAnonymousRequest(w http.ResponseWriter, r *http.Request, err error, crudApp *crud.App, uiApp *ui.App) {
 	if auth.IsForbiddenErr(err) {
-		uiApp.Error(w, http.StatusForbidden, errors.New(`You're not authorized to do this`))
+		uiApp.Error(w, http.StatusForbidden, errors.New(`You're not authorized to do this ⛔️`))
 	} else if !crudApp.CheckAndServeSEO(w, r) {
 		if err == authProvider.ErrMalformedAuth || err == authProvider.ErrUnknownAuthType {
 			uiApp.Error(w, http.StatusBadRequest, err)

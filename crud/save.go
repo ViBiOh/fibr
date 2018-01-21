@@ -36,17 +36,33 @@ func (a *App) CreateDir(w http.ResponseWriter, r *http.Request, config *provider
 		a.renderer.Error(w, http.StatusForbidden, errors.New(`You're not authorized to do this ⛔`))
 	}
 
-	if strings.HasSuffix(config.Path, `/`) {
-		filename, _ := utils.GetPathInfo(config.Root, config.Path)
+	var filename string
 
-		if err := os.MkdirAll(filename, 0700); err != nil {
-			a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while creating directory: %v`, err))
-		} else {
-			w.WriteHeader(http.StatusCreated)
-		}
-	} else {
-		a.renderer.Error(w, http.StatusForbidden, errors.New(`You're not authorized to do this`))
+	formName := r.FormValue(`name`)
+	if formName != `` {
+		filename, _ = utils.GetPathInfo(config.Root, config.Path, formName)
 	}
+
+	if filename == `` {
+		if !strings.HasSuffix(config.Path, `/`) {
+			a.renderer.Error(w, http.StatusForbidden, errors.New(`You're not authorized to do this ⛔`))
+			return
+		}
+
+		filename, _ = utils.GetPathInfo(config.Root, config.Path)
+	}
+
+	if strings.Contains(filename, `..`) {
+		a.renderer.Error(w, http.StatusForbidden, errors.New(`You're not authorized to do this ⛔`))
+		return
+	}
+
+	if err := os.MkdirAll(filename, 0700); err != nil {
+		a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while creating directory: %v`, err))
+		return
+	}
+
+	a.GetDir(w, config, path.Dir(filename), r.URL.Query().Get(`d`), &provider.Message{Level: `success`, Content: fmt.Sprintf(`Directory %s successfully created`, path.Base(filename))})
 }
 
 // SaveFile saves form file to filesystem

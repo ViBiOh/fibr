@@ -2,6 +2,18 @@
   <div class="modal-content">
     <h2 class="header">Create new folder</h2>
 
+    <form method="post">
+      <input type="hidden" name="type" value="folder" />
+      <input type="hidden" name="method" value="PUT" />
+      <p class="center">
+        <label for="name">Name</label>
+        <input id="name" type="text" name="name" />
+      </p>
+      <p class="center">
+        <button type="submit" class="button bg-important">Create</button>
+      </p>
+    </form>
+
     <p class="center">
       <a href="#" class="button">
         Cancel

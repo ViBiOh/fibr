@@ -78,7 +78,7 @@ func (a *App) GetSharedPath(requestPath string) *Share {
 }
 
 func (a *App) loadMetadata() error {
-	filename, info := utils.GetPathInfo(a.rootDirectory, `.fibr.json`)
+	filename, info := utils.GetPathInfo(a.rootDirectory, `.fibr`, `.json`)
 	if info == nil {
 		return nil
 	}

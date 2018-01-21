@@ -23,6 +23,8 @@ func (a *App) Post(w http.ResponseWriter, r *http.Request, config *provider.Requ
 		}
 	} else if r.FormValue(`method`) == http.MethodPost {
 		a.SaveFile(w, r, config)
+	} else if r.FormValue(`method`) == http.MethodPut {
+		a.CreateDir(w, r, config)
 	} else {
 		a.renderer.Error(w, http.StatusMethodNotAllowed, errors.New(`Unknown method`))
 	}
