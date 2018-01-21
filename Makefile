@@ -35,11 +35,13 @@ docker-deps:
 docker-build:
 	docker build -t ${DOCKER_USER}/fibr .
 	docker build -t ${DOCKER_USER}/fibr-static -f Dockerfile_static .
+	docker build -t ${DOCKER_USER}/fibr-thumbnail -f Dockerfile_thumbnail .
 
 docker-push:
 	docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
 	docker push ${DOCKER_USER}/fibr
 	docker push ${DOCKER_USER}/fibr-static
+	docker push ${DOCKER_USER}/fibr-thumbnail
 
 start-deps:
 	go get -u github.com/ViBiOh/viws
