@@ -57,7 +57,7 @@ func NewApp(config map[string]*string, authURL string) *App {
 				return path.Join(parts[:index+1]...)
 			},
 			`typeFromExtension`: func(file os.FileInfo) string {
-				extension := path.Ext(file.Name())
+				extension := strings.ToLower(path.Ext(file.Name()))
 
 				switch {
 				case provider.ArchiveExtensions[extension]:
