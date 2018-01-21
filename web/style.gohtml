@@ -18,7 +18,6 @@
     input {
       font-family:
         -apple-system,
-        BlinkMacSystemFont,
         'Segoe UI',
         'Roboto',
         'Oxygen-Sans',
@@ -128,7 +127,6 @@
       pointer-events: none;
       position: fixed;
       top: 0;
-      z-index: 99999;
     }
 
     .modal-content {
@@ -187,6 +185,7 @@
       .file {
         margin-left: 1rem;
         margin-top: 0.5rem;
+        width: 100%;
       }
 
       .filelink {
@@ -197,11 +196,11 @@
 
       .filename {
         display: inline-block;
+        flex: 1 1 auto;
         overflow: hidden;
         text-align: left;
         text-overflow: ellipsis;
         white-space: nowrap;
-        width: 25rem;
       }
 
       .filelink .icon {
@@ -214,14 +213,6 @@
 
       .file-delete .icon {
         margin: 0;
-      }
-
-      .filelink:hover {
-        background-color: aliceblue;
-      }
-
-      .filelink:hover .file-delete {
-        display: inline-block;
       }
     {{- end -}}
 
