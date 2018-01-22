@@ -51,3 +51,14 @@ go get -u github.com/ViBiOh/fibr
   -version string
       Version (used mainly as a cache-buster)
 ```
+
+## VipsThumbnail
+
+```bash
+docker run \
+  --rm \
+  -v `pwd`:/workdir \
+  -w /workdir \
+  vibioh/fibr-thumbnail \
+  /bin/sh -c "vipsthumbnail /workdir/Photos/MeilleursAgents/*.jpg --size 150 -o /workdir/.fibr/Photos/MeilleursAgents/%s.jpg[optimize_coding,strip] --vips-progress"
+```
