@@ -40,7 +40,7 @@ func (a *App) CreateDir(w http.ResponseWriter, r *http.Request, config *provider
 
 	formName := r.FormValue(`name`)
 	if formName != `` {
-		filename, _ = utils.GetPathInfo(config.Root, config.Path, formName)
+		filename, _ = utils.GetPathInfo(a.rootDirectory, config.Root, config.Path, formName)
 	}
 
 	if filename == `` {
@@ -49,7 +49,7 @@ func (a *App) CreateDir(w http.ResponseWriter, r *http.Request, config *provider
 			return
 		}
 
-		filename, _ = utils.GetPathInfo(config.Root, config.Path)
+		filename, _ = utils.GetPathInfo(a.rootDirectory, config.Root, config.Path)
 	}
 
 	if strings.Contains(filename, `..`) {
@@ -80,7 +80,7 @@ func (a *App) SaveFile(w http.ResponseWriter, r *http.Request, config *provider.
 		return
 	}
 
-	filename, info := utils.GetPathInfo(config.Root, config.Path, uploadedFileHeader.Filename)
+	filename, info := utils.GetPathInfo(a.rootDirectory, config.Root, config.Path, uploadedFileHeader.Filename)
 	hostFile, err := createOrOpenFile(filename, info)
 	if hostFile != nil {
 		defer hostFile.Close()

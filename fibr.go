@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"path"
 	"strings"
 
 	"github.com/NYTimes/gziphandler"
@@ -50,22 +49,23 @@ func browserHandler(crudApp *crud.App, uiApp *ui.App, authApp *auth.App) http.Ha
 			return
 		}
 
+		if strings.Contains(r.URL.Path, `..`) {
+			uiApp.Error(w, http.StatusForbidden, errors.New(`You're not authorized to do this ⛔`))
+		}
+
 		_, err := authApp.IsAuthenticated(r)
 
-		rootDirectory := crudApp.GetRootDirectory()
 		config := &provider.RequestConfig{
-			URL:        r.URL.Path,
-			Root:       rootDirectory,
-			PathPrefix: ``,
-			Path:       r.URL.Path,
-			CanEdit:    true,
-			CanShare:   true,
+			URL:      r.URL.Path,
+			Path:     r.URL.Path,
+			CanEdit:  true,
+			CanShare: true,
 		}
 
 		if share := crudApp.GetSharedPath(config.Path); share != nil {
-			config.Root = path.Join(config.Root, share.Path)
+			config.Root = share.Path
 			config.Path = strings.TrimPrefix(config.Path, fmt.Sprintf(`/%s`, share.ID))
-			config.PathPrefix = share.ID
+			config.Prefix = share.ID
 
 			if err != nil {
 				config.CanEdit = share.Edit
@@ -132,7 +132,7 @@ func main() {
 	log.Printf(`Starting server on port %d`, *port)
 
 	authApp := auth.NewApp(authConfig, service.NewApp(serviceAuthConfig, basicConfig, nil))
-	uiApp := ui.NewApp(uiConfig, authApp.URL)
+	uiApp := ui.NewApp(uiConfig, *crudConfig[`directory`], authApp.URL)
 	crudApp := crud.NewApp(crudConfig, uiApp)
 
 	serviceHandler = owasp.Handler(owaspConfig, browserHandler(crudApp, uiApp, authApp))

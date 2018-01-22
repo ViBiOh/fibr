@@ -7,14 +7,14 @@
   <header class="header">
     <h1 class="title" itemscope itemtype="http://schema.org/BreadcrumbList">
       <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
-        <a href="/{{- .PathPrefix -}}" itemprop="item">
+        <a href="/{{- .Prefix -}}" itemprop="item">
           <span itemprop="name">{{- .RootName -}}</span>
         </a>
       </span>
       {{- range $index, $path := .Paths -}}
         <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
            / 
-          <a href="/{{- $root.PathPrefix -}}{{- rebuildPaths $root.Paths $index -}}/" itemprop="item">
+          <a href="/{{- $root.Prefix -}}{{- rebuildPaths $root.Paths $index -}}/" itemprop="item">
             <span itemprop="name">{{- $path -}}</span>
           </a>
         </span>
@@ -35,7 +35,7 @@
           <li class="file">
         {{- end -}}
           <a class="filelink" href="{{- filename . -}}" title="{{- filename . -}}">
-            {{- if and (isImage .) (eq $root.Display "grid") (or (hasThumbnail $root.Root $root.Path .) (hasThumbnail $root.Root "" .)) -}}
+            {{- if and (isImage .) (eq $root.Display "grid") (hasThumbnail $root.Root $root.Path .) -}}
                 <img class="thumbnail" src="{{- filename . -}}?thumbnail&v={{- $root.Config.Version -}}" alt="thumbnail" />
             {{- else -}}
               {{- if .IsDir -}}

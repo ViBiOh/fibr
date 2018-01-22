@@ -28,12 +28,12 @@ var (
 
 // RequestConfig stores informations
 type RequestConfig struct {
-	URL        string
-	Root       string
-	PathPrefix string
-	Path       string
-	CanEdit    bool
-	CanShare   bool
+	URL      string
+	Root     string
+	Path     string
+	Prefix   string
+	CanEdit  bool
+	CanShare bool
 }
 
 // Message rendered to user

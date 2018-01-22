@@ -28,8 +28,9 @@ func cloneContent(content map[string]interface{}) map[string]interface{} {
 
 // App for rendering UI
 type App struct {
-	base map[string]interface{}
-	tpl  *template.Template
+	rootDirectory string
+	base          map[string]interface{}
+	tpl           *template.Template
 }
 
 // Flags add flags for given prefix
@@ -42,11 +43,12 @@ func Flags(prefix string) map[string]*string {
 }
 
 // NewApp create ui from given config
-func NewApp(config map[string]*string, authURL string) *App {
+func NewApp(config map[string]*string, rootDirectory, authURL string) *App {
 	publicURL := *config[`publicURL`]
 	logoutURL := regexp.MustCompile(`(https?://)(.*)`).ReplaceAllString(publicURL, `${1}nobody:nogroup@${2}`)
 
 	return &App{
+		rootDirectory: rootDirectory,
 		tpl: template.Must(template.New(`fibr`).Funcs(template.FuncMap{
 			`filename`: func(file os.FileInfo) string {
 				if file.IsDir() {
@@ -85,7 +87,7 @@ func NewApp(config map[string]*string, authURL string) *App {
 				return provider.ImageExtensions[path.Ext(file.Name())]
 			},
 			`hasThumbnail`: func(root, path string, file os.FileInfo) bool {
-				_, info := utils.GetPathInfo(root, provider.MetadataDirectoryName, path, file.Name())
+				_, info := utils.GetPathInfo(rootDirectory, provider.MetadataDirectoryName, root, path, file.Name())
 				return info != nil
 			},
 		}).ParseGlob(`./web/*.gohtml`)),
@@ -156,7 +158,12 @@ func (a *App) Directory(w http.ResponseWriter, config *provider.RequestConfig, c
 	if paths[0] == `` {
 		paths = nil
 	}
-	pageContent[`RootName`] = path.Base(config.Root)
+
+	pageContent[`RootName`] = path.Base(a.rootDirectory)
+	if config.Root != `` {
+		pageContent[`RootName`] = path.Base(config.Root)
+	}
+
 	pageContent[`Root`] = config.Root
 	pageContent[`Path`] = config.Path
 	pageContent[`Paths`] = paths
@@ -168,9 +175,9 @@ func (a *App) Directory(w http.ResponseWriter, config *provider.RequestConfig, c
 		pageContent[`Display`] = display
 	}
 
-	pageContent[`PathPrefix`] = config.PathPrefix
-	if config.PathPrefix != `` {
-		pageContent[`PathPrefix`] = fmt.Sprintf(`%s/`, config.PathPrefix)
+	pageContent[`Prefix`] = config.Prefix
+	if config.Prefix != `` {
+		pageContent[`Prefix`] = fmt.Sprintf(`%s/`, config.Prefix)
 	}
 
 	for key, value := range content {

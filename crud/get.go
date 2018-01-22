@@ -33,7 +33,7 @@ func (a *App) GetDir(w http.ResponseWriter, config *provider.RequestConfig, file
 		return
 	}
 
-	config.Path = strings.TrimPrefix(filename, config.Root)
+	config.Path = strings.TrimPrefix(filename, path.Join(a.rootDirectory, config.Root))
 
 	content := map[string]interface{}{
 		`Files`: files,
@@ -48,7 +48,7 @@ func (a *App) GetDir(w http.ResponseWriter, config *provider.RequestConfig, file
 
 // Get write given path from filesystem
 func (a *App) Get(w http.ResponseWriter, r *http.Request, config *provider.RequestConfig, message *provider.Message) {
-	filename, info := utils.GetPathInfo(config.Root, config.Path)
+	filename, info := utils.GetPathInfo(a.rootDirectory, config.Root, config.Path)
 
 	if info == nil {
 		if !a.CheckAndServeSEO(w, r) {
@@ -59,7 +59,7 @@ func (a *App) Get(w http.ResponseWriter, r *http.Request, config *provider.Reque
 	} else {
 		if params, err := url.ParseQuery(r.URL.RawQuery); err == nil {
 			if _, ok := params[`thumbnail`]; ok && provider.ImageExtensions[path.Ext(info.Name())] {
-				if tnFilename, tnInfo := utils.GetPathInfo(config.Root, provider.MetadataDirectoryName, config.Path); tnInfo != nil {
+				if tnFilename, tnInfo := utils.GetPathInfo(a.rootDirectory, config.Root, config.Path); tnInfo != nil {
 					http.ServeFile(w, r, tnFilename)
 					return
 				}
