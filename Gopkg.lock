@@ -50,12 +50,6 @@
   revision = "4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9"
 
 [[projects]]
-  name = "github.com/disintegration/imaging"
-  packages = ["."]
-  revision = "1884593a19ddc6f2ea050403430d02c1d0fc1283"
-  version = "v1.3.0"
-
-[[projects]]
   branch = "master"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
@@ -138,16 +132,6 @@
 
 [[projects]]
   branch = "master"
-  name = "golang.org/x/image"
-  packages = [
-    "bmp",
-    "tiff",
-    "tiff/lzw"
-  ]
-  revision = "12117c17ca67ffa1ce22e9409f3b0b0a93ac08c7"
-
-[[projects]]
-  branch = "master"
   name = "golang.org/x/net"
   packages = [
     "context",
@@ -182,6 +166,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "ad6d7c2044e299e56355092fa347abaa22cfb3f58bbc7923787e149033aa0548"
+  inputs-digest = "55de648e19b1cf9fd90c7c0c9f2310c1325c4a86b14afb52dac113db451d2950"
   solver-name = "gps-cdcl"
   solver-version = 1
