@@ -132,7 +132,7 @@ func main() {
 	log.Printf(`Starting server on port %d`, *port)
 
 	authApp := auth.NewApp(authConfig, service.NewApp(serviceAuthConfig, basicConfig, nil))
-	uiApp := ui.NewApp(uiConfig, *crudConfig[`directory`], authApp.URL)
+	uiApp := ui.NewApp(uiConfig, *crudConfig[`directory`])
 	crudApp := crud.NewApp(crudConfig, uiApp)
 
 	serviceHandler = owasp.Handler(owaspConfig, browserHandler(crudApp, uiApp, authApp))

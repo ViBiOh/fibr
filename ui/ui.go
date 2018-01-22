@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 	"path"
-	"regexp"
 	"strings"
 
 	"github.com/ViBiOh/fibr/provider"
@@ -43,10 +42,7 @@ func Flags(prefix string) map[string]*string {
 }
 
 // NewApp create ui from given config
-func NewApp(config map[string]*string, rootDirectory, authURL string) *App {
-	publicURL := *config[`publicURL`]
-	logoutURL := regexp.MustCompile(`(https?://)(.*)`).ReplaceAllString(publicURL, `${1}nobody:nogroup@${2}`)
-
+func NewApp(config map[string]*string, rootDirectory string) *App {
 	return &App{
 		rootDirectory: rootDirectory,
 		tpl: template.Must(template.New(`fibr`).Funcs(template.FuncMap{
@@ -95,10 +91,8 @@ func NewApp(config map[string]*string, rootDirectory, authURL string) *App {
 		base: map[string]interface{}{
 			`Display`: ``,
 			`Config`: map[string]interface{}{
-				`PublicURL`: publicURL,
-				`LogoutURL`: logoutURL,
+				`PublicURL`: *config[`publicURL`],
 				`StaticURL`: *config[`staticURL`],
-				`AuthURL`:   authURL,
 				`Version`:   *config[`version`],
 			},
 			`Seo`: map[string]interface{}{
