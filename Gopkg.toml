@@ -36,7 +36,3 @@
 [[constraint]]
   branch = "master"
   name = "github.com/ViBiOh/httputils"
-
-[[constraint]]
-  name = "github.com/tdewolff/minify"
-  version = "2.3.3"

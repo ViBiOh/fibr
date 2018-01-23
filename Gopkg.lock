@@ -27,7 +27,7 @@
     "provider/github",
     "service"
   ]
-  revision = "444a0422bb9092ab12a3694d966ca074b4276e85"
+  revision = "0e8ef8b2a9ef9f823836f455152aebba8350a5d8"
 
 [[projects]]
   branch = "master"
@@ -53,7 +53,7 @@
   branch = "master"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
-  revision = "1e59b77b52bf8e4b449a57e6f79f21226d571845"
+  revision = "c65a0412e71e8b9b3bfd22925720d23c0f054237"
 
 [[projects]]
   name = "github.com/matttproud/golang_protobuf_extensions"
@@ -91,9 +91,11 @@
   name = "github.com/prometheus/procfs"
   packages = [
     ".",
+    "internal/util",
+    "nfsd",
     "xfs"
   ]
-  revision = "b15cd069a83443be3154b719d0cc9fe8117f09fb"
+  revision = "85fadb6e89903ef7cca6f6a804474cd5ea85b6e1"
 
 [[projects]]
   name = "github.com/tdewolff/minify"
@@ -128,7 +130,7 @@
     "bcrypt",
     "blowfish"
   ]
-  revision = "a6600008915114d9c087fad9f03d75087b1a74df"
+  revision = "3d37316aaa6bd9929127ac9a527abf408178ea7b"
 
 [[projects]]
   branch = "master"

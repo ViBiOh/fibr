@@ -13,7 +13,7 @@ import (
 	"github.com/ViBiOh/auth/auth"
 	authProvider "github.com/ViBiOh/auth/provider"
 	"github.com/ViBiOh/auth/provider/basic"
-	"github.com/ViBiOh/auth/service"
+	authService "github.com/ViBiOh/auth/service"
 	"github.com/ViBiOh/fibr/crud"
 	"github.com/ViBiOh/fibr/provider"
 	"github.com/ViBiOh/fibr/ui"
@@ -119,7 +119,6 @@ func main() {
 	owaspConfig := owasp.Flags(``)
 
 	authConfig := auth.Flags(`auth`)
-	serviceAuthConfig := service.Flags(`authService`)
 	basicConfig := basic.Flags(`basic`)
 
 	crudConfig := crud.Flags(``)
@@ -131,7 +130,7 @@ func main() {
 
 	log.Printf(`Starting server on port %d`, *port)
 
-	authApp := auth.NewApp(authConfig, service.NewApp(serviceAuthConfig, basicConfig, nil))
+	authApp := auth.NewApp(authConfig, authService.NewBasicApp(basicConfig))
 	uiApp := ui.NewApp(uiConfig, *crudConfig[`directory`])
 	crudApp := crud.NewApp(crudConfig, uiApp)
 
