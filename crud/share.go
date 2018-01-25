@@ -39,7 +39,7 @@ func (a *App) CreateShare(w http.ResponseWriter, r *http.Request, config *provid
 
 	hasher := sha1.New()
 	hasher.Write([]byte(uuid))
-	id := hex.EncodeToString(hasher.Sum(nil))
+	id := hex.EncodeToString(hasher.Sum(nil))[:8]
 
 	a.metadataLock.Lock()
 	defer a.metadataLock.Unlock()

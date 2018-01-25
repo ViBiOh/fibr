@@ -138,15 +138,15 @@ func (a *App) Directory(w http.ResponseWriter, config *provider.RequestConfig, c
 
 	currentPath := strings.Trim(strings.TrimPrefix(config.Path, config.Root), `/`)
 
-	pageContent[`RootName`] = path.Base(a.rootDirectory)
+	rootName := path.Base(a.rootDirectory)
 	if config.Root != `` {
-		pageContent[`RootName`] = path.Base(config.Root)
+		rootName = path.Base(config.Root)
 	}
 
 	seo := a.base[`Seo`].(map[string]interface{})
 	pageContent[`Seo`] = map[string]interface{}{
-		`Title`:       fmt.Sprintf(`fibr - %s`, pageContent[`RootName`]),
-		`Description`: fmt.Sprintf(`FIle BRowser of directory %s`, pageContent[`RootName`]),
+		`Title`:       fmt.Sprintf(`fibr - %s`, path.Join(rootName, config.Path)),
+		`Description`: fmt.Sprintf(`FIle BRowser of directory %s`, path.Join(rootName, config.Path)),
 		`URL`:         config.URL,
 		`Img`:         seo[`Img`],
 		`ImgHeight`:   seo[`ImgHeight`],
@@ -158,6 +158,7 @@ func (a *App) Directory(w http.ResponseWriter, config *provider.RequestConfig, c
 		paths = nil
 	}
 
+	pageContent[`RootName`] = rootName
 	pageContent[`Root`] = config.Root
 	pageContent[`Path`] = config.Path
 	pageContent[`Paths`] = paths
