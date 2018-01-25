@@ -38,7 +38,10 @@ func (a *App) CreateShare(w http.ResponseWriter, r *http.Request, config *provid
 	}
 
 	hasher := sha1.New()
-	hasher.Write([]byte(uuid))
+	if _, err := hasher.Write([]byte(uuid)); err != nil {
+		a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while generating share id: %v`, err))
+		return
+	}
 	id := hex.EncodeToString(hasher.Sum(nil))[:8]
 
 	a.metadataLock.Lock()

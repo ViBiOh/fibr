@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -73,7 +74,11 @@ func (a *App) SaveFile(w http.ResponseWriter, r *http.Request, config *provider.
 
 	uploadedFile, uploadedFileHeader, err := getFileForm(w, r)
 	if uploadedFile != nil {
-		defer uploadedFile.Close()
+		defer func() {
+			if err := uploadedFile.Close(); err != nil {
+				log.Printf(`Error while closing uploaded file: %v`, err)
+			}
+		}()
 	}
 	if err != nil {
 		a.renderer.Error(w, http.StatusBadRequest, fmt.Errorf(`Error while getting file from form: %v`, err))
@@ -83,7 +88,11 @@ func (a *App) SaveFile(w http.ResponseWriter, r *http.Request, config *provider.
 	filename, info := utils.GetPathInfo(a.rootDirectory, config.Root, config.Path, uploadedFileHeader.Filename)
 	hostFile, err := createOrOpenFile(filename, info)
 	if hostFile != nil {
-		defer hostFile.Close()
+		defer func() {
+			if err := hostFile.Close(); err != nil {
+				log.Printf(`Error while closing writted file: %v`, err)
+			}
+		}()
 	}
 	if err != nil {
 		a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while creating or opening file: %v`, err))

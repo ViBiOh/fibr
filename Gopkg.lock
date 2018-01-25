@@ -5,7 +5,7 @@
   branch = "master"
   name = "github.com/NYTimes/gziphandler"
   packages = ["."]
-  revision = "47ca22a0aeea4c9ceddfb935d818d636d934c312"
+  revision = "289a3b81f5aedc99f8d6eb0f67827c142f1310d8"
 
 [[projects]]
   branch = "master"
@@ -41,7 +41,7 @@
     "tools",
     "uuid"
   ]
-  revision = "d9e777753ee5ba376805fcc97fe07d1d76d22dad"
+  revision = "d4377b875d3d705711b30964e5015a2e3e325c09"
 
 [[projects]]
   branch = "master"
@@ -92,10 +92,10 @@
   packages = [
     ".",
     "internal/util",
-    "nfsd",
+    "nfs",
     "xfs"
   ]
-  revision = "85fadb6e89903ef7cca6f6a804474cd5ea85b6e1"
+  revision = "cb4147076ac75738c9a7d279075a253c0cc5acbd"
 
 [[projects]]
   name = "github.com/tdewolff/minify"

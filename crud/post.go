@@ -2,16 +2,20 @@ package crud
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/ViBiOh/fibr/provider"
+	"github.com/ViBiOh/httputils"
 )
 
 const maxPostMemory = 32 * 1024 * 2014 // 32 MB
 
 // Post handle post from form
 func (a *App) Post(w http.ResponseWriter, r *http.Request, config *provider.RequestConfig) {
-	r.ParseMultipartForm(maxPostMemory)
+	if err := r.ParseMultipartForm(maxPostMemory); err != nil {
+		httputils.BadRequest(w, fmt.Errorf(`Error while parsing form: %v`, err))
+	}
 
 	if r.FormValue(`type`) == `share` {
 		if r.FormValue(`method`) == http.MethodPost {
