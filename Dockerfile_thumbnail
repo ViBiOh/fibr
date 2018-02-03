@@ -1,8 +1,0 @@
-FROM alpine:3.7
-
-RUN apk --update add curl build-base glib-dev expat-dev gtk-doc libjpeg-turbo-dev tiff-dev librsvg-dev libpng-dev giflib-dev \
- && curl -OL https://github.com/jcupitt/libvips/releases/download/v8.6.1/vips-8.6.1.tar.gz \
- && tar xzf vips-8.6.1.tar.gz \
- && cd vips-8.6.1 \
- && ./configure && make && make install \
- && rm -rf /vips-8.6.1*

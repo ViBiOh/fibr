@@ -37,13 +37,11 @@ docker-deps:
 docker-build:
 	docker build -t ${DOCKER_USER}/fibr .
 	docker build -t ${DOCKER_USER}/fibr-static -f Dockerfile_static .
-	docker build -t ${DOCKER_USER}/fibr-thumbnail -f Dockerfile_thumbnail .
 
 docker-push:
 	docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
 	docker push ${DOCKER_USER}/fibr
 	docker push ${DOCKER_USER}/fibr-static
-	docker push ${DOCKER_USER}/fibr-thumbnail
 
 start-deps:
 	go get -u github.com/ViBiOh/viws
@@ -52,12 +50,13 @@ start-deps:
 start-static:
 	viws \
 		-directory `pwd`/web/static/ \
-		-port 1082
+		-port 1081
 
 start-api:
 	go run fibr.go \
 		-tls=false \
 		-directory `pwd` \
+		-staticURL http://localhost:1081 \
 		-publicURL http://localhost:1080 \
 		-authUsers admin:admin \
 		-basicUsers 1:admin:`bcrypt password` \

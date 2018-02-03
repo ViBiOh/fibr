@@ -17,25 +17,31 @@ go get -u github.com/ViBiOh/fibr
 
 ```bash
   -authUrl string
-      [auth] Auth URL
+      [auth] Auth URL, if remote
   -authUsers string
       [auth] List of allowed users and profiles (e.g. user:profile1|profile2,user2:profile3)
+  -basicUsers string
+      [Basic] Users in the form "id:username:password,id2:username2:password2"
   -c string
       [health] URL to check
   -csp string
       [owasp] Content-Security-Policy (default "default-src 'self'")
   -directory string
-      Directory to serve (default "/data/")
+      Directory to serve (default "/data")
+  -frameOptions string
+      [owasp] X-Frame-Options (default "deny")
   -hsts
       [owasp] Indicate Strict Transport Security (default true)
-  -port string
-      Listening port (default "1080")
+  -port int
+      Listening port (default 1080)
   -prometheusMetricsHost string
       [prometheus] Allowed hostname to call metrics endpoint (default "localhost")
   -prometheusMetricsPath string
       [prometheus] Metrics endpoint path (default "/metrics")
   -prometheusPrefix string
       [prometheus] Prefix (default "http")
+  -publicURL string
+      Public Server URL (default "https://fibr.vibioh.fr")
   -rateCount uint
       [rate] IP limit (default 5000)
   -staticURL string
@@ -50,15 +56,4 @@ go get -u github.com/ViBiOh/fibr
       [tls] PEM Key file
   -version string
       Version (used mainly as a cache-buster)
-```
-
-## VipsThumbnail
-
-```bash
-docker run \
-  --rm \
-  -v `pwd`:/workdir \
-  -w /workdir \
-  vibioh/fibr-thumbnail \
-  /bin/sh -c "vipsthumbnail /workdir/Photos/MeilleursAgents/*.jpg --size 150 -o /workdir/.fibr/Photos/MeilleursAgents/%s.jpg[optimize_coding,strip] --vips-progress"
 ```
