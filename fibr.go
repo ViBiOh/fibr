@@ -20,8 +20,6 @@ import (
 	"github.com/ViBiOh/httputils"
 	"github.com/ViBiOh/httputils/cert"
 	"github.com/ViBiOh/httputils/owasp"
-	"github.com/ViBiOh/httputils/prometheus"
-	"github.com/ViBiOh/httputils/rate"
 )
 
 var (
@@ -114,8 +112,6 @@ func main() {
 	tls := flag.Bool(`tls`, true, `Serve TLS content`)
 	alcotestConfig := alcotest.Flags(``)
 	certConfig := cert.Flags(`tls`)
-	prometheusConfig := prometheus.Flags(`prometheus`)
-	rateConfig := rate.Flags(`rate`)
 	owaspConfig := owasp.Flags(``)
 
 	authConfig := auth.Flags(`auth`)
@@ -135,7 +131,7 @@ func main() {
 	crudApp := crud.NewApp(crudConfig, uiApp)
 
 	serviceHandler = owasp.Handler(owaspConfig, browserHandler(crudApp, uiApp, authApp))
-	apiHandler = prometheus.Handler(prometheusConfig, rate.Handler(rateConfig, gziphandler.GzipHandler(handler())))
+	apiHandler = gziphandler.GzipHandler(handler())
 
 	server := &http.Server{
 		Addr:    fmt.Sprintf(`:%d`, *port),

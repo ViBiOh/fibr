@@ -34,16 +34,8 @@ go get -u github.com/ViBiOh/fibr
       [owasp] Indicate Strict Transport Security (default true)
   -port int
       Listening port (default 1080)
-  -prometheusMetricsHost string
-      [prometheus] Allowed hostname to call metrics endpoint (default "localhost")
-  -prometheusMetricsPath string
-      [prometheus] Metrics endpoint path (default "/metrics")
-  -prometheusPrefix string
-      [prometheus] Prefix (default "http")
   -publicURL string
       Public Server URL (default "https://fibr.vibioh.fr")
-  -rateCount uint
-      [rate] IP limit (default 5000)
   -staticURL string
       Static Server URL (default "https://fibr-static.vibioh.fr")
   -tls

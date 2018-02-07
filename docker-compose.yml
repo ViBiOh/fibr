@@ -4,14 +4,16 @@ services:
   static:
     image: vibioh/fibr-static
     command:
-    - -prometheusMetricsHost
-    - fibr-static:1080
     - -tls
     labels:
       traefik.frontend.passHostHeader: 'true'
       traefik.frontend.rule: 'Host: fibr-static.vibioh.fr'
       traefik.protocol: 'https'
       traefik.port: '1080'
+      traefik.frontend.rateLimit.extractorFunc: 'client.ip'
+      traefik.frontend.rateLimit.rateSet.first.period: 60
+      traefik.frontend.rateLimit.rateSet.first.average: 100
+      traefik.frontend.rateLimit.rateSet.first.burst: 200
     logging:
       driver: json-file
       options:
@@ -26,8 +28,6 @@ services:
   site:
     image: vibioh/fibr
     command:
-    - -prometheusMetricsHost
-    - fibr:1080
     - -authUsers
     - vibioh:admin
     - -basicUsers
@@ -41,6 +41,10 @@ services:
       traefik.frontend.rule: 'Host: fibr.vibioh.fr'
       traefik.protocol: 'https'
       traefik.port: '1080'
+      traefik.frontend.rateLimit.extractorFunc: 'client.ip'
+      traefik.frontend.rateLimit.rateSet.first.period: 60
+      traefik.frontend.rateLimit.rateSet.first.average: 100
+      traefik.frontend.rateLimit.rateSet.first.burst: 200
     volumes:
     - ${DATA_DIR}:/data
     user: '1000'
