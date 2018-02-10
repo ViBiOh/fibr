@@ -7,12 +7,8 @@ import (
 	"github.com/ViBiOh/fibr/provider"
 )
 
-const maxPostMemory = 32 * 1024 * 2014 // 32 MB
-
 // Post handle post from form
 func (a *App) Post(w http.ResponseWriter, r *http.Request, config *provider.RequestConfig) {
-	_ = r.ParseMultipartForm(maxPostMemory)
-
 	if r.FormValue(`type`) == `share` {
 		if r.FormValue(`method`) == http.MethodPost {
 			a.CreateShare(w, r, config)
