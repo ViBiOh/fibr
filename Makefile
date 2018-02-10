@@ -60,4 +60,4 @@ start-api:
 		-publicURL http://localhost:1080 \
 		-authUsers admin:admin \
 		-basicUsers 1:admin:`bcrypt password` \
-		-csp "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' fibr-static.vibioh.fr"
+		-csp "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' localhost:1081"
