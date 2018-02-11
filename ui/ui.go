@@ -56,7 +56,9 @@ func NewApp(config map[string]*string, rootDirectory string) *App {
 			},
 			`asyncImage`: func(file os.FileInfo, version string) map[string]interface{} {
 				hasher := sha1.New()
-				hasher.Write([]byte(file.Name()))
+				if _, err := hasher.Write([]byte(file.Name())); err != nil {
+					log.Printf(`Error while generating hash for %s: %v`, file.Name(), err)
+				}
 
 				return map[string]interface{}{
 					`File`:        file,
