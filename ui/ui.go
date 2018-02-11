@@ -1,6 +1,8 @@
 package ui
 
 import (
+	"crypto/sha1"
+	"encoding/hex"
 	"flag"
 	"fmt"
 	"html/template"
@@ -51,6 +53,16 @@ func NewApp(config map[string]*string, rootDirectory string) *App {
 					return fmt.Sprintf(`%s/`, file.Name())
 				}
 				return file.Name()
+			},
+			`asyncImage`: func(file os.FileInfo, version string) map[string]interface{} {
+				hasher := sha1.New()
+				hasher.Write([]byte(file.Name()))
+
+				return map[string]interface{}{
+					`File`:        file,
+					`Fingerprint`: template.JS(hex.EncodeToString(hasher.Sum(nil))),
+					`Version`:     version,
+				}
 			},
 			`rebuildPaths`: func(parts []string, index int) string {
 				return path.Join(parts[:index+1]...)
@@ -165,7 +177,7 @@ func (a *App) Directory(w http.ResponseWriter, config *provider.RequestConfig, c
 	pageContent[`CanEdit`] = config.CanEdit
 	pageContent[`CanShare`] = config.CanShare
 
-	pageContent[`Display`] = `list`
+	pageContent[`Display`] = `grid`
 	if display != `` {
 		pageContent[`Display`] = display
 	}
