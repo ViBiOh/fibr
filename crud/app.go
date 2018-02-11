@@ -49,6 +49,8 @@ func NewApp(config map[string]*string, renderer provider.Renderer) *App {
 		log.Fatalf(`Error while loading metadata: %v`, err)
 	}
 
+	go app.generateThumbnail()
+
 	return app
 }
 

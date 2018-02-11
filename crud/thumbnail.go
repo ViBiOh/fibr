@@ -4,40 +4,83 @@ import (
 	"log"
 	"os"
 	"path"
+	"path/filepath"
+	"strings"
 
 	"github.com/ViBiOh/fibr/provider"
 	"github.com/ViBiOh/fibr/utils"
 	"github.com/disintegration/imaging"
 )
 
+func (a *App) generateThumbnail() {
+	ignoredThumbnailDir := map[string]bool{
+		path.Join(a.rootDirectory, provider.MetadataDirectoryName): true,
+		path.Join(a.rootDirectory, `vendor`):                       true,
+		path.Join(a.rootDirectory, `vendors`):                      true,
+	}
+
+	if err := filepath.Walk(a.rootDirectory, func(walkedPath string, info os.FileInfo, _ error) error {
+		if ignoredThumbnailDir[walkedPath] {
+			return filepath.SkipDir
+		}
+
+		if provider.ImageExtensions[path.Ext(info.Name())] {
+			rootRelativeFilename := strings.TrimPrefix(walkedPath, a.rootDirectory)
+
+			if _, thumbnailInfo := utils.GetPathInfo(a.getThumbnailPath(rootRelativeFilename)); thumbnailInfo == nil {
+				a.generateImageThumbnail(rootRelativeFilename)
+			}
+		}
+
+		return nil
+	}); err != nil {
+		log.Printf(`[thumbnail] Error while walking into dir: %v`, err)
+	}
+}
+
+func (a *App) getThumbnailPath(rootRelativeFilename string) string {
+	return path.Join(a.rootDirectory, provider.MetadataDirectoryName, rootRelativeFilename)
+}
+
 func (a *App) generateImageThumbnail(rootRelativeFilename string) {
 	filename, info := utils.GetPathInfo(a.rootDirectory, rootRelativeFilename)
-	thumbnail, thumbInfo := utils.GetPathInfo(a.rootDirectory, provider.MetadataDirectoryName, rootRelativeFilename)
-
 	if info == nil {
-		log.Printf(`[thumbnail] No origin file for %s`, filename)
+		log.Printf(`[thumbnail] Image not found for %s`, rootRelativeFilename)
+		return
 	}
 
+	thumbnail, thumbInfo := utils.GetPathInfo(a.getThumbnailPath(rootRelativeFilename))
 	if thumbInfo != nil {
-		log.Printf(`[thumbnail] Already exist for %s`, filename)
+		log.Printf(`[thumbnail] Thumbnail already exists for %s`, rootRelativeFilename)
 		return
 	}
 
-	origImage, err := imaging.Open(filename)
+	sourceImage, err := imaging.Open(filename)
 	if err != nil {
-		log.Printf(`[thumbnail] Error while opening origin file %s: %v`, filename, err)
+		log.Printf(`[thumbnail] Error while opening file %s: %v`, rootRelativeFilename, err)
 		return
 	}
 
-	resizedImage := imaging.Resize(origImage, 150, 0, imaging.Box)
+	resizedImage := imaging.Fill(sourceImage, 150, 150, imaging.Center, imaging.Box)
 
-	if err = os.MkdirAll(path.Dir(thumbnail), 0700); err != nil {
-		log.Printf(`[thumbnail] Error while creating directory %s: %v`, path.Dir(thumbnail), err)
+	thumbnailDir := path.Dir(thumbnail)
+	thumbnailDirInfo, err := os.Stat(thumbnailDir)
+	if err != nil && !os.IsNotExist(err) {
+		log.Printf(`[thumbnail] Error while getting info for directory %s: %v`, thumbnailDir, err)
 		return
+	}
+
+	if thumbnailDirInfo == nil {
+		if err = os.MkdirAll(thumbnailDir, 0700); err != nil {
+			log.Printf(`[thumbnail] Error while creating directory %s: %v`, thumbnailDir, err)
+			return
+		}
 	}
 
 	if err = imaging.Save(resizedImage, thumbnail); err != nil {
-		log.Printf(`[thumbnail] Error while saving file for %s: %v`, filename, err)
+		log.Printf(`[thumbnail] Error while saving file for %s: %v`, rootRelativeFilename, err)
 		return
 	}
+
+	log.Printf(`[thumbnail] Generation success for %s`, rootRelativeFilename)
 }
