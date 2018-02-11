@@ -99,6 +99,10 @@ func (a *App) SaveFile(w http.ResponseWriter, r *http.Request, config *provider.
 	} else if _, err = io.Copy(hostFile, uploadedFile); err != nil {
 		a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while writing file: %v`, err))
 	} else {
+		if provider.ImageExtensions[path.Ext(uploadedFileHeader.Filename)] {
+			go a.generateImageThumbnail(strings.TrimPrefix(filename, a.rootDirectory))
+		}
+
 		a.GetDir(w, config, path.Dir(filename), r.URL.Query().Get(`d`), &provider.Message{Level: `success`, Content: fmt.Sprintf(`File %s successfully uploaded`, uploadedFileHeader.Filename)})
 	}
 }

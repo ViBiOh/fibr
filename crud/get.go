@@ -63,7 +63,6 @@ func (a *App) Get(w http.ResponseWriter, r *http.Request, config *provider.Reque
 					http.ServeFile(w, r, tnFilename)
 					return
 				}
-				go a.generateImageThumbnail(path.Join(config.Root, config.Path))
 			}
 		}
 
