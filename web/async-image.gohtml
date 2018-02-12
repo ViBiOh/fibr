@@ -1,13 +1,13 @@
 {{- define "async-image" -}}
   <figure id="{{- .Fingerprint -}}-figure">
+    <noscript>
+      <img class="thumbnail" src="{{- filename .File -}}?thumbnail&v={{- .Version -}}" alt="thumbnail" />
+    </noscript>
     <div class="throbber" id="{{- .Fingerprint -}}-throbber">
       <div class="bounce1"></div>
       <div class="bounce2"></div>
       <div class="bounce3"></div>
     </div>
-    <noscript>
-      <img class="thumbnail" src="{{- filename .File -}}?thumbnail&v={{- .Version -}}" alt="thumbnail" />
-    </noscript>
     <script type="text/javascript">
       var throbber{{- .Fingerprint -}} = document.getElementById('{{- .Fingerprint -}}-throbber');
       throbber{{- .Fingerprint -}}.style.display = 'inline-block';

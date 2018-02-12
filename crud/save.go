@@ -35,6 +35,7 @@ func createOrOpenFile(filename string, info os.FileInfo) (io.WriteCloser, error)
 func (a *App) CreateDir(w http.ResponseWriter, r *http.Request, config *provider.RequestConfig) {
 	if !config.CanEdit {
 		a.renderer.Error(w, http.StatusForbidden, errors.New(`You're not authorized to do this ⛔`))
+		return
 	}
 
 	var filename string

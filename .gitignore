@@ -5,3 +5,6 @@ coverage.*
 
 # Docker
 cacert.pem
+
+# Fibr
+.fibr/*
