@@ -2,19 +2,10 @@
 
 
 [[projects]]
-  branch = "master"
   name = "github.com/NYTimes/gziphandler"
   packages = ["."]
-  revision = "289a3b81f5aedc99f8d6eb0f67827c142f1310d8"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/ViBiOh/alcotest"
-  packages = [
-    "alcotest",
-    "httpclient"
-  ]
-  revision = "7820b5444e1a46e9edefbc45d504df7723bb0ca8"
+  revision = "d6f46609c7629af3a02d791a4666866eed3cbd3e"
+  version = "v1.0.0"
 
 [[projects]]
   branch = "master"
@@ -27,19 +18,20 @@
     "provider/github",
     "service"
   ]
-  revision = "bd0d73baad092871fc90ba9f613a1669633b9b17"
+  revision = "e29a7a30fed7f4860c2f0bbbba839f2fea0de457"
 
 [[projects]]
   branch = "master"
   name = "github.com/ViBiOh/httputils"
   packages = [
     ".",
+    "alcotest",
     "cert",
     "owasp",
     "tools",
     "uuid"
   ]
-  revision = "e9aa2ab22a9232ec862b0a40201db24ab63804fe"
+  revision = "5ba574fa9b59230694a75168d2219f0d7f2f5190"
 
 [[projects]]
   name = "github.com/disintegration/imaging"
@@ -86,7 +78,7 @@
     "bcrypt",
     "blowfish"
   ]
-  revision = "5119cf507ed5294cc409c092980c7497ee5d6fd2"
+  revision = "650f4a345ab4e5b245a3034b110ebc7299e68186"
 
 [[projects]]
   branch = "master"
@@ -134,6 +126,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c1bb7daf2057557cd6a918aa5827678426dbe7d831c8add7e671fb2a7946a72e"
+  inputs-digest = "32e3aa1ecd72f0016f483eb9ac567d946ff96a44a60d8da06eefe1829bab72ba"
   solver-name = "gps-cdcl"
   solver-version = 1

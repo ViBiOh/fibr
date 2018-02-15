@@ -28,6 +28,7 @@ services:
   site:
     image: vibioh/fibr
     command:
+    - -tls
     - -authUsers
     - vibioh:admin
     - -basicUsers

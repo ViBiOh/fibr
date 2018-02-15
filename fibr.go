@@ -2,14 +2,11 @@ package main
 
 import (
 	"errors"
-	"flag"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 
 	"github.com/NYTimes/gziphandler"
-	"github.com/ViBiOh/alcotest/alcotest"
 	"github.com/ViBiOh/auth/auth"
 	authProvider "github.com/ViBiOh/auth/provider"
 	"github.com/ViBiOh/auth/provider/basic"
@@ -18,13 +15,8 @@ import (
 	"github.com/ViBiOh/fibr/provider"
 	"github.com/ViBiOh/fibr/ui"
 	"github.com/ViBiOh/httputils"
-	"github.com/ViBiOh/httputils/cert"
+	"github.com/ViBiOh/httputils/healthcheck"
 	"github.com/ViBiOh/httputils/owasp"
-)
-
-var (
-	serviceHandler http.Handler
-	apiHandler     http.Handler
 )
 
 func handleAnonymousRequest(w http.ResponseWriter, r *http.Request, err error, crudApp *crud.App, uiApp *ui.App) {
@@ -89,66 +81,27 @@ func browserHandler(crudApp *crud.App, uiApp *ui.App, authApp *auth.App) http.Ha
 	})
 }
 
-func healthHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodGet {
-		w.WriteHeader(http.StatusOK)
-	} else {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-	}
-}
-
-func handler() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path == `/health` {
-			healthHandler(w, r)
-		} else {
-			serviceHandler.ServeHTTP(w, r)
-		}
-	})
-}
-
 func main() {
-	port := flag.Int(`port`, 1080, `Listening port`)
-	tls := flag.Bool(`tls`, true, `Serve TLS content`)
-	alcotestConfig := alcotest.Flags(``)
-	certConfig := cert.Flags(`tls`)
 	owaspConfig := owasp.Flags(``)
-
 	authConfig := auth.Flags(`auth`)
 	basicConfig := basic.Flags(`basic`)
-
 	crudConfig := crud.Flags(``)
 	uiConfig := ui.Flags(``)
 
-	flag.Parse()
+	httputils.StartMainServer(func() http.Handler {
+		authApp := auth.NewApp(authConfig, authService.NewBasicApp(basicConfig))
+		uiApp := ui.NewApp(uiConfig, *crudConfig[`directory`])
+		crudApp := crud.NewApp(crudConfig, uiApp)
 
-	alcotest.DoAndExit(alcotestConfig)
+		serviceHandler := owasp.Handler(owaspConfig, browserHandler(crudApp, uiApp, authApp))
+		healthHandler := healthcheck.Handler()
 
-	log.Printf(`Starting server on port %d`, *port)
-
-	authApp := auth.NewApp(authConfig, authService.NewBasicApp(basicConfig))
-	uiApp := ui.NewApp(uiConfig, *crudConfig[`directory`])
-	crudApp := crud.NewApp(crudConfig, uiApp)
-
-	serviceHandler = owasp.Handler(owaspConfig, browserHandler(crudApp, uiApp, authApp))
-	apiHandler = gziphandler.GzipHandler(handler())
-
-	server := &http.Server{
-		Addr:    fmt.Sprintf(`:%d`, *port),
-		Handler: apiHandler,
-	}
-
-	var serveError = make(chan error)
-	go func() {
-		defer close(serveError)
-		if *tls {
-			log.Print(`Listening with TLS enabled`)
-			serveError <- cert.ListenAndServeTLS(certConfig, server)
-		} else {
-			log.Print(`⚠ fibr is running without secure connection ⚠`)
-			serveError <- server.ListenAndServe()
-		}
-	}()
-
-	httputils.ServerGracefulClose(server, serveError, nil)
+		return gziphandler.GzipHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.URL.Path == `/health` {
+				healthHandler.ServeHTTP(w, r)
+			} else {
+				serviceHandler.ServeHTTP(w, r)
+			}
+		}))
+	}, nil)
 }
