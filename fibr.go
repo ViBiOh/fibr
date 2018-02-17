@@ -16,6 +16,7 @@ import (
 	"github.com/ViBiOh/fibr/ui"
 	"github.com/ViBiOh/httputils"
 	"github.com/ViBiOh/httputils/healthcheck"
+	"github.com/ViBiOh/httputils/httperror"
 	"github.com/ViBiOh/httputils/owasp"
 )
 
@@ -76,7 +77,7 @@ func browserHandler(crudApp *crud.App, uiApp *ui.App, authApp *auth.App) http.Ha
 		} else if r.Method == http.MethodDelete {
 			crudApp.Delete(w, r, config)
 		} else {
-			httputils.NotFound(w)
+			httperror.NotFound(w)
 		}
 	})
 }

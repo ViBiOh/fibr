@@ -14,7 +14,8 @@ import (
 
 	"github.com/ViBiOh/fibr/provider"
 	"github.com/ViBiOh/fibr/utils"
-	"github.com/ViBiOh/httputils"
+	"github.com/ViBiOh/httputils/httperror"
+	"github.com/ViBiOh/httputils/templates"
 	"github.com/ViBiOh/httputils/tools"
 )
 
@@ -129,8 +130,8 @@ func (a *App) Error(w http.ResponseWriter, status int, err error) {
 		errorContent[`Error`] = err.Error()
 	}
 
-	if err := httputils.WriteHTMLTemplate(a.tpl.Lookup(`error`), w, errorContent, status); err != nil {
-		httputils.InternalServerError(w, err)
+	if err := templates.WriteHTMLTemplate(a.tpl.Lookup(`error`), w, errorContent, status); err != nil {
+		httperror.InternalServerError(w, err)
 	}
 
 	log.Printf(`[error] %v`, err)
@@ -138,8 +139,8 @@ func (a *App) Error(w http.ResponseWriter, status int, err error) {
 
 // Sitemap render sitemap.xml
 func (a *App) Sitemap(w http.ResponseWriter) {
-	if err := httputils.WriteXMLTemplate(a.tpl.Lookup(`sitemap`), w, a.base, http.StatusOK); err != nil {
-		httputils.InternalServerError(w, err)
+	if err := templates.WriteXMLTemplate(a.tpl.Lookup(`sitemap`), w, a.base, http.StatusOK); err != nil {
+		httperror.InternalServerError(w, err)
 	}
 }
 
@@ -193,7 +194,7 @@ func (a *App) Directory(w http.ResponseWriter, config *provider.RequestConfig, c
 		pageContent[key] = value
 	}
 
-	if err := httputils.WriteHTMLTemplate(a.tpl.Lookup(`files`), w, pageContent, http.StatusOK); err != nil {
+	if err := templates.WriteHTMLTemplate(a.tpl.Lookup(`files`), w, pageContent, http.StatusOK); err != nil {
 		a.Error(w, http.StatusInternalServerError, err)
 	}
 }
