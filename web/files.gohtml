@@ -24,7 +24,16 @@
 
   {{- template "message" .Message -}}
 
-  <div>
+  {{- if .CanEdit -}}
+    {{- template "upload-form" . -}}
+    {{- template "folder-form" . -}}
+  {{- end -}}
+
+  {{- if .CanShare -}}
+    {{- template "share-form" . -}}
+  {{- end -}}
+
+  <div class="content">
     {{- template "modifiers" . -}}
 
     <ul id="files">

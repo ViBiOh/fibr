@@ -1,72 +1,74 @@
 {{- define "share-form" -}}
-  <div class="modal-content">
-    <h2 class="header">Shared folders</h2>
+  <div id="share-modal" class="modal full flex flex-center">
+    <div class="modal-content">
+      <h2 class="header">Shared folders</h2>
 
-    {{- $root := . -}}
+      {{- $root := . -}}
 
-    {{- if len .Shares -}}
-      <table id="shares" cellpadding="10" cellspacing="0">
-          <thead>
-            <tr class="share-content">
-                <td>ID</td>
-                <td>Path</td>
-                <td class="icon">
-                  <img class="icon" src="{{- .Config.StaticURL -}}/svg/edit.svg?v={{- .Config.Version -}}" alt="edit" />
-                </td>
-                <td></td>
-            </tr>
-          </thead>
-          <tbody>
-            {{- range .Shares -}}
+      {{- if len .Shares -}}
+        <table id="shares" cellpadding="10" cellspacing="0">
+            <thead>
               <tr class="share-content">
-                  <td>
-                    <a href="/{{- .ID -}}/">
-                      <code>{{- .ID -}}</code>
-                    </a>
+                  <td>ID</td>
+                  <td>Path</td>
+                  <td class="icon">
+                    <img class="icon" src="{{- .Config.StaticURL -}}/svg/edit.svg?v={{- .Config.Version -}}" alt="edit" />
                   </td>
-                  <td>
-                    <code>{{- .Path -}}</code>
-                  </td>
-                  <td>
-                    {{- if .Edit -}}
-                      <img class="icon" src="{{- $root.Config.StaticURL -}}/svg/check.svg?v={{- $root.Config.Version -}}" alt="edit" />
-                    {{- end -}}
-                  </td>
-                  <td>
-                    <form method="post">
-                      <input type="hidden" name="type" value="share" />
-                      <input type="hidden" name="method" value="DELETE" />
-                      <input type="hidden" name="id" value="{{- .ID -}}" />
-                      <button type="submit" onclick="javascript:return confirm('Are you sure you want to delete share for {{ .Path }} ?')" class="button-icon">
-                        <img class="icon" src="{{- $root.Config.StaticURL -}}/svg/times.svg?v={{- $root.Config.Version -}}" alt="delete" />
-                      </button>
-                    </form>
-                  </td>
+                  <td></td>
               </tr>
-            {{- end -}}
-          </tbody>
-      </table>
-    {{- end -}}
+            </thead>
+            <tbody>
+              {{- range .Shares -}}
+                <tr class="share-content">
+                    <td>
+                      <a href="/{{- .ID -}}/">
+                        <code>{{- .ID -}}</code>
+                      </a>
+                    </td>
+                    <td>
+                      <code>{{- .Path -}}</code>
+                    </td>
+                    <td>
+                      {{- if .Edit -}}
+                        <img class="icon" src="{{- $root.Config.StaticURL -}}/svg/check.svg?v={{- $root.Config.Version -}}" alt="edit" />
+                      {{- end -}}
+                    </td>
+                    <td>
+                      <form method="post">
+                        <input type="hidden" name="type" value="share" />
+                        <input type="hidden" name="method" value="DELETE" />
+                        <input type="hidden" name="id" value="{{- .ID -}}" />
+                        <button type="submit" onclick="javascript:return confirm('Are you sure you want to delete share for {{ .Path }} ?')" class="button-icon">
+                          <img class="icon" src="{{- $root.Config.StaticURL -}}/svg/times.svg?v={{- $root.Config.Version -}}" alt="delete" />
+                        </button>
+                      </form>
+                    </td>
+                </tr>
+              {{- end -}}
+            </tbody>
+        </table>
+      {{- end -}}
 
-    <form method="post">
-      <input type="hidden" name="type" value="share" />
-      <input type="hidden" name="method" value="POST" />
+      <form method="post">
+        <input type="hidden" name="type" value="share" />
+        <input type="hidden" name="method" value="POST" />
+        <p class="center">
+          Share this directory,
+          <label for="edit">
+            <strong>with edition </strong>
+          </label>
+          <input id="edit" type="checkbox" name="edit" value="true" />
+          <button type="submit" class="button bg-important">
+            <img class="icon" src="{{- $root.Config.StaticURL -}}/svg/check.svg?v={{- $root.Config.Version -}}" alt="submit" />
+          </button>
+        </p>
+      </form>
+
       <p class="center">
-        Share this directory,
-        <label for="edit">
-          <strong>with edition </strong>
-        </label>
-        <input id="edit" type="checkbox" name="edit" value="true" />
-        <button type="submit" class="button bg-important">
-          <img class="icon" src="{{- $root.Config.StaticURL -}}/svg/check.svg?v={{- $root.Config.Version -}}" alt="submit" />
-        </button>
+        <a href="#" class="button">
+          Cancel
+        </a>
       </p>
-    </form>
-
-    <p class="center">
-      <a href="#" class="button">
-        Cancel
-      </a>
-    </p>
+    </div>
   </div>
 {{- end -}}

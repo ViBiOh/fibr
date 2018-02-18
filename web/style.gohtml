@@ -185,6 +185,12 @@
       display: flex;
     }
 
+    #upload-modal:target ~ .content,
+    #folder-modal:target ~ .content,
+    #share-modal:target ~ .content {
+      pointer-events: none;
+    }
+
     .throbber {
       margin: auto;
       display: none;

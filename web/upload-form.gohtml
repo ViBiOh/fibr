@@ -1,24 +1,26 @@
 {{- define "upload-form" -}}
-  <div class="modal-content">
-    <h2 class="header">Upload a file</h2>
+  <div id="upload-modal" class="modal full flex flex-center">
+    <div class="modal-content">
+      <h2 class="header">Upload a file</h2>
 
-    <form method="post" enctype="multipart/form-data">
-      <input type="hidden" name="method" value="POST" />
-      <p class="center">
-        <label for="file">File</label>
-        <input id="file" type="file" name="file" />
-      </p>
-      <p class="center">
-        <button type="submit" class="button bg-important">
-          Upload
-        </button>
-      </p>
-    </form>
+      <form method="post" enctype="multipart/form-data">
+        <input type="hidden" name="method" value="POST" />
+        <p class="center">
+          <label for="file">File</label>
+          <input id="file" type="file" name="file" />
+        </p>
+        <p class="center">
+          <button type="submit" class="button bg-important">
+            Upload
+          </button>
+        </p>
+      </form>
 
-    <p class="center">
-      <a href="#" class="button">
-        Cancel
-      </a>
-    </p>
+      <p class="center">
+        <a href="#" class="button">
+          Cancel
+        </a>
+      </p>
+    </div>
   </div>
 {{- end -}}

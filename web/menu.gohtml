@@ -4,24 +4,15 @@
       <a href="#upload-modal">
         <img class="icon icon-large" src="{{- .Config.StaticURL -}}/svg/cloud-upload-alt.svg?v={{- .Config.Version -}}" alt="upload" />
       </a>
-      <div id="upload-modal" class="modal full flex flex-center">
-        {{- template "upload-form" . -}}
-      </div>
       <a href="#folder-modal">
         <img class="icon icon-large" src="{{- .Config.StaticURL -}}/svg/folder.svg?v={{- .Config.Version -}}" alt="folder" />
       </a>
-      <div id="folder-modal" class="modal full flex flex-center">
-        {{- template "folder-form" . -}}
-      </div>
     {{- end -}}
 
     {{- if .CanShare -}}
       <a href="#share-modal">
         <img class="icon icon-large" src="{{- .Config.StaticURL -}}/svg/share-alt-square.svg?v={{- .Config.Version -}}" alt="share" />
       </a>
-      <div id="share-modal" class="modal full flex flex-center">
-        {{- template "share-form" . -}}
-      </div>
     {{- end -}}
   </div>
 {{- end -}}
