@@ -27,6 +27,12 @@
   {{- if .CanEdit -}}
     {{- template "upload-form" . -}}
     {{- template "folder-form" . -}}
+
+    {{- if eq .Display "list" -}}
+      {{- range .Files -}}
+        {{- template "confirm-modal" . }}
+      {{- end -}}
+    {{- end -}}
   {{- end -}}
 
   {{- if .CanShare -}}
@@ -55,15 +61,10 @@
               <span class="filename">{{- filename . -}}</span>
             {{- end -}}
 
-            {{- if $root.CanEdit -}}
-              <form class="file-delete" method="post">
-                <input type="hidden" name="type" value="file" />
-                <input type="hidden" name="method" value="DELETE" />
-                <input type="hidden" name="name" value="{{- filename . -}}" />
-                <button type="submit" onclick="javascript:return confirm('Are you sure you want to delete {{ filename . }} ?')" class="button-icon">
-                  <img class="icon" src="{{- $root.Config.StaticURL -}}/svg/times.svg?v={{- $root.Config.Version -}}" alt="delete" />
-                </button>
-              </form>
+            {{- if and (eq $root.Display "list") $root.CanEdit -}}
+              <a class="button button-icon file-delete" href="#confirm-modal-{{ filename_fingerprint . }}">
+                <img class="icon" src="{{- $root.Config.StaticURL -}}/svg/times.svg?v={{- $root.Config.Version -}}" alt="delete" />
+              </a>
             {{- end -}}
           </a>
         </li>

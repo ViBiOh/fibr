@@ -173,18 +173,33 @@
       background-color: aliceblue;
     }
 
+    {{- if and (eq .Display "list") .CanEdit -}}
+      {{- range .Files -}}
+        #confirm-modal-{{ filename_fingerprint . }},
+      {{- end -}}
+    {{- end -}}
     #upload-modal,
     #folder-modal,
     #share-modal {
       display: none;
     }
 
+    {{- if and (eq .Display "list") .CanEdit -}}
+      {{- range .Files -}}
+        #confirm-modal-{{ filename_fingerprint . }}:target,
+      {{- end -}}
+    {{- end -}}
     #upload-modal:target,
     #folder-modal:target,
     #share-modal:target {
       display: flex;
     }
 
+    {{- if and (eq .Display "list") .CanEdit -}}
+      {{- range .Files -}}
+        #confirm-modal-{{ filename_fingerprint . }}:target ~ .content,
+      {{- end -}}
+    {{- end -}}
     #upload-modal:target ~ .content,
     #folder-modal:target ~ .content,
     #share-modal:target ~ .content {
@@ -232,6 +247,9 @@
       }
 
       .file {
+        align-items: center;
+        display: flex;
+        flex-wrap: wrap;
         margin: 0.5rem 1rem 0;
       }
 

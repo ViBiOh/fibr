@@ -1,16 +1,16 @@
 {{- define "menu" -}}
   <div id="tools">
     {{- if .CanEdit -}}
-      <a href="#upload-modal">
+      <a class="button" href="#upload-modal">
         <img class="icon icon-large" src="{{- .Config.StaticURL -}}/svg/cloud-upload-alt.svg?v={{- .Config.Version -}}" alt="upload" />
       </a>
-      <a href="#folder-modal">
+      <a class="button" href="#folder-modal">
         <img class="icon icon-large" src="{{- .Config.StaticURL -}}/svg/folder.svg?v={{- .Config.Version -}}" alt="folder" />
       </a>
     {{- end -}}
 
     {{- if .CanShare -}}
-      <a href="#share-modal">
+      <a class="button" href="#share-modal">
         <img class="icon icon-large" src="{{- .Config.StaticURL -}}/svg/share-alt-square.svg?v={{- .Config.Version -}}" alt="share" />
       </a>
     {{- end -}}

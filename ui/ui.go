@@ -55,6 +55,14 @@ func NewApp(config map[string]*string, rootDirectory string) *App {
 				}
 				return file.Name()
 			},
+			`filename_fingerprint`: func(file os.FileInfo) string {
+				hasher := sha1.New()
+				if _, err := hasher.Write([]byte(file.Name())); err != nil {
+					log.Printf(`Error while generating hash for %s: %v`, file.Name(), err)
+				}
+
+				return hex.EncodeToString(hasher.Sum(nil))
+			},
 			`asyncImage`: func(file os.FileInfo, version string) map[string]interface{} {
 				hasher := sha1.New()
 				if _, err := hasher.Write([]byte(file.Name())); err != nil {

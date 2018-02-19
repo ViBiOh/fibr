@@ -33,6 +33,7 @@
     "owasp",
     "request",
     "server",
+    "templates",
     "tools",
     "uuid"
   ]
@@ -49,6 +50,32 @@
   packages = ["proto"]
   revision = "925541529c1fa6821df4e44ce2723319eb2be768"
   version = "v1.0.0"
+
+[[projects]]
+  name = "github.com/tdewolff/minify"
+  packages = [
+    ".",
+    "css",
+    "html",
+    "js",
+    "xml"
+  ]
+  revision = "222672169d634c440a73abc47685074e1a9daa60"
+  version = "v2.3.4"
+
+[[projects]]
+  name = "github.com/tdewolff/parse"
+  packages = [
+    ".",
+    "buffer",
+    "css",
+    "html",
+    "js",
+    "strconv",
+    "xml"
+  ]
+  revision = "639f6272aec6b52094db77b9ec488214b0b4b1a1"
+  version = "v2.3.2"
 
 [[projects]]
   branch = "master"
@@ -105,6 +132,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "49eac019be542c60f8e1b5ba7cc5086a8b5245e3dc40bb568988b68783722ba8"
+  inputs-digest = "c77520eeda4e2631f58d9b547571096c24a7f33818337a58a3ce6c738ef813ab"
   solver-name = "gps-cdcl"
   solver-version = 1
