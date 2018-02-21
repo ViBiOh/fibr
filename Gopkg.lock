@@ -4,8 +4,8 @@
 [[projects]]
   name = "github.com/NYTimes/gziphandler"
   packages = ["."]
-  revision = "d6f46609c7629af3a02d791a4666866eed3cbd3e"
-  version = "v1.0.0"
+  revision = "2600fb119af974220d3916a5916d6e31176aac1b"
+  version = "v1.0.1"
 
 [[projects]]
   branch = "master"
@@ -18,7 +18,7 @@
     "provider/github",
     "service"
   ]
-  revision = "74feea8d2ec00d4ff1aced25ced0447071973343"
+  revision = "8ae37b8a43d51d92eec3008ad5117da229558ffc"
 
 [[projects]]
   branch = "master"
@@ -37,7 +37,7 @@
     "tools",
     "uuid"
   ]
-  revision = "2802a9be4581106f0f41023d815ed5239145382d"
+  revision = "ffedff675f711425bed74940efee7021ba098536"
 
 [[projects]]
   name = "github.com/disintegration/imaging"
@@ -84,7 +84,7 @@
     "bcrypt",
     "blowfish"
   ]
-  revision = "650f4a345ab4e5b245a3034b110ebc7299e68186"
+  revision = "432090b8f568c018896cd8a0fb0345872bbac6ce"
 
 [[projects]]
   branch = "master"
@@ -103,7 +103,7 @@
     "context",
     "context/ctxhttp"
   ]
-  revision = "136a25c244d3019482a795d728110278d6ba09a4"
+  revision = "cbe0f9307d0156177f9dd5dc85da1a31abc5f2fb"
 
 [[projects]]
   branch = "master"
