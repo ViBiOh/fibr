@@ -1,6 +1,5 @@
 #!/usr/bin/env sh
 
-set -e
 
 MODE="mode: atomic"
 
