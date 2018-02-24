@@ -1,5 +1,6 @@
 #!/usr/bin/env sh
 
+set -e
 
 MODE="mode: atomic"
 
@@ -9,7 +10,7 @@ for pkg in $(go list ./... | grep -v vendor); do
     go test -covermode=atomic -coverprofile=profile.out $pkg
 
     if [ -f profile.out ]; then
-        cat profile.out | grep --invert-match "${MODE}" >> coverage.txt
+        cat profile.out | grep --invert-match "${MODE}" >> coverage.txt || true
         rm profile.out
     fi
 done
