@@ -202,6 +202,7 @@ func (a *App) Directory(w http.ResponseWriter, config *provider.RequestConfig, c
 		pageContent[key] = value
 	}
 
+	w.Header().Set(`content-language`, `fr`)
 	if err := templates.WriteHTMLTemplate(a.tpl.Lookup(`files`), w, pageContent, http.StatusOK); err != nil {
 		a.Error(w, http.StatusInternalServerError, err)
 	}
