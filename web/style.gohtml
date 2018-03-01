@@ -302,22 +302,36 @@
       }
 
       .file {
+        align-items: center;
         border: 1px solid whitesmoke;
-        height: 15rem;
+        display: flex;
+        justify-content: center;
         padding: 0.5rem;
       }
 
       .image {
         border: 1px solid whitesmoke;
-        height: 15rem;
       }
 
       .filelink {
+        align-items: center;
         display: flex;
         flex-direction: column;
-        justify-content: space-around;
-        align-items: center;
         height: 100%;
+        justify-content: space-around;
+        width: 100%;
+      }
+
+      .filelink figure {
+        align-items: center;
+        display: flex;
+        font-size: 0;
+        height: 100%;
+        width: 100%;
+      }
+
+      .filelink figure img {
+        width: 100%;
       }
 
       .filename {
@@ -326,7 +340,6 @@
         text-align: left;
         text-overflow: ellipsis;
         white-space: nowrap;
-        width: 100%;
       }
 
       .file-delete {

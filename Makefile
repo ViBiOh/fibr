@@ -59,5 +59,5 @@ start-api:
 		-staticURL http://localhost:1081 \
 		-publicURL http://localhost:1080 \
 		-authUsers admin:admin \
-		-basicUsers 1:admin:`bcrypt password` \
+		-basicUsers 1:admin:`bcrypt admin` \
 		-csp "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' localhost:1081"
