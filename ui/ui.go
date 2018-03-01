@@ -55,6 +55,9 @@ func NewApp(config map[string]*string, rootDirectory string) *App {
 				}
 				return file.Name()
 			},
+			`urlescape`: func(url string) string {
+				return template.URLQueryEscaper(url)
+			},
 			`filename_fingerprint`: func(file os.FileInfo) string {
 				hasher := sha1.New()
 				if _, err := hasher.Write([]byte(file.Name())); err != nil {

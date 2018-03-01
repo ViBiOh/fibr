@@ -1,7 +1,7 @@
 {{- define "async-image" -}}
   <figure id="{{- .Fingerprint -}}-figure">
     <noscript>
-      <img class="thumbnail" src="{{- filename .File -}}?thumbnail&v={{- .Version -}}" alt="thumbnail" />
+      <img class="thumbnail" src="{{- urlescape (filename .File) -}}?thumbnail&v={{- .Version -}}" alt="thumbnail" />
     </noscript>
     <div class="throbber" id="{{- .Fingerprint -}}-throbber">
       <div class="bounce1"></div>
@@ -17,8 +17,8 @@
         document.getElementById('{{- .Fingerprint -}}-figure').insertBefore(a{{- .Fingerprint -}}, throbber{{- .Fingerprint -}});
         throbber{{- .Fingerprint -}}.style.display = 'none';
       };
-      a{{- .Fingerprint -}}.srcset = '{{- filename .File -}}?thumbnail&v={{- .Version -}}';
-      a{{- .Fingerprint -}}.src = '{{- filename .File -}}?thumbnail&v={{- .Version -}}';
+      a{{- .Fingerprint -}}.srcset = '{{- urlescape (filename .File) -}}?thumbnail&v={{- .Version -}}';
+      a{{- .Fingerprint -}}.src = '{{- urlescape (filename .File) -}}?thumbnail&v={{- .Version -}}';
       a{{- .Fingerprint -}}.alt = 'thumbnail';
     </script>
   </figure>
