@@ -8,6 +8,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"strings"
@@ -56,7 +57,7 @@ func NewApp(config map[string]*string, rootDirectory string) *App {
 				return file.Name()
 			},
 			`urlescape`: func(url string) string {
-				return template.URLQueryEscaper(url)
+				return url.PathEscape(url)
 			},
 			`filename_fingerprint`: func(file os.FileInfo) string {
 				hasher := sha1.New()
