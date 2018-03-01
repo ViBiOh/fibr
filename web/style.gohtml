@@ -295,24 +295,20 @@
       }
 
       #files {
-        align-items: center;
-        display: flex;
-        flex-wrap: wrap;
+        display: grid;
+        grid-gap: .5rem;
+        grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+        margin: .5rem;
       }
 
       .file {
         border: 1px solid whitesmoke;
         height: 15rem;
-        margin: 0.5rem;
         padding: 0.5rem;
-        width: 15rem;
       }
 
       .image {
         border: 1px solid whitesmoke;
-        height: 15rem;
-        margin: 0.5rem;
-        width: 15rem;
       }
 
       .filelink {
