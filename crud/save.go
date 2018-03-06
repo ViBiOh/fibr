@@ -67,6 +67,28 @@ func (a *App) CreateDir(w http.ResponseWriter, r *http.Request, config *provider
 	a.GetDir(w, config, path.Dir(filename), r.URL.Query().Get(`d`), &provider.Message{Level: `success`, Content: fmt.Sprintf(`Directory %s successfully created`, path.Base(filename))})
 }
 
+func (a *App) saveUploadedFile(config *provider.RequestConfig, uploadedFile io.ReadCloser, uploadedFileHeader *multipart.FileHeader) (string, error) {
+	filename, info := utils.GetPathInfo(a.rootDirectory, config.Root, config.Path, uploadedFileHeader.Filename)
+	hostFile, err := createOrOpenFile(filename, info)
+	if hostFile != nil {
+		defer func() {
+			if err := hostFile.Close(); err != nil {
+				log.Printf(`Error while closing writted file: %v`, err)
+			}
+		}()
+	}
+
+	if err != nil {
+		return ``, fmt.Errorf(`Error while creating or opening file: %v`, err)
+	} else if _, err = io.Copy(hostFile, uploadedFile); err != nil {
+		return ``, fmt.Errorf(`Error while writing file: %v`, err)
+	} else if provider.ImageExtensions[path.Ext(uploadedFileHeader.Filename)] {
+		go a.generateImageThumbnail(strings.TrimPrefix(filename, a.rootDirectory))
+	}
+
+	return filename, nil
+}
+
 // SaveFile saves form file to filesystem
 func (a *App) SaveFile(w http.ResponseWriter, r *http.Request, config *provider.RequestConfig) {
 	if !config.CanEdit {
@@ -86,24 +108,9 @@ func (a *App) SaveFile(w http.ResponseWriter, r *http.Request, config *provider.
 		return
 	}
 
-	filename, info := utils.GetPathInfo(a.rootDirectory, config.Root, config.Path, uploadedFileHeader.Filename)
-	hostFile, err := createOrOpenFile(filename, info)
-	if hostFile != nil {
-		defer func() {
-			if err := hostFile.Close(); err != nil {
-				log.Printf(`Error while closing writted file: %v`, err)
-			}
-		}()
-	}
-	if err != nil {
-		a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while creating or opening file: %v`, err))
-	} else if _, err = io.Copy(hostFile, uploadedFile); err != nil {
-		a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while writing file: %v`, err))
+	if filename, err := a.saveUploadedFile(config, uploadedFile, uploadedFileHeader); err != nil {
+		a.renderer.Error(w, http.StatusInternalServerError, err)
 	} else {
-		if provider.ImageExtensions[path.Ext(uploadedFileHeader.Filename)] {
-			go a.generateImageThumbnail(strings.TrimPrefix(filename, a.rootDirectory))
-		}
-
 		a.GetDir(w, config, path.Dir(filename), r.URL.Query().Get(`d`), &provider.Message{Level: `success`, Content: fmt.Sprintf(`File %s successfully uploaded`, uploadedFileHeader.Filename)})
 	}
 }
