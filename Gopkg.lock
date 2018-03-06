@@ -18,7 +18,7 @@
     "provider/github",
     "service"
   ]
-  revision = "8ae37b8a43d51d92eec3008ad5117da229558ffc"
+  revision = "18f009b19151d6f7b5504534a4d23a847615ee1a"
 
 [[projects]]
   branch = "master"
@@ -29,7 +29,7 @@
     "cert",
     "healthcheck",
     "httperror",
-    "json",
+    "httpjson",
     "owasp",
     "request",
     "server",
@@ -37,7 +37,7 @@
     "tools",
     "uuid"
   ]
-  revision = "ffedff675f711425bed74940efee7021ba098536"
+  revision = "203b8898ad2677a44cfc79ef8df214e93e7d4899"
 
 [[projects]]
   name = "github.com/disintegration/imaging"
@@ -84,7 +84,7 @@
     "bcrypt",
     "blowfish"
   ]
-  revision = "432090b8f568c018896cd8a0fb0345872bbac6ce"
+  revision = "91a49db82a88618983a78a06c1cbd4e00ab749ab"
 
 [[projects]]
   branch = "master"
@@ -103,7 +103,7 @@
     "context",
     "context/ctxhttp"
   ]
-  revision = "cbe0f9307d0156177f9dd5dc85da1a31abc5f2fb"
+  revision = "d25186b37f34ebdbbea8f488ef055638dfab272d"
 
 [[projects]]
   branch = "master"
@@ -113,7 +113,7 @@
     "github",
     "internal"
   ]
-  revision = "543e37812f10c46c622c9575afd7ad22f22a12ba"
+  revision = "2f32c3ac0fa4fb807a0fcefb0b6f2468a0d99bd0"
 
 [[projects]]
   name = "google.golang.org/appengine"
