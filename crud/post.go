@@ -18,7 +18,7 @@ func (a *App) Post(w http.ResponseWriter, r *http.Request, config *provider.Requ
 			a.renderer.Error(w, http.StatusMethodNotAllowed, errors.New(`Unknown method`))
 		}
 	} else if r.FormValue(`method`) == http.MethodPost {
-		a.SaveFile(w, r, config)
+		a.SaveFiles(w, r, config)
 	} else if r.FormValue(`method`) == http.MethodPut {
 		a.CreateDir(w, r, config)
 	} else if r.FormValue(`method`) == http.MethodDelete {

@@ -15,14 +15,9 @@ import (
 	"github.com/ViBiOh/fibr/utils"
 )
 
-func getFileForm(w http.ResponseWriter, r *http.Request) (io.ReadCloser, *multipart.FileHeader, error) {
-	uploadedFile, uploadedFileHeader, err := r.FormFile(`file`)
-	if err != nil {
-		return uploadedFile, uploadedFileHeader, fmt.Errorf(`Error while reading file form: %v`, err)
-	}
-
-	return uploadedFile, uploadedFileHeader, nil
-}
+const (
+	defaultMaxMemory = 32 << 20 // 32 MB
+)
 
 func createOrOpenFile(filename string, info os.FileInfo) (io.WriteCloser, error) {
 	if info == nil {
@@ -89,28 +84,56 @@ func (a *App) saveUploadedFile(config *provider.RequestConfig, uploadedFile io.R
 	return filename, nil
 }
 
-// SaveFile saves form file to filesystem
-func (a *App) SaveFile(w http.ResponseWriter, r *http.Request, config *provider.RequestConfig) {
+// SaveFiles saves form files to filesystem
+func (a *App) SaveFiles(w http.ResponseWriter, r *http.Request, config *provider.RequestConfig) {
 	if !config.CanEdit {
 		a.renderer.Error(w, http.StatusForbidden, errors.New(`You're not authorized to do this ⛔`))
 	}
 
-	uploadedFile, uploadedFileHeader, err := getFileForm(w, r)
-	if uploadedFile != nil {
-		defer func() {
-			if err := uploadedFile.Close(); err != nil {
-				log.Printf(`Error while closing uploaded file: %v`, err)
-			}
-		}()
-	}
-	if err != nil {
-		a.renderer.Error(w, http.StatusBadRequest, fmt.Errorf(`Error while getting file from form: %v`, err))
+	if err := r.ParseMultipartForm(defaultMaxMemory); err != nil {
+		a.renderer.Error(w, http.StatusBadRequest, fmt.Errorf(`Error while parsing form: %v`, err))
 		return
 	}
 
-	if filename, err := a.saveUploadedFile(config, uploadedFile, uploadedFileHeader); err != nil {
-		a.renderer.Error(w, http.StatusInternalServerError, err)
-	} else {
-		a.GetDir(w, config, path.Dir(filename), r.URL.Query().Get(`d`), &provider.Message{Level: `success`, Content: fmt.Sprintf(`File %s successfully uploaded`, uploadedFileHeader.Filename)})
+	if r.MultipartForm.File == nil || len(r.MultipartForm.File[`files[]`]) == 0 {
+		a.renderer.Error(w, http.StatusBadRequest, errors.New(`No file provided for save`))
+		return
 	}
+
+	var outputDir string
+	filenames := make([]string, len(r.MultipartForm.File[`files[]`]))
+
+	for index, file := range r.MultipartForm.File[`files[]`] {
+		uploadedFile, err := file.Open()
+		if uploadedFile != nil {
+			defer func() {
+				if err := uploadedFile.Close(); err != nil {
+					log.Printf(`Error while closing uploaded file: %v`, err)
+				}
+			}()
+		}
+		if err != nil {
+			a.renderer.Error(w, http.StatusBadRequest, fmt.Errorf(`Error while getting file from form: %v`, err))
+			return
+		}
+
+		filename, err := a.saveUploadedFile(config, uploadedFile, file)
+		if err != nil {
+			a.renderer.Error(w, http.StatusInternalServerError, err)
+			return
+		}
+
+		if outputDir == `` {
+			outputDir = path.Dir(filename)
+		}
+
+		filenames[index] = file.Filename
+	}
+
+	message := fmt.Sprintf(`File %s successfully uploaded`, filenames[0])
+	if len(filenames) > 1 {
+		message = fmt.Sprintf(`Files %s successfully uploaded`, strings.Join(filenames, `, `))
+	}
+
+	a.GetDir(w, config, outputDir, r.URL.Query().Get(`d`), &provider.Message{Level: `success`, Content: message})
 }
