@@ -34,8 +34,6 @@ go get -u github.com/ViBiOh/fibr
       Listen port (default "1080")
   -publicURL string
       Public Server URL (default "https://fibr.vibioh.fr")
-  -staticURL string
-      Static Server URL (default "https://fibr-static.vibioh.fr")
   -tls
       Serve TLS content
   -tlsCert string

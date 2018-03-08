@@ -36,28 +36,20 @@ docker-deps:
 
 docker-build:
 	docker build -t ${DOCKER_USER}/fibr .
-	docker build -t ${DOCKER_USER}/fibr-static -f Dockerfile_static .
 
 docker-push:
 	docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
 	docker push ${DOCKER_USER}/fibr
-	docker push ${DOCKER_USER}/fibr-static
 
 start-deps:
 	go get -u github.com/ViBiOh/viws
 	go get -u github.com/ViBiOh/auth/bcrypt
 
-start-static:
-	viws \
-		-directory `pwd`/web/static/ \
-		-port 1081
-
 start-api:
 	go run fibr.go \
 		-tls=false \
 		-directory `pwd` \
-		-staticURL http://localhost:1081 \
 		-publicURL http://localhost:1080 \
 		-authUsers admin:admin \
 		-basicUsers 1:admin:`bcrypt admin` \
-		-csp "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' localhost:1081"
+		-csp "default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self'"

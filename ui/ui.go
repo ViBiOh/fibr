@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/ViBiOh/fibr/provider"
@@ -39,9 +40,24 @@ type App struct {
 func Flags(prefix string) map[string]*string {
 	return map[string]*string{
 		`publicURL`: flag.String(tools.ToCamel(fmt.Sprintf(`%sPublicURL`, prefix)), `https://fibr.vibioh.fr`, `Public Server URL`),
-		`staticURL`: flag.String(tools.ToCamel(fmt.Sprintf(`%sStaticURL`, prefix)), `https://fibr-static.vibioh.fr`, `Static Server URL`),
 		`version`:   flag.String(tools.ToCamel(fmt.Sprintf(`%sVersion`, prefix)), ``, `Version (used mainly as a cache-buster)`),
 	}
+}
+
+func getTemplatesFiles() []string {
+	output := make([]string, 0)
+
+	if err := filepath.Walk(`./web/`, func(walkedPath string, info os.FileInfo, _ error) error {
+		if path.Ext(info.Name()) == `.gohtml` {
+			output = append(output, walkedPath)
+		}
+
+		return nil
+	}); err != nil {
+		log.Fatalf(`Error while listing templates: %v`, err)
+	}
+
+	return output
 }
 
 // NewApp create ui from given config
@@ -112,20 +128,19 @@ func NewApp(config map[string]*string, rootDirectory string) *App {
 				_, info := utils.GetPathInfo(rootDirectory, provider.MetadataDirectoryName, root, path, file.Name())
 				return info != nil
 			},
-		}).ParseGlob(`./web/*.gohtml`)),
+		}).ParseFiles(getTemplatesFiles()...)),
 
 		base: map[string]interface{}{
 			`Display`: ``,
 			`Config`: map[string]interface{}{
 				`PublicURL`: *config[`publicURL`],
-				`StaticURL`: *config[`staticURL`],
 				`Version`:   *config[`version`],
 			},
 			`Seo`: map[string]interface{}{
 				`Title`:       `fibr`,
 				`Description`: fmt.Sprintf(`FIle BRowser`),
 				`URL`:         `/`,
-				`Img`:         path.Join(*config[`staticURL`], `/favicon/android-chrome-512x512.png`),
+				`Img`:         fmt.Sprintf(`/favicon/android-chrome-512x512.png?v=%s`, *config[`version`]),
 				`ImgHeight`:   512,
 				`ImgWidth`:    512,
 			},

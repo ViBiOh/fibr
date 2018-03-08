@@ -14,7 +14,7 @@ import (
 
 // CheckAndServeSEO check if filename match SEO and serve it, or not
 func (a *App) CheckAndServeSEO(w http.ResponseWriter, r *http.Request) bool {
-	if r.URL.Path == `/robots.txt` {
+	if r.URL.Path == `/robots.txt` || strings.HasPrefix(r.URL.Path, `/favicon`) {
 		http.ServeFile(w, r, path.Join(`web/static`, r.URL.Path))
 		return true
 	} else if r.URL.Path == `/sitemap.xml` {

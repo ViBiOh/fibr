@@ -54,16 +54,16 @@
               {{- template "async-image" asyncImage . $root.Config.Version -}}
             {{- else -}}
               {{- if .IsDir -}}
-                <img class="icon" src="{{- $root.Config.StaticURL -}}/svg/folder.svg?v={{- $root.Config.Version -}}" alt="folder" />
+                {{- template "svg-folder" "icon" -}}
               {{- else -}}
-                <img class="icon" src="{{- $root.Config.StaticURL -}}/svg/file{{- typeFromExtension . -}}.svg?v={{- $root.Config.Version -}}" alt="file" />
+                {{- template "svg-file" "icon" -}}
               {{- end -}}
               <span class="filename">{{- filename . -}}</span>
             {{- end -}}
 
             {{- if and (eq $root.Display "list") $root.CanEdit -}}
               <a class="button button-icon file-delete" href="#confirm-modal-{{ filename_fingerprint . }}">
-                <img class="icon" src="{{- $root.Config.StaticURL -}}/svg/times.svg?v={{- $root.Config.Version -}}" alt="delete" />
+                {{- template "svg-times" "icon" -}}
               </a>
             {{- end -}}
           </a>

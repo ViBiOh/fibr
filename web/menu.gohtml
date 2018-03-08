@@ -3,16 +3,16 @@
     <div id="tools">
       {{- if .CanEdit -}}
         <a class="button" href="#upload-modal">
-          <img class="icon icon-large" src="{{- .Config.StaticURL -}}/svg/cloud-upload-alt.svg?v={{- .Config.Version -}}" alt="upload" />
+          {{- template "svg-cloud-upload-alt" "icon icon-large" -}}
         </a>
         <a class="button" href="#folder-modal">
-          <img class="icon icon-large" src="{{- .Config.StaticURL -}}/svg/folder.svg?v={{- .Config.Version -}}" alt="folder" />
+          {{- template "svg-folder" "icon icon-large" -}}
         </a>
       {{- end -}}
 
       {{- if .CanShare -}}
         <a class="button" href="#share-modal">
-          <img class="icon icon-large" src="{{- .Config.StaticURL -}}/svg/share-alt-square.svg?v={{- .Config.Version -}}" alt="share" />
+          {{- template "svg-share-alt-square" "icon icon-large" -}}
         </a>
       {{- end -}}
     </div>

@@ -12,7 +12,7 @@
                   <td>ID</td>
                   <td>Path</td>
                   <td class="icon">
-                    <img class="icon" src="{{- .Config.StaticURL -}}/svg/edit.svg?v={{- .Config.Version -}}" alt="edit" />
+                    {{- template "svg-edit" "icon" -}}
                   </td>
                   <td></td>
               </tr>
@@ -30,7 +30,7 @@
                     </td>
                     <td>
                       {{- if .Edit -}}
-                        <img class="icon" src="{{- $root.Config.StaticURL -}}/svg/check.svg?v={{- $root.Config.Version -}}" alt="edit" />
+                        {{- template "svg-check" "icon" -}}
                       {{- end -}}
                     </td>
                     <td>
@@ -39,7 +39,7 @@
                         <input type="hidden" name="method" value="DELETE" />
                         <input type="hidden" name="id" value="{{- .ID -}}" />
                         <button type="submit" onclick="javascript:return confirm('Are you sure you want to delete share for {{ .Path }} ?')" class="button-icon">
-                          <img class="icon" src="{{- $root.Config.StaticURL -}}/svg/times.svg?v={{- $root.Config.Version -}}" alt="delete" />
+                          {{- template "svg-times" "icon" -}}
                         </button>
                       </form>
                     </td>
@@ -59,7 +59,7 @@
           </label>
           <input id="edit" type="checkbox" name="edit" value="true" />
           <button type="submit" class="button bg-important">
-            <img class="icon" src="{{- $root.Config.StaticURL -}}/svg/check.svg?v={{- $root.Config.Version -}}" alt="submit" />
+            {{- template "svg-check" "icon" -}}
           </button>
         </p>
       </form>

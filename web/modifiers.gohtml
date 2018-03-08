@@ -1,8 +1,8 @@
 {{- define "modifiers" -}}
   <a id="list-display" class="modifier" href="?d=list">
-    <img class="icon" src="{{- .Config.StaticURL -}}/svg/list.svg?v={{- .Config.Version -}}" alt="list" />
+    {{- template "svg-list" "icon" -}}
   </a>
   <a id="grid-display" class="modifier" href="?d=grid">
-    <img class="icon" src="{{- .Config.StaticURL -}}/svg/th.svg?v={{- .Config.Version -}}" alt="grid" />
+    {{- template "svg-th" "icon" -}}
   </a>
 {{- end -}}
