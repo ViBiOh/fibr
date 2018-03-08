@@ -30,16 +30,22 @@ bench:
 
 build:
 	CGO_ENABLED=0 go build -ldflags="-s -w" -installsuffix nocgo -o bin/fibr fibr.go
+	CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=7 go build -ldflags="-s -w" -installsuffix nocgo -o bin/fibr-arm fibr.go
+	CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -ldflags="-s -w" -installsuffix nocgo -o bin/fibr-arm64 fibr.go
 
 docker-deps:
 	curl -s -o cacert.pem https://curl.haxx.se/ca/cacert.pem
 
 docker-build:
 	docker build -t ${DOCKER_USER}/fibr .
+	docker build -t ${DOCKER_USER}/fibr:arm -f Dockerfile_arm .
+	docker build -t ${DOCKER_USER}/fibr:arm64 -f Dockerfile_arm64 .
 
 docker-push:
 	docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
 	docker push ${DOCKER_USER}/fibr
+	docker push ${DOCKER_USER}/fibr:arm
+	docker push ${DOCKER_USER}/fibr:arm64
 
 start-deps:
 	go get -u github.com/ViBiOh/viws
