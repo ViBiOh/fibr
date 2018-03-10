@@ -18,7 +18,7 @@
     "provider/github",
     "service"
   ]
-  revision = "18f009b19151d6f7b5504534a4d23a847615ee1a"
+  revision = "5660c8ba378b90fc4833165cf25f00b5ae2c46a7"
 
 [[projects]]
   branch = "master"
@@ -37,13 +37,13 @@
     "tools",
     "uuid"
   ]
-  revision = "203b8898ad2677a44cfc79ef8df214e93e7d4899"
+  revision = "8a3690ccb4c2ecae22443605753de32691c8dbef"
 
 [[projects]]
   name = "github.com/disintegration/imaging"
   packages = ["."]
-  revision = "1884593a19ddc6f2ea050403430d02c1d0fc1283"
-  version = "v1.3.0"
+  revision = "b039796423f87e7caca7f8eaace36878f2cce73d"
+  version = "1.4.0"
 
 [[projects]]
   name = "github.com/golang/protobuf"
@@ -84,7 +84,7 @@
     "bcrypt",
     "blowfish"
   ]
-  revision = "91a49db82a88618983a78a06c1cbd4e00ab749ab"
+  revision = "c7dcf104e3a7a1417abc0230cb0d5240d764159d"
 
 [[projects]]
   branch = "master"
@@ -103,7 +103,7 @@
     "context",
     "context/ctxhttp"
   ]
-  revision = "d25186b37f34ebdbbea8f488ef055638dfab272d"
+  revision = "d0aafc73d5cdc42264b0af071c261abac580695e"
 
 [[projects]]
   branch = "master"

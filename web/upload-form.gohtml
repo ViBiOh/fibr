@@ -1,13 +1,16 @@
 {{- define "upload-form" -}}
   <div id="upload-modal" class="modal full flex flex-center">
     <div class="modal-content">
-      <h2 class="header">Upload a file</h2>
+      <h2 class="header">Upload files</h2>
 
       <form method="post" enctype="multipart/form-data">
         <input type="hidden" name="method" value="POST" />
         <p class="center">
-          <label for="file">File</label>
-          <input id="file" type="file" name="files[]" multiple="multiple" />
+          <label for="file" class="input-files__label">
+            {{- template "svg-cloud-upload-alt" "icon icon-button input-files__icon" -}}
+            Select files
+          </label>
+          <input id="file" type="file" name="files[]" multiple="multiple" class="input-files__input" />
         </p>
         <p class="center">
           <button type="submit" class="button bg-important">
