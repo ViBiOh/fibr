@@ -28,10 +28,8 @@
     {{- template "upload-form" . -}}
     {{- template "folder-form" . -}}
 
-    {{- if eq .Display "list" -}}
-      {{- range .Files -}}
-        {{- template "confirm-modal" . }}
-      {{- end -}}
+    {{- range .Files -}}
+      {{- template "delete-modal" . }}
     {{- end -}}
   {{- end -}}
 
@@ -61,8 +59,11 @@
               <span class="filename">{{- filename . -}}</span>
             {{- end -}}
 
-            {{- if and (eq $root.Display "list") $root.CanEdit -}}
-              <a class="button button-icon file-delete" href="#confirm-modal-{{ filename_fingerprint . }}">
+            {{- if $root.CanEdit -}}
+              <a class="button button-icon file-edit" href="#edit-modal-{{ filename_fingerprint . }}">
+                {{- template "svg-pencil-alt" "icon" -}}
+              </a>
+              <a class="button button-icon file-delete" href="#delete-modal-{{ filename_fingerprint . }}">
                 {{- template "svg-times" "icon" -}}
               </a>
             {{- end -}}

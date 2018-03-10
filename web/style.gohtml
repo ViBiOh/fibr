@@ -149,6 +149,7 @@
       padding: 1rem;
       position: fixed;
       right: 0;
+      z-index: 10;
     }
 
     #files {
@@ -170,9 +171,9 @@
       background-color: aliceblue;
     }
 
-    {{- if and (eq .Display "list") .CanEdit -}}
+    {{- if .CanEdit -}}
       {{- range .Files -}}
-        #confirm-modal-{{ filename_fingerprint . }},
+        #delete-modal-{{ filename_fingerprint . }},
       {{- end -}}
     {{- end -}}
     #upload-modal,
@@ -181,20 +182,21 @@
       display: none;
     }
 
-    {{- if and (eq .Display "list") .CanEdit -}}
+    {{- if .CanEdit -}}
       {{- range .Files -}}
-        #confirm-modal-{{ filename_fingerprint . }}:target,
+        #delete-modal-{{ filename_fingerprint . }}:target,
       {{- end -}}
     {{- end -}}
     #upload-modal:target,
     #folder-modal:target,
     #share-modal:target {
       display: flex;
+      z-index: 5;
     }
 
-    {{- if and (eq .Display "list") .CanEdit -}}
+    {{- if .CanEdit -}}
       {{- range .Files -}}
-        #confirm-modal-{{ filename_fingerprint . }}:target ~ .content,
+        #delete-modal-{{ filename_fingerprint . }}:target ~ .content,
       {{- end -}}
     {{- end -}}
     #upload-modal:target ~ .content,
@@ -267,26 +269,34 @@
       }
 
       .filelink .icon {
-        margin-right: 1rem;
+        margin-right: 2.5rem;
       }
 
+      .file-edit,
       .file-delete {
         display: none;
       }
 
+      .file-delete {
+        margin-left: 0.5rem;
+      }
+
+      .file:hover .file-edit,
       .file:hover .file-delete {
         display: inline-block;
       }
 
+      .file-edit .icon,
       .file-delete .icon {
         margin: 0;
       }
 
       @media screen and (max-width: 640px) {
         .filelink {
-          width: calc(100% - 2rem);
+          width: calc(100% - 4.5rem);
         }
 
+        .file-edit,
         .file-delete {
           display: inline-block;
         }
@@ -311,6 +321,7 @@
         display: flex;
         min-height: 12rem;
         width: 100%;
+        position: relative;
       }
 
       .file {
@@ -341,8 +352,26 @@
         white-space: nowrap;
       }
 
+      .file-edit,
       .file-delete {
+        background-color: white;
         display: none;
+        padding: 0.5rem;
+        position: absolute;
+        top: 0.5rem;
+      }
+
+      .file-edit {
+        left: 0.5rem;
+      }
+
+      .file-delete {
+        right: 0.5rem;
+      }
+
+      #files > *:hover .file-delete,
+      #files > *:hover .file-edit {
+        display: block;
       }
     {{- end -}}
 
