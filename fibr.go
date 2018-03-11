@@ -74,6 +74,8 @@ func browserHandler(crudApp *crud.App, uiApp *ui.App, authApp *auth.App) http.Ha
 			crudApp.Post(w, r, config)
 		} else if r.Method == http.MethodPut {
 			crudApp.CreateDir(w, r, config)
+		} else if r.Method == http.MethodPatch {
+			crudApp.Rename(w, r, config)
 		} else if r.Method == http.MethodDelete {
 			crudApp.Delete(w, r, config)
 		} else {

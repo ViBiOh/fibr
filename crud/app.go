@@ -2,6 +2,7 @@ package crud
 
 import (
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -13,6 +14,9 @@ import (
 	"github.com/ViBiOh/fibr/utils"
 	"github.com/ViBiOh/httputils/tools"
 )
+
+// ErrNotAuthorized error returned when user is not authorized
+var ErrNotAuthorized = errors.New(`You're not authorized to do this ⛔`)
 
 // Share stores informations about shared paths
 type Share struct {

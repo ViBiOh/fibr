@@ -8,36 +8,20 @@ import (
 	"path"
 
 	"github.com/ViBiOh/fibr/provider"
-	"github.com/ViBiOh/fibr/utils"
 )
 
 // Delete given path from filesystem
 func (a *App) Delete(w http.ResponseWriter, r *http.Request, config *provider.RequestConfig) {
 	if !config.CanEdit {
-		a.renderer.Error(w, http.StatusForbidden, errors.New(`You're not authorized to do this ⛔`))
+		a.renderer.Error(w, http.StatusForbidden, ErrNotAuthorized)
 		return
 	}
 
-	var (
-		filename string
-		info     os.FileInfo
-	)
-
-	formName := r.FormValue(`name`)
-	if formName != `` {
-		filename, info = utils.GetPathInfo(a.rootDirectory, config.Root, config.Path, formName)
-	}
-
-	if filename == `` {
-		if config.Path == `/` {
-			a.renderer.Error(w, http.StatusForbidden, errors.New(`You're not authorized to do this ⛔`))
-			return
-		}
-
-		filename, info = utils.GetPathInfo(a.rootDirectory, config.Root, config.Path)
-	}
-
-	if info == nil {
+	filename, info, err := a.getFormOrPathFilename(r, config)
+	if err != nil && err == ErrNotAuthorized {
+		a.renderer.Error(w, http.StatusForbidden, err)
+		return
+	} else if info == nil {
 		a.renderer.Error(w, http.StatusNotFound, errors.New(`Requested path does not exist`))
 		return
 	}

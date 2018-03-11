@@ -29,7 +29,7 @@ func createOrOpenFile(filename string, info os.FileInfo) (io.WriteCloser, error)
 // CreateDir creates given path directory to filesystem
 func (a *App) CreateDir(w http.ResponseWriter, r *http.Request, config *provider.RequestConfig) {
 	if !config.CanEdit {
-		a.renderer.Error(w, http.StatusForbidden, errors.New(`You're not authorized to do this ⛔`))
+		a.renderer.Error(w, http.StatusForbidden, ErrNotAuthorized)
 		return
 	}
 
@@ -42,7 +42,7 @@ func (a *App) CreateDir(w http.ResponseWriter, r *http.Request, config *provider
 
 	if filename == `` {
 		if !strings.HasSuffix(config.Path, `/`) {
-			a.renderer.Error(w, http.StatusForbidden, errors.New(`You're not authorized to do this ⛔`))
+			a.renderer.Error(w, http.StatusForbidden, ErrNotAuthorized)
 			return
 		}
 
@@ -50,7 +50,7 @@ func (a *App) CreateDir(w http.ResponseWriter, r *http.Request, config *provider
 	}
 
 	if strings.Contains(filename, `..`) {
-		a.renderer.Error(w, http.StatusForbidden, errors.New(`You're not authorized to do this ⛔`))
+		a.renderer.Error(w, http.StatusForbidden, ErrNotAuthorized)
 		return
 	}
 
@@ -87,7 +87,7 @@ func (a *App) saveUploadedFile(config *provider.RequestConfig, uploadedFile io.R
 // SaveFiles saves form files to filesystem
 func (a *App) SaveFiles(w http.ResponseWriter, r *http.Request, config *provider.RequestConfig) {
 	if !config.CanEdit {
-		a.renderer.Error(w, http.StatusForbidden, errors.New(`You're not authorized to do this ⛔`))
+		a.renderer.Error(w, http.StatusForbidden, ErrNotAuthorized)
 	}
 
 	if err := r.ParseMultipartForm(defaultMaxMemory); err != nil {
