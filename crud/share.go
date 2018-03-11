@@ -1,14 +1,13 @@
 package crud
 
 import (
-	"crypto/sha1"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/ViBiOh/fibr/provider"
+	"github.com/ViBiOh/httputils/tools"
 	"github.com/ViBiOh/httputils/uuid"
 )
 
@@ -37,12 +36,7 @@ func (a *App) CreateShare(w http.ResponseWriter, r *http.Request, config *provid
 		return
 	}
 
-	hasher := sha1.New()
-	if _, err := hasher.Write([]byte(uuid)); err != nil {
-		a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while generating share id: %v`, err))
-		return
-	}
-	id := hex.EncodeToString(hasher.Sum(nil))[:8]
+	id := tools.Sha1(uuid)
 
 	a.metadataLock.Lock()
 	defer a.metadataLock.Unlock()

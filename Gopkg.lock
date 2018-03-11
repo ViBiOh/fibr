@@ -37,7 +37,7 @@
     "tools",
     "uuid"
   ]
-  revision = "8a3690ccb4c2ecae22443605753de32691c8dbef"
+  revision = "ddb82b61e5aea0d60bdfdb3b7a5fb247e756c63f"
 
 [[projects]]
   name = "github.com/disintegration/imaging"

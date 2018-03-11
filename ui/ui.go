@@ -1,8 +1,6 @@
 package ui
 
 import (
-	"crypto/sha1"
-	"encoding/hex"
 	"flag"
 	"fmt"
 	"html/template"
@@ -75,22 +73,12 @@ func NewApp(config map[string]*string, rootDirectory string) *App {
 				return strings.Replace(url, ` `, `%20`, -1)
 			},
 			`filename_fingerprint`: func(file os.FileInfo) string {
-				hasher := sha1.New()
-				if _, err := hasher.Write([]byte(file.Name())); err != nil {
-					log.Printf(`Error while generating hash for %s: %v`, file.Name(), err)
-				}
-
-				return hex.EncodeToString(hasher.Sum(nil))
+				return tools.Sha1(file.Name())
 			},
 			`asyncImage`: func(file os.FileInfo, version string) map[string]interface{} {
-				hasher := sha1.New()
-				if _, err := hasher.Write([]byte(file.Name())); err != nil {
-					log.Printf(`Error while generating hash for %s: %v`, file.Name(), err)
-				}
-
 				return map[string]interface{}{
 					`File`:        file,
-					`Fingerprint`: template.JS(hex.EncodeToString(hasher.Sum(nil))),
+					`Fingerprint`: template.JS(tools.Sha1(file.Name())),
 					`Version`:     version,
 				}
 			},
