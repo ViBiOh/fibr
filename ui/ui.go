@@ -37,7 +37,7 @@ type App struct {
 // Flags add flags for given prefix
 func Flags(prefix string) map[string]*string {
 	return map[string]*string{
-		`publicURL`: flag.String(tools.ToCamel(fmt.Sprintf(`%sPublicURL`, prefix)), `https://fibr.vibioh.fr`, `Public Server URL`),
+		`publicURL`: flag.String(tools.ToCamel(fmt.Sprintf(`%sPublicURL`, prefix)), `https://fibr.vibioh.fr`, `Public Server URL (for sitemap.xml)`),
 		`version`:   flag.String(tools.ToCamel(fmt.Sprintf(`%sVersion`, prefix)), ``, `Version (used mainly as a cache-buster)`),
 	}
 }
@@ -72,7 +72,7 @@ func NewApp(config map[string]*string, rootDirectory string) *App {
 			`urlescape`: func(url string) string {
 				return strings.Replace(url, ` `, `%20`, -1)
 			},
-			`filename_fingerprint`: func(file os.FileInfo) string {
+			`sha1`: func(file os.FileInfo) string {
 				return tools.Sha1(file.Name())
 			},
 			`asyncImage`: func(file os.FileInfo, version string) map[string]interface{} {

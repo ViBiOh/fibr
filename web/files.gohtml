@@ -60,10 +60,10 @@
             {{- end -}}
 
             {{- if $root.CanEdit -}}
-              <a class="button button-icon file-edit" href="#edit-modal-{{ filename_fingerprint . }}">
+              <a class="button button-icon file-edit" href="#edit-modal-{{ sha1 . }}">
                 {{- template "svg-pencil-alt" "icon" -}}
               </a>
-              <a class="button button-icon file-delete" href="#delete-modal-{{ filename_fingerprint . }}">
+              <a class="button button-icon file-delete" href="#delete-modal-{{ sha1 . }}">
                 {{- template "svg-times" "icon" -}}
               </a>
             {{- end -}}

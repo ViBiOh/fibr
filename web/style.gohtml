@@ -193,7 +193,7 @@
 
     {{- if .CanEdit -}}
       {{- range .Files -}}
-        #delete-modal-{{ filename_fingerprint . }},
+        #delete-modal-{{ sha1 . }},
       {{- end -}}
     {{- end -}}
     #upload-modal,
@@ -204,7 +204,7 @@
 
     {{- if .CanEdit -}}
       {{- range .Files -}}
-        #delete-modal-{{ filename_fingerprint . }}:target,
+        #delete-modal-{{ sha1 . }}:target,
       {{- end -}}
     {{- end -}}
     #upload-modal:target,
@@ -216,7 +216,7 @@
 
     {{- if .CanEdit -}}
       {{- range .Files -}}
-        #delete-modal-{{ filename_fingerprint . }}:target ~ .content,
+        #delete-modal-{{ sha1 . }}:target ~ .content,
       {{- end -}}
     {{- end -}}
     #upload-modal:target ~ .content,

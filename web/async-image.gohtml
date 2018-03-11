@@ -1,25 +1,12 @@
 {{- define "async-image" -}}
-  <figure id="{{- .Fingerprint -}}-figure">
+  <figure id="figure-{{- .Fingerprint -}}">
     <noscript>
       <img class="thumbnail" src="{{- urlescape (filename .File) -}}?thumbnail&v={{- .Version -}}" alt="thumbnail" />
     </noscript>
-    <div class="throbber" id="{{- .Fingerprint -}}-throbber">
+    <div class="throbber" id="throbber-{{- .Fingerprint -}}" data-id="{{- .Fingerprint -}}" data-src="{{- urlescape (filename .File) -}}?thumbnail&v={{- .Version -}}" data-alt="thumbnail">
       <div class="bounce1"></div>
       <div class="bounce2"></div>
       <div class="bounce3"></div>
     </div>
-    <script type="text/javascript">
-      var throbber{{- .Fingerprint -}} = document.getElementById('{{- .Fingerprint -}}-throbber');
-      throbber{{- .Fingerprint -}}.style.display = 'inline-block';
-
-      var a{{- .Fingerprint -}} = new Image();
-      a{{- .Fingerprint -}}.onload = function () {
-        document.getElementById('{{- .Fingerprint -}}-figure').insertBefore(a{{- .Fingerprint -}}, throbber{{- .Fingerprint -}});
-        throbber{{- .Fingerprint -}}.style.display = 'none';
-      };
-      a{{- .Fingerprint -}}.srcset = '{{- urlescape (filename .File) -}}?thumbnail&v={{- .Version -}}';
-      a{{- .Fingerprint -}}.src = '{{- urlescape (filename .File) -}}?thumbnail&v={{- .Version -}}';
-      a{{- .Fingerprint -}}.alt = 'thumbnail';
-    </script>
   </figure>
 {{- end -}}
