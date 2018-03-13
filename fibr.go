@@ -93,7 +93,7 @@ func main() {
 
 	httputils.StartMainServer(func() http.Handler {
 		authApp := auth.NewApp(authConfig, authService.NewBasicApp(basicConfig))
-		uiApp := ui.NewApp(uiConfig, *crudConfig[`directory`])
+		uiApp := ui.NewApp(uiConfig, *crudConfig[`directory`].(*string))
 		crudApp := crud.NewApp(crudConfig, uiApp)
 
 		serviceHandler := owasp.Handler(owaspConfig, browserHandler(crudApp, uiApp, authApp))

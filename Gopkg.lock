@@ -16,9 +16,10 @@
     "provider",
     "provider/basic",
     "provider/github",
+    "provider/twitter",
     "service"
   ]
-  revision = "5660c8ba378b90fc4833165cf25f00b5ae2c46a7"
+  revision = "cb1d2e037f0dbc3da3e2d1d92e7ad7e515627be1"
 
 [[projects]]
   branch = "master"
@@ -43,7 +44,7 @@
   name = "github.com/disintegration/imaging"
   packages = ["."]
   revision = "b039796423f87e7caca7f8eaace36878f2cce73d"
-  version = "1.4.0"
+  version = "v1.4.0"
 
 [[projects]]
   name = "github.com/golang/protobuf"
@@ -84,7 +85,7 @@
     "bcrypt",
     "blowfish"
   ]
-  revision = "c7dcf104e3a7a1417abc0230cb0d5240d764159d"
+  revision = "182114d582623c1caa54f73de9c7224e23a48487"
 
 [[projects]]
   branch = "master"
@@ -103,7 +104,7 @@
     "context",
     "context/ctxhttp"
   ]
-  revision = "d0aafc73d5cdc42264b0af071c261abac580695e"
+  revision = "803fdb99c0f72e493c28ef2099d250a9c989d8ff"
 
 [[projects]]
   branch = "master"
@@ -113,7 +114,7 @@
     "github",
     "internal"
   ]
-  revision = "2f32c3ac0fa4fb807a0fcefb0b6f2468a0d99bd0"
+  revision = "7af32f14d0a25aec7873e0683e8e48dcead159a8"
 
 [[projects]]
   name = "google.golang.org/appengine"

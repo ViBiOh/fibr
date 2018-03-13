@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"strings"
 	"sync"
 
@@ -28,6 +29,7 @@ type Share struct {
 // App stores informations and secret of API
 type App struct {
 	rootDirectory    string
+	metadataCreate   bool
 	metadataFilename string
 	metadatas        []*Share
 	metadataLock     sync.Mutex
@@ -35,11 +37,12 @@ type App struct {
 }
 
 // NewApp creates new App from Flags' config
-func NewApp(config map[string]*string, renderer provider.Renderer) *App {
+func NewApp(config map[string]interface{}, renderer provider.Renderer) *App {
 	app := &App{
-		rootDirectory: *config[`directory`],
-		renderer:      renderer,
-		metadataLock:  sync.Mutex{},
+		rootDirectory:  *config[`directory`].(*string),
+		metadataCreate: *config[`createMeta`].(*bool),
+		renderer:       renderer,
+		metadataLock:   sync.Mutex{},
 	}
 
 	log.Printf(`Serving file from %s`, app.rootDirectory)
@@ -59,9 +62,10 @@ func NewApp(config map[string]*string, renderer provider.Renderer) *App {
 }
 
 // Flags add flags for given prefix
-func Flags(prefix string) map[string]*string {
-	return map[string]*string{
-		`directory`: flag.String(tools.ToCamel(fmt.Sprintf(`%sDirectory`, prefix)), `/data`, `Directory to serve`),
+func Flags(prefix string) map[string]interface{} {
+	return map[string]interface{}{
+		`directory`:  flag.String(tools.ToCamel(fmt.Sprintf(`%sDirectory`, prefix)), `/data`, `Directory to serve`),
+		`createMeta`: flag.Bool(tools.ToCamel(fmt.Sprintf(`%sCreateMeta`, prefix)), false, `Create metadata directory if not exist`),
 	}
 }
 
@@ -86,12 +90,22 @@ func (a *App) GetSharedPath(requestPath string) *Share {
 func (a *App) loadMetadata() error {
 	filename, info := utils.GetPathInfo(a.rootDirectory, provider.MetadataDirectoryName, `.json`)
 	if info == nil {
-		return nil
+		if !a.metadataCreate {
+			return nil
+		}
+
+		if err := os.MkdirAll(filename, 0700); err != nil {
+			return fmt.Errorf(`Error while creating metadata dir: %v`, err)
+		}
 	}
 
 	rawMeta, err := ioutil.ReadFile(filename)
 	if err != nil {
-		return fmt.Errorf(`Error while reading metadata: %v`, err)
+		if !a.metadataCreate {
+			return fmt.Errorf(`Error while reading metadata: %v`, err)
+		}
+
+		rawMeta = []byte(`{}`)
 	}
 
 	if err = json.Unmarshal(rawMeta, &a.metadatas); err != nil {
