@@ -24,7 +24,7 @@ services:
       traefik.frontend.rateLimit.rateSet.first.burst: '200'
     volumes:
     - ${DATA_DIR}:/data
-    user: '1000'
+    user: '${DATA_USER_ID}'
     logging:
       driver: json-file
       options:
