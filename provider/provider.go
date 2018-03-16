@@ -13,7 +13,7 @@ var (
 	// AudioExtensions contains extensions of Audio
 	AudioExtensions = map[string]bool{`.mp3`: true}
 	// CodeExtensions contains extensions of Code
-	CodeExtensions = map[string]bool{`.html`: true, `.css`: true, `.js`: true, `.jsx`: true, `.json`: true, `.yml`: true, `.yaml`: true, `.toml`: true, `.md`: true, `.go`: true, `.py`: true, `.java`: true, `.xml`: true}
+	CodeExtensions = map[string]bool{`.html`: true, `.css`: true, `.js`: true, `.jsx`: true, `.json`: true, `.yml`: true, `.yaml`: true, `.toml`: true, `.md`: true, `.go`: true, `.gohtml`: true, `.py`: true, `.java`: true, `.xml`: true}
 	// ExcelExtensions contains extensions of Excel
 	ExcelExtensions = map[string]bool{`.xls`: true, `.xlsx`: true, `.xlsm`: true}
 	// ImageExtensions contains extensions of Image

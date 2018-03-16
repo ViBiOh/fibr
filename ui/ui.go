@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"html/template"
@@ -60,64 +61,72 @@ func getTemplatesFiles() []string {
 
 // NewApp create ui from given config
 func NewApp(config map[string]*string, rootDirectory string) *App {
+	tpl := template.New(`fibr`)
+
+	tpl.Funcs(template.FuncMap{
+		`filename`: func(file os.FileInfo) string {
+			if file.IsDir() {
+				return fmt.Sprintf(`%s/`, file.Name())
+			}
+			return file.Name()
+		},
+		`urlescape`: func(url string) string {
+			return strings.Replace(url, ` `, `%20`, -1)
+		},
+		`sha1`: func(file os.FileInfo) string {
+			return tools.Sha1(file.Name())
+		},
+		`asyncImage`: func(file os.FileInfo, version string) map[string]interface{} {
+			return map[string]interface{}{
+				`File`:        file,
+				`Fingerprint`: template.JS(tools.Sha1(file.Name())),
+				`Version`:     version,
+			}
+		},
+		`rebuildPaths`: func(parts []string, index int) string {
+			return path.Join(parts[:index+1]...)
+		},
+		`renderTemplate`: func(name string, data interface{}) (template.HTML, error) {
+			output := &bytes.Buffer{}
+			err := tpl.ExecuteTemplate(output, name, data)
+			return template.HTML(output.String()), err
+		},
+		`iconFromExtension`: func(file os.FileInfo) string {
+			extension := strings.ToLower(path.Ext(file.Name()))
+
+			switch {
+			case provider.ArchiveExtensions[extension]:
+				return `svg-file-archive`
+			case provider.AudioExtensions[extension]:
+				return `svg-file-audio`
+			case provider.CodeExtensions[extension]:
+				return `svg-file-code`
+			case provider.ExcelExtensions[extension]:
+				return `svg-file-excel`
+			case provider.ImageExtensions[extension]:
+				return `svg-file-image`
+			case provider.PdfExtensions[extension]:
+				return `svg-file-pdf`
+			case provider.VideoExtensions[extension]:
+				return `svg-file-video`
+			case provider.WordExtensions[extension]:
+				return `svg-file-word`
+			default:
+				return `svg-file`
+			}
+		},
+		`isImage`: func(file os.FileInfo) bool {
+			return provider.ImageExtensions[path.Ext(file.Name())]
+		},
+		`hasThumbnail`: func(root, path string, file os.FileInfo) bool {
+			_, info := utils.GetPathInfo(rootDirectory, provider.MetadataDirectoryName, root, path, file.Name())
+			return info != nil
+		},
+	})
+
 	return &App{
 		rootDirectory: rootDirectory,
-		tpl: template.Must(template.New(`fibr`).Funcs(template.FuncMap{
-			`filename`: func(file os.FileInfo) string {
-				if file.IsDir() {
-					return fmt.Sprintf(`%s/`, file.Name())
-				}
-				return file.Name()
-			},
-			`urlescape`: func(url string) string {
-				return strings.Replace(url, ` `, `%20`, -1)
-			},
-			`sha1`: func(file os.FileInfo) string {
-				return tools.Sha1(file.Name())
-			},
-			`asyncImage`: func(file os.FileInfo, version string) map[string]interface{} {
-				return map[string]interface{}{
-					`File`:        file,
-					`Fingerprint`: template.JS(tools.Sha1(file.Name())),
-					`Version`:     version,
-				}
-			},
-			`rebuildPaths`: func(parts []string, index int) string {
-				return path.Join(parts[:index+1]...)
-			},
-			`typeFromExtension`: func(file os.FileInfo) string {
-				extension := strings.ToLower(path.Ext(file.Name()))
-
-				switch {
-				case provider.ArchiveExtensions[extension]:
-					return `-archive`
-				case provider.AudioExtensions[extension]:
-					return `-audio`
-				case provider.CodeExtensions[extension]:
-					return `-code`
-				case provider.ExcelExtensions[extension]:
-					return `-excel`
-				case provider.ImageExtensions[extension]:
-					return `-image`
-				case provider.PdfExtensions[extension]:
-					return `-pdf`
-				case provider.VideoExtensions[extension]:
-					return `-video`
-				case provider.WordExtensions[extension]:
-					return `-word`
-				default:
-					return ``
-				}
-			},
-			`isImage`: func(file os.FileInfo) bool {
-				return provider.ImageExtensions[path.Ext(file.Name())]
-			},
-			`hasThumbnail`: func(root, path string, file os.FileInfo) bool {
-				_, info := utils.GetPathInfo(rootDirectory, provider.MetadataDirectoryName, root, path, file.Name())
-				return info != nil
-			},
-		}).ParseFiles(getTemplatesFiles()...)),
-
+		tpl:           template.Must(tpl.ParseFiles(getTemplatesFiles()...)),
 		base: map[string]interface{}{
 			`Display`: ``,
 			`Config`: map[string]interface{}{

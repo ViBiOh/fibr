@@ -54,7 +54,7 @@
               {{- if .IsDir -}}
                 {{- template "svg-folder" "icon" -}}
               {{- else -}}
-                {{- template "svg-file" "icon" -}}
+                {{- renderTemplate (iconFromExtension .) "icon" -}}
               {{- end -}}
               <span class="filename">{{- filename . -}}</span>
             {{- end -}}
