@@ -122,7 +122,7 @@ func (a *App) saveMetadata() error {
 		return fmt.Errorf(`No metadata file loaded`)
 	}
 
-	content, err := json.MarshalIndent(&a.metadatas, ``, `  `))
+	content, err := json.MarshalIndent(&a.metadatas, ``, `  `)
 	if err != nil {
 		return fmt.Errorf(`Error while marshalling metadata: %v`, err)
 	}
