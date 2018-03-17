@@ -35,7 +35,7 @@ func (a *App) CreateShare(w http.ResponseWriter, r *http.Request, config *provid
 		return
 	}
 
-	id := tools.Sha1(uuid)
+	id := tools.Sha1(uuid)[:8]
 
 	a.metadataLock.Lock()
 	defer a.metadataLock.Unlock()
