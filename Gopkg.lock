@@ -19,7 +19,7 @@
     "provider/twitter",
     "service"
   ]
-  revision = "cb1d2e037f0dbc3da3e2d1d92e7ad7e515627be1"
+  revision = "9f023884fbc6cebb58f1fbb3f556b7b1417e2580"
 
 [[projects]]
   branch = "master"
@@ -38,13 +38,13 @@
     "tools",
     "uuid"
   ]
-  revision = "ddb82b61e5aea0d60bdfdb3b7a5fb247e756c63f"
+  revision = "9fdf00023e957b3f8b87805f09a4a3f589fa06b7"
 
 [[projects]]
   name = "github.com/disintegration/imaging"
   packages = ["."]
-  revision = "b039796423f87e7caca7f8eaace36878f2cce73d"
-  version = "v1.4.0"
+  revision = "fd34ef7671b12cdf1b024d98c6b327b2770d32c4"
+  version = "v1.4.1"
 
 [[projects]]
   name = "github.com/golang/protobuf"
@@ -85,7 +85,7 @@
     "bcrypt",
     "blowfish"
   ]
-  revision = "182114d582623c1caa54f73de9c7224e23a48487"
+  revision = "374053ea96cb300f8671b8d3b07edeeb06e203b4"
 
 [[projects]]
   branch = "master"
@@ -95,7 +95,7 @@
     "tiff",
     "tiff/lzw"
   ]
-  revision = "12117c17ca67ffa1ce22e9409f3b0b0a93ac08c7"
+  revision = "f3a9b89b59def9194717c1d0bd4c0d08fa1afa7b"
 
 [[projects]]
   branch = "master"
@@ -104,7 +104,7 @@
     "context",
     "context/ctxhttp"
   ]
-  revision = "803fdb99c0f72e493c28ef2099d250a9c989d8ff"
+  revision = "24dd3780ca4f75fed9f321890729414a4b5d3f13"
 
 [[projects]]
   branch = "master"
@@ -114,7 +114,7 @@
     "github",
     "internal"
   ]
-  revision = "7af32f14d0a25aec7873e0683e8e48dcead159a8"
+  revision = "fdc9e635145ae97e6c2cb777c48305600cf515cb"
 
 [[projects]]
   name = "google.golang.org/appengine"

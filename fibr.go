@@ -91,7 +91,7 @@ func main() {
 	crudConfig := crud.Flags(``)
 	uiConfig := ui.Flags(``)
 
-	httputils.StartMainServer(func() http.Handler {
+	httputils.NewApp(httputils.Flags(``), func() http.Handler {
 		authApp := auth.NewApp(authConfig, authService.NewBasicApp(basicConfig))
 		uiApp := ui.NewApp(uiConfig, *crudConfig[`directory`].(*string))
 		crudApp := crud.NewApp(crudConfig, uiApp)
@@ -106,5 +106,5 @@ func main() {
 				serviceHandler.ServeHTTP(w, r)
 			}
 		}))
-	}, nil)
+	}, nil).ListenAndServe()
 }
