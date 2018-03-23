@@ -2,7 +2,7 @@ language: go
 sudo: required
 services:
 - docker
-go: 1.9
+go : '1.10'
 cache:
   directories:
     - ${TRAVIS_BUILD_DIR}/vendor
