@@ -34,15 +34,16 @@ build:
 docker-deps:
 	curl -s -o cacert.pem https://curl.haxx.se/ca/cacert.pem
 
+docker-login:
+	echo $(DOCKER_PASS) | docker login -u $(DOCKER_USER) --password-stdin
+
 docker-build:
 	docker build -t $(DOCKER_USER)/fibr .
 
-docker-push:
-	echo $(DOCKER_PASS) | docker login -u $(DOCKER_USER) --password-stdin
+docker-push: docker-login
 	docker push $(DOCKER_USER)/fibr
 
 start-deps:
-	go get -u github.com/ViBiOh/viws
 	go get -u github.com/ViBiOh/auth/bcrypt
 
 start-api:

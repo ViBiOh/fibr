@@ -6,11 +6,7 @@
       <form method="post" enctype="multipart/form-data" action="#">
         <input type="hidden" name="method" value="POST" />
         <p class="center">
-          <label for="file" class="input-files__label">
-            {{- template "svg-cloud-upload-alt" "icon icon-button input-files__icon" -}}
-            Select files
-          </label>
-          <input id="file" type="file" name="files[]" multiple="multiple" class="input-files__input" />
+          <input id="file" type="file" name="files[]" multiple="multiple" />
         </p>
         <p class="center">
           <button type="submit" class="button bg-important">

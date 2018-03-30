@@ -19,5 +19,36 @@
         img.alt = throbber.getAttribute('data-alt');
       }
     }, false);
+
+    /**
+     * Handle Escape for closing modal.
+     */
+    document.onkeyup = function(e) {
+      if (e.keyCode === 27) {
+        document.location.hash = '';
+      }
+    };
+
+    /**
+     * Drag'n drop.
+     */
+    var dropZone = document.getElementsByTagName('body')[0];
+    dropZone.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    });
+
+    dropZone.addEventListener('dragleave', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    });
+
+    dropZone.addEventListener('drop', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      window.location.hash = '#upload-modal';
+      document.getElementById('file').files = e.dataTransfer.files;
+    });
   </script>
 {{- end -}}
