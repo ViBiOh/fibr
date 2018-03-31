@@ -1,7 +1,6 @@
 package ui
 
 import (
-	"bytes"
 	"flag"
 	"fmt"
 	"html/template"
@@ -86,33 +85,28 @@ func NewApp(config map[string]*string, rootDirectory string) *App {
 		`rebuildPaths`: func(parts []string, index int) string {
 			return path.Join(parts[:index+1]...)
 		},
-		`renderTemplate`: func(name string, data interface{}) (template.HTML, error) {
-			output := &bytes.Buffer{}
-			err := tpl.ExecuteTemplate(output, name, data)
-			return template.HTML(output.String()), err
-		},
 		`iconFromExtension`: func(file os.FileInfo) string {
 			extension := strings.ToLower(path.Ext(file.Name()))
 
 			switch {
 			case provider.ArchiveExtensions[extension]:
-				return `svg-file-archive`
+				return `file-archive`
 			case provider.AudioExtensions[extension]:
-				return `svg-file-audio`
+				return `file-audio`
 			case provider.CodeExtensions[extension]:
-				return `svg-file-code`
+				return `file-code`
 			case provider.ExcelExtensions[extension]:
-				return `svg-file-excel`
+				return `file-excel`
 			case provider.ImageExtensions[extension]:
-				return `svg-file-image`
+				return `file-image`
 			case provider.PdfExtensions[extension]:
-				return `svg-file-pdf`
+				return `file-pdf`
 			case provider.VideoExtensions[extension]:
-				return `svg-file-video`
+				return `file-video`
 			case provider.WordExtensions[extension]:
-				return `svg-file-word`
+				return `file-word`
 			default:
-				return `svg-file`
+				return `file`
 			}
 		},
 		`isImage`: func(file os.FileInfo) bool {

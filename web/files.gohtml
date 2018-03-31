@@ -54,7 +54,7 @@
               {{- if .IsDir -}}
                 <span class="icon icon-folder"></span>
               {{- else -}}
-                {{- renderTemplate (iconFromExtension .) "icon" -}}
+                <span class="icon icon-{{- iconFromExtension . -}}"></span>
               {{- end -}}
               <span class="filename">{{- filename . -}}</span>
             {{- end -}}
