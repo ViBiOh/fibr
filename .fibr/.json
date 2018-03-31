@@ -1,1 +1,7 @@
-[{"id":"no-login","path":"/","edit":true}]
+[
+  {
+    "id": "no-login",
+    "path": "/",
+    "edit": true
+  }
+]

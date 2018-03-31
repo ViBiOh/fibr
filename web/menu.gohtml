@@ -2,18 +2,12 @@
   {{- if or .CanEdit .CanShare -}}
     <div id="tools">
       {{- if .CanEdit -}}
-        <a class="button" href="#upload-modal">
-          {{- template "svg-cloud-upload-alt" "icon icon-large" -}}
-        </a>
-        <a class="button" href="#folder-modal">
-          {{- template "svg-folder" "icon icon-large" -}}
-        </a>
+        <a class="button icon icon-large icon-cloud-upload-alt" href="#upload-modal"></a>
+        <a class="button icon icon-large icon-folder" href="#folder-modal"></a>
       {{- end -}}
 
       {{- if .CanShare -}}
-        <a class="button" href="#share-modal">
-          {{- template "svg-share-alt-square" "icon icon-large" -}}
-        </a>
+        <a class="button icon icon-large icon-share-alt-square" href="#share-modal"></a>
       {{- end -}}
     </div>
   {{- end -}}

@@ -52,7 +52,7 @@
               {{- template "async-image" asyncImage . $root.Config.Version -}}
             {{- else -}}
               {{- if .IsDir -}}
-                {{- template "svg-folder" "icon" -}}
+                <span class="icon icon-folder"></span>
               {{- else -}}
                 {{- renderTemplate (iconFromExtension .) "icon" -}}
               {{- end -}}
@@ -60,12 +60,8 @@
             {{- end -}}
 
             {{- if $root.CanEdit -}}
-              <a class="button button-icon file-edit" href="#edit-modal-{{ sha1 . }}">
-                {{- template "svg-pencil-alt" "icon" -}}
-              </a>
-              <a class="button button-icon file-delete" href="#delete-modal-{{ sha1 . }}">
-                {{- template "svg-times" "icon" -}}
-              </a>
+              <a class="button button-icon file-edit icon icon-pencil-alt" href="#edit-modal-{{ sha1 . }}"></a>
+              <a class="button button-icon file-delete icon icon-times" href="#delete-modal-{{ sha1 . }}"></a>
             {{- end -}}
           </a>
         </li>
