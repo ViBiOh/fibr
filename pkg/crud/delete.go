@@ -7,7 +7,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/ViBiOh/fibr/provider"
+	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
 // Delete given path from filesystem

@@ -8,8 +8,8 @@ import (
 	"path"
 	"strings"
 
-	"github.com/ViBiOh/fibr/provider"
-	"github.com/ViBiOh/fibr/utils"
+	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/fibr/pkg/utils"
 )
 
 // CheckAndServeSEO check if filename match SEO and serve it, or not

@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/ViBiOh/fibr/provider"
-	"github.com/ViBiOh/fibr/utils"
+	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/fibr/pkg/utils"
 )
 
 func (a *App) getFormOrPathFilename(r *http.Request, config *provider.RequestConfig) (string, os.FileInfo, error) {

@@ -11,8 +11,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/ViBiOh/fibr/provider"
-	"github.com/ViBiOh/fibr/utils"
+	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/fibr/pkg/utils"
 	"github.com/ViBiOh/httputils/httperror"
 	"github.com/ViBiOh/httputils/templates"
 	"github.com/ViBiOh/httputils/tools"

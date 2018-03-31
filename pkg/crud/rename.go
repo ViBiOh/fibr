@@ -7,7 +7,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/ViBiOh/fibr/provider"
+	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
 // Rename rename given path to a new one

@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/ViBiOh/fibr/provider"
+	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/tools"
 	"github.com/ViBiOh/httputils/uuid"
 )

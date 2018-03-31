@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/ViBiOh/fibr/provider"
+	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
 // Post handle post from form

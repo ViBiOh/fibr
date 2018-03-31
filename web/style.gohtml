@@ -156,11 +156,7 @@
     }
 
     #tools a {
-      margin-left: 1rem;
-    }
-
-    #tools a:first-of-type {
-      margin-left: 0;
+      margin: 0.5rem 1rem;
     }
 
     #files {
@@ -213,6 +209,7 @@
     #upload-modal:target ~ .content,
     #folder-modal:target ~ .content,
     #share-modal:target ~ .content {
+      filter: blur(1rem);
       pointer-events: none;
     }
 

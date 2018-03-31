@@ -14,8 +14,8 @@ deps:
 	dep ensure
 
 format:
-	goimports -w *.go
-	gofmt -s -w *.go
+	goimports -w **/*.go
+	gofmt -s -w **/*.go
 
 lint:
 	golint `go list ./... | grep -v vendor`
@@ -29,7 +29,7 @@ bench:
 	go test ./... -bench . -benchmem -run Benchmark.*
 
 build:
-	CGO_ENABLED=0 go build -ldflags="-s -w" -installsuffix nocgo -o bin/fibr fibr.go
+	CGO_ENABLED=0 go build -ldflags="-s -w" -installsuffix nocgo -o bin/fibr cmd/fibr.go
 
 docker-deps:
 	curl -s -o cacert.pem https://curl.haxx.se/ca/cacert.pem
@@ -47,7 +47,7 @@ start-deps:
 	go get -u github.com/ViBiOh/auth/bcrypt
 
 start-api:
-	go run fibr.go \
+	go run cmd/fibr.go \
 		-tls=false \
 		-directory `pwd` \
 		-publicURL http://localhost:1080 \
