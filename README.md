@@ -10,7 +10,7 @@ Thanks to [FontAwesome](https://fontawesome.com) for providing awesome svg.
 ## Installation
 
 ```bash
-go get -u github.com/ViBiOh/fibr
+go get -u github.com/ViBiOh/fibr/cmd
 ```
 
 ## Usage

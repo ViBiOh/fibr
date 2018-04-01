@@ -44,7 +44,7 @@ docker-push: docker-login
 	docker push $(DOCKER_USER)/fibr
 
 start-deps:
-	go get -u github.com/ViBiOh/auth/bcrypt
+	go get -u github.com/ViBiOh/auth/cmd/bcrypt
 
 start-api:
 	go run cmd/fibr.go \
