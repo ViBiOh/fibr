@@ -45,7 +45,7 @@ func Flags(prefix string) map[string]*string {
 func getTemplatesFiles() []string {
 	output := make([]string, 0)
 
-	if err := filepath.Walk(`./web/`, func(walkedPath string, info os.FileInfo, _ error) error {
+	if err := filepath.Walk(`./templates/`, func(walkedPath string, info os.FileInfo, _ error) error {
 		if path.Ext(info.Name()) == `.gohtml` {
 			output = append(output, walkedPath)
 		}

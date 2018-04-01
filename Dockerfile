@@ -6,5 +6,5 @@ EXPOSE 1080
 ENTRYPOINT [ "/fibr" ]
 
 COPY bin/fibr /fibr
-COPY web/ web/
+COPY templates/ templates/
 COPY cacert.pem /etc/ssl/certs/ca-certificates.crt
