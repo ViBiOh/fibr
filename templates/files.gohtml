@@ -25,10 +25,11 @@
   {{- template "message" .Message -}}
 
   {{- if .CanEdit -}}
-    {{- template "upload-form" . -}}
-    {{- template "folder-form" . -}}
+    {{- template "upload-modal" . -}}
+    {{- template "folder-modal" . -}}
 
     {{- range .Files -}}
+      {{- template "edit-modal" . }}
       {{- template "delete-modal" . }}
     {{- end -}}
   {{- end -}}

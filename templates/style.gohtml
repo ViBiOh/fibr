@@ -181,6 +181,7 @@
     {{- if .CanEdit -}}
       {{- range .Files -}}
         #delete-modal-{{ sha1 . }},
+        #edit-modal-{{ sha1 . }},
       {{- end -}}
     {{- end -}}
     #upload-modal,
@@ -192,6 +193,7 @@
     {{- if .CanEdit -}}
       {{- range .Files -}}
         #delete-modal-{{ sha1 . }}:target,
+        #edit-modal-{{ sha1 . }}:target,
       {{- end -}}
     {{- end -}}
     #upload-modal:target,
@@ -204,6 +206,7 @@
     {{- if .CanEdit -}}
       {{- range .Files -}}
         #delete-modal-{{ sha1 . }}:target ~ .content,
+        #edit-modal-{{ sha1 . }}:target ~ .content,
       {{- end -}}
     {{- end -}}
     #upload-modal:target ~ .content,
