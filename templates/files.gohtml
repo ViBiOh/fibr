@@ -48,7 +48,7 @@
         {{- else -}}
           <li class="file">
         {{- end -}}
-          <a class="filelink" href="{{- filename . -}}" title="{{- filename . -}}">
+          <a class="filelink" href="{{- filename . -}}{{- if .IsDir -}}/{{- end -}}" title="{{- filename . -}}">
             {{- if and (isImage .) (eq $root.Display "grid") (hasThumbnail $root.Root $root.Path .) -}}
               {{- template "async-image" asyncImage . $root.Config.Version -}}
             {{- else -}}

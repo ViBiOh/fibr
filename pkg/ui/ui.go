@@ -64,9 +64,6 @@ func NewApp(config map[string]*string, rootDirectory string) *App {
 
 	tpl.Funcs(template.FuncMap{
 		`filename`: func(file os.FileInfo) string {
-			if file.IsDir() {
-				return fmt.Sprintf(`%s/`, file.Name())
-			}
 			return file.Name()
 		},
 		`urlescape`: func(url string) string {
