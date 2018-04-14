@@ -54,3 +54,5 @@ start-api:
 		-authUsers admin:admin \
 		-basicUsers 1:admin:`bcrypt admin` \
 		-csp "default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:"
+
+.PHONY: go dev docker deps format lint tst bench build docker-deps docker-login docker-build docker-push start-deps start-api
