@@ -1,63 +1,21 @@
 {{- define "share-form" -}}
-  <div id="share-modal" class="modal full flex flex-center">
+  <div id="share-form" class="modal full flex flex-center">
     <div class="modal-content">
-      <h2 class="header">Shared folders</h2>
-
-      {{- $root := . -}}
-
-      {{- if len .Shares -}}
-        <table id="shares" cellpadding="10" cellspacing="0">
-            <thead>
-              <tr class="share-content">
-                  <td>ID</td>
-                  <td>Path</td>
-                  <td>
-                    <span class="icon icon-edit"></span>
-                  </td>
-                  <td></td>
-              </tr>
-            </thead>
-            <tbody>
-              {{- range .Shares -}}
-                <tr class="share-content">
-                    <td>
-                      <a href="/{{- .ID -}}/">
-                        <code>{{- .ID -}}</code>
-                      </a>
-                    </td>
-                    <td>
-                      <code>{{- .Path -}}</code>
-                    </td>
-                    <td>
-                      {{- if .Edit -}}
-                        <span class="icon icon-check"></span>
-                      {{- end -}}
-                    </td>
-                    <td>
-                      <form method="post">
-                        <input type="hidden" name="type" value="share" />
-                        <input type="hidden" name="method" value="DELETE" />
-                        <input type="hidden" name="id" value="{{- .ID -}}" />
-                        <button type="submit" onclick="javascript:return confirm('Are you sure you want to delete share for {{ .Path }} ?')" class="button-icon icon icon-times"></button>
-                      </form>
-                    </td>
-                </tr>
-              {{- end -}}
-            </tbody>
-        </table>
-      {{- end -}}
+      <h2 class="header">Share this directory</h2>
 
       <form method="post" action="#">
         <input type="hidden" name="type" value="share" />
         <input type="hidden" name="method" value="POST" />
-        <p class="center">
-          Share this directory,
-          <label for="edit">
-            <strong>with edition </strong>
-          </label>
+        <p>
           <input id="edit" type="checkbox" name="edit" value="true" />
+          <label for="edit">Edit right</label>
+        </p>
+        <p>
+          <input id="password" type="text" name="password" value="" placeholder="Password" />
+        </p>
+        <p class="center">
           <button type="submit" class="button bg-important">
-            <span class="icon icon-check"></span>
+            Share
           </button>
         </p>
       </form>

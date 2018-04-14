@@ -186,7 +186,8 @@
     {{- end -}}
     #upload-modal,
     #folder-modal,
-    #share-modal {
+    #share-form,
+    #share-list {
       display: none;
     }
 
@@ -198,7 +199,8 @@
     {{- end -}}
     #upload-modal:target,
     #folder-modal:target,
-    #share-modal:target {
+    #share-form:target,
+    #share-list:target {
       display: flex;
       z-index: 5;
     }
@@ -211,7 +213,8 @@
     {{- end -}}
     #upload-modal:target ~ .content,
     #folder-modal:target ~ .content,
-    #share-modal:target ~ .content {
+    #share-form:target ~ .content,
+    #share-list:target ~ .content {
       filter: blur(1rem);
       pointer-events: none;
     }
