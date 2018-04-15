@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"net/http"
@@ -18,7 +19,36 @@ import (
 	"github.com/ViBiOh/httputils/pkg/healthcheck"
 	"github.com/ViBiOh/httputils/pkg/httperror"
 	"github.com/ViBiOh/httputils/pkg/owasp"
+	"golang.org/x/crypto/bcrypt"
 )
+
+var errEmptyAuthorizationHeader = errors.New(`Empty authorization header`)
+
+func checkSharePassword(r *http.Request, share *crud.Share) error {
+	header := r.Header.Get(`Authorization`)
+	if header == `` {
+		return errEmptyAuthorizationHeader
+	}
+
+	data, err := base64.StdEncoding.DecodeString(strings.TrimPrefix(header, `Basic `))
+	if err != nil {
+		return fmt.Errorf(`Error while decoding basic authentication: %v`, err)
+	}
+
+	dataStr := string(data)
+
+	sepIndex := strings.Index(dataStr, `:`)
+	if sepIndex < 0 {
+		return errors.New(`Error while reading basic authentication`)
+	}
+
+	password := dataStr[sepIndex+1:]
+	if err := bcrypt.CompareHashAndPassword([]byte(share.Password), []byte(password)); err != nil {
+		return errors.New(`Invalid credentials`)
+	}
+
+	return nil
+}
 
 func handleAnonymousRequest(w http.ResponseWriter, r *http.Request, err error, crudApp *crud.App, uiApp *ui.App) {
 	if auth.IsForbiddenErr(err) {
@@ -42,6 +72,7 @@ func browserHandler(crudApp *crud.App, uiApp *ui.App, authApp *auth.App) http.Ha
 
 		if strings.Contains(r.URL.Path, `..`) {
 			uiApp.Error(w, http.StatusForbidden, errors.New(`You're not authorized to do this ⛔`))
+			return
 		}
 
 		_, err := authApp.IsAuthenticated(r)
@@ -61,6 +92,14 @@ func browserHandler(crudApp *crud.App, uiApp *ui.App, authApp *auth.App) http.Ha
 			if err != nil {
 				config.CanEdit = share.Edit
 				config.CanShare = false
+			}
+
+			if share.Password != `` && err != nil {
+				if err := checkSharePassword(r, share); err != nil {
+					w.Header().Add(`WWW-Authenticate`, `Basic`)
+					uiApp.Error(w, http.StatusUnauthorized, err)
+					return
+				}
 			}
 
 			err = nil
