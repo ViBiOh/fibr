@@ -7,17 +7,17 @@ import (
 	"strings"
 
 	"github.com/NYTimes/gziphandler"
-	"github.com/ViBiOh/auth/auth"
-	authProvider "github.com/ViBiOh/auth/provider"
-	"github.com/ViBiOh/auth/provider/basic"
-	authService "github.com/ViBiOh/auth/service"
+	"github.com/ViBiOh/auth/pkg/auth"
+	authProvider "github.com/ViBiOh/auth/pkg/provider"
+	"github.com/ViBiOh/auth/pkg/provider/basic"
+	authService "github.com/ViBiOh/auth/pkg/service"
 	"github.com/ViBiOh/fibr/pkg/crud"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/ui"
-	"github.com/ViBiOh/httputils"
-	"github.com/ViBiOh/httputils/healthcheck"
-	"github.com/ViBiOh/httputils/httperror"
-	"github.com/ViBiOh/httputils/owasp"
+	"github.com/ViBiOh/httputils/pkg"
+	"github.com/ViBiOh/httputils/pkg/healthcheck"
+	"github.com/ViBiOh/httputils/pkg/httperror"
+	"github.com/ViBiOh/httputils/pkg/owasp"
 )
 
 func handleAnonymousRequest(w http.ResponseWriter, r *http.Request, err error, crudApp *crud.App, uiApp *ui.App) {

@@ -13,7 +13,7 @@ import (
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/utils"
-	"github.com/ViBiOh/httputils/tools"
+	"github.com/ViBiOh/httputils/pkg/tools"
 )
 
 // ErrNotAuthorized error returned when user is not authorized
@@ -21,9 +21,10 @@ var ErrNotAuthorized = errors.New(`You're not authorized to do this ⛔`)
 
 // Share stores informations about shared paths
 type Share struct {
-	ID   string `json:"id"`
-	Path string `json:"path"`
-	Edit bool   `json:"edit"`
+	ID       string `json:"id"`
+	Path     string `json:"path"`
+	Edit     bool   `json:"edit"`
+	Password string `json:"password"`
 }
 
 // App stores informations and secret of API

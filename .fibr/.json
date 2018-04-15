@@ -2,6 +2,7 @@
   {
     "id": "no-login",
     "path": "/",
-    "edit": true
+    "edit": true,
+    "password": ""
   }
 ]

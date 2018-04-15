@@ -13,9 +13,9 @@ import (
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/utils"
-	"github.com/ViBiOh/httputils/httperror"
-	"github.com/ViBiOh/httputils/templates"
-	"github.com/ViBiOh/httputils/tools"
+	"github.com/ViBiOh/httputils/pkg/httperror"
+	"github.com/ViBiOh/httputils/pkg/templates"
+	"github.com/ViBiOh/httputils/pkg/tools"
 )
 
 func cloneContent(content map[string]interface{}) map[string]interface{} {

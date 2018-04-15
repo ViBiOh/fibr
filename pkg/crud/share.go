@@ -6,8 +6,9 @@ import (
 	"strconv"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/tools"
-	"github.com/ViBiOh/httputils/uuid"
+	"github.com/ViBiOh/httputils/pkg/tools"
+	"github.com/ViBiOh/httputils/pkg/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // CreateShare create a share for given URL
@@ -16,17 +17,26 @@ func (a *App) CreateShare(w http.ResponseWriter, r *http.Request, config *provid
 		a.renderer.Error(w, http.StatusForbidden, ErrNotAuthorized)
 	}
 
-	var edit bool
 	var err error
 
-	if r.FormValue(`edit`) != `` {
-		edit, err = strconv.ParseBool(r.FormValue(`edit`))
+	edit := false
+	if editValue := r.FormValue(`edit`); editValue != `` {
+		edit, err = strconv.ParseBool(editValue)
 		if err != nil {
 			a.renderer.Error(w, http.StatusBadRequest, fmt.Errorf(`Error while reading form: %v`, err))
 			return
 		}
-	} else {
-		edit = false
+	}
+
+	password := ``
+	if passwordValue := r.FormValue(`password`); passwordValue != `` {
+		hash, err := bcrypt.GenerateFromPassword([]byte(passwordValue), 12)
+		if err != nil {
+			a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while hashing password: %v`, err))
+			return
+		}
+
+		password = string(hash)
 	}
 
 	uuid, err := uuid.New()
@@ -34,16 +44,16 @@ func (a *App) CreateShare(w http.ResponseWriter, r *http.Request, config *provid
 		a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while generating UUID: %v`, err))
 		return
 	}
-
 	id := tools.Sha1(uuid)[:8]
 
 	a.metadataLock.Lock()
 	defer a.metadataLock.Unlock()
 
 	a.metadatas = append(a.metadatas, &Share{
-		ID:   id,
-		Path: r.URL.Path,
-		Edit: edit,
+		ID:       id,
+		Path:     r.URL.Path,
+		Edit:     edit,
+		Password: password,
 	})
 
 	if err = a.saveMetadata(); err != nil {

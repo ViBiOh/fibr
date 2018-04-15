@@ -11,34 +11,34 @@
   branch = "master"
   name = "github.com/ViBiOh/auth"
   packages = [
-    "auth",
-    "cookie",
-    "provider",
-    "provider/basic",
-    "provider/github",
-    "provider/twitter",
-    "service"
+    "pkg/auth",
+    "pkg/cookie",
+    "pkg/provider",
+    "pkg/provider/basic",
+    "pkg/provider/github",
+    "pkg/provider/twitter",
+    "pkg/service"
   ]
-  revision = "9f023884fbc6cebb58f1fbb3f556b7b1417e2580"
+  revision = "007a1d6b864f319619f34b7546711e4cbf523ff4"
 
 [[projects]]
   branch = "master"
   name = "github.com/ViBiOh/httputils"
   packages = [
-    ".",
-    "alcotest",
-    "cert",
-    "healthcheck",
-    "httperror",
-    "httpjson",
-    "owasp",
-    "request",
-    "server",
-    "templates",
-    "tools",
-    "uuid"
+    "pkg",
+    "pkg/alcotest",
+    "pkg/cert",
+    "pkg/healthcheck",
+    "pkg/httperror",
+    "pkg/httpjson",
+    "pkg/owasp",
+    "pkg/request",
+    "pkg/server",
+    "pkg/templates",
+    "pkg/tools",
+    "pkg/uuid"
   ]
-  revision = "9fdf00023e957b3f8b87805f09a4a3f589fa06b7"
+  revision = "b6f823fce0aaac915fb12c29966dba8f27d34b08"
 
 [[projects]]
   name = "github.com/disintegration/imaging"
@@ -85,7 +85,7 @@
     "bcrypt",
     "blowfish"
   ]
-  revision = "374053ea96cb300f8671b8d3b07edeeb06e203b4"
+  revision = "d6449816ce06963d9d136eee5a56fca5b0616e7e"
 
 [[projects]]
   branch = "master"
@@ -95,7 +95,7 @@
     "tiff",
     "tiff/lzw"
   ]
-  revision = "f3a9b89b59def9194717c1d0bd4c0d08fa1afa7b"
+  revision = "f315e440302883054d0c2bd85486878cb4f8572c"
 
 [[projects]]
   branch = "master"
@@ -104,7 +104,7 @@
     "context",
     "context/ctxhttp"
   ]
-  revision = "24dd3780ca4f75fed9f321890729414a4b5d3f13"
+  revision = "61147c48b25b599e5b561d2e9c4f3e1ef489ca41"
 
 [[projects]]
   branch = "master"
@@ -114,7 +114,7 @@
     "github",
     "internal"
   ]
-  revision = "fdc9e635145ae97e6c2cb777c48305600cf515cb"
+  revision = "921ae394b9430ed4fb549668d7b087601bd60a81"
 
 [[projects]]
   name = "google.golang.org/appengine"
@@ -133,6 +133,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c77520eeda4e2631f58d9b547571096c24a7f33818337a58a3ce6c738ef813ab"
+  inputs-digest = "da17ee2d1b4b8a1b6ac85b7867f91645eb23951e7af52bc915c91a3d777b28e7"
   solver-name = "gps-cdcl"
   solver-version = 1

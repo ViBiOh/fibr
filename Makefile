@@ -1,10 +1,15 @@
-default: go docker
+VERSION ?= $(shell git log --pretty=format:'%h' -n 1)
 
-go: deps dev
+default: api docker
 
-dev: format lint tst bench build
+api: deps go
 
-docker: docker-deps docker-build
+go: format lint tst bench build
+
+docker: docker-build docker-push
+
+version:
+	@echo -n $(VERSION)
 
 deps:
 	go get -u github.com/golang/dep/cmd/dep
@@ -37,11 +42,17 @@ docker-deps:
 docker-login:
 	echo $(DOCKER_PASS) | docker login -u $(DOCKER_USER) --password-stdin
 
-docker-build:
-	docker build -t $(DOCKER_USER)/fibr .
+docker-build: docker-deps
+	docker build -t $(DOCKER_USER)/fibr:$(VERSION) .
 
 docker-push: docker-login
-	docker push $(DOCKER_USER)/fibr
+	docker push $(DOCKER_USER)/fibr:$(VERSION)
+
+docker-pull:
+	docker pull $(DOCKER_USER)/fibr:$(VERSION) .
+
+docker-promote: docker-pull
+	docker tag $(DOCKER_USER)/fibr:$(VERSION) $(DOCKER_USER)/fibr:latest
 
 start-deps:
 	go get -u github.com/ViBiOh/auth/cmd/bcrypt
@@ -55,4 +66,4 @@ start-api:
 		-basicUsers 1:admin:`bcrypt admin` \
 		-csp "default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:"
 
-.PHONY: go dev docker deps format lint tst bench build docker-deps docker-login docker-build docker-push start-deps start-api
+.PHONY: api go docker version deps format lint tst bench build docker-deps docker-login docker-build docker-push docker-pull docker-promote start-deps start-api
