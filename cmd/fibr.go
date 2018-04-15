@@ -57,7 +57,7 @@ func handleAnonymousRequest(w http.ResponseWriter, r *http.Request, err error, c
 		if err == authProvider.ErrMalformedAuth || err == authProvider.ErrUnknownAuthType {
 			uiApp.Error(w, http.StatusBadRequest, err)
 		} else {
-			w.Header().Add(`WWW-Authenticate`, `Basic realm="Password required, username optional"`)
+			w.Header().Add(`WWW-Authenticate`, `Basic`)
 			uiApp.Error(w, http.StatusUnauthorized, err)
 		}
 	}
@@ -96,7 +96,7 @@ func browserHandler(crudApp *crud.App, uiApp *ui.App, authApp *auth.App) http.Ha
 
 			if share.Password != `` && err != nil {
 				if err := checkSharePassword(r, share); err != nil {
-					w.Header().Add(`WWW-Authenticate`, `Basic`)
+					w.Header().Add(`WWW-Authenticate`, `Basic realm="Password required, username optional" charset="UTF-8"`)
 					uiApp.Error(w, http.StatusUnauthorized, err)
 					return
 				}
