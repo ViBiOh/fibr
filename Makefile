@@ -49,7 +49,7 @@ docker-push: docker-login
 	docker push $(DOCKER_USER)/fibr:$(VERSION)
 
 docker-pull:
-	docker pull $(DOCKER_USER)/fibr:$(VERSION) .
+	docker pull $(DOCKER_USER)/fibr:$(VERSION)
 
 docker-promote: docker-pull
 	docker tag $(DOCKER_USER)/fibr:$(VERSION) $(DOCKER_USER)/fibr:latest
