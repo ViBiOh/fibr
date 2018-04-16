@@ -54,6 +54,9 @@ docker-pull:
 docker-promote: docker-pull
 	docker tag $(DOCKER_USER)/fibr:$(VERSION) $(DOCKER_USER)/fibr:latest
 
+docker-delete:
+	curl -X DELETE -u "$(DOCKER_USER):$(DOCKER_CLOUD_TOKEN)" "https://cloud.docker.com/v2/repositories/$(DOCKER_USER)/fibr/tags/$(VERSION)/"
+
 start-deps:
 	go get -u github.com/ViBiOh/auth/cmd/bcrypt
 
