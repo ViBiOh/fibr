@@ -54,16 +54,16 @@
               {{- template "async-image" asyncImage . $root.Config.Version -}}
             {{- else -}}
               {{- if .IsDir -}}
-                <span class="icon icon-folder"></span>
+                <span class="icon icon-folder" alt="Folder"></span>
               {{- else -}}
-                <span class="icon icon-{{- iconFromExtension . -}}"></span>
+                <span class="icon icon-{{- iconFromExtension . -}}" alt="File"></span>
               {{- end -}}
               <span class="filename">{{- filename . -}}</span>
             {{- end -}}
 
             {{- if $root.CanEdit -}}
-              <a class="button button-icon file-edit icon icon-pencil-alt" href="#edit-modal-{{ sha1 . }}"></a>
-              <a class="button button-icon file-delete icon icon-times" href="#delete-modal-{{ sha1 . }}"></a>
+              <a href="#edit-modal-{{ sha1 . }}" class="button button-icon file-edit icon icon-pencil-alt" alt="Edit"></a>
+              <a href="#delete-modal-{{ sha1 . }}" class="button button-icon file-delete icon icon-times" alt="Delete"></a>
             {{- end -}}
           </a>
         </li>
