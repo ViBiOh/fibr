@@ -51,7 +51,7 @@
         {{- end -}}
           <a class="filelink" href="{{- filename . -}}{{- if .IsDir -}}/{{- end -}}" title="{{- filename . -}}">
             {{- if and (isImage .) (eq $root.Display "grid") (hasThumbnail $root.Root $root.Path .) -}}
-              <img class="thumbnail" src="{{- urlescape (filename .File) -}}?thumbnail&v={{- $root.Config.Version -}}" alt="thumbnail" />
+              <img class="thumbnail" src="{{- urlescape (filename .) -}}?thumbnail&v={{- $root.Config.Version -}}" alt="thumbnail" />
             {{- else -}}
               {{- if .IsDir -}}
                 <span class="icon icon-folder" alt="Folder"></span>
