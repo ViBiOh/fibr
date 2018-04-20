@@ -38,7 +38,7 @@
     "pkg/tools",
     "pkg/uuid"
   ]
-  revision = "b6f823fce0aaac915fb12c29966dba8f27d34b08"
+  revision = "7c234234484f8af3ff790763c9e8e13f926e59a8"
 
 [[projects]]
   name = "github.com/disintegration/imaging"
@@ -104,7 +104,7 @@
     "context",
     "context/ctxhttp"
   ]
-  revision = "61147c48b25b599e5b561d2e9c4f3e1ef489ca41"
+  revision = "d41e8174641f662c5a2d1c7a5f9e828788eb8706"
 
 [[projects]]
   branch = "master"
@@ -114,7 +114,7 @@
     "github",
     "internal"
   ]
-  revision = "921ae394b9430ed4fb549668d7b087601bd60a81"
+  revision = "6881fee410a5daf86371371f9ad451b95e168b71"
 
 [[projects]]
   name = "google.golang.org/appengine"

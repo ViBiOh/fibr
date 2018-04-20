@@ -17,33 +17,41 @@ go get -u github.com/ViBiOh/fibr/cmd
 
 ```bash
   -authUrl string
-      [auth] Auth URL, if remote
+    	[auth] Auth URL, if remote
   -authUsers string
-      [auth] List of allowed users and profiles (e.g. user:profile1|profile2,user2:profile3)
+    	[auth] List of allowed users and profiles (e.g. user:profile1|profile2,user2:profile3)
   -basicUsers string
-      [Basic] Users in the form "id:username:password,id2:username2:password2"
+    	[Basic] Users in the form "id:username:password,id2:username2:password2"
+  -createMeta
+    	Create metadata directory if not exist
   -csp string
-      [owasp] Content-Security-Policy (default "default-src 'self'")
+    	[owasp] Content-Security-Policy (default "default-src 'self'; base-uri 'self'")
+  -datadogHostname string
+    	Datadog Agent Hostname (default "dd-agent")
+  -datadogPort string
+    	Datadog Agent Port (default "8126")
+  -datadogService string
+    	Service name
   -directory string
-      Directory to serve (default "/data")
+    	Directory to serve (default "/data")
   -frameOptions string
-      [owasp] X-Frame-Options (default "deny")
+    	[owasp] X-Frame-Options (default "deny")
   -hsts
-      [owasp] Indicate Strict Transport Security (default true)
-  -port string
-      Listen port (default "1080")
+    	[owasp] Indicate Strict Transport Security (default true)
+  -port int
+    	Listen port (default 1080)
   -publicURL string
-      Public Server URL (default "https://fibr.vibioh.fr")
+    	Public Server URL (for sitemap.xml) (default "https://fibr.vibioh.fr")
   -tls
-      Serve TLS content
+    	Serve TLS content (default true)
   -tlsCert string
-      [tls] PEM Certificate file
+    	[tls] PEM Certificate file
   -tlsHosts string
-      [tls] Self-signed certificate hosts, comma separated (default "localhost")
+    	[tls] Self-signed certificate hosts, comma separated (default "localhost")
   -tlsKey string
-      [tls] PEM Key file
+    	[tls] PEM Key file
   -url string
-      [health] URL to check
+    	[health] URL to check
   -version string
-      Version (used mainly as a cache-buster)
+    	Version (used mainly as a cache-buster)
 ```

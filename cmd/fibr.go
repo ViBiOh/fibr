@@ -16,6 +16,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/ui"
 	"github.com/ViBiOh/httputils/pkg"
+	"github.com/ViBiOh/httputils/pkg/datadog"
 	"github.com/ViBiOh/httputils/pkg/healthcheck"
 	"github.com/ViBiOh/httputils/pkg/httperror"
 	"github.com/ViBiOh/httputils/pkg/owasp"
@@ -129,6 +130,7 @@ func main() {
 	basicConfig := basic.Flags(`basic`)
 	crudConfig := crud.Flags(``)
 	uiConfig := ui.Flags(``)
+	datadogConfig := datadog.Flags(`datadog`)
 
 	httputils.NewApp(httputils.Flags(``), func() http.Handler {
 		authApp := auth.NewApp(authConfig, authService.NewBasicApp(basicConfig))
@@ -138,12 +140,14 @@ func main() {
 		serviceHandler := owasp.Handler(owaspConfig, browserHandler(crudApp, uiApp, authApp))
 		healthHandler := healthcheck.Handler()
 
-		return gziphandler.GzipHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		datadogApp := datadog.NewApp(datadogConfig)
+
+		return datadogApp.Handler(gziphandler.GzipHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if r.URL.Path == `/health` {
 				healthHandler.ServeHTTP(w, r)
 			} else {
 				serviceHandler.ServeHTTP(w, r)
 			}
-		}))
+		})))
 	}, nil).ListenAndServe()
 }
