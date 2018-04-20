@@ -26,7 +26,7 @@ services:
     volumes:
     - ${DATA_DIR}:/data
     external_links:
-    - datadog_agent_1:dd-agent
+    - monitoring_agent:dd-agent
     user: '${DATA_USER_ID}'
     logging:
       driver: json-file
