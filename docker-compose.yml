@@ -25,6 +25,8 @@ services:
       traefik.frontend.rateLimit.rateSet.first.burst: '200'
     volumes:
     - ${DATA_DIR}:/data
+    external_links:
+    - datadog_agent_1:dd-agent
     user: '${DATA_USER_ID}'
     logging:
       driver: json-file
