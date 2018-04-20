@@ -140,9 +140,7 @@ func main() {
 		serviceHandler := owasp.Handler(owaspConfig, browserHandler(crudApp, uiApp, authApp))
 		healthHandler := healthcheck.Handler()
 
-		datadogApp := datadog.NewApp(datadogConfig)
-
-		return datadogApp.Handler(gziphandler.GzipHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		return datadog.NewApp(datadogConfig).Handler(gziphandler.GzipHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if r.URL.Path == `/health` {
 				healthHandler.ServeHTTP(w, r)
 			} else {
