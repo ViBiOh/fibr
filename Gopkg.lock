@@ -29,7 +29,7 @@
     "pkg/provider/twitter",
     "pkg/service"
   ]
-  revision = "abaa04084f5b97fb47e501870ab3ebeabf4e1504"
+  revision = "f5eeea7d38c173bb1ffbb12308f7f9e69cd83b2a"
 
 [[projects]]
   branch = "master"
