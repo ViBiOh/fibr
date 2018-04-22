@@ -29,7 +29,7 @@
     "pkg/provider/twitter",
     "pkg/service"
   ]
-  revision = "f5eeea7d38c173bb1ffbb12308f7f9e69cd83b2a"
+  revision = "887a9abbe77431d9b30b7fb9e48e183670601ae7"
 
 [[projects]]
   branch = "master"
@@ -49,7 +49,7 @@
     "pkg/tools",
     "pkg/uuid"
   ]
-  revision = "da906830ec72be878b36faf08d0bc9fdbefc7814"
+  revision = "ffc550079fc35ebf9b5872c3771e45c3157b6138"
 
 [[projects]]
   name = "github.com/disintegration/imaging"
