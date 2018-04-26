@@ -71,7 +71,6 @@
     }
 
     .icon {
-      background-color: transparent;
       background-position: center center;
       background-repeat: no-repeat;
       display: inline-block;
@@ -191,47 +190,6 @@
 
     .share-content:hover {
       background-color: aliceblue;
-    }
-
-    {{- if .CanEdit -}}
-      {{- range .Files -}}
-        #delete-modal-{{- sha1 . -}},
-        #edit-modal-{{- sha1 . -}},
-      {{- end -}}
-    {{- end -}}
-    #upload-modal,
-    #folder-modal,
-    #share-form,
-    #share-list {
-      display: none;
-    }
-
-    {{- if .CanEdit -}}
-      {{- range .Files -}}
-        #delete-modal-{{- sha1 . -}}:target,
-        #edit-modal-{{- sha1 . -}}:target,
-      {{- end -}}
-    {{- end -}}
-    #upload-modal:target,
-    #folder-modal:target,
-    #share-form:target,
-    #share-list:target {
-      display: flex;
-      z-index: 5;
-    }
-
-    {{- if .CanEdit -}}
-      {{- range .Files -}}
-        #delete-modal-{{- sha1 . -}}:target ~ .content,
-        #edit-modal-{{- sha1 . -}}:target ~ .content,
-      {{- end -}}
-    {{- end -}}
-    #upload-modal:target ~ .content,
-    #folder-modal:target ~ .content,
-    #share-form:target ~ .content,
-    #share-list:target ~ .content {
-      filter: blur(1rem);
-      pointer-events: none;
     }
 
     .throbber {
