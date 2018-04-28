@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 	"path"
-	"path/filepath"
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -17,15 +16,6 @@ import (
 	"github.com/ViBiOh/httputils/pkg/templates"
 	"github.com/ViBiOh/httputils/pkg/tools"
 )
-
-func cloneContent(content map[string]interface{}) map[string]interface{} {
-	clone := make(map[string]interface{})
-	for key, value := range content {
-		clone[key] = value
-	}
-
-	return clone
-}
 
 // App for rendering UI
 type App struct {
@@ -37,25 +27,9 @@ type App struct {
 // Flags add flags for given prefix
 func Flags(prefix string) map[string]*string {
 	return map[string]*string{
-		`publicURL`: flag.String(tools.ToCamel(fmt.Sprintf(`%sPublicURL`, prefix)), `https://fibr.vibioh.fr`, `Public Server URL (for sitemap.xml)`),
-		`version`:   flag.String(tools.ToCamel(fmt.Sprintf(`%sVersion`, prefix)), ``, `Version (used mainly as a cache-buster)`),
+		`publicURL`: flag.String(tools.ToCamel(fmt.Sprintf(`%sPublicURL`, prefix)), `https://fibr.vibioh.fr`, `[fibr] Public URL`),
+		`version`:   flag.String(tools.ToCamel(fmt.Sprintf(`%sVersion`, prefix)), ``, `[fibr] Version (used mainly as a cache-buster)`),
 	}
-}
-
-func getTemplatesFiles() []string {
-	output := make([]string, 0)
-
-	if err := filepath.Walk(`./templates/`, func(walkedPath string, info os.FileInfo, _ error) error {
-		if path.Ext(info.Name()) == `.gohtml` {
-			output = append(output, walkedPath)
-		}
-
-		return nil
-	}); err != nil {
-		log.Fatalf(`Error while listing templates: %v`, err)
-	}
-
-	return output
 }
 
 // NewApp create ui from given config
@@ -115,9 +89,14 @@ func NewApp(config map[string]*string, rootDirectory string) *App {
 		},
 	})
 
+	fibrTemplates, err := utils.ListFilesByExt(`./templates/`, `.gohtml`)
+	if err != nil {
+		log.Fatalf(`Error while getting templates: %v`, err)
+	}
+
 	return &App{
 		rootDirectory: rootDirectory,
-		tpl:           template.Must(tpl.ParseFiles(getTemplatesFiles()...)),
+		tpl:           template.Must(tpl.ParseFiles(fibrTemplates...)),
 		base: map[string]interface{}{
 			`Display`: ``,
 			`Config`: map[string]interface{}{
@@ -138,7 +117,7 @@ func NewApp(config map[string]*string, rootDirectory string) *App {
 
 // Error render error page with given status
 func (a *App) Error(w http.ResponseWriter, status int, err error) {
-	errorContent := cloneContent(a.base)
+	errorContent := utils.CloneMap(a.base)
 	errorContent[`Status`] = status
 	if err != nil {
 		errorContent[`Error`] = err.Error()
@@ -160,7 +139,7 @@ func (a *App) Sitemap(w http.ResponseWriter) {
 
 // Directory render directory listing
 func (a *App) Directory(w http.ResponseWriter, config *provider.RequestConfig, content map[string]interface{}, display string, message *provider.Message) {
-	pageContent := cloneContent(a.base)
+	pageContent := utils.CloneMap(a.base)
 	if message != nil {
 		pageContent[`Message`] = message
 	}
