@@ -61,7 +61,7 @@ func (a *App) CreateShare(w http.ResponseWriter, r *http.Request, config *provid
 		return
 	}
 
-	a.Get(w, r, config, &provider.Message{
+	a.GetWithMessage(w, r, config, &provider.Message{
 		Level:   `success`,
 		Content: fmt.Sprintf(`Share successfully created with ID: %s`, id),
 	})
@@ -90,7 +90,7 @@ func (a *App) DeleteShare(w http.ResponseWriter, r *http.Request, config *provid
 		return
 	}
 
-	a.Get(w, r, config, &provider.Message{
+	a.GetWithMessage(w, r, config, &provider.Message{
 		Level:   `success`,
 		Content: fmt.Sprintf(`Share with id %s successfully deleted`, id),
 	})

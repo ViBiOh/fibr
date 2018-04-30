@@ -51,22 +51,64 @@ func checkSharePassword(r *http.Request, share *crud.Share) error {
 	return nil
 }
 
+func checkShare(w http.ResponseWriter, r *http.Request, crudApp *crud.App, config *provider.RequestConfig) error {
+	if share := crudApp.GetShare(config.Path); share != nil {
+		config.Root = share.Path
+		config.Path = strings.TrimPrefix(config.Path, fmt.Sprintf(`/%s`, share.ID))
+		config.Prefix = share.ID
+		config.CanEdit = share.Edit
+		config.IsShare = true
+
+		if share.Password != `` {
+			if err := checkSharePassword(r, share); err != nil {
+				w.Header().Add(`WWW-Authenticate`, `Basic realm="Password required" charset="UTF-8"`)
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
 func handleAnonymousRequest(w http.ResponseWriter, r *http.Request, err error, crudApp *crud.App, uiApp *ui.App) {
 	if auth.IsForbiddenErr(err) {
 		uiApp.Error(w, http.StatusForbidden, errors.New(`You're not authorized to do this ⛔️`))
-	} else if !crudApp.CheckAndServeSEO(w, r) {
-		if err == authProvider.ErrMalformedAuth || err == authProvider.ErrUnknownAuthType {
-			uiApp.Error(w, http.StatusBadRequest, err)
-		} else {
-			w.Header().Add(`WWW-Authenticate`, `Basic charset="UTF-8"`)
-			uiApp.Error(w, http.StatusUnauthorized, err)
-		}
+		return
 	}
+
+	if err == authProvider.ErrMalformedAuth || err == authProvider.ErrUnknownAuthType {
+		uiApp.Error(w, http.StatusBadRequest, err)
+		return
+	}
+
+	w.Header().Add(`WWW-Authenticate`, `Basic charset="UTF-8"`)
+	uiApp.Error(w, http.StatusUnauthorized, err)
+}
+
+func handleRequest(w http.ResponseWriter, r *http.Request, crudApp *crud.App, config *provider.RequestConfig) {
+	switch r.Method {
+	case http.MethodGet:
+		crudApp.Get(w, r, config)
+	case http.MethodPost:
+		crudApp.Post(w, r, config)
+	case http.MethodPut:
+		crudApp.CreateDir(w, r, config)
+	case http.MethodPatch:
+		crudApp.Rename(w, r, config)
+	case http.MethodDelete:
+		crudApp.Delete(w, r, config)
+	default:
+		httperror.NotFound(w)
+	}
+}
+
+func checkAllowedMethod(r *http.Request) bool {
+	return r.Method == http.MethodGet || r.Method == http.MethodPost || r.Method == http.MethodPut || r.Method == http.MethodPatch || r.Method == http.MethodDelete
 }
 
 func browserHandler(crudApp *crud.App, uiApp *ui.App, authApp *auth.App) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet && r.Method != http.MethodPost && r.Method != http.MethodPut && r.Method != http.MethodDelete {
+		if !checkAllowedMethod(r) {
 			uiApp.Error(w, http.StatusMethodNotAllowed, errors.New(`We don't understand what you want from us`))
 			return
 		}
@@ -76,51 +118,36 @@ func browserHandler(crudApp *crud.App, uiApp *ui.App, authApp *auth.App) http.Ha
 			return
 		}
 
-		_, err := authApp.IsAuthenticated(r)
+		if crudApp.CheckAndServeSEO(w, r) {
+			return
+		}
 
 		config := &provider.RequestConfig{
 			URL:      r.URL.Path,
 			Path:     r.URL.Path,
-			CanEdit:  true,
-			CanShare: true,
+			CanEdit:  false,
+			CanShare: false,
 		}
 
-		if share := crudApp.GetSharedPath(config.Path); share != nil {
-			config.Root = share.Path
-			config.Path = strings.TrimPrefix(config.Path, fmt.Sprintf(`/%s`, share.ID))
-			config.Prefix = share.ID
+		if err := checkShare(w, r, crudApp, config); err != nil {
+			uiApp.Error(w, http.StatusUnauthorized, err)
+			return
+		}
 
+		if !config.IsShare {
+			user, err := authApp.IsAuthenticated(r)
 			if err != nil {
-				config.CanEdit = share.Edit
-				config.CanShare = false
+				handleAnonymousRequest(w, r, err, crudApp, uiApp)
+				return
 			}
 
-			if share.Password != `` && err != nil {
-				if err := checkSharePassword(r, share); err != nil {
-					w.Header().Add(`WWW-Authenticate`, `Basic realm="Password required, username optional" charset="UTF-8"`)
-					uiApp.Error(w, http.StatusUnauthorized, err)
-					return
-				}
+			if user != nil && user.HasProfile(`admin`) {
+				config.CanEdit = true
+				config.CanShare = true
 			}
-
-			err = nil
 		}
 
-		if err != nil {
-			handleAnonymousRequest(w, r, err, crudApp, uiApp)
-		} else if r.Method == http.MethodGet {
-			crudApp.Get(w, r, config, nil)
-		} else if r.Method == http.MethodPost {
-			crudApp.Post(w, r, config)
-		} else if r.Method == http.MethodPut {
-			crudApp.CreateDir(w, r, config)
-		} else if r.Method == http.MethodPatch {
-			crudApp.Rename(w, r, config)
-		} else if r.Method == http.MethodDelete {
-			crudApp.Delete(w, r, config)
-		} else {
-			httperror.NotFound(w)
-		}
+		handleRequest(w, r, crudApp, config)
 	})
 }
 
@@ -137,14 +164,14 @@ func main() {
 		uiApp := ui.NewApp(uiConfig, *crudConfig[`directory`].(*string))
 		crudApp := crud.NewApp(crudConfig, uiApp)
 
-		serviceHandler := owasp.Handler(owaspConfig, browserHandler(crudApp, uiApp, authApp))
+		webHandler := owasp.Handler(owaspConfig, browserHandler(crudApp, uiApp, authApp))
 		healthHandler := healthcheck.Handler()
 
 		return datadog.NewApp(datadogConfig).Handler(gziphandler.GzipHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if r.URL.Path == `/health` {
 				healthHandler.ServeHTTP(w, r)
 			} else {
-				serviceHandler.ServeHTTP(w, r)
+				webHandler.ServeHTTP(w, r)
 			}
 		})))
 	}, nil).ListenAndServe()

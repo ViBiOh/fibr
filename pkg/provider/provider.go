@@ -34,6 +34,7 @@ type RequestConfig struct {
 	Prefix   string
 	CanEdit  bool
 	CanShare bool
+	IsShare  bool
 }
 
 // Message rendered to user

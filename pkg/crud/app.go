@@ -75,8 +75,8 @@ func (a *App) GetRootDirectory() string {
 	return a.rootDirectory
 }
 
-// GetSharedPath returns share configurion if request path match
-func (a *App) GetSharedPath(requestPath string) *Share {
+// GetShare returns share configurion if request path match
+func (a *App) GetShare(requestPath string) *Share {
 	cleanPath := strings.TrimPrefix(requestPath, `/`)
 
 	for _, share := range a.metadatas {
