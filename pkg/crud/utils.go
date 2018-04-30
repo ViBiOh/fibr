@@ -3,27 +3,36 @@ package crud
 import (
 	"net/http"
 	"os"
+	"path"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/utils"
 )
 
-func (a *App) getFormOrPathFilename(r *http.Request, config *provider.RequestConfig) (string, os.FileInfo, error) {
+func (a *App) getMetadataFileinfo(request *provider.Request, name []byte) (string, os.FileInfo) {
+	return provider.GetFileinfoFromRoot(path.Join(a.rootDirectory, provider.MetadataDirectoryName), request, name)
+}
+
+func (a *App) getFileinfo(request *provider.Request, name []byte) (string, os.FileInfo) {
+	return provider.GetFileinfoFromRoot(a.rootDirectory, request, name)
+}
+
+func (a *App) getFormOrPathFilename(r *http.Request, request *provider.Request) (string, os.FileInfo, error) {
 	formName := r.FormValue(`name`)
 	if formName != `` {
 		if formName == `/` {
 			return ``, nil, ErrNotAuthorized
 		}
 
-		if filename, info := utils.GetPathInfo(a.rootDirectory, config.Root, config.Path, formName); filename != `` {
+		if filename, info := a.getFileinfo(request, []byte(formName)); filename != `` {
 			return filename, info, nil
 		}
 	}
 
-	if config.Path == `/` {
+	if request.Path == `/` {
 		return ``, nil, ErrNotAuthorized
 	}
 
-	filename, info := utils.GetPathInfo(a.rootDirectory, config.Root, config.Path, formName)
+	filename, info := utils.GetPathInfo(a.rootDirectory, request.Share.Path, request.Path, formName)
 	return filename, info, nil
 }

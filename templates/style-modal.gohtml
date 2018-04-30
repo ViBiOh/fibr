@@ -1,7 +1,7 @@
 {{- define "style-modal" -}}
   <style type="text/css">
-    {{- if .CanEdit -}}
-      {{- range .Files -}}
+    {{- if .Request.CanEdit -}}
+      {{- range .Content.Files -}}
         #delete-modal-{{- sha1 . -}},
         #edit-modal-{{- sha1 . -}},
       {{- end -}}
@@ -13,8 +13,8 @@
       display: none;
     }
 
-    {{- if .CanEdit -}}
-      {{- range .Files -}}
+    {{- if .Request.CanEdit -}}
+      {{- range .Content.Files -}}
         #delete-modal-{{- sha1 . -}}:target,
         #edit-modal-{{- sha1 . -}}:target,
       {{- end -}}
@@ -27,8 +27,8 @@
       z-index: 5;
     }
 
-    {{- if .CanEdit -}}
-      {{- range .Files -}}
+    {{- if .Request.CanEdit -}}
+      {{- range .Content.Files -}}
         #delete-modal-{{- sha1 . -}}:target ~ .content,
         #edit-modal-{{- sha1 . -}}:target ~ .content,
       {{- end -}}

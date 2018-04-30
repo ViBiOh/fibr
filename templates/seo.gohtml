@@ -1,18 +1,18 @@
 {{- define "seo" -}}
-  <title>{{- .Seo.Title -}}</title>
-  <meta name="description" content="{{- .Seo.Description -}}">
-  <link rel="canonical" href="{{- .Seo.URL -}}">
+  <title>{{- .Config.Seo.Title -}}</title>
+  <meta name="description" content="{{- .Config.Seo.Description -}}">
+  <link rel="canonical" href="{{- .Config.PublicURL -}}">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:creator" content="@ViBiOh">
-  <meta name="twitter:site" content="{{- .Seo.URL -}}">
-  <meta name="twitter:image" content="{{- .Seo.Img -}}?v={{- .Config.Version -}}">
-  <meta name="twitter:title" content="{{- .Seo.Title -}}">
-  <meta name="twitter:description" content="{{- .Seo.Description -}}">
+  <meta name="twitter:site" content="{{- .Config.PublicURL -}}">
+  <meta name="twitter:image" content="{{- .Config.Seo.Img -}}?v={{- .Config.Version -}}">
+  <meta name="twitter:title" content="{{- .Config.Seo.Title -}}">
+  <meta name="twitter:description" content="{{- .Config.Seo.Description -}}">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="{{- .Seo.URL -}}">
-  <meta property="og:title" content="{{- .Seo.Title -}}">
-  <meta property="og:description" content="{{- .Seo.Description -}}">
-  <meta property="og:image" content="{{- .Seo.Img -}}?v={{- .Config.Version -}}">
-  <meta property="og:image:height" content="{{- .Seo.ImgHeight -}}">
-  <meta property="og:image:width" content="{{- .Seo.ImgWidth -}}">
+  <meta property="og:url" content="{{- .Config.PublicURL -}}">
+  <meta property="og:title" content="{{- .Config.Seo.Title -}}">
+  <meta property="og:description" content="{{- .Config.Seo.Description -}}">
+  <meta property="og:image" content="{{- .Config.Seo.Img -}}?v={{- .Config.Version -}}">
+  <meta property="og:image:height" content="{{- .Config.Seo.ImgHeight -}}">
+  <meta property="og:image:width" content="{{- .Config.Seo.ImgWidth -}}">
 {{- end -}}

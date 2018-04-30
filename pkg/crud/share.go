@@ -3,6 +3,7 @@ package crud
 import (
 	"fmt"
 	"net/http"
+	"path"
 	"strconv"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -12,7 +13,7 @@ import (
 )
 
 // CreateShare create a share for given URL
-func (a *App) CreateShare(w http.ResponseWriter, r *http.Request, config *provider.RequestConfig) {
+func (a *App) CreateShare(w http.ResponseWriter, r *http.Request, config *provider.Request) {
 	if !config.CanShare {
 		a.renderer.Error(w, http.StatusForbidden, ErrNotAuthorized)
 	}
@@ -49,9 +50,10 @@ func (a *App) CreateShare(w http.ResponseWriter, r *http.Request, config *provid
 	a.metadataLock.Lock()
 	defer a.metadataLock.Unlock()
 
-	a.metadatas = append(a.metadatas, &Share{
+	a.metadatas = append(a.metadatas, &provider.Share{
 		ID:       id,
 		Path:     r.URL.Path,
+		RootName: path.Base(r.URL.Path),
 		Edit:     edit,
 		Password: password,
 	})
@@ -68,7 +70,7 @@ func (a *App) CreateShare(w http.ResponseWriter, r *http.Request, config *provid
 }
 
 // DeleteShare delete a share from given ID
-func (a *App) DeleteShare(w http.ResponseWriter, r *http.Request, config *provider.RequestConfig) {
+func (a *App) DeleteShare(w http.ResponseWriter, r *http.Request, config *provider.Request) {
 	if !config.CanShare {
 		a.renderer.Error(w, http.StatusForbidden, ErrNotAuthorized)
 	}

@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/fibr/pkg/utils"
 )
 
 // CheckAndServeSEO check if filename match SEO and serve it, or not
@@ -32,43 +31,44 @@ func (a *App) CheckAndServeSEO(w http.ResponseWriter, r *http.Request) bool {
 }
 
 // GetDir render directory web view of given dirPath
-func (a *App) GetDir(w http.ResponseWriter, config *provider.RequestConfig, filename string, display string, message *provider.Message) {
+func (a *App) GetDir(w http.ResponseWriter, request *provider.Request, filename string, display string, message *provider.Message) {
 	files, err := ioutil.ReadDir(filename)
 	if err != nil {
 		a.renderer.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	config.Path = strings.TrimPrefix(filename, path.Join(a.rootDirectory, config.Root))
+	paths := strings.Split(strings.Trim(request.Path, `/`), `/`)
+	if len(paths) == 1 && paths[0] == `` {
+		paths = nil
+	}
 
 	content := map[string]interface{}{
-		`Files`: files,
+		`Shares`: a.metadatas,
+		`Paths`:  paths,
+		`Files`:  files,
 	}
 
-	if config.CanShare {
-		content[`Shares`] = a.metadatas
-	}
-
-	a.renderer.Directory(w, config, content, display, message)
+	a.renderer.Directory(w, request, content, display, message)
 }
 
 // GetWithMessage output content with given message
-func (a *App) GetWithMessage(w http.ResponseWriter, r *http.Request, config *provider.RequestConfig, message *provider.Message) {
-	filename, info := utils.GetPathInfo(a.rootDirectory, config.Root, config.Path)
+func (a *App) GetWithMessage(w http.ResponseWriter, r *http.Request, request *provider.Request, message *provider.Message) {
+	filename, info := a.getFileinfo(request, nil)
 
 	if info == nil {
-		a.renderer.Error(w, http.StatusNotFound, fmt.Errorf(`Requested path does not exist: %s`, config.Path))
+		a.renderer.Error(w, http.StatusNotFound, fmt.Errorf(`Requested path does not exist: %s`, request.Path))
 		return
 	}
 
 	if info.IsDir() {
-		a.GetDir(w, config, filename, r.URL.Query().Get(`d`), message)
+		a.GetDir(w, request, filename, r.URL.Query().Get(`d`), message)
 		return
 	}
 
 	if params, err := url.ParseQuery(r.URL.RawQuery); err == nil {
 		if _, ok := params[`thumbnail`]; ok && provider.ImageExtensions[path.Ext(info.Name())] {
-			if tnFilename, tnInfo := utils.GetPathInfo(a.rootDirectory, provider.MetadataDirectoryName, config.Root, config.Path); tnInfo != nil {
+			if tnFilename, tnInfo := a.getMetadataFileinfo(request, nil); tnInfo != nil {
 				http.ServeFile(w, r, tnFilename)
 				return
 			}
@@ -79,6 +79,6 @@ func (a *App) GetWithMessage(w http.ResponseWriter, r *http.Request, config *pro
 }
 
 // Get output content
-func (a *App) Get(w http.ResponseWriter, r *http.Request, config *provider.RequestConfig) {
+func (a *App) Get(w http.ResponseWriter, r *http.Request, config *provider.Request) {
 	a.GetWithMessage(w, r, config, nil)
 }

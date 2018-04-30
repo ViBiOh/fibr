@@ -5,7 +5,7 @@
 
       {{- $root := . -}}
 
-      {{- if len .Shares -}}
+      {{- if len .Content.Shares -}}
         <table id="shares" cellpadding="10" cellspacing="0">
             <thead>
               <tr class="share-content">
@@ -18,7 +18,7 @@
               </tr>
             </thead>
             <tbody>
-              {{- range .Shares -}}
+              {{- range .Content.Shares -}}
                 <tr class="share-content">
                     <td>
                       <a href="/{{- .ID -}}/">

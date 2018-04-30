@@ -26,15 +26,50 @@ var (
 	WordExtensions = map[string]bool{`.doc`: true, `.docx`: true, `.docm`: true}
 )
 
-// RequestConfig stores informations
-type RequestConfig struct {
-	URL      string
-	Root     string
+// Request from user
+type Request struct {
 	Path     string
-	Prefix   string
 	CanEdit  bool
 	CanShare bool
-	IsShare  bool
+	IsDebug  bool
+	Share    *Share
+}
+
+// Share stores informations about shared paths
+type Share struct {
+	ID       string `json:"id"`
+	Path     string `json:"path"`
+	RootName string `json:"rootName"`
+	Edit     bool   `json:"edit"`
+	Password string `json:"password"`
+}
+
+// Page renderer to user
+type Page struct {
+	Config  *Config
+	Request *Request
+	Message *Message
+	Error   *Error
+	Layout  string
+	Path    string
+	Content map[string]interface{}
+}
+
+// Config data
+type Config struct {
+	RootName  string
+	PublicURL string
+	Version   string
+	Seo       *Seo
+}
+
+// Seo data
+type Seo struct {
+	Title       string
+	Description string
+	Img         string
+	ImgHeight   uint
+	ImgWidth    uint
 }
 
 // Message rendered to user
@@ -43,9 +78,14 @@ type Message struct {
 	Content string
 }
 
+// Error rendered to user
+type Error struct {
+	Status int
+}
+
 // Renderer interface for return rich content to user
 type Renderer interface {
 	Error(http.ResponseWriter, int, error)
 	Sitemap(http.ResponseWriter)
-	Directory(http.ResponseWriter, *RequestConfig, map[string]interface{}, string, *Message)
+	Directory(http.ResponseWriter, *Request, map[string]interface{}, string, *Message)
 }

@@ -13,6 +13,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/utils"
 	"github.com/ViBiOh/httputils/pkg/httperror"
+	"github.com/ViBiOh/httputils/pkg/httpjson"
 	"github.com/ViBiOh/httputils/pkg/templates"
 	"github.com/ViBiOh/httputils/pkg/tools"
 )
@@ -20,7 +21,8 @@ import (
 // App for rendering UI
 type App struct {
 	rootDirectory string
-	base          map[string]interface{}
+	debug         bool
+	config        *provider.Config
 	tpl           *template.Template
 }
 
@@ -83,8 +85,8 @@ func NewApp(config map[string]*string, rootDirectory string) *App {
 		`isImage`: func(file os.FileInfo) bool {
 			return provider.ImageExtensions[path.Ext(file.Name())]
 		},
-		`hasThumbnail`: func(root, path string, file os.FileInfo) bool {
-			_, info := utils.GetPathInfo(rootDirectory, provider.MetadataDirectoryName, root, path, file.Name())
+		`hasThumbnail`: func(request *provider.Request, file os.FileInfo) bool {
+			_, info := provider.GetFileinfoFromRoot(path.Join(rootDirectory, provider.MetadataDirectoryName), request, []byte(file.Name()))
 			return info != nil
 		},
 	})
@@ -96,20 +98,18 @@ func NewApp(config map[string]*string, rootDirectory string) *App {
 
 	return &App{
 		rootDirectory: rootDirectory,
+		debug:         os.Getenv(`DEBUG`) == `true`,
 		tpl:           template.Must(tpl.ParseFiles(fibrTemplates...)),
-		base: map[string]interface{}{
-			`Display`: ``,
-			`Config`: map[string]interface{}{
-				`PublicURL`: *config[`publicURL`],
-				`Version`:   *config[`version`],
-			},
-			`Seo`: map[string]interface{}{
-				`Title`:       `fibr`,
-				`Description`: fmt.Sprintf(`FIle BRowser`),
-				`URL`:         `/`,
-				`Img`:         fmt.Sprintf(`/favicon/android-chrome-512x512.png?v=%s`, *config[`version`]),
-				`ImgHeight`:   512,
-				`ImgWidth`:    512,
+		config: &provider.Config{
+			RootName:  path.Base(rootDirectory),
+			PublicURL: *config[`publicURL`],
+			Version:   *config[`version`],
+			Seo: &provider.Seo{
+				Title:       `fibr`,
+				Description: fmt.Sprintf(`FIle BRowser`),
+				Img:         fmt.Sprintf(`/favicon/android-chrome-512x512.png?v=%s`, *config[`version`]),
+				ImgHeight:   512,
+				ImgWidth:    512,
 			},
 		},
 	}
@@ -117,13 +117,14 @@ func NewApp(config map[string]*string, rootDirectory string) *App {
 
 // Error render error page with given status
 func (a *App) Error(w http.ResponseWriter, status int, err error) {
-	errorContent := utils.CloneMap(a.base)
-	errorContent[`Status`] = status
-	if err != nil {
-		errorContent[`Error`] = err.Error()
+	page := &provider.Page{
+		Config: a.config,
+		Error: &provider.Error{
+			Status: status,
+		},
 	}
 
-	if err := templates.WriteHTMLTemplate(a.tpl.Lookup(`error`), w, errorContent, status); err != nil {
+	if err := templates.WriteHTMLTemplate(a.tpl.Lookup(`error`), w, page, status); err != nil {
 		httperror.InternalServerError(w, err)
 	}
 
@@ -132,63 +133,30 @@ func (a *App) Error(w http.ResponseWriter, status int, err error) {
 
 // Sitemap render sitemap.xml
 func (a *App) Sitemap(w http.ResponseWriter) {
-	if err := templates.WriteXMLTemplate(a.tpl.Lookup(`sitemap`), w, a.base, http.StatusOK); err != nil {
+	if err := templates.WriteXMLTemplate(a.tpl.Lookup(`sitemap`), w, provider.Page{Config: a.config}, http.StatusOK); err != nil {
 		httperror.InternalServerError(w, err)
 	}
 }
 
 // Directory render directory listing
-func (a *App) Directory(w http.ResponseWriter, config *provider.RequestConfig, content map[string]interface{}, display string, message *provider.Message) {
-	pageContent := utils.CloneMap(a.base)
-	if message != nil {
-		pageContent[`Message`] = message
+func (a *App) Directory(w http.ResponseWriter, request *provider.Request, content map[string]interface{}, layout string, message *provider.Message) {
+	page := &provider.Page{
+		Config:  a.config,
+		Request: request,
+		Message: message,
+		Layout:  layout,
+		Content: content,
 	}
 
-	currentPath := strings.Trim(strings.TrimPrefix(config.Path, config.Root), `/`)
-
-	rootName := path.Base(a.rootDirectory)
-	if config.Root != `` {
-		rootName = path.Base(config.Root)
-	}
-
-	seo := a.base[`Seo`].(map[string]interface{})
-	pageContent[`Seo`] = map[string]interface{}{
-		`Title`:       fmt.Sprintf(`fibr - %s`, path.Join(rootName, config.Path)),
-		`Description`: fmt.Sprintf(`FIle BRowser of directory %s`, path.Join(rootName, config.Path)),
-		`URL`:         config.URL,
-		`Img`:         seo[`Img`],
-		`ImgHeight`:   seo[`ImgHeight`],
-		`ImgWidth`:    seo[`ImgWidth`],
-	}
-
-	paths := strings.Split(currentPath, `/`)
-	if paths[0] == `` {
-		paths = nil
-	}
-
-	pageContent[`RootName`] = rootName
-	pageContent[`Root`] = config.Root
-	pageContent[`Path`] = config.Path
-	pageContent[`Paths`] = paths
-	pageContent[`CanEdit`] = config.CanEdit
-	pageContent[`CanShare`] = config.CanShare
-
-	pageContent[`Display`] = `grid`
-	if display != `` {
-		pageContent[`Display`] = display
-	}
-
-	pageContent[`Prefix`] = config.Prefix
-	if config.Prefix != `` {
-		pageContent[`Prefix`] = fmt.Sprintf(`%s/`, config.Prefix)
-	}
-
-	for key, value := range content {
-		pageContent[key] = value
+	if request.IsDebug && a.debug {
+		if err := httpjson.ResponseJSON(w, http.StatusOK, page, true); err != nil {
+			a.Error(w, http.StatusInternalServerError, err)
+		}
+		return
 	}
 
 	w.Header().Set(`content-language`, `fr`)
-	if err := templates.WriteHTMLTemplate(a.tpl.Lookup(`files`), w, pageContent, http.StatusOK); err != nil {
+	if err := templates.WriteHTMLTemplate(a.tpl.Lookup(`files`), w, page, http.StatusOK); err != nil {
 		a.Error(w, http.StatusInternalServerError, err)
 	}
 }

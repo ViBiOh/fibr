@@ -8,7 +8,7 @@ import (
 )
 
 // Post handle post from form
-func (a *App) Post(w http.ResponseWriter, r *http.Request, config *provider.RequestConfig) {
+func (a *App) Post(w http.ResponseWriter, r *http.Request, config *provider.Request) {
 	if r.FormValue(`type`) == `share` {
 		if r.FormValue(`method`) == http.MethodPost {
 			a.CreateShare(w, r, config)

@@ -27,7 +27,7 @@ func createOrOpenFile(filename string, info os.FileInfo) (io.WriteCloser, error)
 }
 
 // CreateDir creates given path directory to filesystem
-func (a *App) CreateDir(w http.ResponseWriter, r *http.Request, config *provider.RequestConfig) {
+func (a *App) CreateDir(w http.ResponseWriter, r *http.Request, config *provider.Request) {
 	if !config.CanEdit {
 		a.renderer.Error(w, http.StatusForbidden, ErrNotAuthorized)
 		return
@@ -37,7 +37,7 @@ func (a *App) CreateDir(w http.ResponseWriter, r *http.Request, config *provider
 
 	formName := r.FormValue(`name`)
 	if formName != `` {
-		filename, _ = utils.GetPathInfo(a.rootDirectory, config.Root, config.Path, formName)
+		filename, _ = utils.GetPathInfo(a.rootDirectory, config.Share.Path, config.Path, formName)
 	}
 
 	if filename == `` {
@@ -46,7 +46,7 @@ func (a *App) CreateDir(w http.ResponseWriter, r *http.Request, config *provider
 			return
 		}
 
-		filename, _ = utils.GetPathInfo(a.rootDirectory, config.Root, config.Path)
+		filename, _ = utils.GetPathInfo(a.rootDirectory, config.Share.Path, config.Path)
 	}
 
 	if strings.Contains(filename, `..`) {
@@ -62,8 +62,8 @@ func (a *App) CreateDir(w http.ResponseWriter, r *http.Request, config *provider
 	a.GetDir(w, config, path.Dir(filename), r.URL.Query().Get(`d`), &provider.Message{Level: `success`, Content: fmt.Sprintf(`Directory %s successfully created`, path.Base(filename))})
 }
 
-func (a *App) saveUploadedFile(config *provider.RequestConfig, uploadedFile io.ReadCloser, uploadedFileHeader *multipart.FileHeader) (string, error) {
-	filename, info := utils.GetPathInfo(a.rootDirectory, config.Root, config.Path, uploadedFileHeader.Filename)
+func (a *App) saveUploadedFile(config *provider.Request, uploadedFile io.ReadCloser, uploadedFileHeader *multipart.FileHeader) (string, error) {
+	filename, info := utils.GetPathInfo(a.rootDirectory, config.Share.Path, config.Path, uploadedFileHeader.Filename)
 	hostFile, err := createOrOpenFile(filename, info)
 	if hostFile != nil {
 		defer func() {
@@ -85,7 +85,7 @@ func (a *App) saveUploadedFile(config *provider.RequestConfig, uploadedFile io.R
 }
 
 // SaveFiles saves form files to filesystem
-func (a *App) SaveFiles(w http.ResponseWriter, r *http.Request, config *provider.RequestConfig) {
+func (a *App) SaveFiles(w http.ResponseWriter, r *http.Request, config *provider.Request) {
 	if !config.CanEdit {
 		a.renderer.Error(w, http.StatusForbidden, ErrNotAuthorized)
 	}

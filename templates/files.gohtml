@@ -7,14 +7,15 @@
   <header class="header">
     <h1 class="title" itemscope itemtype="http://schema.org/BreadcrumbList">
       <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
-        <a href="/{{- .Prefix -}}" itemprop="item">
-          <span itemprop="name">{{- .RootName -}}</span>
+        
+        <a href="/{{- if .Request.Share -}}{{- .Request.Share.ID -}}/{{- end -}}" itemprop="item">
+          <span itemprop="name">{{- if .Request.Share -}}{{- .Request.Share.RootName -}}{{- else -}}{{- .Config.RootName -}}{{- end -}}</span>
         </a>
       </span>
-      {{- range $index, $path := .Paths -}}
+      {{- range $index, $path := .Content.Paths -}}
         <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
            / 
-          <a href="/{{- $root.Prefix -}}{{- rebuildPaths $root.Paths $index -}}/" itemprop="item">
+          <a href="/{{- if $root.Request.Share -}}{{- $root.Request.Share.ID -}}/{{- end -}}{{- rebuildPaths $root.Content.Paths $index -}}/" itemprop="item">
             <span itemprop="name">{{- $path -}}</span>
           </a>
         </span>
@@ -24,17 +25,17 @@
 
   {{- template "message" .Message -}}
 
-  {{- if .CanEdit -}}
+  {{- if .Request.CanEdit -}}
     {{- template "upload-modal" . -}}
     {{- template "folder-modal" . -}}
 
-    {{- range .Files -}}
+    {{- range .Content.Files -}}
       {{- template "edit-modal" . -}}
       {{- template "delete-modal" . -}}
     {{- end -}}
   {{- end -}}
 
-  {{- if .CanShare -}}
+  {{- if .Request.CanShare -}}
     {{- template "share-form" . -}}
     {{- template "share-list" . -}}
   {{- end -}}
@@ -43,14 +44,14 @@
     {{- template "modifiers" . -}}
 
     <ul id="files">
-      {{- range .Files -}}
-        {{- if and (isImage .) (eq $root.Display "grid") -}}
+      {{- range .Content.Files -}}
+        {{- if and (isImage .) (eq $root.Layout "grid") -}}
           <li class="image">
         {{- else -}}
           <li class="file">
         {{- end -}}
           <a class="filelink" href="{{- filename . -}}{{- if .IsDir -}}/{{- end -}}" title="{{- filename . -}}">
-            {{- if and (isImage .) (eq $root.Display "grid") (hasThumbnail $root.Root $root.Path .) -}}
+            {{- if and (isImage .) (eq $root.Layout "grid") (hasThumbnail $root.Request .) -}}
               {{- template "async-image" asyncImage . $root.Config.Version -}}
             {{- else -}}
               {{- if .IsDir -}}
@@ -61,7 +62,7 @@
               <span class="filename">{{- filename . -}}</span>
             {{- end -}}
 
-            {{- if $root.CanEdit -}}
+            {{- if $root.Request.CanEdit -}}
               <a href="#edit-modal-{{- sha1 . -}}" class="button button-icon file-edit" alt="Edit">
                 <span class="icon icon-pencil-alt"></span>
               </a>

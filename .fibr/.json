@@ -1,12 +1,14 @@
 [
   {
     "id": "no-login",
+    "rootName": "fibr",
     "path": "/",
     "edit": true,
     "password": ""
   },
   {
     "id": "password",
+    "rootName": "fibr",
     "path": "/",
     "edit": false,
     "password": "$2a$12$SVaRKEx6MrP2ZdUOrBoSg.s/hIT5VJTuimQEQGkReIyYRPX14sV12"

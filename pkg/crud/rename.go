@@ -13,7 +13,7 @@ import (
 )
 
 // Rename rename given path to a new one
-func (a *App) Rename(w http.ResponseWriter, r *http.Request, config *provider.RequestConfig) {
+func (a *App) Rename(w http.ResponseWriter, r *http.Request, config *provider.Request) {
 	if !config.CanEdit {
 		a.renderer.Error(w, http.StatusForbidden, ErrNotAuthorized)
 		return
@@ -33,7 +33,7 @@ func (a *App) Rename(w http.ResponseWriter, r *http.Request, config *provider.Re
 		return
 	}
 
-	newFilename, newInfo := utils.GetPathInfo(a.rootDirectory, config.Root, config.Path, newName)
+	newFilename, newInfo := utils.GetPathInfo(a.rootDirectory, config.Share.Path, config.Path, newName)
 	if newInfo != nil {
 		a.renderer.Error(w, http.StatusBadRequest, fmt.Errorf(`%s already exists`, newName))
 		return

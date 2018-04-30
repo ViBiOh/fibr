@@ -228,7 +228,7 @@
       }
     }
 
-    {{- if eq .Display "list" -}}
+    {{- if eq .Layout "list" -}}
       #list-display {
         background-color: aliceblue;
       }
@@ -291,7 +291,7 @@
       }
     {{- end -}}
 
-    {{- if eq .Display "grid" -}}
+    {{- if or (eq .Layout "grid") (eq .Layout "") -}}
       #grid-display {
         background-color: aliceblue;
       }

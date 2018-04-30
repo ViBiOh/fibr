@@ -25,7 +25,7 @@ import (
 
 var errEmptyAuthorizationHeader = errors.New(`Empty authorization header`)
 
-func checkSharePassword(r *http.Request, share *crud.Share) error {
+func checkSharePassword(r *http.Request, share *provider.Share) error {
 	header := r.Header.Get(`Authorization`)
 	if header == `` {
 		return errEmptyAuthorizationHeader
@@ -51,13 +51,11 @@ func checkSharePassword(r *http.Request, share *crud.Share) error {
 	return nil
 }
 
-func checkShare(w http.ResponseWriter, r *http.Request, crudApp *crud.App, config *provider.RequestConfig) error {
-	if share := crudApp.GetShare(config.Path); share != nil {
-		config.Root = share.Path
-		config.Path = strings.TrimPrefix(config.Path, fmt.Sprintf(`/%s`, share.ID))
-		config.Prefix = share.ID
-		config.CanEdit = share.Edit
-		config.IsShare = true
+func checkShare(w http.ResponseWriter, r *http.Request, crudApp *crud.App, request *provider.Request) error {
+	if share := crudApp.GetShare(request.Path); share != nil {
+		request.Share = share
+		request.CanEdit = share.Edit
+		request.Path = strings.TrimPrefix(request.Path, fmt.Sprintf(`/%s`, share.ID))
 
 		if share.Password != `` {
 			if err := checkSharePassword(r, share); err != nil {
@@ -85,7 +83,7 @@ func handleAnonymousRequest(w http.ResponseWriter, r *http.Request, err error, c
 	uiApp.Error(w, http.StatusUnauthorized, err)
 }
 
-func handleRequest(w http.ResponseWriter, r *http.Request, crudApp *crud.App, config *provider.RequestConfig) {
+func handleRequest(w http.ResponseWriter, r *http.Request, crudApp *crud.App, config *provider.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		crudApp.Get(w, r, config)
@@ -122,19 +120,19 @@ func browserHandler(crudApp *crud.App, uiApp *ui.App, authApp *auth.App) http.Ha
 			return
 		}
 
-		config := &provider.RequestConfig{
-			URL:      r.URL.Path,
+		request := &provider.Request{
 			Path:     r.URL.Path,
 			CanEdit:  false,
 			CanShare: false,
+			IsDebug:  r.URL.Query().Get(`debug`) == `true`,
 		}
 
-		if err := checkShare(w, r, crudApp, config); err != nil {
+		if err := checkShare(w, r, crudApp, request); err != nil {
 			uiApp.Error(w, http.StatusUnauthorized, err)
 			return
 		}
 
-		if !config.IsShare {
+		if request.Share == nil {
 			user, err := authApp.IsAuthenticated(r)
 			if err != nil {
 				handleAnonymousRequest(w, r, err, crudApp, uiApp)
@@ -142,12 +140,12 @@ func browserHandler(crudApp *crud.App, uiApp *ui.App, authApp *auth.App) http.Ha
 			}
 
 			if user != nil && user.HasProfile(`admin`) {
-				config.CanEdit = true
-				config.CanShare = true
+				request.CanEdit = true
+				request.CanShare = true
 			}
 		}
 
-		handleRequest(w, r, crudApp, config)
+		handleRequest(w, r, crudApp, request)
 	})
 }
 

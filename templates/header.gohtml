@@ -8,8 +8,11 @@
       {{- template "favicon" . -}}
       {{- template "seo" . -}}
       {{- template "style" . -}}
-      {{- template "style-modal" . -}}
       {{- template "icon" . -}}
+
+      {{- if .Request -}}
+        {{- template "style-modal" . -}}
+      {{- end -}}
     </head>
     <body>
 {{- end -}}
