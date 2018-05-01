@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"strings"
@@ -21,7 +22,6 @@ import (
 // App for rendering UI
 type App struct {
 	rootDirectory string
-	debug         bool
 	config        *provider.Config
 	tpl           *template.Template
 }
@@ -42,8 +42,8 @@ func NewApp(config map[string]*string, rootDirectory string) *App {
 		`filename`: func(file os.FileInfo) string {
 			return file.Name()
 		},
-		`urlescape`: func(url string) string {
-			return strings.Replace(url, ` `, `%20`, -1)
+		`urlescape`: func(path string) string {
+			return url.PathEscape(path)
 		},
 		`sha1`: func(file os.FileInfo) string {
 			return tools.Sha1(file.Name())
@@ -98,7 +98,6 @@ func NewApp(config map[string]*string, rootDirectory string) *App {
 
 	return &App{
 		rootDirectory: rootDirectory,
-		debug:         os.Getenv(`DEBUG`) == `true`,
 		tpl:           template.Must(tpl.ParseFiles(fibrTemplates...)),
 		config: &provider.Config{
 			RootName:  path.Base(rootDirectory),
@@ -106,8 +105,8 @@ func NewApp(config map[string]*string, rootDirectory string) *App {
 			Version:   *config[`version`],
 			Seo: &provider.Seo{
 				Title:       `fibr`,
-				Description: fmt.Sprintf(`FIle BRowser`),
-				Img:         fmt.Sprintf(`/favicon/android-chrome-512x512.png?v=%s`, *config[`version`]),
+				Description: `FIle BRowser`,
+				Img:         `/favicon/android-chrome-512x512.png`,
 				ImgHeight:   512,
 				ImgWidth:    512,
 			},
@@ -148,7 +147,11 @@ func (a *App) Directory(w http.ResponseWriter, request *provider.Request, conten
 		Content: content,
 	}
 
-	if request.IsDebug && a.debug {
+	if page.Layout == `` {
+		page.Layout = `grid`
+	}
+
+	if request.IsDebug {
 		if err := httpjson.ResponseJSON(w, http.StatusOK, page, true); err != nil {
 			a.Error(w, http.StatusInternalServerError, err)
 		}

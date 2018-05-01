@@ -291,7 +291,7 @@
       }
     {{- end -}}
 
-    {{- if or (eq .Layout "grid") (eq .Layout "") -}}
+    {{- if eq .Layout "grid" -}}
       #grid-display {
         background-color: aliceblue;
       }

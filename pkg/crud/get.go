@@ -18,7 +18,7 @@ func (a *App) CheckAndServeSEO(w http.ResponseWriter, r *http.Request) bool {
 	}
 
 	if r.URL.Path == `/robots.txt` || strings.HasPrefix(r.URL.Path, `/favicon`) {
-		http.ServeFile(w, r, path.Join(`web/static`, r.URL.Path))
+		http.ServeFile(w, r, path.Join(`templates/static`, r.URL.Path))
 		return true
 	}
 
@@ -44,9 +44,12 @@ func (a *App) GetDir(w http.ResponseWriter, request *provider.Request, filename 
 	}
 
 	content := map[string]interface{}{
-		`Shares`: a.metadatas,
-		`Paths`:  paths,
-		`Files`:  files,
+		`Paths`: paths,
+		`Files`: files,
+	}
+
+	if request.CanShare {
+		content[`Shares`] = a.metadatas
 	}
 
 	a.renderer.Directory(w, request, content, display, message)

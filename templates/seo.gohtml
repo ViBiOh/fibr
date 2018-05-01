@@ -1,16 +1,16 @@
 {{- define "seo" -}}
-  <title>{{- .Config.Seo.Title -}}</title>
+  <title>{{- .Title -}}</title>
   <meta name="description" content="{{- .Config.Seo.Description -}}">
-  <link rel="canonical" href="{{- .Config.PublicURL -}}">
+  <link rel="canonical" href="{{- .PublicURL -}}">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:creator" content="@ViBiOh">
-  <meta name="twitter:site" content="{{- .Config.PublicURL -}}">
+  <meta name="twitter:site" content="{{- .PublicURL -}}">
   <meta name="twitter:image" content="{{- .Config.Seo.Img -}}?v={{- .Config.Version -}}">
-  <meta name="twitter:title" content="{{- .Config.Seo.Title -}}">
+  <meta name="twitter:title" content="{{- .Title -}}">
   <meta name="twitter:description" content="{{- .Config.Seo.Description -}}">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="{{- .Config.PublicURL -}}">
-  <meta property="og:title" content="{{- .Config.Seo.Title -}}">
+  <meta property="og:url" content="{{- .PublicURL -}}">
+  <meta property="og:title" content="{{- .Title -}}">
   <meta property="og:description" content="{{- .Config.Seo.Description -}}">
   <meta property="og:image" content="{{- .Config.Seo.Img -}}?v={{- .Config.Version -}}">
   <meta property="og:image:height" content="{{- .Config.Seo.ImgHeight -}}">

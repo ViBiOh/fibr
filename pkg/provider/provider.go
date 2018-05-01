@@ -1,7 +1,9 @@
 package provider
 
 import (
+	"fmt"
 	"net/http"
+	"strings"
 )
 
 // MetadataDirectoryName directory when metadata are stored
@@ -53,6 +55,32 @@ type Page struct {
 	Layout  string
 	Path    string
 	Content map[string]interface{}
+}
+
+// PublicURL compute public URL
+func (p Page) PublicURL() string {
+	url := p.Config.PublicURL
+
+	if p.Request != nil {
+		if p.Request.Share != nil {
+			url = fmt.Sprintf(`%s/%s`, url, p.Request.Share.ID)
+		}
+
+		url = fmt.Sprintf(`%s%s`, url, p.Request.Path)
+	}
+
+	return url
+}
+
+// Title compute title of page
+func (p Page) Title() string {
+	title := fmt.Sprintf(`%s - %s`, p.Config.Seo.Title, p.Config.RootName)
+
+	if p.Request != nil {
+		title = fmt.Sprintf(`%s - %s`, title, strings.Trim(p.Request.Path, `/`))
+	}
+
+	return title
 }
 
 // Config data
