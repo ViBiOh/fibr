@@ -6,7 +6,6 @@ import (
 	"path"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/fibr/pkg/utils"
 )
 
 func (a *App) getMetadataFileinfo(request *provider.Request, name []byte) (string, os.FileInfo) {
@@ -33,6 +32,6 @@ func (a *App) getFormOrPathFilename(r *http.Request, request *provider.Request) 
 		return ``, nil, ErrNotAuthorized
 	}
 
-	filename, info := utils.GetPathInfo(a.rootDirectory, request.Share.Path, request.Path, formName)
+	filename, info := a.getFileinfo(request, []byte(formName))
 	return filename, info, nil
 }

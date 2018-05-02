@@ -61,8 +61,8 @@
 [[projects]]
   name = "github.com/golang/protobuf"
   packages = ["proto"]
-  revision = "925541529c1fa6821df4e44ce2723319eb2be768"
-  version = "v1.0.0"
+  revision = "b4deda0973fb4c70b50d226b1af49f3da59f5265"
+  version = "v1.1.0"
 
 [[projects]]
   name = "github.com/tdewolff/minify"
@@ -102,7 +102,7 @@
     "bcrypt",
     "blowfish"
   ]
-  revision = "b49d69b5da943f7ef3c9cf91c8777c1f78a0cc3c"
+  revision = "613d6eafa307c6881a737a3c35c0e312e8d3a8c5"
 
 [[projects]]
   branch = "master"
@@ -137,7 +137,7 @@
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["windows"]
-  revision = "f67ecc163a74fbeea4cb1db0a101dcd07201464a"
+  revision = "78d5f264b493f125018180c204871ecf58a2dce1"
 
 [[projects]]
   name = "google.golang.org/appengine"
@@ -156,6 +156,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "e4c5551e4206e93fa1b481f407b4569d8ad6728f16e9af2d1d41952a94b91b64"
+  inputs-digest = "4f6ecf18a76f6248f6c9a3d4b521a2a7ff4a921e73c99927248e19510f3b069b"
   solver-name = "gps-cdcl"
   solver-version = 1

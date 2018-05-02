@@ -9,12 +9,11 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/fibr/pkg/utils"
 )
 
 // Rename rename given path to a new one
-func (a *App) Rename(w http.ResponseWriter, r *http.Request, config *provider.Request) {
-	if !config.CanEdit {
+func (a *App) Rename(w http.ResponseWriter, r *http.Request, request *provider.Request) {
+	if !request.CanEdit {
 		a.renderer.Error(w, http.StatusForbidden, ErrNotAuthorized)
 		return
 	}
@@ -24,7 +23,7 @@ func (a *App) Rename(w http.ResponseWriter, r *http.Request, config *provider.Re
 		a.renderer.Error(w, http.StatusBadRequest, errors.New(`New name is empty`))
 	}
 
-	filename, info, err := a.getFormOrPathFilename(r, config)
+	filename, info, err := a.getFormOrPathFilename(r, request)
 	if err != nil && err == ErrNotAuthorized {
 		a.renderer.Error(w, http.StatusForbidden, err)
 		return
@@ -33,7 +32,7 @@ func (a *App) Rename(w http.ResponseWriter, r *http.Request, config *provider.Re
 		return
 	}
 
-	newFilename, newInfo := utils.GetPathInfo(a.rootDirectory, config.Share.Path, config.Path, newName)
+	newFilename, newInfo := a.getFileinfo(request, []byte(newName))
 	if newInfo != nil {
 		a.renderer.Error(w, http.StatusBadRequest, fmt.Errorf(`%s already exists`, newName))
 		return
@@ -44,5 +43,5 @@ func (a *App) Rename(w http.ResponseWriter, r *http.Request, config *provider.Re
 		return
 	}
 
-	a.GetDir(w, config, path.Dir(newFilename), r.URL.Query().Get(`d`), &provider.Message{Level: `success`, Content: fmt.Sprintf(`%s successfully renamed to %s`, info.Name(), newName)})
+	a.GetDir(w, request, path.Dir(newFilename), r.URL.Query().Get(`d`), &provider.Message{Level: `success`, Content: fmt.Sprintf(`%s successfully renamed to %s`, info.Name(), newName)})
 }
