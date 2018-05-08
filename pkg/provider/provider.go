@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"strings"
 )
@@ -116,4 +117,18 @@ type Renderer interface {
 	Error(http.ResponseWriter, int, error)
 	Sitemap(http.ResponseWriter)
 	Directory(http.ResponseWriter, *Request, map[string]interface{}, string, *Message)
+}
+
+// StorageItem describe item on a storage provider
+type StorageItem interface {
+	Name() string
+}
+
+// Storage describe action on a storage provider
+type Storage interface {
+	ReadDir(dirname string) ([]StorageItem, error)
+	CreateDir(dirname string) error
+	Upload(filename string, content io.ReadCloser) error
+	Rename(oldName, newName string) error
+	Remove(filename string) error
 }
