@@ -35,3 +35,16 @@ func (a *App) getFormOrPathFilename(r *http.Request, request *provider.Request) 
 	filename, info := a.getFileinfo(request, []byte(formName))
 	return filename, info, nil
 }
+
+func getFilepath(r *http.Request, request *provider.Request) (string, error) {
+	name := r.FormValue(`name`)
+	if name == `` {
+		name = request.Path
+	}
+
+	if name == `/` {
+		return ``, ErrNotAuthorized
+	}
+
+	return provider.GetFilename(request, []byte(name)), nil
+}

@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"os"
 	"path"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -17,19 +16,23 @@ func (a *App) Delete(w http.ResponseWriter, r *http.Request, config *provider.Re
 		return
 	}
 
-	filename, info, err := a.getFormOrPathFilename(r, config)
+	pathname, err := getFilepath(r, config)
 	if err != nil && err == ErrNotAuthorized {
 		a.renderer.Error(w, http.StatusForbidden, err)
 		return
-	} else if info == nil {
+	}
+
+	info, err := a.storage.Info(pathname)
+	if err != nil {
 		a.renderer.Error(w, http.StatusNotFound, errors.New(`Requested path does not exist`))
 		return
 	}
 
-	if err := os.RemoveAll(filename); err != nil {
-		a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while deleting %s: %v`, filename, err))
+	if err := a.storage.Remove(pathname); err != nil {
+		a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while deleting %s: %v`, pathname, err))
 		return
 	}
 
-	a.GetDir(w, config, path.Dir(filename), r.URL.Query().Get(`d`), &provider.Message{Level: `success`, Content: fmt.Sprintf(`%s successfully deleted`, info.Name())})
+	// TODO clean rootDirectory
+	a.GetDir(w, config, path.Join(a.rootDirectory, path.Dir(pathname)), r.URL.Query().Get(`d`), &provider.Message{Level: `success`, Content: fmt.Sprintf(`%s successfully deleted`, info.Name)})
 }
