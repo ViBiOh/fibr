@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 
@@ -59,20 +60,8 @@ func NewApp(config map[string]*string) (*App, error) {
 // Flags adds flags for given prefix
 func Flags(prefix string) map[string]*string {
 	return map[string]*string{
-		`directory`: flag.String(tools.ToCamel(fmt.Sprintf(`%sDirectory`, prefix)), ``, `[filesystem] Path to served directory`),
+		`directory`: flag.String(tools.ToCamel(fmt.Sprintf(`%sDirectory`, prefix)), `/data`, `[filesystem] Path to served directory`),
 	}
-}
-
-func (a App) checkPathname(pathname string) error {
-	if strings.Contains(pathname, `..`) {
-		return ErrRelativePath
-	}
-
-	if !strings.HasPrefix(a.rootDirectory, pathname) {
-		return ErrOutsidePath
-	}
-
-	return nil
 }
 
 func createOrOpenFile(filename string, info *provider.StorageItem) (io.WriteCloser, error) {
@@ -82,14 +71,58 @@ func createOrOpenFile(filename string, info *provider.StorageItem) (io.WriteClos
 	return os.Open(filename)
 }
 
+func (a App) checkPathname(pathname string) error {
+	if strings.Contains(pathname, `..`) {
+		return ErrRelativePath
+	}
+
+	return nil
+}
+
+func (a App) getFullPath(pathname string) string {
+	return path.Join(a.rootDirectory, pathname)
+}
+
+// Name of the storage
+func (a App) Name() string {
+	return `filesystem`
+}
+
 // Info provide metadata about given pathname
 func (a App) Info(pathname string) (*provider.StorageItem, error) {
-	info, err := os.Stat(pathname)
+	if err := a.checkPathname(pathname); err != nil {
+		return nil, err
+	}
+
+	info, err := os.Stat(a.getFullPath(pathname))
 	if err != nil {
 		return nil, err
 	}
 
 	return convertToItem(info), nil
+}
+
+// Read content of given pathname
+func (a App) Read(pathname string) (io.ReadCloser, error) {
+	if err := a.checkPathname(pathname); err != nil {
+		return nil, err
+	}
+
+	return os.Open(a.getFullPath(pathname))
+}
+
+// Open writer for given pathname
+func (a App) Open(pathname string) (io.WriteCloser, error) {
+	if err := a.checkPathname(pathname); err != nil {
+		return nil, err
+	}
+
+	info, err := a.Info(pathname)
+	if err != nil && !os.IsNotExist(err) {
+		return nil, err
+	}
+
+	return createOrOpenFile(a.getFullPath(pathname), info)
 }
 
 // List item in the storage
@@ -98,7 +131,7 @@ func (a App) List(pathname string) ([]*provider.StorageItem, error) {
 		return nil, err
 	}
 
-	files, err := ioutil.ReadDir(pathname)
+	files, err := ioutil.ReadDir(a.getFullPath(pathname))
 	if err != nil {
 		return nil, err
 	}
@@ -112,9 +145,9 @@ func (a App) List(pathname string) ([]*provider.StorageItem, error) {
 }
 
 // Walk browse item recursively
-func (a App) Walk(pathname string, walkFn func(string, *provider.StorageItem, error) error) error {
-	return filepath.Walk(pathname, func(path string, info os.FileInfo, err error) error {
-		return walkFn(path, convertToItem(info), err)
+func (a App) Walk(walkFn func(string, *provider.StorageItem, error) error) error {
+	return filepath.Walk(a.rootDirectory, func(path string, info os.FileInfo, err error) error {
+		return walkFn(strings.TrimPrefix(path, a.rootDirectory), convertToItem(info), err)
 	})
 }
 
@@ -134,11 +167,11 @@ func (a App) Upload(pathname string, content io.ReadCloser) error {
 	}
 
 	info, err := a.Info(pathname)
-	if err != nil && err != os.ErrNotExist {
+	if err != nil && !os.IsNotExist(err) {
 		return err
 	}
 
-	storageFile, err := createOrOpenFile(pathname, info)
+	storageFile, err := createOrOpenFile(a.getFullPath(pathname), info)
 	if storageFile != nil {
 		defer func() {
 			if err := storageFile.Close(); err != nil {
@@ -178,11 +211,11 @@ func (a App) Rename(oldName, newName string) error {
 		return fmt.Errorf(`%s already exists`, newName)
 	}
 
-	if err != os.ErrNotExist {
+	if !os.IsNotExist(err) {
 		return fmt.Errorf(`Error while getting infos about %s: %v`, newName, err)
 	}
 
-	return os.Rename(oldName, newName)
+	return os.Rename(a.getFullPath(oldName), a.getFullPath(newName))
 }
 
 // Remove file or directory from storage
@@ -191,5 +224,5 @@ func (a App) Remove(pathname string) error {
 		return err
 	}
 
-	return os.RemoveAll(pathname)
+	return os.RemoveAll(a.getFullPath(pathname))
 }

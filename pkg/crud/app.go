@@ -10,6 +10,7 @@ import (
 	"sync"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/fibr/pkg/utils"
 	"github.com/ViBiOh/httputils/pkg/tools"
 )
@@ -29,7 +30,7 @@ type App struct {
 }
 
 // NewApp creates new App from Flags' config
-func NewApp(config map[string]interface{}, storages []provider.Storage, renderer provider.Renderer) *App {
+func NewApp(config map[string]interface{}, storages []provider.Storage, renderer provider.Renderer, thumbnailApp *thumbnail.App) *App {
 	rootDirectory := *config[`directory`].(*string)
 	_, info := utils.GetPathInfo(rootDirectory)
 	if info == nil || !info.IsDir() {
@@ -52,7 +53,7 @@ func NewApp(config map[string]interface{}, storages []provider.Storage, renderer
 			log.Fatalf(`Error while loading metadata: %v`, err)
 		}
 
-		go app.generateThumbnail()
+		go thumbnailApp.Generate()
 	}
 
 	return app

@@ -4,39 +4,11 @@ import (
 	"log"
 	"os"
 	"path"
-	"path/filepath"
-	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/utils"
 	"github.com/disintegration/imaging"
 )
-
-func (a *App) generateThumbnail() {
-	ignoredThumbnailDir := map[string]bool{
-		`vendor`:       true,
-		`vendors`:      true,
-		`node_modules`: true,
-	}
-
-	if err := filepath.Walk(a.rootDirectory, func(walkedPath string, info os.FileInfo, _ error) error {
-		if name := info.Name(); info.IsDir() && strings.HasPrefix(name, `.`) || ignoredThumbnailDir[name] {
-			return filepath.SkipDir
-		}
-
-		if provider.ImageExtensions[path.Ext(info.Name())] {
-			rootRelativeFilename := strings.TrimPrefix(walkedPath, a.rootDirectory)
-
-			if _, thumbnailInfo := utils.GetPathInfo(a.getThumbnailPath(rootRelativeFilename)); thumbnailInfo == nil {
-				a.generateImageThumbnail(rootRelativeFilename)
-			}
-		}
-
-		return nil
-	}); err != nil {
-		log.Printf(`[thumbnail] Error while walking into dir: %v`, err)
-	}
-}
 
 func (a *App) getThumbnailPath(rootRelativeFilename string) string {
 	return path.Join(a.rootDirectory, provider.MetadataDirectoryName, rootRelativeFilename)

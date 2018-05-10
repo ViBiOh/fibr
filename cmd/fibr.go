@@ -16,6 +16,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/crud"
 	"github.com/ViBiOh/fibr/pkg/filesystem"
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/fibr/pkg/ui"
 	"github.com/ViBiOh/httputils/pkg"
 	"github.com/ViBiOh/httputils/pkg/datadog"
@@ -155,16 +156,18 @@ func getStorages(configs map[string]interface{}) []provider.Storage {
 	storages := make([]provider.Storage, 0)
 
 	var app provider.Storage
+	var appNilValue provider.Storage
 	var err error
 
 	for name, config := range configs {
 		if name == `filesystem` {
+			appNilValue = (*filesystem.App)(nil)
 			app, err = filesystem.NewApp(config.(map[string]*string))
 		}
 
 		if err != nil {
 			log.Printf(`[%s] %v`, name, err)
-		} else if app != nil {
+		} else if app != appNilValue {
 			storages = append(storages, app)
 		}
 	}
@@ -185,9 +188,13 @@ func main() {
 	httputils.NewApp(httputils.Flags(``), func() http.Handler {
 		authApp := auth.NewApp(authConfig, authService.NewBasicApp(basicConfig))
 		uiApp := ui.NewApp(uiConfig, *crudConfig[`directory`].(*string))
-		crudApp := crud.NewApp(crudConfig, getStorages(map[string]interface{}{
+
+		storages := getStorages(map[string]interface{}{
 			`filesystem`: filesystemConfig,
-		}), uiApp)
+		})
+
+		thumbnailApp := thumbnail.NewApp(storages)
+		crudApp := crud.NewApp(crudConfig, storages, uiApp, thumbnailApp)
 
 		webHandler := owasp.Handler(owaspConfig, browserHandler(crudApp, uiApp, authApp))
 		healthHandler := healthcheck.Handler()

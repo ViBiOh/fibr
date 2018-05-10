@@ -64,6 +64,7 @@ start-api:
 	DEBUG=true go run cmd/fibr.go \
 		-tls=false \
 		-directory `pwd` \
+		-fsDirectory `pwd` \
 		-publicURL http://localhost:1080 \
 		-authUsers admin:admin \
 		-basicUsers 1:admin:`bcrypt admin` \

@@ -65,6 +65,10 @@ func (a *App) GetWithMessage(w http.ResponseWriter, r *http.Request, request *pr
 	}
 
 	if info.IsDir() {
+		if !strings.HasSuffix(r.URL.Path, `/`) {
+			http.Redirect(w, r, fmt.Sprintf(`%s/`, r.URL.Path), http.StatusPermanentRedirect)
+		}
+
 		a.GetDir(w, request, filename, r.URL.Query().Get(`d`), message)
 		return
 	}

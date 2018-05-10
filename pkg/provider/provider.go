@@ -127,9 +127,12 @@ type StorageItem struct {
 
 // Storage describe action on a storage provider
 type Storage interface {
+	Name() string
 	Info(pathname string) (*StorageItem, error)
+	Open(pathname string) (io.WriteCloser, error)
+	Read(pathname string) (io.ReadCloser, error)
 	List(pathname string) ([]*StorageItem, error)
-	Walk(pathname string, walkFn func(string, *StorageItem, error) error) error
+	Walk(walkFn func(string, *StorageItem, error) error) error
 	Create(name string) error
 	Upload(pathname string, content io.ReadCloser) error
 	Rename(oldName, newName string) error

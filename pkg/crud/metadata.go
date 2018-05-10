@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
@@ -14,7 +15,7 @@ var metadataFilename = []byte(`.json`)
 func (a *App) loadMetadata() error {
 	filename, info := a.getMetadataFileinfo(nil, metadataFilename)
 	if info == nil {
-		if err := os.MkdirAll(filename, 0700); err != nil {
+		if err := os.MkdirAll(path.Dir(filename), 0700); err != nil {
 			return fmt.Errorf(`Error while creating metadata dir: %v`, err)
 		}
 
