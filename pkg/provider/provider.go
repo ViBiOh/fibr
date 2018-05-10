@@ -120,15 +120,17 @@ type Renderer interface {
 }
 
 // StorageItem describe item on a storage provider
-type StorageItem interface {
-	Name() string
+type StorageItem struct {
+	Name  string
+	IsDir bool
 }
 
 // Storage describe action on a storage provider
 type Storage interface {
-	ReadDir(dirname string) ([]StorageItem, error)
-	CreateDir(dirname string) error
-	Upload(filename string, content io.ReadCloser) error
+	Info(pathname string) (*StorageItem, error)
+	List(pathname string) ([]*StorageItem, error)
+	Create(name string) error
+	Upload(pathname string, content io.ReadCloser) error
 	Rename(oldName, newName string) error
-	Remove(filename string) error
+	Remove(pathname string) error
 }
