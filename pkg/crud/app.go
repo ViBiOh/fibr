@@ -25,12 +25,12 @@ type App struct {
 	metadataEnabled bool
 	metadatas       []*provider.Share
 	metadataLock    sync.Mutex
-	storages        []provider.Storage
+	storage         provider.Storage
 	renderer        provider.Renderer
 }
 
 // NewApp creates new App from Flags' config
-func NewApp(config map[string]interface{}, storages []provider.Storage, renderer provider.Renderer, thumbnailApp *thumbnail.App) *App {
+func NewApp(config map[string]interface{}, storage provider.Storage, renderer provider.Renderer, thumbnailApp *thumbnail.App) *App {
 	rootDirectory := *config[`directory`].(*string)
 	_, info := utils.GetPathInfo(rootDirectory)
 	if info == nil || !info.IsDir() {
@@ -42,7 +42,7 @@ func NewApp(config map[string]interface{}, storages []provider.Storage, renderer
 		rootDirname:     path.Base(rootDirectory),
 		metadataEnabled: *config[`metadata`].(*bool),
 		metadataLock:    sync.Mutex{},
-		storages:        storages,
+		storage:         storage,
 		renderer:        renderer,
 	}
 

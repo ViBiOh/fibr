@@ -3,6 +3,7 @@ package crud
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path"
@@ -10,13 +11,19 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
-var metadataFilename = []byte(`.json`)
+var (
+	metadataFilename = path.Join(provider.MetadataDirectoryName, `.json`)
+)
 
-func (a *App) loadMetadata() error {
-	filename, info := a.getMetadataFileinfo(nil, metadataFilename)
+func (a *App) loadMetadata() (err error) {
+	info, err := a.storage.Info(metadataFilename)
+	if err != nil && !os.IsNotExist(err) {
+		return fmt.Errorf(`Error while getting metadata: %v`, err)
+	}
+
 	if info == nil {
-		if err := os.MkdirAll(path.Dir(filename), 0700); err != nil {
-			return fmt.Errorf(`Error while creating metadata dir: %v`, err)
+		if err := a.storage.Create(provider.MetadataDirectoryName); err != nil {
+			return fmt.Errorf(`Error while creating metadata: %v`, err)
 		}
 
 		a.metadatas = make([]*provider.Share, 0)
@@ -24,7 +31,19 @@ func (a *App) loadMetadata() error {
 		return nil
 	}
 
-	rawMeta, err := ioutil.ReadFile(filename)
+	file, err := a.storage.Read(metadataFilename)
+	if file != nil {
+		defer func() {
+			if closeErr := file.Close(); closeErr != nil {
+				err = fmt.Errorf(`%s, and also error while closing metadata: %v`, err, closeErr)
+			}
+		}()
+	}
+	if err != nil {
+		return fmt.Errorf(`Error while opening metadata: %v`, err)
+	}
+
+	rawMeta, err := ioutil.ReadAll(file)
 	if err != nil {
 		return fmt.Errorf(`Error while reading metadata: %v`, err)
 
@@ -37,9 +56,9 @@ func (a *App) loadMetadata() error {
 	return nil
 }
 
-func (a *App) saveMetadata() error {
+func (a *App) saveMetadata() (err error) {
 	if !a.metadataEnabled {
-		return fmt.Errorf(`Metadatas not enabled`)
+		return fmt.Errorf(`Metadata not enabled`)
 	}
 
 	content, err := json.MarshalIndent(&a.metadatas, ``, `  `)
@@ -47,9 +66,24 @@ func (a *App) saveMetadata() error {
 		return fmt.Errorf(`Error while marshalling metadata: %v`, err)
 	}
 
-	filename, _ := a.getMetadataFileinfo(nil, metadataFilename)
-	if err := ioutil.WriteFile(filename, content, 0600); err != nil {
+	file, err := a.storage.Open(metadataFilename)
+	if file != nil {
+		defer func() {
+			if closeErr := file.Close(); closeErr != nil {
+				err = fmt.Errorf(`%s, and also error while closing metadata: %v`, err, closeErr)
+			}
+		}()
+	}
+	if err != nil {
+		return fmt.Errorf(`Error while opening metadata: %v`, err)
+	}
+
+	n, err := file.Write(content)
+	if err != nil {
 		return fmt.Errorf(`Error while writing metadatas: %v`, err)
+	}
+	if n < len(content) {
+		return fmt.Errorf(`Error while writing metadatas: %v`, io.ErrShortWrite)
 	}
 
 	return nil

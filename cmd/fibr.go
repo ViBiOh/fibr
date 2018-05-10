@@ -152,27 +152,37 @@ func browserHandler(crudApp *crud.App, uiApp *ui.App, authApp *auth.App) http.Ha
 	})
 }
 
-func getStorages(configs map[string]interface{}) []provider.Storage {
-	storages := make([]provider.Storage, 0)
+func getStorage(storageName string, configs map[string]interface{}) provider.Storage {
+	config, ok := configs[storageName]
+	if !ok {
+		log.Fatalf(`Unable to find storage config %s`, storageName)
+		return nil
+	}
 
 	var app provider.Storage
 	var appNilValue provider.Storage
 	var err error
 
-	for name, config := range configs {
-		if name == `filesystem` {
-			appNilValue = (*filesystem.App)(nil)
-			app, err = filesystem.NewApp(config.(map[string]*string))
-		}
+	switch storageName {
+	case `filesystem`:
+		appNilValue = (*filesystem.App)(nil)
+		app, err = filesystem.NewApp(config.(map[string]*string))
 
-		if err != nil {
-			log.Printf(`[%s] %v`, name, err)
-		} else if app != appNilValue {
-			storages = append(storages, app)
-		}
+	default:
+		err = errors.New(`Unknown storage type`)
 	}
 
-	return storages
+	if err != nil {
+		log.Fatalf(`Error while initializing storage: %v`, err)
+		return nil
+	}
+
+	if app == appNilValue {
+		log.Fatalf(`Unable to initialize storage: %v`, err)
+		return nil
+	}
+
+	return app
 }
 
 func main() {
@@ -189,12 +199,12 @@ func main() {
 		authApp := auth.NewApp(authConfig, authService.NewBasicApp(basicConfig))
 		uiApp := ui.NewApp(uiConfig, *crudConfig[`directory`].(*string))
 
-		storages := getStorages(map[string]interface{}{
+		storage := getStorage(`filesystem`, map[string]interface{}{
 			`filesystem`: filesystemConfig,
 		})
 
-		thumbnailApp := thumbnail.NewApp(storages)
-		crudApp := crud.NewApp(crudConfig, storages, uiApp, thumbnailApp)
+		thumbnailApp := thumbnail.NewApp(storage)
+		crudApp := crud.NewApp(crudConfig, storage, uiApp, thumbnailApp)
 
 		webHandler := owasp.Handler(owaspConfig, browserHandler(crudApp, uiApp, authApp))
 		healthHandler := healthcheck.Handler()

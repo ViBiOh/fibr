@@ -64,11 +64,8 @@ func Flags(prefix string) map[string]*string {
 	}
 }
 
-func createOrOpenFile(filename string, info *provider.StorageItem) (io.WriteCloser, error) {
-	if info == nil {
-		return os.Create(filename)
-	}
-	return os.Open(filename)
+func getFile(filename string) (io.WriteCloser, error) {
+	return os.OpenFile(filename, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 }
 
 func (a App) checkPathname(pathname string) error {
@@ -108,7 +105,7 @@ func (a App) Read(pathname string) (io.ReadCloser, error) {
 		return nil, err
 	}
 
-	return os.Open(a.getFullPath(pathname))
+	return os.OpenFile(a.getFullPath(pathname), os.O_RDONLY, 0600)
 }
 
 // Open writer for given pathname
@@ -117,12 +114,7 @@ func (a App) Open(pathname string) (io.WriteCloser, error) {
 		return nil, err
 	}
 
-	info, err := a.Info(pathname)
-	if err != nil && !os.IsNotExist(err) {
-		return nil, err
-	}
-
-	return createOrOpenFile(a.getFullPath(pathname), info)
+	return getFile(a.getFullPath(pathname))
 }
 
 // List item in the storage
@@ -166,12 +158,7 @@ func (a App) Upload(pathname string, content io.ReadCloser) error {
 		return err
 	}
 
-	info, err := a.Info(pathname)
-	if err != nil && !os.IsNotExist(err) {
-		return err
-	}
-
-	storageFile, err := createOrOpenFile(a.getFullPath(pathname), info)
+	storageFile, err := getFile(a.getFullPath(pathname))
 	if storageFile != nil {
 		defer func() {
 			if err := storageFile.Close(); err != nil {
