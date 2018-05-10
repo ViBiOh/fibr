@@ -25,42 +25,6 @@ func createOrOpenFile(filename string, info os.FileInfo) (io.WriteCloser, error)
 	return os.Open(filename)
 }
 
-// CreateDir creates given path directory to filesystem
-func (a *App) CreateDir(w http.ResponseWriter, r *http.Request, request *provider.Request) {
-	if !request.CanEdit {
-		a.renderer.Error(w, http.StatusForbidden, ErrNotAuthorized)
-		return
-	}
-
-	var filename string
-
-	formName := r.FormValue(`name`)
-	if formName != `` {
-		filename, _ = a.getFileinfo(request, []byte(formName))
-	}
-
-	if filename == `` {
-		if !strings.HasSuffix(request.Path, `/`) {
-			a.renderer.Error(w, http.StatusForbidden, ErrNotAuthorized)
-			return
-		}
-
-		filename, _ = a.getFileinfo(request, nil)
-	}
-
-	if strings.Contains(filename, `..`) {
-		a.renderer.Error(w, http.StatusForbidden, ErrNotAuthorized)
-		return
-	}
-
-	if err := os.MkdirAll(filename, 0700); err != nil {
-		a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while creating directory: %v`, err))
-		return
-	}
-
-	a.GetDir(w, request, path.Dir(filename), r.URL.Query().Get(`d`), &provider.Message{Level: `success`, Content: fmt.Sprintf(`Directory %s successfully created`, path.Base(filename))})
-}
-
 func (a *App) saveUploadedFile(request *provider.Request, uploadedFile io.ReadCloser, uploadedFileHeader *multipart.FileHeader) (string, error) {
 	filename, info := a.getFileinfo(request, []byte(uploadedFileHeader.Filename))
 	hostFile, err := createOrOpenFile(filename, info)
@@ -83,8 +47,8 @@ func (a *App) saveUploadedFile(request *provider.Request, uploadedFile io.ReadCl
 	return filename, nil
 }
 
-// SaveFiles saves form files to filesystem
-func (a *App) SaveFiles(w http.ResponseWriter, r *http.Request, request *provider.Request) {
+// Upload saves form files to filesystem
+func (a *App) Upload(w http.ResponseWriter, r *http.Request, request *provider.Request) {
 	if !request.CanEdit {
 		a.renderer.Error(w, http.StatusForbidden, ErrNotAuthorized)
 	}

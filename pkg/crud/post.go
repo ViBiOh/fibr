@@ -18,11 +18,11 @@ func (a *App) Post(w http.ResponseWriter, r *http.Request, config *provider.Requ
 			a.renderer.Error(w, http.StatusMethodNotAllowed, errors.New(`Unknown method`))
 		}
 	} else if r.FormValue(`method`) == http.MethodPost {
-		a.SaveFiles(w, r, config)
+		a.Upload(w, r, config)
 	} else if r.FormValue(`method`) == http.MethodPatch {
 		a.Rename(w, r, config)
 	} else if r.FormValue(`method`) == http.MethodPut {
-		a.CreateDir(w, r, config)
+		a.Create(w, r, config)
 	} else if r.FormValue(`method`) == http.MethodDelete {
 		a.Delete(w, r, config)
 	} else {

@@ -93,7 +93,7 @@ func handleRequest(w http.ResponseWriter, r *http.Request, crudApp *crud.App, co
 	case http.MethodPost:
 		crudApp.Post(w, r, config)
 	case http.MethodPut:
-		crudApp.CreateDir(w, r, config)
+		crudApp.Create(w, r, config)
 	case http.MethodPatch:
 		crudApp.Rename(w, r, config)
 	case http.MethodDelete:
