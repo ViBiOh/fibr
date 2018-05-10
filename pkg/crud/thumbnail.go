@@ -14,13 +14,13 @@ import (
 
 func (a *App) generateThumbnail() {
 	ignoredThumbnailDir := map[string]bool{
-		path.Join(a.rootDirectory, provider.MetadataDirectoryName): true,
-		path.Join(a.rootDirectory, `vendor`):                       true,
-		path.Join(a.rootDirectory, `vendors`):                      true,
+		`vendor`:       true,
+		`vendors`:      true,
+		`node_modules`: true,
 	}
 
 	if err := filepath.Walk(a.rootDirectory, func(walkedPath string, info os.FileInfo, _ error) error {
-		if ignoredThumbnailDir[walkedPath] {
+		if name := info.Name(); info.IsDir() && strings.HasPrefix(name, `.`) || ignoredThumbnailDir[name] {
 			return filepath.SkipDir
 		}
 

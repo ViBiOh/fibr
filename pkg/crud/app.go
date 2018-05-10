@@ -24,11 +24,12 @@ type App struct {
 	metadataEnabled bool
 	metadatas       []*provider.Share
 	metadataLock    sync.Mutex
+	storages        []provider.Storage
 	renderer        provider.Renderer
 }
 
 // NewApp creates new App from Flags' config
-func NewApp(config map[string]interface{}, renderer provider.Renderer) *App {
+func NewApp(config map[string]interface{}, storages []provider.Storage, renderer provider.Renderer) *App {
 	rootDirectory := *config[`directory`].(*string)
 	_, info := utils.GetPathInfo(rootDirectory)
 	if info == nil || !info.IsDir() {
@@ -39,8 +40,9 @@ func NewApp(config map[string]interface{}, renderer provider.Renderer) *App {
 		rootDirectory:   rootDirectory,
 		rootDirname:     path.Base(rootDirectory),
 		metadataEnabled: *config[`metadata`].(*bool),
-		renderer:        renderer,
 		metadataLock:    sync.Mutex{},
+		storages:        storages,
+		renderer:        renderer,
 	}
 
 	log.Printf(`Serving file from %s`, rootDirectory)

@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -31,6 +32,10 @@ type App struct {
 // NewApp creates new App from Flags' config
 func NewApp(config map[string]*string) (*App, error) {
 	rootDirectory := *config[`directory`]
+
+	if rootDirectory == `` {
+		return nil, nil
+	}
 
 	info, err := os.Stat(rootDirectory)
 	if err != nil {
@@ -104,6 +109,13 @@ func (a App) List(pathname string) ([]*provider.StorageItem, error) {
 	}
 
 	return items, nil
+}
+
+// Walk browse item recursively
+func (a App) Walk(pathname string, walkFn func(string, *provider.StorageItem, error) error) error {
+	return filepath.Walk(pathname, func(path string, info os.FileInfo, err error) error {
+		return walkFn(path, convertToItem(info), err)
+	})
 }
 
 // Create container in storage

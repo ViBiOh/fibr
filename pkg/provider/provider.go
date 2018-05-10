@@ -129,6 +129,7 @@ type StorageItem struct {
 type Storage interface {
 	Info(pathname string) (*StorageItem, error)
 	List(pathname string) ([]*StorageItem, error)
+	Walk(pathname string, walkFn func(string, *StorageItem, error) error) error
 	Create(name string) error
 	Upload(pathname string, content io.ReadCloser) error
 	Rename(oldName, newName string) error
