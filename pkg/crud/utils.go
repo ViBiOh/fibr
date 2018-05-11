@@ -48,3 +48,16 @@ func getFilepath(r *http.Request, request *provider.Request) (string, error) {
 
 	return provider.GetFilename(request, []byte(name)), nil
 }
+
+func getFormFilepath(r *http.Request, request *provider.Request, formName string) (string, error) {
+	name := r.FormValue(formName)
+	if name == `` {
+		return ``, ErrEmptyName
+	}
+
+	if name == `/` {
+		return ``, ErrNotAuthorized
+	}
+
+	return provider.GetFilename(request, []byte(name)), nil
+}

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"os"
 	"path"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -17,7 +16,7 @@ var (
 
 func (a *App) loadMetadata() (err error) {
 	info, err := a.storage.Info(metadataFilename)
-	if err != nil && !os.IsNotExist(err) {
+	if err != nil && !provider.IsNotExist(err) {
 		return fmt.Errorf(`Error while getting metadata: %v`, err)
 	}
 

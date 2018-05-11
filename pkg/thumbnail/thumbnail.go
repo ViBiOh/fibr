@@ -2,7 +2,6 @@ package thumbnail
 
 import (
 	"log"
-	"os"
 	"path"
 	"path/filepath"
 	"strings"
@@ -40,7 +39,7 @@ func (a App) Generate() {
 
 		if provider.ImageExtensions[path.Ext(item.Name)] {
 			info, err := a.storage.Info(path.Join(provider.MetadataDirectoryName, pathname))
-			if err != nil && !os.IsNotExist(err) {
+			if err != nil && !provider.IsNotExist(err) {
 				return err
 			}
 
@@ -60,7 +59,7 @@ func (a App) Generate() {
 // GenerateImageThumbnail generate thumbnail image for given path
 func (a App) GenerateImageThumbnail(pathname string) {
 	info, err := a.storage.Info(pathname)
-	if err != nil && !os.IsNotExist(err) {
+	if err != nil && !provider.IsNotExist(err) {
 		log.Printf(`[thumbnail] Error while getting info about %s: %v`, pathname, err)
 		return
 	}
@@ -73,7 +72,7 @@ func (a App) GenerateImageThumbnail(pathname string) {
 	thumbnailPath := path.Join(provider.MetadataDirectoryName, pathname)
 
 	thumbInfo, err := a.storage.Info(thumbnailPath)
-	if err != nil && !os.IsNotExist(err) {
+	if err != nil && !provider.IsNotExist(err) {
 		log.Printf(`[thumbnail] Error while getting info about thumbnail for %s: %v`, pathname, err)
 		return
 	}

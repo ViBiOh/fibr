@@ -15,8 +15,13 @@ import (
 	"github.com/ViBiOh/httputils/pkg/tools"
 )
 
-// ErrNotAuthorized error returned when user is not authorized
-var ErrNotAuthorized = errors.New(`You're not authorized to do this ⛔`)
+var (
+	// ErrNotAuthorized error returned when user is not authorized
+	ErrNotAuthorized = errors.New(`You're not authorized to do this ⛔`)
+
+	// ErrEmptyName error returned when user does not provide a name
+	ErrEmptyName = errors.New(`Provided name is empty`)
+)
 
 // App stores informations and secret of API
 type App struct {

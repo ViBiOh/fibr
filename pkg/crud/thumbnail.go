@@ -37,7 +37,7 @@ func (a *App) generateImageThumbnail(rootRelativeFilename string) {
 
 	thumbnailDir := path.Dir(thumbnail)
 	thumbnailDirInfo, err := os.Stat(thumbnailDir)
-	if err != nil && !os.IsNotExist(err) {
+	if err != nil && !provider.IsNotExist(err) {
 		log.Printf(`[thumbnail] Error while getting info for directory %s: %v`, thumbnailDir, err)
 		return
 	}

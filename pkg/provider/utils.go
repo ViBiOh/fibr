@@ -3,6 +3,7 @@ package provider
 import (
 	"os"
 	"path"
+	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/utils"
 )
@@ -43,4 +44,9 @@ func GetFilename(request *Request, name []byte) string {
 	}
 
 	return path.Join(paths...)
+}
+
+// IsNotExist checks if error match a not found
+func IsNotExist(err error) bool {
+	return strings.HasSuffix(err.Error(), `no such file or directory`)
 }

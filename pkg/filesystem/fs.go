@@ -198,7 +198,7 @@ func (a App) Rename(oldName, newName string) error {
 		return fmt.Errorf(`%s already exists`, newName)
 	}
 
-	if !os.IsNotExist(err) {
+	if !provider.IsNotExist(err) {
 		return fmt.Errorf(`Error while getting infos about %s: %v`, newName, err)
 	}
 
