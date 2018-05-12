@@ -72,7 +72,7 @@ func (a App) List(w http.ResponseWriter, r *http.Request, pathname string) {
 			continue
 		}
 
-		file, err := a.storage.Read(item.Pathname)
+		file, err := a.storage.Read(getThumbnailPath(item.Pathname))
 		if err != nil {
 			httperror.InternalServerError(w, fmt.Errorf(`Error while reading %s: %v`, item.Pathname, err))
 			return
