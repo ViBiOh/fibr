@@ -21,10 +21,9 @@ import (
 
 // App for rendering UI
 type App struct {
-	rootDirectory string
-	config        *provider.Config
-	tpl           *template.Template
-	thumbnailApp  *thumbnail.App
+	config       *provider.Config
+	tpl          *template.Template
+	thumbnailApp *thumbnail.App
 }
 
 // Flags add flags for given prefix
@@ -36,7 +35,7 @@ func Flags(prefix string) map[string]*string {
 }
 
 // NewApp create ui from given config
-func NewApp(config map[string]*string, rootDirectory string, thumbnailApp *thumbnail.App) *App {
+func NewApp(config map[string]*string, rootName string, thumbnailApp *thumbnail.App) *App {
 	tpl := template.New(`fibr`)
 
 	tpl.Funcs(template.FuncMap{
@@ -94,10 +93,9 @@ func NewApp(config map[string]*string, rootDirectory string, thumbnailApp *thumb
 	}
 
 	return &App{
-		rootDirectory: rootDirectory,
-		tpl:           template.Must(tpl.ParseFiles(fibrTemplates...)),
+		tpl: template.Must(tpl.ParseFiles(fibrTemplates...)),
 		config: &provider.Config{
-			RootName:  path.Base(rootDirectory),
+			RootName:  rootName,
 			PublicURL: *config[`publicURL`],
 			Version:   *config[`version`],
 			Seo: &provider.Seo{

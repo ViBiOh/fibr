@@ -201,7 +201,7 @@ func main() {
 		})
 
 		thumbnailApp := thumbnail.NewApp(storage)
-		uiApp := ui.NewApp(uiConfig, *crudConfig[`directory`].(*string), thumbnailApp)
+		uiApp := ui.NewApp(uiConfig, storage.Root(), thumbnailApp)
 		crudApp := crud.NewApp(crudConfig, storage, uiApp, thumbnailApp)
 
 		authApp := auth.NewApp(authConfig, authService.NewBasicApp(basicConfig))

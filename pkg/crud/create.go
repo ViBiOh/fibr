@@ -3,9 +3,8 @@ package crud
 import (
 	"fmt"
 	"net/http"
-	"os"
+	"net/url"
 	"path"
-	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
@@ -17,31 +16,16 @@ func (a *App) Create(w http.ResponseWriter, r *http.Request, request *provider.R
 		return
 	}
 
-	var filename string
-
-	formName := r.FormValue(`name`)
-	if formName != `` {
-		filename, _ = a.getFileinfo(request, []byte(formName))
-	}
-
-	if filename == `` {
-		if !strings.HasSuffix(request.Path, `/`) {
-			a.renderer.Error(w, http.StatusForbidden, ErrNotAuthorized)
-			return
-		}
-
-		filename, _ = a.getFileinfo(request, nil)
-	}
-
-	if strings.Contains(filename, `..`) {
+	pathname, err := getFilepath(r, request)
+	if err != nil {
 		a.renderer.Error(w, http.StatusForbidden, ErrNotAuthorized)
 		return
 	}
 
-	if err := os.MkdirAll(filename, 0700); err != nil {
+	if err := a.storage.Create(pathname); err != nil {
 		a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while creating directory: %v`, err))
 		return
 	}
 
-	a.List(w, request, path.Dir(filename), r.URL.Query().Get(`d`), &provider.Message{Level: `success`, Content: fmt.Sprintf(`Directory %s successfully created`, path.Base(filename))})
+	http.Redirect(w, r, fmt.Sprintf(`%s/?message=%s&messageLevel=success`, pathname, url.QueryEscape(fmt.Sprintf(`Directory %s successfully created`, path.Base(pathname)))), http.StatusMovedPermanently)
 }

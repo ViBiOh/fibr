@@ -87,6 +87,11 @@ func (a App) Name() string {
 	return `filesystem`
 }
 
+// Root name of the storage
+func (a App) Root() string {
+	return a.rootDirname
+}
+
 // Info provide metadata about given pathname
 func (a App) Info(pathname string) (*provider.StorageItem, error) {
 	if err := a.checkPathname(pathname); err != nil {
@@ -161,7 +166,7 @@ func (a App) Create(name string) error {
 		return err
 	}
 
-	return os.MkdirAll(name, 0700)
+	return os.MkdirAll(a.getFullPath(name), 0700)
 }
 
 // Upload file to storage

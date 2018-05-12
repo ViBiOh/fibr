@@ -3,7 +3,6 @@ package crud
 import (
 	"fmt"
 	"net/http"
-	"net/url"
 	"path"
 	"strings"
 
@@ -30,10 +29,8 @@ func (a *App) CheckAndServeSEO(w http.ResponseWriter, r *http.Request) bool {
 }
 
 func (a *App) checkAndServeThumbnail(w http.ResponseWriter, r *http.Request, pathname string, info *provider.StorageItem) bool {
-	if params, err := url.ParseQuery(r.URL.RawQuery); err == nil {
-		if _, ok := params[`thumbnail`]; ok && provider.ImageExtensions[path.Ext(info.Name)] {
-			return a.thumbnailApp.ServeIfPresent(w, r, pathname)
-		}
+	if r.URL.Query().Get(`thumbnail`) == `true` && provider.ImageExtensions[path.Ext(info.Name)] {
+		return a.thumbnailApp.ServeIfPresent(w, r, pathname)
 	}
 
 	return false
@@ -70,5 +67,14 @@ func (a *App) GetWithMessage(w http.ResponseWriter, r *http.Request, request *pr
 
 // Get output content
 func (a *App) Get(w http.ResponseWriter, r *http.Request, config *provider.Request) {
-	a.GetWithMessage(w, r, config, nil)
+	var message *provider.Message
+
+	if messageContent := r.URL.Query().Get(`message`); messageContent != `` {
+		message = &provider.Message{
+			Level:   r.URL.Query().Get(`messageLevel`),
+			Content: messageContent,
+		}
+	}
+
+	a.GetWithMessage(w, r, config, message)
 }

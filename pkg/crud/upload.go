@@ -7,7 +7,6 @@ import (
 	"log"
 	"mime/multipart"
 	"net/http"
-	"os"
 	"path"
 	"strings"
 
@@ -18,16 +17,10 @@ const (
 	defaultMaxMemory = 32 << 20 // 32 MB
 )
 
-func createOrOpenFile(filename string, info os.FileInfo) (io.WriteCloser, error) {
-	if info == nil {
-		return os.Create(filename)
-	}
-	return os.Open(filename)
-}
+func (a *App) saveUploadedFile(request *provider.Request, uploadedFile io.ReadCloser, uploadedFileHeader *multipart.FileHeader) error {
+	filename := provider.GetPathname(request, []byte(uploadedFileHeader.Filename))
 
-func (a *App) saveUploadedFile(request *provider.Request, uploadedFile io.ReadCloser, uploadedFileHeader *multipart.FileHeader) (string, error) {
-	filename, info := a.getFileinfo(request, []byte(uploadedFileHeader.Filename))
-	hostFile, err := createOrOpenFile(filename, info)
+	hostFile, err := a.storage.Open(filename)
 	if hostFile != nil {
 		defer func() {
 			if err := hostFile.Close(); err != nil {
@@ -37,14 +30,18 @@ func (a *App) saveUploadedFile(request *provider.Request, uploadedFile io.ReadCl
 	}
 
 	if err != nil {
-		return ``, fmt.Errorf(`Error while creating or opening file: %v`, err)
-	} else if _, err = io.Copy(hostFile, uploadedFile); err != nil {
-		return ``, fmt.Errorf(`Error while writing file: %v`, err)
-	} else if provider.ImageExtensions[path.Ext(uploadedFileHeader.Filename)] {
-		go a.generateImageThumbnail(strings.TrimPrefix(filename, a.rootDirectory))
+		return fmt.Errorf(`Error while creating or opening file: %v`, err)
 	}
 
-	return filename, nil
+	if _, err = io.Copy(hostFile, uploadedFile); err != nil {
+		return fmt.Errorf(`Error while writing file: %v`, err)
+	}
+
+	if provider.ImageExtensions[path.Ext(uploadedFileHeader.Filename)] {
+		go a.thumbnailApp.GenerateImageThumbnail(filename)
+	}
+
+	return nil
 }
 
 // Upload saves form files to filesystem
@@ -64,7 +61,6 @@ func (a *App) Upload(w http.ResponseWriter, r *http.Request, request *provider.R
 		return
 	}
 
-	var outputDir string
 	filenames := make([]string, len(r.MultipartForm.File[`files[]`]))
 
 	for index, file := range r.MultipartForm.File[`files[]`] {
@@ -81,14 +77,9 @@ func (a *App) Upload(w http.ResponseWriter, r *http.Request, request *provider.R
 			return
 		}
 
-		filename, err := a.saveUploadedFile(request, uploadedFile, file)
-		if err != nil {
+		if err := a.saveUploadedFile(request, uploadedFile, file); err != nil {
 			a.renderer.Error(w, http.StatusInternalServerError, err)
 			return
-		}
-
-		if outputDir == `` {
-			outputDir = path.Dir(filename)
 		}
 
 		filenames[index] = file.Filename
@@ -99,5 +90,5 @@ func (a *App) Upload(w http.ResponseWriter, r *http.Request, request *provider.R
 		message = fmt.Sprintf(`Files %s successfully uploaded`, strings.Join(filenames, `, `))
 	}
 
-	a.List(w, request, outputDir, r.URL.Query().Get(`d`), &provider.Message{Level: `success`, Content: message})
+	a.List(w, request, request.Path, r.URL.Query().Get(`d`), &provider.Message{Level: `success`, Content: message})
 }

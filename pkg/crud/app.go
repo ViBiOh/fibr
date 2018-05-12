@@ -5,13 +5,11 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"path"
 	"strings"
 	"sync"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
-	"github.com/ViBiOh/fibr/pkg/utils"
 	"github.com/ViBiOh/httputils/pkg/tools"
 )
 
@@ -25,8 +23,6 @@ var (
 
 // App stores informations and secret of API
 type App struct {
-	rootDirectory   string
-	rootDirname     string
 	metadataEnabled bool
 	metadatas       []*provider.Share
 	metadataLock    sync.Mutex
@@ -37,23 +33,13 @@ type App struct {
 
 // NewApp creates new App from Flags' config
 func NewApp(config map[string]interface{}, storage provider.Storage, renderer provider.Renderer, thumbnailApp *thumbnail.App) *App {
-	rootDirectory := *config[`directory`].(*string)
-	_, info := utils.GetPathInfo(rootDirectory)
-	if info == nil || !info.IsDir() {
-		log.Fatalf(`Directory %s is unreachable`, rootDirectory)
-	}
-
 	app := &App{
-		rootDirectory:   rootDirectory,
-		rootDirname:     path.Base(rootDirectory),
 		metadataEnabled: *config[`metadata`].(*bool),
 		metadataLock:    sync.Mutex{},
 		storage:         storage,
 		renderer:        renderer,
 		thumbnailApp:    thumbnailApp,
 	}
-
-	log.Printf(`Serving file from %s`, rootDirectory)
 
 	if app.metadataEnabled {
 		if err := app.loadMetadata(); err != nil {
@@ -69,8 +55,7 @@ func NewApp(config map[string]interface{}, storage provider.Storage, renderer pr
 // Flags add flags for given prefix
 func Flags(prefix string) map[string]interface{} {
 	return map[string]interface{}{
-		`directory`: flag.String(tools.ToCamel(fmt.Sprintf(`%sDirectory`, prefix)), `/data`, `Directory to serve`),
-		`metadata`:  flag.Bool(tools.ToCamel(fmt.Sprintf(`%sMetadata`, prefix)), true, `Enable metadata storage`),
+		`metadata`: flag.Bool(tools.ToCamel(fmt.Sprintf(`%sMetadata`, prefix)), true, `Enable metadata storage`),
 	}
 }
 

@@ -31,9 +31,13 @@ func NewApp(storage provider.Storage) *App {
 	}
 }
 
+func getThumbnailPath(pathname string) string {
+	return path.Join(provider.MetadataDirectoryName, pathname)
+}
+
 // IsExist determine if thumbnail exist for given pathname
 func (a App) IsExist(pathname string) bool {
-	_, err := a.storage.Info(path.Join(provider.MetadataDirectoryName, pathname))
+	_, err := a.storage.Info(getThumbnailPath(pathname))
 	return err == nil
 }
 
@@ -41,7 +45,7 @@ func (a App) IsExist(pathname string) bool {
 func (a App) ServeIfPresent(w http.ResponseWriter, r *http.Request, pathname string) bool {
 	exist := a.IsExist(pathname)
 	if exist {
-		a.storage.Serve(w, r, path.Join(provider.MetadataDirectoryName, pathname))
+		a.storage.Serve(w, r, getThumbnailPath(pathname))
 	}
 
 	return exist
@@ -55,7 +59,7 @@ func (a App) Generate() {
 		}
 
 		if provider.ImageExtensions[path.Ext(item.Name)] {
-			info, err := a.storage.Info(path.Join(provider.MetadataDirectoryName, pathname))
+			info, err := a.storage.Info(getThumbnailPath(pathname))
 			if err != nil && !provider.IsNotExist(err) {
 				return err
 			}
@@ -86,7 +90,7 @@ func (a App) GenerateImageThumbnail(pathname string) {
 		return
 	}
 
-	thumbnailPath := path.Join(provider.MetadataDirectoryName, pathname)
+	thumbnailPath := getThumbnailPath(pathname)
 
 	thumbInfo, err := a.storage.Info(thumbnailPath)
 	if err != nil && !provider.IsNotExist(err) {
