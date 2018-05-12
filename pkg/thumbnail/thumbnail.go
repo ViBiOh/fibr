@@ -1,6 +1,9 @@
 package thumbnail
 
 import (
+	"encoding/base64"
+	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"path"
@@ -8,6 +11,9 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/pkg/httperror"
+	"github.com/ViBiOh/httputils/pkg/httpjson"
+	"github.com/ViBiOh/httputils/pkg/tools"
 	"github.com/disintegration/imaging"
 )
 
@@ -49,6 +55,41 @@ func (a App) ServeIfPresent(w http.ResponseWriter, r *http.Request, pathname str
 	}
 
 	return exist
+}
+
+// List return all thumbnail in a base64 form
+func (a App) List(w http.ResponseWriter, r *http.Request, pathname string) {
+	items, err := a.storage.List(pathname)
+	if err != nil {
+		httperror.InternalServerError(w, err)
+		return
+	}
+
+	thumbnails := make(map[string]string)
+
+	for _, item := range items {
+		if !a.IsExist(item.Pathname) {
+			continue
+		}
+
+		file, err := a.storage.Read(item.Pathname)
+		if err != nil {
+			httperror.InternalServerError(w, fmt.Errorf(`Error while reading %s: %v`, item.Pathname, err))
+			return
+		}
+
+		content, err := ioutil.ReadAll(file)
+		if err != nil {
+			httperror.InternalServerError(w, fmt.Errorf(`Error while reading content %s: %v`, item.Pathname, err))
+			return
+		}
+
+		thumbnails[tools.Sha1(item.Name)] = base64.StdEncoding.EncodeToString(content)
+	}
+
+	if err := httpjson.ResponseJSON(w, http.StatusOK, thumbnails, httpjson.IsPretty(r.URL.RawQuery)); err != nil {
+		httperror.InternalServerError(w, err)
+	}
 }
 
 // Generate thumbnail for all storage

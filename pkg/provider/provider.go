@@ -121,8 +121,9 @@ type Renderer interface {
 
 // StorageItem describe item on a storage provider
 type StorageItem struct {
-	Name  string
-	IsDir bool
+	Pathname string
+	Name     string
+	IsDir    bool
 }
 
 // Storage describe action on a storage provider

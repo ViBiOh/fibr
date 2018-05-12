@@ -103,7 +103,7 @@ func (a App) Info(pathname string) (*provider.StorageItem, error) {
 		return nil, err
 	}
 
-	return convertToItem(info), nil
+	return convertToItem(pathname, info), nil
 }
 
 // Read content of given pathname
@@ -147,7 +147,7 @@ func (a App) List(pathname string) ([]*provider.StorageItem, error) {
 
 	items := make([]*provider.StorageItem, len(files))
 	for index, item := range files {
-		items[index] = convertToItem(item)
+		items[index] = convertToItem(pathname, item)
 	}
 
 	return items, nil
@@ -156,7 +156,8 @@ func (a App) List(pathname string) ([]*provider.StorageItem, error) {
 // Walk browse item recursively
 func (a App) Walk(walkFn func(string, *provider.StorageItem, error) error) error {
 	return filepath.Walk(a.rootDirectory, func(path string, info os.FileInfo, err error) error {
-		return walkFn(strings.TrimPrefix(path, a.rootDirectory), convertToItem(info), err)
+		pathname := strings.TrimPrefix(path, a.rootDirectory)
+		return walkFn(pathname, convertToItem(pathname, info), err)
 	})
 }
 

@@ -3,7 +3,7 @@
     <noscript>
       <img class="thumbnail" src="{{- urlescape (.File.Name) -}}?thumbnail=true&v={{- .Version -}}" alt="thumbnail" />
     </noscript>
-    <div class="throbber" id="throbber-{{- .Fingerprint -}}" data-id="{{- .Fingerprint -}}" data-src="{{- urlescape (.File.Name) -}}?thumbnail=true&v={{- .Version -}}" data-alt="thumbnail">
+    <div class="throbber" id="throbber-{{- .Fingerprint -}}" data-id="{{- .Fingerprint -}}">
       <div class="bounce1"></div>
       <div class="bounce2"></div>
       <div class="bounce3"></div>

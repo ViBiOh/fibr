@@ -62,7 +62,11 @@ func (a *App) GetWithMessage(w http.ResponseWriter, r *http.Request, request *pr
 		return
 	}
 
-	a.List(w, request, pathname, r.URL.Query().Get(`d`), message)
+	if r.URL.Query().Get(`thumbnail`) == `true` {
+		a.thumbnailApp.List(w, r, pathname)
+	} else {
+		a.List(w, request, pathname, r.URL.Query().Get(`d`), message)
+	}
 }
 
 // Get output content
