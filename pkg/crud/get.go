@@ -51,7 +51,9 @@ func (a *App) GetWithMessage(w http.ResponseWriter, r *http.Request, request *pr
 	}
 
 	if !info.IsDir {
-		a.storage.Serve(w, r, pathname)
+		if !a.checkAndServeThumbnail(w, r, pathname, info) {
+			a.storage.Serve(w, r, pathname)
+		}
 		return
 	}
 
@@ -60,9 +62,7 @@ func (a *App) GetWithMessage(w http.ResponseWriter, r *http.Request, request *pr
 		return
 	}
 
-	if !a.checkAndServeThumbnail(w, r, pathname, info) {
-		a.List(w, request, pathname, r.URL.Query().Get(`d`), message)
-	}
+	a.List(w, request, pathname, r.URL.Query().Get(`d`), message)
 }
 
 // Get output content
