@@ -82,6 +82,9 @@ func NewApp(config map[string]*string, rootName string, thumbnailApp *thumbnail.
 		`isImage`: func(file *provider.StorageItem) bool {
 			return provider.ImageExtensions[path.Ext(file.Name)]
 		},
+		`extension`: func(file *provider.StorageItem) string {
+			return strings.ToLower(strings.TrimPrefix(path.Ext(file.Name), `.`))
+		},
 		`hasThumbnail`: func(request *provider.Request, file *provider.StorageItem) bool {
 			return thumbnailApp.IsExist(provider.GetPathname(request, []byte(file.Name)))
 		},

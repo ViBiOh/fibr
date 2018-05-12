@@ -68,7 +68,7 @@ func (a App) List(w http.ResponseWriter, r *http.Request, pathname string) {
 	thumbnails := make(map[string]string)
 
 	for _, item := range items {
-		if !a.IsExist(item.Pathname) {
+		if item.IsDir || !a.IsExist(item.Pathname) {
 			continue
 		}
 

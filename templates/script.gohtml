@@ -3,31 +3,26 @@
     /**
      * Async image loading
      */
-    function loadAsyncImage(throbber, content) {
-      var img = new Image();
-      img.src = 'data:image/png;base64,' + content;
-      img.alt = throbber.getAttribute('data-alt');
-
-      document.getElementById('figure-' + throbber.getAttribute('data-id')).replaceChild(img, throbber);
-    }
-
     function getThumbnails() {
       return fetch('?thumbnail=true', { credentials: 'same-origin' }).then(response => {
         if (response.status >= 400) {
           return Promise.reject('Error while loading thumbnails')
         }
-
         return response.json();
       });
     }
 
     window.addEventListener('load', function() {
       var throbbers = document.querySelectorAll('.throbber');
-
       [].forEach.call(throbbers, throbber => throbber.style.display = 'inline-block');
+
       getThumbnails().then(thumbnails => {
         [].forEach.call(throbbers, throbber => {
-          loadAsyncImage(throbber, thumbnails[throbber.getAttribute('data-id')])
+          var img = new Image();
+          img.src = 'data:image/' + throbber.dataset.type + ';base64,' + thumbnails[throbber.dataset.id];
+          img.alt = throbber.dataset.alt;
+
+          document.getElementById('figure-' + throbber.dataset.id).replaceChild(img, throbber);
         })
       });
     }, false);
