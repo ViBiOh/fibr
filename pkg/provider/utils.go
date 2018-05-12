@@ -27,8 +27,8 @@ func GetFileinfoFromRoot(root string, request *Request, name []byte) (string, os
 	return utils.GetPathInfo(paths...)
 }
 
-// GetFilename return file path from given paths
-func GetFilename(request *Request, name []byte) string {
+// GetPathname return file path from given paths
+func GetPathname(request *Request, name []byte) string {
 	paths := make([]string, 0)
 
 	if request != nil {

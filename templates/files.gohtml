@@ -50,7 +50,7 @@
         {{- else -}}
           <li class="file">
         {{- end -}}
-          <a class="filelink" href="{{- filename . -}}{{- if .IsDir -}}/{{- end -}}" title="{{- filename . -}}">
+          <a class="filelink" href="{{- .Name -}}{{- if .IsDir -}}/{{- end -}}" title="{{- .Name -}}">
             {{- if and (isImage .) (eq $root.Layout "grid") (hasThumbnail $root.Request .) -}}
               {{- template "async-image" asyncImage . $root.Config.Version -}}
             {{- else -}}
@@ -59,7 +59,7 @@
               {{- else -}}
                 <span class="icon icon-{{- iconFromExtension . -}}" alt="File"></span>
               {{- end -}}
-              <span class="filename">{{- filename . -}}</span>
+              <span class="filename">{{- .Name -}}</span>
             {{- end -}}
 
             {{- if $root.Request.CanEdit -}}

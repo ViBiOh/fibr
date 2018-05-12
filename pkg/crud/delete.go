@@ -33,6 +33,5 @@ func (a *App) Delete(w http.ResponseWriter, r *http.Request, config *provider.Re
 		return
 	}
 
-	// TODO clean rootDirectory
-	a.GetDir(w, config, path.Join(a.rootDirectory, path.Dir(pathname)), r.URL.Query().Get(`d`), &provider.Message{Level: `success`, Content: fmt.Sprintf(`%s successfully deleted`, info.Name)})
+	a.List(w, config, path.Dir(pathname), r.URL.Query().Get(`d`), &provider.Message{Level: `success`, Content: fmt.Sprintf(`%s successfully deleted`, info.Name)})
 }

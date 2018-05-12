@@ -32,6 +32,7 @@ type App struct {
 	metadataLock    sync.Mutex
 	storage         provider.Storage
 	renderer        provider.Renderer
+	thumbnailApp    *thumbnail.App
 }
 
 // NewApp creates new App from Flags' config
@@ -49,6 +50,7 @@ func NewApp(config map[string]interface{}, storage provider.Storage, renderer pr
 		metadataLock:    sync.Mutex{},
 		storage:         storage,
 		renderer:        renderer,
+		thumbnailApp:    thumbnailApp,
 	}
 
 	log.Printf(`Serving file from %s`, rootDirectory)

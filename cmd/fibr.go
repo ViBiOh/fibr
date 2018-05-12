@@ -196,15 +196,15 @@ func main() {
 	filesystemConfig := filesystem.Flags(`fs`)
 
 	httputils.NewApp(httputils.Flags(``), func() http.Handler {
-		authApp := auth.NewApp(authConfig, authService.NewBasicApp(basicConfig))
-		uiApp := ui.NewApp(uiConfig, *crudConfig[`directory`].(*string))
-
 		storage := getStorage(`filesystem`, map[string]interface{}{
 			`filesystem`: filesystemConfig,
 		})
 
 		thumbnailApp := thumbnail.NewApp(storage)
+		uiApp := ui.NewApp(uiConfig, *crudConfig[`directory`].(*string), thumbnailApp)
 		crudApp := crud.NewApp(crudConfig, storage, uiApp, thumbnailApp)
+
+		authApp := auth.NewApp(authConfig, authService.NewBasicApp(basicConfig))
 
 		webHandler := owasp.Handler(owaspConfig, browserHandler(crudApp, uiApp, authApp))
 		healthHandler := healthcheck.Handler()

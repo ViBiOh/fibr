@@ -2,7 +2,6 @@ package crud
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"path"
@@ -30,59 +29,43 @@ func (a *App) CheckAndServeSEO(w http.ResponseWriter, r *http.Request) bool {
 	return false
 }
 
-// GetDir render directory web view of given dirPath
-func (a *App) GetDir(w http.ResponseWriter, request *provider.Request, filename string, display string, message *provider.Message) {
-	files, err := ioutil.ReadDir(filename)
-	if err != nil {
-		a.renderer.Error(w, http.StatusInternalServerError, err)
-		return
+func (a *App) checkAndServeThumbnail(w http.ResponseWriter, r *http.Request, pathname string, info *provider.StorageItem) bool {
+	if params, err := url.ParseQuery(r.URL.RawQuery); err == nil {
+		if _, ok := params[`thumbnail`]; ok && provider.ImageExtensions[path.Ext(info.Name)] {
+			return a.thumbnailApp.ServeIfPresent(w, r, pathname)
+		}
 	}
 
-	paths := strings.Split(strings.Trim(request.Path, `/`), `/`)
-	if len(paths) == 1 && paths[0] == `` {
-		paths = nil
-	}
-
-	content := map[string]interface{}{
-		`Paths`: paths,
-		`Files`: files,
-	}
-
-	if request.CanShare {
-		content[`Shares`] = a.metadatas
-	}
-
-	a.renderer.Directory(w, request, content, display, message)
+	return false
 }
 
 // GetWithMessage output content with given message
 func (a *App) GetWithMessage(w http.ResponseWriter, r *http.Request, request *provider.Request, message *provider.Message) {
-	filename, info := a.getFileinfo(request, nil)
+	pathname := provider.GetPathname(request, nil)
 
-	if info == nil {
-		a.renderer.Error(w, http.StatusNotFound, fmt.Errorf(`Requested path does not exist: %s`, request.Path))
+	info, err := a.storage.Info(pathname)
+	if err != nil {
+		if !provider.IsNotExist(err) {
+			a.renderer.Error(w, http.StatusNotFound, fmt.Errorf(`Requested path does not exist: %s`, request.Path))
+		} else {
+			a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while reading %s: %s`, request.Path, err))
+		}
 		return
 	}
 
-	if info.IsDir() {
-		if !strings.HasSuffix(r.URL.Path, `/`) {
-			http.Redirect(w, r, fmt.Sprintf(`%s/`, r.URL.Path), http.StatusPermanentRedirect)
-		}
-
-		a.GetDir(w, request, filename, r.URL.Query().Get(`d`), message)
+	if !info.IsDir {
+		a.storage.Serve(w, r, pathname)
 		return
 	}
 
-	if params, err := url.ParseQuery(r.URL.RawQuery); err == nil {
-		if _, ok := params[`thumbnail`]; ok && provider.ImageExtensions[path.Ext(info.Name())] {
-			if tnFilename, tnInfo := a.getMetadataFileinfo(request, nil); tnInfo != nil {
-				http.ServeFile(w, r, tnFilename)
-				return
-			}
-		}
+	if !strings.HasSuffix(r.URL.Path, `/`) {
+		http.Redirect(w, r, fmt.Sprintf(`%s/`, r.URL.Path), http.StatusPermanentRedirect)
+		return
 	}
 
-	http.ServeFile(w, r, filename)
+	if !a.checkAndServeThumbnail(w, r, pathname, info) {
+		a.List(w, request, pathname, r.URL.Query().Get(`d`), message)
+	}
 }
 
 // Get output content

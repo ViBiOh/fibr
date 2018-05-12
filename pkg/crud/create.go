@@ -43,5 +43,5 @@ func (a *App) Create(w http.ResponseWriter, r *http.Request, request *provider.R
 		return
 	}
 
-	a.GetDir(w, request, path.Dir(filename), r.URL.Query().Get(`d`), &provider.Message{Level: `success`, Content: fmt.Sprintf(`Directory %s successfully created`, path.Base(filename))})
+	a.List(w, request, path.Dir(filename), r.URL.Query().Get(`d`), &provider.Message{Level: `success`, Content: fmt.Sprintf(`Directory %s successfully created`, path.Base(filename))})
 }

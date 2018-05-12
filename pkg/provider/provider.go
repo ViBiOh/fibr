@@ -131,6 +131,7 @@ type Storage interface {
 	Info(pathname string) (*StorageItem, error)
 	Open(pathname string) (io.WriteCloser, error)
 	Read(pathname string) (io.ReadCloser, error)
+	Serve(http.ResponseWriter, *http.Request, string)
 	List(pathname string) ([]*StorageItem, error)
 	Walk(walkFn func(string, *StorageItem, error) error) error
 	Create(name string) error

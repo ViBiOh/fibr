@@ -58,6 +58,5 @@ func (a *App) Rename(w http.ResponseWriter, r *http.Request, config *provider.Re
 		return
 	}
 
-	// TODO clean rootDirectory
-	a.GetDir(w, config, path.Join(a.rootDirectory, path.Dir(oldName)), r.URL.Query().Get(`d`), &provider.Message{Level: `success`, Content: fmt.Sprintf(`%s successfully renamed to %s`, info.Name, newName)})
+	a.List(w, config, path.Dir(oldName), r.URL.Query().Get(`d`), &provider.Message{Level: `success`, Content: fmt.Sprintf(`%s successfully renamed to %s`, info.Name, newName)})
 }

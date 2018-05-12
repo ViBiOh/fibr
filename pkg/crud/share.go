@@ -13,9 +13,10 @@ import (
 )
 
 // CreateShare create a share for given URL
-func (a *App) CreateShare(w http.ResponseWriter, r *http.Request, config *provider.Request) {
-	if !config.CanShare {
+func (a *App) CreateShare(w http.ResponseWriter, r *http.Request, request *provider.Request) {
+	if !request.CanShare {
 		a.renderer.Error(w, http.StatusForbidden, ErrNotAuthorized)
+		return
 	}
 
 	var err error
@@ -52,8 +53,8 @@ func (a *App) CreateShare(w http.ResponseWriter, r *http.Request, config *provid
 
 	a.metadatas = append(a.metadatas, &provider.Share{
 		ID:       id,
-		Path:     r.URL.Path,
-		RootName: path.Base(r.URL.Path),
+		Path:     request.Path,
+		RootName: path.Base(request.Path),
 		Edit:     edit,
 		Password: password,
 	})
@@ -63,16 +64,17 @@ func (a *App) CreateShare(w http.ResponseWriter, r *http.Request, config *provid
 		return
 	}
 
-	a.GetWithMessage(w, r, config, &provider.Message{
+	a.GetWithMessage(w, r, request, &provider.Message{
 		Level:   `success`,
 		Content: fmt.Sprintf(`Share successfully created with ID: %s`, id),
 	})
 }
 
 // DeleteShare delete a share from given ID
-func (a *App) DeleteShare(w http.ResponseWriter, r *http.Request, config *provider.Request) {
-	if !config.CanShare {
+func (a *App) DeleteShare(w http.ResponseWriter, r *http.Request, request *provider.Request) {
+	if !request.CanShare {
 		a.renderer.Error(w, http.StatusForbidden, ErrNotAuthorized)
+		return
 	}
 
 	id := r.FormValue(`id`)
@@ -92,7 +94,7 @@ func (a *App) DeleteShare(w http.ResponseWriter, r *http.Request, config *provid
 		return
 	}
 
-	a.GetWithMessage(w, r, config, &provider.Message{
+	a.GetWithMessage(w, r, request, &provider.Message{
 		Level:   `success`,
 		Content: fmt.Sprintf(`Share with id %s successfully deleted`, id),
 	})

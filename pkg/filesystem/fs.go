@@ -7,12 +7,14 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/pkg/httperror"
 	"github.com/ViBiOh/httputils/pkg/tools"
 )
 
@@ -115,6 +117,16 @@ func (a App) Open(pathname string) (io.WriteCloser, error) {
 	}
 
 	return getFile(a.getFullPath(pathname))
+}
+
+// Serve file for given pathname
+func (a App) Serve(w http.ResponseWriter, r *http.Request, pathname string) {
+	if err := a.checkPathname(pathname); err != nil {
+		httperror.Forbidden(w)
+		return
+	}
+
+	http.ServeFile(w, r, a.getFullPath(pathname))
 }
 
 // List item in the storage

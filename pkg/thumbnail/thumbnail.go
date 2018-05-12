@@ -2,6 +2,7 @@ package thumbnail
 
 import (
 	"log"
+	"net/http"
 	"path"
 	"path/filepath"
 	"strings"
@@ -28,6 +29,22 @@ func NewApp(storage provider.Storage) *App {
 	return &App{
 		storage: storage,
 	}
+}
+
+// IsExist determine if thumbnail exist for given pathname
+func (a App) IsExist(pathname string) bool {
+	_, err := a.storage.Info(path.Join(provider.MetadataDirectoryName, pathname))
+	return err == nil
+}
+
+// ServeIfPresent check if thumbnail is present and serve it
+func (a App) ServeIfPresent(w http.ResponseWriter, r *http.Request, pathname string) bool {
+	exist := a.IsExist(pathname)
+	if exist {
+		a.storage.Serve(w, r, path.Join(provider.MetadataDirectoryName, pathname))
+	}
+
+	return exist
 }
 
 // Generate thumbnail for all storage

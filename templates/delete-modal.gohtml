@@ -6,10 +6,10 @@
       <form method="post" action="#">
         <input type="hidden" name="type" value="file" />
         <input type="hidden" name="method" value="DELETE" />
-        <input type="hidden" name="name" value="{{- filename . -}}" />
+        <input type="hidden" name="name" value="{{- .Name -}}" />
 
         <p class="center">
-          Are you sure you want to delete <strong>{{- filename . -}}</strong>?
+          Are you sure you want to delete <strong>{{- .Name -}}</strong>?
         </p>
 
         <p class="center">

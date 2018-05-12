@@ -51,6 +51,7 @@ func (a *App) saveUploadedFile(request *provider.Request, uploadedFile io.ReadCl
 func (a *App) Upload(w http.ResponseWriter, r *http.Request, request *provider.Request) {
 	if !request.CanEdit {
 		a.renderer.Error(w, http.StatusForbidden, ErrNotAuthorized)
+		return
 	}
 
 	if err := r.ParseMultipartForm(defaultMaxMemory); err != nil {
@@ -98,5 +99,5 @@ func (a *App) Upload(w http.ResponseWriter, r *http.Request, request *provider.R
 		message = fmt.Sprintf(`Files %s successfully uploaded`, strings.Join(filenames, `, `))
 	}
 
-	a.GetDir(w, request, outputDir, r.URL.Query().Get(`d`), &provider.Message{Level: `success`, Content: message})
+	a.List(w, request, outputDir, r.URL.Query().Get(`d`), &provider.Message{Level: `success`, Content: message})
 }

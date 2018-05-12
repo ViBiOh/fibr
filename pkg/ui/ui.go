@@ -7,11 +7,11 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"os"
 	"path"
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/fibr/pkg/utils"
 	"github.com/ViBiOh/httputils/pkg/httperror"
 	"github.com/ViBiOh/httputils/pkg/httpjson"
@@ -24,6 +24,7 @@ type App struct {
 	rootDirectory string
 	config        *provider.Config
 	tpl           *template.Template
+	thumbnailApp  *thumbnail.App
 }
 
 // Flags add flags for given prefix
@@ -35,31 +36,28 @@ func Flags(prefix string) map[string]*string {
 }
 
 // NewApp create ui from given config
-func NewApp(config map[string]*string, rootDirectory string) *App {
+func NewApp(config map[string]*string, rootDirectory string, thumbnailApp *thumbnail.App) *App {
 	tpl := template.New(`fibr`)
 
 	tpl.Funcs(template.FuncMap{
-		`filename`: func(file os.FileInfo) string {
-			return file.Name()
-		},
 		`urlescape`: func(path string) string {
 			return url.PathEscape(path)
 		},
-		`sha1`: func(file os.FileInfo) string {
-			return tools.Sha1(file.Name())
+		`sha1`: func(file *provider.StorageItem) string {
+			return tools.Sha1(file.Name)
 		},
-		`asyncImage`: func(file os.FileInfo, version string) map[string]interface{} {
+		`asyncImage`: func(file *provider.StorageItem, version string) map[string]interface{} {
 			return map[string]interface{}{
 				`File`:        file,
-				`Fingerprint`: template.JS(tools.Sha1(file.Name())),
+				`Fingerprint`: template.JS(tools.Sha1(file.Name)),
 				`Version`:     version,
 			}
 		},
 		`rebuildPaths`: func(parts []string, index int) string {
 			return path.Join(parts[:index+1]...)
 		},
-		`iconFromExtension`: func(file os.FileInfo) string {
-			extension := strings.ToLower(path.Ext(file.Name()))
+		`iconFromExtension`: func(file *provider.StorageItem) string {
+			extension := strings.ToLower(path.Ext(file.Name))
 
 			switch {
 			case provider.ArchiveExtensions[extension]:
@@ -82,12 +80,11 @@ func NewApp(config map[string]*string, rootDirectory string) *App {
 				return `file`
 			}
 		},
-		`isImage`: func(file os.FileInfo) bool {
-			return provider.ImageExtensions[path.Ext(file.Name())]
+		`isImage`: func(file *provider.StorageItem) bool {
+			return provider.ImageExtensions[path.Ext(file.Name)]
 		},
-		`hasThumbnail`: func(request *provider.Request, file os.FileInfo) bool {
-			_, info := provider.GetFileinfoFromRoot(path.Join(rootDirectory, provider.MetadataDirectoryName), request, []byte(file.Name()))
-			return info != nil
+		`hasThumbnail`: func(request *provider.Request, file *provider.StorageItem) bool {
+			return thumbnailApp.IsExist(provider.GetPathname(request, []byte(file.Name)))
 		},
 	})
 
@@ -111,6 +108,7 @@ func NewApp(config map[string]*string, rootDirectory string) *App {
 				ImgWidth:    512,
 			},
 		},
+		thumbnailApp: thumbnailApp,
 	}
 }
 
