@@ -1,8 +1,7 @@
 {{- define "file" -}}
   {{- template "layout" . -}}
 
-  <div class="content">
-  </div>
+  <iframe src="{{- .PublicURL -}}" class="nested-file"></iframe>
 
   {{- template "footer" . -}}
 {{- end -}}

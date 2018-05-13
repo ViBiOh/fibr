@@ -51,9 +51,16 @@ func (a *App) GetWithMessage(w http.ResponseWriter, r *http.Request, request *pr
 	}
 
 	if !info.IsDir {
-		if !a.checkAndServeThumbnail(w, r, pathname, info) {
-			a.storage.Serve(w, r, pathname)
+		if a.checkAndServeThumbnail(w, r, pathname, info) {
+			return
 		}
+
+		if r.URL.Query().Get(`browser`) == `true` {
+			a.Browser(w, request, message)
+			return
+		}
+
+		a.storage.Serve(w, r, pathname)
 		return
 	}
 

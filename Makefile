@@ -67,6 +67,7 @@ start-api:
 		-publicURL http://localhost:1080 \
 		-authUsers admin:admin \
 		-basicUsers 1:admin:`bcrypt admin` \
+		-frameOptions "SAMEORIGIN" \
 		-csp "default-src 'self'; base-uri 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:"
 
 .PHONY: api go docker version deps format lint tst bench build docker-deps docker-login docker-build docker-push docker-pull docker-promote start-deps start-api

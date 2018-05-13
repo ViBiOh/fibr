@@ -1,6 +1,5 @@
 {{- define "layout" -}}
   {{- template "header" . -}}
-  {{- template "menu" . -}}
 
   {{- $root := . -}}
 
@@ -24,14 +23,4 @@
   </header>
 
   {{- template "message" .Message -}}
-
-  {{- if .Request.CanEdit -}}
-    {{- template "upload-modal" . -}}
-    {{- template "folder-modal" . -}}
-  {{- end -}}
-
-  {{- if .Request.CanShare -}}
-    {{- template "share-form" . -}}
-    {{- template "share-list" . -}}
-  {{- end -}}
 {{- end -}}

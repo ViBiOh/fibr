@@ -13,18 +13,20 @@
     }
 
     window.addEventListener('load', function() {
-      var throbbers = document.querySelectorAll('.throbber');
-      [].forEach.call(throbbers, throbber => throbber.style.display = 'inline-block');
+      if (window.location.pathname.endsWith('/')) {
+        var throbbers = document.querySelectorAll('.throbber');
+        [].forEach.call(throbbers, throbber => throbber.style.display = 'inline-block');
 
-      getThumbnails().then(thumbnails => {
-        [].forEach.call(throbbers, throbber => {
-          var img = new Image();
-          img.src = 'data:image/' + throbber.dataset.type + ';base64,' + thumbnails[throbber.dataset.id];
-          img.alt = throbber.dataset.alt;
+        getThumbnails().then(thumbnails => {
+          [].forEach.call(throbbers, throbber => {
+            var img = new Image();
+            img.src = 'data:image/' + throbber.dataset.type + ';base64,' + thumbnails[throbber.dataset.id];
+            img.alt = throbber.dataset.alt;
 
-          document.getElementById('figure-' + throbber.dataset.id).replaceChild(img, throbber);
-        })
-      });
+            document.getElementById('figure-' + throbber.dataset.id).replaceChild(img, throbber);
+          })
+        });
+      }
     }, false);
 
     /**

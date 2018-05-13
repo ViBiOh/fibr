@@ -115,6 +115,16 @@ func NewApp(config map[string]*string, rootName string, thumbnailApp *thumbnail.
 	}
 }
 
+func (a *App) createPageConfiguration(request *provider.Request, message *provider.Message, content map[string]interface{}, layout string) *provider.Page {
+	return &provider.Page{
+		Config:  a.config,
+		Request: request,
+		Message: message,
+		Content: content,
+		Layout:  layout,
+	}
+}
+
 // Error render error page with given status
 func (a *App) Error(w http.ResponseWriter, status int, err error) {
 	page := &provider.Page{
@@ -140,13 +150,7 @@ func (a *App) Sitemap(w http.ResponseWriter) {
 
 // Directory render directory listing
 func (a *App) Directory(w http.ResponseWriter, request *provider.Request, content map[string]interface{}, layout string, message *provider.Message) {
-	page := &provider.Page{
-		Config:  a.config,
-		Request: request,
-		Message: message,
-		Layout:  layout,
-		Content: content,
-	}
+	page := a.createPageConfiguration(request, message, content, layout)
 
 	if page.Layout == `` {
 		page.Layout = `grid`
@@ -161,6 +165,23 @@ func (a *App) Directory(w http.ResponseWriter, request *provider.Request, conten
 
 	w.Header().Set(`content-language`, `fr`)
 	if err := templates.WriteHTMLTemplate(a.tpl.Lookup(`files`), w, page, http.StatusOK); err != nil {
+		a.Error(w, http.StatusInternalServerError, err)
+	}
+}
+
+// File render file detail
+func (a *App) File(w http.ResponseWriter, request *provider.Request, content map[string]interface{}, message *provider.Message) {
+	page := a.createPageConfiguration(request, message, content, `browser`)
+
+	if request.IsDebug {
+		if err := httpjson.ResponseJSON(w, http.StatusOK, page, true); err != nil {
+			a.Error(w, http.StatusInternalServerError, err)
+		}
+		return
+	}
+
+	w.Header().Set(`content-language`, `fr`)
+	if err := templates.WriteHTMLTemplate(a.tpl.Lookup(`file`), w, page, http.StatusOK); err != nil {
 		a.Error(w, http.StatusInternalServerError, err)
 	}
 }

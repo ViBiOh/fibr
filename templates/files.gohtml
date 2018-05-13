@@ -1,7 +1,18 @@
 {{- define "files" -}}
   {{- template "layout" . -}}
+  {{- template "menu" . -}}
 
   {{- $root := . -}}
+
+  {{- if .Request.CanEdit -}}
+    {{- template "upload-modal" . -}}
+    {{- template "folder-modal" . -}}
+  {{- end -}}
+
+  {{- if and .Request.CanShare .Content.Shares -}}
+    {{- template "share-form" . -}}
+    {{- template "share-list" . -}}
+  {{- end -}}
 
   {{- if .Request.CanEdit -}}
     {{- range .Content.Files -}}
@@ -20,7 +31,7 @@
         {{- else -}}
           <li class="file">
         {{- end -}}
-          <a class="filelink" href="{{- .Name -}}{{- if .IsDir -}}/{{- end -}}" title="{{- .Name -}}">
+          <a class="filelink" href="{{- .Name -}}{{- if .IsDir -}}/{{- else -}}?browser=true{{- end -}}" title="{{- .Name -}}">
             {{- if and (isImage .) (eq $root.Layout "grid") (hasThumbnail $root.Request .) -}}
               {{- template "async-image" asyncImage . $root.Config.Version -}}
             {{- else -}}
