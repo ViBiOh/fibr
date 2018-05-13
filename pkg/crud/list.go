@@ -2,7 +2,6 @@ package crud
 
 import (
 	"net/http"
-	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
@@ -15,13 +14,8 @@ func (a *App) List(w http.ResponseWriter, request *provider.Request, filename st
 		return
 	}
 
-	paths := strings.Split(strings.Trim(request.Path, `/`), `/`)
-	if len(paths) == 1 && paths[0] == `` {
-		paths = nil
-	}
-
 	content := map[string]interface{}{
-		`Paths`: paths,
+		`Paths`: getPathParts(request),
 		`Files`: files,
 	}
 

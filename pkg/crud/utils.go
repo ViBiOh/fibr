@@ -2,6 +2,7 @@ package crud
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
@@ -30,4 +31,13 @@ func getFormFilepath(r *http.Request, request *provider.Request, formName string
 	}
 
 	return provider.GetPathname(request, []byte(name)), nil
+}
+
+func getPathParts(request *provider.Request) []string {
+	paths := strings.Split(strings.Trim(request.Path, `/`), `/`)
+	if len(paths) == 1 && paths[0] == `` {
+		paths = nil
+	}
+
+	return paths
 }

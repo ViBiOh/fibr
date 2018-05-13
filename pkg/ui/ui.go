@@ -95,16 +95,18 @@ func NewApp(config map[string]*string, rootName string, thumbnailApp *thumbnail.
 		log.Fatalf(`Error while getting templates: %v`, err)
 	}
 
+	publicURL := *config[`publicURL`]
+
 	return &App{
 		tpl: template.Must(tpl.ParseFiles(fibrTemplates...)),
 		config: &provider.Config{
 			RootName:  rootName,
-			PublicURL: *config[`publicURL`],
+			PublicURL: publicURL,
 			Version:   *config[`version`],
 			Seo: &provider.Seo{
 				Title:       `fibr`,
 				Description: `FIle BRowser`,
-				Img:         `/favicon/android-chrome-512x512.png`,
+				Img:         fmt.Sprintf(`%s/favicon/android-chrome-512x512.png`, publicURL),
 				ImgHeight:   512,
 				ImgWidth:    512,
 			},

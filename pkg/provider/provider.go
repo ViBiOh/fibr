@@ -77,11 +77,22 @@ func (p Page) PublicURL() string {
 func (p Page) Title() string {
 	title := fmt.Sprintf(`%s - %s`, p.Config.Seo.Title, p.Config.RootName)
 
-	if p.Request != nil {
+	if p.Request != nil && p.Request.Path != `` {
 		title = fmt.Sprintf(`%s - %s`, title, strings.Trim(p.Request.Path, `/`))
 	}
 
 	return title
+}
+
+// Description compute title of page
+func (p Page) Description() string {
+	description := fmt.Sprintf(`%s of directory %s`, p.Config.Seo.Description, p.Config.RootName)
+
+	if p.Request != nil && p.Request.Path != `` {
+		description = fmt.Sprintf(`%s/%s`, description, strings.Trim(p.Request.Path, `/`))
+	}
+
+	return description
 }
 
 // Config data

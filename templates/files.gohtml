@@ -1,43 +1,13 @@
 {{- define "files" -}}
-  {{- template "header" . -}}
-  {{- template "menu" . -}}
+  {{- template "layout" . -}}
 
   {{- $root := . -}}
 
-  <header class="header">
-    <h1 class="title" itemscope itemtype="http://schema.org/BreadcrumbList">
-      <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
-        
-        <a href="/{{- if .Request.Share -}}{{- .Request.Share.ID -}}/{{- end -}}" itemprop="item">
-          <span itemprop="name">{{- if .Request.Share -}}{{- .Request.Share.RootName -}}{{- else -}}{{- .Config.RootName -}}{{- end -}}</span>
-        </a>
-      </span>
-      {{- range $index, $path := .Content.Paths -}}
-        <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
-           / 
-          <a href="/{{- if $root.Request.Share -}}{{- $root.Request.Share.ID -}}/{{- end -}}{{- rebuildPaths $root.Content.Paths $index -}}/" itemprop="item">
-            <span itemprop="name">{{- $path -}}</span>
-          </a>
-        </span>
-      {{- end -}}
-    </h1>
-  </header>
-
-  {{- template "message" .Message -}}
-
   {{- if .Request.CanEdit -}}
-    {{- template "upload-modal" . -}}
-    {{- template "folder-modal" . -}}
-
     {{- range .Content.Files -}}
       {{- template "edit-modal" . -}}
       {{- template "delete-modal" . -}}
     {{- end -}}
-  {{- end -}}
-
-  {{- if .Request.CanShare -}}
-    {{- template "share-form" . -}}
-    {{- template "share-list" . -}}
   {{- end -}}
 
   <div class="content">
