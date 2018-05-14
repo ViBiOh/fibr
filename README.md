@@ -30,10 +30,10 @@ go get -u github.com/ViBiOh/fibr/cmd
       Datadog Agent Port (default "8126")
   -datadogService string
       Service name
-  -directory string
-      Directory to serve (default "/data")
   -frameOptions string
       [owasp] X-Frame-Options (default "deny")
+  -fsDirectory string
+      [filesystem] Path to served directory (default "/data")
   -hsts
       [owasp] Indicate Strict Transport Security (default true)
   -metadata
