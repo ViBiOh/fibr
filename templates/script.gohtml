@@ -20,7 +20,7 @@
         getThumbnails().then(thumbnails => {
           [].forEach.call(throbbers, throbber => {
             var img = new Image();
-            img.src = 'data:image/' + throbber.dataset.type + ';base64,' + thumbnails[throbber.dataset.id];
+            img.src = 'data:' + throbber.dataset.mime + ';base64,' + thumbnails[throbber.dataset.id];
             img.alt = throbber.dataset.alt;
 
             document.getElementById('figure-' + throbber.dataset.id).replaceChild(img, throbber);

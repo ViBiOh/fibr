@@ -3,6 +3,7 @@ package provider
 import (
 	"fmt"
 	"io"
+	"mime"
 	"net/http"
 	"path"
 	"strings"
@@ -13,21 +14,21 @@ const MetadataDirectoryName = `.fibr`
 
 var (
 	// ArchiveExtensions contains extensions of Archive
-	ArchiveExtensions = map[string]bool{`zip`: true, `tar`: true, `gz`: true, `rar`: true}
+	ArchiveExtensions = map[string]bool{`.zip`: true, `.tar`: true, `.gz`: true, `.rar`: true}
 	// AudioExtensions contains extensions of Audio
-	AudioExtensions = map[string]bool{`mp3`: true}
+	AudioExtensions = map[string]bool{`.mp3`: true}
 	// CodeExtensions contains extensions of Code
-	CodeExtensions = map[string]bool{`html`: true, `css`: true, `js`: true, `jsx`: true, `json`: true, `yml`: true, `yaml`: true, `toml`: true, `md`: true, `go`: true, `gohtml`: true, `py`: true, `java`: true, `xml`: true}
+	CodeExtensions = map[string]bool{`.html`: true, `.css`: true, `.js`: true, `.jsx`: true, `.json`: true, `.yml`: true, `.yaml`: true, `.toml`: true, `.md`: true, `.go`: true, `.gohtml`: true, `.py`: true, `.java`: true, `.xml`: true}
 	// ExcelExtensions contains extensions of Excel
-	ExcelExtensions = map[string]bool{`xls`: true, `xlsx`: true, `xlsm`: true}
+	ExcelExtensions = map[string]bool{`.xls`: true, `.xlsx`: true, `.xlsm`: true}
 	// ImageExtensions contains extensions of Image
-	ImageExtensions = map[string]bool{`jpg`: true, `jpeg`: true, `png`: true, `gif`: true}
+	ImageExtensions = map[string]bool{`.jpg`: true, `.jpeg`: true, `.png`: true, `.gif`: true}
 	// PdfExtensions contains extensions of Pdf
-	PdfExtensions = map[string]bool{`pdf`: true}
+	PdfExtensions = map[string]bool{`.pdf`: true}
 	// VideoExtensions contains extensions of Video
-	VideoExtensions = map[string]string{`mp4`: `video/mp4`, `mov`: `video/quicktime`, `avi`: `video/x-msvideo`}
+	VideoExtensions = map[string]string{`.mp4`: `video/mp4`, `mov`: `video/quicktime`, `avi`: `video/x-msvideo`}
 	// WordExtensions contains extensions of Word
-	WordExtensions = map[string]bool{`doc`: true, `docx`: true, `docm`: true}
+	WordExtensions = map[string]bool{`.doc`: true, `.docx`: true, `.docm`: true}
 )
 
 // Request from user
@@ -157,7 +158,25 @@ type StorageItem struct {
 
 // Extension gives extensions of item
 func (s StorageItem) Extension() string {
-	return strings.ToLower(strings.TrimPrefix(path.Ext(s.Name), `.`))
+	return strings.ToLower(path.Ext(s.Name))
+}
+
+// Extension gives extensions of item
+func (s StorageItem) Mime() string {
+	extension := s.Extension()
+	if mime := mime.TypeByExtension(extension); mime != `` {
+		return mime
+	}
+
+	if CodeExtensions[extension] {
+		return `text/plain`
+	}
+
+	if mime, ok := VideoExtensions[extension]; ok {
+		return mime
+	}
+
+	return ``
 }
 
 // Storage describe action on a storage provider

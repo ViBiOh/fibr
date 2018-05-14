@@ -1,7 +1,7 @@
 {{- define "file" -}}
   {{- template "layout" . -}}
 
-  <object data="{{- .Request.Path -}}" type="{{ mime .Content.File -}}" typemustmatch="true"></object>
+  <object data="{{- .Request.Path -}}" type="{{ .Content.File.Mime -}}"></object>
 
   {{- template "footer" . -}}
 {{- end -}}
