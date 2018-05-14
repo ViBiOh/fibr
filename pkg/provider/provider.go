@@ -75,10 +75,18 @@ func (p Page) PublicURL() string {
 
 // Title compute title of page
 func (p Page) Title() string {
-	title := fmt.Sprintf(`%s - %s`, p.Config.Seo.Title, p.Config.RootName)
+	title := p.Config.Seo.Title
 
-	if p.Request != nil && p.Request.Path != `` {
-		title = fmt.Sprintf(`%s - %s`, title, strings.Trim(p.Request.Path, `/`))
+	if p.Request != nil {
+		if p.Request.Share != nil {
+			title = fmt.Sprintf(`%s - %s`, title, p.Request.Share.RootName)
+		} else {
+			title = fmt.Sprintf(`%s - %s`, title, p.Config.RootName)
+		}
+
+		if p.Request.Path != `` {
+			title = fmt.Sprintf(`%s - %s`, title, strings.Trim(p.Request.Path, `/`))
+		}
 	}
 
 	return title
@@ -86,10 +94,18 @@ func (p Page) Title() string {
 
 // Description compute title of page
 func (p Page) Description() string {
-	description := fmt.Sprintf(`%s of directory %s`, p.Config.Seo.Description, p.Config.RootName)
+	description := p.Config.Seo.Description
 
-	if p.Request != nil && p.Request.Path != `` {
-		description = fmt.Sprintf(`%s/%s`, description, strings.Trim(p.Request.Path, `/`))
+	if p.Request != nil {
+		if p.Request.Share != nil {
+			description = fmt.Sprintf(`%s - %s`, description, p.Request.Share.RootName)
+		} else {
+			description = fmt.Sprintf(`%s - %s`, description, p.Config.RootName)
+		}
+
+		if p.Request.Path != `` {
+			description = fmt.Sprintf(`%s/%s`, description, strings.Trim(p.Request.Path, `/`))
+		}
 	}
 
 	return description
