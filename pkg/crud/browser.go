@@ -7,9 +7,10 @@ import (
 )
 
 // Browser render file web view
-func (a *App) Browser(w http.ResponseWriter, request *provider.Request, message *provider.Message) {
+func (a *App) Browser(w http.ResponseWriter, request *provider.Request, file *provider.StorageItem, message *provider.Message) {
 	content := map[string]interface{}{
 		`Paths`: getPathParts(request),
+		`File`:  file,
 	}
 
 	a.renderer.File(w, request, content, message)

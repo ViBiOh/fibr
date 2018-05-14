@@ -35,9 +35,24 @@
       margin: 1rem;
     }
 
-    iframe {
-      border: 0;
-    }
+    {{- if eq .Layout "browser" -}}
+      body {
+        {{- if not (isImage .Content.File) -}}
+          display: flex;
+          flex-direction: column;
+        {{- end -}}
+      }
+
+      object {
+        border: 0;
+        {{- if not (isImage .Content.File) -}}
+          flex: 1 1;
+          flex-basis: auto;
+        {{- end -}}
+        max-height: 100%;
+        max-width: 100%;
+      }
+    {{- end -}}
 
     figure {
       margin: 0;

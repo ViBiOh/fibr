@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html/template"
 	"log"
+	"mime"
 	"net/http"
 	"net/url"
 	"path"
@@ -84,6 +85,9 @@ func NewApp(config map[string]*string, rootName string, thumbnailApp *thumbnail.
 		},
 		`extension`: func(file *provider.StorageItem) string {
 			return strings.ToLower(strings.TrimPrefix(path.Ext(file.Name), `.`))
+		},
+		`mime`: func(file *provider.StorageItem) string {
+			return mime.TypeByExtension(path.Ext(file.Name))
 		},
 		`hasThumbnail`: func(request *provider.Request, file *provider.StorageItem) bool {
 			return thumbnailApp.IsExist(provider.GetPathname(request, []byte(file.Name)))

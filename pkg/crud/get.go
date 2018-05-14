@@ -56,7 +56,7 @@ func (a *App) GetWithMessage(w http.ResponseWriter, r *http.Request, request *pr
 		}
 
 		if r.URL.Query().Get(`browser`) == `true` {
-			a.Browser(w, request, message)
+			a.Browser(w, request, info, message)
 			return
 		}
 
