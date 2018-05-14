@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"net/url"
 	"path"
-	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
@@ -57,7 +56,7 @@ func NewApp(config map[string]*string, rootName string, thumbnailApp *thumbnail.
 			return path.Join(parts[:index+1]...)
 		},
 		`iconFromExtension`: func(file *provider.StorageItem) string {
-			extension := strings.ToLower(path.Ext(file.Name))
+			extension := file.Extension()
 
 			switch {
 			case provider.ArchiveExtensions[extension]:
@@ -72,7 +71,7 @@ func NewApp(config map[string]*string, rootName string, thumbnailApp *thumbnail.
 				return `file-image`
 			case provider.PdfExtensions[extension]:
 				return `file-pdf`
-			case provider.VideoExtensions[extension]:
+			case provider.VideoExtensions[extension] != ``:
 				return `file-video`
 			case provider.WordExtensions[extension]:
 				return `file-word`
@@ -81,13 +80,25 @@ func NewApp(config map[string]*string, rootName string, thumbnailApp *thumbnail.
 			}
 		},
 		`isImage`: func(file *provider.StorageItem) bool {
-			return provider.ImageExtensions[path.Ext(file.Name)]
-		},
-		`extension`: func(file *provider.StorageItem) string {
-			return strings.ToLower(strings.TrimPrefix(path.Ext(file.Name), `.`))
+			return provider.ImageExtensions[file.Extension()]
 		},
 		`mime`: func(file *provider.StorageItem) string {
-			return mime.TypeByExtension(path.Ext(file.Name))
+			extension := file.Extension()
+			mime := mime.TypeByExtension(extension)
+
+			if mime != `` {
+				return mime
+			}
+
+			if mime, ok := provider.VideoExtensions[extension]; ok {
+				return mime
+			}
+
+			if provider.CodeExtensions[extension] {
+				return `text/plain`
+			}
+
+			return ``
 		},
 		`hasThumbnail`: func(request *provider.Request, file *provider.StorageItem) bool {
 			return thumbnailApp.IsExist(provider.GetPathname(request, []byte(file.Name)))

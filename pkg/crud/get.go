@@ -29,7 +29,7 @@ func (a *App) CheckAndServeSEO(w http.ResponseWriter, r *http.Request) bool {
 }
 
 func (a *App) checkAndServeThumbnail(w http.ResponseWriter, r *http.Request, pathname string, info *provider.StorageItem) bool {
-	if r.URL.Query().Get(`thumbnail`) == `true` && provider.ImageExtensions[path.Ext(info.Name)] {
+	if r.URL.Query().Get(`thumbnail`) == `true` && provider.ImageExtensions[info.Extension()] {
 		return a.thumbnailApp.ServeIfPresent(w, r, pathname)
 	}
 

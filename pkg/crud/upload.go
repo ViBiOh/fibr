@@ -37,7 +37,7 @@ func (a *App) saveUploadedFile(request *provider.Request, uploadedFile io.ReadCl
 		return fmt.Errorf(`Error while writing file: %v`, err)
 	}
 
-	if provider.ImageExtensions[path.Ext(uploadedFileHeader.Filename)] {
+	if provider.ImageExtensions[strings.ToLower(strings.TrimPrefix(path.Ext(uploadedFileHeader.Filename), `.`))] {
 		go a.thumbnailApp.GenerateImageThumbnail(filename)
 	}
 

@@ -99,7 +99,7 @@ func (a App) Generate() {
 			return filepath.SkipDir
 		}
 
-		if provider.ImageExtensions[path.Ext(item.Name)] {
+		if provider.ImageExtensions[item.Extension()] {
 			info, err := a.storage.Info(getThumbnailPath(pathname))
 			if err != nil && !provider.IsNotExist(err) {
 				return err
