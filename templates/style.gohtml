@@ -37,7 +37,7 @@
 
     {{- if eq .Layout "browser" -}}
       body {
-        {{- if not (isImage .Content.File) -}}
+        {{- if not .Content.File.IsImage -}}
           display: flex;
           flex-direction: column;
         {{- end -}}
@@ -45,7 +45,7 @@
 
       object {
         border: 0;
-        {{- if not (isImage .Content.File) -}}
+        {{- if not .Content.File.IsImage -}}
           flex: 1 1;
           flex-basis: auto;
         {{- end -}}

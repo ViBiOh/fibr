@@ -1,7 +1,11 @@
 {{- define "file" -}}
   {{- template "layout" . -}}
 
-  <object data="{{- .Request.Path -}}" type="{{ .Content.File.Mime -}}"></object>
+  {{- if .Content.File.IsVideo -}}
+    <video controls src="{{- .Request.Path -}}" type="{{ .Content.File.Mime -}}"></video>
+  {{- else -}}
+    <object data="{{- .Request.Path -}}" type="{{ .Content.File.Mime -}}"></object>
+  {{- end -}}
 
   {{- template "footer" . -}}
 {{- end -}}

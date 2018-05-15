@@ -161,7 +161,7 @@ func (s StorageItem) Extension() string {
 	return strings.ToLower(path.Ext(s.Name))
 }
 
-// Extension gives extensions of item
+// Mime gives Mime Type of item
 func (s StorageItem) Mime() string {
 	extension := s.Extension()
 	if mime := mime.TypeByExtension(extension); mime != `` {
@@ -177,6 +177,16 @@ func (s StorageItem) Mime() string {
 	}
 
 	return ``
+}
+
+// IsImage determine if item if an image
+func (s StorageItem) IsImage() bool {
+	return ImageExtensions[s.Extension()]
+}
+
+// IsVideo determine if item if a video
+func (s StorageItem) IsVideo() bool {
+	return VideoExtensions[s.Extension()] != ``
 }
 
 // Storage describe action on a storage provider

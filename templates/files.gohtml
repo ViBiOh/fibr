@@ -26,13 +26,13 @@
 
     <ul id="files">
       {{- range .Content.Files -}}
-        {{- if and (isImage .) (eq $root.Layout "grid") -}}
+        {{- if and (.IsImage) (eq $root.Layout "grid") -}}
           <li class="image">
         {{- else -}}
           <li class="file">
         {{- end -}}
           <a class="filelink" href="{{- .Name -}}{{- if .IsDir -}}/{{- else -}}?browser=true{{- end -}}" title="{{- .Name -}}">
-            {{- if and (isImage .) (eq $root.Layout "grid") (hasThumbnail $root.Request .) -}}
+            {{- if and (.IsImage) (eq $root.Layout "grid") (hasThumbnail $root.Request .) -}}
               {{- template "async-image" asyncImage . $root.Config.Version -}}
             {{- else -}}
               {{- if .IsDir -}}
