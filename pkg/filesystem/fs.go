@@ -54,7 +54,7 @@ func NewApp(config map[string]*string) (*App, error) {
 		rootDirname:   info.Name(),
 	}
 
-	log.Printf(`Serving file from %s`, rootDirectory)
+	log.Printf(`[fs] Serving file from %s`, rootDirectory)
 
 	return app, nil
 }
@@ -180,7 +180,7 @@ func (a App) Upload(pathname string, content io.ReadCloser) error {
 	if storageFile != nil {
 		defer func() {
 			if err := storageFile.Close(); err != nil {
-				log.Printf(`Error while closing file: %v`, err)
+				log.Printf(`[fs] Error while closing file: %v`, err)
 			}
 		}()
 	}
