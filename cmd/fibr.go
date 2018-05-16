@@ -195,7 +195,7 @@ func main() {
 
 	filesystemConfig := filesystem.Flags(`fs`)
 
-	healthcheckApp := healthcheck.NewApp(healthcheck.Basic())
+	healthcheckApp := healthcheck.NewApp()
 
 	httputils.NewApp(httputils.Flags(``), func() http.Handler {
 		storage := getStorage(`filesystem`, map[string]interface{}{
@@ -208,7 +208,7 @@ func main() {
 		authApp := auth.NewApp(authConfig, authService.NewBasicApp(basicConfig))
 
 		webHandler := owasp.Handler(owaspConfig, browserHandler(crudApp, uiApp, authApp))
-		healthcheckHandler := healthcheckApp.Handler()
+		healthcheckHandler := healthcheckApp.Handler(nil)
 
 		return datadog.NewApp(datadogConfig).Handler(gziphandler.GzipHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if r.URL.Path == `/health` {

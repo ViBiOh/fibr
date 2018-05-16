@@ -50,7 +50,7 @@
     "pkg/tools",
     "pkg/uuid"
   ]
-  revision = "a105d64e1b7f1e5ff7709e0027bab1a32a0575fb"
+  revision = "8028a990597f0ec475330fe26c1ba1bd60a50ccc"
 
 [[projects]]
   name = "github.com/disintegration/imaging"
