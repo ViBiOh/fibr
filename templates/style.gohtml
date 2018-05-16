@@ -390,7 +390,7 @@
 
     @media print {
       body::after {
-        content: 'Save ink, share link.';
+        content: 'Save ink, share link. {{- .PublicURL -}}';
       }
 
       body > * {
