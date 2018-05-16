@@ -195,6 +195,8 @@ func main() {
 
 	filesystemConfig := filesystem.Flags(`fs`)
 
+	healthcheckApp := healthcheck.NewApp(healthcheck.Basic())
+
 	httputils.NewApp(httputils.Flags(``), func() http.Handler {
 		storage := getStorage(`filesystem`, map[string]interface{}{
 			`filesystem`: filesystemConfig,
@@ -203,18 +205,17 @@ func main() {
 		thumbnailApp := thumbnail.NewApp(storage)
 		uiApp := ui.NewApp(uiConfig, storage.Root(), thumbnailApp)
 		crudApp := crud.NewApp(crudConfig, storage, uiApp, thumbnailApp)
-
 		authApp := auth.NewApp(authConfig, authService.NewBasicApp(basicConfig))
 
 		webHandler := owasp.Handler(owaspConfig, browserHandler(crudApp, uiApp, authApp))
-		healthHandler := healthcheck.Handler()
+		healthcheckHandler := healthcheckApp.Handler()
 
 		return datadog.NewApp(datadogConfig).Handler(gziphandler.GzipHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if r.URL.Path == `/health` {
-				healthHandler.ServeHTTP(w, r)
+				healthcheckHandler.ServeHTTP(w, r)
 			} else {
 				webHandler.ServeHTTP(w, r)
 			}
 		})))
-	}, nil).ListenAndServe()
+	}, nil, healthcheckApp).ListenAndServe()
 }

@@ -50,7 +50,7 @@
     "pkg/tools",
     "pkg/uuid"
   ]
-  revision = "e7c1fd8a46a63382a359fa2164174aa1f33e1d75"
+  revision = "a105d64e1b7f1e5ff7709e0027bab1a32a0575fb"
 
 [[projects]]
   name = "github.com/disintegration/imaging"
@@ -102,7 +102,7 @@
     "bcrypt",
     "blowfish"
   ]
-  revision = "4ec37c66abab2c7e02ae775328b2ff001c3f025a"
+  revision = "1a580b3eff7814fc9b40602fd35256c63b50f491"
 
 [[projects]]
   branch = "master"
@@ -121,7 +121,7 @@
     "context",
     "context/ctxhttp"
   ]
-  revision = "d11bb6cd8e3c4e60239c9cb20ef68586d74500d0"
+  revision = "2491c5de3490fced2f6cff376127c667efeed857"
 
 [[projects]]
   branch = "master"
@@ -137,7 +137,7 @@
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["windows"]
-  revision = "7db1c3b1a98089d0071c84f646ff5c96aad43682"
+  revision = "7c87d13f8e835d2fb3a70a2912c811ed0c1d241b"
 
 [[projects]]
   name = "google.golang.org/appengine"
