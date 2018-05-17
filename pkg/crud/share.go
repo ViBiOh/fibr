@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"path"
 	"strconv"
+	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/pkg/tools"
@@ -22,7 +23,7 @@ func (a *App) CreateShare(w http.ResponseWriter, r *http.Request, request *provi
 	var err error
 
 	edit := false
-	if editValue := r.FormValue(`edit`); editValue != `` {
+	if editValue := strings.TrimSpace(r.FormValue(`edit`)); editValue != `` {
 		edit, err = strconv.ParseBool(editValue)
 		if err != nil {
 			a.renderer.Error(w, http.StatusBadRequest, fmt.Errorf(`Error while reading form: %v`, err))
@@ -31,7 +32,7 @@ func (a *App) CreateShare(w http.ResponseWriter, r *http.Request, request *provi
 	}
 
 	password := ``
-	if passwordValue := r.FormValue(`password`); passwordValue != `` {
+	if passwordValue := strings.TrimSpace(r.FormValue(`password`)); passwordValue != `` {
 		hash, err := bcrypt.GenerateFromPassword([]byte(passwordValue), 12)
 		if err != nil {
 			a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while hashing password: %v`, err))

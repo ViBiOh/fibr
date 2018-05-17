@@ -80,7 +80,7 @@ func (a *App) GetWithMessage(w http.ResponseWriter, r *http.Request, request *pr
 func (a *App) Get(w http.ResponseWriter, r *http.Request, config *provider.Request) {
 	var message *provider.Message
 
-	if messageContent := r.URL.Query().Get(`message`); messageContent != `` {
+	if messageContent := strings.TrimSpace(r.URL.Query().Get(`message`)); messageContent != `` {
 		message = &provider.Message{
 			Level:   r.URL.Query().Get(`messageLevel`),
 			Content: messageContent,
