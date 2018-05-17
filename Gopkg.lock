@@ -2,16 +2,6 @@
 
 
 [[projects]]
-  name = "github.com/DataDog/dd-trace-go"
-  packages = [
-    "contrib/net/http",
-    "tracer",
-    "tracer/ext"
-  ]
-  revision = "27617015d45e6cd550b9a7ac7715c37cc2f7d020"
-  version = "v0.6.1"
-
-[[projects]]
   name = "github.com/NYTimes/gziphandler"
   packages = ["."]
   revision = "2600fb119af974220d3916a5916d6e31176aac1b"
@@ -30,7 +20,7 @@
     "pkg/provider/twitter",
     "pkg/service"
   ]
-  revision = "d10933d4547e8ca13e1968ce52557156c270ce20"
+  revision = "acd4fa56195f886e1188cba649555ff3c24da205"
 
 [[projects]]
   branch = "master"
@@ -39,7 +29,6 @@
     "pkg",
     "pkg/alcotest",
     "pkg/cert",
-    "pkg/datadog",
     "pkg/healthcheck",
     "pkg/httperror",
     "pkg/httpjson",
@@ -91,11 +80,6 @@
   version = "v2.3.2"
 
 [[projects]]
-  name = "github.com/ugorji/go"
-  packages = ["codec"]
-  revision = "9c7f9b7a2bc3a520f7c7b30b34b7f85f47fe27b6"
-
-[[projects]]
   branch = "master"
   name = "golang.org/x/crypto"
   packages = [
@@ -134,12 +118,6 @@
   revision = "cdc340f7c179dbbfa4afd43b7614e8fcadde4269"
 
 [[projects]]
-  branch = "master"
-  name = "golang.org/x/sys"
-  packages = ["windows"]
-  revision = "7c87d13f8e835d2fb3a70a2912c811ed0c1d241b"
-
-[[projects]]
   name = "google.golang.org/appengine"
   packages = [
     "internal",
@@ -156,6 +134,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "4f6ecf18a76f6248f6c9a3d4b521a2a7ff4a921e73c99927248e19510f3b069b"
+  inputs-digest = "7797003cafbff6f1fa950e7dced189f5af83da4c4be260f1da41dfa957eea6d4"
   solver-name = "gps-cdcl"
   solver-version = 1
