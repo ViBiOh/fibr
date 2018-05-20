@@ -2,12 +2,12 @@
   {{- template "layout" . -}}
 
   {{- if .Content.File.IsVideo -}}
-    <video controls src="{{- .Request.Path -}}" type="{{ .Content.File.Mime -}}"></video>
+    <video controls src="{{- .PublicURL -}}" type="{{ .Content.File.Mime -}}"></video>
   {{- else -}}
     {{- if .Content.File.IsImage -}}
-      <img src="{{- .Request.Path -}}" alt="{{- .Content.File.Name -}}" />
+      <img src="{{- .PublicURL -}}" alt="{{- .Content.File.Name -}}" />
     {{- else -}}
-      <object data="{{- .Request.Path -}}" type="{{ .Content.File.Mime -}}"></object>
+      <object data="{{- .PublicURL -}}" type="{{ .Content.File.Mime -}}"></object>
     {{- end -}}
   {{- end -}}
 
