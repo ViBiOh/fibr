@@ -21,6 +21,7 @@ import (
 	"github.com/ViBiOh/httputils/pkg"
 	"github.com/ViBiOh/httputils/pkg/healthcheck"
 	"github.com/ViBiOh/httputils/pkg/httperror"
+	"github.com/ViBiOh/httputils/pkg/opentracing"
 	"github.com/ViBiOh/httputils/pkg/owasp"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -190,6 +191,7 @@ func main() {
 	basicConfig := basic.Flags(`basic`)
 	crudConfig := crud.Flags(``)
 	uiConfig := ui.Flags(``)
+	opentracingConfig := opentracing.Flags(`tracing`)
 
 	filesystemConfig := filesystem.Flags(`fs`)
 
@@ -205,15 +207,15 @@ func main() {
 		crudApp := crud.NewApp(crudConfig, storage, uiApp, thumbnailApp)
 		authApp := auth.NewApp(authConfig, authService.NewBasicApp(basicConfig))
 
-		webHandler := owasp.Handler(owaspConfig, browserHandler(crudApp, uiApp, authApp))
+		webHandler := opentracing.NewApp(opentracingConfig).Handler(gziphandler.GzipHandler(owasp.Handler(owaspConfig, browserHandler(crudApp, uiApp, authApp))))
 		healthcheckHandler := healthcheckApp.Handler(nil)
 
-		return gziphandler.GzipHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if r.URL.Path == `/health` {
 				healthcheckHandler.ServeHTTP(w, r)
 			} else {
 				webHandler.ServeHTTP(w, r)
 			}
-		}))
+		})
 	}, nil, healthcheckApp).ListenAndServe()
 }
