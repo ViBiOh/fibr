@@ -61,7 +61,7 @@ start-deps:
 	go get -u github.com/ViBiOh/auth/cmd/bcrypt
 
 start-api:
-	DEBUG=true go run cmd/fibr.go \
+	DEBUG=true go run -race cmd/fibr.go \
 		-tls=false \
 		-fsDirectory `pwd` \
 		-publicURL http://localhost:1080 \
