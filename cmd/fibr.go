@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/base64"
 	"errors"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -19,10 +20,12 @@ import (
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/fibr/pkg/ui"
 	"github.com/ViBiOh/httputils/pkg"
+	"github.com/ViBiOh/httputils/pkg/alcotest"
 	"github.com/ViBiOh/httputils/pkg/healthcheck"
 	"github.com/ViBiOh/httputils/pkg/httperror"
 	"github.com/ViBiOh/httputils/pkg/opentracing"
 	"github.com/ViBiOh/httputils/pkg/owasp"
+	"github.com/ViBiOh/httputils/pkg/server"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -186,36 +189,37 @@ func getStorage(storageName string, configs map[string]interface{}) provider.Sto
 }
 
 func main() {
+	serverConfig := httputils.Flags(``)
+	alcotestConfig := alcotest.Flags(``)
+	opentracingConfig := opentracing.Flags(`tracing`)
 	owaspConfig := owasp.Flags(``)
+
 	authConfig := auth.Flags(`auth`)
 	basicConfig := basic.Flags(`basic`)
 	crudConfig := crud.Flags(``)
 	uiConfig := ui.Flags(``)
-	opentracingConfig := opentracing.Flags(`tracing`)
 
 	filesystemConfig := filesystem.Flags(`fs`)
 
+	flag.Parse()
+
+	alcotest.DoAndExit(alcotestConfig)
+
+	serverApp := httputils.NewApp(serverConfig)
 	healthcheckApp := healthcheck.NewApp()
+	opentracingApp := opentracing.NewApp(opentracingConfig)
+	owaspApp := owasp.NewApp(owaspConfig)
 
-	httputils.NewApp(httputils.Flags(``), func() http.Handler {
-		storage := getStorage(`filesystem`, map[string]interface{}{
-			`filesystem`: filesystemConfig,
-		})
+	storage := getStorage(`filesystem`, map[string]interface{}{
+		`filesystem`: filesystemConfig,
+	})
 
-		thumbnailApp := thumbnail.NewApp(storage)
-		uiApp := ui.NewApp(uiConfig, storage.Root(), thumbnailApp)
-		crudApp := crud.NewApp(crudConfig, storage, uiApp, thumbnailApp)
-		authApp := auth.NewApp(authConfig, authService.NewBasicApp(basicConfig))
+	thumbnailApp := thumbnail.NewApp(storage)
+	uiApp := ui.NewApp(uiConfig, storage.Root(), thumbnailApp)
+	crudApp := crud.NewApp(crudConfig, storage, uiApp, thumbnailApp)
+	authApp := auth.NewApp(authConfig, authService.NewBasicApp(basicConfig))
 
-		webHandler := opentracing.NewApp(opentracingConfig).Handler(gziphandler.GzipHandler(owasp.Handler(owaspConfig, browserHandler(crudApp, uiApp, authApp))))
-		healthcheckHandler := healthcheckApp.Handler(nil)
+	webHandler := server.ChainMiddlewares(gziphandler.GzipHandler(browserHandler(crudApp, uiApp, authApp)), opentracingApp, owaspApp)
 
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if r.URL.Path == `/health` {
-				healthcheckHandler.ServeHTTP(w, r)
-			} else {
-				webHandler.ServeHTTP(w, r)
-			}
-		})
-	}, nil, healthcheckApp).ListenAndServe()
+	serverApp.ListenAndServe(webHandler, nil, healthcheckApp)
 }
