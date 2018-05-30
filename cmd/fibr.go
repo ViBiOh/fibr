@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/NYTimes/gziphandler"
 	"github.com/ViBiOh/auth/pkg/auth"
 	authProvider "github.com/ViBiOh/auth/pkg/provider"
 	"github.com/ViBiOh/auth/pkg/provider/basic"
@@ -21,6 +20,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/ui"
 	"github.com/ViBiOh/httputils/pkg"
 	"github.com/ViBiOh/httputils/pkg/alcotest"
+	"github.com/ViBiOh/httputils/pkg/gzip"
 	"github.com/ViBiOh/httputils/pkg/healthcheck"
 	"github.com/ViBiOh/httputils/pkg/httperror"
 	"github.com/ViBiOh/httputils/pkg/opentracing"
@@ -209,6 +209,7 @@ func main() {
 	healthcheckApp := healthcheck.NewApp()
 	opentracingApp := opentracing.NewApp(opentracingConfig)
 	owaspApp := owasp.NewApp(owaspConfig)
+	gzipApp := gzip.NewApp()
 
 	storage := getStorage(`filesystem`, map[string]interface{}{
 		`filesystem`: filesystemConfig,
@@ -219,7 +220,7 @@ func main() {
 	crudApp := crud.NewApp(crudConfig, storage, uiApp, thumbnailApp)
 	authApp := auth.NewApp(authConfig, authService.NewBasicApp(basicConfig))
 
-	webHandler := server.ChainMiddlewares(gziphandler.GzipHandler(browserHandler(crudApp, uiApp, authApp)), opentracingApp, owaspApp)
+	webHandler := server.ChainMiddlewares(browserHandler(crudApp, uiApp, authApp), opentracingApp, gzipApp, owaspApp)
 
 	serverApp.ListenAndServe(webHandler, nil, healthcheckApp)
 }

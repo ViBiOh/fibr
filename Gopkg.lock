@@ -20,13 +20,14 @@
     "pkg/provider/twitter",
     "pkg/service"
   ]
-  revision = "2066a2837230bed40fb099f3b4eed72085434d46"
+  revision = "92ab1ff6003fd02a3b925d531109a27fe1364e3d"
 
 [[projects]]
   branch = "master"
   name = "github.com/ViBiOh/httputils"
   packages = [
     "pkg",
+    "pkg/alcotest",
     "pkg/cert",
     "pkg/healthcheck",
     "pkg/httperror",
@@ -39,7 +40,7 @@
     "pkg/tools",
     "pkg/uuid"
   ]
-  revision = "102aa71021682a10c43740d54cf8879fb33e59a3"
+  revision = "5f118d9228ef4b0d3a598415e4cccc37b65f5577"
 
 [[projects]]
   branch = "master"
@@ -68,8 +69,8 @@
 [[projects]]
   name = "github.com/matttproud/golang_protobuf_extensions"
   packages = ["pbutil"]
-  revision = "3247c84500bff8d9fb6d579d800f20b3e091582c"
-  version = "v1.0.0"
+  revision = "c12348ce28de40eed0136aa2b644d0ee0650e56c"
+  version = "v1.0.1"
 
 [[projects]]
   branch = "master"
@@ -127,7 +128,7 @@
     "nfs",
     "xfs"
   ]
-  revision = "8b1c2da0d56deffdbb9e48d4414b4e674bd8083e"
+  revision = "fe93d378a6b03758a2c1b65e86cf630bf78681c0"
 
 [[projects]]
   name = "github.com/tdewolff/minify"
@@ -210,7 +211,7 @@
     "context",
     "context/ctxhttp"
   ]
-  revision = "dfa909b99c79129e1100513e5cd36307665e5723"
+  revision = "89e543239a64caf31d3a6865872ea120b41446df"
 
 [[projects]]
   branch = "master"
@@ -220,7 +221,7 @@
     "github",
     "internal"
   ]
-  revision = "770e5ebd4ab27c4d70b0983674d138217f5e2c72"
+  revision = "ec22f46f877b4505e0117eeaab541714644fdd28"
 
 [[projects]]
   name = "google.golang.org/appengine"
@@ -239,6 +240,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "30489aec4b15d6c008520983cf515f841a7eebfca20537e8925e3286e1ef4209"
+  inputs-digest = "b13ebf6bc96d33947b42aa3700d3048a76c5bba6f8a7d4ae2cb5cfbe0f72a67c"
   solver-name = "gps-cdcl"
   solver-version = 1
