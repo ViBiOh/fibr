@@ -29,6 +29,7 @@
     "pkg",
     "pkg/alcotest",
     "pkg/cert",
+    "pkg/gzip",
     "pkg/healthcheck",
     "pkg/httperror",
     "pkg/httpjson",
@@ -40,7 +41,7 @@
     "pkg/tools",
     "pkg/uuid"
   ]
-  revision = "5f118d9228ef4b0d3a598415e4cccc37b65f5577"
+  revision = "9f9961492345a8306528feb1283c6b76fc6d7e3e"
 
 [[projects]]
   branch = "master"
@@ -211,7 +212,7 @@
     "context",
     "context/ctxhttp"
   ]
-  revision = "89e543239a64caf31d3a6865872ea120b41446df"
+  revision = "8d282c4e200f6234d5df69ac4ad1ecb709c3df2c"
 
 [[projects]]
   branch = "master"
@@ -240,6 +241,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "b13ebf6bc96d33947b42aa3700d3048a76c5bba6f8a7d4ae2cb5cfbe0f72a67c"
+  inputs-digest = "5632ff54741fe34736c7a21ec1bd1ab7922b46235a773ade18e7c80794c9d741"
   solver-name = "gps-cdcl"
   solver-version = 1
