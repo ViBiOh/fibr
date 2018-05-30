@@ -1,7 +1,6 @@
 package crud
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"path"
@@ -24,7 +23,7 @@ func (a *App) Delete(w http.ResponseWriter, r *http.Request, config *provider.Re
 
 	info, err := a.storage.Info(pathname)
 	if err != nil {
-		a.renderer.Error(w, http.StatusNotFound, errors.New(`Requested path does not exist`))
+		a.renderer.Error(w, http.StatusNotFound, fmt.Errorf(`Requested path does not exist %s`, pathname))
 		return
 	}
 

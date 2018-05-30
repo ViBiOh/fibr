@@ -1,7 +1,6 @@
 package crud
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"path"
@@ -47,7 +46,7 @@ func (a *App) Rename(w http.ResponseWriter, r *http.Request, config *provider.Re
 		if !provider.IsNotExist(err) {
 			a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while getting infos for %s: %v`, oldName, err))
 		} else {
-			a.renderer.Error(w, http.StatusNotFound, errors.New(`Requested path does not exist`))
+			a.renderer.Error(w, http.StatusNotFound, fmt.Errorf(`Requested path does not exist %s`, oldName))
 		}
 
 		return
