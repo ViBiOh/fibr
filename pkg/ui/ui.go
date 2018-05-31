@@ -108,7 +108,7 @@ func NewApp(config map[string]*string, rootName string, thumbnailApp *thumbnail.
 	}
 }
 
-func (a *App) createPageConfiguration(request *provider.Request, message *provider.Message, content map[string]interface{}, layout string) *provider.Page {
+func (a App) createPageConfiguration(request *provider.Request, message *provider.Message, content map[string]interface{}, layout string) *provider.Page {
 	return &provider.Page{
 		Config:  a.config,
 		Request: request,
@@ -119,7 +119,7 @@ func (a *App) createPageConfiguration(request *provider.Request, message *provid
 }
 
 // Error render error page with given status
-func (a *App) Error(w http.ResponseWriter, status int, err error) {
+func (a App) Error(w http.ResponseWriter, status int, err error) {
 	page := &provider.Page{
 		Config: a.config,
 		Error: &provider.Error{
@@ -135,14 +135,14 @@ func (a *App) Error(w http.ResponseWriter, status int, err error) {
 }
 
 // Sitemap render sitemap.xml
-func (a *App) Sitemap(w http.ResponseWriter) {
+func (a App) Sitemap(w http.ResponseWriter) {
 	if err := templates.WriteXMLTemplate(a.tpl.Lookup(`sitemap`), w, provider.Page{Config: a.config}, http.StatusOK); err != nil {
 		httperror.InternalServerError(w, err)
 	}
 }
 
 // Directory render directory listing
-func (a *App) Directory(w http.ResponseWriter, request *provider.Request, content map[string]interface{}, layout string, message *provider.Message) {
+func (a App) Directory(w http.ResponseWriter, request *provider.Request, content map[string]interface{}, layout string, message *provider.Message) {
 	page := a.createPageConfiguration(request, message, content, layout)
 
 	if page.Layout == `` {
@@ -163,7 +163,7 @@ func (a *App) Directory(w http.ResponseWriter, request *provider.Request, conten
 }
 
 // File render file detail
-func (a *App) File(w http.ResponseWriter, request *provider.Request, content map[string]interface{}, message *provider.Message) {
+func (a App) File(w http.ResponseWriter, request *provider.Request, content map[string]interface{}, message *provider.Message) {
 	page := a.createPageConfiguration(request, message, content, `browser`)
 
 	if request.IsDebug {
