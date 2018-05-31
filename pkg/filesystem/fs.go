@@ -103,7 +103,7 @@ func (a App) Info(pathname string) (*provider.StorageItem, error) {
 		return nil, err
 	}
 
-	return convertToItem(pathname, info), nil
+	return convertToItem(path.Dir(pathname), info), nil
 }
 
 // Read content of given pathname

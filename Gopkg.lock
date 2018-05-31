@@ -20,7 +20,7 @@
     "pkg/provider/twitter",
     "pkg/service"
   ]
-  revision = "92ab1ff6003fd02a3b925d531109a27fe1364e3d"
+  revision = "3387097319e629c467f2d6623dcd6eb119e89d71"
 
 [[projects]]
   branch = "master"
@@ -129,7 +129,7 @@
     "nfs",
     "xfs"
   ]
-  revision = "fe93d378a6b03758a2c1b65e86cf630bf78681c0"
+  revision = "61aaa706c6d4fda9365b6273c96839eb7e27f6e4"
 
 [[projects]]
   name = "github.com/tdewolff/minify"
@@ -193,7 +193,7 @@
     "bcrypt",
     "blowfish"
   ]
-  revision = "ab813273cd59e1333f7ae7bff5d027d4aadf528c"
+  revision = "5ba7f63082460102a45837dbd1827e10f9479ac0"
 
 [[projects]]
   branch = "master"
@@ -212,7 +212,7 @@
     "context",
     "context/ctxhttp"
   ]
-  revision = "8d282c4e200f6234d5df69ac4ad1ecb709c3df2c"
+  revision = "1e491301e022f8f977054da4c2d852decd59571f"
 
 [[projects]]
   branch = "master"
