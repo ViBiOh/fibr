@@ -37,6 +37,8 @@
 
     {{- if eq .Layout "browser" -}}
       body {
+        text-align: center;
+
         {{- if not .Content.File.IsImage -}}
           display: flex;
           flex-direction: column;
@@ -89,6 +91,7 @@
       background-color: whitesmoke;
       color: dimgray;
       padding: 0.5rem 1rem;
+      text-align: left;
     }
 
     .title {
