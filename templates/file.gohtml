@@ -11,5 +11,26 @@
     {{- end -}}
   {{- end -}}
 
+  {{- if or .Content.Next .Content.Previous -}}
+    <script type="text/javascript">
+      /**
+       * Handle Previous/next.
+       */
+      window.onkeyup = function(e) {
+        {{- if .Content.Previous -}}
+          if (e.keyCode === 37) {
+            window.location.href = '{{- .Content.Previous.Name -}}?browser=true';
+          }
+        {{- end -}}
+
+        {{- if .Content.Next -}}
+          if (e.keyCode === 39) {
+            window.location.href = '{{- .Content.Next.Name -}}?browser=true';
+          }
+        {{- end -}}
+      };
+    </script>
+  {{- end -}}
+
   {{- template "footer" . -}}
 {{- end -}}

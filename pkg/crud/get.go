@@ -2,7 +2,6 @@ package crud
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"path"
 	"strings"
@@ -56,7 +55,6 @@ func (a *App) GetWithMessage(w http.ResponseWriter, r *http.Request, request *pr
 			return
 		}
 
-		log.Printf("%+v", info)
 		if r.URL.Query().Get(`browser`) == `true` {
 			a.Browser(w, request, info, message)
 			return
