@@ -129,7 +129,7 @@
     "nfs",
     "xfs"
   ]
-  revision = "61aaa706c6d4fda9365b6273c96839eb7e27f6e4"
+  revision = "94663424ae5ae9856b40a9f170762b4197024661"
 
 [[projects]]
   name = "github.com/tdewolff/minify"
@@ -193,7 +193,7 @@
     "bcrypt",
     "blowfish"
   ]
-  revision = "5ba7f63082460102a45837dbd1827e10f9479ac0"
+  revision = "df8d4716b3472e4a531c33cedbe537dae921a1a9"
 
 [[projects]]
   branch = "master"
@@ -203,7 +203,7 @@
     "tiff",
     "tiff/lzw"
   ]
-  revision = "f315e440302883054d0c2bd85486878cb4f8572c"
+  revision = "af66defab954cb421ca110193eed9477c8541e2a"
 
 [[projects]]
   branch = "master"
@@ -222,7 +222,7 @@
     "github",
     "internal"
   ]
-  revision = "ec22f46f877b4505e0117eeaab541714644fdd28"
+  revision = "1e0a3fa8ba9a5c9eb35c271780101fdaf1b205d7"
 
 [[projects]]
   name = "google.golang.org/appengine"

@@ -11,6 +11,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -149,6 +150,8 @@ func (a App) List(pathname string) ([]*provider.StorageItem, error) {
 	for index, item := range files {
 		items[index] = convertToItem(pathname, item)
 	}
+
+	sort.Sort(ByName(items))
 
 	return items, nil
 }
