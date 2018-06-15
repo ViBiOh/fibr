@@ -37,6 +37,7 @@
 
     {{- if eq .Layout "browser" -}}
       body {
+        position: relative;
         text-align: center;
 
         {{- if not .Content.File.IsImage -}}
@@ -59,6 +60,39 @@
         border: 0;
         max-height: 100%;
         max-width: 100%;
+      }
+
+      .hover-side {
+        align-items: center;
+        display: flex;
+        height: calc(100% - 100px);
+        justify-content: center;
+        position: absolute;
+        top: 100px;
+        width: 20%;
+      }
+
+      .hover-nav {
+        align-items: center;
+        background-color: whitesmoke;
+        border-radius: 50%;
+        display: none;
+        height: 3rem;
+        justify-content: center;
+        padding: 1rem;
+        width: 3rem;
+      }
+
+      .hover-side:hover .hover-nav {
+        display: flex;
+      }
+
+      .left-side {
+        left: 0;
+      }
+
+      .right-side {
+        right: 0;
       }
     {{- end -}}
 
