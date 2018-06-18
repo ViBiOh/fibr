@@ -11,16 +11,21 @@
     {{- end -}}
   {{- end -}}
 
-  <div class="hover-side left-side">
-    <a href="{{- .Content.Previous.Name -}}?browser=true" class="hover-nav">
-      <span class="icon icon-chevron-left" alt="Previous"></span>
-    </a>
-  </div>
-  <div class="hover-side right-side">
-    <a href="{{- .Content.Next.Name -}}?browser=true" class="hover-nav">
-      <span class="icon icon-chevron-right" alt="Next"></span>
-    </a>
-  </div>
+  {{— if .Content.Previous -}}
+    <div class="hover-side left-side">
+      <a href="{{- .Content.Previous.Name -}}?browser=true" class="hover-nav">
+        <span class="icon icon-chevron-left" alt="Previous"></span>
+      </a>
+    </div>
+  {{— end -}}
+
+  {{— if .Content.Next -}}
+    <div class="hover-side right-side">
+      <a href="{{- .Content.Next.Name -}}?browser=true" class="hover-nav">
+        <span class="icon icon-chevron-right" alt="Next"></span>
+      </a>
+    </div>
+  {{— end -}}
 
   {{- if or .Content.Next .Content.Previous -}}
     <script type="text/javascript">
