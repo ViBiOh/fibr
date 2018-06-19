@@ -36,16 +36,6 @@
     }
 
     {{- if eq .Layout "browser" -}}
-      body {
-        position: relative;
-        text-align: center;
-
-        {{- if not .Content.File.IsImage -}}
-          display: flex;
-          flex-direction: column;
-        {{- end -}}
-      }
-
       object {
         border: 0;
         {{- if not .Content.File.IsImage -}}
@@ -62,25 +52,39 @@
         max-width: 100%;
       }
 
+      .browser {
+        position: relative;
+        text-align: center;
+        height: 100%;
+
+        {{- if not .Content.File.IsImage -}}
+          display: flex;
+          flex-direction: column;
+        {{- end -}}
+      }
+
       .hover-side {
         align-items: center;
         display: flex;
-        height: calc(100% - 100px);
+        height: 100%;
         justify-content: center;
         position: absolute;
-        top: 100px;
-        width: 20%;
+        top: 0;
+        width: 10rem;
       }
 
       .hover-nav {
         align-items: center;
-        background-color: whitesmoke;
-        border-radius: 50%;
         display: none;
-        height: 3rem;
+        height: 100%;
         justify-content: center;
         padding: 1rem;
-        width: 3rem;
+        width: 100%;
+      }
+
+      .hover-side:hover {
+        background-color: whitesmoke;
+        opacity: 0.8;
       }
 
       .hover-side:hover .hover-nav {
