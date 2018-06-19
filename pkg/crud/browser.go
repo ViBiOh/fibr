@@ -7,25 +7,34 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
+func getPreviousAndNext(file *provider.StorageItem, files []*provider.StorageItem) (previous *provider.StorageItem, next *provider.StorageItem) {
+	found := false
+	for _, neighbor := range files {
+		if neighbor.Pathname == file.Pathname {
+			found = true
+			continue
+		}
+
+		if !found && !neighbor.IsDir {
+			previous = neighbor
+		}
+
+		if found && !neighbor.IsDir {
+			next = neighbor
+			return
+		}
+	}
+
+	return
+}
+
 // Browser render file web view
 func (a *App) Browser(w http.ResponseWriter, request *provider.Request, file *provider.StorageItem, message *provider.Message) {
 	var previous, next *provider.StorageItem
 
 	files, err := a.storage.List(path.Dir(file.Pathname))
 	if err == nil {
-		for i, neighbor := range files {
-			if neighbor.Pathname == file.Pathname {
-				if i > 0 {
-					previous = files[i-1]
-				}
-
-				if i != len(files)-1 {
-					next = files[i+1]
-				}
-
-				break
-			}
-		}
+		previous, next = getPreviousAndNext(file, files)
 	}
 
 	content := map[string]interface{}{
