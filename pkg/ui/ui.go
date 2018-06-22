@@ -83,7 +83,7 @@ func NewApp(config map[string]*string, rootName string, thumbnailApp *thumbnail.
 		},
 	})
 
-	fibrTemplates, err := utils.ListFilesByExt(`./templates/`, `.gohtml`)
+	fibrTemplates, err := utils.ListFilesByExt(`./templates/`, `.html`)
 	if err != nil {
 		log.Fatalf(`Error while getting templates: %v`, err)
 	}
