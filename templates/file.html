@@ -1,0 +1,54 @@
+{{- define "file" -}}
+  {{- template "layout" . -}}
+
+  <div class="browser">
+    {{- if .Content.File.IsVideo -}}
+      <video controls src="{{- .PublicURL -}}" type="{{ .Content.File.Mime -}}"></video>
+    {{- else -}}
+      {{- if .Content.File.IsImage -}}
+        <img src="{{- .PublicURL -}}" alt="{{- .Content.File.Name -}}" />
+      {{- else -}}
+        <object data="{{- .PublicURL -}}" type="{{ .Content.File.Mime -}}"></object>
+      {{- end -}}
+    {{- end -}}
+
+    {{- if .Content.Previous -}}
+      <div class="hover-side left-side">
+        <a href="{{- .Content.Previous.Name -}}?browser=true" class="hover-nav">
+          <span class="icon icon-chevron-left" alt="Previous"></span>
+        </a>
+      </div>
+    {{- end -}}
+
+    {{- if .Content.Next -}}
+      <div class="hover-side right-side">
+        <a href="{{- .Content.Next.Name -}}?browser=true" class="hover-side right-side hover-nav">
+          <span class="icon icon-chevron-right" alt="Next"></span>
+        </a>
+      </div>
+    {{- end -}}
+  </div>
+
+  {{- if or .Content.Next .Content.Previous -}}
+    <script type="text/javascript">
+      /**
+       * Handle Previous/next.
+       */
+      window.onkeyup = function(e) {
+        {{- if .Content.Previous -}}
+          if (e.keyCode === 37) {
+            window.location.href = '{{- .Content.Previous.Name -}}?browser=true';
+          }
+        {{- end -}}
+
+        {{- if .Content.Next -}}
+          if (e.keyCode === 39) {
+            window.location.href = '{{- .Content.Next.Name -}}?browser=true';
+          }
+        {{- end -}}
+      };
+    </script>
+  {{- end -}}
+
+  {{- template "footer" . -}}
+{{- end -}}

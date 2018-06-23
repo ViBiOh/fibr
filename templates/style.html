@@ -1,0 +1,442 @@
+{{- define "style" -}}
+  <style type="text/css">
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      font-size: 62.5%;
+    }
+
+    body {
+      -webkit-overflow-scrolling: touch;
+      margin: 0;
+      height: 100vh;
+    }
+
+    body,
+    button,
+    input {
+      font-family:
+        -apple-system,
+        'Segoe UI',
+        'Roboto',
+        'Oxygen-Sans',
+        'Ubuntu',
+        'Cantarell',
+        'Helvetica Nue',
+        sans-serif;
+      font-size: 1.6rem;
+      font-style: normal;
+      font-weight: 400;
+    }
+
+    p {
+      margin: 1rem;
+    }
+
+    {{- if eq .Layout "browser" -}}
+      object {
+        border: 0;
+        {{- if not .Content.File.IsImage -}}
+          flex: 1 1;
+          flex-basis: auto;
+        {{- end -}}
+        max-height: 100%;
+        max-width: 100%;
+      }
+
+      video, img {
+        border: 0;
+        max-height: 100%;
+        max-width: 100%;
+      }
+
+      .browser {
+        position: relative;
+        text-align: center;
+        height: 100%;
+
+        {{- if not .Content.File.IsImage -}}
+          display: flex;
+          flex-direction: column;
+        {{- end -}}
+      }
+
+      .hover-side {
+        align-items: center;
+        display: flex;
+        height: 100%;
+        justify-content: center;
+        position: absolute;
+        top: 0;
+        width: 10rem;
+      }
+
+      .hover-nav {
+        align-items: center;
+        display: none;
+        height: 100%;
+        justify-content: center;
+        padding: 1rem;
+        width: 100%;
+      }
+
+      .hover-side:hover {
+        background-color: whitesmoke;
+        opacity: 0.8;
+      }
+
+      .hover-side:hover .hover-nav {
+        display: flex;
+      }
+
+      .left-side {
+        left: 0;
+      }
+
+      .right-side {
+        right: 0;
+      }
+    {{- end -}}
+
+    figure {
+      margin: 0;
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    .full {
+      width: 100%;
+    }
+
+    .flex {
+      display: flex;
+    }
+
+    .flex-center {
+      align-items: center;
+      justify-content: center;
+    }
+
+    .no-margin {
+      margin: 0;
+    }
+
+    .header {
+      background-color: whitesmoke;
+      color: dimgray;
+      padding: 0.5rem 1rem;
+      text-align: left;
+    }
+
+    .title {
+      margin: 0;
+      padding: 0;
+    }
+
+    .icon {
+      background-position: center center;
+      background-repeat: no-repeat;
+      display: inline-block;
+      height: 2rem;
+      text-decoration: none;
+      vertical-align: middle;
+      width: 2rem;
+    }
+
+    .icon-medium {
+      height: 3rem;
+      width: 3rem;
+    }
+
+    .icon-large {
+      height: 4rem;
+      width: 4rem;
+    }
+
+    .thumbnail {
+      width: 100%;
+      max-height: 100%;
+    }
+
+    .button {
+      border-radius: 4px;
+      border: 0;
+      display: inline-block;
+      padding: 1rem;
+      text-decoration: none;
+    }
+
+    .button-icon {
+      background-color: transparent;
+      border: 0;
+      margin: 0;
+      padding: 0;
+    }
+
+    .bg-important {
+      background-color: royalblue;
+      color: ghostwhite;
+    }
+
+    .bg-success {
+      background-color: yellowgreen;
+      color: ghostwhite;
+    }
+
+    .bg-danger {
+      background-color: tomato;
+      color: ghostwhite;
+    }
+
+    .modifier {
+      display: inline-block;
+      padding: 1rem;
+    }
+
+    .modal {
+      background-color: rgba(105, 105, 105, 0.75);
+      height: 100%;
+      left: 0;
+      pointer-events: none;
+      position: fixed;
+      top: 0;
+    }
+
+    .modal-content {
+      background-color: whitesmoke;
+      pointer-events: auto;
+    }
+
+    @media screen and (max-width: 640px) {
+      .modal-content {
+        width: 100%;
+      }
+    }
+
+    .message {
+      margin: 0;
+      padding: 1rem 2rem;
+      text-align: center;
+    }
+
+    #tools {
+      background-color: whitesmoke;
+      bottom: 0;
+      padding: 1rem;
+      position: fixed;
+      right: 0;
+      z-index: 10;
+    }
+
+    #tools a {
+      margin: 0.5rem 1rem;
+    }
+
+    .content {
+      padding-bottom: 7rem;
+    }
+
+    #files {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    #shares {
+      padding: 1rem;
+      width: 100%;
+    }
+
+    .share-content td {
+      border-bottom: 1px solid dimgray;
+    }
+
+    .share-content:hover {
+      background-color: aliceblue;
+    }
+
+    .throbber {
+      margin: auto;
+      display: none;
+      text-align: center;
+    }
+
+    .throbber > div {
+      width: 1rem;
+      height: 1rem;
+      background-color: dimgrey;
+      border-radius: 100%;
+      display: inline-block;
+      animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+    }
+
+    .throbber .bounce1 {
+      animation-delay: -0.32s;
+    }
+
+    .throbber .bounce2 {
+      animation-delay: -0.16s;
+    }
+
+    @keyframes sk-bouncedelay {
+      0%,
+      80%,
+      100% {
+        transform: scale(0);
+      }
+
+      40% {
+        transform: scale(1);
+      }
+    }
+
+    {{- if eq .Layout "list" -}}
+      #list-display {
+        background-color: aliceblue;
+      }
+
+      .file {
+        align-items: center;
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0.5rem 1rem 0;
+      }
+
+      .filelink {
+        align-items: center;
+        display: inline-flex;
+        height: 2.5rem;
+        width: 35rem;
+      }
+
+      .filename {
+        display: inline-block;
+        flex: 1 1;
+        overflow: hidden;
+        text-align: left;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .filelink .icon {
+        margin-right: 1rem;
+      }
+
+      .file-edit,
+      .file-delete {
+        display: none;
+      }
+
+      .file-delete {
+        margin-left: 0.5rem;
+      }
+
+      .file:hover .file-edit,
+      .file:hover .file-delete {
+        display: inline-block;
+      }
+
+      .file-edit .icon,
+      .file-delete .icon {
+        margin: 0;
+      }
+
+      @media screen and (max-width: 640px) {
+        .filelink {
+          width: calc(100% - 4.5rem);
+        }
+
+        .file-edit,
+        .file-delete {
+          display: inline-block;
+        }
+      }
+    {{- end -}}
+
+    {{- if eq .Layout "grid" -}}
+      #grid-display {
+        background-color: aliceblue;
+      }
+
+      #files {
+        display: grid;
+        grid-gap: .5rem;
+        grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+        margin: .5rem;
+      }
+
+      #files > * {
+        align-items: center;
+        border: 1px solid whitesmoke;
+        display: flex;
+        min-height: 12rem;
+        width: 100%;
+        position: relative;
+      }
+
+      .file {
+        padding: 0.5rem;
+      }
+
+      .filelink {
+        text-align: center;
+        width: 100%;
+      }
+
+      .filelink .icon {
+        height: 6rem;
+        width: 6rem;
+      }
+
+      .filelink figure img {
+        vertical-align: middle;
+        width: 100%;
+      }
+
+      .filename {
+        display: block;
+        margin-top: 1rem;
+        overflow: hidden;
+        text-align: center;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .file-edit,
+      .file-delete {
+        background-color: white;
+        display: none;
+        padding: 0.5rem;
+        position: absolute;
+        top: 0.5rem;
+      }
+
+      .file-edit {
+        left: 0.5rem;
+      }
+
+      .file-delete {
+        right: 0.5rem;
+      }
+
+      #files > *:hover .file-delete,
+      #files > *:hover .file-edit {
+        display: block;
+      }
+    {{- end -}}
+
+    @media print {
+      body::after {
+        content: 'Save ink, share link. {{- .PublicURL -}}';
+      }
+
+      body > * {
+        display: none;
+      }
+    }
+  </style>
+{{- end -}}

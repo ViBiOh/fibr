@@ -1,0 +1,15 @@
+{{- define "error" -}}
+  {{- template "header" . -}}
+
+  <header class="header center">
+    <h1 class="title">fibr</h1>
+  </header>
+
+  <h2 class="center">Error {{ .Error.Status }} ¯\_(ツ)_/¯</h2>
+
+  <p class="center">
+    <a href="/">Back to home</a>
+  </p>
+
+  {{- template "footer" . -}}
+{{- end -}}

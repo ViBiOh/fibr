@@ -1,0 +1,26 @@
+{{- define "delete-modal" -}}
+  <div id="delete-modal-{{- sha1 . -}}" class="modal full flex flex-center">
+    <div class="modal-content">
+      <h2 class="header">Confirmation</h2>
+
+      <form method="post" action="#">
+        <input type="hidden" name="type" value="file" />
+        <input type="hidden" name="method" value="DELETE" />
+        <input type="hidden" name="name" value="{{- .Name -}}" />
+
+        <p class="center">
+          Are you sure you want to delete <strong>{{- .Name -}}</strong>?
+        </p>
+
+        <p class="center">
+          <a href="#" class="button">
+            Cancel
+          </a>
+          <button type="submit" class="button bg-important">
+            Confirm
+          </button>
+        </p>
+      </form>
+    </div>
+  </div>
+{{- end -}}

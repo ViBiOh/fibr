@@ -1,0 +1,30 @@
+{{- define "share-form" -}}
+  <div id="share-form" class="modal full flex flex-center">
+    <div class="modal-content">
+      <h2 class="header">Share this directory</h2>
+
+      <form method="post" action="#">
+        <input type="hidden" name="type" value="share" />
+        <input type="hidden" name="method" value="POST" />
+        <p class="center">
+          <input id="edit" type="checkbox" name="edit" value="true" />
+          <label for="edit">Edit right</label>
+        </p>
+        <p class="center">
+          <input id="password" type="text" name="password" value="" placeholder="Password" />
+        </p>
+        <p class="center">
+          <button type="submit" class="button bg-important">
+            Share
+          </button>
+        </p>
+      </form>
+
+      <p class="center">
+        <a href="#" class="button">
+          Cancel
+        </a>
+      </p>
+    </div>
+  </div>
+{{- end -}}

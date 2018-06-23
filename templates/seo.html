@@ -1,0 +1,18 @@
+{{- define "seo" -}}
+  <title>{{- .Title -}}</title>
+  <meta name="description" content="{{- .Description -}}">
+  <link rel="canonical" href="{{- .PublicURL -}}">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:creator" content="@ViBiOh">
+  <meta name="twitter:site" content="{{- .PublicURL -}}">
+  <meta name="twitter:image" content="{{- .Config.Seo.Img -}}?v={{- .Config.Version -}}">
+  <meta name="twitter:title" content="{{- .Title -}}">
+  <meta name="twitter:description" content="{{- .Description -}}">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{- .PublicURL -}}">
+  <meta property="og:title" content="{{- .Title -}}">
+  <meta property="og:description" content="{{- .Description -}}">
+  <meta property="og:image" content="{{- .Config.Seo.Img -}}?v={{- .Config.Version -}}">
+  <meta property="og:image:height" content="{{- .Config.Seo.ImgHeight -}}">
+  <meta property="og:image:width" content="{{- .Config.Seo.ImgWidth -}}">
+{{- end -}}
