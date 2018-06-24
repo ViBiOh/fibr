@@ -61,13 +61,13 @@ start-deps:
 	go get -u github.com/ViBiOh/auth/cmd/bcrypt
 
 start-api:
-	DEBUG=true go run -race cmd/fibr.go \
+	DEBUG=true go run cmd/fibr.go \
 		-tls=false \
 		-fsDirectory `pwd` \
 		-publicURL http://localhost:1080 \
 		-authUsers admin:admin \
 		-basicUsers 1:admin:`bcrypt admin` \
 		-frameOptions "SAMEORIGIN" \
-		-csp "default-src 'self'; base-uri 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:"
+		-csp "default-src 'self'; base-uri 'self'; script-src 'unsafe-inline' unpkg.com/hammerjs@2.0.8/; style-src 'unsafe-inline'; img-src 'self' data:"
 
 .PHONY: api go docker version deps format lint tst bench build docker-deps docker-login docker-build docker-push docker-pull docker-promote start-deps start-api

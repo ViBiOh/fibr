@@ -11,7 +11,7 @@ services:
     - -version
     - ${VERSION}
     - -csp
-    - "default-src 'self'; base-uri 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:"
+    - "default-src 'self'; base-uri 'self'; script-src 'unsafe-inline' unpkg.com/hammerjs@2.0.8/; style-src 'unsafe-inline'; img-src 'self' data:"
     - -frameOptions
     - SAMEORIGIN
     - -tracingName

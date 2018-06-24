@@ -3,12 +3,12 @@
 
   <div class="browser">
     {{- if .Content.File.IsVideo -}}
-      <video controls src="{{- .PublicURL -}}" type="{{ .Content.File.Mime -}}"></video>
+      <video controls src="{{- .Content.File.Pathname -}}" type="{{ .Content.File.Mime -}}"></video>
     {{- else -}}
       {{- if .Content.File.IsImage -}}
-        <img src="{{- .PublicURL -}}" alt="{{- .Content.File.Name -}}" />
+        <img src="{{- .Content.File.Pathname -}}" alt="{{- .Content.File.Name -}}" />
       {{- else -}}
-        <object data="{{- .PublicURL -}}" type="{{ .Content.File.Mime -}}"></object>
+        <object data="{{- .Content.File.Pathname -}}" type="{{ .Content.File.Mime -}}"></object>
       {{- end -}}
     {{- end -}}
 
@@ -29,7 +29,10 @@
     {{- end -}}
   </div>
 
+  {{- template "footer" . -}}
+
   {{- if or .Content.Next .Content.Previous -}}
+    <script type="text/javascript" src="https://unpkg.com/hammerjs@2.0.8/hammer.min.js"></script>
     <script type="text/javascript">
       /**
        * Handle Previous/next.
@@ -47,8 +50,17 @@
           }
         {{- end -}}
       };
+
+      if (Hammer) {
+        var mc = new Hammer(document.querySelector('.browser'));
+        {{- if .Content.Previous -}}
+          mc.on('panleft', () =>  window.location.href = '{{- .Content.Previous.Name -}}?browser=true');
+        {{- end -}}
+
+        {{- if .Content.Next -}}
+          mc.on('panright', () =>  window.location.href = '{{- .Content.Next.Name -}}?browser=true');
+        {{- end -}}
+      }
     </script>
   {{- end -}}
-
-  {{- template "footer" . -}}
 {{- end -}}

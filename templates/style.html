@@ -36,6 +36,11 @@
     }
 
     {{- if eq .Layout "browser" -}}
+      body {
+        display: flex;
+        flex-direction: column;
+      }
+
       object {
         border: 0;
         {{- if not .Content.File.IsImage -}}
@@ -53,9 +58,9 @@
       }
 
       .browser {
+        flex: 1 1;
         position: relative;
         text-align: center;
-        height: 100%;
 
         {{- if not .Content.File.IsImage -}}
           display: flex;
