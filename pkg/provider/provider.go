@@ -40,6 +40,17 @@ type Request struct {
 	Share    *Share
 }
 
+// GetPath of request according to share
+func (r Request) GetPath() string {
+	var prefix string
+
+	if r.Share != nil {
+		prefix = r.Share.Path
+	}
+
+	return path.Join(prefix, r.Path)
+}
+
 // Share stores informations about shared paths
 type Share struct {
 	ID       string `json:"id"`

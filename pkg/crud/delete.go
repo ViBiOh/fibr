@@ -9,13 +9,13 @@ import (
 )
 
 // Delete given path from filesystem
-func (a *App) Delete(w http.ResponseWriter, r *http.Request, config *provider.Request) {
-	if !config.CanEdit {
+func (a *App) Delete(w http.ResponseWriter, r *http.Request, request *provider.Request) {
+	if !request.CanEdit {
 		a.renderer.Error(w, http.StatusForbidden, ErrNotAuthorized)
 		return
 	}
 
-	pathname, err := getFilepath(r, config)
+	pathname, err := getFilepath(r, request)
 	if err != nil && err == ErrNotAuthorized {
 		a.renderer.Error(w, http.StatusForbidden, err)
 		return
@@ -32,5 +32,5 @@ func (a *App) Delete(w http.ResponseWriter, r *http.Request, config *provider.Re
 		return
 	}
 
-	a.List(w, config, path.Dir(pathname), r.URL.Query().Get(`d`), &provider.Message{Level: `success`, Content: fmt.Sprintf(`%s successfully deleted`, info.Name)})
+	a.List(w, request, path.Dir(request.GetPath()), r.URL.Query().Get(`d`), &provider.Message{Level: `success`, Content: fmt.Sprintf(`%s successfully deleted`, info.Name)})
 }

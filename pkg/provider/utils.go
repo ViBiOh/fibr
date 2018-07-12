@@ -32,11 +32,7 @@ func GetPathname(request *Request, name []byte) string {
 	paths := make([]string, 0)
 
 	if request != nil {
-		if request.Share != nil {
-			paths = append(paths, request.Share.Path)
-		}
-
-		paths = append(paths, request.Path)
+		paths = append(paths, request.GetPath())
 	}
 
 	if name != nil {

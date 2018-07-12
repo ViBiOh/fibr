@@ -3,19 +3,18 @@ package crud
 import (
 	"fmt"
 	"net/http"
-	"path"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
 // Rename rename given path to a new one
-func (a *App) Rename(w http.ResponseWriter, r *http.Request, config *provider.Request) {
-	if !config.CanEdit {
+func (a *App) Rename(w http.ResponseWriter, r *http.Request, request *provider.Request) {
+	if !request.CanEdit {
 		a.renderer.Error(w, http.StatusForbidden, ErrNotAuthorized)
 		return
 	}
 
-	newName, err := getFormFilepath(r, config, `newName`)
+	newName, err := getFormFilepath(r, request, `newName`)
 	if err != nil {
 		if err == ErrNotAuthorized {
 			a.renderer.Error(w, http.StatusForbidden, err)
@@ -35,7 +34,7 @@ func (a *App) Rename(w http.ResponseWriter, r *http.Request, config *provider.Re
 		return
 	}
 
-	oldName, err := getFilepath(r, config)
+	oldName, err := getFilepath(r, request)
 	if err != nil && err == ErrNotAuthorized {
 		a.renderer.Error(w, http.StatusForbidden, err)
 		return
@@ -57,5 +56,5 @@ func (a *App) Rename(w http.ResponseWriter, r *http.Request, config *provider.Re
 		return
 	}
 
-	a.List(w, config, path.Dir(oldName), r.URL.Query().Get(`d`), &provider.Message{Level: `success`, Content: fmt.Sprintf(`%s successfully renamed to %s`, info.Name, newName)})
+	a.List(w, request, request.GetPath(), r.URL.Query().Get(`d`), &provider.Message{Level: `success`, Content: fmt.Sprintf(`%s successfully renamed to %s`, info.Name, newName)})
 }
