@@ -3,7 +3,6 @@ package crud
 import (
 	"fmt"
 	"net/http"
-	"path"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
@@ -32,5 +31,5 @@ func (a *App) Delete(w http.ResponseWriter, r *http.Request, request *provider.R
 		return
 	}
 
-	a.List(w, request, path.Dir(request.GetPath()), r.URL.Query().Get(`d`), &provider.Message{Level: `success`, Content: fmt.Sprintf(`%s successfully deleted`, info.Name)})
+	a.List(w, request, r.URL.Query().Get(`d`), &provider.Message{Level: `success`, Content: fmt.Sprintf(`%s successfully deleted`, info.Name)})
 }

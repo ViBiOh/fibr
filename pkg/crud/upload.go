@@ -90,5 +90,5 @@ func (a *App) Upload(w http.ResponseWriter, r *http.Request, request *provider.R
 		message = fmt.Sprintf(`Files %s successfully uploaded`, strings.Join(filenames, `, `))
 	}
 
-	a.List(w, request, request.GetPath(), r.URL.Query().Get(`d`), &provider.Message{Level: `success`, Content: message})
+	a.List(w, request, r.URL.Query().Get(`d`), &provider.Message{Level: `success`, Content: message})
 }

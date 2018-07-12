@@ -7,8 +7,8 @@ import (
 )
 
 // List render directory web view of given dirPath
-func (a *App) List(w http.ResponseWriter, request *provider.Request, filename string, display string, message *provider.Message) {
-	files, err := a.storage.List(filename)
+func (a *App) List(w http.ResponseWriter, request *provider.Request, display string, message *provider.Message) {
+	files, err := a.storage.List(request.GetPath())
 	if err != nil {
 		a.renderer.Error(w, http.StatusInternalServerError, err)
 		return

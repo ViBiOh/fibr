@@ -56,5 +56,5 @@ func (a *App) Rename(w http.ResponseWriter, r *http.Request, request *provider.R
 		return
 	}
 
-	a.List(w, request, request.GetPath(), r.URL.Query().Get(`d`), &provider.Message{Level: `success`, Content: fmt.Sprintf(`%s successfully renamed to %s`, info.Name, newName)})
+	a.List(w, request, r.URL.Query().Get(`d`), &provider.Message{Level: `success`, Content: fmt.Sprintf(`%s successfully renamed to %s`, info.Name, newName)})
 }
