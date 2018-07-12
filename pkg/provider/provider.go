@@ -86,8 +86,9 @@ func (p Page) Title() string {
 			title = fmt.Sprintf(`%s - %s`, title, p.Config.RootName)
 		}
 
-		if p.Request.Path != `` {
-			title = fmt.Sprintf(`%s - %s`, title, strings.Trim(p.Request.Path, `/`))
+		path := strings.Trim(p.Request.Path, `/`)
+		if path != `` {
+			title = fmt.Sprintf(`%s - %s`, title, path)
 		}
 	}
 
