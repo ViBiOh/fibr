@@ -30,7 +30,7 @@ jobs:
     deploy:
       provider: script
       skip_cleanup: true
-      script: "curl -H 'Authorization: GitHub ${GITHUB_OAUTH_TOKEN}' -X POST \"https://dashboard-api.vibioh.fr/deploy/fibr/?rollbar_token=${ROLLBAR_TOKEN}&user=`perl -MURI::Escape -e 'print uri_escape($ARGV[0]);' "$(make author)"`&revions=`make version`\" --data-binary @docker-compose-env.yml"
+      script: "curl -H 'Authorization: GitHub ${GITHUB_OAUTH_TOKEN}' -X POST \"https://dashboard-api.vibioh.fr/deploy/fibr/?rollbar_token=${ROLLBAR_TOKEN}&user=`perl -MURI::Escape -e 'print uri_escape($ARGV[0]);' "$(make author)"`&revision=`make version`\" --data-binary @docker-compose-env.yml"
 
 stages:
   - Build
