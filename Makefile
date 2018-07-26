@@ -1,4 +1,5 @@
 VERSION ?= $(shell git log --pretty=format:'%h' -n 1)
+AUTHOR ?= $(shell git log --pretty=format:'%an' -n 1)
 
 default: api docker
 
@@ -10,6 +11,9 @@ docker: docker-build docker-push
 
 version:
 	@echo -n $(VERSION)
+
+author:
+	@echo -n $(AUTHOR)
 
 deps:
 	go get -u github.com/golang/dep/cmd/dep
@@ -70,4 +74,4 @@ start-api:
 		-frameOptions "SAMEORIGIN" \
 		-csp "default-src 'self'; base-uri 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:"
 
-.PHONY: api go docker version deps format lint tst bench build docker-deps docker-login docker-build docker-push docker-pull docker-promote start-deps start-api
+.PHONY: api go docker version author deps format lint tst bench build docker-deps docker-login docker-build docker-push docker-pull docker-promote start-deps start-api

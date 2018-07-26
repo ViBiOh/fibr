@@ -194,7 +194,7 @@ func main() {
 	alcotestConfig := alcotest.Flags(``)
 	opentracingConfig := opentracing.Flags(`tracing`)
 	owaspConfig := owasp.Flags(``)
-	rollbarConfig := rollbar.Flags(``)
+	rollbarConfig := rollbar.Flags(`rollbar`)
 
 	authConfig := auth.Flags(`auth`)
 	basicConfig := basic.Flags(`basic`)
