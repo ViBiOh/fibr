@@ -25,6 +25,7 @@ import (
 	"github.com/ViBiOh/httputils/pkg/httperror"
 	"github.com/ViBiOh/httputils/pkg/opentracing"
 	"github.com/ViBiOh/httputils/pkg/owasp"
+	"github.com/ViBiOh/httputils/pkg/rollbar"
 	"github.com/ViBiOh/httputils/pkg/server"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -193,6 +194,7 @@ func main() {
 	alcotestConfig := alcotest.Flags(``)
 	opentracingConfig := opentracing.Flags(`tracing`)
 	owaspConfig := owasp.Flags(``)
+	rollbarConfig := rollbar.Flags(``)
 
 	authConfig := auth.Flags(`auth`)
 	basicConfig := basic.Flags(`basic`)
@@ -209,6 +211,7 @@ func main() {
 	healthcheckApp := healthcheck.NewApp()
 	opentracingApp := opentracing.NewApp(opentracingConfig)
 	owaspApp := owasp.NewApp(owaspConfig)
+	rollbarApp := rollbar.NewApp(rollbarConfig)
 	gzipApp := gzip.NewApp()
 
 	storage := getStorage(`filesystem`, map[string]interface{}{
@@ -220,7 +223,7 @@ func main() {
 	crudApp := crud.NewApp(crudConfig, storage, uiApp, thumbnailApp)
 	authApp := auth.NewApp(authConfig, authService.NewBasicApp(basicConfig))
 
-	webHandler := server.ChainMiddlewares(browserHandler(crudApp, uiApp, authApp), opentracingApp, gzipApp, owaspApp)
+	webHandler := server.ChainMiddlewares(browserHandler(crudApp, uiApp, authApp), opentracingApp, rollbarApp, gzipApp, owaspApp)
 
 	serverApp.ListenAndServe(webHandler, nil, healthcheckApp)
 }

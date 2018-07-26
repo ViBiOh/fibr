@@ -16,6 +16,7 @@ import (
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/pkg/httperror"
+	"github.com/ViBiOh/httputils/pkg/rollbar"
 	"github.com/ViBiOh/httputils/pkg/tools"
 )
 
@@ -183,7 +184,7 @@ func (a App) Upload(pathname string, content io.ReadCloser) error {
 	if storageFile != nil {
 		defer func() {
 			if err := storageFile.Close(); err != nil {
-				log.Printf(`[fs] Error while closing file: %v`, err)
+				rollbar.LogError(`[fs] Error while closing file: %v`, err)
 			}
 		}()
 	}

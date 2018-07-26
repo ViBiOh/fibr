@@ -14,6 +14,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/utils"
 	"github.com/ViBiOh/httputils/pkg/httperror"
 	"github.com/ViBiOh/httputils/pkg/httpjson"
+	"github.com/ViBiOh/httputils/pkg/rollbar"
 	"github.com/ViBiOh/httputils/pkg/templates"
 	"github.com/ViBiOh/httputils/pkg/tools"
 )
@@ -131,7 +132,7 @@ func (a App) Error(w http.ResponseWriter, status int, err error) {
 		httperror.InternalServerError(w, err)
 	}
 
-	log.Printf(`[error] %v`, err)
+	rollbar.LogError(`[error] %v`, err)
 }
 
 // Sitemap render sitemap.xml

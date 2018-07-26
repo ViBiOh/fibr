@@ -24,6 +24,7 @@ jobs:
         -e "s|\${DATA_DIR}|${DATA_DIR}|g" \
         -e "s|\${DATA_USER_ID}|${DATA_USER_ID}|g" \
         -e "s|\${BASIC_USERS}|${BASIC_USERS}|g" \
+        -e "s|\${ROLLBAR_TOKEN}|${ROLLBAR_TOKEN}|g" \
         -e "s|\${VERSION}|${TRAVIS_COMMIT}|g" \
         docker-compose.yml > docker-compose-env.yml
     deploy:

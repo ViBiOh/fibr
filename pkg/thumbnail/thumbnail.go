@@ -13,6 +13,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/pkg/httperror"
 	"github.com/ViBiOh/httputils/pkg/httpjson"
+	"github.com/ViBiOh/httputils/pkg/rollbar"
 	"github.com/ViBiOh/httputils/pkg/tools"
 	"github.com/disintegration/imaging"
 )
@@ -114,7 +115,7 @@ func (a App) Generate() {
 	})
 
 	if err != nil {
-		log.Printf(`[thumbnail] Error while walking: %v`, err)
+		rollbar.LogError(`[thumbnail] Error while walking: %v`, err)
 	}
 }
 
@@ -122,12 +123,12 @@ func (a App) Generate() {
 func (a App) GenerateImageThumbnail(pathname string) {
 	info, err := a.storage.Info(pathname)
 	if err != nil && !provider.IsNotExist(err) {
-		log.Printf(`[thumbnail] Error while getting info about %s: %v`, pathname, err)
+		rollbar.LogError(`[thumbnail] Error while getting info about %s: %v`, pathname, err)
 		return
 	}
 
 	if info == nil {
-		log.Printf(`[thumbnail] Image not found for %s`, pathname)
+		rollbar.LogError(`[thumbnail] Image not found for %s`, pathname)
 		return
 	}
 
@@ -135,12 +136,12 @@ func (a App) GenerateImageThumbnail(pathname string) {
 
 	thumbInfo, err := a.storage.Info(thumbnailPath)
 	if err != nil && !provider.IsNotExist(err) {
-		log.Printf(`[thumbnail] Error while getting info about thumbnail for %s: %v`, pathname, err)
+		rollbar.LogError(`[thumbnail] Error while getting info about thumbnail for %s: %v`, pathname, err)
 		return
 	}
 
 	if thumbInfo != nil {
-		log.Printf(`[thumbnail] Thumbnail already exists for %s`, pathname)
+		rollbar.LogError(`[thumbnail] Thumbnail already exists for %s`, pathname)
 		return
 	}
 
@@ -148,24 +149,24 @@ func (a App) GenerateImageThumbnail(pathname string) {
 	if file != nil {
 		defer func() {
 			if err := file.Close(); err != nil {
-				log.Printf(`[thumbnail] Error while closing file %s: %v`, pathname, err)
+				rollbar.LogError(`[thumbnail] Error while closing file %s: %v`, pathname, err)
 			}
 		}()
 	}
 	if err != nil {
-		log.Printf(`[thumbnail] Error while opening file %s: %v`, pathname, err)
+		rollbar.LogError(`[thumbnail] Error while opening file %s: %v`, pathname, err)
 		return
 	}
 
 	sourceImage, err := imaging.Decode(file)
 	if err != nil {
-		log.Printf(`[thumbnail] Error while opening file %s: %v`, pathname, err)
+		rollbar.LogError(`[thumbnail] Error while opening file %s: %v`, pathname, err)
 		return
 	}
 	resizedImage := imaging.Fill(sourceImage, 150, 150, imaging.Center, imaging.Box)
 
 	if err := a.storage.Create(path.Dir(thumbnailPath)); err != nil {
-		log.Printf(`[thumbnail] Error while getting creating thumbnail dir for %s: %v`, pathname, err)
+		rollbar.LogError(`[thumbnail] Error while getting creating thumbnail dir for %s: %v`, pathname, err)
 		return
 	}
 
@@ -173,23 +174,23 @@ func (a App) GenerateImageThumbnail(pathname string) {
 	if thumbnailFile != nil {
 		defer func() {
 			if err := thumbnailFile.Close(); err != nil {
-				log.Printf(`[thumbnail] Error while closing file %s: %v`, thumbnailPath, err)
+				rollbar.LogError(`[thumbnail] Error while closing file %s: %v`, thumbnailPath, err)
 			}
 		}()
 	}
 	if err != nil {
-		log.Printf(`[thumbnail] Error while opening thumbnail file %s: %v`, pathname, err)
+		rollbar.LogError(`[thumbnail] Error while opening thumbnail file %s: %v`, pathname, err)
 		return
 	}
 
 	format, err := imaging.FormatFromFilename(thumbnailPath)
 	if err != nil {
-		log.Printf(`[thumbnail] Error while getting thumbnail format for %s: %v`, pathname, err)
+		rollbar.LogError(`[thumbnail] Error while getting thumbnail format for %s: %v`, pathname, err)
 		return
 	}
 
 	if err = imaging.Encode(thumbnailFile, resizedImage, format); err != nil {
-		log.Printf(`[thumbnail] Error while saving file for %s: %v`, pathname, err)
+		rollbar.LogError(`[thumbnail] Error while saving file for %s: %v`, pathname, err)
 		return
 	}
 
