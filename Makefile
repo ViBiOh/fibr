@@ -13,7 +13,7 @@ version:
 	@echo -n $(VERSION)
 
 author:
-	@python -c 'import sys; import urllib; print urllib.quote(sys.argv[1])' "$(AUTHOR)"
+	@python -c 'import sys; import urllib; print urllib.quote_plus(sys.argv[1])' "$(AUTHOR)"
 
 deps:
 	go get github.com/golang/dep/cmd/dep
