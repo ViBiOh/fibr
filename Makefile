@@ -62,7 +62,7 @@ docker-delete:
 	curl -X DELETE -u "$(DOCKER_USER):$(DOCKER_CLOUD_TOKEN)" "https://cloud.docker.com/v2/repositories/$(DOCKER_USER)/fibr/tags/$(VERSION)/"
 
 start-deps:
-	go get -u github.com/ViBiOh/auth/cmd/bcrypt
+	go get github.com/ViBiOh/auth/cmd/bcrypt
 
 start-api:
 	DEBUG=true go run cmd/fibr.go \
