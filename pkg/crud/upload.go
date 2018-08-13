@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	defaultMaxMemory = 256 << 20 // 256 MB
+	defaultMaxMemory = 128 << 20 // 128 MB
 )
 
 func (a *App) saveUploadedFile(request *provider.Request, uploadedFile io.ReadCloser, uploadedFileHeader *multipart.FileHeader) error {
