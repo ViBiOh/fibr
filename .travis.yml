@@ -2,24 +2,30 @@ jobs:
   include:
   - stage: Build
 
-    language: go
     sudo: required
     services:
     - docker
-    go : '1.10'
+    script: make
     after_success: |
-      if [ "${TRAVIS_BRANCH}" == "master" ]; then
-        bash <(curl -s https://codecov.io/bash)
-        curl -s -X POST https://goreportcard.com/checks?repo=github.com/ViBiOh/fibr
-      fi
+      echo ${DOCKER_PASS} | docker login -u vibioh --password-stdin
+      docker push vibioh/`make name`:`make version`
+
+  - stage: Publish
+
+    sudo: required
+    services:
+    - docker
+    script: |
+      echo ${DOCKER_PASS} | docker login -u vibioh --password-stdin
+      docker pull vibioh/`make name`:`make version`
+      docker tag vibioh/`make name`:`make version` vibioh/`make name`:latest
+      docker push vibioh/`make name`:latest
+    after_success: |
+      curl -s -X POST https://goreportcard.com/checks?repo=github.com/ViBiOh/fibr
 
   - stage: Deploy
 
     script: |
-      make docker-promote
-      VERSION=latest make docker-push
-      make docker-delete
-
       sed \
         -e "s|\${DATA_DIR}|${DATA_DIR}|g" \
         -e "s|\${DATA_USER_ID}|${DATA_USER_ID}|g" \
@@ -34,6 +40,8 @@ jobs:
 
 stages:
   - Build
+  - name: Publish
+    if: branch = master
   - name: Deploy
     if: branch = master
 

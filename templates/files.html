@@ -9,7 +9,7 @@
     {{- template "folder-modal" . -}}
   {{- end -}}
 
-  {{- if and .Request.CanShare .Content.Shares -}}
+  {{- if .Request.CanShare -}}
     {{- template "share-form" . -}}
     {{- template "share-list" . -}}
   {{- end -}}
