@@ -56,4 +56,4 @@ start:
 		-frameOptions "SAMEORIGIN" \
 		-csp "default-src 'self'; base-uri 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:"
 
-.PHONY: $(APP_NAME) go name version author deps format lint tst bench build start-deps start
+.PHONY: docker $(APP_NAME) go name version author deps format lint tst bench build start-deps start
