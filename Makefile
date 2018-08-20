@@ -2,9 +2,6 @@ APP_NAME ?= fibr
 VERSION ?= $(shell git log --pretty=format:'%h' -n 1)
 AUTHOR ?= $(shell git log --pretty=format:'%an' -n 1)
 
-docker:
-	docker build -t vibioh/$(APP_NAME):$(VERSION) .
-
 $(APP_NAME): deps go
 
 go: format lint tst bench build
@@ -56,4 +53,4 @@ start:
 		-frameOptions "SAMEORIGIN" \
 		-csp "default-src 'self'; base-uri 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:"
 
-.PHONY: docker $(APP_NAME) go name version author deps format lint tst bench build start-deps start
+.PHONY: $(APP_NAME) go name version author deps format lint tst bench build start-deps start

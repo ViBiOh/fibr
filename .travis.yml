@@ -5,7 +5,7 @@ jobs:
     sudo: required
     services:
     - docker
-    script: make docker
+    script: docker build -t vibioh/`make name`:`make version`
     after_success: |
       echo ${DOCKER_PASS} | docker login -u vibioh --password-stdin
       docker push vibioh/`make name`:`make version`
