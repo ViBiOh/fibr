@@ -88,7 +88,7 @@ func (a App) List(w http.ResponseWriter, r *http.Request, pathname string) {
 		thumbnails[tools.Sha1(item.Name)] = base64.StdEncoding.EncodeToString(content)
 	}
 
-	if err := httpjson.ResponseJSON(w, http.StatusOK, thumbnails, httpjson.IsPretty(r.URL.RawQuery)); err != nil {
+	if err := httpjson.ResponseJSON(w, http.StatusOK, thumbnails, httpjson.IsPretty(r)); err != nil {
 		httperror.InternalServerError(w, err)
 	}
 }

@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/pkg/query"
 )
 
 // CheckAndServeSEO check if filename match SEO and serve it, or not
@@ -28,8 +29,12 @@ func (a *App) CheckAndServeSEO(w http.ResponseWriter, r *http.Request) bool {
 	return false
 }
 
+func isThumbnail(r *http.Request) bool {
+	return query.GetBool(r, `thumbnail`)
+}
+
 func (a *App) checkAndServeThumbnail(w http.ResponseWriter, r *http.Request, pathname string, info *provider.StorageItem) bool {
-	if r.URL.Query().Get(`thumbnail`) == `true` && provider.ImageExtensions[info.Extension()] {
+	if isThumbnail(r) && provider.ImageExtensions[info.Extension()] {
 		return a.thumbnailApp.ServeIfPresent(w, r, pathname)
 	}
 
@@ -69,7 +74,7 @@ func (a *App) GetWithMessage(w http.ResponseWriter, r *http.Request, request *pr
 		return
 	}
 
-	if r.URL.Query().Get(`thumbnail`) == `true` {
+	if isThumbnail(r) {
 		a.thumbnailApp.List(w, r, pathname)
 	} else {
 		a.List(w, request, r.URL.Query().Get(`d`), message)

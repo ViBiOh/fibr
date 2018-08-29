@@ -11,7 +11,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:886e209d7f75d5ba5c64c497f05f1d0095ee24976a93dabcfae652c0ea6b4482"
+  digest = "1:017300dd6192cc23ced99b26683d99df5b917a6cec49ef5d9c798e8691598102"
   name = "github.com/ViBiOh/auth"
   packages = [
     "pkg/auth",
@@ -20,26 +20,28 @@
     "pkg/provider",
     "pkg/provider/basic",
     "pkg/provider/github",
-    "pkg/provider/twitter",
     "pkg/service",
   ]
   pruneopts = "UT"
-  revision = "c9db34479073406bac517ee1af5db88d85b93d24"
+  revision = "4bff6bba8d89a3992ef28b0a8e6dae1a30a59c65"
 
 [[projects]]
   branch = "master"
-  digest = "1:2085776d9a0dea9782606efaa8d79e0a1537845a9612957a0cf575747efebae3"
+  digest = "1:94d76f7c6c2b8bdd97857afda58ffa17a46d095fb45e266a6cb8f206af6c99cf"
   name = "github.com/ViBiOh/httputils"
   packages = [
     "pkg",
     "pkg/alcotest",
+    "pkg/cache",
     "pkg/cert",
     "pkg/gzip",
     "pkg/healthcheck",
     "pkg/httperror",
     "pkg/httpjson",
+    "pkg/model",
     "pkg/opentracing",
     "pkg/owasp",
+    "pkg/query",
     "pkg/request",
     "pkg/rollbar",
     "pkg/server",
@@ -48,7 +50,7 @@
     "pkg/uuid",
   ]
   pruneopts = "UT"
-  revision = "86591b20f496b2bfbd5e5b5c8df86937c0d7555b"
+  revision = "65833ba145f6f70978880f1a82defac3187800ec"
 
 [[projects]]
   branch = "master"
@@ -67,20 +69,20 @@
   revision = "3a0bb77429bd3a61596f5e8a3172445844342120"
 
 [[projects]]
-  digest = "1:256dd949e34358cbf396484da03e028e3c004a7a031d59892aef0a101fa0a01c"
+  digest = "1:2694597a20d303502ad1b7f1cc688977c7dc34da732ccf4d27e98b552cceed5b"
   name = "github.com/disintegration/imaging"
   packages = ["."]
   pruneopts = "UT"
-  revision = "bbcee2f5c9d5e94ca42c8b50ec847fec64a6c134"
-  version = "v1.4.2"
+  revision = "0bd5694c78c9c3d9a3cd06a706a8f3c59296a9ac"
+  version = "v1.5.0"
 
 [[projects]]
-  digest = "1:15042ad3498153684d09f393bbaec6b216c8eec6d61f63dff711de7d64ed8861"
+  digest = "1:97df918963298c287643883209a2c3f642e6593379f97ab400c2a2e219ab647d"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
   pruneopts = "UT"
-  revision = "b4deda0973fb4c70b50d226b1af49f3da59f5265"
-  version = "v1.1.0"
+  revision = "aa810b61a9c79d51363740d207bb46cf8e620ed5"
+  version = "v1.2.0"
 
 [[projects]]
   digest = "1:ff5ebae34cfbf047d505ee150de27e60570e8c394b3b8fdbb720ff6ac71985fc"
@@ -99,7 +101,7 @@
   revision = "07a764486eb10927e8cf38337918a40d430524ee"
 
 [[projects]]
-  digest = "1:27af6024faa3c28426a698b8c653be0fd908bc96e25b7d76f2192eb342427db6"
+  digest = "1:450b7623b185031f3a456801155c8320209f75d0d4c4e633c6b1e59d44d6e392"
   name = "github.com/opentracing/opentracing-go"
   packages = [
     ".",
@@ -119,7 +121,7 @@
   version = "v0.8.0"
 
 [[projects]]
-  digest = "1:1bd84ab43883f0ef0129fb753f9fdabba3903eff922816aaaba8e6204fb3cde9"
+  digest = "1:d14a5f4bfecf017cb780bdde1b6483e5deb87e12c332544d2c430eda58734bcb"
   name = "github.com/prometheus/client_golang"
   packages = [
     "prometheus",
@@ -131,7 +133,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:0f37e09b3e92aaeda5991581311f8dbf38944b36a3edec61cc2d1991f527554a"
+  digest = "1:2d5cd61daa5565187e1d96bae64dbbc6080dacf741448e9629c64fd93203b0d4"
   name = "github.com/prometheus/client_model"
   packages = ["go"]
   pruneopts = "UT"
@@ -139,7 +141,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:4d291d51042ed9de40eef61a3c1b56e969d6e0f8aa5fd3da5e958ec66bee68e4"
+  digest = "1:63b68062b8968092eb86bedc4e68894bd096ea6b24920faca8b9dcf451f54bb5"
   name = "github.com/prometheus/common"
   packages = [
     "expfmt",
@@ -147,11 +149,11 @@
     "model",
   ]
   pruneopts = "UT"
-  revision = "7600349dcfe1abd18d72d3a1770870d9800a7801"
+  revision = "c7de2306084e37d54b8be01f3541a8464345e9a5"
 
 [[projects]]
   branch = "master"
-  digest = "1:a37c98f4b7a66bb5c539c0539f0915a74ef1c8e0b3b6f45735289d94cae92bfd"
+  digest = "1:8c49953a1414305f2ff5465147ee576dd705487c35b15918fcd4efdc0cb7a290"
   name = "github.com/prometheus/procfs"
   packages = [
     ".",
@@ -163,15 +165,15 @@
   revision = "05ee40e3a273f7245e8777337fc7b46e533a9a92"
 
 [[projects]]
-  digest = "1:f9141ca80ae9d81b7b8a624848750d6ac73bf942de994086bdcf6e373349be3f"
+  digest = "1:8b6db3b490230af0836cd57f2da94e092ac0c2837fe24e762458006531749b53"
   name = "github.com/rollbar/rollbar-go"
   packages = ["."]
   pruneopts = "UT"
-  revision = "dff56a4ed902ad4f385427794b1748ea2182e84c"
-  version = "v1.0.0"
+  revision = "5f41889d7c6a59e4add07998cf776b1d335d287f"
+  version = "v1.0.1"
 
 [[projects]]
-  digest = "1:aa424126c67d89cf1a7488f0134d59b33fa106b766470aca95dfe53a3ab549d8"
+  digest = "1:22d0b8854d1df1d03e806e3d172dac199ae539f46c0b9f55b9f6a9be592de0bc"
   name = "github.com/tdewolff/minify"
   packages = [
     ".",
@@ -185,7 +187,7 @@
   version = "v2.3.5"
 
 [[projects]]
-  digest = "1:ec790a8f24bb12096cb8c4acf1e2edf38e034282e2c74277dcc81b455df351e1"
+  digest = "1:f86520dc9ce94fe3fab66ecee0c658c47a34860ffd6a60803f40f9476a32ad5a"
   name = "github.com/tdewolff/parse"
   packages = [
     ".",
@@ -201,7 +203,7 @@
   version = "v2.3.3"
 
 [[projects]]
-  digest = "1:7627e9377eb0551bc8c6e2b0c54abbbf67e9afb675f45ea916bc63d8acb1d690"
+  digest = "1:104a2d7446f4628e4663d7c029b18da1aad4313735de775f37b6e7720b1d0aa7"
   name = "github.com/uber/jaeger-client-go"
   packages = [
     ".",
@@ -235,18 +237,18 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:866e7e1c540791df6b277bbfc496e27fa6c8c55e60b159c8b9787b3487af98b2"
+  digest = "1:1ecf2a49df33be51e757d0033d5d51d5f784f35f68e5a38f797b2d3f03357d71"
   name = "golang.org/x/crypto"
   packages = [
     "bcrypt",
     "blowfish",
   ]
   pruneopts = "UT"
-  revision = "c126467f60eb25f8f27e5a981f32a87e3965053f"
+  revision = "614d502a4dac94afa3a6ce146bd1736da82514c6"
 
 [[projects]]
   branch = "master"
-  digest = "1:d7ca20afe3232af92ca012f69bdb647bfb4e420e47140da3a8bfdc913fbddfce"
+  digest = "1:d3d337e91c35f337d548873978c858ecb723168a6303a41a3ba625c79094f899"
   name = "golang.org/x/image"
   packages = [
     "bmp",
@@ -258,18 +260,18 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:ce1f391e0e8c5e3c635dc2c712b037a2d0fd4241cc5648f23ca071565dd385f2"
+  digest = "1:d6b719875cf8091fbab38527d81d34e71f4521b9ee9ccfbd4a32cff2ac5af96e"
   name = "golang.org/x/net"
   packages = [
     "context",
     "context/ctxhttp",
   ]
   pruneopts = "UT"
-  revision = "3673e40ba22529d22c3fd7c93e97b0ce50fa7bdd"
+  revision = "8a410e7b638dca158bf9e766925842f6651ff828"
 
 [[projects]]
   branch = "master"
-  digest = "1:088ae627529826fcae49466ab90dab726afe75fabf1aea7476e6946996f3bee5"
+  digest = "1:ada838e8c6151b19b06f90199f5da9771b50fbfd74838d461ad58b96cbf98015"
   name = "golang.org/x/oauth2"
   packages = [
     ".",
@@ -277,10 +279,10 @@
     "internal",
   ]
   pruneopts = "UT"
-  revision = "3d292e4d0cdc3a0113e6d207bb137145ef1de42f"
+  revision = "d2e6202438beef2727060aa7cabdd924d92ebfd9"
 
 [[projects]]
-  digest = "1:1df608126759f99976e509eef1645a75a3bb5472d2fc57cf0664444d13915a23"
+  digest = "1:328b5e4f197d928c444a51a75385f4b978915c0e75521f0ad6a3db976c97a7d3"
   name = "google.golang.org/appengine"
   packages = [
     "internal",
@@ -311,6 +313,8 @@
     "github.com/ViBiOh/httputils/pkg/httpjson",
     "github.com/ViBiOh/httputils/pkg/opentracing",
     "github.com/ViBiOh/httputils/pkg/owasp",
+    "github.com/ViBiOh/httputils/pkg/query",
+    "github.com/ViBiOh/httputils/pkg/rollbar",
     "github.com/ViBiOh/httputils/pkg/server",
     "github.com/ViBiOh/httputils/pkg/templates",
     "github.com/ViBiOh/httputils/pkg/tools",

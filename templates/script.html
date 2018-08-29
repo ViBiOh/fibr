@@ -4,7 +4,7 @@
      * Async image loading
      */
     function getThumbnails() {
-      return fetch('?thumbnail=true', { credentials: 'same-origin' }).then(response => {
+      return fetch('?thumbnail', { credentials: 'same-origin' }).then(response => {
         if (response.status >= 400) {
           return Promise.reject('Error while loading thumbnails')
         }
@@ -13,20 +13,22 @@
     }
 
     window.addEventListener('load', function() {
-      if (window.location.pathname.endsWith('/')) {
-        var throbbers = document.querySelectorAll('.throbber');
-        [].forEach.call(throbbers, throbber => throbber.style.display = 'inline-block');
-
-        getThumbnails().then(thumbnails => {
-          [].forEach.call(throbbers, throbber => {
-            var img = new Image();
-            img.src = 'data:' + throbber.dataset.mime + ';base64,' + thumbnails[throbber.dataset.id];
-            img.alt = throbber.dataset.alt;
-
-            document.getElementById('figure-' + throbber.dataset.id).replaceChild(img, throbber);
-          })
-        });
+      var throbbers = document.querySelectorAll('.throbber');
+      for (var i = throbbers.length - 1; i >= 0; i--) {
+        throbbers[i].style.display = 'inline-block';
       }
+
+      getThumbnails().then(thumbnails => {
+        for (var i = throbbers.length - 1; i >= 0; i--) {
+          var throbber = throbbers[i];
+
+          var img = new Image();
+          img.src = 'data:' + throbber.dataset.mime + ';base64,' + thumbnails[throbber.dataset.id];
+          img.alt = throbber.dataset.alt;
+
+          document.getElementById('picture-' + throbber.dataset.id).replaceChild(img, throbber);
+        }
+      });
     }, false);
 
     /**
@@ -42,19 +44,20 @@
      * Drag'n drop.
      */
     var dropZone = document.getElementsByTagName('body')[0];
-    dropZone.addEventListener('dragover', function(e) {
+
+    /**
+     * Noop function for event handler.
+     * @param  {Object} e Event
+     */
+    function eventNoop(e) {
       e.preventDefault();
       e.stopPropagation();
-    });
+    }
 
-    dropZone.addEventListener('dragleave', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-    });
-
+    dropZone.addEventListener('dragover', eventNoop);
+    dropZone.addEventListener('dragleave', eventNoop);
     dropZone.addEventListener('drop', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
+      eventNoop(e);
 
       window.location.hash = '#upload-modal';
       document.getElementById('file').files = e.dataTransfer.files;
