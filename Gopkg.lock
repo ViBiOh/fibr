@@ -23,7 +23,7 @@
     "pkg/service",
   ]
   pruneopts = "UT"
-  revision = "4bff6bba8d89a3992ef28b0a8e6dae1a30a59c65"
+  revision = "150db9542dd44578993615afdd8b6eb9cc49722b"
 
 [[projects]]
   branch = "master"
@@ -50,7 +50,7 @@
     "pkg/uuid",
   ]
   pruneopts = "UT"
-  revision = "65833ba145f6f70978880f1a82defac3187800ec"
+  revision = "f3ea8ad8f900dc62836623435ef0daadf32a887a"
 
 [[projects]]
   branch = "master"
@@ -244,7 +244,7 @@
     "blowfish",
   ]
   pruneopts = "UT"
-  revision = "614d502a4dac94afa3a6ce146bd1736da82514c6"
+  revision = "182538f80094b6a8efaade63a8fd8e0d9d5843dd"
 
 [[projects]]
   branch = "master"
