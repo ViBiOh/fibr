@@ -15,6 +15,7 @@ import (
 	authService "github.com/ViBiOh/auth/pkg/service"
 	"github.com/ViBiOh/fibr/pkg/crud"
 	"github.com/ViBiOh/fibr/pkg/filesystem"
+	"github.com/ViBiOh/fibr/pkg/minio"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/fibr/pkg/ui"
@@ -202,6 +203,7 @@ func main() {
 	uiConfig := ui.Flags(``)
 
 	filesystemConfig := filesystem.Flags(`fs`)
+	minio.Flags(`minio`)
 
 	flag.Parse()
 
