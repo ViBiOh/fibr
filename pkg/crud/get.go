@@ -43,7 +43,7 @@ func (a *App) checkAndServeThumbnail(w http.ResponseWriter, r *http.Request, pat
 
 // GetWithMessage output content with given message
 func (a *App) GetWithMessage(w http.ResponseWriter, r *http.Request, request *provider.Request, message *provider.Message) {
-	pathname := provider.GetPathname(request, nil)
+	pathname := provider.GetPathname(request, ``)
 
 	info, err := a.storage.Info(pathname)
 	if err != nil {

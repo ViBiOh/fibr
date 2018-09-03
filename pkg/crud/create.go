@@ -22,6 +22,12 @@ func (a *App) Create(w http.ResponseWriter, r *http.Request, request *provider.R
 		return
 	}
 
+	pathname, err = provider.SanitizeName(pathname)
+	if err != nil {
+		a.renderer.Error(w, http.StatusBadRequest, fmt.Errorf(`Error while sanitizing name: %v`, err))
+		return
+	}
+
 	if err := a.storage.Create(pathname); err != nil {
 		a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while creating directory: %v`, err))
 		return

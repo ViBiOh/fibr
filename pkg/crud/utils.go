@@ -17,7 +17,7 @@ func getFilepath(r *http.Request, request *provider.Request) (string, error) {
 		return ``, ErrNotAuthorized
 	}
 
-	return provider.GetPathname(request, []byte(name)), nil
+	return provider.GetPathname(request, name), nil
 }
 
 func getFormFilepath(r *http.Request, request *provider.Request, formName string) (string, error) {
@@ -30,7 +30,7 @@ func getFormFilepath(r *http.Request, request *provider.Request, formName string
 		return ``, ErrNotAuthorized
 	}
 
-	return provider.GetPathname(request, []byte(name)), nil
+	return provider.GetPathname(request, name), nil
 }
 
 func getPathParts(request *provider.Request) []string {

@@ -18,7 +18,12 @@ const (
 )
 
 func (a *App) saveUploadedFile(request *provider.Request, uploadedFile io.ReadCloser, uploadedFileHeader *multipart.FileHeader) error {
-	filename := provider.GetPathname(request, []byte(uploadedFileHeader.Filename))
+	filename, err := provider.SanitizeName(uploadedFileHeader.Filename)
+	if err != nil {
+		return fmt.Errorf(`Error while sanitizing filename: %v`, err)
+	}
+
+	filename = provider.GetPathname(request, filename)
 
 	hostFile, err := a.storage.Open(filename)
 	if hostFile != nil {

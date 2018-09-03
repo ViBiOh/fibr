@@ -27,7 +27,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:94d76f7c6c2b8bdd97857afda58ffa17a46d095fb45e266a6cb8f206af6c99cf"
+  digest = "1:ac845666b46e02f84b2cb280737b2b2ef743d6c464ed0a84d05d9d188e8d590b"
   name = "github.com/ViBiOh/httputils"
   packages = [
     "pkg",
@@ -50,7 +50,7 @@
     "pkg/uuid",
   ]
   pruneopts = "UT"
-  revision = "f3ea8ad8f900dc62836623435ef0daadf32a887a"
+  revision = "e933a668dcf09f5cb1865381c3dbfb2bce0574dc"
 
 [[projects]]
   branch = "master"
@@ -109,7 +109,8 @@
   version = "v1.0.1"
 
 [[projects]]
-  digest = "1:95c73c666919be2843b955eafc83f58c136312b74f79c703152f4c4a95fd64dc"
+  branch = "master"
+  digest = "1:b342ca8ef7aa066ba03b278088cd308ff4c2c55284b7a93df806fb86dfbd78f1"
   name = "github.com/minio/minio-go"
   packages = [
     ".",
@@ -120,8 +121,7 @@
     "pkg/set",
   ]
   pruneopts = "UT"
-  revision = "70799fe8dae6ecfb6c7d7e9e048fce27f23a1992"
-  version = "v6.0.5"
+  revision = "01b15613e730e5d71fc5f5275295fc7f111d123c"
 
 [[projects]]
   digest = "1:78bbb1ba5b7c3f2ed0ea1eab57bdd3859aec7e177811563edc41198a760b06af"
@@ -343,16 +343,19 @@
     "windows",
   ]
   pruneopts = "UT"
-  revision = "fa5fdf94c78965f1aa8423f0cc50b8b8d728b05a"
+  revision = "2b024373dcd9800f0cae693839fac6ede8d64a8c"
 
 [[projects]]
-  digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
+  branch = "master"
+  digest = "1:ac28c92ecf872cdaf70d467d78c8182616f47136a438e5bff7d6ad7ae631a568"
   name = "golang.org/x/text"
   packages = [
     "collate",
     "collate/build",
     "internal/colltab",
     "internal/gen",
+    "internal/language",
+    "internal/language/compact",
     "internal/tag",
     "internal/triegen",
     "internal/ucd",
@@ -365,8 +368,7 @@
     "unicode/rangetable",
   ]
   pruneopts = "UT"
-  revision = "f21a4dfb5e38f5895301dc265a8def02365cc3d0"
-  version = "v0.3.0"
+  revision = "6e3c4e7365ddcc329f090f96e4348398f6310088"
 
 [[projects]]
   digest = "1:328b5e4f197d928c444a51a75385f4b978915c0e75521f0ad6a3db976c97a7d3"
@@ -409,6 +411,8 @@
     "github.com/disintegration/imaging",
     "github.com/minio/minio-go",
     "golang.org/x/crypto/bcrypt",
+    "golang.org/x/text/transform",
+    "golang.org/x/text/unicode/norm",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
