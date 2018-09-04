@@ -17,15 +17,15 @@ const (
 	defaultMaxMemory = 128 << 20 // 128 MB
 )
 
-func (a *App) saveUploadedFile(request *provider.Request, uploadedFile io.ReadCloser, uploadedFileHeader *multipart.FileHeader) error {
+func (a *App) saveUploadedFile(request *provider.Request, uploadedFile io.ReadCloser, uploadedFileHeader *multipart.FileHeader) (string, error) {
 	filename, err := provider.SanitizeName(uploadedFileHeader.Filename)
 	if err != nil {
-		return fmt.Errorf(`Error while sanitizing filename: %v`, err)
+		return ``, fmt.Errorf(`Error while sanitizing filename: %v`, err)
 	}
 
-	filename = provider.GetPathname(request, filename)
+	filePath := provider.GetPathname(request, filename)
 
-	hostFile, err := a.storage.Open(filename)
+	hostFile, err := a.storage.Open(filePath)
 	if hostFile != nil {
 		defer func() {
 			if err := hostFile.Close(); err != nil {
@@ -35,18 +35,18 @@ func (a *App) saveUploadedFile(request *provider.Request, uploadedFile io.ReadCl
 	}
 
 	if err != nil {
-		return fmt.Errorf(`Error while creating or opening file: %v`, err)
+		return ``, fmt.Errorf(`Error while creating or opening file: %v`, err)
 	}
 
 	if _, err = io.Copy(hostFile, uploadedFile); err != nil {
-		return fmt.Errorf(`Error while writing file: %v`, err)
+		return ``, fmt.Errorf(`Error while writing file: %v`, err)
 	}
 
 	if provider.ImageExtensions[strings.ToLower(path.Ext(uploadedFileHeader.Filename))] {
-		go a.thumbnailApp.GenerateImageThumbnail(filename)
+		go a.thumbnailApp.GenerateImageThumbnail(filePath)
 	}
 
-	return nil
+	return filename, nil
 }
 
 // Upload saves form files to filesystem
@@ -82,12 +82,13 @@ func (a *App) Upload(w http.ResponseWriter, r *http.Request, request *provider.R
 			return
 		}
 
-		if err := a.saveUploadedFile(request, uploadedFile, file); err != nil {
+		filename, err := a.saveUploadedFile(request, uploadedFile, file)
+		if err != nil {
 			a.renderer.Error(w, http.StatusInternalServerError, err)
 			return
 		}
 
-		filenames[index] = file.Filename
+		filenames[index] = filename
 	}
 
 	message := fmt.Sprintf(`File %s successfully uploaded`, filenames[0])
