@@ -48,7 +48,7 @@ func NewApp(config map[string]*string) (*App, error) {
 	}
 
 	if !info.IsDir() {
-		return nil, fmt.Errorf(`Directory %s is unreachable`, rootDirectory)
+		return nil, fmt.Errorf(`directory %s is unreachable`, rootDirectory)
 	}
 
 	app := &App{
@@ -190,11 +190,11 @@ func (a App) Upload(pathname string, content io.ReadCloser) error {
 	}
 
 	if err != nil {
-		return fmt.Errorf(`Error while opening file: %v`, err)
+		return fmt.Errorf(`error while opening file: %v`, err)
 	}
 
 	if _, err = io.Copy(storageFile, content); err != nil {
-		return fmt.Errorf(`Error while writing file: %v`, err)
+		return fmt.Errorf(`error while writing file: %v`, err)
 	}
 
 	return nil
@@ -212,7 +212,7 @@ func (a App) Rename(oldName, newName string) error {
 
 	_, err := a.Info(oldName)
 	if err != nil {
-		return fmt.Errorf(`Error while getting infos about %s: %v`, oldName, err)
+		return fmt.Errorf(`error while getting infos about %s: %v`, oldName, err)
 	}
 
 	_, err = a.Info(newName)
@@ -221,7 +221,7 @@ func (a App) Rename(oldName, newName string) error {
 	}
 
 	if !provider.IsNotExist(err) {
-		return fmt.Errorf(`Error while getting infos about %s: %v`, newName, err)
+		return fmt.Errorf(`error while getting infos about %s: %v`, newName, err)
 	}
 
 	return os.Rename(a.getFullPath(oldName), a.getFullPath(newName))

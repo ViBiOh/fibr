@@ -20,7 +20,7 @@ const (
 func (a *App) saveUploadedFile(request *provider.Request, uploadedFile io.ReadCloser, uploadedFileHeader *multipart.FileHeader) (string, error) {
 	filename, err := provider.SanitizeName(uploadedFileHeader.Filename)
 	if err != nil {
-		return ``, fmt.Errorf(`Error while sanitizing filename: %v`, err)
+		return ``, fmt.Errorf(`error while sanitizing filename: %v`, err)
 	}
 
 	filePath := provider.GetPathname(request, filename)
@@ -35,11 +35,11 @@ func (a *App) saveUploadedFile(request *provider.Request, uploadedFile io.ReadCl
 	}
 
 	if err != nil {
-		return ``, fmt.Errorf(`Error while creating or opening file: %v`, err)
+		return ``, fmt.Errorf(`error while creating or opening file: %v`, err)
 	}
 
 	if _, err = io.Copy(hostFile, uploadedFile); err != nil {
-		return ``, fmt.Errorf(`Error while writing file: %v`, err)
+		return ``, fmt.Errorf(`error while writing file: %v`, err)
 	}
 
 	if provider.ImageExtensions[strings.ToLower(path.Ext(uploadedFileHeader.Filename))] {
@@ -57,12 +57,12 @@ func (a *App) Upload(w http.ResponseWriter, r *http.Request, request *provider.R
 	}
 
 	if err := r.ParseMultipartForm(defaultMaxMemory); err != nil {
-		a.renderer.Error(w, http.StatusBadRequest, fmt.Errorf(`Error while parsing form: %v`, err))
+		a.renderer.Error(w, http.StatusBadRequest, fmt.Errorf(`error while parsing form: %v`, err))
 		return
 	}
 
 	if r.MultipartForm.File == nil || len(r.MultipartForm.File[`files[]`]) == 0 {
-		a.renderer.Error(w, http.StatusBadRequest, errors.New(`No file provided for save`))
+		a.renderer.Error(w, http.StatusBadRequest, errors.New(`no file provided for save`))
 		return
 	}
 
@@ -78,7 +78,7 @@ func (a *App) Upload(w http.ResponseWriter, r *http.Request, request *provider.R
 			}()
 		}
 		if err != nil {
-			a.renderer.Error(w, http.StatusBadRequest, fmt.Errorf(`Error while getting file from form: %v`, err))
+			a.renderer.Error(w, http.StatusBadRequest, fmt.Errorf(`error while getting file from form: %v`, err))
 			return
 		}
 

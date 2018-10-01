@@ -29,7 +29,7 @@ func ListFilesByExt(dir, ext string) ([]string, error) {
 
 		return nil
 	}); err != nil {
-		return nil, fmt.Errorf(`Error while listing files: %v`, err)
+		return nil, fmt.Errorf(`error while listing files: %v`, err)
 	}
 
 	return output, nil

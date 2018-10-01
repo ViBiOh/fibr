@@ -31,7 +31,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-var errEmptyAuthorizationHeader = errors.New(`Empty authorization header`)
+var errEmptyAuthorizationHeader = errors.New(`empty authorization header`)
 
 func checkSharePassword(r *http.Request, share *provider.Share) error {
 	header := r.Header.Get(`Authorization`)
@@ -41,19 +41,19 @@ func checkSharePassword(r *http.Request, share *provider.Share) error {
 
 	data, err := base64.StdEncoding.DecodeString(strings.TrimPrefix(header, `Basic `))
 	if err != nil {
-		return fmt.Errorf(`Error while decoding basic authentication: %v`, err)
+		return fmt.Errorf(`error while decoding basic authentication: %v`, err)
 	}
 
 	dataStr := string(data)
 
 	sepIndex := strings.Index(dataStr, `:`)
 	if sepIndex < 0 {
-		return errors.New(`Error while reading basic authentication`)
+		return errors.New(`error while reading basic authentication`)
 	}
 
 	password := dataStr[sepIndex+1:]
 	if err := bcrypt.CompareHashAndPassword([]byte(share.Password), []byte(password)); err != nil {
-		return errors.New(`Invalid credentials`)
+		return errors.New(`invalid credentials`)
 	}
 
 	return nil
@@ -78,7 +78,7 @@ func checkShare(w http.ResponseWriter, r *http.Request, crudApp *crud.App, reque
 
 func handleAnonymousRequest(w http.ResponseWriter, r *http.Request, err error, crudApp *crud.App, uiApp *ui.App) {
 	if auth.IsForbiddenErr(err) {
-		uiApp.Error(w, http.StatusForbidden, errors.New(`You're not authorized to do this ⛔️`))
+		uiApp.Error(w, http.StatusForbidden, errors.New(`you're not authorized to do this ⛔️`))
 		return
 	}
 
@@ -115,12 +115,12 @@ func checkAllowedMethod(r *http.Request) bool {
 func browserHandler(crudApp *crud.App, uiApp *ui.App, authApp *auth.App) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !checkAllowedMethod(r) {
-			uiApp.Error(w, http.StatusMethodNotAllowed, errors.New(`We don't understand what you want from us`))
+			uiApp.Error(w, http.StatusMethodNotAllowed, errors.New(`we don't understand what you want from us`))
 			return
 		}
 
 		if strings.Contains(r.URL.Path, `..`) {
-			uiApp.Error(w, http.StatusForbidden, errors.New(`You're not authorized to do this ⛔`))
+			uiApp.Error(w, http.StatusForbidden, errors.New(`you're not authorized to do this ⛔`))
 			return
 		}
 
@@ -174,7 +174,7 @@ func getStorage(storageName string, configs map[string]interface{}) provider.Sto
 		app, err = filesystem.NewApp(config.(map[string]*string))
 
 	default:
-		err = errors.New(`Unknown storage type`)
+		err = errors.New(`unknown storage type`)
 	}
 
 	if err != nil {

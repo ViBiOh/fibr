@@ -23,7 +23,7 @@ func NewApp(config map[string]*string) (*App, error) {
 
 	minioClient, err := miniolib.New(endpoint, accessKey, secretKey, useSSL)
 	if err != nil {
-		return nil, fmt.Errorf(`Error while initializing Minio client:  %v`, err)
+		return nil, fmt.Errorf(`error while initializing Minio client:  %v`, err)
 	}
 
 	return &App{

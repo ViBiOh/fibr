@@ -30,7 +30,7 @@ func getTransformer() transform.Transformer {
 func SanitizeName(name string) (string, error) {
 	withouDiacritics, _, err := transform.String(transformer, name)
 	if err != nil {
-		return ``, fmt.Errorf(`Error while transforming string: %v`, err)
+		return ``, fmt.Errorf(`error while transforming string: %v`, err)
 	}
 
 	withoutSpecials := specialChars.ReplaceAllString(withouDiacritics, ``)

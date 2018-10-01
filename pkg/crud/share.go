@@ -26,7 +26,7 @@ func (a *App) CreateShare(w http.ResponseWriter, r *http.Request, request *provi
 	if editValue := strings.TrimSpace(r.FormValue(`edit`)); editValue != `` {
 		edit, err = strconv.ParseBool(editValue)
 		if err != nil {
-			a.renderer.Error(w, http.StatusBadRequest, fmt.Errorf(`Error while reading form: %v`, err))
+			a.renderer.Error(w, http.StatusBadRequest, fmt.Errorf(`error while reading form: %v`, err))
 			return
 		}
 	}
@@ -35,7 +35,7 @@ func (a *App) CreateShare(w http.ResponseWriter, r *http.Request, request *provi
 	if passwordValue := strings.TrimSpace(r.FormValue(`password`)); passwordValue != `` {
 		hash, err := bcrypt.GenerateFromPassword([]byte(passwordValue), 12)
 		if err != nil {
-			a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while hashing password: %v`, err))
+			a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`error while hashing password: %v`, err))
 			return
 		}
 
@@ -44,7 +44,7 @@ func (a *App) CreateShare(w http.ResponseWriter, r *http.Request, request *provi
 
 	uuid, err := uuid.New()
 	if err != nil {
-		a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while generating UUID: %v`, err))
+		a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`error while generating UUID: %v`, err))
 		return
 	}
 	id := tools.Sha1(uuid)[:8]
@@ -61,7 +61,7 @@ func (a *App) CreateShare(w http.ResponseWriter, r *http.Request, request *provi
 	})
 
 	if err = a.saveMetadata(); err != nil {
-		a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while saving share: %v`, err))
+		a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`error while saving share: %v`, err))
 		return
 	}
 
@@ -91,7 +91,7 @@ func (a *App) DeleteShare(w http.ResponseWriter, r *http.Request, request *provi
 	}
 
 	if err := a.saveMetadata(); err != nil {
-		a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`Error while saving share: %v`, err))
+		a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`error while saving share: %v`, err))
 		return
 	}
 

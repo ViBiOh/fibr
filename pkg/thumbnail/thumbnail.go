@@ -75,13 +75,13 @@ func (a App) List(w http.ResponseWriter, r *http.Request, pathname string) {
 
 		file, err := a.storage.Read(getThumbnailPath(item.Pathname))
 		if err != nil {
-			httperror.InternalServerError(w, fmt.Errorf(`Error while reading %s: %v`, item.Pathname, err))
+			httperror.InternalServerError(w, fmt.Errorf(`error while reading %s: %v`, item.Pathname, err))
 			return
 		}
 
 		content, err := ioutil.ReadAll(file)
 		if err != nil {
-			httperror.InternalServerError(w, fmt.Errorf(`Error while reading content %s: %v`, item.Pathname, err))
+			httperror.InternalServerError(w, fmt.Errorf(`error while reading content %s: %v`, item.Pathname, err))
 			return
 		}
 

@@ -15,10 +15,10 @@ import (
 
 var (
 	// ErrNotAuthorized error returned when user is not authorized
-	ErrNotAuthorized = errors.New(`You're not authorized to do this ⛔`)
+	ErrNotAuthorized = errors.New(`you're not authorized to do this ⛔`)
 
 	// ErrEmptyName error returned when user does not provide a name
-	ErrEmptyName = errors.New(`Provided name is empty`)
+	ErrEmptyName = errors.New(`provided name is empty`)
 )
 
 // App stores informations and secret of API

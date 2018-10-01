@@ -15,7 +15,7 @@ func (a *App) Post(w http.ResponseWriter, r *http.Request, config *provider.Requ
 		} else if r.FormValue(`method`) == http.MethodDelete {
 			a.DeleteShare(w, r, config)
 		} else {
-			a.renderer.Error(w, http.StatusMethodNotAllowed, errors.New(`Unknown method`))
+			a.renderer.Error(w, http.StatusMethodNotAllowed, errors.New(`unknown method`))
 		}
 	} else if r.FormValue(`method`) == http.MethodPost {
 		a.Upload(w, r, config)
@@ -26,6 +26,6 @@ func (a *App) Post(w http.ResponseWriter, r *http.Request, config *provider.Requ
 	} else if r.FormValue(`method`) == http.MethodDelete {
 		a.Delete(w, r, config)
 	} else {
-		a.renderer.Error(w, http.StatusMethodNotAllowed, errors.New(`Unknown method`))
+		a.renderer.Error(w, http.StatusMethodNotAllowed, errors.New(`unknown method`))
 	}
 }
