@@ -115,7 +115,7 @@ func (a App) Generate() {
 	})
 
 	if err != nil {
-		rollbar.LogError(`[thumbnail] Error while walking: %v`, err)
+		rollbar.LogError(`error while walking: %v`, err)
 	}
 }
 
@@ -123,12 +123,12 @@ func (a App) Generate() {
 func (a App) GenerateImageThumbnail(pathname string) {
 	info, err := a.storage.Info(pathname)
 	if err != nil && !provider.IsNotExist(err) {
-		rollbar.LogError(`[thumbnail] Error while getting info about %s: %v`, pathname, err)
+		rollbar.LogError(`error while getting info about %s: %v`, pathname, err)
 		return
 	}
 
 	if info == nil {
-		rollbar.LogError(`[thumbnail] Image not found for %s`, pathname)
+		rollbar.LogError(`emage not found for %s`, pathname)
 		return
 	}
 
@@ -136,12 +136,12 @@ func (a App) GenerateImageThumbnail(pathname string) {
 
 	thumbInfo, err := a.storage.Info(thumbnailPath)
 	if err != nil && !provider.IsNotExist(err) {
-		rollbar.LogError(`[thumbnail] Error while getting info about thumbnail for %s: %v`, pathname, err)
+		rollbar.LogError(`error while getting info about thumbnail for %s: %v`, pathname, err)
 		return
 	}
 
 	if thumbInfo != nil {
-		rollbar.LogError(`[thumbnail] Thumbnail already exists for %s`, pathname)
+		rollbar.LogError(`ehumbnail already exists for %s`, pathname)
 		return
 	}
 
@@ -149,24 +149,24 @@ func (a App) GenerateImageThumbnail(pathname string) {
 	if file != nil {
 		defer func() {
 			if err := file.Close(); err != nil {
-				rollbar.LogError(`[thumbnail] Error while closing file %s: %v`, pathname, err)
+				rollbar.LogError(`error while closing file %s: %v`, pathname, err)
 			}
 		}()
 	}
 	if err != nil {
-		rollbar.LogError(`[thumbnail] Error while opening file %s: %v`, pathname, err)
+		rollbar.LogError(`error while opening file %s: %v`, pathname, err)
 		return
 	}
 
 	sourceImage, err := imaging.Decode(file)
 	if err != nil {
-		rollbar.LogError(`[thumbnail] Error while opening file %s: %v`, pathname, err)
+		rollbar.LogError(`error while opening file %s: %v`, pathname, err)
 		return
 	}
 	resizedImage := imaging.Fill(sourceImage, 150, 150, imaging.Center, imaging.Box)
 
 	if err := a.storage.Create(path.Dir(thumbnailPath)); err != nil {
-		rollbar.LogError(`[thumbnail] Error while getting creating thumbnail dir for %s: %v`, pathname, err)
+		rollbar.LogError(`error while getting creating thumbnail dir for %s: %v`, pathname, err)
 		return
 	}
 
@@ -174,25 +174,25 @@ func (a App) GenerateImageThumbnail(pathname string) {
 	if thumbnailFile != nil {
 		defer func() {
 			if err := thumbnailFile.Close(); err != nil {
-				rollbar.LogError(`[thumbnail] Error while closing file %s: %v`, thumbnailPath, err)
+				rollbar.LogError(`error while closing file %s: %v`, thumbnailPath, err)
 			}
 		}()
 	}
 	if err != nil {
-		rollbar.LogError(`[thumbnail] Error while opening thumbnail file %s: %v`, pathname, err)
+		rollbar.LogError(`error while opening thumbnail file %s: %v`, pathname, err)
 		return
 	}
 
 	format, err := imaging.FormatFromFilename(thumbnailPath)
 	if err != nil {
-		rollbar.LogError(`[thumbnail] Error while getting thumbnail format for %s: %v`, pathname, err)
+		rollbar.LogError(`error while getting thumbnail format for %s: %v`, pathname, err)
 		return
 	}
 
 	if err = imaging.Encode(thumbnailFile, resizedImage, format); err != nil {
-		rollbar.LogError(`[thumbnail] Error while saving file for %s: %v`, pathname, err)
+		rollbar.LogError(`error while saving file for %s: %v`, pathname, err)
 		return
 	}
 
-	log.Printf(`[thumbnail] Generation success for %s`, pathname)
+	log.Printf(`Generation success for %s`, pathname)
 }

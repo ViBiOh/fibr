@@ -5,8 +5,8 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/ViBiOh/auth/pkg/auth"
@@ -157,37 +157,28 @@ func browserHandler(crudApp *crud.App, uiApp *ui.App, authApp *auth.App) http.Ha
 	})
 }
 
-func getStorage(storageName string, configs map[string]interface{}) provider.Storage {
+func getStorage(storageName string, configs map[string]map[string]*string) (provider.Storage, error) {
 	config, ok := configs[storageName]
 	if !ok {
-		log.Fatalf(`Unable to find storage config %s`, storageName)
-		return nil
+		return nil, fmt.Errorf(`unable to find storage config %s`, storageName)
 	}
 
 	var app provider.Storage
-	var appNilValue provider.Storage
 	var err error
 
 	switch storageName {
 	case `filesystem`:
-		appNilValue = (*filesystem.App)(nil)
-		app, err = filesystem.NewApp(config.(map[string]*string))
+		app, err = filesystem.NewApp(config)
 
 	default:
 		err = errors.New(`unknown storage type`)
 	}
 
 	if err != nil {
-		log.Fatalf(`Error while initializing storage: %v`, err)
-		return nil
+		return nil, fmt.Errorf(`error while initializing storage: %v`, err)
 	}
 
-	if app == appNilValue {
-		log.Fatalf(`Unable to initialize storage: %v`, err)
-		return nil
-	}
-
-	return app
+	return app, nil
 }
 
 func main() {
@@ -203,11 +194,22 @@ func main() {
 	uiConfig := ui.Flags(``)
 
 	filesystemConfig := filesystem.Flags(`fs`)
-	minio.Flags(`minio`)
+	minioConfig := minio.Flags(`minio`)
+
+	storageName := flag.String(`storage`, `filesystem`, `Storage used (e.g. 'filesystem', 'minio')`)
 
 	flag.Parse()
 
 	alcotest.DoAndExit(alcotestConfig)
+
+	storage, err := getStorage(*storageName, map[string]map[string]*string{
+		`filesystem`: filesystemConfig,
+		`minio`:      minioConfig,
+	})
+	if err != nil {
+		rollbar.LogError(`error while getting storage: %v`, err)
+		os.Exit(1)
+	}
 
 	serverApp := httputils.NewApp(serverConfig)
 	healthcheckApp := healthcheck.NewApp()
@@ -215,10 +217,6 @@ func main() {
 	owaspApp := owasp.NewApp(owaspConfig)
 	rollbarApp := rollbar.NewApp(rollbarConfig)
 	gzipApp := gzip.NewApp()
-
-	storage := getStorage(`filesystem`, map[string]interface{}{
-		`filesystem`: filesystemConfig,
-	})
 
 	thumbnailApp := thumbnail.NewApp(storage)
 	uiApp := ui.NewApp(uiConfig, storage.Root(), thumbnailApp)

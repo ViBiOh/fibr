@@ -39,7 +39,7 @@ func NewApp(config map[string]*string) (*App, error) {
 	rootDirectory := *config[`directory`]
 
 	if rootDirectory == `` {
-		return nil, nil
+		return nil, errors.New(`no directory provided`)
 	}
 
 	info, err := os.Stat(rootDirectory)
@@ -56,7 +56,7 @@ func NewApp(config map[string]*string) (*App, error) {
 		rootDirname:   info.Name(),
 	}
 
-	log.Printf(`[fs] Serving file from %s`, rootDirectory)
+	log.Printf(`Serving file from %s`, rootDirectory)
 
 	return app, nil
 }
@@ -184,7 +184,7 @@ func (a App) Upload(pathname string, content io.ReadCloser) error {
 	if storageFile != nil {
 		defer func() {
 			if err := storageFile.Close(); err != nil {
-				rollbar.LogError(`[fs] Error while closing file: %v`, err)
+				rollbar.LogError(`error while closing file: %v`, err)
 			}
 		}()
 	}
