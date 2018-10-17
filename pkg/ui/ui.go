@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"html/template"
-	"log"
 	"net/http"
 	"net/url"
 	"path"
@@ -14,7 +13,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/utils"
 	"github.com/ViBiOh/httputils/pkg/httperror"
 	"github.com/ViBiOh/httputils/pkg/httpjson"
-	"github.com/ViBiOh/httputils/pkg/rollbar"
+	"github.com/ViBiOh/httputils/pkg/logger"
 	"github.com/ViBiOh/httputils/pkg/templates"
 	"github.com/ViBiOh/httputils/pkg/tools"
 )
@@ -86,7 +85,7 @@ func NewApp(config map[string]*string, rootName string, thumbnailApp *thumbnail.
 
 	fibrTemplates, err := utils.ListFilesByExt(`./templates/`, `.html`)
 	if err != nil {
-		log.Fatalf(`Error while getting templates: %v`, err)
+		logger.Fatal(`error while getting templates: %v`, err)
 	}
 
 	publicURL := *config[`publicURL`]
@@ -132,7 +131,7 @@ func (a App) Error(w http.ResponseWriter, status int, err error) {
 		httperror.InternalServerError(w, err)
 	}
 
-	rollbar.LogError(`[error] %v`, err)
+	logger.Error(`[error] %v`, err)
 }
 
 // Sitemap render sitemap.xml

@@ -11,7 +11,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:918b57182e422790b6b1c923db1431296dbb72bc0f6347d91521bab179d2b02c"
+  digest = "1:70ea114cf944f5c2dad09bda8a4d0da41ec9b9b41443e821c6b1b30802719e14"
   name = "github.com/ViBiOh/auth"
   packages = [
     "pkg/auth",
@@ -23,11 +23,11 @@
     "pkg/service",
   ]
   pruneopts = "UT"
-  revision = "244aa3e4c507736ad814a10b7dff1240a213f727"
+  revision = "587cc066dc5651bd9a766663f3211cef5924c11c"
 
 [[projects]]
   branch = "master"
-  digest = "1:14520e5dacf504673493e11a55a7eb473b48928d619e5010ba4cbef13e9e7f37"
+  digest = "1:3278e8f7d1e1ec21b878cc32a691208c6f0133e04a4fec185988c26127682ecd"
   name = "github.com/ViBiOh/httputils"
   packages = [
     "pkg",
@@ -38,6 +38,7 @@
     "pkg/healthcheck",
     "pkg/httperror",
     "pkg/httpjson",
+    "pkg/logger",
     "pkg/model",
     "pkg/opentracing",
     "pkg/owasp",
@@ -50,7 +51,7 @@
     "pkg/uuid",
   ]
   pruneopts = "UT"
-  revision = "8f53aba915f1a0641612051384470523a6afb829"
+  revision = "b22fe94b0781e1d9599dab3cbb93a3490c063f1c"
 
 [[projects]]
   branch = "master"
@@ -77,20 +78,20 @@
   version = "v1.5.0"
 
 [[projects]]
-  branch = "master"
   digest = "1:6f9339c912bbdda81302633ad7e99a28dfa5a639c864061f1929510a9a64aa74"
   name = "github.com/dustin/go-humanize"
   packages = ["."]
   pruneopts = "UT"
   revision = "9f541cc9db5d55bce703bd99987c9d5cb8eea45e"
+  version = "v1.0.0"
 
 [[projects]]
-  digest = "1:b98e7574fc27ec166fb31195ec72c3bd0bffd73926d3612eb4c929bc5236f75b"
+  digest = "1:15e27372d379b45b18ac917b9dafc45c45485239490ece18cca97a12f9591146"
   name = "github.com/go-ini/ini"
   packages = ["."]
   pruneopts = "UT"
-  revision = "7b294651033cd7d9e7f0d9ffa1b75ed1e198e737"
-  version = "v1.38.3"
+  revision = "9c8236e659b76e87bf02044d06fde8683008ff3e"
+  version = "v1.39.0"
 
 [[projects]]
   digest = "1:97df918963298c287643883209a2c3f642e6593379f97ab400c2a2e219ab647d"
@@ -118,7 +119,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:a59961d3a1bdcce745e237a22006f462e454297ba63f81f251e40e11801797ad"
+  digest = "1:f1a4a33cfdb6c1d5eb3b7cbb00dbdded2162a8191d90dabb5e204cda7ca12988"
   name = "github.com/minio/minio-go"
   packages = [
     ".",
@@ -129,7 +130,7 @@
     "pkg/set",
   ]
   pruneopts = "UT"
-  revision = "76305dad725fda18a9abcfc6cfc5797f251ea271"
+  revision = "31e3bbc8590bf72d763be83a191836f02eb61437"
 
 [[projects]]
   digest = "1:78bbb1ba5b7c3f2ed0ea1eab57bdd3859aec7e177811563edc41198a760b06af"
@@ -188,7 +189,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:63b68062b8968092eb86bedc4e68894bd096ea6b24920faca8b9dcf451f54bb5"
+  digest = "1:c0d39a0cad193ac49b6e24516e0f994b241d7c27142e5a58e8bd13defb2d9ac8"
   name = "github.com/prometheus/common"
   packages = [
     "expfmt",
@@ -196,7 +197,7 @@
     "model",
   ]
   pruneopts = "UT"
-  revision = "c7de2306084e37d54b8be01f3541a8464345e9a5"
+  revision = "bcb74de08d37a417cb6789eec1d6c810040f0470"
 
 [[projects]]
   branch = "master"
@@ -258,7 +259,7 @@
   version = "v2.3.3"
 
 [[projects]]
-  digest = "1:104a2d7446f4628e4663d7c029b18da1aad4313735de775f37b6e7720b1d0aa7"
+  digest = "1:ac6f26e917fd2fb3194a7ebe2baf6fb32de2f2fbfed130c18aac0e758a6e1d22"
   name = "github.com/uber/jaeger-client-go"
   packages = [
     ".",
@@ -276,11 +277,12 @@
     "thrift-gen/jaeger",
     "thrift-gen/sampling",
     "thrift-gen/zipkincore",
+    "transport",
     "utils",
   ]
   pruneopts = "UT"
-  revision = "b043381d944715b469fd6b37addfd30145ca1758"
-  version = "v2.14.0"
+  revision = "1a782e2da844727691fef1757c72eb190c2909f0"
+  version = "v2.15.0"
 
 [[projects]]
   digest = "1:0f09db8429e19d57c8346ad76fbbc679341fa86073d3b8fb5ac919f0357d8f4c"
@@ -302,7 +304,7 @@
     "ssh/terminal",
   ]
   pruneopts = "UT"
-  revision = "e3636079e1a4c1f337f212cc5cd2aca108f6c900"
+  revision = "0c41d7ab0a0ee717d4590a44bcb987dfd9e183eb"
 
 [[projects]]
   branch = "master"
@@ -327,7 +329,7 @@
     "idna",
   ]
   pruneopts = "UT"
-  revision = "146acd28ed5894421fb5aac80ca93bc1b1f46f87"
+  revision = "49bb7cea24b1df9410e1712aa6433dae904ff66a"
 
 [[projects]]
   branch = "master"
@@ -343,7 +345,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:c7fca7fb607a610caae0ea941ef3843a8022f6abb69b6cd646406253f1ed36f7"
+  digest = "1:9499e4b3284b485c77e0b08c20392d1add88a982fba2468fc01a45a025110df5"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
@@ -351,7 +353,7 @@
     "windows",
   ]
   pruneopts = "UT"
-  revision = "4497e2df6f9e69048a54498c7affbbec3294ad47"
+  revision = "fa43e7bc11baaae89f3f902b2b4d832b68234844"
 
 [[projects]]
   branch = "master"
@@ -376,7 +378,7 @@
     "unicode/rangetable",
   ]
   pruneopts = "UT"
-  revision = "905a57155faa8230500121607930ebb9dd8e139c"
+  revision = "4d1c5fb19474adfe9562c9847ba425e7da817e81"
 
 [[projects]]
   digest = "1:6247f76e55a1e1a5c19a81e2d4b4dff6730461eeb5bbb0a16dd4a8ec8637ee93"
@@ -408,6 +410,7 @@
     "github.com/ViBiOh/httputils/pkg/healthcheck",
     "github.com/ViBiOh/httputils/pkg/httperror",
     "github.com/ViBiOh/httputils/pkg/httpjson",
+    "github.com/ViBiOh/httputils/pkg/logger",
     "github.com/ViBiOh/httputils/pkg/opentracing",
     "github.com/ViBiOh/httputils/pkg/owasp",
     "github.com/ViBiOh/httputils/pkg/query",

@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/pkg/rollbar"
+	"github.com/ViBiOh/httputils/pkg/logger"
 )
 
 const (
@@ -29,7 +29,7 @@ func (a *App) saveUploadedFile(request *provider.Request, uploadedFile io.ReadCl
 	if hostFile != nil {
 		defer func() {
 			if err := hostFile.Close(); err != nil {
-				rollbar.LogError(`Error while closing writted file: %v`, err)
+				logger.Error(`Error while closing writted file: %v`, err)
 			}
 		}()
 	}
@@ -73,7 +73,7 @@ func (a *App) Upload(w http.ResponseWriter, r *http.Request, request *provider.R
 		if uploadedFile != nil {
 			defer func() {
 				if err := uploadedFile.Close(); err != nil {
-					rollbar.LogError(`Error while closing uploaded file: %v`, err)
+					logger.Error(`Error while closing uploaded file: %v`, err)
 				}
 			}()
 		}

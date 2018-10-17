@@ -24,6 +24,7 @@ import (
 	"github.com/ViBiOh/httputils/pkg/gzip"
 	"github.com/ViBiOh/httputils/pkg/healthcheck"
 	"github.com/ViBiOh/httputils/pkg/httperror"
+	"github.com/ViBiOh/httputils/pkg/logger"
 	"github.com/ViBiOh/httputils/pkg/opentracing"
 	"github.com/ViBiOh/httputils/pkg/owasp"
 	"github.com/ViBiOh/httputils/pkg/rollbar"
@@ -207,7 +208,7 @@ func main() {
 		`minio`:      minioConfig,
 	})
 	if err != nil {
-		rollbar.LogError(`error while getting storage: %v`, err)
+		logger.Error(`error while getting storage: %v`, err)
 		os.Exit(1)
 	}
 

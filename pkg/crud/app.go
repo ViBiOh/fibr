@@ -4,12 +4,12 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"log"
 	"strings"
 	"sync"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
+	"github.com/ViBiOh/httputils/pkg/logger"
 	"github.com/ViBiOh/httputils/pkg/tools"
 )
 
@@ -43,7 +43,7 @@ func NewApp(config map[string]interface{}, storage provider.Storage, renderer pr
 
 	if app.metadataEnabled {
 		if err := app.loadMetadata(); err != nil {
-			log.Fatalf(`Error while loading metadata: %v`, err)
+			logger.Fatal(`Error while loading metadata: %v`, err)
 		}
 
 		go thumbnailApp.Generate()

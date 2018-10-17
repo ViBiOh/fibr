@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"path"
@@ -16,7 +15,7 @@ import (
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/pkg/httperror"
-	"github.com/ViBiOh/httputils/pkg/rollbar"
+	"github.com/ViBiOh/httputils/pkg/logger"
 	"github.com/ViBiOh/httputils/pkg/tools"
 )
 
@@ -56,7 +55,7 @@ func NewApp(config map[string]*string) (*App, error) {
 		rootDirname:   info.Name(),
 	}
 
-	log.Printf(`Serving file from %s`, rootDirectory)
+	logger.Info(`Serving file from %s`, rootDirectory)
 
 	return app, nil
 }
@@ -184,7 +183,7 @@ func (a App) Upload(pathname string, content io.ReadCloser) error {
 	if storageFile != nil {
 		defer func() {
 			if err := storageFile.Close(); err != nil {
-				rollbar.LogError(`error while closing file: %v`, err)
+				logger.Error(`error while closing file: %v`, err)
 			}
 		}()
 	}
