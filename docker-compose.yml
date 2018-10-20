@@ -16,12 +16,6 @@ services:
     - SAMEORIGIN
     - -tracingName
     - fibr
-    - -rollbarToken
-    - ${ROLLBAR_TOKEN}
-    - -rollbarServerRoot
-    - github.com/ViBiOh/fibr
-    - -rollbarEnv
-    - prod
     labels:
       traefik.frontend.passHostHeader: 'true'
       traefik.frontend.rule: 'Host: fibr.vibioh.fr'

@@ -30,13 +30,12 @@ jobs:
         -e "s|\${DATA_DIR}|${DATA_DIR}|g" \
         -e "s|\${DATA_USER_ID}|${DATA_USER_ID}|g" \
         -e "s|\${BASIC_USERS}|${BASIC_USERS}|g" \
-        -e "s|\${ROLLBAR_TOKEN}|${ROLLBAR_TOKEN}|g" \
         -e "s|\${VERSION}|${TRAVIS_COMMIT}|g" \
         docker-compose.yml > docker-compose-env.yml
     deploy:
       provider: script
       skip_cleanup: true
-      script: 'curl -H "Authorization: GitHub ${GITHUB_OAUTH_TOKEN}" -X POST "https://dashboard-api.vibioh.fr/deploy/fibr/?rollbar_token=${ROLLBAR_TOKEN}&user=`make author`&revision=`make version`&environment=prod" --data-binary @docker-compose-env.yml'
+      script: 'curl -H "Authorization: GitHub ${GITHUB_OAUTH_TOKEN}" -X POST "https://dashboard-api.vibioh.fr/deploy/fibr/" --data-binary @docker-compose-env.yml'
 
 stages:
   - Build

@@ -23,11 +23,11 @@
     "pkg/service",
   ]
   pruneopts = "UT"
-  revision = "818d3c7980e252f10a14d6ca5fcd2ba9876e6e7f"
+  revision = "412eb84033e2c783ba9fe22c540c4f31279ffc66"
 
 [[projects]]
   branch = "master"
-  digest = "1:85741fae457fa4d3c6dabc9e3d8de0021787f290b6b6f4e3b147293edb8ec42d"
+  digest = "1:520f5d08bdc82e34130c1ccee06c08046f35dcafbc6bd79bdd15ad1e06c387de"
   name = "github.com/ViBiOh/httputils"
   packages = [
     "pkg",
@@ -43,9 +43,9 @@
     "pkg/model",
     "pkg/opentracing",
     "pkg/owasp",
+    "pkg/prometheus",
     "pkg/query",
     "pkg/request",
-    "pkg/rollbar",
     "pkg/server",
     "pkg/templates",
     "pkg/tools",
@@ -53,6 +53,14 @@
   ]
   pruneopts = "UT"
   revision = "a147310fb9a8c422292a2d6f7fe4781eda74919d"
+
+[[projects]]
+  branch = "master"
+  digest = "1:d6afaeed1502aa28e80a4ed0981d570ad91b2579193404256ce672ed0a609e0d"
+  name = "github.com/beorn7/perks"
+  packages = ["quantile"]
+  pruneopts = "UT"
+  revision = "3a771d992973f24aa725d07868b467d1ddfceafb"
 
 [[projects]]
   branch = "master"
@@ -100,6 +108,14 @@
   packages = ["."]
   pruneopts = "UT"
   revision = "5c8c8bd35d3832f5d134ae1e1e375b69a4d25242"
+  version = "v1.0.1"
+
+[[projects]]
+  digest = "1:ff5ebae34cfbf047d505ee150de27e60570e8c394b3b8fdbb720ff6ac71985fc"
+  name = "github.com/matttproud/golang_protobuf_extensions"
+  packages = ["pbutil"]
+  pruneopts = "UT"
+  revision = "c12348ce28de40eed0136aa2b644d0ee0650e56c"
   version = "v1.0.1"
 
 [[projects]]
@@ -154,12 +170,48 @@
   version = "v0.8.0"
 
 [[projects]]
-  digest = "1:8b6db3b490230af0836cd57f2da94e092ac0c2837fe24e762458006531749b53"
-  name = "github.com/rollbar/rollbar-go"
-  packages = ["."]
+  digest = "1:d14a5f4bfecf017cb780bdde1b6483e5deb87e12c332544d2c430eda58734bcb"
+  name = "github.com/prometheus/client_golang"
+  packages = [
+    "prometheus",
+    "prometheus/promhttp",
+  ]
   pruneopts = "UT"
-  revision = "5f41889d7c6a59e4add07998cf776b1d335d287f"
-  version = "v1.0.1"
+  revision = "c5b7fccd204277076155f10851dad72b76a49317"
+  version = "v0.8.0"
+
+[[projects]]
+  branch = "master"
+  digest = "1:2d5cd61daa5565187e1d96bae64dbbc6080dacf741448e9629c64fd93203b0d4"
+  name = "github.com/prometheus/client_model"
+  packages = ["go"]
+  pruneopts = "UT"
+  revision = "5c3871d89910bfb32f5fcab2aa4b9ec68e65a99f"
+
+[[projects]]
+  branch = "master"
+  digest = "1:1261069fb38fbe59aba55117ee39c59814f211c027d66d59ed1c60e5c11b377c"
+  name = "github.com/prometheus/common"
+  packages = [
+    "expfmt",
+    "internal/bitbucket.org/ww/goautoneg",
+    "model",
+  ]
+  pruneopts = "UT"
+  revision = "16b4535ad14a9ef20a9d9fd8055143c5faa15224"
+
+[[projects]]
+  branch = "master"
+  digest = "1:ef74914912f99c79434d9c09658274678bc85080ebe3ab32bec3940ebce5e1fc"
+  name = "github.com/prometheus/procfs"
+  packages = [
+    ".",
+    "internal/util",
+    "nfs",
+    "xfs",
+  ]
+  pruneopts = "UT"
+  revision = "185b4288413d2a0dd0806f78c90dde719829e5ae"
 
 [[projects]]
   digest = "1:3f53e9e4dfbb664cd62940c9c4b65a2171c66acd0b7621a1a6b8e78513525a52"
@@ -355,8 +407,8 @@
     "github.com/ViBiOh/httputils/pkg/logger",
     "github.com/ViBiOh/httputils/pkg/opentracing",
     "github.com/ViBiOh/httputils/pkg/owasp",
+    "github.com/ViBiOh/httputils/pkg/prometheus",
     "github.com/ViBiOh/httputils/pkg/query",
-    "github.com/ViBiOh/httputils/pkg/rollbar",
     "github.com/ViBiOh/httputils/pkg/server",
     "github.com/ViBiOh/httputils/pkg/templates",
     "github.com/ViBiOh/httputils/pkg/tools",
