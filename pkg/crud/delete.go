@@ -22,12 +22,12 @@ func (a *App) Delete(w http.ResponseWriter, r *http.Request, request *provider.R
 
 	info, err := a.storage.Info(pathname)
 	if err != nil {
-		a.renderer.Error(w, http.StatusNotFound, fmt.Errorf(`requested path does not exist %s`, pathname))
+		a.renderer.Error(w, http.StatusNotFound, err)
 		return
 	}
 
 	if err := a.storage.Remove(pathname); err != nil {
-		a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`error while deleting %s: %v`, pathname, err))
+		a.renderer.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 

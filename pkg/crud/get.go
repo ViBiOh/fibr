@@ -48,9 +48,9 @@ func (a *App) GetWithMessage(w http.ResponseWriter, r *http.Request, request *pr
 	info, err := a.storage.Info(pathname)
 	if err != nil {
 		if provider.IsNotExist(err) {
-			a.renderer.Error(w, http.StatusNotFound, fmt.Errorf(`requested path does not exist: %s`, request.Path))
+			a.renderer.Error(w, http.StatusNotFound, err)
 		} else {
-			a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`error while reading %s: %s`, request.Path, err))
+			a.renderer.Error(w, http.StatusInternalServerError, err)
 		}
 		return
 	}

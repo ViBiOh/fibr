@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/ViBiOh/httputils/pkg/errors"
 	"github.com/ViBiOh/httputils/pkg/tools"
 	miniolib "github.com/minio/minio-go"
 )
@@ -23,7 +24,7 @@ func NewApp(config map[string]*string) (*App, error) {
 
 	minioClient, err := miniolib.New(endpoint, accessKey, secretKey, useSSL)
 	if err != nil {
-		return nil, fmt.Errorf(`error while initializing Minio client:  %v`, err)
+		return nil, errors.WithStack(err)
 	}
 
 	return &App{

@@ -1,7 +1,6 @@
 package provider
 
 import (
-	"fmt"
 	"os"
 	"path"
 	"regexp"
@@ -9,6 +8,7 @@ import (
 	"unicode"
 
 	"github.com/ViBiOh/fibr/pkg/utils"
+	"github.com/ViBiOh/httputils/pkg/errors"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
 )
@@ -30,7 +30,7 @@ func getTransformer() transform.Transformer {
 func SanitizeName(name string) (string, error) {
 	withouDiacritics, _, err := transform.String(transformer, name)
 	if err != nil {
-		return ``, fmt.Errorf(`error while transforming string: %v`, err)
+		return ``, errors.WithStack(err)
 	}
 
 	withoutSpecials := specialChars.ReplaceAllString(withouDiacritics, ``)

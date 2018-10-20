@@ -1,7 +1,7 @@
 package filesystem
 
 import (
-	"errors"
+	native_errors "errors"
 	"flag"
 	"fmt"
 	"io"
@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/pkg/errors"
 	"github.com/ViBiOh/httputils/pkg/httperror"
 	"github.com/ViBiOh/httputils/pkg/logger"
 	"github.com/ViBiOh/httputils/pkg/tools"
@@ -21,10 +22,10 @@ import (
 
 var (
 	// ErrRelativePath occurs when path is relative (contains ".."")
-	ErrRelativePath = errors.New(`pathname contains relatives paths`)
+	ErrRelativePath = native_errors.New(`pathname contains relatives paths`)
 
 	// ErrOutsidePath occurs when path is not under served directory
-	ErrOutsidePath = errors.New(`pathname does not belong to served directory`)
+	ErrOutsidePath = native_errors.New(`pathname does not belong to served directory`)
 )
 
 // App stores informations
@@ -47,7 +48,7 @@ func NewApp(config map[string]*string) (*App, error) {
 	}
 
 	if !info.IsDir() {
-		return nil, fmt.Errorf(`directory %s is unreachable`, rootDirectory)
+		return nil, errors.New(`unreachable dir %s`, rootDirectory)
 	}
 
 	app := &App{
@@ -113,7 +114,8 @@ func (a App) Read(pathname string) (io.ReadCloser, error) {
 		return nil, err
 	}
 
-	return os.OpenFile(a.getFullPath(pathname), os.O_RDONLY, 0600)
+	output, err := os.OpenFile(a.getFullPath(pathname), os.O_RDONLY, 0600)
+	return output, errors.WithStack(err)
 }
 
 // Open writer for given pathname
@@ -143,7 +145,7 @@ func (a App) List(pathname string) ([]*provider.StorageItem, error) {
 
 	files, err := ioutil.ReadDir(a.getFullPath(pathname))
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	items := make([]*provider.StorageItem, len(files))
@@ -158,10 +160,10 @@ func (a App) List(pathname string) ([]*provider.StorageItem, error) {
 
 // Walk browse item recursively
 func (a App) Walk(walkFn func(string, *provider.StorageItem, error) error) error {
-	return filepath.Walk(a.rootDirectory, func(path string, info os.FileInfo, err error) error {
+	return errors.WithStack(filepath.Walk(a.rootDirectory, func(path string, info os.FileInfo, err error) error {
 		pathname := strings.TrimPrefix(path, a.rootDirectory)
 		return walkFn(pathname, convertToItem(pathname, info), err)
-	})
+	}))
 }
 
 // Create container in storage
@@ -170,7 +172,7 @@ func (a App) Create(name string) error {
 		return err
 	}
 
-	return os.MkdirAll(a.getFullPath(name), 0700)
+	return errors.WithStack(os.MkdirAll(a.getFullPath(name), 0700))
 }
 
 // Upload file to storage
@@ -183,17 +185,17 @@ func (a App) Upload(pathname string, content io.ReadCloser) error {
 	if storageFile != nil {
 		defer func() {
 			if err := storageFile.Close(); err != nil {
-				logger.Error(`error while closing file: %v`, err)
+				logger.Error(`%+v`, err)
 			}
 		}()
 	}
 
 	if err != nil {
-		return fmt.Errorf(`error while opening file: %v`, err)
+		return err
 	}
 
 	if _, err = io.Copy(storageFile, content); err != nil {
-		return fmt.Errorf(`error while writing file: %v`, err)
+		return errors.WithStack(err)
 	}
 
 	return nil
@@ -211,19 +213,19 @@ func (a App) Rename(oldName, newName string) error {
 
 	_, err := a.Info(oldName)
 	if err != nil {
-		return fmt.Errorf(`error while getting infos about %s: %v`, oldName, err)
+		return err
 	}
 
 	_, err = a.Info(newName)
 	if err == nil {
-		return fmt.Errorf(`%s already exists`, newName)
+		return errors.New(`%s already exists`, newName)
 	}
 
 	if !provider.IsNotExist(err) {
-		return fmt.Errorf(`error while getting infos about %s: %v`, newName, err)
+		return err
 	}
 
-	return os.Rename(a.getFullPath(oldName), a.getFullPath(newName))
+	return errors.WithStack(os.Rename(a.getFullPath(oldName), a.getFullPath(newName)))
 }
 
 // Remove file or directory from storage
@@ -232,5 +234,5 @@ func (a App) Remove(pathname string) error {
 		return err
 	}
 
-	return os.RemoveAll(a.getFullPath(pathname))
+	return errors.WithStack(os.RemoveAll(a.getFullPath(pathname)))
 }

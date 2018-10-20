@@ -2,7 +2,6 @@ package thumbnail
 
 import (
 	"encoding/base64"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"path"
@@ -10,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/pkg/errors"
 	"github.com/ViBiOh/httputils/pkg/httperror"
 	"github.com/ViBiOh/httputils/pkg/httpjson"
 	"github.com/ViBiOh/httputils/pkg/logger"
@@ -74,13 +74,13 @@ func (a App) List(w http.ResponseWriter, r *http.Request, pathname string) {
 
 		file, err := a.storage.Read(getThumbnailPath(item.Pathname))
 		if err != nil {
-			httperror.InternalServerError(w, fmt.Errorf(`error while reading %s: %v`, item.Pathname, err))
+			httperror.InternalServerError(w, err)
 			return
 		}
 
 		content, err := ioutil.ReadAll(file)
 		if err != nil {
-			httperror.InternalServerError(w, fmt.Errorf(`error while reading content %s: %v`, item.Pathname, err))
+			httperror.InternalServerError(w, errors.WithStack(err))
 			return
 		}
 
@@ -114,7 +114,7 @@ func (a App) Generate() {
 	})
 
 	if err != nil {
-		logger.Error(`error while walking: %v`, err)
+		logger.Error(`%+v`, err)
 	}
 }
 
@@ -122,12 +122,12 @@ func (a App) Generate() {
 func (a App) GenerateImageThumbnail(pathname string) {
 	info, err := a.storage.Info(pathname)
 	if err != nil && !provider.IsNotExist(err) {
-		logger.Error(`error while getting info about %s: %v`, pathname, err)
+		logger.Error(`%+v`, err)
 		return
 	}
 
 	if info == nil {
-		logger.Error(`emage not found for %s`, pathname)
+		logger.Error(`%s: image not found`, pathname)
 		return
 	}
 
@@ -135,12 +135,12 @@ func (a App) GenerateImageThumbnail(pathname string) {
 
 	thumbInfo, err := a.storage.Info(thumbnailPath)
 	if err != nil && !provider.IsNotExist(err) {
-		logger.Error(`error while getting info about thumbnail for %s: %v`, pathname, err)
+		logger.Error(`%+v`, err)
 		return
 	}
 
 	if thumbInfo != nil {
-		logger.Error(`ehumbnail already exists for %s`, pathname)
+		logger.Error(`%s: thumbnail already exists`, pathname)
 		return
 	}
 
@@ -148,24 +148,24 @@ func (a App) GenerateImageThumbnail(pathname string) {
 	if file != nil {
 		defer func() {
 			if err := file.Close(); err != nil {
-				logger.Error(`error while closing file %s: %v`, pathname, err)
+				logger.Error(`%+v`, err)
 			}
 		}()
 	}
 	if err != nil {
-		logger.Error(`error while opening file %s: %v`, pathname, err)
+		logger.Error(`%+v`, err)
 		return
 	}
 
 	sourceImage, err := imaging.Decode(file)
 	if err != nil {
-		logger.Error(`error while opening file %s: %v`, pathname, err)
+		logger.Error(`%+v`, errors.WithStack(err))
 		return
 	}
 	resizedImage := imaging.Fill(sourceImage, 150, 150, imaging.Center, imaging.Box)
 
 	if err := a.storage.Create(path.Dir(thumbnailPath)); err != nil {
-		logger.Error(`error while getting creating thumbnail dir for %s: %v`, pathname, err)
+		logger.Error(`%+v`, err)
 		return
 	}
 
@@ -173,23 +173,23 @@ func (a App) GenerateImageThumbnail(pathname string) {
 	if thumbnailFile != nil {
 		defer func() {
 			if err := thumbnailFile.Close(); err != nil {
-				logger.Error(`error while closing file %s: %v`, thumbnailPath, err)
+				logger.Error(`%+v`, err)
 			}
 		}()
 	}
 	if err != nil {
-		logger.Error(`error while opening thumbnail file %s: %v`, pathname, err)
+		logger.Error(`%+v`, err)
 		return
 	}
 
 	format, err := imaging.FormatFromFilename(thumbnailPath)
 	if err != nil {
-		logger.Error(`error while getting thumbnail format for %s: %v`, pathname, err)
+		logger.Error(`%+v`, errors.WithStack(err))
 		return
 	}
 
 	if err = imaging.Encode(thumbnailFile, resizedImage, format); err != nil {
-		logger.Error(`error while saving file for %s: %v`, pathname, err)
+		logger.Error(`%+v`, errors.WithStack(err))
 		return
 	}
 

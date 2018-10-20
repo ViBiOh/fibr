@@ -2,12 +2,12 @@ package crud
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"path"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/pkg/errors"
 )
 
 var (
@@ -17,12 +17,12 @@ var (
 func (a *App) loadMetadata() (err error) {
 	info, err := a.storage.Info(metadataFilename)
 	if err != nil && !provider.IsNotExist(err) {
-		return fmt.Errorf(`error while getting metadata: %v`, err)
+		return err
 	}
 
 	if info == nil {
 		if err := a.storage.Create(provider.MetadataDirectoryName); err != nil {
-			return fmt.Errorf(`error while creating metadata: %v`, err)
+			return err
 		}
 
 		a.metadatas = make([]*provider.Share, 0)
@@ -34,22 +34,22 @@ func (a *App) loadMetadata() (err error) {
 	if file != nil {
 		defer func() {
 			if closeErr := file.Close(); closeErr != nil {
-				err = fmt.Errorf(`%s, and also error while closing metadata: %v`, err, closeErr)
+				err = errors.New(`%s and also %v`, err, closeErr)
 			}
 		}()
 	}
 	if err != nil {
-		return fmt.Errorf(`error while opening metadata: %v`, err)
+		return err
 	}
 
 	rawMeta, err := ioutil.ReadAll(file)
 	if err != nil {
-		return fmt.Errorf(`error while reading metadata: %v`, err)
+		return errors.WithStack(err)
 
 	}
 
 	if err = json.Unmarshal(rawMeta, &a.metadatas); err != nil {
-		return fmt.Errorf(`error while unmarshalling metadata: %v`, err)
+		return errors.WithStack(err)
 	}
 
 	return nil
@@ -57,32 +57,33 @@ func (a *App) loadMetadata() (err error) {
 
 func (a *App) saveMetadata() (err error) {
 	if !a.metadataEnabled {
-		return fmt.Errorf(`metadata not enabled`)
+		return errors.New(`metadata not enabled`)
 	}
 
 	content, err := json.MarshalIndent(&a.metadatas, ``, `  `)
 	if err != nil {
-		return fmt.Errorf(`error while marshalling metadata: %v`, err)
+		return errors.WithStack(err)
 	}
 
 	file, err := a.storage.Open(metadataFilename)
 	if file != nil {
 		defer func() {
 			if closeErr := file.Close(); closeErr != nil {
-				err = fmt.Errorf(`%s, and also error while closing metadata: %v`, err, closeErr)
+				err = errors.New(`%s and also %v`, err, closeErr)
 			}
 		}()
 	}
 	if err != nil {
-		return fmt.Errorf(`error while opening metadata: %v`, err)
+		return err
 	}
 
 	n, err := file.Write(content)
 	if err != nil {
-		return fmt.Errorf(`error while writing metadatas: %v`, err)
+		return err
 	}
+
 	if n < len(content) {
-		return fmt.Errorf(`error while writing metadatas: %v`, io.ErrShortWrite)
+		return errors.WithStack(io.ErrShortWrite)
 	}
 
 	return nil

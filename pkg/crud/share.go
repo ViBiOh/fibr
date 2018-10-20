@@ -9,6 +9,7 @@ import (
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/pkg/tools"
+	"github.com/ViBiOh/httputils/pkg/errors"
 	"github.com/ViBiOh/httputils/pkg/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -26,7 +27,7 @@ func (a *App) CreateShare(w http.ResponseWriter, r *http.Request, request *provi
 	if editValue := strings.TrimSpace(r.FormValue(`edit`)); editValue != `` {
 		edit, err = strconv.ParseBool(editValue)
 		if err != nil {
-			a.renderer.Error(w, http.StatusBadRequest, fmt.Errorf(`error while reading form: %v`, err))
+			a.renderer.Error(w, http.StatusBadRequest, errors.WithStack(err))
 			return
 		}
 	}
@@ -35,7 +36,7 @@ func (a *App) CreateShare(w http.ResponseWriter, r *http.Request, request *provi
 	if passwordValue := strings.TrimSpace(r.FormValue(`password`)); passwordValue != `` {
 		hash, err := bcrypt.GenerateFromPassword([]byte(passwordValue), 12)
 		if err != nil {
-			a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`error while hashing password: %v`, err))
+			a.renderer.Error(w, http.StatusInternalServerError, errors.WithStack(err))
 			return
 		}
 
@@ -44,7 +45,7 @@ func (a *App) CreateShare(w http.ResponseWriter, r *http.Request, request *provi
 
 	uuid, err := uuid.New()
 	if err != nil {
-		a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`error while generating UUID: %v`, err))
+		a.renderer.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 	id := tools.Sha1(uuid)[:8]
@@ -61,7 +62,7 @@ func (a *App) CreateShare(w http.ResponseWriter, r *http.Request, request *provi
 	})
 
 	if err = a.saveMetadata(); err != nil {
-		a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`error while saving share: %v`, err))
+		a.renderer.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -91,7 +92,7 @@ func (a *App) DeleteShare(w http.ResponseWriter, r *http.Request, request *provi
 	}
 
 	if err := a.saveMetadata(); err != nil {
-		a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`error while saving share: %v`, err))
+		a.renderer.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 

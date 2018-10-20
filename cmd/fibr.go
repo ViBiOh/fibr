@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/base64"
-	"errors"
 	"flag"
 	"fmt"
 	"net/http"
@@ -21,6 +20,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/ui"
 	"github.com/ViBiOh/httputils/pkg"
 	"github.com/ViBiOh/httputils/pkg/alcotest"
+	"github.com/ViBiOh/httputils/pkg/errors"
 	"github.com/ViBiOh/httputils/pkg/gzip"
 	"github.com/ViBiOh/httputils/pkg/healthcheck"
 	"github.com/ViBiOh/httputils/pkg/httperror"
@@ -42,14 +42,14 @@ func checkSharePassword(r *http.Request, share *provider.Share) error {
 
 	data, err := base64.StdEncoding.DecodeString(strings.TrimPrefix(header, `Basic `))
 	if err != nil {
-		return fmt.Errorf(`error while decoding basic authentication: %v`, err)
+		return errors.WithStack(err)
 	}
 
 	dataStr := string(data)
 
 	sepIndex := strings.Index(dataStr, `:`)
 	if sepIndex < 0 {
-		return errors.New(`error while reading basic authentication`)
+		return errors.New(`invalid format for basic auth`)
 	}
 
 	password := dataStr[sepIndex+1:]
@@ -78,7 +78,7 @@ func checkShare(w http.ResponseWriter, r *http.Request, crudApp *crud.App, reque
 }
 
 func handleAnonymousRequest(w http.ResponseWriter, r *http.Request, err error, crudApp *crud.App, uiApp *ui.App) {
-	if auth.IsForbiddenErr(err) {
+	if auth.ErrNotAllowed == err {
 		uiApp.Error(w, http.StatusForbidden, errors.New(`you're not authorized to do this ⛔️`))
 		return
 	}
@@ -161,7 +161,7 @@ func browserHandler(crudApp *crud.App, uiApp *ui.App, authApp *auth.App) http.Ha
 func getStorage(storageName string, configs map[string]map[string]*string) (provider.Storage, error) {
 	config, ok := configs[storageName]
 	if !ok {
-		return nil, fmt.Errorf(`unable to find storage config %s`, storageName)
+		return nil, errors.New(`no storage config for %s`, storageName)
 	}
 
 	var app provider.Storage
@@ -176,7 +176,7 @@ func getStorage(storageName string, configs map[string]map[string]*string) (prov
 	}
 
 	if err != nil {
-		return nil, fmt.Errorf(`error while initializing storage: %v`, err)
+		return nil, err
 	}
 
 	return app, nil
@@ -208,7 +208,7 @@ func main() {
 		`minio`:      minioConfig,
 	})
 	if err != nil {
-		logger.Error(`error while getting storage: %v`, err)
+		logger.Error(`%+v`, err)
 		os.Exit(1)
 	}
 

@@ -11,7 +11,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:70ea114cf944f5c2dad09bda8a4d0da41ec9b9b41443e821c6b1b30802719e14"
+  digest = "1:ece1e4435f2a2a793a9860b5b4500322a3eda6890911074b5a16d88f4f015561"
   name = "github.com/ViBiOh/auth"
   packages = [
     "pkg/auth",
@@ -23,17 +23,18 @@
     "pkg/service",
   ]
   pruneopts = "UT"
-  revision = "2da2e43de425b914b71081505210604481714322"
+  revision = "818d3c7980e252f10a14d6ca5fcd2ba9876e6e7f"
 
 [[projects]]
   branch = "master"
-  digest = "1:3d9912de2ca00ca4bcdc86846dfc133715046b74ae4794d05defb91a26493a76"
+  digest = "1:85741fae457fa4d3c6dabc9e3d8de0021787f290b6b6f4e3b147293edb8ec42d"
   name = "github.com/ViBiOh/httputils"
   packages = [
     "pkg",
     "pkg/alcotest",
     "pkg/cache",
     "pkg/cert",
+    "pkg/errors",
     "pkg/gzip",
     "pkg/healthcheck",
     "pkg/httperror",
@@ -51,7 +52,7 @@
     "pkg/uuid",
   ]
   pruneopts = "UT"
-  revision = "2fa55f3c04629fa0b3a5be6a2efba29137fddaaa"
+  revision = "a147310fb9a8c422292a2d6f7fe4781eda74919d"
 
 [[projects]]
   branch = "master"
@@ -285,7 +286,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:9499e4b3284b485c77e0b08c20392d1add88a982fba2468fc01a45a025110df5"
+  digest = "1:410ff1c0e223b297100e1a3078e1a22c5aa37ace30c7d671d252c7ea61105f16"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
@@ -293,7 +294,7 @@
     "windows",
   ]
   pruneopts = "UT"
-  revision = "fa43e7bc11baaae89f3f902b2b4d832b68234844"
+  revision = "8e24a49d80f82323e1c4db1b5da3e0f31171a151"
 
 [[projects]]
   branch = "master"
@@ -346,6 +347,7 @@
     "github.com/ViBiOh/auth/pkg/service",
     "github.com/ViBiOh/httputils/pkg",
     "github.com/ViBiOh/httputils/pkg/alcotest",
+    "github.com/ViBiOh/httputils/pkg/errors",
     "github.com/ViBiOh/httputils/pkg/gzip",
     "github.com/ViBiOh/httputils/pkg/healthcheck",
     "github.com/ViBiOh/httputils/pkg/httperror",

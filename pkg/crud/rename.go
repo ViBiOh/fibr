@@ -27,10 +27,10 @@ func (a *App) Rename(w http.ResponseWriter, r *http.Request, request *provider.R
 
 	_, err = a.storage.Info(newName)
 	if err == nil {
-		a.renderer.Error(w, http.StatusBadRequest, fmt.Errorf(`%s already exists`, newName))
+		a.renderer.Error(w, http.StatusBadRequest, err)
 		return
 	} else if !provider.IsNotExist(err) {
-		a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`error while getting infos for %s: %v`, newName, err))
+		a.renderer.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -43,16 +43,16 @@ func (a *App) Rename(w http.ResponseWriter, r *http.Request, request *provider.R
 	info, err := a.storage.Info(oldName)
 	if err != nil {
 		if !provider.IsNotExist(err) {
-			a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`error while getting infos for %s: %v`, oldName, err))
+			a.renderer.Error(w, http.StatusInternalServerError, err)
 		} else {
-			a.renderer.Error(w, http.StatusNotFound, fmt.Errorf(`requested path does not exist %s`, oldName))
+			a.renderer.Error(w, http.StatusNotFound, err)
 		}
 
 		return
 	}
 
 	if err := a.storage.Rename(oldName, newName); err != nil {
-		a.renderer.Error(w, http.StatusInternalServerError, fmt.Errorf(`error while renaming file: %v`, err))
+		a.renderer.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 

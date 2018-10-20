@@ -43,7 +43,7 @@ func NewApp(config map[string]interface{}, storage provider.Storage, renderer pr
 
 	if app.metadataEnabled {
 		if err := app.loadMetadata(); err != nil {
-			logger.Fatal(`Error while loading metadata: %v`, err)
+			logger.Fatal(`%+v`, err)
 		}
 
 		go thumbnailApp.Generate()

@@ -1,10 +1,11 @@
 package utils
 
 import (
-	"fmt"
 	"os"
 	"path"
 	"path/filepath"
+
+	"github.com/ViBiOh/httputils/pkg/errors"
 )
 
 // GetPathInfo retrieve filesystem informations for given paths
@@ -22,14 +23,16 @@ func GetPathInfo(parts ...string) (string, os.FileInfo) {
 func ListFilesByExt(dir, ext string) ([]string, error) {
 	output := make([]string, 0)
 
-	if err := filepath.Walk(dir, func(walkedPath string, info os.FileInfo, _ error) error {
+	err := filepath.Walk(dir, func(walkedPath string, info os.FileInfo, _ error) error {
 		if path.Ext(info.Name()) == ext {
 			output = append(output, walkedPath)
 		}
 
 		return nil
-	}); err != nil {
-		return nil, fmt.Errorf(`error while listing files: %v`, err)
+	})
+
+	if err != nil {
+		return nil, errors.WithStack(err)
 	}
 
 	return output, nil

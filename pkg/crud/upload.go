@@ -1,7 +1,6 @@
 package crud
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -10,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/pkg/errors"
 	"github.com/ViBiOh/httputils/pkg/logger"
 )
 
@@ -20,7 +20,7 @@ const (
 func (a *App) saveUploadedFile(request *provider.Request, uploadedFile io.ReadCloser, uploadedFileHeader *multipart.FileHeader) (string, error) {
 	filename, err := provider.SanitizeName(uploadedFileHeader.Filename)
 	if err != nil {
-		return ``, fmt.Errorf(`error while sanitizing filename: %v`, err)
+		return ``, err
 	}
 
 	filePath := provider.GetPathname(request, filename)
@@ -29,17 +29,17 @@ func (a *App) saveUploadedFile(request *provider.Request, uploadedFile io.ReadCl
 	if hostFile != nil {
 		defer func() {
 			if err := hostFile.Close(); err != nil {
-				logger.Error(`Error while closing writted file: %v`, err)
+				logger.Error(`%+v`, err)
 			}
 		}()
 	}
 
 	if err != nil {
-		return ``, fmt.Errorf(`error while creating or opening file: %v`, err)
+		return ``, err
 	}
 
 	if _, err = io.Copy(hostFile, uploadedFile); err != nil {
-		return ``, fmt.Errorf(`error while writing file: %v`, err)
+		return ``, errors.WithStack(err)
 	}
 
 	if provider.ImageExtensions[strings.ToLower(path.Ext(uploadedFileHeader.Filename))] {
@@ -57,7 +57,7 @@ func (a *App) Upload(w http.ResponseWriter, r *http.Request, request *provider.R
 	}
 
 	if err := r.ParseMultipartForm(defaultMaxMemory); err != nil {
-		a.renderer.Error(w, http.StatusBadRequest, fmt.Errorf(`error while parsing form: %v`, err))
+		a.renderer.Error(w, http.StatusBadRequest, errors.WithStack(err))
 		return
 	}
 
@@ -73,12 +73,12 @@ func (a *App) Upload(w http.ResponseWriter, r *http.Request, request *provider.R
 		if uploadedFile != nil {
 			defer func() {
 				if err := uploadedFile.Close(); err != nil {
-					logger.Error(`Error while closing uploaded file: %v`, err)
+					logger.Error(`%+v`, errors.WithStack(err))
 				}
 			}()
 		}
 		if err != nil {
-			a.renderer.Error(w, http.StatusBadRequest, fmt.Errorf(`error while getting file from form: %v`, err))
+			a.renderer.Error(w, http.StatusBadRequest, errors.WithStack(err))
 			return
 		}
 

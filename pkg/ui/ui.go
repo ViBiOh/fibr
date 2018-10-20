@@ -85,7 +85,7 @@ func NewApp(config map[string]*string, rootName string, thumbnailApp *thumbnail.
 
 	fibrTemplates, err := utils.ListFilesByExt(`./templates/`, `.html`)
 	if err != nil {
-		logger.Fatal(`error while getting templates: %v`, err)
+		logger.Fatal(`%+v`, err)
 	}
 
 	publicURL := *config[`publicURL`]
@@ -131,7 +131,7 @@ func (a App) Error(w http.ResponseWriter, status int, err error) {
 		httperror.InternalServerError(w, err)
 	}
 
-	logger.Error(`[error] %v`, err)
+	logger.Error(`%+v`, err)
 }
 
 // Sitemap render sitemap.xml
