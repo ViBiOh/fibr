@@ -78,7 +78,7 @@ func checkShare(w http.ResponseWriter, r *http.Request, crudApp *crud.App, reque
 }
 
 func handleAnonymousRequest(w http.ResponseWriter, r *http.Request, err error, crudApp *crud.App, uiApp *ui.App) {
-	if auth.ErrNotAllowed == err {
+	if authProvider.ErrForbidden == err {
 		uiApp.Error(w, http.StatusForbidden, errors.New(`you're not authorized to do this ⛔️`))
 		return
 	}
