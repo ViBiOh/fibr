@@ -1,10 +1,9 @@
-MAKEFLAGS += --silent
-GOBIN=bin
-BINARY_PATH=$(GOBIN)/$(APP_NAME)
+APP_NAME ?= fibr
 VERSION ?= $(shell git log --pretty=format:'%h' -n 1)
 AUTHOR ?= $(shell git log --pretty=format:'%an' -n 1)
 
-APP_NAME ?= fibr
+GOBIN=bin
+BINARY_PATH=$(GOBIN)/$(APP_NAME)
 
 help: Makefile
 	@sed -n 's|^##||p' $< | column -t -s ':' | sed -e 's|^| |'
