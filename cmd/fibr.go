@@ -9,9 +9,9 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/auth/pkg/auth"
-	authProvider "github.com/ViBiOh/auth/pkg/provider"
-	"github.com/ViBiOh/auth/pkg/provider/basic"
-	authService "github.com/ViBiOh/auth/pkg/service"
+	"github.com/ViBiOh/auth/pkg/ident"
+	"github.com/ViBiOh/auth/pkg/ident/basic"
+	authService "github.com/ViBiOh/auth/pkg/ident/service"
 	"github.com/ViBiOh/fibr/pkg/crud"
 	"github.com/ViBiOh/fibr/pkg/filesystem"
 	"github.com/ViBiOh/fibr/pkg/minio"
@@ -78,12 +78,12 @@ func checkShare(w http.ResponseWriter, r *http.Request, crudApp *crud.App, reque
 }
 
 func handleAnonymousRequest(w http.ResponseWriter, r *http.Request, err error, crudApp *crud.App, uiApp *ui.App) {
-	if authProvider.ErrForbidden == err {
+	if auth.ErrForbidden == err {
 		uiApp.Error(w, http.StatusForbidden, errors.New(`you're not authorized to do this ⛔️`))
 		return
 	}
 
-	if err == authProvider.ErrMalformedAuth || err == authProvider.ErrUnknownAuthType {
+	if err == ident.ErrMalformedAuth || err == ident.ErrUnknownIdentType {
 		uiApp.Error(w, http.StatusBadRequest, err)
 		return
 	}
@@ -222,7 +222,7 @@ func main() {
 	thumbnailApp := thumbnail.NewApp(storage)
 	uiApp := ui.NewApp(uiConfig, storage.Root(), thumbnailApp)
 	crudApp := crud.NewApp(crudConfig, storage, uiApp, thumbnailApp)
-	authApp := auth.NewApp(authConfig, authService.NewBasicApp(basicConfig))
+	authApp := auth.NewServiceApp(authConfig, authService.NewBasicApp(basicConfig, nil))
 
 	webHandler := server.ChainMiddlewares(browserHandler(crudApp, uiApp, authApp), prometheusApp, opentracingApp, gzipApp, owaspApp)
 
