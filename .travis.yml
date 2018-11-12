@@ -23,26 +23,26 @@ jobs:
     after_success: |
       curl -s -X POST https://goreportcard.com/checks?repo=github.com/ViBiOh/fibr
 
-  # - stage: Deploy
+  - stage: Deploy
 
-  #   script: |
-  #     sed \
-  #       -e "s|\${DATA_DIR}|${DATA_DIR}|g" \
-  #       -e "s|\${DATA_USER_ID}|${DATA_USER_ID}|g" \
-  #       -e "s|\${BASIC_USERS}|${BASIC_USERS}|g" \
-  #       -e "s|\${VERSION}|${TRAVIS_COMMIT}|g" \
-  #       docker-compose.yml > docker-compose-env.yml
-  #   deploy:
-  #     provider: script
-  #     skip_cleanup: true
-  #     script: 'curl -H "Authorization: GitHub ${GITHUB_OAUTH_TOKEN}" -X POST "https://dashboard-api.vibioh.fr/deploy/fibr/" --data-binary @docker-compose-env.yml'
+    script: |
+      sed \
+        -e "s|\${DATA_DIR}|${DATA_DIR}|g" \
+        -e "s|\${DATA_USER_ID}|${DATA_USER_ID}|g" \
+        -e "s|\${BASIC_USERS}|${BASIC_USERS}|g" \
+        -e "s|\${VERSION}|${TRAVIS_COMMIT}|g" \
+        docker-compose.yml > docker-compose-env.yml
+    deploy:
+      provider: script
+      skip_cleanup: true
+      script: 'curl -H "Authorization: GitHub ${GITHUB_OAUTH_TOKEN}" -X POST "https://dashboard-api.vibioh.fr/deploy/fibr/" --data-binary @docker-compose-env.yml'
 
 stages:
   - Build
   - name: Publish
     if: branch = master
-  # - name: Deploy
-  #   if: branch = master
+  - name: Deploy
+    if: branch = master
 
 notifications:
   email: false

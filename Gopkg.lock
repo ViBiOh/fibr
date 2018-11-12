@@ -22,11 +22,11 @@
     "pkg/model",
   ]
   pruneopts = "UT"
-  revision = "3afc7498e8cfe2d4397206a2b07ba1b24d9b171e"
+  revision = "af06892de15363a0a9d16533a9693d62fe15b081"
 
 [[projects]]
   branch = "master"
-  digest = "1:0d2d5dc7bd5ae65ea02c5fa73e9d1dd2ddfd42620951244a0757229115bee5ca"
+  digest = "1:fbf22af08f56c262e58334d8c46cd17348f4bf817e7cc3425cd373a75fc58c89"
   name = "github.com/ViBiOh/httputils"
   packages = [
     "pkg",
@@ -50,7 +50,7 @@
     "pkg/uuid",
   ]
   pruneopts = "UT"
-  revision = "08cb8f858a20d8b33b15504d05bff2b97b35883f"
+  revision = "9ff165f27876dc806981d470f4c31c68e1b035c5"
 
 [[projects]]
   branch = "master"
@@ -118,7 +118,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:601123ef72b2f4c348bfd22e826bfbdde993259e0c0655b6958c79ae81ec8518"
+  digest = "1:bfbc3eed6b95f28a1f46b9d676f87f385c61a1fd9dfb5fefd3597ffaee082c5c"
   name = "github.com/minio/minio-go"
   packages = [
     ".",
@@ -129,7 +129,7 @@
     "pkg/set",
   ]
   pruneopts = "UT"
-  revision = "46b02d3b4e8c63804a5d4d4d14a562fd71c66730"
+  revision = "774475480ffe1bffa9dae62ea98f6ea75e8cf567"
 
 [[projects]]
   digest = "1:78bbb1ba5b7c3f2ed0ea1eab57bdd3859aec7e177811563edc41198a760b06af"
@@ -196,7 +196,7 @@
     "model",
   ]
   pruneopts = "UT"
-  revision = "7e9e6cabbd393fc208072eedef99188d0ce788b6"
+  revision = "0b1957f9d949dfa3084171a6ec5642b38055276a"
 
 [[projects]]
   branch = "master"
@@ -234,7 +234,7 @@
   version = "v2.3.6"
 
 [[projects]]
-  digest = "1:948e6ddd6f64a519f36879ec28bc392d1e8268ebc0591200db3c98dd587afed9"
+  digest = "1:a8b339430c8019600d19196b9882506ada70af7f4a505080a5843ab5488bb5c0"
   name = "github.com/tdewolff/parse"
   packages = [
     ".",
@@ -246,7 +246,7 @@
     "xml",
   ]
   pruneopts = "UT"
-  revision = "fced451e0bedc5b641b8dcae76b07859e3b4adfd"
+  revision = "1b0354dccc7aceb4528eb638fbfec60d20338a29"
   version = "v2.3.4"
 
 [[projects]]
@@ -295,7 +295,7 @@
     "ssh/terminal",
   ]
   pruneopts = "UT"
-  revision = "4d3f4d9ffa16a13f451c3b2999e9c49e9750bf06"
+  revision = "e4dc69e5b2fd71dcaf8bd5d054eb936deb78d1fa"
 
 [[projects]]
   branch = "master"
@@ -307,7 +307,7 @@
     "tiff/lzw",
   ]
   pruneopts = "UT"
-  revision = "63626fb251ce5d89650d28bc5d6ccd7d63a70fef"
+  revision = "249dc8530c0efc2766606a940c1c50b434b2f1cd"
 
 [[projects]]
   branch = "master"
@@ -319,11 +319,11 @@
     "idna",
   ]
   pruneopts = "UT"
-  revision = "10aee181995363b41f712a55844a0dd52ea04646"
+  revision = "03003ca0c849e57b6ea29a4bab8d3cb6e4d568fe"
 
 [[projects]]
   branch = "master"
-  digest = "1:81582bece959863da0ecd0e33659e20e010c3bb0808c592efb0ea78df1a974dd"
+  digest = "1:8f32f0ccb71f71d4780147c6e6fac5bcec522f148e7a0d6d4543770081e8884d"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
@@ -331,7 +331,7 @@
     "windows",
   ]
   pruneopts = "UT"
-  revision = "7155702f2d47d94b134229da97195d0130cab001"
+  revision = "66b7b1311ac80bbafcd2daeef9a5e6e2cd1e2399"
 
 [[projects]]
   branch = "master"
