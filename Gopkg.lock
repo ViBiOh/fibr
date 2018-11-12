@@ -11,7 +11,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:721ff50e50c2bb80231058749f91a85c7da32a497124dc40f2b4f717d455960e"
+  digest = "1:a3630285c12fa2a48aa40927c749dcb45a30e4805b5bc956e2812490f63c5eed"
   name = "github.com/ViBiOh/auth"
   packages = [
     "pkg/auth",
@@ -22,7 +22,7 @@
     "pkg/model",
   ]
   pruneopts = "UT"
-  revision = "af06892de15363a0a9d16533a9693d62fe15b081"
+  revision = "495f69b1bcdb4c4b2531cdba6ffb8107e2c57db3"
 
 [[projects]]
   branch = "master"
@@ -295,7 +295,7 @@
     "ssh/terminal",
   ]
   pruneopts = "UT"
-  revision = "e4dc69e5b2fd71dcaf8bd5d054eb936deb78d1fa"
+  revision = "3d3f9f413869b949e48070b5bc593aa22cc2b8f2"
 
 [[projects]]
   branch = "master"
