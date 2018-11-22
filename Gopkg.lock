@@ -22,11 +22,11 @@
     "pkg/model",
   ]
   pruneopts = "UT"
-  revision = "495f69b1bcdb4c4b2531cdba6ffb8107e2c57db3"
+  revision = "fa75a3534d12bbec5e0e8b13032638bbe546e7a2"
 
 [[projects]]
   branch = "master"
-  digest = "1:fbf22af08f56c262e58334d8c46cd17348f4bf817e7cc3425cd373a75fc58c89"
+  digest = "1:5ffc41c5d88ffd4d0b417a8e8f9b9cf9226ec706248453ac574dab9f07ffec3e"
   name = "github.com/ViBiOh/httputils"
   packages = [
     "pkg",
@@ -50,7 +50,7 @@
     "pkg/uuid",
   ]
   pruneopts = "UT"
-  revision = "9ff165f27876dc806981d470f4c31c68e1b035c5"
+  revision = "56a96ad8671ec77441ad5cd779ca9ec7364a0ea9"
 
 [[projects]]
   branch = "master"
@@ -118,7 +118,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:bfbc3eed6b95f28a1f46b9d676f87f385c61a1fd9dfb5fefd3597ffaee082c5c"
+  digest = "1:ce1c41ebdf4761c8c1336e967b822568534342bf836ad56fee476b102653cec3"
   name = "github.com/minio/minio-go"
   packages = [
     ".",
@@ -129,7 +129,7 @@
     "pkg/set",
   ]
   pruneopts = "UT"
-  revision = "774475480ffe1bffa9dae62ea98f6ea75e8cf567"
+  revision = "39381cf62425050629c7264228fc2f9e0c6616f6"
 
 [[projects]]
   digest = "1:78bbb1ba5b7c3f2ed0ea1eab57bdd3859aec7e177811563edc41198a760b06af"
@@ -196,7 +196,7 @@
     "model",
   ]
   pruneopts = "UT"
-  revision = "0b1957f9d949dfa3084171a6ec5642b38055276a"
+  revision = "aeab699e26f4d4089dba5e522e5d9babd2adbaf7"
 
 [[projects]]
   branch = "master"
@@ -307,7 +307,7 @@
     "tiff/lzw",
   ]
   pruneopts = "UT"
-  revision = "249dc8530c0efc2766606a940c1c50b434b2f1cd"
+  revision = "cd38e8056d9b27bb2f265effa37fb0ea6b8a7f0f"
 
 [[projects]]
   branch = "master"
@@ -319,11 +319,11 @@
     "idna",
   ]
   pruneopts = "UT"
-  revision = "03003ca0c849e57b6ea29a4bab8d3cb6e4d568fe"
+  revision = "adae6a3d119ae4890b46832a2e88a95adc62b8e7"
 
 [[projects]]
   branch = "master"
-  digest = "1:8f32f0ccb71f71d4780147c6e6fac5bcec522f148e7a0d6d4543770081e8884d"
+  digest = "1:5a613be9198dc04fd2032ff2fe57b649b3e4121d0e4c3d1e5289a62f2204de64"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
@@ -331,7 +331,7 @@
     "windows",
   ]
   pruneopts = "UT"
-  revision = "66b7b1311ac80bbafcd2daeef9a5e6e2cd1e2399"
+  revision = "62eef0e2fa9b2c385f7b2778e763486da6880d37"
 
 [[projects]]
   branch = "master"
