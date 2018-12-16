@@ -11,7 +11,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:a3630285c12fa2a48aa40927c749dcb45a30e4805b5bc956e2812490f63c5eed"
+  digest = "1:91352dffa1ad78e4d9fad046aa5b0e9162f7e75f013cb1b1e38716e87a9b0e1a"
   name = "github.com/ViBiOh/auth"
   packages = [
     "pkg/auth",
@@ -22,16 +22,17 @@
     "pkg/model",
   ]
   pruneopts = "UT"
-  revision = "fa75a3534d12bbec5e0e8b13032638bbe546e7a2"
+  revision = "dd9b59e79bcaf744422e2cee78f68fa7796374ab"
 
 [[projects]]
   branch = "master"
-  digest = "1:5ffc41c5d88ffd4d0b417a8e8f9b9cf9226ec706248453ac574dab9f07ffec3e"
+  digest = "1:822ed8bb68aace23bf2a56a2b388182ab8cf1639e1a9126757ca9c38a88a4dfd"
   name = "github.com/ViBiOh/httputils"
   packages = [
     "pkg",
     "pkg/alcotest",
     "pkg/cert",
+    "pkg/crud",
     "pkg/errors",
     "pkg/gzip",
     "pkg/healthcheck",
@@ -41,6 +42,7 @@
     "pkg/model",
     "pkg/opentracing",
     "pkg/owasp",
+    "pkg/pagination",
     "pkg/prometheus",
     "pkg/query",
     "pkg/request",
@@ -50,7 +52,7 @@
     "pkg/uuid",
   ]
   pruneopts = "UT"
-  revision = "56a96ad8671ec77441ad5cd779ca9ec7364a0ea9"
+  revision = "c63a4d292c81848acc76c431f66e5140190df87e"
 
 [[projects]]
   branch = "master"
@@ -85,12 +87,12 @@
   version = "v1.0.0"
 
 [[projects]]
-  digest = "1:15e27372d379b45b18ac917b9dafc45c45485239490ece18cca97a12f9591146"
+  digest = "1:19ea97688477f0c05ef94e9ddf48c5a2d8837b4ba781a1014c068293dcca2e5b"
   name = "github.com/go-ini/ini"
   packages = ["."]
   pruneopts = "UT"
-  revision = "9c8236e659b76e87bf02044d06fde8683008ff3e"
-  version = "v1.39.0"
+  revision = "f55231ca73a76c1d61eb05fe0d64a1ccebf93cba"
+  version = "v1.39.3"
 
 [[projects]]
   digest = "1:97df918963298c287643883209a2c3f642e6593379f97ab400c2a2e219ab647d"
@@ -118,7 +120,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:ce1c41ebdf4761c8c1336e967b822568534342bf836ad56fee476b102653cec3"
+  digest = "1:7c419cae597770aed10382383384adad78f2587dbf74bf094c3ab9f6d348114d"
   name = "github.com/minio/minio-go"
   packages = [
     ".",
@@ -129,7 +131,7 @@
     "pkg/set",
   ]
   pruneopts = "UT"
-  revision = "39381cf62425050629c7264228fc2f9e0c6616f6"
+  revision = "c085651199f9403929babaa1e6524a53085d2395"
 
 [[projects]]
   digest = "1:78bbb1ba5b7c3f2ed0ea1eab57bdd3859aec7e177811563edc41198a760b06af"
@@ -141,11 +143,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:51fb21c0dd1b64d5ae74c34f544e312ee73edd2a258db6347369014b5949f44a"
+  digest = "1:5d7236b6cedaadd901d2f1533113f11c955bb676df646b676c94d13c43dfedbe"
   name = "github.com/opentracing-contrib/go-stdlib"
   packages = ["nethttp"]
   pruneopts = "UT"
-  revision = "c9628a4f0148d7e441a4af66dc0b1653cd941c20"
+  revision = "09659152d0aa5b83bb7683a9c33c79f8ee57038c"
 
 [[projects]]
   digest = "1:450b7623b185031f3a456801155c8320209f75d0d4c4e633c6b1e59d44d6e392"
@@ -196,11 +198,11 @@
     "model",
   ]
   pruneopts = "UT"
-  revision = "aeab699e26f4d4089dba5e522e5d9babd2adbaf7"
+  revision = "4724e9255275ce38f7179b2478abeae4e28c904f"
 
 [[projects]]
   branch = "master"
-  digest = "1:ef74914912f99c79434d9c09658274678bc85080ebe3ab32bec3940ebce5e1fc"
+  digest = "1:d39e7c7677b161c2dd4c635a2ac196460608c7d8ba5337cc8cae5825a2681f8f"
   name = "github.com/prometheus/procfs"
   packages = [
     ".",
@@ -209,7 +211,7 @@
     "xfs",
   ]
   pruneopts = "UT"
-  revision = "185b4288413d2a0dd0806f78c90dde719829e5ae"
+  revision = "1dc9a6cbc91aacc3e8b2d63db4d2e957a5394ac4"
 
 [[projects]]
   digest = "1:69b1cc331fca23d702bd72f860c6a647afd0aa9fcbc1d0659b1365e26546dd70"
@@ -285,7 +287,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:8b98ef0c36b4368e414b2923054ba20e4da31d8d9c5170ce4c47cd456f07af54"
+  digest = "1:fb3f8e4a426e6424718fa88e2ed5979156994a14e8ff8f003e3215baaa730bdb"
   name = "golang.org/x/crypto"
   packages = [
     "argon2",
@@ -295,7 +297,7 @@
     "ssh/terminal",
   ]
   pruneopts = "UT"
-  revision = "3d3f9f413869b949e48070b5bc593aa22cc2b8f2"
+  revision = "505ab145d0a99da450461ae2c1a9f6cd10d1f447"
 
 [[projects]]
   branch = "master"
@@ -319,11 +321,11 @@
     "idna",
   ]
   pruneopts = "UT"
-  revision = "adae6a3d119ae4890b46832a2e88a95adc62b8e7"
+  revision = "891ebc4b82d6e74f468c533b06f983c7be918a96"
 
 [[projects]]
   branch = "master"
-  digest = "1:5a613be9198dc04fd2032ff2fe57b649b3e4121d0e4c3d1e5289a62f2204de64"
+  digest = "1:c640964729379798b492e5ddd4a78eb496b78b5f03ad3d719e7d4bbb326da22f"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
@@ -331,7 +333,7 @@
     "windows",
   ]
   pruneopts = "UT"
-  revision = "62eef0e2fa9b2c385f7b2778e763486da6880d37"
+  revision = "4d1cda033e0619309c606fc686de3adcf599539e"
 
 [[projects]]
   branch = "master"
@@ -356,7 +358,7 @@
     "unicode/rangetable",
   ]
   pruneopts = "UT"
-  revision = "6f44c5a2ea40ee3593d98cdcc905cc1fdaa660e2"
+  revision = "17bcc049122f272a32787ba38073ee47433023e9"
 
 [solve-meta]
   analyzer-name = "dep"
