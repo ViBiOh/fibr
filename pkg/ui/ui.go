@@ -18,23 +18,29 @@ import (
 	"github.com/ViBiOh/httputils/pkg/tools"
 )
 
-// App for rendering UI
+// Config of package
+type Config struct {
+	publicURL *string
+	version   *string
+}
+
+// App of package
 type App struct {
 	config       *provider.Config
 	tpl          *template.Template
 	thumbnailApp *thumbnail.App
 }
 
-// Flags add flags for given prefix
-func Flags(prefix string) map[string]*string {
-	return map[string]*string{
-		`publicURL`: flag.String(tools.ToCamel(fmt.Sprintf(`%sPublicURL`, prefix)), `https://fibr.vibioh.fr`, `[fibr] Public URL`),
-		`version`:   flag.String(tools.ToCamel(fmt.Sprintf(`%sVersion`, prefix)), ``, `[fibr] Version (used mainly as a cache-buster)`),
+// Flags adds flags for configuring package
+func Flags(fs *flag.FlagSet, prefix string) Config {
+	return Config{
+		publicURL: fs.String(tools.ToCamel(fmt.Sprintf(`%sPublicURL`, prefix)), `https://fibr.vibioh.fr`, `[fibr] Public URL`),
+		version:   fs.String(tools.ToCamel(fmt.Sprintf(`%sVersion`, prefix)), ``, `[fibr] Version (used mainly as a cache-buster)`),
 	}
 }
 
-// NewApp create ui from given config
-func NewApp(config map[string]*string, rootName string, thumbnailApp *thumbnail.App) *App {
+// New creates new App from Config
+func New(config Config, rootName string, thumbnailApp *thumbnail.App) *App {
 	tpl := template.New(`fibr`)
 
 	tpl.Funcs(template.FuncMap{
@@ -88,14 +94,14 @@ func NewApp(config map[string]*string, rootName string, thumbnailApp *thumbnail.
 		logger.Fatal(`%+v`, err)
 	}
 
-	publicURL := *config[`publicURL`]
+	publicURL := *config.publicURL
 
 	return &App{
 		tpl: template.Must(tpl.ParseFiles(fibrTemplates...)),
 		config: &provider.Config{
 			RootName:  rootName,
 			PublicURL: publicURL,
-			Version:   *config[`version`],
+			Version:   *config.version,
 			Seo: &provider.Seo{
 				Title:       `fibr`,
 				Description: `FIle BRowser`,

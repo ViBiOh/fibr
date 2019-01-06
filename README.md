@@ -22,9 +22,9 @@ Usage of fibr:
   -authUrl string
       [auth] Auth URL, if remote
   -authUsers string
-      [auth] List of allowed users and profiles (e.g. user:profile1|profile2,user2:profile3)
+      [auth] Allowed users and profiles (e.g. user:profile1|profile2,user2:profile3). Empty allow any identified user
   -basicUsers string
-      [Basic] Users in the form "id:username:password,id2:username2:password2"
+      [basic] Users in the form "id:username:password,id2:username2:password2"
   -csp string
       [owasp] Content-Security-Policy (default "default-src 'self'; base-uri 'self'")
   -frameOptions string
@@ -35,20 +35,10 @@ Usage of fibr:
       [owasp] Indicate Strict Transport Security (default true)
   -metadata
       Enable metadata storage (default true)
-  -minioAccessKey string
-      [minio] Access Key
-  -minioEndpoint string
-      [minio] Endpoint server
-  -minioSecretKey string
-      [minio] Secret Key
   -port int
       Listen port (default 1080)
-  -prometheusPath string
-      [prometheus] Path for exposing metrics (default "/metrics")
   -publicURL string
       [fibr] Public URL (default "https://fibr.vibioh.fr")
-  -storage string
-      Storage used (e.g. 'filesystem', 'minio') (default "filesystem")
   -tls
       Serve TLS content (default true)
   -tlsCert string

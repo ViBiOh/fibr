@@ -25,13 +25,13 @@ var (
 	}
 )
 
-// App stores informations
+// App of package
 type App struct {
 	storage provider.Storage
 }
 
-// NewApp creates new App from Flags' config
-func NewApp(storage provider.Storage) *App {
+// New creates new App
+func New(storage provider.Storage) *App {
 	return &App{
 		storage: storage,
 	}

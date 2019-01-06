@@ -21,7 +21,12 @@ var (
 	ErrEmptyName = errors.New(`provided name is empty`)
 )
 
-// App stores informations and secret of API
+// Config of package
+type Config struct {
+	metadata *bool
+}
+
+// App of package
 type App struct {
 	metadataEnabled bool
 	metadatas       []*provider.Share
@@ -31,10 +36,17 @@ type App struct {
 	thumbnailApp    *thumbnail.App
 }
 
-// NewApp creates new App from Flags' config
-func NewApp(config map[string]interface{}, storage provider.Storage, renderer provider.Renderer, thumbnailApp *thumbnail.App) *App {
+// Flags adds flags for configuring package
+func Flags(fs *flag.FlagSet, prefix string) Config {
+	return Config{
+		metadata: fs.Bool(tools.ToCamel(fmt.Sprintf(`%sMetadata`, prefix)), true, `Enable metadata storage`),
+	}
+}
+
+// New creates new App from Config
+func New(config Config, storage provider.Storage, renderer provider.Renderer, thumbnailApp *thumbnail.App) *App {
 	app := &App{
-		metadataEnabled: *config[`metadata`].(*bool),
+		metadataEnabled: *config.metadata,
 		metadataLock:    sync.Mutex{},
 		storage:         storage,
 		renderer:        renderer,
@@ -50,13 +62,6 @@ func NewApp(config map[string]interface{}, storage provider.Storage, renderer pr
 	}
 
 	return app
-}
-
-// Flags add flags for given prefix
-func Flags(prefix string) map[string]interface{} {
-	return map[string]interface{}{
-		`metadata`: flag.Bool(tools.ToCamel(fmt.Sprintf(`%sMetadata`, prefix)), true, `Enable metadata storage`),
-	}
 }
 
 // GetShare returns share configuration if request path match

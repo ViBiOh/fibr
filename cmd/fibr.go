@@ -14,7 +14,6 @@ import (
 	authService "github.com/ViBiOh/auth/pkg/ident/service"
 	"github.com/ViBiOh/fibr/pkg/crud"
 	"github.com/ViBiOh/fibr/pkg/filesystem"
-	"github.com/ViBiOh/fibr/pkg/minio"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/fibr/pkg/ui"
@@ -157,69 +156,43 @@ func browserHandler(crudApp *crud.App, uiApp *ui.App, authApp *auth.App) http.Ha
 	})
 }
 
-func getStorage(storageName string, configs map[string]map[string]*string) (provider.Storage, error) {
-	config, ok := configs[storageName]
-	if !ok {
-		return nil, errors.New(`no storage config for %s`, storageName)
-	}
-
-	var app provider.Storage
-	var err error
-
-	switch storageName {
-	case `filesystem`:
-		app, err = filesystem.NewApp(config)
-
-	default:
-		err = errors.New(`unknown storage type`)
-	}
-
-	if err != nil {
-		return nil, err
-	}
-
-	return app, nil
-}
-
 func main() {
-	serverConfig := httputils.Flags(``)
-	alcotestConfig := alcotest.Flags(``)
-	opentracingConfig := opentracing.Flags(`tracing`)
-	owaspConfig := owasp.Flags(``)
+	fs := flag.NewFlagSet(`fibr`, flag.ExitOnError)
 
-	authConfig := auth.Flags(`auth`)
-	basicConfig := basic.Flags(`basic`)
-	crudConfig := crud.Flags(``)
-	uiConfig := ui.Flags(``)
+	serverConfig := httputils.Flags(fs, ``)
+	alcotestConfig := alcotest.Flags(fs, ``)
+	opentracingConfig := opentracing.Flags(fs, `tracing`)
+	owaspConfig := owasp.Flags(fs, ``)
 
-	filesystemConfig := filesystem.Flags(`fs`)
-	minioConfig := minio.Flags(`minio`)
+	authConfig := auth.Flags(fs, `auth`)
+	basicConfig := basic.Flags(fs, `basic`)
+	crudConfig := crud.Flags(fs, ``)
+	uiConfig := ui.Flags(fs, ``)
 
-	storageName := flag.String(`storage`, `filesystem`, `Storage used (e.g. 'filesystem', 'minio')`)
+	filesystemConfig := filesystem.Flags(fs, `fs`)
 
-	flag.Parse()
+	if err := fs.Parse(os.Args[1:]); err != nil {
+		logger.Fatal(`%+v`, err)
+	}
 
 	alcotest.DoAndExit(alcotestConfig)
 
-	storage, err := getStorage(*storageName, map[string]map[string]*string{
-		`filesystem`: filesystemConfig,
-		`minio`:      minioConfig,
-	})
+	storage, err := filesystem.New(filesystemConfig)
 	if err != nil {
 		logger.Error(`%+v`, err)
 		os.Exit(1)
 	}
 
-	serverApp := httputils.NewApp(serverConfig)
-	healthcheckApp := healthcheck.NewApp()
-	opentracingApp := opentracing.NewApp(opentracingConfig)
-	owaspApp := owasp.NewApp(owaspConfig)
-	gzipApp := gzip.NewApp()
+	serverApp := httputils.New(serverConfig)
+	healthcheckApp := healthcheck.New()
+	opentracingApp := opentracing.New(opentracingConfig)
+	owaspApp := owasp.New(owaspConfig)
+	gzipApp := gzip.New()
 
-	thumbnailApp := thumbnail.NewApp(storage)
-	uiApp := ui.NewApp(uiConfig, storage.Root(), thumbnailApp)
-	crudApp := crud.NewApp(crudConfig, storage, uiApp, thumbnailApp)
-	authApp := auth.NewServiceApp(authConfig, authService.NewBasicApp(basicConfig, nil))
+	thumbnailApp := thumbnail.New(storage)
+	uiApp := ui.New(uiConfig, storage.Root(), thumbnailApp)
+	crudApp := crud.New(crudConfig, storage, uiApp, thumbnailApp)
+	authApp := auth.NewService(authConfig, authService.NewBasic(basicConfig, nil))
 
 	webHandler := server.ChainMiddlewares(browserHandler(crudApp, uiApp, authApp), opentracingApp, gzipApp, owaspApp)
 

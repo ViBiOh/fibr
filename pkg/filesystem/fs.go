@@ -28,15 +28,27 @@ var (
 	ErrOutsidePath = native_errors.New(`pathname does not belong to served directory`)
 )
 
-// App stores informations
+// Config of package
+type Config struct {
+	directory *string
+}
+
+// App of package
 type App struct {
 	rootDirectory string
 	rootDirname   string
 }
 
-// NewApp creates new App from Flags' config
-func NewApp(config map[string]*string) (*App, error) {
-	rootDirectory := *config[`directory`]
+// Flags adds flags for configuring package
+func Flags(fs *flag.FlagSet, prefix string) Config {
+	return Config{
+		directory: fs.String(tools.ToCamel(fmt.Sprintf(`%sDirectory`, prefix)), `/data`, `[filesystem] Path to served directory`),
+	}
+}
+
+// New creates new App from Config
+func New(config Config) (*App, error) {
+	rootDirectory := *config.directory
 
 	if rootDirectory == `` {
 		return nil, errors.New(`no directory provided`)
@@ -59,13 +71,6 @@ func NewApp(config map[string]*string) (*App, error) {
 	logger.Info(`Serving file from %s`, rootDirectory)
 
 	return app, nil
-}
-
-// Flags adds flags for given prefix
-func Flags(prefix string) map[string]*string {
-	return map[string]*string{
-		`directory`: flag.String(tools.ToCamel(fmt.Sprintf(`%sDirectory`, prefix)), `/data`, `[filesystem] Path to served directory`),
-	}
 }
 
 func getFile(filename string) (io.WriteCloser, error) {

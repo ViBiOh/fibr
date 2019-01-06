@@ -11,7 +11,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:91352dffa1ad78e4d9fad046aa5b0e9162f7e75f013cb1b1e38716e87a9b0e1a"
+  digest = "1:0efc2d02b40099e5aa830184831f877fa5a89115bcb4838616ee8ba0325458d6"
   name = "github.com/ViBiOh/auth"
   packages = [
     "pkg/auth",
@@ -22,11 +22,11 @@
     "pkg/model",
   ]
   pruneopts = "UT"
-  revision = "dd9b59e79bcaf744422e2cee78f68fa7796374ab"
+  revision = "f1350386d8c8393f90ae80f615d0b10ff7529577"
 
 [[projects]]
   branch = "master"
-  digest = "1:713f7fb7f2ebdee893963ccc244d0636b37a97f55ac5c57c3f63e1b9ed998e03"
+  digest = "1:d6303ebbd73353210ca59dab161d0fd4f46409d928876c02693898b0e9992238"
   name = "github.com/ViBiOh/httputils"
   packages = [
     "pkg",
@@ -51,7 +51,7 @@
     "pkg/uuid",
   ]
   pruneopts = "UT"
-  revision = "c63a4d292c81848acc76c431f66e5140190df87e"
+  revision = "b569bdfdbf9036f8f2026fc7203db165decc61ec"
 
 [[projects]]
   branch = "master"
@@ -70,59 +70,12 @@
   version = "v1.5.0"
 
 [[projects]]
-  digest = "1:6f9339c912bbdda81302633ad7e99a28dfa5a639c864061f1929510a9a64aa74"
-  name = "github.com/dustin/go-humanize"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "9f541cc9db5d55bce703bd99987c9d5cb8eea45e"
-  version = "v1.0.0"
-
-[[projects]]
-  digest = "1:19ea97688477f0c05ef94e9ddf48c5a2d8837b4ba781a1014c068293dcca2e5b"
-  name = "github.com/go-ini/ini"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "f55231ca73a76c1d61eb05fe0d64a1ccebf93cba"
-  version = "v1.39.3"
-
-[[projects]]
-  digest = "1:0a69a1c0db3591fcefb47f115b224592c8dfa4368b7ba9fae509d5e16cdc95c8"
-  name = "github.com/konsorten/go-windows-terminal-sequences"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "5c8c8bd35d3832f5d134ae1e1e375b69a4d25242"
-  version = "v1.0.1"
-
-[[projects]]
   branch = "master"
-  digest = "1:7c419cae597770aed10382383384adad78f2587dbf74bf094c3ab9f6d348114d"
-  name = "github.com/minio/minio-go"
-  packages = [
-    ".",
-    "pkg/credentials",
-    "pkg/encrypt",
-    "pkg/s3signer",
-    "pkg/s3utils",
-    "pkg/set",
-  ]
-  pruneopts = "UT"
-  revision = "c085651199f9403929babaa1e6524a53085d2395"
-
-[[projects]]
-  digest = "1:78bbb1ba5b7c3f2ed0ea1eab57bdd3859aec7e177811563edc41198a760b06af"
-  name = "github.com/mitchellh/go-homedir"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "ae18d6b8b3205b561c79e8e5f69bff09736185f4"
-  version = "v1.0.0"
-
-[[projects]]
-  branch = "master"
-  digest = "1:5d7236b6cedaadd901d2f1533113f11c955bb676df646b676c94d13c43dfedbe"
+  digest = "1:bfc0c5e306ac24c94aaa10bcd8f22ef1436005582da9241c0742a1a26fd93174"
   name = "github.com/opentracing-contrib/go-stdlib"
   packages = ["nethttp"]
   pruneopts = "UT"
-  revision = "09659152d0aa5b83bb7683a9c33c79f8ee57038c"
+  revision = "77df8e8e70b403c6b13c0fffaa4867c9044ff4e9"
 
 [[projects]]
   digest = "1:450b7623b185031f3a456801155c8320209f75d0d4c4e633c6b1e59d44d6e392"
@@ -137,20 +90,12 @@
   version = "v1.0.2"
 
 [[projects]]
-  digest = "1:40e195917a951a8bf867cd05de2a46aaf1806c50cf92eebf4c16f78cd196f747"
+  digest = "1:cf31692c14422fa27c83a05292eb5cbe0fb2775972e8f1f8446a71549bd8980b"
   name = "github.com/pkg/errors"
   packages = ["."]
   pruneopts = "UT"
-  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
-  version = "v0.8.0"
-
-[[projects]]
-  digest = "1:69b1cc331fca23d702bd72f860c6a647afd0aa9fcbc1d0659b1365e26546dd70"
-  name = "github.com/sirupsen/logrus"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "bcd833dfe83d3cebad139e4a29ed79cb2318bf95"
-  version = "v1.2.0"
+  revision = "ba968bfe8b2f7e042a574c888954fccecfa385b4"
+  version = "v0.8.1"
 
 [[projects]]
   digest = "1:48c8c8d1fb550f059bcb5696a6f333693e19e3bad4db00d5c9b19f3846629511"
@@ -218,17 +163,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:fb3f8e4a426e6424718fa88e2ed5979156994a14e8ff8f003e3215baaa730bdb"
+  digest = "1:1ecf2a49df33be51e757d0033d5d51d5f784f35f68e5a38f797b2d3f03357d71"
   name = "golang.org/x/crypto"
   packages = [
-    "argon2",
     "bcrypt",
-    "blake2b",
     "blowfish",
-    "ssh/terminal",
   ]
   pruneopts = "UT"
-  revision = "505ab145d0a99da450461ae2c1a9f6cd10d1f447"
+  revision = "ff983b9c42bc9fbf91556e191cc8efb585c16908"
 
 [[projects]]
   branch = "master"
@@ -244,52 +186,26 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:1ece11b8b8cccab7ab13b91a44201a6c16f6e4c5a4d1060075b258d4df08da2b"
+  digest = "1:76ee51c3f468493aff39dbacc401e8831fbb765104cbf613b89bef01cf4bad70"
   name = "golang.org/x/net"
-  packages = [
-    "context",
-    "http/httpguts",
-    "idna",
-  ]
+  packages = ["context"]
   pruneopts = "UT"
-  revision = "891ebc4b82d6e74f468c533b06f983c7be918a96"
+  revision = "927f97764cc334a6575f4b7a1584a147864d5723"
 
 [[projects]]
   branch = "master"
-  digest = "1:c640964729379798b492e5ddd4a78eb496b78b5f03ad3d719e7d4bbb326da22f"
-  name = "golang.org/x/sys"
-  packages = [
-    "cpu",
-    "unix",
-    "windows",
-  ]
-  pruneopts = "UT"
-  revision = "4d1cda033e0619309c606fc686de3adcf599539e"
-
-[[projects]]
-  branch = "master"
-  digest = "1:698a3249bb7cfc1fd3cd012b1f68ea038f97ae285655a4aad00cf4e9fba687f0"
+  digest = "1:6347a2dff55cc3aebda787bb01f588766fbf2c95537d6d54e73c124f4feef4f1"
   name = "golang.org/x/text"
   packages = [
-    "collate",
-    "collate/build",
-    "internal/colltab",
     "internal/gen",
-    "internal/language",
-    "internal/language/compact",
-    "internal/tag",
     "internal/triegen",
     "internal/ucd",
-    "language",
-    "secure/bidirule",
     "transform",
-    "unicode/bidi",
     "unicode/cldr",
     "unicode/norm",
-    "unicode/rangetable",
   ]
   pruneopts = "UT"
-  revision = "17bcc049122f272a32787ba38073ee47433023e9"
+  revision = "e6919f6577db79269a6443b9dc46d18f2238fb5d"
 
 [solve-meta]
   analyzer-name = "dep"
@@ -315,7 +231,6 @@
     "github.com/ViBiOh/httputils/pkg/tools",
     "github.com/ViBiOh/httputils/pkg/uuid",
     "github.com/disintegration/imaging",
-    "github.com/minio/minio-go",
     "golang.org/x/crypto/bcrypt",
     "golang.org/x/text/transform",
     "golang.org/x/text/unicode/norm",
