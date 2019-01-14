@@ -18,7 +18,7 @@ const (
 )
 
 func (a *App) saveUploadedFile(request *provider.Request, uploadedFile io.ReadCloser, uploadedFileHeader *multipart.FileHeader) (string, error) {
-	filename, err := provider.SanitizeName(uploadedFileHeader.Filename)
+	filename, err := provider.SanitizeName(uploadedFileHeader.Filename, true)
 	if err != nil {
 		return ``, err
 	}

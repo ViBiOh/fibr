@@ -22,7 +22,7 @@ func (a *App) Create(w http.ResponseWriter, r *http.Request, request *provider.R
 		return
 	}
 
-	pathname, err = provider.SanitizeName(pathname)
+	pathname, err = provider.SanitizeName(pathname, false)
 	if err != nil {
 		a.renderer.Error(w, http.StatusBadRequest, err)
 		return

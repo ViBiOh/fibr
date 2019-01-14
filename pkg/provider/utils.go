@@ -15,7 +15,7 @@ import (
 
 var (
 	transformer  = getTransformer()
-	specialChars = regexp.MustCompile(`[[\](){}&"'§!$*€^%+=/\\;?\x60](?m)`)
+	specialChars = regexp.MustCompile(`[[\](){}&"'§!$*€^%+=\\;?\x60](?m)`)
 )
 
 func getTransformer() transform.Transformer {
@@ -27,17 +27,22 @@ func getTransformer() transform.Transformer {
 }
 
 // SanitizeName return sanitized name (remove diacritics)
-func SanitizeName(name string) (string, error) {
-	withouDiacritics, _, err := transform.String(transformer, name)
+func SanitizeName(name string, removeSlash bool) (string, error) {
+	withoutDiacritics, _, err := transform.String(transformer, name)
 	if err != nil {
 		return ``, errors.WithStack(err)
 	}
 
-	withoutSpecials := specialChars.ReplaceAllString(withouDiacritics, ``)
+	withoutSpecials := specialChars.ReplaceAllString(withoutDiacritics, ``)
 	withoutSpaces := strings.Replace(withoutSpecials, ` `, `_`, -1)
 	toLower := strings.ToLower(withoutSpaces)
 
-	return toLower, nil
+	sanitized := toLower
+	if removeSlash {
+		sanitized = strings.Replace(sanitized, `/`, `_`, -1)
+	}
+
+	return sanitized, nil
 }
 
 // GetFileinfoFromRoot return file informations from given paths
