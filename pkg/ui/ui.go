@@ -135,6 +135,7 @@ func (a App) Error(w http.ResponseWriter, status int, err error) {
 
 	if err := templates.WriteHTMLTemplate(a.tpl.Lookup(`error`), w, page, status); err != nil {
 		httperror.InternalServerError(w, err)
+		return
 	}
 
 	logger.Error(`%+v`, err)
@@ -144,6 +145,7 @@ func (a App) Error(w http.ResponseWriter, status int, err error) {
 func (a App) Sitemap(w http.ResponseWriter) {
 	if err := templates.WriteXMLTemplate(a.tpl.Lookup(`sitemap`), w, provider.Page{Config: a.config}, http.StatusOK); err != nil {
 		httperror.InternalServerError(w, err)
+		return
 	}
 }
 
@@ -165,6 +167,7 @@ func (a App) Directory(w http.ResponseWriter, request *provider.Request, content
 	w.Header().Set(`content-language`, `fr`)
 	if err := templates.WriteHTMLTemplate(a.tpl.Lookup(`files`), w, page, http.StatusOK); err != nil {
 		a.Error(w, http.StatusInternalServerError, err)
+		return
 	}
 }
 
@@ -182,5 +185,6 @@ func (a App) File(w http.ResponseWriter, request *provider.Request, content map[
 	w.Header().Set(`content-language`, `fr`)
 	if err := templates.WriteHTMLTemplate(a.tpl.Lookup(`file`), w, page, http.StatusOK); err != nil {
 		a.Error(w, http.StatusInternalServerError, err)
+		return
 	}
 }

@@ -1,7 +1,6 @@
 package crud
 
 import (
-	"errors"
 	"flag"
 	"fmt"
 	"strings"
@@ -9,6 +8,7 @@ import (
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
+	"github.com/ViBiOh/httputils/pkg/errors"
 	"github.com/ViBiOh/httputils/pkg/logger"
 	"github.com/ViBiOh/httputils/pkg/tools"
 )

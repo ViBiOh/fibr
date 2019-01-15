@@ -1,10 +1,10 @@
 package crud
 
 import (
-	"errors"
 	"net/http"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/pkg/errors"
 )
 
 // Post handle post from form
