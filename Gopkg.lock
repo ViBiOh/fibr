@@ -11,7 +11,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:0efc2d02b40099e5aa830184831f877fa5a89115bcb4838616ee8ba0325458d6"
+  digest = "1:83356bdc41e0d156b9094f4e8581ffd4d45e9bcece8ffeb18a16bae32ffacbf7"
   name = "github.com/ViBiOh/auth"
   packages = [
     "pkg/auth",
@@ -22,11 +22,11 @@
     "pkg/model",
   ]
   pruneopts = "UT"
-  revision = "f1350386d8c8393f90ae80f615d0b10ff7529577"
+  revision = "0f7bf7a3e9c1d6f28a9d0622d0c45a31aed3430a"
 
 [[projects]]
   branch = "master"
-  digest = "1:d6303ebbd73353210ca59dab161d0fd4f46409d928876c02693898b0e9992238"
+  digest = "1:9dd94ca80b6dc6a9bf77e479226375e30bce3cce43db9f540121a54c878ae77c"
   name = "github.com/ViBiOh/httputils"
   packages = [
     "pkg",
@@ -51,7 +51,7 @@
     "pkg/uuid",
   ]
   pruneopts = "UT"
-  revision = "b569bdfdbf9036f8f2026fc7203db165decc61ec"
+  revision = "f34a4b0c6f552c687db14b15c1a88111f8c40419"
 
 [[projects]]
   branch = "master"
@@ -182,7 +182,7 @@
     "tiff/lzw",
   ]
   pruneopts = "UT"
-  revision = "cd38e8056d9b27bb2f265effa37fb0ea6b8a7f0f"
+  revision = "183bebdce1b249c42a7cf6772817e8c2e873b966"
 
 [[projects]]
   branch = "master"
@@ -190,7 +190,7 @@
   name = "golang.org/x/net"
   packages = ["context"]
   pruneopts = "UT"
-  revision = "927f97764cc334a6575f4b7a1584a147864d5723"
+  revision = "ed066c81e75eba56dd9bd2139ade88125b855585"
 
 [[projects]]
   branch = "master"
