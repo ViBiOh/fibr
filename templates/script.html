@@ -62,5 +62,49 @@
       window.location.hash = '#upload-modal';
       document.getElementById('file').files = e.dataTransfer.files;
     });
+
+    /**
+     * Handle upload submit
+     * @param  {Object} e Submit event
+     */
+    function upload(e) {
+      e.preventDefault();
+
+      var values = [].filter
+        .call(event.target, function(e) {
+          return e.nodeName.toLowerCase() === 'input';
+        })
+        .reduce(function(acc, cur) {
+          if (cur.type === 'file') {
+            acc.files = cur.files;
+          } else {
+            acc[cur.name] = cur.value;
+          }
+
+          return acc;
+        }, {});
+
+      var promises = [];
+
+      [].forEach.call(values.files, function(file) {
+        var formData = new FormData();
+        formData.append('method', values.method);
+        formData.append('files[]', file);
+
+        promises.push(
+          fetch('', {
+            method: 'POST',
+            body: formData,
+          }),
+        );
+      });
+
+      Promise.all(promises).then(function() {
+        document.location.hash = '';
+        window.location.reload(true);
+      });
+
+      return false;
+    }
   </script>
 {{- end -}}

@@ -19,8 +19,6 @@ var (
 )
 
 func getTransformer() transform.Transformer {
-	// From https://blog.golang.org/normalization
-
 	return transform.Chain(norm.NFD, transform.RemoveFunc(func(r rune) bool {
 		return unicode.Is(unicode.Mn, r)
 	}), norm.NFC)

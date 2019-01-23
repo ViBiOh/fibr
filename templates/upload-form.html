@@ -3,10 +3,10 @@
     <div class="modal-content">
       <h2 class="header">Upload files</h2>
 
-      <form method="post" enctype="multipart/form-data" action="#">
+      <form method="post" enctype="multipart/form-data" action="#" onSubmit="return upload(event)">
         <input type="hidden" name="method" value="POST" />
         <p class="center">
-          <input id="file" type="file" name="files[]" multiple="multiple" />
+          <input id="file" type="file" name="files[]" multiple />
         </p>
         <p class="center">
           <button type="submit" class="button bg-important">
