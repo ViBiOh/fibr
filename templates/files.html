@@ -43,18 +43,18 @@
               <span class="filename">{{- .Name -}}</span>
             {{- end -}}
 
-            {{- if not .IsDir -}}
-              <a href="{{- .Name -}}" class="button button-icon file-download" alt="Download" download>
-                <span class="icon icon-download"></span>
-              </a>
-            {{- end -}}
-
             {{- if $root.Request.CanEdit -}}
+              <a href="#delete-modal-{{- sha1 . -}}" class="button button-icon file-delete" alt="Delete">
+                <span class="icon icon-times"></span>
+              </a>
               <a href="#edit-modal-{{- sha1 . -}}" class="button button-icon file-edit" alt="Edit">
                 <span class="icon icon-pencil-alt"></span>
               </a>
-              <a href="#delete-modal-{{- sha1 . -}}" class="button button-icon file-delete" alt="Delete">
-                <span class="icon icon-times"></span>
+            {{- end -}}
+
+            {{- if not .IsDir -}}
+              <a href="{{- .Name -}}" class="button button-icon file-download" alt="Download" download>
+                <span class="icon icon-download"></span>
               </a>
             {{- end -}}
           </a>
