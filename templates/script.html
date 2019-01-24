@@ -1,6 +1,16 @@
 {{- define "script" -}}
   <script type="text/javascript">
     /**
+     * Remove all element child
+     * @param  {DOMNode} element Element to clear
+     */
+    function removeAllChild(element) {
+      while (element.firstChild) {
+        element.removeChild(element.firstChild);
+      }
+    }
+
+    /**
      * Async image loading
      */
     function getThumbnails() {
@@ -63,12 +73,28 @@
       document.getElementById('file').files = e.dataTransfer.files;
     });
 
+    function generateUploadItem(file, index) {
+      var wrapper = document.createElement('div');
+      wrapper.id = 'upload-file-' + index;
+      wrapper.classList.add('flex');
+
+      var filename = document.createElement('span');
+      wrapper.appendChild(filename);
+      filename.classList.add('uploadname');
+      filename.innerHTML = file.name;
+
+      return wrapper;
+    }
+
     /**
      * Handle upload submit
      * @param  {Object} e Submit event
      */
     function upload(e) {
       e.preventDefault();
+
+      var uploadList = document.getElementById('uploadList');
+      removeAllChild(uploadList);
 
       var values = [].filter
         .call(event.target, function(e) {
@@ -77,6 +103,11 @@
         .reduce(function(acc, cur) {
           if (cur.type === 'file') {
             acc.files = cur.files;
+
+            [].forEach.call(acc.files, function(file, index) {
+              uploadList.appendChild(generateUploadItem(file, index));
+            })
+
           } else {
             acc[cur.name] = cur.value;
           }
@@ -86,16 +117,33 @@
 
       var promises = [];
 
-      [].forEach.call(values.files, function(file) {
+      [].forEach.call(values.files, function(file, index) {
         var formData = new FormData();
         formData.append('method', values.method);
         formData.append('files[]', file);
 
         promises.push(
           fetch('', {
+            credentials: 'same-origin',
             method: 'POST',
             body: formData,
-          }),
+          })
+          .then(function(e) {
+            var success = document.createElement('span');
+            success.classList.add('success');
+            success.innerHTML = '✓';
+
+            document.getElementById('upload-file-' + index).appendChild(success);
+            return e;
+          }).catch(function(e) {
+            var success = document.createElement('span');
+            success.classList.add('danger');
+            success.title = String(e);
+            success.innerHTML = '╳';
+
+            document.getElementById('upload-file-' + index).appendChild(success)
+            return e;
+          })
         );
       });
 
