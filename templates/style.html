@@ -343,20 +343,24 @@
       }
 
       .file-edit,
+      .file-download,
       .file-delete {
         display: none;
       }
 
+      .file-edit,
       .file-delete {
         margin-left: 0.5rem;
       }
 
       .file:hover .file-edit,
+      .file:hover .file-download,
       .file:hover .file-delete {
         display: inline-block;
       }
 
       .file-edit .icon,
+      .file-download .icon,
       .file-delete .icon {
         margin: 0;
       }
@@ -367,6 +371,7 @@
         }
 
         .file-edit,
+        .file-download,
         .file-delete {
           display: inline-block;
         }
@@ -423,6 +428,7 @@
       }
 
       .file-edit,
+      .file-download,
       .file-delete {
         background-color: white;
         display: none;
@@ -431,16 +437,22 @@
         top: 0.5rem;
       }
 
-      .file-edit {
+      .file-edit,
+      .file-download {
         left: 0.5rem;
+      }
+
+      .file-download {
+        top: 3.5rem;
       }
 
       .file-delete {
         right: 0.5rem;
       }
 
-      #files > *:hover .file-delete,
-      #files > *:hover .file-edit {
+      #files > *:hover .file-edit,
+      #files > *:hover .file-download,
+      #files > *:hover .file-delete {
         display: block;
       }
     {{- end -}}
