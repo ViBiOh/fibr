@@ -1,4 +1,150 @@
 {{- define "upload-modal" -}}
+  <script type="text/javascript">
+    /**
+     * Remove all element child
+     * @param  {DOMNode} element Element to clear
+     */
+    function removeAllChild(element) {
+      while (element.firstChild) {
+        element.removeChild(element.firstChild);
+      }
+    }
+
+    /**
+     * Drag'n drop.
+     */
+    const dropZone = document.getElementsByTagName('body')[0];
+
+    /**
+     * Noop function for event handler.
+     * @param  {Object} e Event
+     */
+    function eventNoop(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    dropZone.addEventListener('dragover', eventNoop);
+    dropZone.addEventListener('dragleave', eventNoop);
+    dropZone.addEventListener('drop', (e) => {
+      eventNoop(e);
+
+      window.location.hash = '#upload-modal';
+      document.getElementById('file').files = e.dataTransfer.files;
+    });
+
+    /**
+     * Convert an ArrayBuffer to a HexString
+     * @param  {ArrayBuffer} buffer ArrayBuffer to convert
+     * @return {String}      Matching hex string
+     */
+    function bufferToHex(buffer) {
+      return Array.prototype.map.call(new Uint8Array(buffer), x => (`00${x.toString(16)}`).slice(-2)).join('');
+    }
+
+    /**
+     * Compute the sha1 on input.
+     * @param  {Object} data Data to hash
+     * @return {Promise<String>} Promise that will resolve the sha1 string
+     */
+    function sha1(data) {
+      return crypto.subtle.digest('SHA-1', new TextEncoder('utf-8').encode(data)).then(buf2hex);
+    }
+
+    /**
+     * Generate file message id.
+     * @param  {File} file File to generate id from.
+     * @return {Promise<String>} Promise that will resolve the message id.
+     */
+    function fileMessageId(file) {
+      return sha1(file.name).then(hash => `upload-file-${hash}`);
+    }
+
+    /**
+     * Generate upload item content.
+     * @param  {File} file  File to generate an item
+     * @param  {Number} index Index of generated file
+     * @return {DOMNode} Item content
+     */
+    function generateUploadItem(file, index) {
+      const wrapper = document.createElement('div');
+      wrapper.id = 'upload-file-' + index;
+      wrapper.classList.add('flex');
+
+      const filename = document.createElement('span');
+      wrapper.appendChild(filename);
+      filename.classList.add('uploadname');
+      filename.innerHTML = file.name;
+
+      return wrapper;
+    }
+
+    /**
+     * Handle upload submit
+     * @param  {Object} e Submit event
+     */
+    function upload(e) {
+      e.preventDefault();
+
+      const uploadList = document.getElementById('uploadList');
+      removeAllChild(uploadList);
+
+      const values = [].filter
+        .call(event.target, (e) => e.nodeName.toLowerCase() === 'input')
+        .reduce((acc, cur) => {
+          if (cur.type === 'file') {
+            acc.files = cur.files;
+
+            [].forEach.call(acc.files, (file, index) => uploadList.appendChild(generateUploadItem(file, index)))
+
+          } else {
+            acc[cur.name] = cur.value;
+          }
+
+          return acc;
+        }, {});
+
+      const promises = [];
+
+      [].forEach.call(values.files, (file, index) => {
+        const formData = new FormData();
+        formData.append('method', values.method);
+        formData.append('files[]', file);
+
+        promises.push(
+          fetch('', {
+            credentials: 'same-origin',
+            method: 'POST',
+            body: formData,
+          })
+          .then((e) => {
+            const success = document.createElement('span');
+            success.classList.add('success');
+            success.innerHTML = '✓';
+
+            document.getElementById('upload-file-' + index).appendChild(success);
+            return e;
+          }).catch((e) => {
+            const success = document.createElement('span');
+            success.classList.add('danger');
+            success.title = String(e);
+            success.innerHTML = '╳';
+
+            document.getElementById('upload-file-' + index).appendChild(success)
+            return e;
+          })
+        );
+      });
+
+      Promise.all(promises).then(() => {
+        document.location.hash = '';
+        window.location.reload(true);
+      });
+
+      return false;
+    }
+  </script>
+
   <div id="upload-modal" class="modal full flex flex-center">
     <div class="modal-content">
       <h2 class="header">Upload files</h2>

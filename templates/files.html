@@ -21,6 +21,39 @@
     {{- end -}}
   {{- end -}}
 
+  <script type="text/javascript">
+    /**
+     * Async image loading
+     */
+    function getThumbnails() {
+      return fetch('?thumbnail', { credentials: 'same-origin' }).then(response => {
+        if (response.status >= 400) {
+          return Promise.reject('Error while loading thumbnails')
+        }
+        return response.json();
+      });
+    }
+
+    window.addEventListener('load', () => {
+      const throbbers = document.querySelectorAll('.throbber');
+      for (let i = throbbers.length - 1; i >= 0; i--) {
+        throbbers[i].style.display = 'inline-block';
+      }
+
+      getThumbnails().then(thumbnails => {
+        for (let i = throbbers.length - 1; i >= 0; i--) {
+          const throbber = throbbers[i];
+
+          const img = new Image();
+          img.src = 'data:' + throbber.dataset.mime + ';base64,' + thumbnails[throbber.dataset.id];
+          img.alt = throbber.dataset.alt;
+
+          document.getElementById('picture-' + throbber.dataset.id).replaceChild(img, throbber);
+        }
+      });
+    }, false);
+  </script>
+
   <div class="content">
     {{- template "modifiers" . -}}
 
