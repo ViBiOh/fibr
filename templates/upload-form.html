@@ -44,8 +44,8 @@
 
     /**
      * Compute the sha1 on input.
-     * @param  {Object} data Data to hash
-     * @return {Promise<String>} Promise that will resolve the sha1 string
+     * @param  {Object}          data Data to hash
+     * @return {Promise<String>}      Promise that will resolve the sha1 string
      */
     function sha1(data) {
       return crypto.subtle.digest('SHA-1', new TextEncoder('utf-8').encode(data)).then(bufferToHex);
@@ -53,7 +53,7 @@
 
     /**
      * Generate file message id.
-     * @param  {File} file File to generate id from.
+     * @param  {File} file       File to generate id from.
      * @return {Promise<String>} Promise that will resolve the message id.
      */
     function fileMessageId(file) {
@@ -61,22 +61,44 @@
     }
 
     /**
-     * Generate upload item content.
-     * @param  {File} file  File to generate an item
-     * @param  {Number} index Index of generated file
-     * @return {DOMNode} Item content
+     * Add upload item content to container.
+     * @param  {DOMNode} container Container to append item
+     * @param  {File}    file      File to generate an item
+     * @param  {Number}  index     Index of generated file
      */
-    function generateUploadItem(file, index) {
-      const wrapper = document.createElement('div');
-      wrapper.id = 'upload-file-' + index;
-      wrapper.classList.add('flex');
+    function addUploadItem(container, file) {
+      fileMessageId(file).then(messageId => {
+        const item = document.createElement('div');
+        item.id = messageId;
+        item.classList.add('flex');
 
-      const filename = document.createElement('span');
-      wrapper.appendChild(filename);
-      filename.classList.add('uploadname');
-      filename.innerHTML = file.name;
+        const filename = document.createElement('span');
+        filename.classList.add('uploadname');
+        filename.innerHTML = file.name;
+        item.appendChild(filename);
 
-      return wrapper;
+        container.appendChild(item);
+      });
+    }
+
+    /**
+     * Add upload message for file
+     * @param {File} file    File to generate message
+     * @param {Any} content  Content of message
+     */
+    function addUploadMessage(file, content, style) {
+      fileMessageId(file).then(messageId => {
+        const container = document.getElementById(messageId);
+        if (!container) {
+          return;
+        }
+
+        const message = document.createElement('span');
+        success.classList.add(style);
+        success.innerHTML = content;
+
+        container.appendChild(message);
+      });
     }
 
     /**
@@ -90,13 +112,12 @@
       removeAllChild(uploadList);
 
       const values = [].filter
-        .call(event.target, (e) => e.nodeName.toLowerCase() === 'input')
+        .call(event.target, e => e.nodeName.toLowerCase() === 'input')
         .reduce((acc, cur) => {
           if (cur.type === 'file') {
             acc.files = cur.files;
 
-            [].forEach.call(acc.files, (file, index) => uploadList.appendChild(generateUploadItem(file, index)))
-
+            [].forEach.call(acc.files, file => addUploadItem(uploadList, file));
           } else {
             acc[cur.name] = cur.value;
           }
@@ -106,7 +127,7 @@
 
       const promises = [];
 
-      [].forEach.call(values.files, (file, index) => {
+      [].forEach.call(values.files, file => {
         const formData = new FormData();
         formData.append('method', values.method);
         formData.append('files[]', file);
@@ -117,31 +138,31 @@
             method: 'POST',
             body: formData,
           })
-          .then((e) => {
-            const success = document.createElement('span');
-            success.classList.add('success');
-            success.innerHTML = '✓';
-
-            document.getElementById('upload-file-' + index).appendChild(success);
-            return e;
-          }).catch((e) => {
-            const success = document.createElement('span');
-            success.classList.add('danger');
-            success.title = String(e);
-            success.innerHTML = '╳';
-
-            document.getElementById('upload-file-' + index).appendChild(success)
-            return e;
-          })
+            .then(e => {
+              addUploadMessage(file, '✓', 'success');
+              return e;
+            })
+            .catch(e => {
+              addUploadMessage(file, '╳', 'danger');
+              console.error(e);
+              return e;
+            }),
         );
       });
 
       Promise.all(promises).then(() => {
-        document.location.hash = '';
-        window.location.reload(true);
+        document.location.hash = '#upload-success';
       });
 
       return false;
+    }
+
+    /**
+     * Close any modal and refresh page.
+     */
+    function closeAndRefresh() {
+      document.location.hash = '';
+      window.location.reload(true);
     }
   </script>
 
@@ -169,6 +190,18 @@
         <a href="#" class="button">
           Cancel
         </a>
+      </p>
+    </div>
+  </div>
+
+  <div id="upload-success" class="modal full flex flex-center">
+    <div class="modal-content">
+      <h2 class="header success padding">Upload success ✓</h2>
+
+      <p class="center">
+        <button type="button" class="button" onclick="closeAndRefresh()">
+          Close
+        </button>
       </p>
     </div>
   </div>
