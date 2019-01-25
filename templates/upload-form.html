@@ -48,7 +48,7 @@
      * @return {Promise<String>} Promise that will resolve the sha1 string
      */
     function sha1(data) {
-      return crypto.subtle.digest('SHA-1', new TextEncoder('utf-8').encode(data)).then(buf2hex);
+      return crypto.subtle.digest('SHA-1', new TextEncoder('utf-8').encode(data)).then(bufferToHex);
     }
 
     /**
