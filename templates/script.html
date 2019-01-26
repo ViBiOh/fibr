@@ -5,7 +5,12 @@
      */
     document.onkeyup = (e) => {
       if (e.keyCode === 27) {
+        const previousHash = document.location.hash;
         document.location.hash = '';
+
+        if (/success$/gmi.test(previousHash)) {
+          window.location.reload(true);
+        }
       }
     };
   </script>

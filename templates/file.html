@@ -36,7 +36,7 @@
       /**
        * Handle Previous/next.
        */
-      window.onkeyup = function(e) {
+      window.onkeyup = (e) => {
         {{- if .Content.Previous -}}
           if (e.keyCode === 37) {
             window.location.href = '{{- .Content.Previous.Name -}}?browser=true';
