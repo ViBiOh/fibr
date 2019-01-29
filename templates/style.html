@@ -320,18 +320,18 @@
     }
 
     .throbber {
-      margin: auto;
       display: none;
+      margin: auto;
       text-align: center;
     }
 
     .throbber > div {
-      width: 1rem;
-      height: 1rem;
-      background-color: var(--grey);
+      animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+      background-color: var(--dark);
       border-radius: 100%;
       display: inline-block;
-      animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+      height: 1rem;
+      width: 1rem;
     }
 
     .throbber .bounce1 {
