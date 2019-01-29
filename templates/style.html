@@ -237,6 +237,11 @@
     .modifier {
       display: inline-block;
       padding: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .modifier:first-of-type {
+      margin-left: 0.5rem;
     }
 
     .modal {
@@ -351,7 +356,7 @@
 
     #list-display,
     #grid-display {
-      background-color: var(--white);
+      background-color: var(--grey);
     }
 
     {{- if eq .Layout "list" -}}
@@ -436,11 +441,11 @@
 
       #files > * {
         align-items: center;
-        border: 1px solid whitesmoke;
+        background-color: var(--grey);
         display: flex;
         min-height: 12rem;
-        width: 100%;
         position: relative;
+        width: 100%;
       }
 
       .file {
@@ -474,7 +479,7 @@
       .file-edit,
       .file-download,
       .file-delete {
-        background-color: var(--grey);
+        background-color: var(--dark);
         display: none;
         padding: 0.5rem;
         position: absolute;

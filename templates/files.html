@@ -69,25 +69,25 @@
               {{- template "async-image" asyncImage . $root.Config.Version -}}
             {{- else -}}
               {{- if .IsDir -}}
-                <img class="icon" src="/svg/folder?fill=grey" alt="Folder">
+                <img class="icon" src="/svg/folder?fill=silver" alt="Folder">
               {{- else -}}
-                <img class="icon" src="/svg/{{- iconFromExtension . -}}?fill=grey" alt="File">
+                <img class="icon" src="/svg/{{- iconFromExtension . -}}?fill=silver" alt="File">
               {{- end -}}
               <span class="filename">{{- .Name -}}</span>
             {{- end -}}
 
             {{- if $root.Request.CanEdit -}}
               <a href="#delete-modal-{{- sha1 . -}}" class="button button-icon file-delete" alt="Delete">
-                <img class="icon" src="/svg/times?fill=grey" alt="Delete">
+                <img class="icon" src="/svg/times?fill=silver" alt="Delete">
               </a>
               <a href="#edit-modal-{{- sha1 . -}}" class="button button-icon file-edit" alt="Edit">
-                <img class="icon" src="/svg/pencil-alt?fill=grey" alt="Edit">
+                <img class="icon" src="/svg/pencil-alt?fill=silver" alt="Edit">
               </a>
             {{- end -}}
 
             {{- if not .IsDir -}}
               <a href="{{- .Name -}}" class="button button-icon file-download" alt="Download" download>
-                <img class="icon" src="/svg/download?fill=grey" alt="Download">
+                <img class="icon" src="/svg/download?fill=silver" alt="Download">
               </a>
             {{- end -}}
           </a>
