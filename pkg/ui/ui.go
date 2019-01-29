@@ -149,6 +149,20 @@ func (a App) Sitemap(w http.ResponseWriter) {
 	}
 }
 
+// SVG render a svg in given coolor
+func (a App) SVG(w http.ResponseWriter, name, fill string) {
+	tpl := a.tpl.Lookup(fmt.Sprintf(`svg-%s`, name))
+	if tpl == nil {
+		httperror.NotFound(w)
+		return
+	}
+
+	w.Header().Set(`Content-Type`, `image/svg+xml`)
+	if err := tpl.Execute(w, fill); err != nil {
+		httperror.InternalServerError(w, err)
+	}
+}
+
 // Directory render directory listing
 func (a App) Directory(w http.ResponseWriter, request *provider.Request, content map[string]interface{}, layout string, message *provider.Message) {
 	page := a.createPageConfiguration(request, message, content, layout)

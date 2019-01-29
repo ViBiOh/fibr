@@ -157,6 +157,7 @@ type Error struct {
 type Renderer interface {
 	Error(http.ResponseWriter, int, error)
 	Sitemap(http.ResponseWriter)
+	SVG(http.ResponseWriter, string, string)
 	Directory(http.ResponseWriter, *Request, map[string]interface{}, string, *Message)
 	File(http.ResponseWriter, *Request, map[string]interface{}, *Message)
 }

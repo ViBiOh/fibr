@@ -1,5 +1,14 @@
 {{- define "style" -}}
   <style type="text/css">
+    :root {
+      --primary: royalblue;
+      --success: limegreen;
+      --danger: crimson;
+      --dark: #272727;
+      --grey: #3b3b3b;
+      --white: silver;
+    }
+
     * {
       box-sizing: border-box;
     }
@@ -10,13 +19,16 @@
 
     body {
       -webkit-overflow-scrolling: touch;
-      margin: 0;
+      background-color: var(--dark);
+      color: var(--white);
       height: 100vh;
+      margin: 0;
     }
 
     body,
     button,
     input {
+      color: var(--white);
       font-family:
         -apple-system,
         'Segoe UI',
@@ -31,17 +43,22 @@
       font-weight: 400;
     }
 
+    input {
+      background-color: var(--white);
+      color: var(--dark);
+    }
+
     p {
       margin: 1rem;
     }
 
     a {
-      color: dimgray;
       text-decoration: none;
+      color: var(--white);
     }
 
     a:hover {
-      color: royalblue;
+      color: var(--primary);
       text-decoration: underline;
     }
 
@@ -99,7 +116,6 @@
       }
 
       .hover-side:hover {
-        background-color: whitesmoke;
         opacity: 0.8;
       }
 
@@ -142,8 +158,8 @@
     }
 
     .header {
-      background-color: whitesmoke;
-      color: dimgray;
+      background-color: var(--grey);
+      margin-top: 0;
       padding: 0.5rem 1rem;
       text-align: left;
     }
@@ -156,6 +172,7 @@
     .icon {
       background-position: center center;
       background-repeat: no-repeat;
+      color: var(--white);
       display: inline-block;
       height: 2rem;
       text-decoration: none;
@@ -194,30 +211,27 @@
     }
 
     .important {
-      color: royalblue;
+      color: var(--primary);
     }
 
     .bg-important {
-      background-color: royalblue;
-      color: ghostwhite;
+      background-color: var(--primary);
     }
 
     .success {
-      color: yellowgreen;
+      color: var(--success);
     }
 
     .bg-success {
-      background-color: yellowgreen;
-      color: ghostwhite;
+      background-color: var(--success);
     }
 
     .danger {
-      color: tomato;
+      color: var(--danger);
     }
 
     .bg-danger {
-      background-color: tomato;
-      color: ghostwhite;
+      background-color: var(--danger);
     }
 
     .modifier {
@@ -226,7 +240,7 @@
     }
 
     .modal {
-      background-color: rgba(105, 105, 105, 0.75);
+      background-color: rgba(84, 84, 84, 0.75);
       height: 100%;
       left: 0;
       pointer-events: none;
@@ -235,7 +249,7 @@
     }
 
     .modal-content {
-      background-color: whitesmoke;
+      background-color: var(--dark);
       pointer-events: auto;
     }
 
@@ -252,7 +266,7 @@
     }
 
     #tools {
-      background-color: whitesmoke;
+      background-color: var(--grey);
       bottom: 0;
       padding: 1rem;
       position: fixed;
@@ -293,11 +307,11 @@
     }
 
     .share-content td {
-      border-bottom: 1px solid dimgray;
+      border-bottom: 1px solid var(--grey);
     }
 
     .share-content:hover {
-      background-color: aliceblue;
+      background-color: var(--grey);
     }
 
     .throbber {
@@ -309,7 +323,7 @@
     .throbber > div {
       width: 1rem;
       height: 1rem;
-      background-color: dimgrey;
+      background-color: var(--grey);
       border-radius: 100%;
       display: inline-block;
       animation: sk-bouncedelay 1.4s infinite ease-in-out both;
@@ -335,9 +349,14 @@
       }
     }
 
+    #list-display,
+    #grid-display {
+      background-color: var(--white);
+    }
+
     {{- if eq .Layout "list" -}}
       #list-display {
-        background-color: aliceblue;
+        background-color: var(--primary);
       }
 
       .file {
@@ -405,7 +424,7 @@
 
     {{- if eq .Layout "grid" -}}
       #grid-display {
-        background-color: aliceblue;
+        background-color: var(--primary);
       }
 
       #files {
@@ -455,7 +474,7 @@
       .file-edit,
       .file-download,
       .file-delete {
-        background-color: white;
+        background-color: var(--grey);
         display: none;
         padding: 0.5rem;
         position: absolute;
@@ -472,7 +491,7 @@
       }
 
       .file-delete {
-        top: 3.5rem;
+        top: 4rem;
       }
 
       #files > *:hover .file-edit,

@@ -26,6 +26,11 @@ func (a *App) CheckAndServeSEO(w http.ResponseWriter, r *http.Request) bool {
 		return true
 	}
 
+	if strings.HasPrefix(r.URL.Path, `/svg`) {
+		a.renderer.SVG(w, strings.TrimPrefix(r.URL.Path, `/svg/`), r.URL.Query().Get(`fill`))
+		return true
+	}
+
 	return false
 }
 
