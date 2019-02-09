@@ -26,6 +26,7 @@ import (
 	"github.com/ViBiOh/httputils/pkg/logger"
 	"github.com/ViBiOh/httputils/pkg/opentracing"
 	"github.com/ViBiOh/httputils/pkg/owasp"
+	"github.com/ViBiOh/httputils/pkg/prometheus"
 	"github.com/ViBiOh/httputils/pkg/server"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -161,6 +162,7 @@ func main() {
 
 	serverConfig := httputils.Flags(fs, ``)
 	alcotestConfig := alcotest.Flags(fs, ``)
+	prometheusConfig := prometheus.Flags(fs, `prometheus`)
 	opentracingConfig := opentracing.Flags(fs, `tracing`)
 	owaspConfig := owasp.Flags(fs, ``)
 
@@ -185,6 +187,7 @@ func main() {
 
 	serverApp := httputils.New(serverConfig)
 	healthcheckApp := healthcheck.New()
+	prometheusApp := prometheus.New(prometheusConfig)
 	opentracingApp := opentracing.New(opentracingConfig)
 	owaspApp := owasp.New(owaspConfig)
 	gzipApp := gzip.New()
@@ -194,7 +197,7 @@ func main() {
 	crudApp := crud.New(crudConfig, storage, uiApp, thumbnailApp)
 	authApp := auth.NewService(authConfig, authService.NewBasic(basicConfig, nil))
 
-	webHandler := server.ChainMiddlewares(browserHandler(crudApp, uiApp, authApp), opentracingApp, gzipApp, owaspApp)
+	webHandler := server.ChainMiddlewares(browserHandler(crudApp, uiApp, authApp), prometheusApp, opentracingApp, gzipApp, owaspApp)
 
 	serverApp.ListenAndServe(webHandler, nil, healthcheckApp)
 }

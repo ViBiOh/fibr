@@ -37,6 +37,8 @@ Usage of fibr:
       Enable metadata storage (default true)
   -port int
       Listen port (default 1080)
+  -prometheusPath string
+      [prometheus] Path for exposing metrics (default "/metrics")
   -publicURL string
       [fibr] Public URL (default "https://fibr.vibioh.fr")
   -tls
