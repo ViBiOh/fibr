@@ -14,6 +14,8 @@ services:
     - "default-src 'self'; base-uri 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:"
     - -frameOptions
     - SAMEORIGIN
+    - -tracingAgent
+    - monitoring_jaeger:6831
     - -tracingName
     - fibr
     labels:
