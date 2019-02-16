@@ -26,7 +26,7 @@
 
     dropZone.addEventListener('dragover', eventNoop);
     dropZone.addEventListener('dragleave', eventNoop);
-    dropZone.addEventListener('drop', (e) => {
+    dropZone.addEventListener('drop', e => {
       eventNoop(e);
 
       window.location.hash = '#upload-modal';
@@ -39,7 +39,9 @@
      * @return {String}      Matching hex string
      */
     function bufferToHex(buffer) {
-      return Array.prototype.map.call(new Uint8Array(buffer), x => (`00${x.toString(16)}`).slice(-2)).join('');
+      return Array.prototype.map
+        .call(new Uint8Array(buffer), x => `00${x.toString(16)}`.slice(-2))
+        .join('');
     }
 
     /**
@@ -67,7 +69,7 @@
      * @param  {Number}  index     Index of generated file
      */
     function addUploadItem(container, file) {
-      fileMessageId(file).then(messageId => {
+      return fileMessageId(file).then(messageId => {
         const item = document.createElement('div');
         item.id = messageId;
         item.classList.add('flex');
@@ -87,7 +89,7 @@
      * @param {Any} content  Content of message
      */
     function addUploadMessage(file, content, style) {
-      fileMessageId(file).then(messageId => {
+      return fileMessageId(file).then(messageId => {
         const container = document.getElementById(messageId);
         if (!container) {
           return;
@@ -187,7 +189,7 @@
       </form>
 
       <p class="center">
-        <a href="#" class="button">
+        <a href="#" class="button white">
           Cancel
         </a>
       </p>
@@ -199,7 +201,7 @@
       <h2 class="header success padding">Upload success ✓</h2>
 
       <p class="center">
-        <button type="button" class="button" onclick="closeAndRefresh()">
+        <button type="button" class="button white" onclick="closeAndRefresh()">
           Close
         </button>
       </p>
