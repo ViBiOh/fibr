@@ -37,7 +37,7 @@ services:
     restart: on-failure:5
     read_only: true
     cpu_shares: 128
-    mem_limit: 134217728
+    mem_limit: 201326592
     security_opt:
     - no-new-privileges
 
@@ -51,8 +51,8 @@ services:
         max-size: '10m'
     restart: on-failure:5
     read_only: true
-    cpu_shares: 128
-    mem_limit: 134217728
+    cpu_shares: 256
+    mem_limit: 201326592
     security_opt:
     - no-new-privileges
 

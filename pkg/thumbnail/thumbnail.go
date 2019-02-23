@@ -1,6 +1,7 @@
 package thumbnail
 
 import (
+	"bytes"
 	"context"
 	"encoding/base64"
 	"flag"
@@ -63,20 +64,20 @@ func getThumbnailPath(pathname string) string {
 	return path.Join(provider.MetadataDirectoryName, pathname)
 }
 
-// IsExist determine if thumbnail exist for given pathname
-func (a App) IsExist(pathname string) bool {
+// HasThumbnail determine if thumbnail exist for given pathname
+func (a App) HasThumbnail(pathname string) bool {
 	_, err := a.storage.Info(getThumbnailPath(pathname))
 	return err == nil
 }
 
 // ServeIfPresent check if thumbnail is present and serve it
 func (a App) ServeIfPresent(w http.ResponseWriter, r *http.Request, pathname string) bool {
-	exist := a.IsExist(pathname)
-	if exist {
+	if a.HasThumbnail(pathname) {
 		a.storage.Serve(w, r, getThumbnailPath(pathname))
+		return true
 	}
 
-	return exist
+	return false
 }
 
 // List return all thumbnail in a base64 form
@@ -90,7 +91,7 @@ func (a App) List(w http.ResponseWriter, r *http.Request, pathname string) {
 	thumbnails := make(map[string]string)
 
 	for _, item := range items {
-		if item.IsDir || !a.IsExist(item.Pathname) {
+		if item.IsDir || !a.HasThumbnail(item.Pathname) {
 			continue
 		}
 
@@ -158,15 +159,8 @@ func (a App) GenerateImageThumbnail(pathname string) {
 	}
 
 	thumbnailPath := getThumbnailPath(pathname)
-
-	thumbInfo, err := a.storage.Info(thumbnailPath)
-	if err != nil && !provider.IsNotExist(err) {
+	if err := a.storage.Create(path.Dir(thumbnailPath)); err != nil {
 		logger.Error(`%+v`, err)
-		return
-	}
-
-	if thumbInfo != nil {
-		logger.Error(`%s: thumbnail already exists`, pathname)
 		return
 	}
 
@@ -185,7 +179,7 @@ func (a App) GenerateImageThumbnail(pathname string) {
 
 	payload, err := ioutil.ReadAll(file)
 	if err != nil {
-		logger.Error(`%+v`, err)
+		logger.Error(`%+v`, errors.WithStack(err))
 		return
 	}
 
@@ -201,12 +195,7 @@ func (a App) GenerateImageThumbnail(pathname string) {
 		return
 	}
 
-	if err := a.storage.Create(path.Dir(thumbnailPath)); err != nil {
-		logger.Error(`%+v`, err)
-		return
-	}
-
-	if err := ioutil.WriteFile(thumbnailPath, result, 0600); err != nil {
+	if err := a.storage.Upload(thumbnailPath, ioutil.NopCloser(bytes.NewReader(result))); err != nil {
 		logger.Error(`%+v`, err)
 		return
 	}
