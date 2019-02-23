@@ -37,7 +37,22 @@ services:
     restart: on-failure:5
     read_only: true
     cpu_shares: 128
-    mem_limit: 335544320
+    mem_limit: 134217728
+    security_opt:
+    - no-new-privileges
+
+  image:
+    image: h2non/imaginary
+    labels:
+      traefik.enable: 'false'
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+    restart: on-failure:5
+    read_only: true
+    cpu_shares: 128
+    mem_limit: 134217728
     security_opt:
     - no-new-privileges
 

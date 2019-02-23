@@ -1,20 +1,28 @@
 package thumbnail
 
 import (
+	"context"
 	"encoding/base64"
+	"flag"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"path"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/pkg/errors"
 	"github.com/ViBiOh/httputils/pkg/httperror"
 	"github.com/ViBiOh/httputils/pkg/httpjson"
 	"github.com/ViBiOh/httputils/pkg/logger"
+	"github.com/ViBiOh/httputils/pkg/request"
 	"github.com/ViBiOh/httputils/pkg/tools"
-	"github.com/disintegration/imaging"
+)
+
+const (
+	defaultTimeout = time.Second * 30
 )
 
 var (
@@ -25,15 +33,29 @@ var (
 	}
 )
 
-// App of package
-type App struct {
-	storage provider.Storage
+// Config of package
+type Config struct {
+	imaginaryURL *string
 }
 
-// New creates new App
-func New(storage provider.Storage) *App {
+// App of package
+type App struct {
+	imaginaryURL string
+	storage      provider.Storage
+}
+
+// Flags adds flags for configuring package
+func Flags(fs *flag.FlagSet, prefix string) Config {
+	return Config{
+		imaginaryURL: fs.String(tools.ToCamel(fmt.Sprintf(`%sImaginaryURL`, prefix)), `http://image:9000`, `[thumbnail] Imaginary URL`),
+	}
+}
+
+// New creates new App from Config
+func New(config Config, storage provider.Storage) *App {
 	return &App{
-		storage: storage,
+		imaginaryURL: strings.TrimSpace(*config.imaginaryURL),
+		storage:      storage,
 	}
 }
 
@@ -118,6 +140,10 @@ func (a App) Generate() {
 	}
 }
 
+func getCtx(ctx context.Context) (context.Context, context.CancelFunc) {
+	return context.WithTimeout(ctx, defaultTimeout)
+}
+
 // GenerateImageThumbnail generate thumbnail image for given path
 func (a App) GenerateImageThumbnail(pathname string) {
 	info, err := a.storage.Info(pathname)
@@ -157,39 +183,31 @@ func (a App) GenerateImageThumbnail(pathname string) {
 		return
 	}
 
-	sourceImage, err := imaging.Decode(file)
+	payload, err := ioutil.ReadAll(file)
 	if err != nil {
-		logger.Error(`%+v`, errors.WithStack(err))
+		logger.Error(`%+v`, err)
 		return
 	}
-	resizedImage := imaging.Fill(sourceImage, 150, 150, imaging.Center, imaging.Box)
+
+	ctx, cancel := getCtx(context.Background())
+	defer cancel()
+
+	headers := http.Header{}
+	headers.Set(`Content-Type`, `image/*`)
+	headers.Set(`Accept`, `image/*`)
+	result, _, _, err := request.Do(ctx, http.MethodPost, fmt.Sprintf(`%s/smartcrop?width=150&height=150&stripmeta=true`, a.imaginaryURL), payload, headers)
+	if err != nil {
+		logger.Error(`%+v`, err)
+		return
+	}
 
 	if err := a.storage.Create(path.Dir(thumbnailPath)); err != nil {
 		logger.Error(`%+v`, err)
 		return
 	}
 
-	thumbnailFile, err := a.storage.Open(thumbnailPath)
-	if thumbnailFile != nil {
-		defer func() {
-			if err := thumbnailFile.Close(); err != nil {
-				logger.Error(`%+v`, err)
-			}
-		}()
-	}
-	if err != nil {
+	if err := ioutil.WriteFile(thumbnailPath, result, 0600); err != nil {
 		logger.Error(`%+v`, err)
-		return
-	}
-
-	format, err := imaging.FormatFromFilename(thumbnailPath)
-	if err != nil {
-		logger.Error(`%+v`, errors.WithStack(err))
-		return
-	}
-
-	if err = imaging.Encode(thumbnailFile, resizedImage, format); err != nil {
-		logger.Error(`%+v`, errors.WithStack(err))
 		return
 	}
 

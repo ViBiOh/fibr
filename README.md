@@ -17,57 +17,50 @@ go get github.com/ViBiOh/fibr/cmd
 
 ```bash
 Usage of fibr:
-Usage of fibr:
   -authDisable
-      [auth] Disable auth
+        [auth] Disable auth
   -authUrl string
-      [auth] Auth URL, if remote
+        [auth] Auth URL, if remote
   -authUsers string
-      [auth] Allowed users and profiles (e.g. user:profile1|profile2,user2:profile3). Empty allow any identified user
+        [auth] Allowed users and profiles (e.g. user:profile1|profile2,user2:profile3). Empty allow any identified user
   -basicUsers string
-      [basic] Users in the form "id:username:password,id2:username2:password2"
+        [basic] Users in the form "id:username:password,id2:username2:password2"
   -csp string
-      [owasp] Content-Security-Policy (default "default-src 'self'; base-uri 'self'")
+        [owasp] Content-Security-Policy (default "default-src 'self'; base-uri 'self'")
   -frameOptions string
-      [owasp] X-Frame-Options (default "deny")
+        [owasp] X-Frame-Options (default "deny")
   -fsDirectory string
-      [filesystem] Path to served directory (default "/data")
+        [filesystem] Path to served directory (default "/data")
   -hsts
-      [owasp] Indicate Strict Transport Security (default true)
+        [owasp] Indicate Strict Transport Security (default true)
   -metadata
-      Enable metadata storage (default true)
-  -minioAccessKey string
-      [minio] Access key
-  -minioEndpoint string
-      [minio] Endpoint
-  -minioSecretKey string
-      [minio] Secret key
-  -minioSsl
-      [minio] Use SSL (default true)
+        Enable metadata storage (default true)
   -port int
-      Listen port (default 1080)
+        Listen port (default 1080)
   -prometheusPath string
-      [prometheus] Path for exposing metrics (default "/metrics")
+        [prometheus] Path for exposing metrics (default "/metrics")
   -publicURL string
-      [fibr] Public URL (default "https://fibr.vibioh.fr")
+        [fibr] Public URL (default "https://fibr.vibioh.fr")
+  -thumbnailImaginaryURL string
+        [thumbnail] Imaginary URL (default "http://image:9000")
   -tls
-      Serve TLS content (default true)
+        Serve TLS content (default true)
   -tlsCert string
-      [tls] PEM Certificate file
+        [tls] PEM Certificate file
   -tlsHosts string
-      [tls] Self-signed certificate hosts, comma separated (default "localhost")
+        [tls] Self-signed certificate hosts, comma separated (default "localhost")
   -tlsKey string
-      [tls] PEM Key file
+        [tls] PEM Key file
   -tlsOrganization string
-      [tls] Self-signed certificate organization (default "ViBiOh")
+        [tls] Self-signed certificate organization (default "ViBiOh")
   -tracingAgent string
-      [opentracing] Jaeger Agent (e.g. host:port) (default "jaeger:6831")
+        [opentracing] Jaeger Agent (e.g. host:port) (default "jaeger:6831")
   -tracingName string
-      [opentracing] Service name
+        [opentracing] Service name
   -url string
-      [health] URL to check
+        [health] URL to check
   -userAgent string
-      [health] User-Agent for check (default "Golang alcotest")
+        [health] User-Agent for check (default "Golang alcotest")
   -version string
-      [fibr] Version (used mainly as a cache-buster)
+        [fibr] Version (used mainly as a cache-buster)
 ```

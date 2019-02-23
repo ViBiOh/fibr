@@ -7,21 +7,9 @@
   name = "github.com/ViBiOh/httputils"
 
 [[constraint]]
-  name = "github.com/disintegration/imaging"
-  version = "1.4.1"
-
-[[constraint]]
   branch = "master"
   name = "golang.org/x/crypto"
-
-[[constraint]]
-  branch = "master"
-  name = "golang.org/x/text"
 
 [prune]
   go-tests = true
   unused-packages = true
-
-[[constraint]]
-  name = "github.com/minio/minio-go"
-  version = "6.0.17"
