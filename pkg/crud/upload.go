@@ -43,7 +43,7 @@ func (a *App) saveUploadedFile(request *provider.Request, uploadedFile io.ReadCl
 	}
 
 	if provider.ImageExtensions[strings.ToLower(path.Ext(uploadedFileHeader.Filename))] {
-		go a.thumbnailApp.GenerateImageThumbnail(filePath)
+		a.thumbnailApp.AsyncGenerateThumbnail(filePath)
 	}
 
 	return filename, nil

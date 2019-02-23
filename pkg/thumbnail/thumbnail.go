@@ -23,7 +23,8 @@ import (
 )
 
 const (
-	defaultTimeout = time.Second * 30
+	defaultTimeout     = time.Second * 30
+	maxImageGeneration = 4
 )
 
 var (
@@ -41,8 +42,9 @@ type Config struct {
 
 // App of package
 type App struct {
-	imaginaryURL string
-	storage      provider.Storage
+	imaginaryURL     string
+	storage          provider.Storage
+	pathnameGenerate chan<- interface{}
 }
 
 // Flags adds flags for configuring package
@@ -54,10 +56,31 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 
 // New creates new App from Config
 func New(config Config, storage provider.Storage) *App {
-	return &App{
+	app := &App{
 		imaginaryURL: strings.TrimSpace(*config.imaginaryURL),
 		storage:      storage,
 	}
+
+	inputs, results, errs := tools.ConcurrentAction(maxImageGeneration, func(ID interface{}) (interface{}, error) {
+		return app.generateThumbnail(ID.(string))
+	})
+
+	app.pathnameGenerate = inputs
+
+	go func() {
+		for {
+			select {
+			case err := <-errs:
+				logger.Error(`%+v`, err)
+				break
+			case result := <-results:
+				logger.Info(`Thumbnail generated for %s`, result)
+				break
+			}
+		}
+	}()
+
+	return app
 }
 
 func getThumbnailPath(pathname string) string {
@@ -129,7 +152,7 @@ func (a App) Generate() {
 			}
 
 			if info == nil {
-				a.GenerateImageThumbnail(pathname)
+				a.AsyncGenerateThumbnail(pathname)
 			}
 		}
 
@@ -145,23 +168,24 @@ func getCtx(ctx context.Context) (context.Context, context.CancelFunc) {
 	return context.WithTimeout(ctx, defaultTimeout)
 }
 
-// GenerateImageThumbnail generate thumbnail image for given path
-func (a App) GenerateImageThumbnail(pathname string) {
+// AsyncGenerateThumbnail generate thumbnail image for given path
+func (a App) AsyncGenerateThumbnail(pathname string) {
+	a.pathnameGenerate <- pathname
+}
+
+func (a App) generateThumbnail(pathname string) (string, error) {
 	info, err := a.storage.Info(pathname)
 	if err != nil && !provider.IsNotExist(err) {
-		logger.Error(`%+v`, err)
-		return
+		return ``, err
 	}
 
 	if info == nil {
-		logger.Error(`%s: image not found`, pathname)
-		return
+		return ``, errors.New(`%s: image not found`, pathname)
 	}
 
 	thumbnailPath := getThumbnailPath(pathname)
 	if err := a.storage.Create(path.Dir(thumbnailPath)); err != nil {
-		logger.Error(`%+v`, err)
-		return
+		return ``, err
 	}
 
 	file, err := a.storage.Read(pathname)
@@ -173,14 +197,12 @@ func (a App) GenerateImageThumbnail(pathname string) {
 		}()
 	}
 	if err != nil {
-		logger.Error(`%+v`, err)
-		return
+		return ``, err
 	}
 
 	payload, err := ioutil.ReadAll(file)
 	if err != nil {
-		logger.Error(`%+v`, errors.WithStack(err))
-		return
+		return ``, errors.WithStack(err)
 	}
 
 	ctx, cancel := getCtx(context.Background())
@@ -191,14 +213,12 @@ func (a App) GenerateImageThumbnail(pathname string) {
 	headers.Set(`Accept`, `image/*`)
 	result, _, _, err := request.Do(ctx, http.MethodPost, fmt.Sprintf(`%s/smartcrop?width=150&height=150&stripmeta=true`, a.imaginaryURL), payload, headers)
 	if err != nil {
-		logger.Error(`%+v`, err)
-		return
+		return ``, err
 	}
 
 	if err := a.storage.Upload(thumbnailPath, ioutil.NopCloser(bytes.NewReader(result))); err != nil {
-		logger.Error(`%+v`, err)
-		return
+		return ``, err
 	}
 
-	logger.Info(`Generation success for %s`, pathname)
+	return pathname, nil
 }
