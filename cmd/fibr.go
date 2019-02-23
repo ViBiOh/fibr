@@ -14,6 +14,7 @@ import (
 	authService "github.com/ViBiOh/auth/pkg/ident/service"
 	"github.com/ViBiOh/fibr/pkg/crud"
 	"github.com/ViBiOh/fibr/pkg/filesystem"
+	"github.com/ViBiOh/fibr/pkg/minio"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/fibr/pkg/ui"
@@ -157,6 +158,24 @@ func browserHandler(crudApp *crud.App, uiApp *ui.App, authApp *auth.App) http.Ha
 	})
 }
 
+func getStorage(filesystemConfig filesystem.Config, minioConfig minio.Config) (provider.Storage, error) {
+	fsStorage, err := filesystem.New(filesystemConfig)
+	if err != nil {
+		logger.Error(`%+v`, err)
+	} else {
+		return fsStorage, nil
+	}
+
+	minioStorage, err := minio.New(minioConfig)
+	if err != nil {
+		logger.Error(`%+v`, err)
+	} else {
+		return minioStorage, nil
+	}
+
+	return nil, errors.New(`no storage available`)
+}
+
 func main() {
 	fs := flag.NewFlagSet(`fibr`, flag.ExitOnError)
 
@@ -172,6 +191,7 @@ func main() {
 	uiConfig := ui.Flags(fs, ``)
 
 	filesystemConfig := filesystem.Flags(fs, `fs`)
+	minioConfig := minio.Flags(fs, `minio`)
 
 	if err := fs.Parse(os.Args[1:]); err != nil {
 		logger.Fatal(`%+v`, err)
@@ -179,7 +199,7 @@ func main() {
 
 	alcotest.DoAndExit(alcotestConfig)
 
-	storage, err := filesystem.New(filesystemConfig)
+	storage, err := getStorage(filesystemConfig, minioConfig)
 	if err != nil {
 		logger.Error(`%+v`, err)
 		os.Exit(1)

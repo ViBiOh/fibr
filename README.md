@@ -17,6 +17,7 @@ go get github.com/ViBiOh/fibr/cmd
 
 ```bash
 Usage of fibr:
+Usage of fibr:
   -authDisable
       [auth] Disable auth
   -authUrl string
@@ -35,6 +36,14 @@ Usage of fibr:
       [owasp] Indicate Strict Transport Security (default true)
   -metadata
       Enable metadata storage (default true)
+  -minioAccessKey string
+      [minio] Access key
+  -minioEndpoint string
+      [minio] Endpoint
+  -minioSecretKey string
+      [minio] Secret key
+  -minioSsl
+      [minio] Use SSL (default true)
   -port int
       Listen port (default 1080)
   -prometheusPath string

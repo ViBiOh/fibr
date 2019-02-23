@@ -113,6 +113,15 @@ func (a App) Info(pathname string) (*provider.StorageItem, error) {
 	return convertToItem(path.Dir(pathname), info), nil
 }
 
+// Open writer for given pathname
+func (a App) Open(pathname string) (io.WriteCloser, error) {
+	if err := a.checkPathname(pathname); err != nil {
+		return nil, err
+	}
+
+	return getFile(a.getFullPath(pathname))
+}
+
 // Read content of given pathname
 func (a App) Read(pathname string) (io.ReadCloser, error) {
 	if err := a.checkPathname(pathname); err != nil {
@@ -121,15 +130,6 @@ func (a App) Read(pathname string) (io.ReadCloser, error) {
 
 	output, err := os.OpenFile(a.getFullPath(pathname), os.O_RDONLY, 0600)
 	return output, errors.WithStack(err)
-}
-
-// Open writer for given pathname
-func (a App) Open(pathname string) (io.WriteCloser, error) {
-	if err := a.checkPathname(pathname); err != nil {
-		return nil, err
-	}
-
-	return getFile(a.getFullPath(pathname))
 }
 
 // Serve file for given pathname
