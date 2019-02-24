@@ -49,9 +49,9 @@ services:
       driver: json-file
       options:
         max-size: '10m'
-    restart: on-failure:5
+    restart: on-failure:10
     read_only: true
-    cpu_shares: 256
+    cpu_shares: 128
     mem_limit: 268435456
     security_opt:
     - no-new-privileges

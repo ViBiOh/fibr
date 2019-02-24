@@ -22,7 +22,7 @@ var (
 	// ExcelExtensions contains extensions of Excel
 	ExcelExtensions = map[string]bool{`.xls`: true, `.xlsx`: true, `.xlsm`: true}
 	// ImageExtensions contains extensions of Image
-	ImageExtensions = map[string]bool{`.jpg`: true, `.jpeg`: true, `.png`: true, `.gif`: true}
+	ImageExtensions = map[string]bool{`.jpg`: true, `.jpeg`: true, `.png`: true, `.gif`: true, `.svg`: true, `.tiff`: true}
 	// PdfExtensions contains extensions of Pdf
 	PdfExtensions = map[string]bool{`.pdf`: true}
 	// VideoExtensions contains extensions of Video

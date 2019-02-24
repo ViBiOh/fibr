@@ -68,6 +68,9 @@ func New(config Config, storage provider.Storage) *App {
 			} else {
 				logger.Info(`Thumbnail generated for %s`, pathname)
 			}
+
+			// Do not stress API
+			time.Sleep(time.Second * 0.5)
 		}
 	}()
 
@@ -136,7 +139,7 @@ func (a App) Generate() {
 			return filepath.SkipDir
 		}
 
-		if !provider.ImageExtensions[item.Extension()] || a.HasThumbnail(pathname) {
+		if !provider.ImageExtensions[item.Extension()] || !provider.PdfExtensions[item.Extension()] || a.HasThumbnail(pathname) {
 			return nil
 		}
 
@@ -183,7 +186,7 @@ func (a App) generateThumbnail(pathname string) error {
 
 	headers := http.Header{}
 	headers.Set(`Content-Type`, `image/*`)
-	headers.Set(`Accept`, `image/*`)
+	headers.Set(`Accept`, `image/webp`)
 	result, _, _, err := request.Do(ctx, http.MethodPost, fmt.Sprintf(`%s/smartcrop?width=150&height=150&stripmeta=true`, a.imaginaryURL), payload, headers)
 	if err != nil {
 		return err
