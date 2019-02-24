@@ -139,7 +139,7 @@ func (a App) Generate() {
 			return filepath.SkipDir
 		}
 
-		if !(provider.ImageExtensions[item.Extension()] || provider.PdfExtensions[item.Extension()]) || a.HasThumbnail(pathname) {
+		if !provider.ImageExtensions[item.Extension()] || a.HasThumbnail(pathname) {
 			return nil
 		}
 
