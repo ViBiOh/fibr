@@ -187,7 +187,7 @@ func (a App) generateThumbnail(pathname string) error {
 	headers := http.Header{}
 	headers.Set(`Content-Type`, `image/*`)
 	headers.Set(`Accept`, `image/webp`)
-	result, _, _, err := request.Do(ctx, http.MethodPost, fmt.Sprintf(`%s/smartcrop?width=150&height=150&stripmeta=true`, a.imaginaryURL), payload, headers)
+	result, _, _, err := request.Do(ctx, http.MethodPost, fmt.Sprintf(`%s/crop?width=150&height=150&stripmeta=true`, a.imaginaryURL), payload, headers)
 	if err != nil {
 		return err
 	}
