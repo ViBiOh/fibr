@@ -145,18 +145,14 @@ func (a App) Generate() {
 			return filepath.SkipDir
 		}
 
-		if provider.ImageExtensions[item.Extension()] {
-			info, err := a.storage.Info(getThumbnailPath(pathname))
-			if err != nil && !provider.IsNotExist(err) {
-				return err
-			}
-
-			if info == nil {
-				a.AsyncGenerateThumbnail(pathname)
-			}
+		if !provider.ImageExtensions[item.Extension()] || a.HasThumbnail(pathname) {
+			return nil
 		}
 
+		a.AsyncGenerateThumbnail(pathname)
+
 		return nil
+
 	})
 
 	if err != nil {
@@ -174,20 +170,6 @@ func (a App) AsyncGenerateThumbnail(pathname string) {
 }
 
 func (a App) generateThumbnail(pathname string) (string, error) {
-	info, err := a.storage.Info(pathname)
-	if err != nil && !provider.IsNotExist(err) {
-		return ``, err
-	}
-
-	if info == nil {
-		return ``, errors.New(`%s: image not found`, pathname)
-	}
-
-	thumbnailPath := getThumbnailPath(pathname)
-	if err := a.storage.Create(path.Dir(thumbnailPath)); err != nil {
-		return ``, err
-	}
-
 	file, err := a.storage.Read(pathname)
 	if file != nil {
 		defer func() {
@@ -211,8 +193,13 @@ func (a App) generateThumbnail(pathname string) (string, error) {
 	headers := http.Header{}
 	headers.Set(`Content-Type`, `image/*`)
 	headers.Set(`Accept`, `image/*`)
-	result, _, _, err := request.Do(ctx, http.MethodPost, fmt.Sprintf(`%s/smartcrop?width=150&height=150&stripmeta=true`, a.imaginaryURL), payload, headers)
+	result, _, _, err := request.Do(ctx, http.MethodPost, fmt.Sprintf(`%s/thumbnail?width=150&height=150&stripmeta=true`, a.imaginaryURL), payload, headers)
 	if err != nil {
+		return ``, err
+	}
+
+	thumbnailPath := getThumbnailPath(pathname)
+	if err := a.storage.Create(path.Dir(thumbnailPath)); err != nil {
 		return ``, err
 	}
 

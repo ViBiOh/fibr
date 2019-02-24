@@ -45,7 +45,7 @@ services:
     image: h2non/imaginary
     command:
     - -concurrency
-    - 5
+    - 4
     labels:
       traefik.enable: 'false'
     logging:
