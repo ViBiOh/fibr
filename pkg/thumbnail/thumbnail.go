@@ -70,7 +70,7 @@ func New(config Config, storage provider.Storage) *App {
 			}
 
 			// Do not stress API
-			time.Sleep(time.Second * 0.5)
+			time.Sleep(time.Millisecond * 500)
 		}
 	}()
 
