@@ -24,7 +24,7 @@ import (
 
 const (
 	defaultTimeout     = time.Second * 30
-	maxImageGeneration = 2
+	maxImageGeneration = 1
 )
 
 var (
