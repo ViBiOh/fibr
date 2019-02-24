@@ -58,19 +58,19 @@ func New(config Config, storage provider.Storage) *App {
 	app := &App{
 		imaginaryURL:  strings.TrimSpace(*config.imaginaryURL),
 		storage:       storage,
-		pathnameInput: make(chan string),
+		pathnameInput: make(chan string, 10),
 	}
 
 	go func() {
 		for pathname := range app.pathnameInput {
+			// Do not stress API
+			time.Sleep(time.Millisecond * 500)
+
 			if err := app.generateThumbnail(pathname); err != nil {
 				logger.Error(`%+v`, err)
 			} else {
 				logger.Info(`Thumbnail generated for %s`, pathname)
 			}
-
-			// Do not stress API
-			time.Sleep(time.Millisecond * 500)
 		}
 	}()
 
@@ -139,7 +139,7 @@ func (a App) Generate() {
 			return filepath.SkipDir
 		}
 
-		if !provider.ImageExtensions[item.Extension()] || !provider.PdfExtensions[item.Extension()] || a.HasThumbnail(pathname) {
+		if !(provider.ImageExtensions[item.Extension()] || provider.PdfExtensions[item.Extension()]) || a.HasThumbnail(pathname) {
 			return nil
 		}
 
