@@ -1,7 +1,6 @@
 package thumbnail
 
 import (
-	"bytes"
 	"context"
 	"encoding/base64"
 	"flag"
@@ -165,13 +164,6 @@ func (a App) AsyncGenerateThumbnail(pathname string) {
 
 func (a App) generateThumbnail(pathname string) error {
 	file, err := a.storage.Read(pathname)
-	if file != nil {
-		defer func() {
-			if err := file.Close(); err != nil {
-				logger.Error(`%+v`, err)
-			}
-		}()
-	}
 	if err != nil {
 		return err
 	}
@@ -192,7 +184,7 @@ func (a App) generateThumbnail(pathname string) error {
 		return err
 	}
 
-	if err := a.storage.Upload(thumbnailPath, ioutil.NopCloser(bytes.NewReader(result))); err != nil {
+	if err := a.storage.Upload(thumbnailPath, result); err != nil {
 		return err
 	}
 
