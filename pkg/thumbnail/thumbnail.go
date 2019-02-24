@@ -63,6 +63,9 @@ func New(config Config, storage provider.Storage) *App {
 
 	go func() {
 		for pathname := range app.pathnameInput {
+			// Do not stress API
+			time.Sleep(time.Millisecond * 300)
+
 			if err := app.generateThumbnail(pathname); err != nil {
 				logger.Error(`%+v`, err)
 			} else {
