@@ -38,9 +38,9 @@ func isThumbnail(r *http.Request) bool {
 	return query.GetBool(r, `thumbnail`)
 }
 
-func (a *App) checkAndServeThumbnail(w http.ResponseWriter, r *http.Request, pathname string, info *provider.StorageItem) bool {
-	if isThumbnail(r) && provider.ImageExtensions[info.Extension()] {
-		return a.thumbnailApp.ServeIfPresent(w, r, pathname)
+func (a *App) checkAndServeThumbnail(w http.ResponseWriter, r *http.Request, info *provider.StorageItem) bool {
+	if isThumbnail(r) && a.thumbnailApp.CanHaveThumbnail(info.Pathname) {
+		return a.thumbnailApp.ServeIfPresent(w, r, info.Pathname)
 	}
 
 	return false
@@ -61,7 +61,7 @@ func (a *App) GetWithMessage(w http.ResponseWriter, r *http.Request, request *pr
 	}
 
 	if !info.IsDir {
-		if a.checkAndServeThumbnail(w, r, pathname, info) {
+		if a.checkAndServeThumbnail(w, r, info) {
 			return
 		}
 
