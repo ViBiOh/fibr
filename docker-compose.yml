@@ -45,11 +45,14 @@ services:
     image: h2non/imaginary
     labels:
       traefik.enable: 'false'
+    healthcheck:
+      test: ["CMD", "ps", "-p", "1", "--no-headers"]
+      retries: 10
     logging:
       driver: json-file
       options:
         max-size: '10m'
-    restart: on-failure:10
+    restart: on-failure:5
     read_only: true
     cpu_shares: 128
     mem_limit: 536870912
