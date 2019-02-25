@@ -36,7 +36,6 @@ type Request struct {
 	Path     string
 	CanEdit  bool
 	CanShare bool
-	IsDebug  bool
 	Share    *Share
 }
 
@@ -211,7 +210,7 @@ type Storage interface {
 	Read(pathname string) (io.ReadCloser, error)
 	Serve(http.ResponseWriter, *http.Request, string)
 	List(pathname string) ([]*StorageItem, error)
-	Walk(walkFn func(string, *StorageItem, error) error) error
+	Walk(walkFn func(*StorageItem, error) error) error
 	Create(name string) error
 	Upload(pathname string, content io.ReadCloser) error
 	Rename(oldName, newName string) error

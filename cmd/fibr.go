@@ -132,7 +132,6 @@ func browserHandler(crudApp *crud.App, uiApp *ui.App, authApp *auth.App) http.Ha
 			Path:     r.URL.Path,
 			CanEdit:  false,
 			CanShare: false,
-			IsDebug:  r.URL.Query().Get(`debug`) == `true`,
 		}
 
 		if err := checkShare(w, r, crudApp, request); err != nil {

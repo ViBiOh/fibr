@@ -5,7 +5,6 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
-	"path"
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -42,7 +41,7 @@ func (a *App) saveUploadedFile(request *provider.Request, uploadedFile io.ReadCl
 		return ``, errors.WithStack(err)
 	}
 
-	if provider.ImageExtensions[strings.ToLower(path.Ext(uploadedFileHeader.Filename))] {
+	if a.thumbnailApp.CanHaveThumbnail(filePath) {
 		a.thumbnailApp.AsyncGenerateThumbnail(filePath)
 	}
 
@@ -77,6 +76,7 @@ func (a *App) Upload(w http.ResponseWriter, r *http.Request, request *provider.R
 				}
 			}()
 		}
+
 		if err != nil {
 			a.renderer.Error(w, http.StatusBadRequest, errors.WithStack(err))
 			return

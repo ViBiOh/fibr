@@ -164,10 +164,10 @@ func (a App) List(pathname string) ([]*provider.StorageItem, error) {
 }
 
 // Walk browse item recursively
-func (a App) Walk(walkFn func(string, *provider.StorageItem, error) error) error {
+func (a App) Walk(walkFn func(*provider.StorageItem, error) error) error {
 	return errors.WithStack(filepath.Walk(a.rootDirectory, func(path string, info os.FileInfo, err error) error {
 		pathname := strings.TrimPrefix(path, a.rootDirectory)
-		return walkFn(pathname, convertToItem(pathname, info), err)
+		return walkFn(convertToItem(pathname, info), err)
 	}))
 }
 

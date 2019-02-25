@@ -23,6 +23,7 @@ import (
 
 const (
 	defaultTimeout = time.Second * 30
+	waitTimeout    = time.Millisecond * 300
 )
 
 var (
@@ -32,6 +33,10 @@ var (
 		`node_modules`: true,
 	}
 )
+
+func getCtx(ctx context.Context) (context.Context, context.CancelFunc) {
+	return context.WithTimeout(ctx, defaultTimeout)
+}
 
 // Config of package
 type Config struct {
@@ -63,7 +68,7 @@ func New(config Config, storage provider.Storage) *App {
 	go func() {
 		for pathname := range app.pathnameInput {
 			// Do not stress API
-			time.Sleep(time.Millisecond * 300)
+			time.Sleep(waitTimeout)
 
 			if err := app.generateThumbnail(pathname); err != nil {
 				logger.Error(`%+v`, err)
@@ -80,6 +85,13 @@ func getThumbnailPath(pathname string) string {
 	fullPath := path.Join(provider.MetadataDirectoryName, pathname)
 
 	return fmt.Sprintf(`%s.png`, strings.TrimSuffix(fullPath, path.Ext(fullPath)))
+}
+
+// CanHaveThumbnail determine if thumbnail can be generated for given pathname
+func (a App) CanHaveThumbnail(pathname string) bool {
+	extension := strings.ToLower(path.Ext(pathname))
+
+	return provider.ImageExtensions[extension] || provider.PdfExtensions[extension]
 }
 
 // HasThumbnail determine if thumbnail exist for given pathname
@@ -135,16 +147,16 @@ func (a App) List(w http.ResponseWriter, r *http.Request, pathname string) {
 
 // Generate thumbnail for all storage
 func (a App) Generate() {
-	err := a.storage.Walk(func(pathname string, item *provider.StorageItem, _ error) error {
+	err := a.storage.Walk(func(item *provider.StorageItem, _ error) error {
 		if item.IsDir && strings.HasPrefix(item.Name, `.`) || ignoredThumbnailDir[item.Name] {
 			return filepath.SkipDir
 		}
 
-		if !(provider.ImageExtensions[item.Extension()] || provider.PdfExtensions[item.Extension()]) || a.HasThumbnail(pathname) {
+		if !a.CanHaveThumbnail(item.Pathname) || a.HasThumbnail(item.Pathname) {
 			return nil
 		}
 
-		a.AsyncGenerateThumbnail(pathname)
+		a.AsyncGenerateThumbnail(item.Pathname)
 
 		return nil
 
@@ -153,10 +165,6 @@ func (a App) Generate() {
 	if err != nil {
 		logger.Error(`%+v`, err)
 	}
-}
-
-func getCtx(ctx context.Context) (context.Context, context.CancelFunc) {
-	return context.WithTimeout(ctx, defaultTimeout)
 }
 
 // AsyncGenerateThumbnail generate thumbnail image for given path
