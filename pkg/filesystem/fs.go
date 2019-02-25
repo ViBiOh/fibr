@@ -155,7 +155,7 @@ func (a App) List(pathname string) ([]*provider.StorageItem, error) {
 
 	items := make([]*provider.StorageItem, len(files))
 	for index, item := range files {
-		items[index] = convertToItem(pathname, item)
+		items[index] = convertToItem(path.Dir(pathname), item)
 	}
 
 	sort.Sort(ByName(items))
@@ -165,9 +165,9 @@ func (a App) List(pathname string) ([]*provider.StorageItem, error) {
 
 // Walk browse item recursively
 func (a App) Walk(walkFn func(*provider.StorageItem, error) error) error {
-	return errors.WithStack(filepath.Walk(a.rootDirectory, func(path string, info os.FileInfo, err error) error {
-		pathname := strings.TrimPrefix(path, a.rootDirectory)
-		return walkFn(convertToItem(pathname, info), err)
+	return errors.WithStack(filepath.Walk(a.rootDirectory, func(pathname string, info os.FileInfo, err error) error {
+		relativePath := strings.TrimPrefix(pathname, a.rootDirectory)
+		return walkFn(convertToItem(path.Dir(relativePath), info), err)
 	}))
 }
 

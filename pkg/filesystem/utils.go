@@ -3,7 +3,6 @@ package filesystem
 import (
 	"os"
 	"path"
-	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
@@ -15,7 +14,7 @@ func convertToItem(pathname string, info os.FileInfo) *provider.StorageItem {
 
 	return &provider.StorageItem{
 		Pathname: path.Join(pathname, info.Name()),
-		Name:     strings.TrimSpace(info.Name()),
+		Name:     info.Name(),
 		IsDir:    info.IsDir(),
 	}
 }
