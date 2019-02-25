@@ -155,7 +155,7 @@ func (a App) List(pathname string) ([]*provider.StorageItem, error) {
 
 	items := make([]*provider.StorageItem, len(files))
 	for index, item := range files {
-		items[index] = convertToItem(path.Dir(pathname), item)
+		items[index] = convertToItem(pathname, item)
 	}
 
 	sort.Sort(ByName(items))
