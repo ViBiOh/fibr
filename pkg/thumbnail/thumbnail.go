@@ -77,7 +77,9 @@ func New(config Config, storage provider.Storage) *App {
 }
 
 func getThumbnailPath(pathname string) string {
-	return path.Join(provider.MetadataDirectoryName, pathname)
+	fullPath := path.Join(provider.MetadataDirectoryName, pathname)
+
+	return fmt.Sprintf(`%s.png`, strings.TrimSuffix(fullPath, path.Ext(fullPath)))
 }
 
 // HasThumbnail determine if thumbnail exist for given pathname
@@ -138,7 +140,7 @@ func (a App) Generate() {
 			return filepath.SkipDir
 		}
 
-		if !provider.ImageExtensions[item.Extension()] || a.HasThumbnail(pathname) {
+		if !(provider.ImageExtensions[item.Extension()] || provider.PdfExtensions[item.Extension()]) || a.HasThumbnail(pathname) {
 			return nil
 		}
 
@@ -171,10 +173,7 @@ func (a App) generateThumbnail(pathname string) error {
 	ctx, cancel := getCtx(context.Background())
 	defer cancel()
 
-	headers := http.Header{}
-	headers.Set(`Content-Type`, `image/*`)
-	headers.Set(`Accept`, `image/webp`)
-	result, _, _, err := request.Do(ctx, http.MethodPost, fmt.Sprintf(`%s/crop?width=150&height=150&stripmeta=true`, a.imaginaryURL), file, headers)
+	result, _, _, err := request.Do(ctx, http.MethodPost, fmt.Sprintf(`%s/crop?width=150&height=150&stripmeta=true&type=png`, a.imaginaryURL), file, nil)
 	if err != nil {
 		return err
 	}
