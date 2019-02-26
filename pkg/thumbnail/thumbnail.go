@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"flag"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"path"
@@ -15,7 +16,6 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/pkg/errors"
 	"github.com/ViBiOh/httputils/pkg/httperror"
-	"github.com/ViBiOh/httputils/pkg/httpjson"
 	"github.com/ViBiOh/httputils/pkg/logger"
 	"github.com/ViBiOh/httputils/pkg/request"
 	"github.com/ViBiOh/httputils/pkg/tools"
@@ -110,6 +110,12 @@ func (a App) ServeIfPresent(w http.ResponseWriter, r *http.Request, pathname str
 	return false
 }
 
+func safeWrite(w io.Writer, content string) {
+	if _, err := io.WriteString(w, content); err != nil {
+		logger.Error(`%+v`, errors.WithStack(err))
+	}
+}
+
 // List return all thumbnail in a base64 form
 func (a App) List(w http.ResponseWriter, r *http.Request, pathname string) {
 	items, err := a.storage.List(pathname)
@@ -118,31 +124,36 @@ func (a App) List(w http.ResponseWriter, r *http.Request, pathname string) {
 		return
 	}
 
-	thumbnails := make(map[string]string)
+	w.Header().Set(`Content-Type`, `application/json; charset=utf-8`)
+	w.Header().Set(`Cache-Control`, `no-cache`)
+	w.WriteHeader(http.StatusOK)
 
-	for _, item := range items {
+	safeWrite(w, `{`)
+
+	for index, item := range items {
 		if item.IsDir || !a.HasThumbnail(item.Pathname) {
 			continue
 		}
 
 		file, err := a.storage.Read(getThumbnailPath(item.Pathname))
 		if err != nil {
-			httperror.InternalServerError(w, err)
-			return
+			logger.Error(`unable to open %s: %+v`, item.Pathname, err)
 		}
 
 		content, err := ioutil.ReadAll(file)
 		if err != nil {
-			httperror.InternalServerError(w, errors.WithStack(err))
-			return
+			logger.Error(`unable to read %s: %+v`, item.Pathname, errors.WithStack(err))
 		}
 
-		thumbnails[tools.Sha1(item.Name)] = base64.StdEncoding.EncodeToString(content)
+		if index != 0 {
+			safeWrite(w, `,`)
+		}
+		safeWrite(w, fmt.Sprintf(`"%s":`, tools.Sha1(item.Name)))
+		safeWrite(w, fmt.Sprintf(`"%s"`, base64.StdEncoding.EncodeToString(content)))
+
 	}
 
-	if err := httpjson.ResponseJSON(w, http.StatusOK, thumbnails, httpjson.IsPretty(r)); err != nil {
-		httperror.InternalServerError(w, err)
-	}
+	safeWrite(w, `}`)
 }
 
 // Generate thumbnail for all storage
