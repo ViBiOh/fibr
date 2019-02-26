@@ -26,6 +26,8 @@ var (
 
 	// ErrOutsidePath occurs when path is not under served directory
 	ErrOutsidePath = native_errors.New(`pathname does not belong to served directory`)
+
+	copyBuffer = make([]byte, 32*1024)
 )
 
 // Config of package
@@ -199,7 +201,7 @@ func (a App) Upload(pathname string, content io.ReadCloser) error {
 		return err
 	}
 
-	if _, err = io.Copy(storageFile, content); err != nil {
+	if _, err = io.CopyBuffer(storageFile, content, copyBuffer); err != nil {
 		return errors.WithStack(err)
 	}
 

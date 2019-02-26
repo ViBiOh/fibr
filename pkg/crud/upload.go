@@ -16,6 +16,10 @@ const (
 	defaultMaxMemory = 128 << 20 // 128 MB
 )
 
+var (
+	copyBuffer = make([]byte, 32*1024)
+)
+
 func (a *App) saveUploadedFile(request *provider.Request, uploadedFile io.ReadCloser, uploadedFileHeader *multipart.FileHeader) (string, error) {
 	filename, err := provider.SanitizeName(uploadedFileHeader.Filename, true)
 	if err != nil {
@@ -37,7 +41,7 @@ func (a *App) saveUploadedFile(request *provider.Request, uploadedFile io.ReadCl
 		return ``, err
 	}
 
-	if _, err = io.Copy(hostFile, uploadedFile); err != nil {
+	if _, err = io.CopyBuffer(hostFile, uploadedFile, copyBuffer); err != nil {
 		return ``, errors.WithStack(err)
 	}
 

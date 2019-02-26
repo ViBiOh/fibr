@@ -170,7 +170,6 @@ func (a App) Generate() {
 		a.AsyncGenerateThumbnail(item.Pathname)
 
 		return nil
-
 	})
 
 	if err != nil {
