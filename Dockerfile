@@ -1,4 +1,4 @@
-FROM golang:1.11 as builder
+FROM golang:1.12 as builder
 
 ENV APP_NAME fibr
 ENV WORKDIR ${GOPATH}/src/github.com/ViBiOh/fibr
