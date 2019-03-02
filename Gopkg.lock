@@ -22,7 +22,7 @@
     "pkg/model",
   ]
   pruneopts = "UT"
-  revision = "bc4c3b206a5dc78d41d82a76448424736c27229d"
+  revision = "a5a871faee815667596f495cb008554b6d56c34b"
 
 [[projects]]
   branch = "master"
@@ -52,7 +52,7 @@
     "pkg/uuid",
   ]
   pruneopts = "UT"
-  revision = "fe6853cdcbced4fb6193f8634a4530c97aaf947a"
+  revision = "7cbf1759de457453c3522c4205b0dd678fa6dc42"
 
 [[projects]]
   branch = "master"
