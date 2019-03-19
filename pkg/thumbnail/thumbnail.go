@@ -191,7 +191,7 @@ func (a App) generateThumbnail(pathname string) error {
 	ctx, cancel := getCtx(context.Background())
 	defer cancel()
 
-	result, _, _, err := request.Do(ctx, http.MethodPost, fmt.Sprintf(`%s/crop?width=150&height=150&stripmeta=true&type=png`, a.imaginaryURL), file, nil)
+	result, _, _, err := request.Do(ctx, http.MethodPost, fmt.Sprintf(`%s/crop?width=150&height=150&stripmeta=true&noprofile=true&compression=9&type=png`, a.imaginaryURL), file, nil)
 	if err != nil {
 		return err
 	}
