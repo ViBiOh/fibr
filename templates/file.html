@@ -11,22 +11,6 @@
         <object data="{{- .Content.File.Name -}}" type="{{ .Content.File.Mime -}}"></object>
       {{- end -}}
     {{- end -}}
-
-    {{- if .Content.Previous -}}
-      <div class="hover-side left-side">
-        <a href="{{- .Content.Previous.Name -}}?browser=true" class="hover-nav">
-          <img class="icon" src="/svg/chevron-left?fill=silver" alt="Previous">
-        </a>
-      </div>
-    {{- end -}}
-
-    {{- if .Content.Next -}}
-      <div class="hover-side right-side">
-        <a href="{{- .Content.Next.Name -}}?browser=true" class="hover-side right-side hover-nav">
-          <img class="icon" src="/svg/chevron-right?fill=silver" alt="Next">
-        </a>
-      </div>
-    {{- end -}}
   </div>
 
   {{- template "footer" . -}}
