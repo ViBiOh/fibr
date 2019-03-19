@@ -1,4 +1,4 @@
-{{- define "style" -}}
+{{ define "style" }}
   <style type="text/css">
     :root {
       --primary: royalblue;
@@ -62,7 +62,7 @@
       text-decoration: underline;
     }
 
-    {{- if eq .Layout "browser" -}}
+    {{ if eq .Layout "browser" }}
       body {
         display: flex;
         flex-direction: column;
@@ -70,10 +70,10 @@
 
       object {
         border: 0;
-        {{- if not .Content.File.IsImage -}}
+        {{ if not .Content.File.IsImage }}
           flex: 1 1;
           flex-basis: auto;
-        {{- end -}}
+        {{ end }}
         max-height: 100%;
         max-width: 100%;
       }
@@ -90,12 +90,12 @@
         position: relative;
         text-align: center;
 
-        {{- if not .Content.File.IsImage -}}
+        {{ if not .Content.File.IsImage }}
           display: flex;
           flex-direction: column;
-        {{- end -}}
+        {{ end }}
       }
-    {{- end -}}
+    {{ end }}
 
     picture {
       margin: 0;
@@ -291,7 +291,6 @@
     }
 
     .throbber {
-      display: none;
       margin: auto;
       text-align: center;
     }
@@ -337,7 +336,7 @@
       background-color: var(--grey);
     }
 
-    {{- if eq .Layout "list" -}}
+    {{ if eq .Layout "list" }}
       #list-display {
         background-color: var(--primary);
       }
@@ -394,11 +393,11 @@
 
       @media screen and (max-width: 640px) {
         .filelink {
-          {{- if .Request.CanEdit -}}
+          {{ if .Request.CanEdit }}
             width: calc(100% - 7rem);
-          {{- else -}}
+          {{ else }}
             width: calc(100% - 2.5rem);
-          {{- end -}} 
+          {{ end }} 
         }
 
         .file-edit,
@@ -407,9 +406,9 @@
           display: inline-block;
         }
       }
-    {{- end -}}
+    {{ end }}
 
-    {{- if eq .Layout "grid" -}}
+    {{ if eq .Layout "grid" }}
       #grid-display {
         background-color: var(--primary);
       }
@@ -425,9 +424,8 @@
         align-items: center;
         background-color: var(--grey);
         display: flex;
-        min-height: 12rem;
+        min-height: 15.4rem;
         position: relative;
-        width: 100%;
       }
 
       .file {
@@ -486,11 +484,11 @@
       #files > *:hover .file-delete {
         display: block;
       }
-    {{- end -}}
+    {{ end }}
 
     @media print {
-      body::after {
-        content: 'Save ink, share link. {{- .PublicURL -}}';
+      body::before {
+        content: 'Save ink, share link. {{ .PublicURL }}';
       }
 
       body > * {
@@ -498,4 +496,4 @@
       }
     }
   </style>
-{{- end -}}
+{{ end }}

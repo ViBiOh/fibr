@@ -1,13 +1,7 @@
 {{- define "async-image" -}}
-  <picture id="picture-{{- .Fingerprint -}}">
+  <picture id="picture-{{- .Fingerprint -}}" data-picture data-alt="Thumbnail of {{ .File.Name -}}">
     <noscript>
-      <img class="thumbnail" src="{{- urlescape (.File.Name) -}}?thumbnail&v={{- .Version -}}" alt="thumbnail" />
+      <img class="thumbnail" src="{{- urlescape (.File.Name) -}}?thumbnail&v={{- .Version -}}" alt="Thumbnail of {{ .File.Name -}}" />
     </noscript>
-
-    <div class="throbber" id="throbber-{{- .Fingerprint -}}" data-id="{{- .Fingerprint -}}" data-mime="{{- .File.Mime -}}" data-alt="Thumbnail of {{ .File.Name -}}">
-      <div class="bounce1"></div>
-      <div class="bounce2"></div>
-      <div class="bounce3"></div>
-    </div>
   </picture>
 {{- end -}}

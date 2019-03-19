@@ -28,36 +28,37 @@
     function getThumbnails() {
       return fetch('?thumbnail', { credentials: 'same-origin' }).then(response => {
         if (response.status >= 400) {
-          return Promise.reject('Error while loading thumbnails')
+          return Promise.reject('unable to load thumbnails');
         }
         return response.json();
       });
     }
 
-    window.addEventListener('load', () => {
-      const throbbers = document.querySelectorAll('.throbber');
-      for (let i = throbbers.length - 1; i >= 0; i--) {
-        throbbers[i].style.display = 'inline-block';
-      }
+    window.addEventListener(
+      'load',
+      () => {
+        document.querySelectorAll('[data-picture]').forEach(picture => {
+          replaceContent(picture, generateThrobber());
+        });
 
-      getThumbnails().then(thumbnails => {
-        for (let i = throbbers.length - 1; i >= 0; i--) {
-          const throbber = throbbers[i];
+        getThumbnails()
+          .then(thumbnails => {
+            Object.keys(thumbnails).forEach(id => {
+              const picture = document.getElementById(`picture-${id}`);
 
-          const thumbnailData = thumbnails[throbber.dataset.id];
-          if (thumbnailData) {
-            const img = new Image();
-            img.src = `data:image/jpeg;base64,${thumbnailData}`;
-            img.alt = throbber.dataset.alt;
+              if (picture) {
+                const img = new Image();
+                img.src = `data:image/jpeg;base64,${thumbnails[id]}`;
+                img.alt = picture.dataset.alt;
 
-            const picturePlaceholder = document.getElementById('picture-' + throbber.dataset.id)
-            if (picturePlaceholder) {
-              picturePlaceholder.replaceChild(img, throbber);
-            }
-          }
-        }
-      });
-    }, false);
+                replaceContent(picture, img);
+              }
+            });
+          })
+          .catch(e => console.error(e));
+      },
+      false,
+    );
   </script>
 
   <div class="content">
