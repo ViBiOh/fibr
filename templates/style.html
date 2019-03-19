@@ -394,7 +394,11 @@
 
       @media screen and (max-width: 640px) {
         .filelink {
-          width: calc(100% - 4.5rem);
+          {{- if .Request.CanEdit -}}
+            width: calc(100% - 7rem);
+          {{- else -}}
+            width: calc(100% - 2rem);
+          {{- end -}} 
         }
 
         .file-edit,
