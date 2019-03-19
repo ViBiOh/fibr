@@ -84,7 +84,7 @@ func New(config Config, storage provider.Storage) *App {
 func getThumbnailPath(pathname string) string {
 	fullPath := path.Join(provider.MetadataDirectoryName, pathname)
 
-	return fmt.Sprintf(`%s.png`, strings.TrimSuffix(fullPath, path.Ext(fullPath)))
+	return fmt.Sprintf(`%s.jpg`, strings.TrimSuffix(fullPath, path.Ext(fullPath)))
 }
 
 // CanHaveThumbnail determine if thumbnail can be generated for given pathname
