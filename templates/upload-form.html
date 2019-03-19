@@ -104,11 +104,38 @@
     }
 
     /**
+     * Generate a hidden throbber.
+     * @return {DOMElement}
+     */
+    function generateThrobber() {
+      const wrapper = document.createElement('div');
+      wrapper.classList.add('throbber');
+
+      for (let i = 0; i < 3; i++) {
+        const dot = document.createElement('div');
+        dot.classList.add(`bounce${i}`)
+        wrapper.appendChild(dot);
+      }
+
+      return wrapper;
+    }
+
+    /**
      * Handle upload submit
      * @param  {Object} e Submit event
      */
     function upload(e) {
       e.preventDefault();
+
+      const uploadButton = document.getElementById('upload-button');
+      if (uploadButton) {
+        const throbber = generateThrobber();
+        throbber.classList.add('throbber-white');
+        throbber.style.display = 'inline-block';
+
+        removeAllChild(uploadButton)
+        uploadButton.appendChild(throbber);
+      }
 
       const uploadList = document.getElementById('uploadList');
       removeAllChild(uploadList);
@@ -152,9 +179,15 @@
         );
       });
 
-      Promise.all(promises).then(() => {
-        document.location.hash = '#upload-success';
-      });
+      Promise.all(promises)
+        .then(() => {
+          document.location.hash = '#upload-success';
+        })
+        .catch(() => {
+          if (uploadButton) {
+            uploadButton.innerHTML = 'Upload';
+          }
+        });
 
       return false;
     }
@@ -182,7 +215,7 @@
         </div>
 
         <p class="center">
-          <button type="submit" class="button bg-important">
+          <button id="upload-button" type="submit" class="button bg-important">
             Upload
           </button>
         </p>
@@ -201,9 +234,9 @@
       <h2 class="header success padding">Upload success ✓</h2>
 
       <p class="center">
-        <button type="button" class="button bg-success" onclick="closeAndRefresh()">
+        <a href="#" class="button bg-grey" onclick="closeAndRefresh()">
           Close
-        </button>
+        </a>
       </p>
     </div>
   </div>

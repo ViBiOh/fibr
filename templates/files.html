@@ -44,11 +44,17 @@
         for (let i = throbbers.length - 1; i >= 0; i--) {
           const throbber = throbbers[i];
 
-          const img = new Image();
-          img.src = 'data:image/jpeg;base64,' + thumbnails[throbber.dataset.id];
-          img.alt = throbber.dataset.alt;
+          const thumbnailData = thumbnails[throbber.dataset.id];
+          if (thumbnailData) {
+            const img = new Image();
+            img.src = `data:image/jpeg;base64,${thumbnailData}`;
+            img.alt = throbber.dataset.alt;
 
-          document.getElementById('picture-' + throbber.dataset.id).replaceChild(img, throbber);
+            const picturePlaceholder = document.getElementById('picture-' + throbber.dataset.id)
+            if (picturePlaceholder) {
+              picturePlaceholder.replaceChild(img, throbber);
+            }
+          }
         }
       });
     }, false);

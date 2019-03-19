@@ -219,11 +219,6 @@
       background-color: var(--primary);
       color: var(--white);
     }
-      
-    .bg-success {
-      background-color: var(--success);
-      color: var(--white);
-    }
 
     .success {
       color: var(--success);
@@ -234,6 +229,11 @@
     }
 
     .white {
+      color: var(--white);
+    }
+
+    .bg-grey {
+      background-color: var(--grey);
       color: var(--white);
     }
 
@@ -332,8 +332,15 @@
     }
 
     .throbber > div {
-      animation: sk-bouncedelay 1.4s infinite ease-in-out both;
       background-color: var(--dark);
+    }
+
+    .throbber-white > div {
+      background-color: var(--white);
+    }
+
+    .throbber > div {
+      animation: sk-bouncedelay 1.4s infinite ease-in-out both;
       border-radius: 100%;
       display: inline-block;
       height: 1rem;
