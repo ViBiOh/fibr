@@ -141,14 +141,11 @@
             method: 'POST',
             body: formData,
           })
-            .then(e => {
-              setUploadStatus(file, '✓', 'success');
-              return e;
-            })
+            .then(() => setUploadStatus(file, '✓', 'success'))
             .catch(e => {
               setUploadStatus(file, '╳', 'danger');
               console.error(e);
-              return e;
+              throw e;
             }),
         );
       });
