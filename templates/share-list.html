@@ -1,11 +1,11 @@
-{{- define "share-list" -}}
+{{ define "share-list" }}
   <div id="share-list" class="modal full flex flex-center">
     <div class="modal-content">
       <h2 class="header">Shared folders</h2>
 
-      {{- $root := . -}}
+      {{ $root := . }}
 
-      {{- if len .Content.Shares -}}
+      {{ if len .Content.Shares }}
         <table id="shares" cellpadding="10" cellspacing="0">
             <thead>
               <tr class="share-content">
@@ -18,38 +18,38 @@
               </tr>
             </thead>
             <tbody>
-              {{- range .Content.Shares -}}
+              {{ range .Content.Shares }}
                 <tr class="share-content">
                     <td>
-                      <a href="/{{- .ID -}}/">
-                        <code>{{- .ID -}}</code>
+                      <a href="/{{ .ID }}/">
+                        <code>{{ .ID }}</code>
                       </a>
                     </td>
                     <td>
-                      <code>{{- .Path -}}</code>
+                      <code>{{ .Path }}</code>
                     </td>
                     <td>
-                      {{- if .Edit -}}
+                      {{ if .Edit }}
                         <img class="icon" src="/svg/check?fill=silver" alt="Edit allowed">
-                      {{- end -}}
+                      {{ end }}
                     </td>
                     <td>
                       <form method="post">
                         <input type="hidden" name="type" value="share" />
                         <input type="hidden" name="method" value="DELETE" />
-                        <input type="hidden" name="id" value="{{- .ID -}}" />
-                        <button type="submit" onclick="javascript:return confirm('Are you sure you want to delete share for {{ .Path -}}?')" class="button-icon icon icon-times" alt="Delete"></button>
+                        <input type="hidden" name="id" value="{{ .ID }}" />
+                        <button type="submit" onclick="javascript:return confirm('Are you sure you want to delete share for {{ .Path }}?')" class="button-icon icon icon-times" alt="Delete"></button>
                       </form>
                     </td>
                 </tr>
-              {{- end -}}
+              {{ end }}
             </tbody>
         </table>
-      {{- else -}}
+      {{ else }}
         <p class="center">
           <em>No shared folder yet.</em>
         </p>
-      {{- end -}}
+      {{ end }}
 
       <p class="center">
         <a href="#share-form">
@@ -64,4 +64,4 @@
       </p>
     </div>
   </div>
-{{- end -}}
+{{ end }}

@@ -1,25 +1,25 @@
-{{- define "files" -}}
-  {{- template "layout" . -}}
-  {{- template "menu" . -}}
+{{ define "files" }}
+  {{ template "layout" . }}
+  {{ template "menu" . }}
 
-  {{- $root := . -}}
+  {{ $root := . }}
 
-  {{- if .Request.CanEdit -}}
-    {{- template "upload-modal" . -}}
-    {{- template "folder-modal" . -}}
-  {{- end -}}
+  {{ if .Request.CanEdit }}
+    {{ template "upload-modal" . }}
+    {{ template "folder-modal" . }}
+  {{ end }}
 
-  {{- if .Request.CanShare -}}
-    {{- template "share-form" . -}}
-    {{- template "share-list" . -}}
-  {{- end -}}
+  {{ if .Request.CanShare }}
+    {{ template "share-form" . }}
+    {{ template "share-list" . }}
+  {{ end }}
 
-  {{- if .Request.CanEdit -}}
-    {{- range .Content.Files -}}
-      {{- template "edit-modal" . -}}
-      {{- template "delete-modal" . -}}
-    {{- end -}}
-  {{- end -}}
+  {{ if .Request.CanEdit }}
+    {{ range .Content.Files }}
+      {{ template "edit-modal" . }}
+      {{ template "delete-modal" . }}
+    {{ end }}
+  {{ end }}
 
   <script type="text/javascript">
     /**
@@ -62,47 +62,47 @@
   </script>
 
   <div class="content">
-    {{- template "modifiers" . -}}
+    {{ template "modifiers" . }}
 
     <ul id="files">
-      {{- range .Content.Files -}}
-        {{- if and (.IsImage) (eq $root.Layout "grid") -}}
+      {{ range .Content.Files }}
+        {{ if and (.IsImage) (eq $root.Layout "grid") }}
           <li class="image">
-        {{- else -}}
+        {{ else }}
           <li class="file">
-        {{- end -}}
-          <a class="filelink" href="{{- .Name -}}{{- if .IsDir -}}/{{- else -}}?browser=true{{- end -}}" title="{{- .Name -}}">
-            {{- if and (eq $root.Layout "grid") (hasThumbnail $root.Request .) -}}
-              {{- template "async-image" asyncImage . $root.Config.Version -}}
-            {{- else -}}
-              {{- if .IsDir -}}
+        {{ end }}
+          <a class="filelink" href="{{ .Name }}{{ if .IsDir }}/{{ else }}?browser=true{{ end }}" title="{{ .Name }}">
+            {{ if and (eq $root.Layout "grid") (hasThumbnail $root.Request .) }}
+              {{ template "async-image" asyncImage . $root.Config.Version }}
+            {{ else }}
+              {{ if .IsDir }}
                 <img class="icon" src="/svg/folder?fill=silver" alt="Folder">
-              {{- else -}}
-                <img class="icon" src="/svg/{{- iconFromExtension . -}}?fill=silver" alt="File">
-              {{- end -}}
-              <span class="filename">{{- .Name -}}</span>
-            {{- end -}}
+              {{ else }}
+                <img class="icon" src="/svg/{{ iconFromExtension . }}?fill=silver" alt="File">
+              {{ end }}
+              <span class="filename">{{ .Name }}</span>
+            {{ end }}
 
-            {{- if $root.Request.CanEdit -}}
-              <a href="#delete-modal-{{- sha1 . -}}" class="button button-icon file-delete" alt="Delete">
+            {{ if $root.Request.CanEdit }}
+              <a href="#delete-modal-{{ sha1 . }}" class="button button-icon file-delete" alt="Delete">
                 <img class="icon" src="/svg/times?fill=silver" alt="Delete">
               </a>
-              <a href="#edit-modal-{{- sha1 . -}}" class="button button-icon file-edit" alt="Edit">
+              <a href="#edit-modal-{{ sha1 . }}" class="button button-icon file-edit" alt="Edit">
                 <img class="icon" src="/svg/pencil-alt?fill=silver" alt="Edit">
               </a>
-            {{- end -}}
+            {{ end }}
 
-            {{- if not .IsDir -}}
-              <a href="{{- .Name -}}" class="button button-icon file-download" alt="Download" download>
+            {{ if not .IsDir }}
+              <a href="{{ .Name }}" class="button button-icon file-download" alt="Download" download>
                 <img class="icon" src="/svg/download?fill=silver" alt="Download">
               </a>
-            {{- end -}}
+            {{ end }}
           </a>
         </li>
-      {{- end -}}
+      {{ end }}
     </ul>
   </div>
 
-  {{- template "script" -}}
-  {{- template "footer" . -}}
-{{- end -}}
+  {{ template "script" }}
+  {{ template "footer" . }}
+{{ end }}

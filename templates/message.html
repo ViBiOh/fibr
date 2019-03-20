@@ -1,7 +1,7 @@
-{{- define "message" -}}
-  {{- if . -}}
-    <p class="message full {{ if eq .Level "success" -}}success{{- else if eq .Level "error" -}}danger{{- end -}}">
-      {{- .Content -}}
+{{ define "message" }}
+  {{ if . }}
+    <p class="message full {{ if eq .Level "success" }}success{{ else if eq .Level "error" }}danger{{ end }}">
+      {{ .Content }}
     </p>
-  {{- end -}}
-{{- end -}}
+  {{ end }}
+{{ end }}

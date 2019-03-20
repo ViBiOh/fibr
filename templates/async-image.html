@@ -1,7 +1,7 @@
-{{- define "async-image" -}}
-  <picture id="picture-{{- .Fingerprint -}}" data-picture data-alt="Thumbnail of {{ .File.Name -}}">
+{{ define "async-image" }}
+  <picture id="picture-{{ .Fingerprint }}" data-picture data-alt="Thumbnail of {{ .File.Name }}">
     <noscript>
-      <img class="thumbnail" src="{{- urlescape (.File.Name) -}}?thumbnail&v={{- .Version -}}" alt="Thumbnail of {{ .File.Name -}}" />
+      <img class="thumbnail full" src="{{ urlescape (.File.Name) }}?thumbnail&v={{ .Version }}" alt="Thumbnail of {{ .File.Name }}" />
     </noscript>
   </picture>
-{{- end -}}
+{{ end }}

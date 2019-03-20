@@ -1,20 +1,20 @@
-{{- define "menu" -}}
-  {{- if or .Request.CanEdit .Request.CanShare -}}
+{{ define "menu" }}
+  {{ if or .Request.CanEdit .Request.CanShare }}
     <div id="tools">
-      {{- if .Request.CanEdit -}}
+      {{ if .Request.CanEdit }}
         <a href="#upload-modal" class="button button-icon">
           <img class="icon icon-large" src="/svg/cloud-upload-alt?fill=silver" alt="Upload">
         </a>
         <a href="#folder-modal" class="button button-icon">
           <img class="icon icon-large" src="/svg/folder?fill=silver" alt="Create folder">
         </a>
-      {{- end -}}
+      {{ end }}
 
-      {{- if .Request.CanShare -}}
+      {{ if .Request.CanShare }}
         <a href="#share-list" class="button button-icon">
           <img class="icon icon-large" src="/svg/share-alt-square?fill=silver" alt="Share">
         </a>
-      {{- end -}}
+      {{ end }}
     </div>
-  {{- end -}}
-{{- end -}}
+  {{ end }}
+{{ end }}

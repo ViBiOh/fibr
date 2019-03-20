@@ -1,38 +1,38 @@
-{{- define "file" -}}
-  {{- template "layout" . -}}
+{{ define "file" }}
+  {{ template "layout" . }}
 
   <div class="browser">
-    {{- if .Content.File.IsVideo -}}
-      <video controls src="{{- .Content.File.Name -}}" type="{{ .Content.File.Mime -}}"></video>
-    {{- else -}}
-      {{- if .Content.File.IsImage -}}
-        <img src="{{- .Content.File.Name -}}" alt="{{- .Content.File.Name -}}" />
-      {{- else -}}
-        <object data="{{- .Content.File.Name -}}" type="{{ .Content.File.Mime -}}"></object>
-      {{- end -}}
-    {{- end -}}
+    {{ if .Content.File.IsVideo }}
+      <video controls src="{{ .Content.File.Name }}" type="{{ .Content.File.Mime }}"></video>
+    {{ else }}
+      {{ if .Content.File.IsImage }}
+        <img src="{{ .Content.File.Name }}" alt="{{ .Content.File.Name }}" />
+      {{ else }}
+        <object data="{{ .Content.File.Name }}" type="{{ .Content.File.Mime }}"></object>
+      {{ end }}
+    {{ end }}
   </div>
 
-  {{- template "footer" . -}}
+  {{ template "footer" . }}
 
-  {{- if or .Content.Next .Content.Previous -}}
+  {{ if or .Content.Next .Content.Previous }}
     <script type="text/javascript">
       /**
        * Handle Previous/next.
        */
       window.onkeyup = (e) => {
-        {{- if .Content.Previous -}}
+        {{ if .Content.Previous }}
           if (e.keyCode === 37) {
-            window.location.href = '{{- .Content.Previous.Name -}}?browser=true';
+            window.location.href = '{{ .Content.Previous.Name }}?browser=true';
           }
-        {{- end -}}
+        {{ end }}
 
-        {{- if .Content.Next -}}
+        {{ if .Content.Next }}
           if (e.keyCode === 39) {
-            window.location.href = '{{- .Content.Next.Name -}}?browser=true';
+            window.location.href = '{{ .Content.Next.Name }}?browser=true';
           }
-        {{- end -}}
+        {{ end }}
       };
     </script>
-  {{- end -}}
-{{- end -}}
+  {{ end }}
+{{ end }}
