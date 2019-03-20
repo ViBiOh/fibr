@@ -64,10 +64,20 @@
         item.id = messageId;
         item.classList.add('flex', 'flex-center');
 
-        const filename = document.createElement('span');
+        const progressWrapper = document.createElement('div');
+        progressWrapper.classList.add('upload-item', 'full');
+        item.appendChild(progressWrapper);
+
+        const filename = document.createElement('div');
         filename.classList.add('upload-name');
         filename.innerHTML = file.name;
-        item.appendChild(filename);
+        progressWrapper.appendChild(filename);
+
+        const progress = document.createElement('progress');
+        progress.classList.add('full');
+        progress.max = 100;
+        progress.value = 0;
+        progressWrapper.appendChild(progress);
 
         const status = document.createElement('span');
         status.classList.add('upload-status');
@@ -96,6 +106,50 @@
 
         statusContainer.innerHTML = content;
         statusContainer.classList.add(style);
+      });
+    }
+
+    /**
+     * Upload file with updating progress indicator.
+     * @param  {String} method Method for uploading
+     * @param  {File} file     File to upload
+     * @return {Promise}       Promise of upload
+     */
+    function uploadFile(method, file) {
+      return new Promise((resolve, reject) => {
+        fileMessageId(file).then(messageId => {
+          const xhr = new XMLHttpRequest();
+
+          const container = document.getElementById(messageId);
+          if (container) {
+            const progress = container.querySelector('progress');
+
+            if (progress) {
+              xhr.upload.addEventListener(
+                'progress',
+                e => (progress.value = parseInt((e.loaded / e.total) * 100, 10)),
+                false,
+              );
+            }
+          }
+
+          xhr.onreadystatechange = e => {
+            if (xhr.readyState == 4) {
+              if (xhr.status < 400) {
+                resolve(e);
+              } else {
+                reject(e);
+              }
+            }
+          };
+
+          const formData = new FormData();
+          formData.append('method', method);
+          formData.append('files[]', file);
+
+          xhr.open('POST', '', true);
+          xhr.send(formData);
+        });
       });
     }
 
@@ -131,19 +185,11 @@
       const promises = [];
 
       [].forEach.call(values.files, file => {
-        const formData = new FormData();
-        formData.append('method', values.method);
-        formData.append('files[]', file);
-
         promises.push(
-          fetch('', {
-            credentials: 'same-origin',
-            method: 'POST',
-            body: formData,
-          })
+          uploadFile(values.method, file)
             .then(() => setUploadStatus(file, '✓', 'success'))
             .catch(e => {
-              setUploadStatus(file, '╳', 'danger');
+              setUploadStatus(file, 'X', 'danger');
               console.error(e);
               throw e;
             }),
