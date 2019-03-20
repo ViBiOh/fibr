@@ -62,12 +62,16 @@
       return fileMessageId(file).then(messageId => {
         const item = document.createElement('div');
         item.id = messageId;
-        item.classList.add('flex');
+        item.classList.add('flex', 'flex-center');
 
         const filename = document.createElement('span');
-        filename.classList.add('uploadname');
+        filename.classList.add('upload-name');
         filename.innerHTML = file.name;
         item.appendChild(filename);
+
+        const status = document.createElement('span');
+        status.classList.add('upload-status');
+        item.appendChild(status);
 
         container.appendChild(item);
       });
@@ -78,18 +82,20 @@
      * @param {File} file    File to generate message
      * @param {Any} content  Content of message
      */
-    function addUploadMessage(file, content, style) {
+    function setUploadStatus(file, content, style) {
       return fileMessageId(file).then(messageId => {
         const container = document.getElementById(messageId);
         if (!container) {
           return;
         }
 
-        const message = document.createElement('span');
-        message.classList.add(style);
-        message.innerHTML = content;
+        const statusContainer = container.querySelector('.upload-status');
+        if (!statusContainer) {
+          return;
+        }
 
-        container.appendChild(message);
+        statusContainer.innerHTML = content;
+        statusContainer.classList.add(style);
       });
     }
 
@@ -136,11 +142,11 @@
             body: formData,
           })
             .then(e => {
-              addUploadMessage(file, '✓', 'success');
+              setUploadStatus(file, '✓', 'success');
               return e;
             })
             .catch(e => {
-              addUploadMessage(file, '╳', 'danger');
+              setUploadStatus(file, '╳', 'danger');
               console.error(e);
               return e;
             }),
