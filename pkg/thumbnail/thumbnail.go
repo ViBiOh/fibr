@@ -128,9 +128,10 @@ func (a App) List(w http.ResponseWriter, r *http.Request, pathname string) {
 	w.Header().Set(`Cache-Control`, `no-cache`)
 	w.WriteHeader(http.StatusOK)
 
+	count := 0
 	safeWrite(w, `{`)
 
-	for index, item := range items {
+	for _, item := range items {
 		if item.IsDir || !a.HasThumbnail(item.Pathname) {
 			continue
 		}
@@ -145,12 +146,13 @@ func (a App) List(w http.ResponseWriter, r *http.Request, pathname string) {
 			logger.Error(`unable to read %s: %+v`, item.Pathname, errors.WithStack(err))
 		}
 
-		if index != 0 {
+		if count != 0 {
 			safeWrite(w, `,`)
 		}
+
 		safeWrite(w, fmt.Sprintf(`"%s":`, tools.Sha1(item.Name)))
 		safeWrite(w, fmt.Sprintf(`"%s"`, base64.StdEncoding.EncodeToString(content)))
-
+		count++
 	}
 
 	safeWrite(w, `}`)
