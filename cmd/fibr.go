@@ -78,7 +78,7 @@ func checkShare(w http.ResponseWriter, r *http.Request, crudApp *crud.App, reque
 
 func handleAnonymousRequest(w http.ResponseWriter, r *http.Request, err error, crudApp *crud.App, uiApp *ui.App) {
 	if auth.ErrForbidden == err {
-		uiApp.Error(w, http.StatusForbidden, errors.New(`you're not authorized to do this ⛔️`))
+		uiApp.Error(w, http.StatusForbidden, errors.New(`you're not authorized to speak to me`))
 		return
 	}
 
@@ -115,12 +115,12 @@ func checkAllowedMethod(r *http.Request) bool {
 func browserHandler(crudApp *crud.App, uiApp *ui.App, authApp *auth.App) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !checkAllowedMethod(r) {
-			uiApp.Error(w, http.StatusMethodNotAllowed, errors.New(`we don't understand what you want from us`))
+			uiApp.Error(w, http.StatusMethodNotAllowed, errors.New(`you lack of accurate method for calling me`))
 			return
 		}
 
 		if strings.Contains(r.URL.Path, `..`) {
-			uiApp.Error(w, http.StatusForbidden, errors.New(`you're not authorized to do this ⛔`))
+			uiApp.Error(w, http.StatusForbidden, errors.New(`you can't speak to my parent`))
 			return
 		}
 
