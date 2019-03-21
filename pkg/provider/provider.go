@@ -149,7 +149,8 @@ type Message struct {
 
 // Error rendered to user
 type Error struct {
-	Status int
+	Status  int
+	Content string
 }
 
 // Renderer interface for return rich content to user

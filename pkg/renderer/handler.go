@@ -1,4 +1,4 @@
-package ui
+package renderer
 
 import (
 	"fmt"
@@ -12,10 +12,11 @@ import (
 
 // Error render error page with given status
 func (a App) Error(w http.ResponseWriter, status int, err error) {
-	page := &provider.Page{
+	page := provider.Page{
 		Config: a.config,
 		Error: &provider.Error{
-			Status: status,
+			Status:  status,
+			Content: err.Error(),
 		},
 	}
 
@@ -29,7 +30,11 @@ func (a App) Error(w http.ResponseWriter, status int, err error) {
 
 // Sitemap render sitemap.xml
 func (a App) Sitemap(w http.ResponseWriter) {
-	if err := templates.WriteXMLTemplate(a.tpl.Lookup(`sitemap`), w, provider.Page{Config: a.config}, http.StatusOK); err != nil {
+	page := provider.Page{
+		Config: a.config,
+	}
+
+	if err := templates.WriteXMLTemplate(a.tpl.Lookup(`sitemap`), w, page, http.StatusOK); err != nil {
 		httperror.InternalServerError(w, err)
 		return
 	}

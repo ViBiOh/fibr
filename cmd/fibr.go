@@ -15,8 +15,8 @@ import (
 	"github.com/ViBiOh/fibr/pkg/crud"
 	"github.com/ViBiOh/fibr/pkg/filesystem"
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/fibr/pkg/renderer"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
-	"github.com/ViBiOh/fibr/pkg/ui"
 	httputils "github.com/ViBiOh/httputils/pkg"
 	"github.com/ViBiOh/httputils/pkg/alcotest"
 	"github.com/ViBiOh/httputils/pkg/errors"
@@ -76,19 +76,19 @@ func checkShare(w http.ResponseWriter, r *http.Request, crudApp *crud.App, reque
 	return nil
 }
 
-func handleAnonymousRequest(w http.ResponseWriter, r *http.Request, err error, crudApp *crud.App, uiApp *ui.App) {
+func handleAnonymousRequest(w http.ResponseWriter, r *http.Request, err error, crudApp *crud.App, rendererApp *renderer.App) {
 	if auth.ErrForbidden == err {
-		uiApp.Error(w, http.StatusForbidden, errors.New(`you're not authorized to speak to me`))
+		rendererApp.Error(w, http.StatusForbidden, errors.New(`you're not authorized to speak to me`))
 		return
 	}
 
 	if err == ident.ErrMalformedAuth || err == ident.ErrUnknownIdentType {
-		uiApp.Error(w, http.StatusBadRequest, err)
+		rendererApp.Error(w, http.StatusBadRequest, err)
 		return
 	}
 
 	w.Header().Add(`WWW-Authenticate`, `Basic charset="UTF-8"`)
-	uiApp.Error(w, http.StatusUnauthorized, err)
+	rendererApp.Error(w, http.StatusUnauthorized, err)
 }
 
 func handleRequest(w http.ResponseWriter, r *http.Request, crudApp *crud.App, config *provider.Request) {
@@ -112,15 +112,15 @@ func checkAllowedMethod(r *http.Request) bool {
 	return r.Method == http.MethodGet || r.Method == http.MethodPost || r.Method == http.MethodPut || r.Method == http.MethodPatch || r.Method == http.MethodDelete
 }
 
-func browserHandler(crudApp *crud.App, uiApp *ui.App, authApp *auth.App) http.Handler {
+func browserHandler(crudApp *crud.App, rendererApp *renderer.App, authApp *auth.App) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !checkAllowedMethod(r) {
-			uiApp.Error(w, http.StatusMethodNotAllowed, errors.New(`you lack of accurate method for calling me`))
+			rendererApp.Error(w, http.StatusMethodNotAllowed, errors.New(`you lack of accurate method for calling me`))
 			return
 		}
 
 		if strings.Contains(r.URL.Path, `..`) {
-			uiApp.Error(w, http.StatusForbidden, errors.New(`you can't speak to my parent`))
+			rendererApp.Error(w, http.StatusForbidden, errors.New(`you can't speak to my parent`))
 			return
 		}
 
@@ -135,14 +135,14 @@ func browserHandler(crudApp *crud.App, uiApp *ui.App, authApp *auth.App) http.Ha
 		}
 
 		if err := checkShare(w, r, crudApp, request); err != nil {
-			uiApp.Error(w, http.StatusUnauthorized, err)
+			rendererApp.Error(w, http.StatusUnauthorized, err)
 			return
 		}
 
 		if request.Share == nil {
 			user, err := authApp.IsAuthenticated(r)
 			if err != nil {
-				handleAnonymousRequest(w, r, err, crudApp, uiApp)
+				handleAnonymousRequest(w, r, err, crudApp, rendererApp)
 				return
 			}
 
@@ -168,7 +168,7 @@ func main() {
 	authConfig := auth.Flags(fs, `auth`)
 	basicConfig := basic.Flags(fs, `basic`)
 	crudConfig := crud.Flags(fs, ``)
-	uiConfig := ui.Flags(fs, ``)
+	rendererConfig := renderer.Flags(fs, ``)
 
 	filesystemConfig := filesystem.Flags(fs, `fs`)
 	thumbnailConfig := thumbnail.Flags(fs, `thumbnail`)
@@ -193,11 +193,11 @@ func main() {
 	gzipApp := gzip.New()
 
 	thumbnailApp := thumbnail.New(thumbnailConfig, storage)
-	uiApp := ui.New(uiConfig, storage.Root(), thumbnailApp)
-	crudApp := crud.New(crudConfig, storage, uiApp, thumbnailApp)
+	rendererApp := renderer.New(rendererConfig, storage.Root(), thumbnailApp)
+	crudApp := crud.New(crudConfig, storage, rendererApp, thumbnailApp)
 	authApp := auth.NewService(authConfig, authService.NewBasic(basicConfig, nil))
 
-	webHandler := server.ChainMiddlewares(browserHandler(crudApp, uiApp, authApp), prometheusApp, opentracingApp, gzipApp, owaspApp)
+	webHandler := server.ChainMiddlewares(browserHandler(crudApp, rendererApp, authApp), prometheusApp, opentracingApp, gzipApp, owaspApp)
 
 	serverApp.ListenAndServe(webHandler, nil, healthcheckApp)
 }

@@ -59,6 +59,10 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 
 // New creates new App from Config
 func New(config Config, storage provider.Storage) *App {
+	if *config.imaginaryURL == `` {
+		return &App{}
+	}
+
 	app := &App{
 		imaginaryURL:  fmt.Sprintf(`%s/crop?width=150&height=150&stripmeta=true&noprofile=true&quality=80&type=jpeg`, *config.imaginaryURL),
 		storage:       storage,
@@ -79,12 +83,6 @@ func New(config Config, storage provider.Storage) *App {
 	}()
 
 	return app
-}
-
-func getThumbnailPath(pathname string) string {
-	fullPath := path.Join(provider.MetadataDirectoryName, pathname)
-
-	return fmt.Sprintf(`%s.jpg`, strings.TrimSuffix(fullPath, path.Ext(fullPath)))
 }
 
 // CanHaveThumbnail determine if thumbnail can be generated for given pathname
@@ -159,32 +157,6 @@ func (a App) List(w http.ResponseWriter, r *http.Request, pathname string) {
 	safeWrite(w, `}`)
 }
 
-// Generate thumbnail for all storage
-func (a App) Generate() {
-	err := a.storage.Walk(func(item *provider.StorageItem, _ error) error {
-		if item.IsDir && strings.HasPrefix(item.Name, `.`) || ignoredThumbnailDir[item.Name] {
-			return filepath.SkipDir
-		}
-
-		if !a.CanHaveThumbnail(item.Pathname) || a.HasThumbnail(item.Pathname) {
-			return nil
-		}
-
-		a.AsyncGenerateThumbnail(item.Pathname)
-
-		return nil
-	})
-
-	if err != nil {
-		logger.Error(`%+v`, err)
-	}
-}
-
-// AsyncGenerateThumbnail generate thumbnail image for given path
-func (a App) AsyncGenerateThumbnail(pathname string) {
-	a.pathnameInput <- pathname
-}
-
 func (a App) generateThumbnail(pathname string) error {
 	file, err := a.storage.Read(pathname)
 	if err != nil {
@@ -209,4 +181,48 @@ func (a App) generateThumbnail(pathname string) error {
 	}
 
 	return nil
+}
+
+func getThumbnailPath(pathname string) string {
+	fullPath := path.Join(provider.MetadataDirectoryName, pathname)
+
+	return fmt.Sprintf(`%s.jpg`, strings.TrimSuffix(fullPath, path.Ext(fullPath)))
+}
+
+func (a App) isEnabled() bool {
+	return a.imaginaryURL != `` && a.storage != nil
+}
+
+// Generate thumbnail for all storage
+func (a App) Generate() {
+	if !a.isEnabled() {
+		return
+	}
+
+	err := a.storage.Walk(func(item *provider.StorageItem, _ error) error {
+		if item.IsDir && strings.HasPrefix(item.Name, `.`) || ignoredThumbnailDir[item.Name] {
+			return filepath.SkipDir
+		}
+
+		if !a.CanHaveThumbnail(item.Pathname) || a.HasThumbnail(item.Pathname) {
+			return nil
+		}
+
+		a.AsyncGenerateThumbnail(item.Pathname)
+
+		return nil
+	})
+
+	if err != nil {
+		logger.Error(`%+v`, err)
+	}
+}
+
+// AsyncGenerateThumbnail generate thumbnail image for given path
+func (a App) AsyncGenerateThumbnail(pathname string) {
+	if !a.isEnabled() {
+		return
+	}
+
+	a.pathnameInput <- pathname
 }

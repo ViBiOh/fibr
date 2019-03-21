@@ -1,4 +1,4 @@
-package ui
+package renderer
 
 import (
 	"flag"
@@ -111,8 +111,8 @@ func New(config Config, rootName string, thumbnailApp *thumbnail.App) *App {
 	}
 }
 
-func (a App) createPageConfiguration(request *provider.Request, message *provider.Message, content map[string]interface{}, layout string) *provider.Page {
-	return &provider.Page{
+func (a App) createPageConfiguration(request *provider.Request, message *provider.Message, content map[string]interface{}, layout string) provider.Page {
+	return provider.Page{
 		Config:  a.config,
 		Request: request,
 		Message: message,
@@ -129,7 +129,7 @@ func (a App) Directory(w http.ResponseWriter, request *provider.Request, content
 		page.Layout = `grid`
 	}
 
-	w.Header().Set(`content-language`, `fr`)
+	w.Header().Set(`content-language`, `en`)
 	if err := templates.WriteHTMLTemplate(a.tpl.Lookup(`files`), w, page, http.StatusOK); err != nil {
 		a.Error(w, http.StatusInternalServerError, err)
 		return
@@ -140,7 +140,7 @@ func (a App) Directory(w http.ResponseWriter, request *provider.Request, content
 func (a App) File(w http.ResponseWriter, request *provider.Request, content map[string]interface{}, message *provider.Message) {
 	page := a.createPageConfiguration(request, message, content, `browser`)
 
-	w.Header().Set(`content-language`, `fr`)
+	w.Header().Set(`content-language`, `en`)
 	if err := templates.WriteHTMLTemplate(a.tpl.Lookup(`file`), w, page, http.StatusOK); err != nil {
 		a.Error(w, http.StatusInternalServerError, err)
 		return

@@ -89,5 +89,5 @@ start:
 		-authUsers admin:admin \
 		-basicUsers 1:admin:`bcrypt admin` \
 		-frameOptions "SAMEORIGIN" \
-		-thumbnailImaginaryURL http://localhost:9000 \
+		-thumbnailImaginaryURL "" \
 		-csp "default-src 'self'; base-uri 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:"
