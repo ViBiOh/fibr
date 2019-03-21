@@ -60,7 +60,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 // New creates new App from Config
 func New(config Config, storage provider.Storage) *App {
 	app := &App{
-		imaginaryURL:  strings.TrimSpace(*config.imaginaryURL),
+		imaginaryURL:  fmt.Sprintf(`%s/crop?width=150&height=150&stripmeta=true&noprofile=true&quality=80&type=jpeg`, *config.imaginaryURL),
 		storage:       storage,
 		pathnameInput: make(chan string, 10),
 	}
@@ -128,7 +128,7 @@ func (a App) List(w http.ResponseWriter, r *http.Request, pathname string) {
 	w.Header().Set(`Cache-Control`, `no-cache`)
 	w.WriteHeader(http.StatusOK)
 
-	count := 0
+	commaNeeded := false
 	safeWrite(w, `{`)
 
 	for _, item := range items {
@@ -146,13 +146,14 @@ func (a App) List(w http.ResponseWriter, r *http.Request, pathname string) {
 			logger.Error(`unable to read %s: %+v`, item.Pathname, errors.WithStack(err))
 		}
 
-		if count != 0 {
+		if commaNeeded {
 			safeWrite(w, `,`)
+		} else {
+			commaNeeded = true
 		}
 
 		safeWrite(w, fmt.Sprintf(`"%s":`, tools.Sha1(item.Name)))
 		safeWrite(w, fmt.Sprintf(`"%s"`, base64.StdEncoding.EncodeToString(content)))
-		count++
 	}
 
 	safeWrite(w, `}`)
@@ -193,7 +194,7 @@ func (a App) generateThumbnail(pathname string) error {
 	ctx, cancel := getCtx(context.Background())
 	defer cancel()
 
-	result, _, _, err := request.Do(ctx, http.MethodPost, fmt.Sprintf(`%s/crop?width=150&height=150&stripmeta=true&noprofile=true&quality=80&type=jpeg`, a.imaginaryURL), file, nil)
+	result, _, _, err := request.Do(ctx, http.MethodPost, a.imaginaryURL, file, nil)
 	if err != nil {
 		return err
 	}
