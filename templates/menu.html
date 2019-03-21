@@ -1,6 +1,6 @@
 {{ define "menu" }}
   {{ if or .Request.CanEdit .Request.CanShare }}
-    <div id="tools">
+    <div id="tools" class="padding">
       {{ if .Request.CanEdit }}
         <a href="#upload-modal" class="button button-icon">
           <img class="icon icon-large" src="/svg/cloud-upload-alt?fill=silver" alt="Upload">

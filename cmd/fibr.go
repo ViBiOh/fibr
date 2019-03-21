@@ -91,6 +91,38 @@ func handleAnonymousRequest(w http.ResponseWriter, r *http.Request, err error, c
 	rendererApp.Error(w, http.StatusUnauthorized, err)
 }
 
+func checkAllowedMethod(r *http.Request) bool {
+	return r.Method == http.MethodGet || r.Method == http.MethodPost || r.Method == http.MethodPut || r.Method == http.MethodPatch || r.Method == http.MethodDelete
+}
+
+func checkRequest(crudApp *crud.App, rendererApp *renderer.App, authApp *auth.App, w http.ResponseWriter, r *http.Request) *provider.Request {
+	request := &provider.Request{
+		Path:     r.URL.Path,
+		CanEdit:  false,
+		CanShare: false,
+	}
+
+	if err := checkShare(w, r, crudApp, request); err != nil {
+		rendererApp.Error(w, http.StatusUnauthorized, err)
+		return nil
+	}
+
+	if request.Share == nil {
+		user, err := authApp.IsAuthenticated(r)
+		if err != nil {
+			handleAnonymousRequest(w, r, err, crudApp, rendererApp)
+			return nil
+		}
+
+		if user != nil && user.HasProfile(`admin`) {
+			request.CanEdit = true
+			request.CanShare = true
+		}
+	}
+
+	return request
+}
+
 func handleRequest(w http.ResponseWriter, r *http.Request, crudApp *crud.App, config *provider.Request) {
 	switch r.Method {
 	case http.MethodGet:
@@ -106,10 +138,6 @@ func handleRequest(w http.ResponseWriter, r *http.Request, crudApp *crud.App, co
 	default:
 		httperror.NotFound(w)
 	}
-}
-
-func checkAllowedMethod(r *http.Request) bool {
-	return r.Method == http.MethodGet || r.Method == http.MethodPost || r.Method == http.MethodPut || r.Method == http.MethodPatch || r.Method == http.MethodDelete
 }
 
 func browserHandler(crudApp *crud.App, rendererApp *renderer.App, authApp *auth.App) http.Handler {
@@ -128,31 +156,10 @@ func browserHandler(crudApp *crud.App, rendererApp *renderer.App, authApp *auth.
 			return
 		}
 
-		request := &provider.Request{
-			Path:     r.URL.Path,
-			CanEdit:  false,
-			CanShare: false,
+		request := checkRequest(crudApp, rendererApp, authApp, w, r)
+		if request != nil {
+			handleRequest(w, r, crudApp, request)
 		}
-
-		if err := checkShare(w, r, crudApp, request); err != nil {
-			rendererApp.Error(w, http.StatusUnauthorized, err)
-			return
-		}
-
-		if request.Share == nil {
-			user, err := authApp.IsAuthenticated(r)
-			if err != nil {
-				handleAnonymousRequest(w, r, err, crudApp, rendererApp)
-				return
-			}
-
-			if user != nil && user.HasProfile(`admin`) {
-				request.CanEdit = true
-				request.CanShare = true
-			}
-		}
-
-		handleRequest(w, r, crudApp, request)
 	})
 }
 
