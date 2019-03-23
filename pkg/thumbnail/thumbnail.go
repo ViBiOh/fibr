@@ -94,6 +94,10 @@ func (a App) CanHaveThumbnail(pathname string) bool {
 
 // HasThumbnail determine if thumbnail exist for given pathname
 func (a App) HasThumbnail(pathname string) bool {
+	if !a.isEnabled() {
+		return false
+	}
+
 	_, err := a.storage.Info(getThumbnailPath(pathname))
 	return err == nil
 }
@@ -116,6 +120,11 @@ func safeWrite(w io.Writer, content string) {
 
 // List return all thumbnail in a base64 form
 func (a App) List(w http.ResponseWriter, r *http.Request, pathname string) {
+	if !a.isEnabled() {
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
+
 	items, err := a.storage.List(pathname)
 	if err != nil {
 		httperror.InternalServerError(w, err)

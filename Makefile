@@ -6,6 +6,12 @@ PACKAGES ?= ./...
 GOBIN=bin
 BINARY_PATH=$(GOBIN)/$(APP_NAME)
 
+SERVER_SOURCE = cmd/fibr.go
+SERVER_RUNNER = go run $(SERVER_SOURCE)
+ifeq ($(DEBUG), true)
+	SERVER_RUNNER = dlv debug $(SERVER_SOURCE) --
+endif
+
 help: Makefile
 	@sed -n 's|^##||p' $< | column -t -s ':' | sed -e 's|^| |'
 
@@ -82,7 +88,7 @@ start-deps:
 ## start: Start app
 .PHONY: start
 start:
-	DEBUG=true go run cmd/fibr.go \
+	$(SERVER_RUNNER) \
 		-tls=false \
 		-fsDirectory `pwd` \
 		-publicURL http://localhost:1080 \
