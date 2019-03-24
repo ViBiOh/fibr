@@ -1,5 +1,5 @@
 {{ define "style-modal" }}
-  <style type="text/css">
+  <style>
     {{ if .Request.CanEdit }}
       {{ range .Content.Files }}
         #delete-modal-{{ sha1 . }},
