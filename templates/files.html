@@ -64,6 +64,8 @@
   <div class="content">
     {{ template "modifiers" . }}
 
+    <span class="padding-left">{{ len .Content.Files }} elements</span>
+
     <ul id="files">
       {{ range .Content.Files }}
         {{ if and (.IsImage) (eq $root.Layout "grid") }}
