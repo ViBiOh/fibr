@@ -22,11 +22,11 @@
     "pkg/model",
   ]
   pruneopts = "UT"
-  revision = "d670266ec95226f3268b071e80580e81515929bc"
+  revision = "8d7efb214704f277978fcd835868dc216e02a163"
 
 [[projects]]
   branch = "master"
-  digest = "1:1c002ce5fb59093fd44b6b9415ccde30c5c91e6ca0cae0579abe040513640d73"
+  digest = "1:ade785894b7041feb088593d175edbde198bdc6998ed6959ea835b2c157c5ebc"
   name = "github.com/ViBiOh/httputils"
   packages = [
     "pkg",
@@ -52,7 +52,7 @@
     "pkg/uuid",
   ]
   pruneopts = "UT"
-  revision = "a1db1860e57f3e9b24c53fe39a6c247be70e8937"
+  revision = "a3654c130b1e16698c9c2ebb5d22796d9dd6ddaf"
 
 [[projects]]
   branch = "master"
@@ -61,14 +61,6 @@
   packages = ["quantile"]
   pruneopts = "UT"
   revision = "3a771d992973f24aa725d07868b467d1ddfceafb"
-
-[[projects]]
-  branch = "master"
-  digest = "1:4c4c33075b704791d6a7f09dfb55c66769e8a1dc6adf87026292d274fe8ad113"
-  name = "github.com/codahale/hdrhistogram"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "3a0bb77429bd3a61596f5e8a3172445844342120"
 
 [[projects]]
   digest = "1:318f1c959a8a740366fce4b1e1eb2fd914036b4af58fbd0a003349b305f118ad"
@@ -88,14 +80,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:c58bca71e857da7662bb1dbc23a06bdfa56a063297989ff3a12d6ccae0f15690"
+  digest = "1:bccaead3121ab7964fd80fab704f612e5893fb5a2c581d520ec847ed8cfac27e"
   name = "github.com/opentracing-contrib/go-stdlib"
   packages = ["nethttp"]
   pruneopts = "UT"
-  revision = "431a6bc76b4852198549116d114392e4b9098836"
+  revision = "3020fec0e66bdb65fd42cb346cb65d58deb92e0d"
 
 [[projects]]
-  digest = "1:450b7623b185031f3a456801155c8320209f75d0d4c4e633c6b1e59d44d6e392"
+  digest = "1:11e62d6050198055e6cd87ed57e5d8c669e84f839c16e16f192374d913d1a70d"
   name = "github.com/opentracing/opentracing-go"
   packages = [
     ".",
@@ -103,8 +95,8 @@
     "log",
   ]
   pruneopts = "UT"
-  revision = "1949ddbfd147afd4d964a9f00b24eb291e0e7c38"
-  version = "v1.0.2"
+  revision = "659c90643e714681897ec2521c60567dd21da733"
+  version = "v1.1.0"
 
 [[projects]]
   digest = "1:cf31692c14422fa27c83a05292eb5cbe0fb2775972e8f1f8446a71549bd8980b"
@@ -148,17 +140,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:c31163bd62461e0c5f7ddc7363e39ef8d9e929693e77b5c11c709b05f9cb9219"
+  digest = "1:f806b417865e83457c3659232926203f5b0d39aa741b71d9e3e4c0c774e71a5c"
   name = "github.com/prometheus/procfs"
-  packages = [
-    ".",
-    "internal/util",
-    "iostats",
-    "nfs",
-    "xfs",
-  ]
+  packages = ["."]
   pruneopts = "UT"
-  revision = "55ae3d9d557340b5bc24cd8aa5f6fa2c2ab31352"
+  revision = "af7bedc223fba51343f25a6fa7aba84355d0357a"
 
 [[projects]]
   digest = "1:48c8c8d1fb550f059bcb5696a6f333693e19e3bad4db00d5c9b19f3846629511"
@@ -191,7 +177,7 @@
   version = "v2.3.4"
 
 [[projects]]
-  digest = "1:ac6f26e917fd2fb3194a7ebe2baf6fb32de2f2fbfed130c18aac0e758a6e1d22"
+  digest = "1:3b0ac1ac6f703e6d43f4e29c97da2c9e34465c66e2e19f9828e9841d1c9279a4"
   name = "github.com/uber/jaeger-client-go"
   packages = [
     ".",
@@ -213,16 +199,16 @@
     "utils",
   ]
   pruneopts = "UT"
-  revision = "1a782e2da844727691fef1757c72eb190c2909f0"
-  version = "v2.15.0"
+  revision = "2f47546e3facd43297739439600bcf43f44cce5d"
+  version = "v2.16.0"
 
 [[projects]]
-  digest = "1:0f09db8429e19d57c8346ad76fbbc679341fa86073d3b8fb5ac919f0357d8f4c"
+  digest = "1:c9d69a04f7fa171f50360bbcc32196b4de8ab8837ef772f6302d0140a1e3e7f6"
   name = "github.com/uber/jaeger-lib"
   packages = ["metrics"]
   pruneopts = "UT"
-  revision = "ed3a127ec5fef7ae9ea95b01b542c47fbd999ce5"
-  version = "v1.5.0"
+  revision = "0e30338a695636fe5bcf7301e8030ce8dd2a8530"
+  version = "v2.0.0"
 
 [[projects]]
   branch = "master"
@@ -233,15 +219,7 @@
     "blowfish",
   ]
   pruneopts = "UT"
-  revision = "b7391e95e576cacdcdd422573063bc057239113d"
-
-[[projects]]
-  branch = "master"
-  digest = "1:76ee51c3f468493aff39dbacc401e8831fbb765104cbf613b89bef01cf4bad70"
-  name = "golang.org/x/net"
-  packages = ["context"]
-  pruneopts = "UT"
-  revision = "addf6b3196f61cd44ce5a76657913698c73479d0"
+  revision = "a5d413f7728c81fb97d96a2b722368945f651e78"
 
 [[projects]]
   digest = "1:8029e9743749d4be5bc9f7d42ea1659471767860f0cdc34d37c3111bd308a295"
