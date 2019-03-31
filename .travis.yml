@@ -5,10 +5,10 @@ jobs:
     sudo: required
     services:
     - docker
-    script: docker build -t vibioh/`make name`:`make version` .
+    script: docker build -t vibioh/$(make name):$(make version) .
     after_success: |
       echo ${DOCKER_PASS} | docker login -u vibioh --password-stdin
-      docker push vibioh/`make name`:`make version`
+      docker push vibioh/$(make name):$(make version)
 
   - stage: Publish
 
@@ -17,9 +17,9 @@ jobs:
     - docker
     script: |
       echo ${DOCKER_PASS} | docker login -u vibioh --password-stdin
-      docker pull vibioh/`make name`:`make version`
-      docker tag vibioh/`make name`:`make version` vibioh/`make name`:latest
-      docker push vibioh/`make name`:latest
+      docker pull vibioh/$(make name):$(make version)
+      docker tag vibioh/$(make name):$(make version) vibioh/$(make name):latest
+      docker push vibioh/$(make name):latest
     after_success: |
       curl -s -X POST https://goreportcard.com/checks?repo=github.com/ViBiOh/fibr
 
