@@ -22,7 +22,7 @@
     "pkg/model",
   ]
   pruneopts = "UT"
-  revision = "8d7efb214704f277978fcd835868dc216e02a163"
+  revision = "ae0ebb5f76fe8e3325c1271cad5bc85e2eb19dd7"
 
 [[projects]]
   branch = "master"
@@ -52,7 +52,7 @@
     "pkg/uuid",
   ]
   pruneopts = "UT"
-  revision = "a3654c130b1e16698c9c2ebb5d22796d9dd6ddaf"
+  revision = "864a7148bc82cda83652d30ce21a8c48909b5927"
 
 [[projects]]
   branch = "master"
@@ -144,7 +144,7 @@
   name = "github.com/prometheus/procfs"
   packages = ["."]
   pruneopts = "UT"
-  revision = "af7bedc223fba51343f25a6fa7aba84355d0357a"
+  revision = "ea9eea63887261e4d8ed8315f4078e88d540c725"
 
 [[projects]]
   digest = "1:48c8c8d1fb550f059bcb5696a6f333693e19e3bad4db00d5c9b19f3846629511"
@@ -219,7 +219,7 @@
     "blowfish",
   ]
   pruneopts = "UT"
-  revision = "a5d413f7728c81fb97d96a2b722368945f651e78"
+  revision = "38d8ce5564a5b71b2e3a00553993f1b9a7ae852f"
 
 [[projects]]
   digest = "1:8029e9743749d4be5bc9f7d42ea1659471767860f0cdc34d37c3111bd308a295"
