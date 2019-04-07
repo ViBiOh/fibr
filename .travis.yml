@@ -31,11 +31,12 @@ jobs:
         -e "s|\${DATA_USER_ID}|${DATA_USER_ID}|g" \
         -e "s|\${BASIC_USERS}|${BASIC_USERS}|g" \
         -e "s|\${VERSION}|${TRAVIS_COMMIT}|g" \
+        -e "s|\\\$|\$\$|g" \
         docker-compose.yml > docker-compose-env.yml
     deploy:
       provider: script
       skip_cleanup: true
-      script: 'curl -H "Authorization: GitHub ${GITHUB_OAUTH_TOKEN}" -X POST "https://dashboard-api.vibioh.fr/deploy/fibr/" --data-binary @docker-compose-env.yml'
+      script: 'curl -X POST -u "${DEPLOY_CREDENTIALS}" "https://deploy.vibioh.fr/?project=$(make name)&version=$(make version)" --data-binary @docker-compose-env.yml'
 
 stages:
   - Build
