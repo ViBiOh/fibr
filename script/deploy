@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+set -o nounset -o pipefail -o errexit
+
+HTTP_STATUS=$(curl -X POST -u "${DEPLOY_CREDENTIALS}" -o output.txt -w "%{http_code}" "${1}" --data-binary "${2}")
+
+cat output.txt
+
+if [[ "${HTTP_STATUS}" != "200" ]]; then
+   exit 1
+fi
