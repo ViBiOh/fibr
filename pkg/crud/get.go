@@ -16,18 +16,18 @@ func (a *App) CheckAndServeSEO(w http.ResponseWriter, r *http.Request) bool {
 		return false
 	}
 
-	if r.URL.Path == `/robots.txt` || strings.HasPrefix(r.URL.Path, `/favicon`) {
-		http.ServeFile(w, r, path.Join(`templates/static`, r.URL.Path))
+	if r.URL.Path == "/robots.txt" || strings.HasPrefix(r.URL.Path, "/favicon") {
+		http.ServeFile(w, r, path.Join("templates/static", r.URL.Path))
 		return true
 	}
 
-	if r.URL.Path == `/sitemap.xml` {
+	if r.URL.Path == "/sitemap.xml" {
 		a.renderer.Sitemap(w)
 		return true
 	}
 
-	if strings.HasPrefix(r.URL.Path, `/svg`) {
-		a.renderer.SVG(w, strings.TrimPrefix(r.URL.Path, `/svg/`), r.URL.Query().Get(`fill`))
+	if strings.HasPrefix(r.URL.Path, "/svg") {
+		a.renderer.SVG(w, strings.TrimPrefix(r.URL.Path, "/svg/"), r.URL.Query().Get("fill"))
 		return true
 	}
 
@@ -35,7 +35,7 @@ func (a *App) CheckAndServeSEO(w http.ResponseWriter, r *http.Request) bool {
 }
 
 func isThumbnail(r *http.Request) bool {
-	return query.GetBool(r, `thumbnail`)
+	return query.GetBool(r, "thumbnail")
 }
 
 func (a *App) checkAndServeThumbnail(w http.ResponseWriter, r *http.Request, info *provider.StorageItem) bool {
@@ -48,7 +48,7 @@ func (a *App) checkAndServeThumbnail(w http.ResponseWriter, r *http.Request, inf
 
 // GetWithMessage output content with given message
 func (a *App) GetWithMessage(w http.ResponseWriter, r *http.Request, request *provider.Request, message *provider.Message) {
-	pathname := provider.GetPathname(request, ``)
+	pathname := provider.GetPathname(request, "")
 
 	info, err := a.storage.Info(pathname)
 	if err != nil {
@@ -65,7 +65,7 @@ func (a *App) GetWithMessage(w http.ResponseWriter, r *http.Request, request *pr
 			return
 		}
 
-		if r.URL.Query().Get(`browser`) == `true` {
+		if r.URL.Query().Get("browser") == "true" {
 			a.Browser(w, request, info, message)
 			return
 		}
@@ -74,15 +74,15 @@ func (a *App) GetWithMessage(w http.ResponseWriter, r *http.Request, request *pr
 		return
 	}
 
-	if !strings.HasSuffix(r.URL.Path, `/`) {
-		http.Redirect(w, r, fmt.Sprintf(`%s/`, r.URL.Path), http.StatusPermanentRedirect)
+	if !strings.HasSuffix(r.URL.Path, "/") {
+		http.Redirect(w, r, fmt.Sprintf("%s/", r.URL.Path), http.StatusPermanentRedirect)
 		return
 	}
 
 	if isThumbnail(r) {
 		a.thumbnailApp.List(w, r, pathname)
 	} else {
-		a.List(w, request, r.URL.Query().Get(`d`), message)
+		a.List(w, request, r.URL.Query().Get("d"), message)
 	}
 }
 
@@ -90,9 +90,9 @@ func (a *App) GetWithMessage(w http.ResponseWriter, r *http.Request, request *pr
 func (a *App) Get(w http.ResponseWriter, r *http.Request, config *provider.Request) {
 	var message *provider.Message
 
-	if messageContent := strings.TrimSpace(r.URL.Query().Get(`message`)); messageContent != `` {
+	if messageContent := strings.TrimSpace(r.URL.Query().Get("message")); messageContent != "" {
 		message = &provider.Message{
-			Level:   r.URL.Query().Get(`messageLevel`),
+			Level:   r.URL.Query().Get("messageLevel"),
 			Content: messageContent,
 		}
 	}

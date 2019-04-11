@@ -23,7 +23,7 @@ var (
 func (a *App) saveUploadedFile(request *provider.Request, uploadedFile io.ReadCloser, uploadedFileHeader *multipart.FileHeader) (string, error) {
 	filename, err := provider.SanitizeName(uploadedFileHeader.Filename, true)
 	if err != nil {
-		return ``, err
+		return "", err
 	}
 
 	filePath := provider.GetPathname(request, filename)
@@ -32,17 +32,17 @@ func (a *App) saveUploadedFile(request *provider.Request, uploadedFile io.ReadCl
 	if hostFile != nil {
 		defer func() {
 			if err := hostFile.Close(); err != nil {
-				logger.Error(`%+v`, err)
+				logger.Error("%+v", err)
 			}
 		}()
 	}
 
 	if err != nil {
-		return ``, err
+		return "", err
 	}
 
 	if _, err = io.CopyBuffer(hostFile, uploadedFile, copyBuffer); err != nil {
-		return ``, errors.WithStack(err)
+		return "", errors.WithStack(err)
 	}
 
 	if a.thumbnailApp.CanHaveThumbnail(filePath) {
@@ -64,19 +64,19 @@ func (a *App) Upload(w http.ResponseWriter, r *http.Request, request *provider.R
 		return
 	}
 
-	if r.MultipartForm.File == nil || len(r.MultipartForm.File[`files[]`]) == 0 {
-		a.renderer.Error(w, http.StatusBadRequest, errors.New(`no file provided for save`))
+	if r.MultipartForm.File == nil || len(r.MultipartForm.File["files[]"]) == 0 {
+		a.renderer.Error(w, http.StatusBadRequest, errors.New("no file provided for save"))
 		return
 	}
 
-	filenames := make([]string, len(r.MultipartForm.File[`files[]`]))
+	filenames := make([]string, len(r.MultipartForm.File["files[]"]))
 
-	for index, file := range r.MultipartForm.File[`files[]`] {
+	for index, file := range r.MultipartForm.File["files[]"] {
 		uploadedFile, err := file.Open()
 		if uploadedFile != nil {
 			defer func() {
 				if err := uploadedFile.Close(); err != nil {
-					logger.Error(`%+v`, errors.WithStack(err))
+					logger.Error("%+v", errors.WithStack(err))
 				}
 			}()
 		}
@@ -95,10 +95,10 @@ func (a *App) Upload(w http.ResponseWriter, r *http.Request, request *provider.R
 		filenames[index] = filename
 	}
 
-	message := fmt.Sprintf(`File %s successfully uploaded`, filenames[0])
+	message := fmt.Sprintf("File %s successfully uploaded", filenames[0])
 	if len(filenames) > 1 {
-		message = fmt.Sprintf(`Files %s successfully uploaded`, strings.Join(filenames, `, `))
+		message = fmt.Sprintf("Files %s successfully uploaded", strings.Join(filenames, ", "))
 	}
 
-	a.List(w, request, r.URL.Query().Get(`d`), &provider.Message{Level: `success`, Content: message})
+	a.List(w, request, r.URL.Query().Get("d"), &provider.Message{Level: "success", Content: message})
 }

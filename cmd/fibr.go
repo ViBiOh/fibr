@@ -31,29 +31,29 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-var errEmptyAuthorizationHeader = errors.New(`empty authorization header`)
+var errEmptyAuthorizationHeader = errors.New("empty authorization header")
 
 func checkSharePassword(r *http.Request, share *provider.Share) error {
-	header := r.Header.Get(`Authorization`)
-	if header == `` {
+	header := r.Header.Get("Authorization")
+	if header == "" {
 		return errEmptyAuthorizationHeader
 	}
 
-	data, err := base64.StdEncoding.DecodeString(strings.TrimPrefix(header, `Basic `))
+	data, err := base64.StdEncoding.DecodeString(strings.TrimPrefix(header, "Basic "))
 	if err != nil {
 		return errors.WithStack(err)
 	}
 
 	dataStr := string(data)
 
-	sepIndex := strings.Index(dataStr, `:`)
+	sepIndex := strings.Index(dataStr, ":")
 	if sepIndex < 0 {
-		return errors.New(`invalid format for basic auth`)
+		return errors.New("invalid format for basic auth")
 	}
 
 	password := dataStr[sepIndex+1:]
 	if err := bcrypt.CompareHashAndPassword([]byte(share.Password), []byte(password)); err != nil {
-		return errors.New(`invalid credentials`)
+		return errors.New("invalid credentials")
 	}
 
 	return nil
@@ -63,11 +63,11 @@ func checkShare(w http.ResponseWriter, r *http.Request, crudApp *crud.App, reque
 	if share := crudApp.GetShare(request.Path); share != nil {
 		request.Share = share
 		request.CanEdit = share.Edit
-		request.Path = strings.TrimPrefix(request.Path, fmt.Sprintf(`/%s`, share.ID))
+		request.Path = strings.TrimPrefix(request.Path, fmt.Sprintf("/%s", share.ID))
 
-		if share.Password != `` {
+		if share.Password != "" {
 			if err := checkSharePassword(r, share); err != nil {
-				w.Header().Add(`WWW-Authenticate`, `Basic realm="Password required" charset="UTF-8"`)
+				w.Header().Add("WWW-Authenticate", "Basic realm=\"Password required\" charset=\"UTF-8\"")
 				return err
 			}
 		}
@@ -78,7 +78,7 @@ func checkShare(w http.ResponseWriter, r *http.Request, crudApp *crud.App, reque
 
 func handleAnonymousRequest(w http.ResponseWriter, r *http.Request, err error, crudApp *crud.App, rendererApp *renderer.App) {
 	if auth.ErrForbidden == err {
-		rendererApp.Error(w, http.StatusForbidden, errors.New(`you're not authorized to speak to me`))
+		rendererApp.Error(w, http.StatusForbidden, errors.New("you're not authorized to speak to me"))
 		return
 	}
 
@@ -87,7 +87,7 @@ func handleAnonymousRequest(w http.ResponseWriter, r *http.Request, err error, c
 		return
 	}
 
-	w.Header().Add(`WWW-Authenticate`, `Basic charset="UTF-8"`)
+	w.Header().Add("WWW-Authenticate", "Basic charset=\"UTF-8\"")
 	rendererApp.Error(w, http.StatusUnauthorized, err)
 }
 
@@ -114,7 +114,7 @@ func checkRequest(crudApp *crud.App, rendererApp *renderer.App, authApp *auth.Ap
 			return nil
 		}
 
-		if user != nil && user.HasProfile(`admin`) {
+		if user != nil && user.HasProfile("admin") {
 			request.CanEdit = true
 			request.CanShare = true
 		}
@@ -143,12 +143,12 @@ func handleRequest(w http.ResponseWriter, r *http.Request, crudApp *crud.App, co
 func browserHandler(crudApp *crud.App, rendererApp *renderer.App, authApp *auth.App) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !checkAllowedMethod(r) {
-			rendererApp.Error(w, http.StatusMethodNotAllowed, errors.New(`you lack of accurate method for calling me`))
+			rendererApp.Error(w, http.StatusMethodNotAllowed, errors.New("you lack of accurate method for calling me"))
 			return
 		}
 
-		if strings.Contains(r.URL.Path, `..`) {
-			rendererApp.Error(w, http.StatusForbidden, errors.New(`you can't speak to my parent`))
+		if strings.Contains(r.URL.Path, "..") {
+			rendererApp.Error(w, http.StatusForbidden, errors.New("you can't speak to my parent"))
 			return
 		}
 
@@ -164,31 +164,31 @@ func browserHandler(crudApp *crud.App, rendererApp *renderer.App, authApp *auth.
 }
 
 func main() {
-	fs := flag.NewFlagSet(`fibr`, flag.ExitOnError)
+	fs := flag.NewFlagSet("fibr", flag.ExitOnError)
 
-	serverConfig := httputils.Flags(fs, ``)
-	alcotestConfig := alcotest.Flags(fs, ``)
-	prometheusConfig := prometheus.Flags(fs, `prometheus`)
-	opentracingConfig := opentracing.Flags(fs, `tracing`)
-	owaspConfig := owasp.Flags(fs, ``)
+	serverConfig := httputils.Flags(fs, "")
+	alcotestConfig := alcotest.Flags(fs, "")
+	prometheusConfig := prometheus.Flags(fs, "prometheus")
+	opentracingConfig := opentracing.Flags(fs, "tracing")
+	owaspConfig := owasp.Flags(fs, "")
 
-	authConfig := auth.Flags(fs, `auth`)
-	basicConfig := basic.Flags(fs, `basic`)
-	crudConfig := crud.Flags(fs, ``)
-	rendererConfig := renderer.Flags(fs, ``)
+	authConfig := auth.Flags(fs, "auth")
+	basicConfig := basic.Flags(fs, "basic")
+	crudConfig := crud.Flags(fs, "")
+	rendererConfig := renderer.Flags(fs, "")
 
-	filesystemConfig := filesystem.Flags(fs, `fs`)
-	thumbnailConfig := thumbnail.Flags(fs, `thumbnail`)
+	filesystemConfig := filesystem.Flags(fs, "fs")
+	thumbnailConfig := thumbnail.Flags(fs, "thumbnail")
 
 	if err := fs.Parse(os.Args[1:]); err != nil {
-		logger.Fatal(`%+v`, err)
+		logger.Fatal("%+v", err)
 	}
 
 	alcotest.DoAndExit(alcotestConfig)
 
 	storage, err := filesystem.New(filesystemConfig)
 	if err != nil {
-		logger.Error(`%+v`, err)
+		logger.Error("%+v", err)
 		os.Exit(1)
 	}
 

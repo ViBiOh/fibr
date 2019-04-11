@@ -20,9 +20,9 @@ func (a App) Error(w http.ResponseWriter, status int, err error) {
 		},
 	}
 
-	logger.Error(`%+v`, err)
+	logger.Error("%+v", err)
 
-	if err := templates.WriteHTMLTemplate(a.tpl.Lookup(`error`), w, page, status); err != nil {
+	if err := templates.WriteHTMLTemplate(a.tpl.Lookup("error"), w, page, status); err != nil {
 		httperror.InternalServerError(w, err)
 		return
 	}
@@ -34,7 +34,7 @@ func (a App) Sitemap(w http.ResponseWriter) {
 		Config: a.config,
 	}
 
-	if err := templates.WriteXMLTemplate(a.tpl.Lookup(`sitemap`), w, page, http.StatusOK); err != nil {
+	if err := templates.WriteXMLTemplate(a.tpl.Lookup("sitemap"), w, page, http.StatusOK); err != nil {
 		httperror.InternalServerError(w, err)
 		return
 	}
@@ -42,13 +42,13 @@ func (a App) Sitemap(w http.ResponseWriter) {
 
 // SVG render a svg in given coolor
 func (a App) SVG(w http.ResponseWriter, name, fill string) {
-	tpl := a.tpl.Lookup(fmt.Sprintf(`svg-%s`, name))
+	tpl := a.tpl.Lookup(fmt.Sprintf("svg-%s", name))
 	if tpl == nil {
 		httperror.NotFound(w)
 		return
 	}
 
-	w.Header().Set(`Content-Type`, `image/svg+xml`)
+	w.Header().Set("Content-Type", "image/svg+xml")
 	if err := tpl.Execute(w, fill); err != nil {
 		httperror.InternalServerError(w, err)
 	}

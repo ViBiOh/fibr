@@ -22,10 +22,10 @@ import (
 
 var (
 	// ErrRelativePath occurs when path is relative (contains ".."")
-	ErrRelativePath = native_errors.New(`pathname contains relatives paths`)
+	ErrRelativePath = native_errors.New("pathname contains relatives paths")
 
 	// ErrOutsidePath occurs when path is not under served directory
-	ErrOutsidePath = native_errors.New(`pathname does not belong to served directory`)
+	ErrOutsidePath = native_errors.New("pathname does not belong to served directory")
 
 	copyBuffer = make([]byte, 32*1024)
 )
@@ -44,7 +44,7 @@ type App struct {
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		directory: fs.String(tools.ToCamel(fmt.Sprintf(`%sDirectory`, prefix)), `/data`, `[filesystem] Path to served directory`),
+		directory: fs.String(tools.ToCamel(fmt.Sprintf("%sDirectory", prefix)), "/data", "[filesystem] Path to served directory"),
 	}
 }
 
@@ -52,8 +52,8 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 func New(config Config) (*App, error) {
 	rootDirectory := *config.directory
 
-	if rootDirectory == `` {
-		return nil, errors.New(`no directory provided`)
+	if rootDirectory == "" {
+		return nil, errors.New("no directory provided")
 	}
 
 	info, err := os.Stat(rootDirectory)
@@ -62,7 +62,7 @@ func New(config Config) (*App, error) {
 	}
 
 	if !info.IsDir() {
-		return nil, errors.New(`unreachable dir %s`, rootDirectory)
+		return nil, errors.New("unreachable dir %s", rootDirectory)
 	}
 
 	app := &App{
@@ -70,7 +70,7 @@ func New(config Config) (*App, error) {
 		rootDirname:   info.Name(),
 	}
 
-	logger.Info(`Serving file from %s`, rootDirectory)
+	logger.Info("Serving file from %s", rootDirectory)
 
 	return app, nil
 }
@@ -80,7 +80,7 @@ func getFile(filename string) (io.WriteCloser, error) {
 }
 
 func (a App) checkPathname(pathname string) error {
-	if strings.Contains(pathname, `..`) {
+	if strings.Contains(pathname, "..") {
 		return ErrRelativePath
 	}
 
@@ -93,7 +93,7 @@ func (a App) getFullPath(pathname string) string {
 
 // Name of the storage
 func (a App) Name() string {
-	return `filesystem`
+	return "filesystem"
 }
 
 // Root name of the storage
@@ -192,7 +192,7 @@ func (a App) Upload(pathname string, content io.ReadCloser) error {
 	if storageFile != nil {
 		defer func() {
 			if err := storageFile.Close(); err != nil {
-				logger.Error(`%+v`, err)
+				logger.Error("%+v", err)
 			}
 		}()
 	}
@@ -225,7 +225,7 @@ func (a App) Rename(oldName, newName string) error {
 
 	_, err = a.Info(newName)
 	if err == nil {
-		return errors.New(`%s already exists`, newName)
+		return errors.New("%s already exists", newName)
 	}
 
 	if !provider.IsNotExist(err) {

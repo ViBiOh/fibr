@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	metadataFilename = path.Join(provider.MetadataDirectoryName, `.json`)
+	metadataFilename = path.Join(provider.MetadataDirectoryName, ".json")
 )
 
 func (a *App) loadMetadata() (err error) {
@@ -34,7 +34,7 @@ func (a *App) loadMetadata() (err error) {
 	if file != nil {
 		defer func() {
 			if closeErr := file.Close(); closeErr != nil {
-				err = errors.New(`%s and also %v`, err, closeErr)
+				err = errors.New("%s and also %v", err, closeErr)
 			}
 		}()
 	}
@@ -57,10 +57,10 @@ func (a *App) loadMetadata() (err error) {
 
 func (a *App) saveMetadata() (err error) {
 	if !a.metadataEnabled {
-		return errors.New(`metadata not enabled`)
+		return errors.New("metadata not enabled")
 	}
 
-	content, err := json.MarshalIndent(&a.metadatas, ``, `  `)
+	content, err := json.MarshalIndent(&a.metadatas, "", "  ")
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -69,7 +69,7 @@ func (a *App) saveMetadata() (err error) {
 	if file != nil {
 		defer func() {
 			if closeErr := file.Close(); closeErr != nil {
-				err = errors.New(`%s and also %v`, err, closeErr)
+				err = errors.New("%s and also %v", err, closeErr)
 			}
 		}()
 	}

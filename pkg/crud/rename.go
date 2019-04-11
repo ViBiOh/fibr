@@ -14,7 +14,7 @@ func (a *App) Rename(w http.ResponseWriter, r *http.Request, request *provider.R
 		return
 	}
 
-	newName, err := getFormFilepath(r, request, `newName`)
+	newName, err := getFormFilepath(r, request, "newName")
 	if err != nil {
 		if err == ErrNotAuthorized {
 			a.renderer.Error(w, http.StatusForbidden, err)
@@ -56,5 +56,5 @@ func (a *App) Rename(w http.ResponseWriter, r *http.Request, request *provider.R
 		return
 	}
 
-	a.List(w, request, r.URL.Query().Get(`d`), &provider.Message{Level: `success`, Content: fmt.Sprintf(`%s successfully renamed to %s`, info.Name, newName)})
+	a.List(w, request, r.URL.Query().Get("d"), &provider.Message{Level: "success", Content: fmt.Sprintf("%s successfully renamed to %s", info.Name, newName)})
 }

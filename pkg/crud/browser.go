@@ -38,10 +38,10 @@ func (a *App) Browser(w http.ResponseWriter, request *provider.Request, file *pr
 	}
 
 	content := map[string]interface{}{
-		`Paths`:    getPathParts(request),
-		`File`:     file,
-		`Previous`: previous,
-		`Next`:     next,
+		"Paths":    getPathParts(request),
+		"File":     file,
+		"Previous": previous,
+		"Next":     next,
 	}
 
 	a.renderer.File(w, request, content, message)

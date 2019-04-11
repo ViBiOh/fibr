@@ -15,10 +15,10 @@ import (
 
 var (
 	// ErrNotAuthorized error returned when user is not authorized
-	ErrNotAuthorized = errors.New(`you're not authorized to do this ⛔`)
+	ErrNotAuthorized = errors.New("you're not authorized to do this ⛔")
 
 	// ErrEmptyName error returned when user does not provide a name
-	ErrEmptyName = errors.New(`provided name is empty`)
+	ErrEmptyName = errors.New("provided name is empty")
 )
 
 // Config of package
@@ -39,7 +39,7 @@ type App struct {
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		metadata: fs.Bool(tools.ToCamel(fmt.Sprintf(`%sMetadata`, prefix)), true, `Enable metadata storage`),
+		metadata: fs.Bool(tools.ToCamel(fmt.Sprintf("%sMetadata", prefix)), true, "Enable metadata storage"),
 	}
 }
 
@@ -55,7 +55,7 @@ func New(config Config, storage provider.Storage, renderer provider.Renderer, th
 
 	if app.metadataEnabled {
 		if err := app.loadMetadata(); err != nil {
-			logger.Fatal(`%+v`, err)
+			logger.Fatal("%+v", err)
 		}
 
 		go thumbnailApp.Generate()
@@ -66,7 +66,7 @@ func New(config Config, storage provider.Storage, renderer provider.Renderer, th
 
 // GetShare returns share configuration if request path match
 func (a *App) GetShare(requestPath string) *provider.Share {
-	cleanPath := strings.TrimPrefix(requestPath, `/`)
+	cleanPath := strings.TrimPrefix(requestPath, "/")
 
 	for _, share := range a.metadatas {
 		if strings.HasPrefix(cleanPath, share.ID) {

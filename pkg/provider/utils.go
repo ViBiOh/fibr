@@ -26,16 +26,16 @@ func getTransformer() transform.Transformer {
 func SanitizeName(name string, removeSlash bool) (string, error) {
 	withoutDiacritics, _, err := transform.String(transformer, name)
 	if err != nil {
-		return ``, errors.WithStack(err)
+		return "", errors.WithStack(err)
 	}
 
-	withoutSpecials := specialChars.ReplaceAllString(withoutDiacritics, ``)
-	withoutSpaces := strings.Replace(withoutSpecials, ` `, `_`, -1)
+	withoutSpecials := specialChars.ReplaceAllString(withoutDiacritics, "")
+	withoutSpaces := strings.Replace(withoutSpecials, " ", "_", -1)
 	toLower := strings.ToLower(withoutSpaces)
 
 	sanitized := toLower
 	if removeSlash {
-		sanitized = strings.Replace(sanitized, `/`, `_`, -1)
+		sanitized = strings.Replace(sanitized, "/", "_", -1)
 	}
 
 	return sanitized, nil
@@ -49,7 +49,7 @@ func GetPathname(request *Request, name string) string {
 		paths = append(paths, request.GetPath())
 	}
 
-	if name != `` {
+	if name != "" {
 		paths = append(paths, name)
 	}
 
@@ -58,5 +58,5 @@ func GetPathname(request *Request, name string) string {
 
 // IsNotExist checks if error match a not found
 func IsNotExist(err error) bool {
-	return strings.HasSuffix(err.Error(), `no such file or directory`)
+	return strings.HasSuffix(err.Error(), "no such file or directory")
 }

@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/pkg/tools"
 	"github.com/ViBiOh/httputils/pkg/errors"
+	"github.com/ViBiOh/httputils/pkg/tools"
 	"github.com/ViBiOh/httputils/pkg/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -24,7 +24,7 @@ func (a *App) CreateShare(w http.ResponseWriter, r *http.Request, request *provi
 	var err error
 
 	edit := false
-	if editValue := strings.TrimSpace(r.FormValue(`edit`)); editValue != `` {
+	if editValue := strings.TrimSpace(r.FormValue("edit")); editValue != "" {
 		edit, err = strconv.ParseBool(editValue)
 		if err != nil {
 			a.renderer.Error(w, http.StatusBadRequest, errors.WithStack(err))
@@ -32,8 +32,8 @@ func (a *App) CreateShare(w http.ResponseWriter, r *http.Request, request *provi
 		}
 	}
 
-	password := ``
-	if passwordValue := strings.TrimSpace(r.FormValue(`password`)); passwordValue != `` {
+	password := ""
+	if passwordValue := strings.TrimSpace(r.FormValue("password")); passwordValue != "" {
 		hash, err := bcrypt.GenerateFromPassword([]byte(passwordValue), 12)
 		if err != nil {
 			a.renderer.Error(w, http.StatusInternalServerError, errors.WithStack(err))
@@ -67,8 +67,8 @@ func (a *App) CreateShare(w http.ResponseWriter, r *http.Request, request *provi
 	}
 
 	a.GetWithMessage(w, r, request, &provider.Message{
-		Level:   `success`,
-		Content: fmt.Sprintf(`Share successfully created with ID: %s`, id),
+		Level:   "success",
+		Content: fmt.Sprintf("Share successfully created with ID: %s", id),
 	})
 }
 
@@ -79,7 +79,7 @@ func (a *App) DeleteShare(w http.ResponseWriter, r *http.Request, request *provi
 		return
 	}
 
-	id := r.FormValue(`id`)
+	id := r.FormValue("id")
 
 	a.metadataLock.Lock()
 	defer a.metadataLock.Unlock()
@@ -97,7 +97,7 @@ func (a *App) DeleteShare(w http.ResponseWriter, r *http.Request, request *provi
 	}
 
 	a.GetWithMessage(w, r, request, &provider.Message{
-		Level:   `success`,
-		Content: fmt.Sprintf(`Share with id %s successfully deleted`, id),
+		Level:   "success",
+		Content: fmt.Sprintf("Share with id %s successfully deleted", id),
 	})
 }

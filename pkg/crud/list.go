@@ -15,12 +15,12 @@ func (a *App) List(w http.ResponseWriter, request *provider.Request, display str
 	}
 
 	content := map[string]interface{}{
-		`Paths`: getPathParts(request),
-		`Files`: files,
+		"Paths": getPathParts(request),
+		"Files": files,
 	}
 
 	if request.CanShare {
-		content[`Shares`] = a.metadatas
+		content["Shares"] = a.metadatas
 	}
 
 	a.renderer.Directory(w, request, content, display, message)

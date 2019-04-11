@@ -10,25 +10,25 @@ import (
 )
 
 // MetadataDirectoryName directory when metadata are stored
-const MetadataDirectoryName = `.fibr`
+const MetadataDirectoryName = ".fibr"
 
 var (
 	// ArchiveExtensions contains extensions of Archive
-	ArchiveExtensions = map[string]bool{`.zip`: true, `.tar`: true, `.gz`: true, `.rar`: true}
+	ArchiveExtensions = map[string]bool{".zip": true, ".tar": true, ".gz": true, ".rar": true}
 	// AudioExtensions contains extensions of Audio
-	AudioExtensions = map[string]bool{`.mp3`: true}
+	AudioExtensions = map[string]bool{".mp3": true}
 	// CodeExtensions contains extensions of Code
-	CodeExtensions = map[string]bool{`.html`: true, `.css`: true, `.js`: true, `.jsx`: true, `.json`: true, `.yml`: true, `.yaml`: true, `.toml`: true, `.md`: true, `.go`: true, `.py`: true, `.java`: true, `.xml`: true}
+	CodeExtensions = map[string]bool{".html": true, ".css": true, ".js": true, ".jsx": true, ".json": true, ".yml": true, ".yaml": true, ".toml": true, ".md": true, ".go": true, ".py": true, ".java": true, ".xml": true}
 	// ExcelExtensions contains extensions of Excel
-	ExcelExtensions = map[string]bool{`.xls`: true, `.xlsx`: true, `.xlsm`: true}
+	ExcelExtensions = map[string]bool{".xls": true, ".xlsx": true, ".xlsm": true}
 	// ImageExtensions contains extensions of Image
-	ImageExtensions = map[string]bool{`.jpg`: true, `.jpeg`: true, `.png`: true, `.gif`: true, `.svg`: true, `.tiff`: true}
+	ImageExtensions = map[string]bool{".jpg": true, ".jpeg": true, ".png": true, ".gif": true, ".svg": true, ".tiff": true}
 	// PdfExtensions contains extensions of Pdf
-	PdfExtensions = map[string]bool{`.pdf`: true}
+	PdfExtensions = map[string]bool{".pdf": true}
 	// VideoExtensions contains extensions of Video
-	VideoExtensions = map[string]string{`.mp4`: `video/mp4`, `.mov`: `video/quicktime`, `.avi`: `video/x-msvideo`}
+	VideoExtensions = map[string]string{".mp4": "video/mp4", ".mov": "video/quicktime", ".avi": "video/x-msvideo"}
 	// WordExtensions contains extensions of Word
-	WordExtensions = map[string]bool{`.doc`: true, `.docx`: true, `.docm`: true}
+	WordExtensions = map[string]bool{".doc": true, ".docx": true, ".docm": true}
 )
 
 // Request from user
@@ -76,10 +76,10 @@ func (p Page) PublicURL() string {
 
 	if p.Request != nil {
 		if p.Request.Share != nil {
-			url = fmt.Sprintf(`%s/%s`, url, p.Request.Share.ID)
+			url = fmt.Sprintf("%s/%s", url, p.Request.Share.ID)
 		}
 
-		url = fmt.Sprintf(`%s%s`, url, p.Request.Path)
+		url = fmt.Sprintf("%s%s", url, p.Request.Path)
 	}
 
 	return url
@@ -91,14 +91,14 @@ func (p Page) Title() string {
 
 	if p.Request != nil {
 		if p.Request.Share != nil {
-			title = fmt.Sprintf(`%s - %s`, title, p.Request.Share.RootName)
+			title = fmt.Sprintf("%s - %s", title, p.Request.Share.RootName)
 		} else {
-			title = fmt.Sprintf(`%s - %s`, title, p.Config.RootName)
+			title = fmt.Sprintf("%s - %s", title, p.Config.RootName)
 		}
 
-		path := strings.Trim(p.Request.Path, `/`)
-		if path != `` {
-			title = fmt.Sprintf(`%s - %s`, title, path)
+		path := strings.Trim(p.Request.Path, "/")
+		if path != "" {
+			title = fmt.Sprintf("%s - %s", title, path)
 		}
 	}
 
@@ -111,13 +111,13 @@ func (p Page) Description() string {
 
 	if p.Request != nil {
 		if p.Request.Share != nil {
-			description = fmt.Sprintf(`%s - %s`, description, p.Request.Share.RootName)
+			description = fmt.Sprintf("%s - %s", description, p.Request.Share.RootName)
 		} else {
-			description = fmt.Sprintf(`%s - %s`, description, p.Config.RootName)
+			description = fmt.Sprintf("%s - %s", description, p.Config.RootName)
 		}
 
-		if p.Request.Path != `` {
-			description = fmt.Sprintf(`%s/%s`, description, strings.Trim(p.Request.Path, `/`))
+		if p.Request.Path != "" {
+			description = fmt.Sprintf("%s/%s", description, strings.Trim(p.Request.Path, "/"))
 		}
 	}
 
@@ -177,19 +177,19 @@ func (s StorageItem) Extension() string {
 // Mime gives Mime Type of item
 func (s StorageItem) Mime() string {
 	extension := s.Extension()
-	if mime := mime.TypeByExtension(extension); mime != `` {
+	if mime := mime.TypeByExtension(extension); mime != "" {
 		return mime
 	}
 
 	if CodeExtensions[extension] {
-		return `text/plain`
+		return "text/plain"
 	}
 
 	if mime, ok := VideoExtensions[extension]; ok {
 		return mime
 	}
 
-	return ``
+	return ""
 }
 
 // IsImage determine if item if an image
@@ -199,7 +199,7 @@ func (s StorageItem) IsImage() bool {
 
 // IsVideo determine if item if a video
 func (s StorageItem) IsVideo() bool {
-	return VideoExtensions[s.Extension()] != ``
+	return VideoExtensions[s.Extension()] != ""
 }
 
 // Storage describe action on a storage provider

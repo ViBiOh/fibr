@@ -28,9 +28,9 @@ const (
 
 var (
 	ignoredThumbnailDir = map[string]bool{
-		`vendor`:       true,
-		`vendors`:      true,
-		`node_modules`: true,
+		"vendor":       true,
+		"vendors":      true,
+		"node_modules": true,
 	}
 )
 
@@ -53,18 +53,18 @@ type App struct {
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		imaginaryURL: fs.String(tools.ToCamel(fmt.Sprintf(`%sImaginaryURL`, prefix)), `http://image:9000`, `[thumbnail] Imaginary URL`),
+		imaginaryURL: fs.String(tools.ToCamel(fmt.Sprintf("%sImaginaryURL", prefix)), "http://image:9000", "[thumbnail] Imaginary URL"),
 	}
 }
 
 // New creates new App from Config
 func New(config Config, storage provider.Storage) *App {
-	if *config.imaginaryURL == `` {
+	if *config.imaginaryURL == "" {
 		return &App{}
 	}
 
 	app := &App{
-		imaginaryURL:  fmt.Sprintf(`%s/crop?width=150&height=150&stripmeta=true&noprofile=true&quality=80&type=jpeg`, *config.imaginaryURL),
+		imaginaryURL:  fmt.Sprintf("%s/crop?width=150&height=150&stripmeta=true&noprofile=true&quality=80&type=jpeg", *config.imaginaryURL),
 		storage:       storage,
 		pathnameInput: make(chan string, 10),
 	}
@@ -75,9 +75,9 @@ func New(config Config, storage provider.Storage) *App {
 			time.Sleep(waitTimeout)
 
 			if err := app.generateThumbnail(pathname); err != nil {
-				logger.Error(`%+v`, err)
+				logger.Error("%+v", err)
 			} else {
-				logger.Info(`Thumbnail generated for %s`, pathname)
+				logger.Info("Thumbnail generated for %s", pathname)
 			}
 		}
 	}()
@@ -114,7 +114,7 @@ func (a App) ServeIfPresent(w http.ResponseWriter, r *http.Request, pathname str
 
 func safeWrite(w io.Writer, content string) {
 	if _, err := io.WriteString(w, content); err != nil {
-		logger.Error(`%+v`, errors.WithStack(err))
+		logger.Error("%+v", errors.WithStack(err))
 	}
 }
 
@@ -131,12 +131,12 @@ func (a App) List(w http.ResponseWriter, r *http.Request, pathname string) {
 		return
 	}
 
-	w.Header().Set(`Content-Type`, `application/json; charset=utf-8`)
-	w.Header().Set(`Cache-Control`, `no-cache`)
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("Cache-Control", "no-cache")
 	w.WriteHeader(http.StatusOK)
 
 	commaNeeded := false
-	safeWrite(w, `{`)
+	safeWrite(w, "{")
 
 	for _, item := range items {
 		if item.IsDir || !a.HasThumbnail(item.Pathname) {
@@ -145,16 +145,16 @@ func (a App) List(w http.ResponseWriter, r *http.Request, pathname string) {
 
 		file, err := a.storage.Read(getThumbnailPath(item.Pathname))
 		if err != nil {
-			logger.Error(`unable to open %s: %+v`, item.Pathname, err)
+			logger.Error("unable to open %s: %+v", item.Pathname, err)
 		}
 
 		content, err := ioutil.ReadAll(file)
 		if err != nil {
-			logger.Error(`unable to read %s: %+v`, item.Pathname, errors.WithStack(err))
+			logger.Error("unable to read %s: %+v", item.Pathname, errors.WithStack(err))
 		}
 
 		if commaNeeded {
-			safeWrite(w, `,`)
+			safeWrite(w, ",")
 		} else {
 			commaNeeded = true
 		}
@@ -163,7 +163,7 @@ func (a App) List(w http.ResponseWriter, r *http.Request, pathname string) {
 		safeWrite(w, fmt.Sprintf(`"%s"`, base64.StdEncoding.EncodeToString(content)))
 	}
 
-	safeWrite(w, `}`)
+	safeWrite(w, "}")
 }
 
 func (a App) generateThumbnail(pathname string) error {
@@ -195,11 +195,11 @@ func (a App) generateThumbnail(pathname string) error {
 func getThumbnailPath(pathname string) string {
 	fullPath := path.Join(provider.MetadataDirectoryName, pathname)
 
-	return fmt.Sprintf(`%s.jpg`, strings.TrimSuffix(fullPath, path.Ext(fullPath)))
+	return fmt.Sprintf("%s.jpg", strings.TrimSuffix(fullPath, path.Ext(fullPath)))
 }
 
 func (a App) isEnabled() bool {
-	return a.imaginaryURL != `` && a.storage != nil
+	return a.imaginaryURL != "" && a.storage != nil
 }
 
 // Generate thumbnail for all storage
@@ -209,7 +209,7 @@ func (a App) Generate() {
 	}
 
 	err := a.storage.Walk(func(item *provider.StorageItem, _ error) error {
-		if item.IsDir && strings.HasPrefix(item.Name, `.`) || ignoredThumbnailDir[item.Name] {
+		if item.IsDir && strings.HasPrefix(item.Name, ".") || ignoredThumbnailDir[item.Name] {
 			return filepath.SkipDir
 		}
 
@@ -223,7 +223,7 @@ func (a App) Generate() {
 	})
 
 	if err != nil {
-		logger.Error(`%+v`, err)
+		logger.Error("%+v", err)
 	}
 }
 

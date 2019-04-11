@@ -11,7 +11,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:af7f75e2107c5f6b3b3d742cb04a95a5e747d1e590bd7bf8b55625d081a9c10e"
+  digest = "1:4b08c2b40717d2d3a3d41eb6720e03d31566fd59a62bc29d226af4e94c0e972c"
   name = "github.com/ViBiOh/auth"
   packages = [
     "pkg/auth",
@@ -22,11 +22,11 @@
     "pkg/model",
   ]
   pruneopts = "UT"
-  revision = "7e9caa63d2bb1fdf936c8d303ea22d9f86c8a524"
+  revision = "be9b930ba77255972183d1ce8369914e0a9e250c"
 
 [[projects]]
   branch = "master"
-  digest = "1:ade785894b7041feb088593d175edbde198bdc6998ed6959ea835b2c157c5ebc"
+  digest = "1:7faf8864f1c8d4d5aed03fca928b7e010c01d5bfbcb194cf3e9443c83c481d65"
   name = "github.com/ViBiOh/httputils"
   packages = [
     "pkg",
@@ -52,7 +52,7 @@
     "pkg/uuid",
   ]
   pruneopts = "UT"
-  revision = "002301d92a6a400d3dd251d112d42a496c54bbea"
+  revision = "c191236038f12c99cd630821c708457637cba3ce"
 
 [[projects]]
   branch = "master"

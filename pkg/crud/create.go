@@ -33,5 +33,5 @@ func (a *App) Create(w http.ResponseWriter, r *http.Request, request *provider.R
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf(`%s/?message=%s&messageLevel=success`, pathname, url.QueryEscape(fmt.Sprintf(`Directory %s successfully created`, path.Base(pathname)))), http.StatusMovedPermanently)
+	http.Redirect(w, r, fmt.Sprintf("%s/?message=%s&messageLevel=success", pathname, url.QueryEscape(fmt.Sprintf("Directory %s successfully created", path.Base(pathname)))), http.StatusMovedPermanently)
 }
