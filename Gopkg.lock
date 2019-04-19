@@ -22,7 +22,7 @@
     "pkg/model",
   ]
   pruneopts = "UT"
-  revision = "7235e104b5d6a79550d0d7f67ca08cc3a7d4e67b"
+  revision = "de806f1e09f6e6d047588baed0b7d98961b265e8"
 
 [[projects]]
   branch = "master"
@@ -52,15 +52,15 @@
     "pkg/uuid",
   ]
   pruneopts = "UT"
-  revision = "62297f2e814369e4226a4ebd7a7b524275888e9d"
+  revision = "751b4f2862d35d785f73bef12e38733e610e3b56"
 
 [[projects]]
-  branch = "master"
   digest = "1:d6afaeed1502aa28e80a4ed0981d570ad91b2579193404256ce672ed0a609e0d"
   name = "github.com/beorn7/perks"
   packages = ["quantile"]
   pruneopts = "UT"
-  revision = "234731a4f01687625231ac651d6b2776e3f3142e"
+  revision = "4b2b341e8d7715fae06375aa633dbb6e91b3fb46"
+  version = "v1.0.0"
 
 [[projects]]
   digest = "1:318f1c959a8a740366fce4b1e1eb2fd914036b4af58fbd0a003349b305f118ad"
@@ -140,11 +140,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:5e412e2a03bd0cfdb102db97212be2e625df74fa8b2d4a8a51f107b1456e256b"
+  digest = "1:49b09905e781d7775c086604cc00083e1832d0783f1f421b79f42657c457d029"
   name = "github.com/prometheus/procfs"
   packages = ["."]
   pruneopts = "UT"
-  revision = "e22ddced71425e65e388b17b7d0289c5ea77d06e"
+  revision = "8368d24ba045f26503eb745b624d930cbe214c79"
 
 [[projects]]
   digest = "1:48c8c8d1fb550f059bcb5696a6f333693e19e3bad4db00d5c9b19f3846629511"
@@ -219,7 +219,7 @@
     "blowfish",
   ]
   pruneopts = "UT"
-  revision = "88737f569e3a9c7ab309cdc09a07fe7fc87233c3"
+  revision = "df01cb2cc480549d72034218dd98bf97671450ac"
 
 [[projects]]
   digest = "1:8029e9743749d4be5bc9f7d42ea1659471767860f0cdc34d37c3111bd308a295"
