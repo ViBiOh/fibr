@@ -30,10 +30,6 @@ services:
     volumes:
     - ${DATA_DIR}:/data
     user: '${DATA_USER_ID}'
-    logging:
-      driver: json-file
-      options:
-        max-size: '10m'
     restart: on-failure:5
     read_only: true
     cpu_shares: 128
@@ -48,10 +44,6 @@ services:
     healthcheck:
       test: ["CMD", "ps", "-p", "1", "--no-headers"]
       retries: 10
-    logging:
-      driver: json-file
-      options:
-        max-size: '10m'
     restart: on-failure:5
     read_only: true
     cpu_shares: 128
