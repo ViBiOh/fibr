@@ -14,7 +14,7 @@ RUN make ${APP_NAME} \
 FROM scratch
 
 ENV APP_NAME fibr
-HEALTHCHECK --retries=10 CMD [ "/fibr", "-url", "https://localhost:1080/health" ]
+HEALTHCHECK --retries=10 CMD [ "/fibr", "-url", "http://localhost:1080/health" ]
 
 EXPOSE 1080
 ENTRYPOINT [ "/fibr" ]
