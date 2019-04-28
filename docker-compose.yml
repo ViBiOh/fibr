@@ -21,7 +21,7 @@ services:
     labels:
       traefik.frontend.passHostHeader: 'true'
       traefik.frontend.rule: 'Host: fibr.vibioh.fr'
-      traefik.protocol: 'https'
+      traefik.protocol: 'http'
       traefik.port: '1080'
       traefik.frontend.rateLimit.extractorFunc: 'client.ip'
       traefik.frontend.rateLimit.rateSet.first.period: '60s'

@@ -82,7 +82,7 @@ bench:
 ## build: Build binary of app
 .PHONY: build
 build:
-	CGO_ENABLED=0 go build -ldflags="-s -w" -installsuffix nocgo -o $(BINARY_PATH) cmd/fibr.go
+	CGO_ENABLED=0 go build -ldflags="-s -w" -installsuffix nocgo -o $(BINARY_PATH) $(SERVER_SOURCE)
 
 ## start-deps: Download start dependencies
 .PHONY: start-deps
@@ -93,7 +93,6 @@ start-deps:
 .PHONY: start
 start:
 	$(SERVER_RUNNER) \
-		-tls=false \
 		-fsDirectory "$(pwd)" \
 		-publicURL "http://localhost:1080" \
 		-authUsers "admin:admin" \

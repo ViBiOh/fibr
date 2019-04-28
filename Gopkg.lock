@@ -22,16 +22,15 @@
     "pkg/model",
   ]
   pruneopts = "UT"
-  revision = "de806f1e09f6e6d047588baed0b7d98961b265e8"
+  revision = "4aa85158665da5ea44aad4b27c1f7058c9e74688"
 
 [[projects]]
   branch = "master"
-  digest = "1:7faf8864f1c8d4d5aed03fca928b7e010c01d5bfbcb194cf3e9443c83c481d65"
+  digest = "1:bf145b7af0d985ddd3ef7397580a95ad8e63dd095e9d5bbd83d1b4c93b429cef"
   name = "github.com/ViBiOh/httputils"
   packages = [
     "pkg",
     "pkg/alcotest",
-    "pkg/cert",
     "pkg/crud",
     "pkg/errors",
     "pkg/gzip",
@@ -52,7 +51,7 @@
     "pkg/uuid",
   ]
   pruneopts = "UT"
-  revision = "751b4f2862d35d785f73bef12e38733e610e3b56"
+  revision = "7f155d4514001316eedafe5a74a3a52659a2fb5c"
 
 [[projects]]
   digest = "1:d6afaeed1502aa28e80a4ed0981d570ad91b2579193404256ce672ed0a609e0d"
@@ -140,11 +139,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:49b09905e781d7775c086604cc00083e1832d0783f1f421b79f42657c457d029"
+  digest = "1:2ea45e71e0198d6b989ed6302cc4f72a83be1e7d6469d08a59e56a2c447aea55"
   name = "github.com/prometheus/procfs"
   packages = ["."]
   pruneopts = "UT"
-  revision = "8368d24ba045f26503eb745b624d930cbe214c79"
+  revision = "87a4384529e0652f5035fb5cc8095faf73ea9b0b"
 
 [[projects]]
   digest = "1:48c8c8d1fb550f059bcb5696a6f333693e19e3bad4db00d5c9b19f3846629511"
@@ -219,10 +218,10 @@
     "blowfish",
   ]
   pruneopts = "UT"
-  revision = "df01cb2cc480549d72034218dd98bf97671450ac"
+  revision = "a29dc8fdc73485234dbef99ebedb95d2eced08de"
 
 [[projects]]
-  digest = "1:8029e9743749d4be5bc9f7d42ea1659471767860f0cdc34d37c3111bd308a295"
+  digest = "1:1093f2eb4b344996604f7d8b29a16c5b22ab9e1b25652140d3fede39f640d5cd"
   name = "golang.org/x/text"
   packages = [
     "internal/gen",
@@ -233,8 +232,8 @@
     "unicode/norm",
   ]
   pruneopts = "UT"
-  revision = "f21a4dfb5e38f5895301dc265a8def02365cc3d0"
-  version = "v0.3.0"
+  revision = "342b2e1fbaa52c93f31447ad2c6abc048c63e475"
+  version = "v0.3.2"
 
 [solve-meta]
   analyzer-name = "dep"

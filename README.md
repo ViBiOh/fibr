@@ -23,8 +23,10 @@ Usage of fibr:
         [auth] Auth URL, if remote
   -authUsers string
         [auth] Allowed users and profiles (e.g. user:profile1|profile2,user2:profile3). Empty allow any identified user
-  -basicUsers string
-        [basic] Users in the form "id:username:password,id2:username2:password2"
+  -basicUsers id:username:password,id2:username2:password2
+        [basic] Users in the form id:username:password,id2:username2:password2
+  -cert string
+        [http] Certificate file
   -csp string
         [owasp] Content-Security-Policy (default "default-src 'self'; base-uri 'self'")
   -frameOptions string
@@ -33,34 +35,26 @@ Usage of fibr:
         [filesystem] Path to served directory (default "/data")
   -hsts
         [owasp] Indicate Strict Transport Security (default true)
+  -key string
+        [http] Key file
   -metadata
         Enable metadata storage (default true)
   -port int
-        Listen port (default 1080)
+        [http] Listen port (default 1080)
   -prometheusPath string
         [prometheus] Path for exposing metrics (default "/metrics")
   -publicURL string
         [fibr] Public URL (default "https://fibr.vibioh.fr")
   -thumbnailImaginaryURL string
         [thumbnail] Imaginary URL (default "http://image:9000")
-  -tls
-        Serve TLS content (default true)
-  -tlsCert string
-        [tls] PEM Certificate file
-  -tlsHosts string
-        [tls] Self-signed certificate hosts, comma separated (default "localhost")
-  -tlsKey string
-        [tls] PEM Key file
-  -tlsOrganization string
-        [tls] Self-signed certificate organization (default "ViBiOh")
   -tracingAgent string
-        [opentracing] Jaeger Agent (e.g. host:port) (default "jaeger:6831")
+        [tracing] Jaeger Agent (e.g. host:port) (default "jaeger:6831")
   -tracingName string
-        [opentracing] Service name
+        [tracing] Service name
   -url string
-        [health] URL to check
+        [alcotest] URL to check
   -userAgent string
-        [health] User-Agent for check (default "Golang alcotest")
+        [alcotest] User-Agent for check (default "Golang alcotest")
   -version string
         [fibr] Version (used mainly as a cache-buster)
 ```
