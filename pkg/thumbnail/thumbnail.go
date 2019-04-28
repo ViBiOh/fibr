@@ -93,19 +93,21 @@ func (a App) CanHaveThumbnail(pathname string) bool {
 }
 
 // HasThumbnail determine if thumbnail exist for given pathname
-func (a App) HasThumbnail(pathname string) bool {
+func (a App) HasThumbnail(pathname string) (string, bool) {
 	if !a.isEnabled() {
-		return false
+		return "", false
 	}
 
-	_, err := a.storage.Info(getThumbnailPath(pathname))
-	return err == nil
+	thumbnailPath := getThumbnailPath(pathname)
+
+	_, err := a.storage.Info(thumbnailPath)
+	return thumbnailPath, err == nil
 }
 
 // ServeIfPresent check if thumbnail is present and serve it
 func (a App) ServeIfPresent(w http.ResponseWriter, r *http.Request, pathname string) bool {
-	if a.HasThumbnail(pathname) {
-		a.storage.Serve(w, r, getThumbnailPath(pathname))
+	if thumbnailPath, ok := a.HasThumbnail(pathname); ok {
+		a.storage.Serve(w, r, thumbnailPath)
 		return true
 	}
 
@@ -139,11 +141,16 @@ func (a App) List(w http.ResponseWriter, r *http.Request, pathname string) {
 	safeWrite(w, "{")
 
 	for _, item := range items {
-		if item.IsDir || !a.HasThumbnail(item.Pathname) {
+		if item.IsDir {
 			continue
 		}
 
-		file, err := a.storage.Read(getThumbnailPath(item.Pathname))
+		thumbnailPath, ok := a.HasThumbnail(item.Pathname)
+		if !ok {
+			continue
+		}
+
+		file, err := a.storage.Read(thumbnailPath)
 		if err != nil {
 			logger.Error("unable to open %s: %+v", item.Pathname, err)
 		}
@@ -213,7 +220,11 @@ func (a App) Generate() {
 			return filepath.SkipDir
 		}
 
-		if !a.CanHaveThumbnail(item.Pathname) || a.HasThumbnail(item.Pathname) {
+		if !a.CanHaveThumbnail(item.Pathname) {
+			return nil
+		}
+
+		if _, ok := a.HasThumbnail(item.Pathname); ok {
 			return nil
 		}
 

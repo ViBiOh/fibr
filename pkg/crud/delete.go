@@ -31,5 +31,12 @@ func (a *App) Delete(w http.ResponseWriter, r *http.Request, request *provider.R
 		return
 	}
 
+	if thumbnailPath, ok := a.thumbnailApp.HasThumbnail(pathname); ok {
+		if err := a.storage.Remove(thumbnailPath); err != nil {
+			a.renderer.Error(w, http.StatusInternalServerError, err)
+			return
+		}
+	}
+
 	a.List(w, request, r.URL.Query().Get("d"), &provider.Message{Level: "success", Content: fmt.Sprintf("%s successfully deleted", info.Name)})
 }
