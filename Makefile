@@ -25,7 +25,7 @@ $(APP_NAME): deps go
 
 ## go: Build Golang app
 .PHONY: go
-go: format lint tst bench build
+go: format lint test bench build
 
 ## name: Output name of app
 .PHONY: name
@@ -69,9 +69,9 @@ lint:
 	errcheck -ignoretests $(APP_PACKAGES)
 	go vet $(APP_PACKAGES)
 
-## tst: Test code of app with coverage
-.PHONY: tst
-tst:
+## test: Test code of app with coverage
+.PHONY: test
+test:
 	script/coverage
 
 ## bench: Benchmark code of app
