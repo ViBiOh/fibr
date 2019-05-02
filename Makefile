@@ -93,10 +93,10 @@ start-deps:
 .PHONY: start
 start:
 	$(SERVER_RUNNER) \
-		-fsDirectory "$(pwd)" \
+		-fsDirectory "$(PWD)" \
 		-publicURL "http://localhost:1080" \
 		-authUsers "admin:admin" \
-		-basicUsers "1:admin:$(bcrypt admin)" \
+		-basicUsers "1:`htpasswd -nBb admin admin`" \
 		-frameOptions "SAMEORIGIN" \
 		-thumbnailImaginaryURL "" \
 		-csp "default-src 'self'; base-uri 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:"

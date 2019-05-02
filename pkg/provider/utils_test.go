@@ -2,7 +2,7 @@ package provider
 
 import "testing"
 
-func Test_SanitizeName(t *testing.T) {
+func TestSanitizeName(t *testing.T) {
 	var cases = []struct {
 		intention   string
 		name        string

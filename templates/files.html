@@ -25,37 +25,40 @@
     /**
      * Async image loading
      */
-    function getThumbnails() {
-      return fetch('?thumbnail', { credentials: 'same-origin' }).then(response => {
-        if (response.status >= 400) {
-          return Promise.reject('unable to load thumbnails');
-        }
-        return response.json();
-      });
+    async function getThumbnails() {
+      const response = await fetch('?thumbnail', { credentials: 'same-origin' })
+
+      if (response.status >= 400) {
+        return Promise.reject('unable to load thumbnails');
+      }
+
+      if (response.status === 204) {
+        return {};
+      }
+
+      return response.json();
     }
 
     window.addEventListener(
       'load',
-      () => {
+      async () => {
         document.querySelectorAll('[data-picture]').forEach(picture => {
           replaceContent(picture, generateThrobber());
         });
 
-        getThumbnails()
-          .then(thumbnails => {
-            Object.keys(thumbnails).forEach(id => {
-              const picture = document.getElementById(`picture-${id}`);
+        const thumbnails = await getThumbnails();
 
-              if (picture) {
-                const img = new Image();
-                img.src = `data:image/jpeg;base64,${thumbnails[id]}`;
-                img.alt = picture.dataset.alt;
+        Object.keys(thumbnails).forEach(id => {
+          const picture = document.getElementById(`picture-${id}`);
 
-                replaceContent(picture, img);
-              }
-            });
-          })
-          .catch(e => console.error(e));
+          if (picture) {
+            const img = new Image();
+            img.src = `data:image/jpeg;base64,${thumbnails[id]}`;
+            img.alt = picture.dataset.alt;
+
+            replaceContent(picture, img);
+          }
+        });
       },
       false,
     );

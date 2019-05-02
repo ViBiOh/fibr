@@ -39,8 +39,10 @@
      * @param  {Object}          data Data to hash
      * @return {Promise<String>}      Promise that will resolve the sha1 string
      */
-    function sha1(data) {
-      return crypto.subtle.digest('SHA-1', new TextEncoder('utf-8').encode(data)).then(bufferToHex);
+    async function sha1(data) {
+      const buffer = await crypto.subtle.digest('SHA-1', new TextEncoder('utf-8').encode(data))
+
+      return bufferToHex(buffer);
     }
 
     /**
@@ -48,8 +50,9 @@
      * @param  {File} file       File to generate id from.
      * @return {Promise<String>} Promise that will resolve the message id.
      */
-    function fileMessageId(file) {
-      return sha1(file.name).then(hash => `upload-file-${hash}`);
+    async function fileMessageId(file) {
+      const hash = await sha1(file.name);
+      return `upload-file-${hash}`;
     }
 
     /**
@@ -58,33 +61,33 @@
      * @param  {File}    file      File to generate an item
      * @param  {Number}  index     Index of generated file
      */
-    function addUploadItem(container, file) {
-      return fileMessageId(file).then(messageId => {
-        const item = document.createElement('div');
-        item.id = messageId;
-        item.classList.add('flex', 'flex-center');
+    async function addUploadItem(container, file) {
+      const messageId = await fileMessageId(file);
 
-        const progressWrapper = document.createElement('div');
-        progressWrapper.classList.add('upload-item', 'full');
-        item.appendChild(progressWrapper);
+      const item = document.createElement('div');
+      item.id = messageId;
+      item.classList.add('flex', 'flex-center');
 
-        const filename = document.createElement('div');
-        filename.classList.add('upload-name');
-        filename.innerHTML = file.name;
-        progressWrapper.appendChild(filename);
+      const progressWrapper = document.createElement('div');
+      progressWrapper.classList.add('upload-item', 'full');
+      item.appendChild(progressWrapper);
 
-        const progress = document.createElement('progress');
-        progress.classList.add('full');
-        progress.max = 100;
-        progress.value = 0;
-        progressWrapper.appendChild(progress);
+      const filename = document.createElement('div');
+      filename.classList.add('upload-name');
+      filename.innerHTML = file.name;
+      progressWrapper.appendChild(filename);
 
-        const status = document.createElement('span');
-        status.classList.add('upload-status');
-        item.appendChild(status);
+      const progress = document.createElement('progress');
+      progress.classList.add('full');
+      progress.max = 100;
+      progress.value = 0;
+      progressWrapper.appendChild(progress);
 
-        container.appendChild(item);
-      });
+      const status = document.createElement('span');
+      status.classList.add('upload-status');
+      item.appendChild(status);
+
+      container.appendChild(item);
     }
 
     /**
@@ -92,21 +95,21 @@
      * @param {File} file    File to generate message
      * @param {Any} content  Content of message
      */
-    function setUploadStatus(file, content, style) {
-      return fileMessageId(file).then(messageId => {
-        const container = document.getElementById(messageId);
-        if (!container) {
-          return;
-        }
+    async function setUploadStatus(file, content, style) {
+      const messageId = await fileMessageId(file);
 
-        const statusContainer = container.querySelector('.upload-status');
-        if (!statusContainer) {
-          return;
-        }
+      const container = document.getElementById(messageId);
+      if (!container) {
+        return;
+      }
 
-        statusContainer.innerHTML = content;
-        statusContainer.classList.add(style);
-      });
+      const statusContainer = container.querySelector('.upload-status');
+      if (!statusContainer) {
+        return;
+      }
+
+      statusContainer.innerHTML = content;
+      statusContainer.classList.add(style);
     }
 
     /**
@@ -115,41 +118,41 @@
      * @param  {File} file     File to upload
      * @return {Promise}       Promise of upload
      */
-    function uploadFile(method, file) {
+    async function uploadFile(method, file) {
       return new Promise((resolve, reject) => {
-        fileMessageId(file).then(messageId => {
-          const xhr = new XMLHttpRequest();
+        const messageId = fileMessageId(file);
 
-          const container = document.getElementById(messageId);
-          if (container) {
-            const progress = container.querySelector('progress');
+        const xhr = new XMLHttpRequest();
 
-            if (progress) {
-              xhr.upload.addEventListener(
-                'progress',
-                e => (progress.value = parseInt((e.loaded / e.total) * 100, 10)),
-                false,
-              );
+        const container = document.getElementById(messageId);
+        if (container) {
+          const progress = container.querySelector('progress');
+
+          if (progress) {
+            xhr.upload.addEventListener(
+              'progress',
+              e => (progress.value = parseInt((e.loaded / e.total) * 100, 10)),
+              false,
+            );
+          }
+        }
+
+        xhr.onreadystatechange = e => {
+          if (xhr.readyState == 4) {
+            if (xhr.status < 400) {
+              resolve(e);
+            } else {
+              reject(e);
             }
           }
+        };
 
-          xhr.onreadystatechange = e => {
-            if (xhr.readyState == 4) {
-              if (xhr.status < 400) {
-                resolve(e);
-              } else {
-                reject(e);
-              }
-            }
-          };
+        const formData = new FormData();
+        formData.append('method', method);
+        formData.append('files[]', file);
 
-          const formData = new FormData();
-          formData.append('method', method);
-          formData.append('files[]', file);
-
-          xhr.open('POST', '', true);
-          xhr.send(formData);
-        });
+        xhr.open('POST', '', true);
+        xhr.send(formData);
       });
     }
 
@@ -157,7 +160,7 @@
      * Handle upload submit
      * @param  {Object} e Submit event
      */
-    function upload(e) {
+    async function upload(e) {
       e.preventDefault();
 
       const uploadButton = document.getElementById('upload-button');
@@ -196,15 +199,14 @@
         );
       });
 
-      Promise.all(promises)
-        .then(() => {
-          document.location.hash = '#upload-success';
-        })
-        .catch(() => {
-          if (uploadButton) {
-            uploadButton.innerHTML = 'Upload';
-          }
-        });
+      try {
+        await Promise.all(promises)
+        document.location.hash = '#upload-success';
+      } catch (e) {
+        if (uploadButton) {
+          uploadButton.innerHTML = 'Upload';
+        }
+      }
 
       return false;
     }
