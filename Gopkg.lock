@@ -22,11 +22,11 @@
     "pkg/model",
   ]
   pruneopts = "UT"
-  revision = "4aa85158665da5ea44aad4b27c1f7058c9e74688"
+  revision = "5d1e0683275b61de2c9538a467c8da50ad5231ad"
 
 [[projects]]
   branch = "master"
-  digest = "1:bf145b7af0d985ddd3ef7397580a95ad8e63dd095e9d5bbd83d1b4c93b429cef"
+  digest = "1:bd922d8d0d50cfef97fbb4caa8cd388ddf9ed80acb7308449417bb6efc116b45"
   name = "github.com/ViBiOh/httputils"
   packages = [
     "pkg",
@@ -51,7 +51,7 @@
     "pkg/uuid",
   ]
   pruneopts = "UT"
-  revision = "7f155d4514001316eedafe5a74a3a52659a2fb5c"
+  revision = "205ac7f9dd32f4060cefa8744aaf349126e6ad67"
 
 [[projects]]
   digest = "1:d6afaeed1502aa28e80a4ed0981d570ad91b2579193404256ce672ed0a609e0d"
@@ -139,11 +139,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:2ea45e71e0198d6b989ed6302cc4f72a83be1e7d6469d08a59e56a2c447aea55"
+  digest = "1:08f5524b0ca33fab03c05bd0015337c1d5658c3cf580d4772d789cbe42344db3"
   name = "github.com/prometheus/procfs"
-  packages = ["."]
+  packages = [
+    ".",
+    "internal/fs",
+  ]
   pruneopts = "UT"
-  revision = "87a4384529e0652f5035fb5cc8095faf73ea9b0b"
+  revision = "740c0778500738e56e1877d52904c431a3fdc573"
 
 [[projects]]
   digest = "1:48c8c8d1fb550f059bcb5696a6f333693e19e3bad4db00d5c9b19f3846629511"
