@@ -1,11 +1,9 @@
 SHELL = /bin/sh
 
 APP_NAME ?= fibr
-VERSION ?= $(shell git rev-parse --short HEAD)
-AUTHOR ?= $(shell git log --pretty=format:'%an' -n 1)
 
 PACKAGES ?= ./...
-APP_PACKAGES = $(shell go list -e $(PACKAGES) | grep -v vendor | grep -v node_modules)
+APP_PACKAGES = $(shell go list -e $(PACKAGES) | grep -v node_modules)
 
 GOBIN=bin
 BINARY_PATH=$(GOBIN)/$(APP_NAME)
@@ -40,21 +38,19 @@ dist:
 ## version: Output sha1 of last commit
 .PHONY: version
 version:
-	@echo -n $(VERSION)
+	@echo -n $(shell git rev-parse --short HEAD)
 
 ## author: Output author's name of last commit
 .PHONY: author
 author:
-	@python -c 'import sys; import urllib; sys.stdout.write(urllib.quote_plus(sys.argv[1]))' "$(AUTHOR)"
+	@python -c 'import sys; import urllib; sys.stdout.write(urllib.quote_plus(sys.argv[1]))' "$(shell git log --pretty=format:'%an' -n 1)"
 
 ## deps: Download dependencies
 .PHONY: deps
 deps:
-	go get github.com/golang/dep/cmd/dep
 	go get github.com/kisielk/errcheck
 	go get golang.org/x/lint/golint
 	go get golang.org/x/tools/cmd/goimports
-	dep ensure
 
 ## format: Format code of app
 .PHONY: format

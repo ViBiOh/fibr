@@ -1,15 +1,12 @@
 FROM golang:1.12 as builder
 
 ENV APP_NAME fibr
-ENV WORKDIR ${GOPATH}/src/github.com/ViBiOh/fibr
 
-WORKDIR ${WORKDIR}
-COPY ./ ${WORKDIR}/
+WORKDIR /app
+COPY . .
 
 RUN make ${APP_NAME} \
- && mkdir -p /app \
- && curl -s -o /app/cacert.pem https://curl.haxx.se/ca/cacert.pem \
- && cp bin/${APP_NAME} /app/
+ && curl -s -o /app/cacert.pem https://curl.haxx.se/ca/cacert.pem
 
 FROM scratch
 
@@ -22,4 +19,4 @@ ENTRYPOINT [ "/fibr" ]
 COPY templates/ templates/
 
 COPY --from=builder /app/cacert.pem /etc/ssl/certs/ca-certificates.crt
-COPY --from=builder /app/${APP_NAME} /fibr
+COPY --from=builder /app/bin/${APP_NAME} /fibr
