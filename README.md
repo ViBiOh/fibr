@@ -4,6 +4,7 @@ Web File Browser and Manager
 
 [![Build Status](https://travis-ci.org/ViBiOh/fibr.svg?branch=master)](https://travis-ci.org/ViBiOh/fibr)
 [![Go Report Card](https://goreportcard.com/badge/github.com/ViBiOh/fibr)](https://goreportcard.com/report/github.com/ViBiOh/fibr)
+[![codecov](https://codecov.io/gh/ViBiOh/fibr/branch/master/graph/badge.svg)](https://codecov.io/gh/ViBiOh/fibr)
 
 Thanks to [FontAwesome](https://fontawesome.com) for providing awesome svg.
 
@@ -33,6 +34,8 @@ Usage of fibr:
         [owasp] X-Frame-Options (default "deny")
   -fsDirectory string
         [filesystem] Path to served directory (default "/data")
+  -graceful string
+        [http] Graceful close duration (default "35s")
   -hsts
         [owasp] Indicate Strict Transport Security (default true)
   -key string

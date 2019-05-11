@@ -192,7 +192,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	serverApp := httputils.New(serverConfig)
+	serverApp, err := httputils.New(serverConfig)
+	if err != nil {
+		logger.Fatal("%+v", err)
+	}
+
 	healthcheckApp := healthcheck.New()
 	prometheusApp := prometheus.New(prometheusConfig)
 	opentracingApp := opentracing.New(opentracingConfig)
