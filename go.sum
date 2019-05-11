@@ -1,10 +1,12 @@
 cloud.google.com/go v0.34.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 github.com/NYTimes/gziphandler v1.1.1 h1:ZUDjpQae29j0ryrS0u/B8HZfJBtBQHjqw2rQ2cqUQ3I=
 github.com/NYTimes/gziphandler v1.1.1/go.mod h1:n/CVRwUEOgIxrgPvAQhUUr9oeUtvrhMomdKFjzJNB0c=
-github.com/ViBiOh/auth v0.0.0-20190508154059-583c20c46dec h1:AJdt3Y90/0q2/d7FVBEyjXRTUx/61YebOdRUXHsidIA=
-github.com/ViBiOh/auth v0.0.0-20190508154059-583c20c46dec/go.mod h1:Mtn/IVXJ4ECGLt+nteNImjy5gPf8g7zfk2cZd1KL9jI=
+github.com/ViBiOh/auth v0.0.0-20190511183232-2cf3bda8242b h1:XrI2IH2WJ+oKw6L+g+d+JugMM5Ti1ZUVOR0hKg9J2ws=
+github.com/ViBiOh/auth v0.0.0-20190511183232-2cf3bda8242b/go.mod h1:Mtn/IVXJ4ECGLt+nteNImjy5gPf8g7zfk2cZd1KL9jI=
 github.com/ViBiOh/httputils v0.0.0-20190508152348-be16ede80742 h1:W8dZ8lkToBoAuo20QKcwISPoFAa9bw3v/AR9M3RlQ0o=
 github.com/ViBiOh/httputils v0.0.0-20190508152348-be16ede80742/go.mod h1:guuz80AeB7/Dww4Gae6C5Cf1dRPlIbNg4c80LzvDCVc=
+github.com/ViBiOh/httputils v0.0.0-20190511183233-cd8835aea919 h1:icVjku+3cvw8JzJ/hqlVcVUhigCnck4NGKMuaXG2/YY=
+github.com/ViBiOh/httputils v0.0.0-20190511183233-cd8835aea919/go.mod h1:sSBu8hTzB2AGwo0dqq3MhOYWkaxLOSbfcGC4hbWzqK8=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf/go.mod h1:ybxpYRFXyAe+OPACYpWeL0wqObRcbAqCMya13uyzqw0=
 github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973/go.mod h1:Dwedo/Wpr24TaqPxmxbtue+5NUziq4I4S80YR8gNf3Q=
@@ -35,6 +37,8 @@ github.com/matttproud/golang_protobuf_extensions v1.0.1/go.mod h1:D8He9yQNgCq6Z5
 github.com/mwitkow/go-conntrack v0.0.0-20161129095857-cc309e4a2223/go.mod h1:qRWi+5nqEBWmkhHvq77mSJWrCKwh8bxhgT7d/eI7P4U=
 github.com/opentracing-contrib/go-stdlib v0.0.0-20190324214902-3020fec0e66b h1:N/+vVH19UEwFml23XATspYXdbpBU/oPvXy3CnkODjc0=
 github.com/opentracing-contrib/go-stdlib v0.0.0-20190324214902-3020fec0e66b/go.mod h1:PLldrQSroqzH70Xl+1DQcGnefIbqsKR7UDaiux3zV+w=
+github.com/opentracing-contrib/go-stdlib v0.0.0-20190510164024-2b2d2700a3b7 h1:sRfr13qLClTOCZ8f2tFb0k9m1TZayEUz1fpWL38ocnE=
+github.com/opentracing-contrib/go-stdlib v0.0.0-20190510164024-2b2d2700a3b7/go.mod h1:PLldrQSroqzH70Xl+1DQcGnefIbqsKR7UDaiux3zV+w=
 github.com/opentracing/opentracing-go v1.1.0 h1:pWlfV3Bxv7k65HYwkikxat0+s3pV4bsqf19k25Ur8rU=
 github.com/opentracing/opentracing-go v1.1.0/go.mod h1:UkNAQd3GIcIGf0SeVgPpRdFStlNbqXla1AfSYxPUl2o=
 github.com/pkg/errors v0.8.0/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
@@ -82,6 +86,8 @@ golang.org/x/crypto v0.0.0-20180904163835-0709b304e793/go.mod h1:6SG95UA2DQfeDnf
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/crypto v0.0.0-20190506204251-e1dfcc566284 h1:rlLehGeYg6jfoyz/eDqDU1iRXLKfR42nnNh57ytKEWo=
 golang.org/x/crypto v0.0.0-20190506204251-e1dfcc566284/go.mod h1:yigFU9vqHzYiE8UmvKecakEJjdnWj3jj499lnFckfCI=
+golang.org/x/crypto v0.0.0-20190510104115-cbcb75029529 h1:iMGN4xG0cnqj3t+zOM8wUB0BiPKHEwSxEZCvzcbZuvk=
+golang.org/x/crypto v0.0.0-20190510104115-cbcb75029529/go.mod h1:yigFU9vqHzYiE8UmvKecakEJjdnWj3jj499lnFckfCI=
 golang.org/x/net v0.0.0-20180724234803-3673e40ba225/go.mod h1:mL1N/T3taQHkDXs73rZJwtUhF3w3ftmwwsq0BUmARs4=
 golang.org/x/net v0.0.0-20181114220301-adae6a3d119a/go.mod h1:mL1N/T3taQHkDXs73rZJwtUhF3w3ftmwwsq0BUmARs4=
 golang.org/x/net v0.0.0-20181201002055-351d144fa1fc/go.mod h1:mL1N/T3taQHkDXs73rZJwtUhF3w3ftmwwsq0BUmARs4=
