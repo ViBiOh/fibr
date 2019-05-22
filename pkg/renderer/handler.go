@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/pkg/errors"
 	"github.com/ViBiOh/httputils/pkg/httperror"
 	"github.com/ViBiOh/httputils/pkg/logger"
 	"github.com/ViBiOh/httputils/pkg/templates"
@@ -50,6 +51,6 @@ func (a App) SVG(w http.ResponseWriter, name, fill string) {
 
 	w.Header().Set("Content-Type", "image/svg+xml")
 	if err := tpl.Execute(w, fill); err != nil {
-		httperror.InternalServerError(w, err)
+		httperror.InternalServerError(w, errors.WithStack(err))
 	}
 }
