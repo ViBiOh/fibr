@@ -89,7 +89,7 @@ func New(config Config, rootName string, thumbnailApp *thumbnail.App) *App {
 
 	fibrTemplates, err := templates.GetTemplates("./templates/", ".html")
 	if err != nil {
-		logger.Fatal("%+v", err)
+		logger.Fatal("%#v", err)
 	}
 
 	publicURL := *config.publicURL

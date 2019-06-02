@@ -192,7 +192,7 @@ func (a App) Upload(pathname string, content io.ReadCloser) error {
 	if storageFile != nil {
 		defer func() {
 			if err := storageFile.Close(); err != nil {
-				logger.Error("%+v", err)
+				logger.Error("%#v", err)
 			}
 		}()
 	}

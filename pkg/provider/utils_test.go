@@ -65,7 +65,7 @@ func TestSanitizeName(t *testing.T) {
 		}
 
 		if failed {
-			t.Errorf("%s\nSanitizeName(`%s`) = (%+v, %+v), want (%+v, %+v)", testCase.intention, testCase.name, result, err, testCase.want, testCase.wantErr)
+			t.Errorf("%s\nSanitizeName(`%s`) = (%#v, %#v), want (%#v, %#v)", testCase.intention, testCase.name, result, err, testCase.want, testCase.wantErr)
 		}
 	}
 }

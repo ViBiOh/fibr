@@ -181,20 +181,20 @@ func main() {
 	thumbnailConfig := thumbnail.Flags(fs, "thumbnail")
 
 	if err := fs.Parse(os.Args[1:]); err != nil {
-		logger.Fatal("%+v", err)
+		logger.Fatal("%#v", err)
 	}
 
 	alcotest.DoAndExit(alcotestConfig)
 
 	storage, err := filesystem.New(filesystemConfig)
 	if err != nil {
-		logger.Error("%+v", err)
+		logger.Error("%#v", err)
 		os.Exit(1)
 	}
 
 	serverApp, err := httputils.New(serverConfig)
 	if err != nil {
-		logger.Fatal("%+v", err)
+		logger.Fatal("%#v", err)
 	}
 
 	healthcheckApp := healthcheck.New()

@@ -21,7 +21,7 @@ func (a App) Error(w http.ResponseWriter, status int, err error) {
 		},
 	}
 
-	logger.Error("%+v", err)
+	logger.Error("%#v", err)
 
 	if err := templates.WriteHTMLTemplate(a.tpl.Lookup("error"), w, page, status); err != nil {
 		httperror.InternalServerError(w, err)

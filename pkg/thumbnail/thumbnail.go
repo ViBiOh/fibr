@@ -75,7 +75,7 @@ func New(config Config, storage provider.Storage) *App {
 			time.Sleep(waitTimeout)
 
 			if err := app.generateThumbnail(pathname); err != nil {
-				logger.Error("%+v", err)
+				logger.Error("%#v", err)
 			} else {
 				logger.Info("Thumbnail generated for %s", pathname)
 			}
@@ -116,7 +116,7 @@ func (a App) ServeIfPresent(w http.ResponseWriter, r *http.Request, pathname str
 
 func safeWrite(w io.Writer, content string) {
 	if _, err := io.WriteString(w, content); err != nil {
-		logger.Error("%+v", errors.WithStack(err))
+		logger.Error("%#v", errors.WithStack(err))
 	}
 }
 
@@ -152,12 +152,12 @@ func (a App) List(w http.ResponseWriter, r *http.Request, pathname string) {
 
 		file, err := a.storage.Read(thumbnailPath)
 		if err != nil {
-			logger.Error("unable to open %s: %+v", item.Pathname, err)
+			logger.Error("unable to open %s: %#v", item.Pathname, err)
 		}
 
 		content, err := ioutil.ReadAll(file)
 		if err != nil {
-			logger.Error("unable to read %s: %+v", item.Pathname, errors.WithStack(err))
+			logger.Error("unable to read %s: %#v", item.Pathname, errors.WithStack(err))
 		}
 
 		if commaNeeded {
@@ -234,7 +234,7 @@ func (a App) Generate() {
 	})
 
 	if err != nil {
-		logger.Error("%+v", err)
+		logger.Error("%#v", err)
 	}
 }
 

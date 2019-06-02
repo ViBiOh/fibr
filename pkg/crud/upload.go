@@ -32,7 +32,7 @@ func (a *App) saveUploadedFile(request *provider.Request, uploadedFile io.ReadCl
 	if hostFile != nil {
 		defer func() {
 			if err := hostFile.Close(); err != nil {
-				logger.Error("%+v", err)
+				logger.Error("%#v", err)
 			}
 		}()
 	}
@@ -76,7 +76,7 @@ func (a *App) Upload(w http.ResponseWriter, r *http.Request, request *provider.R
 		if uploadedFile != nil {
 			defer func() {
 				if err := uploadedFile.Close(); err != nil {
-					logger.Error("%+v", errors.WithStack(err))
+					logger.Error("%#v", errors.WithStack(err))
 				}
 			}()
 		}

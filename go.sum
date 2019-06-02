@@ -6,6 +6,8 @@ github.com/ViBiOh/auth v0.0.0-20190531191122-fb0225292164 h1:P5H0do45kshHi1/Fgc3
 github.com/ViBiOh/auth v0.0.0-20190531191122-fb0225292164/go.mod h1:zLZpF9r59SiHdZUJwHZbAl5bAKFo+5x1RDE66pL6Mvs=
 github.com/ViBiOh/httputils v0.0.0-20190531173630-5e86de0116e0 h1:7mDge97zDLpsEan2oL8tB7WFkaaBVDwHHK5uzrLO1lQ=
 github.com/ViBiOh/httputils v0.0.0-20190531173630-5e86de0116e0/go.mod h1:RbGgZbwpdF4szDwFxyWT6Onn9AwGyrWLYwo6C7WsHrE=
+github.com/ViBiOh/httputils v0.0.0-20190602112646-484e2c3a5867 h1:E9FGRligB/rClKaOmOQj4MAYI9mhWOxHzixAssgRzxs=
+github.com/ViBiOh/httputils v0.0.0-20190602112646-484e2c3a5867/go.mod h1:RbGgZbwpdF4szDwFxyWT6Onn9AwGyrWLYwo6C7WsHrE=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf/go.mod h1:ybxpYRFXyAe+OPACYpWeL0wqObRcbAqCMya13uyzqw0=
 github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973/go.mod h1:Dwedo/Wpr24TaqPxmxbtue+5NUziq4I4S80YR8gNf3Q=
