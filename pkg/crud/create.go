@@ -28,7 +28,7 @@ func (a *App) Create(w http.ResponseWriter, r *http.Request, request *provider.R
 		return
 	}
 
-	if err := a.storage.Create(pathname); err != nil {
+	if err := a.storage.CreateDir(pathname); err != nil {
 		a.renderer.Error(w, http.StatusInternalServerError, err)
 		return
 	}

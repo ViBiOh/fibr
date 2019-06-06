@@ -150,7 +150,7 @@ func (a App) List(w http.ResponseWriter, r *http.Request, pathname string) {
 			continue
 		}
 
-		file, err := a.storage.Read(thumbnailPath)
+		file, err := a.storage.ReaderFrom(thumbnailPath)
 		if err != nil {
 			logger.Error("unable to open %s: %#v", item.Pathname, err)
 		}
@@ -174,7 +174,7 @@ func (a App) List(w http.ResponseWriter, r *http.Request, pathname string) {
 }
 
 func (a App) generateThumbnail(pathname string) error {
-	file, err := a.storage.Read(pathname)
+	file, err := a.storage.ReaderFrom(pathname)
 	if err != nil {
 		return err
 	}
@@ -188,11 +188,11 @@ func (a App) generateThumbnail(pathname string) error {
 	}
 
 	thumbnailPath := getThumbnailPath(pathname)
-	if err := a.storage.Create(path.Dir(thumbnailPath)); err != nil {
+	if err := a.storage.CreateDir(path.Dir(thumbnailPath)); err != nil {
 		return err
 	}
 
-	if err := a.storage.Upload(thumbnailPath, result); err != nil {
+	if err := a.storage.Store(thumbnailPath, result); err != nil {
 		return err
 	}
 

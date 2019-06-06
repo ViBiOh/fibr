@@ -28,7 +28,7 @@ func (a *App) saveUploadedFile(request *provider.Request, uploadedFile io.ReadCl
 
 	filePath := provider.GetPathname(request, filename)
 
-	hostFile, err := a.storage.Open(filePath)
+	hostFile, err := a.storage.WriterTo(filePath)
 	if hostFile != nil {
 		defer func() {
 			if err := hostFile.Close(); err != nil {

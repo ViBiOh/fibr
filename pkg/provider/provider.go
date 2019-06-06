@@ -207,13 +207,13 @@ type Storage interface {
 	Name() string
 	Root() string
 	Info(pathname string) (*StorageItem, error)
-	Open(pathname string) (io.WriteCloser, error)
-	Read(pathname string) (io.ReadCloser, error)
+	WriterTo(pathname string) (io.WriteCloser, error)
+	ReaderFrom(pathname string) (io.ReadCloser, error)
 	Serve(http.ResponseWriter, *http.Request, string)
 	List(pathname string) ([]*StorageItem, error)
 	Walk(walkFn func(*StorageItem, error) error) error
-	Create(name string) error
-	Upload(pathname string, content io.ReadCloser) error
+	CreateDir(name string) error
+	Store(pathname string, content io.ReadCloser) error
 	Rename(oldName, newName string) error
 	Remove(pathname string) error
 }

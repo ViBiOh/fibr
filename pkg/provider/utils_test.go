@@ -1,6 +1,9 @@
 package provider
 
-import "testing"
+import (
+	"errors"
+	"testing"
+)
 
 func TestSanitizeName(t *testing.T) {
 	var cases = []struct {
@@ -67,5 +70,37 @@ func TestSanitizeName(t *testing.T) {
 		if failed {
 			t.Errorf("%s\nSanitizeName(`%s`) = (%#v, %#v), want (%#v, %#v)", testCase.intention, testCase.name, result, err, testCase.want, testCase.wantErr)
 		}
+	}
+}
+
+func TestIsNotExist(t *testing.T) {
+	var cases = []struct {
+		intention string
+		input     error
+		want      bool
+	}{
+		{
+			"nil error",
+			nil,
+			false,
+		},
+		{
+			"empty error",
+			errors.New("invalid value"),
+			false,
+		},
+		{
+			"empty error",
+			errors.New("index.html: no such file or directory"),
+			true,
+		},
+	}
+
+	for _, testCase := range cases {
+		t.Run(testCase.intention, func(t *testing.T) {
+			if result := IsNotExist(testCase.input); result != testCase.want {
+				t.Errorf("IsNotExist(`%#v`) = %#v, want %#v", testCase.input, result, testCase.want)
+			}
+		})
 	}
 }

@@ -58,5 +58,9 @@ func GetPathname(request *Request, name string) string {
 
 // IsNotExist checks if error match a not found
 func IsNotExist(err error) bool {
+	if err == nil {
+		return false
+	}
+
 	return strings.HasSuffix(err.Error(), "no such file or directory")
 }

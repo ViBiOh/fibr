@@ -21,7 +21,7 @@ func (a *App) loadMetadata() (err error) {
 	}
 
 	if info == nil {
-		if err := a.storage.Create(provider.MetadataDirectoryName); err != nil {
+		if err := a.storage.CreateDir(provider.MetadataDirectoryName); err != nil {
 			return err
 		}
 
@@ -30,7 +30,7 @@ func (a *App) loadMetadata() (err error) {
 		return nil
 	}
 
-	file, err := a.storage.Read(metadataFilename)
+	file, err := a.storage.ReaderFrom(metadataFilename)
 	if file != nil {
 		defer func() {
 			if closeErr := file.Close(); closeErr != nil {
@@ -65,7 +65,7 @@ func (a *App) saveMetadata() (err error) {
 		return errors.WithStack(err)
 	}
 
-	file, err := a.storage.Open(metadataFilename)
+	file, err := a.storage.WriterTo(metadataFilename)
 	if file != nil {
 		defer func() {
 			if closeErr := file.Close(); closeErr != nil {
