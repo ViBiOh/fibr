@@ -3,6 +3,7 @@ package crud
 import (
 	"flag"
 	"fmt"
+	"net/http"
 	"strings"
 	"sync"
 
@@ -21,13 +22,30 @@ var (
 	ErrEmptyName = errors.New("provided name is empty")
 )
 
+// App of package
+type App interface {
+	Browser(http.ResponseWriter, *provider.Request, *provider.StorageItem, *provider.Message)
+	CheckAndServeSEO(http.ResponseWriter, *http.Request) bool
+
+	List(http.ResponseWriter, *provider.Request, string, *provider.Message)
+	Get(http.ResponseWriter, *http.Request, *provider.Request)
+	Post(http.ResponseWriter, *http.Request, *provider.Request)
+	Create(http.ResponseWriter, *http.Request, *provider.Request)
+	Upload(http.ResponseWriter, *http.Request, *provider.Request)
+	Rename(http.ResponseWriter, *http.Request, *provider.Request)
+	Delete(http.ResponseWriter, *http.Request, *provider.Request)
+
+	GetShare(string) *provider.Share
+	CreateShare(http.ResponseWriter, *http.Request, *provider.Request)
+	DeleteShare(http.ResponseWriter, *http.Request, *provider.Request)
+}
+
 // Config of package
 type Config struct {
 	metadata *bool
 }
 
-// App of package
-type App struct {
+type app struct {
 	metadataEnabled bool
 	metadatas       []*provider.Share
 	metadataLock    sync.Mutex
@@ -44,8 +62,8 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 }
 
 // New creates new App from Config
-func New(config Config, storage provider.Storage, renderer provider.Renderer, thumbnailApp *thumbnail.App) *App {
-	app := &App{
+func New(config Config, storage provider.Storage, renderer provider.Renderer, thumbnailApp *thumbnail.App) App {
+	app := &app{
 		metadataEnabled: *config.metadata,
 		metadataLock:    sync.Mutex{},
 		storage:         storage,
@@ -65,7 +83,7 @@ func New(config Config, storage provider.Storage, renderer provider.Renderer, th
 }
 
 // GetShare returns share configuration if request path match
-func (a *App) GetShare(requestPath string) *provider.Share {
+func (a *app) GetShare(requestPath string) *provider.Share {
 	cleanPath := strings.TrimPrefix(requestPath, "/")
 
 	for _, share := range a.metadatas {

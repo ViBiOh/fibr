@@ -24,13 +24,13 @@ type App interface {
 }
 
 type app struct {
-	crud     *crud.App
+	crud     crud.App
 	renderer *renderer.App
 	auth     auth.App
 }
 
 // New creates new App from Config
-func New(crudApp *crud.App, rendererApp *renderer.App, authApp auth.App) App {
+func New(crudApp crud.App, rendererApp *renderer.App, authApp auth.App) App {
 	return &app{
 		crud:     crudApp,
 		renderer: rendererApp,

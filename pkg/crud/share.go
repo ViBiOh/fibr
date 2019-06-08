@@ -15,7 +15,7 @@ import (
 )
 
 // CreateShare create a share for given URL
-func (a *App) CreateShare(w http.ResponseWriter, r *http.Request, request *provider.Request) {
+func (a *app) CreateShare(w http.ResponseWriter, r *http.Request, request *provider.Request) {
 	if !request.CanShare {
 		a.renderer.Error(w, http.StatusForbidden, ErrNotAuthorized)
 		return
@@ -73,7 +73,7 @@ func (a *App) CreateShare(w http.ResponseWriter, r *http.Request, request *provi
 }
 
 // DeleteShare delete a share from given ID
-func (a *App) DeleteShare(w http.ResponseWriter, r *http.Request, request *provider.Request) {
+func (a *app) DeleteShare(w http.ResponseWriter, r *http.Request, request *provider.Request) {
 	if !request.CanShare {
 		a.renderer.Error(w, http.StatusForbidden, ErrNotAuthorized)
 		return

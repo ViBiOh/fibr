@@ -8,7 +8,7 @@ import (
 )
 
 // Delete given path from filesystem
-func (a *App) Delete(w http.ResponseWriter, r *http.Request, request *provider.Request) {
+func (a *app) Delete(w http.ResponseWriter, r *http.Request, request *provider.Request) {
 	if !request.CanEdit {
 		a.renderer.Error(w, http.StatusForbidden, ErrNotAuthorized)
 		return

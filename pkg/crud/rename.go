@@ -9,7 +9,7 @@ import (
 )
 
 // Rename rename given path to a new one
-func (a *App) Rename(w http.ResponseWriter, r *http.Request, request *provider.Request) {
+func (a *app) Rename(w http.ResponseWriter, r *http.Request, request *provider.Request) {
 	if !request.CanEdit {
 		a.renderer.Error(w, http.StatusForbidden, ErrNotAuthorized)
 		return

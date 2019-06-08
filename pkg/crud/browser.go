@@ -29,7 +29,7 @@ func getPreviousAndNext(file *provider.StorageItem, files []*provider.StorageIte
 }
 
 // Browser render file web view
-func (a *App) Browser(w http.ResponseWriter, request *provider.Request, file *provider.StorageItem, message *provider.Message) {
+func (a *app) Browser(w http.ResponseWriter, request *provider.Request, file *provider.StorageItem, message *provider.Message) {
 	var previous, next *provider.StorageItem
 
 	files, err := a.storage.List(path.Dir(file.Pathname))

@@ -14,7 +14,7 @@ var (
 	metadataFilename = path.Join(provider.MetadataDirectoryName, ".json")
 )
 
-func (a *App) loadMetadata() (err error) {
+func (a *app) loadMetadata() (err error) {
 	info, err := a.storage.Info(metadataFilename)
 	if err != nil && !provider.IsNotExist(err) {
 		return err
@@ -55,7 +55,7 @@ func (a *App) loadMetadata() (err error) {
 	return nil
 }
 
-func (a *App) saveMetadata() (err error) {
+func (a *app) saveMetadata() (err error) {
 	if !a.metadataEnabled {
 		return errors.New("metadata not enabled")
 	}

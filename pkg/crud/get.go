@@ -12,7 +12,7 @@ import (
 )
 
 // CheckAndServeSEO check if filename match SEO and serve it, or not
-func (a *App) CheckAndServeSEO(w http.ResponseWriter, r *http.Request) bool {
+func (a *app) CheckAndServeSEO(w http.ResponseWriter, r *http.Request) bool {
 	if r.Method != http.MethodGet {
 		return false
 	}
@@ -39,7 +39,7 @@ func isThumbnail(r *http.Request) bool {
 	return query.GetBool(r, "thumbnail")
 }
 
-func (a *App) checkAndServeThumbnail(w http.ResponseWriter, r *http.Request, info *provider.StorageItem) bool {
+func (a *app) checkAndServeThumbnail(w http.ResponseWriter, r *http.Request, info *provider.StorageItem) bool {
 	if isThumbnail(r) && thumbnail.CanHaveThumbnail(info.Pathname) {
 		return a.thumbnailApp.ServeIfPresent(w, r, info.Pathname)
 	}
@@ -48,7 +48,7 @@ func (a *App) checkAndServeThumbnail(w http.ResponseWriter, r *http.Request, inf
 }
 
 // GetWithMessage output content with given message
-func (a *App) GetWithMessage(w http.ResponseWriter, r *http.Request, request *provider.Request, message *provider.Message) {
+func (a *app) GetWithMessage(w http.ResponseWriter, r *http.Request, request *provider.Request, message *provider.Message) {
 	pathname := provider.GetPathname(request, "")
 
 	info, err := a.storage.Info(pathname)
@@ -88,7 +88,7 @@ func (a *App) GetWithMessage(w http.ResponseWriter, r *http.Request, request *pr
 }
 
 // Get output content
-func (a *App) Get(w http.ResponseWriter, r *http.Request, config *provider.Request) {
+func (a *app) Get(w http.ResponseWriter, r *http.Request, config *provider.Request) {
 	var message *provider.Message
 
 	if messageContent := strings.TrimSpace(r.URL.Query().Get("message")); messageContent != "" {
