@@ -12,7 +12,7 @@ import (
 )
 
 // Error render error page with given status
-func (a App) Error(w http.ResponseWriter, status int, err error) {
+func (a app) Error(w http.ResponseWriter, status int, err error) {
 	page := provider.Page{
 		Config: a.config,
 		Error: &provider.Error{
@@ -30,7 +30,7 @@ func (a App) Error(w http.ResponseWriter, status int, err error) {
 }
 
 // Sitemap render sitemap.xml
-func (a App) Sitemap(w http.ResponseWriter) {
+func (a app) Sitemap(w http.ResponseWriter) {
 	page := provider.Page{
 		Config: a.config,
 	}
@@ -42,7 +42,7 @@ func (a App) Sitemap(w http.ResponseWriter) {
 }
 
 // SVG render a svg in given coolor
-func (a App) SVG(w http.ResponseWriter, name, fill string) {
+func (a app) SVG(w http.ResponseWriter, name, fill string) {
 	tpl := a.tpl.Lookup(fmt.Sprintf("svg-%s", name))
 	if tpl == nil {
 		httperror.NotFound(w)

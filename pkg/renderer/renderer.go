@@ -15,14 +15,22 @@ import (
 	"github.com/ViBiOh/httputils/pkg/tools"
 )
 
+// App of package
+type App interface {
+	Directory(http.ResponseWriter, *provider.Request, map[string]interface{}, string, *provider.Message)
+	File(http.ResponseWriter, *provider.Request, map[string]interface{}, *provider.Message)
+	Error(http.ResponseWriter, int, error)
+	Sitemap(http.ResponseWriter)
+	SVG(http.ResponseWriter, string, string)
+}
+
 // Config of package
 type Config struct {
 	publicURL *string
 	version   *string
 }
 
-// App of package
-type App struct {
+type app struct {
 	config       *provider.Config
 	tpl          *template.Template
 	thumbnailApp *thumbnail.App
@@ -37,7 +45,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 }
 
 // New creates new App from Config
-func New(config Config, rootName string, thumbnailApp *thumbnail.App) *App {
+func New(config Config, rootName string, thumbnailApp *thumbnail.App) App {
 	tpl := template.New("fibr")
 
 	tpl.Funcs(template.FuncMap{
@@ -94,7 +102,7 @@ func New(config Config, rootName string, thumbnailApp *thumbnail.App) *App {
 
 	publicURL := *config.publicURL
 
-	return &App{
+	return app{
 		tpl: template.Must(tpl.ParseFiles(fibrTemplates...)),
 		config: &provider.Config{
 			RootName:  rootName,
@@ -112,7 +120,7 @@ func New(config Config, rootName string, thumbnailApp *thumbnail.App) *App {
 	}
 }
 
-func (a App) createPageConfiguration(request *provider.Request, message *provider.Message, content map[string]interface{}, layout string) provider.Page {
+func (a app) createPageConfiguration(request *provider.Request, message *provider.Message, content map[string]interface{}, layout string) provider.Page {
 	return provider.Page{
 		Config:  a.config,
 		Request: request,
@@ -123,7 +131,7 @@ func (a App) createPageConfiguration(request *provider.Request, message *provide
 }
 
 // Directory render directory listing
-func (a App) Directory(w http.ResponseWriter, request *provider.Request, content map[string]interface{}, layout string, message *provider.Message) {
+func (a app) Directory(w http.ResponseWriter, request *provider.Request, content map[string]interface{}, layout string, message *provider.Message) {
 	page := a.createPageConfiguration(request, message, content, layout)
 
 	if page.Layout == "" {
@@ -138,7 +146,7 @@ func (a App) Directory(w http.ResponseWriter, request *provider.Request, content
 }
 
 // File render file detail
-func (a App) File(w http.ResponseWriter, request *provider.Request, content map[string]interface{}, message *provider.Message) {
+func (a app) File(w http.ResponseWriter, request *provider.Request, content map[string]interface{}, message *provider.Message) {
 	page := a.createPageConfiguration(request, message, content, "browser")
 
 	w.Header().Set("content-language", "en")
