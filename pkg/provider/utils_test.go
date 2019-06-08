@@ -50,12 +50,10 @@ func TestSanitizeName(t *testing.T) {
 		},
 	}
 
-	var failed bool
-
 	for _, testCase := range cases {
 		result, err := SanitizeName(testCase.name, testCase.removeSlash)
 
-		failed = false
+    failed := false
 
 		if err == nil && testCase.wantErr != nil {
 			failed = true
