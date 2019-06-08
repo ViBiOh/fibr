@@ -12,12 +12,12 @@ import (
 )
 
 var (
-	transformer  = getTransformer()
+	transformer  transform.Transformer
 	specialChars = regexp.MustCompile(`[[\](){}&"'§!$*€^%+=\\;?\x60](?m)`)
 )
 
-func getTransformer() transform.Transformer {
-	return transform.Chain(norm.NFD, transform.RemoveFunc(func(r rune) bool {
+func init() {
+	transformer = transform.Chain(norm.NFD, transform.RemoveFunc(func(r rune) bool {
 		return unicode.Is(unicode.Mn, r)
 	}), norm.NFC)
 }

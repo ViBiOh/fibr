@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/pkg/query"
 )
 
@@ -39,7 +40,7 @@ func isThumbnail(r *http.Request) bool {
 }
 
 func (a *App) checkAndServeThumbnail(w http.ResponseWriter, r *http.Request, info *provider.StorageItem) bool {
-	if isThumbnail(r) && a.thumbnailApp.CanHaveThumbnail(info.Pathname) {
+	if isThumbnail(r) && thumbnail.CanHaveThumbnail(info.Pathname) {
 		return a.thumbnailApp.ServeIfPresent(w, r, info.Pathname)
 	}
 

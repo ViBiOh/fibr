@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/pkg/errors"
 	"github.com/ViBiOh/httputils/pkg/logger"
 )
@@ -45,7 +46,7 @@ func (a *App) saveUploadedFile(request *provider.Request, uploadedFile io.ReadCl
 		return "", errors.WithStack(err)
 	}
 
-	if a.thumbnailApp.CanHaveThumbnail(filePath) {
+	if thumbnail.CanHaveThumbnail(filePath) {
 		a.thumbnailApp.AsyncGenerateThumbnail(filePath)
 	}
 

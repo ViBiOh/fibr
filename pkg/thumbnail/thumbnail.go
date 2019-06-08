@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"flag"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"path"
@@ -33,10 +32,6 @@ var (
 		"node_modules": true,
 	}
 )
-
-func getCtx(ctx context.Context) (context.Context, context.CancelFunc) {
-	return context.WithTimeout(ctx, defaultTimeout)
-}
 
 // Config of package
 type Config struct {
@@ -85,16 +80,14 @@ func New(config Config, storage provider.Storage) *App {
 	return app
 }
 
-// CanHaveThumbnail determine if thumbnail can be generated for given pathname
-func (a App) CanHaveThumbnail(pathname string) bool {
-	extension := strings.ToLower(path.Ext(pathname))
-
-	return provider.ImageExtensions[extension] || provider.PdfExtensions[extension]
+// Enabled checks if app is enabled
+func (a App) Enabled() bool {
+	return a.imaginaryURL != "" && a.storage != nil
 }
 
 // HasThumbnail determine if thumbnail exist for given pathname
 func (a App) HasThumbnail(pathname string) (string, bool) {
-	if !a.isEnabled() {
+	if !a.Enabled() {
 		return "", false
 	}
 
@@ -114,15 +107,9 @@ func (a App) ServeIfPresent(w http.ResponseWriter, r *http.Request, pathname str
 	return false
 }
 
-func safeWrite(w io.Writer, content string) {
-	if _, err := io.WriteString(w, content); err != nil {
-		logger.Error("%#v", errors.WithStack(err))
-	}
-}
-
 // List return all thumbnail in a base64 form
 func (a App) List(w http.ResponseWriter, r *http.Request, pathname string) {
-	if !a.isEnabled() {
+	if !a.Enabled() {
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
@@ -199,19 +186,9 @@ func (a App) generateThumbnail(pathname string) error {
 	return nil
 }
 
-func getThumbnailPath(pathname string) string {
-	fullPath := path.Join(provider.MetadataDirectoryName, pathname)
-
-	return fmt.Sprintf("%s.jpg", strings.TrimSuffix(fullPath, path.Ext(fullPath)))
-}
-
-func (a App) isEnabled() bool {
-	return a.imaginaryURL != "" && a.storage != nil
-}
-
 // Generate thumbnail for all storage
 func (a App) Generate() {
-	if !a.isEnabled() {
+	if !a.Enabled() {
 		return
 	}
 
@@ -220,7 +197,7 @@ func (a App) Generate() {
 			return filepath.SkipDir
 		}
 
-		if !a.CanHaveThumbnail(item.Pathname) {
+		if !CanHaveThumbnail(item.Pathname) {
 			return nil
 		}
 
@@ -240,7 +217,7 @@ func (a App) Generate() {
 
 // AsyncGenerateThumbnail generate thumbnail image for given path
 func (a App) AsyncGenerateThumbnail(pathname string) {
-	if !a.isEnabled() {
+	if !a.Enabled() {
 		return
 	}
 

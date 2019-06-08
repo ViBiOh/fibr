@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/fibr/pkg/thumbnail"
 )
 
 // Rename rename given path to a new one
@@ -62,7 +63,7 @@ func (a *App) Rename(w http.ResponseWriter, r *http.Request, request *provider.R
 			return
 		}
 
-		if a.thumbnailApp.CanHaveThumbnail(newName) {
+		if thumbnail.CanHaveThumbnail(newName) {
 			a.thumbnailApp.AsyncGenerateThumbnail(newName)
 		}
 	}
