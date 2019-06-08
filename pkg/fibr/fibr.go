@@ -24,9 +24,9 @@ type App interface {
 }
 
 type app struct {
+	auth     auth.App
 	crud     crud.App
 	renderer renderer.App
-	auth     auth.App
 }
 
 // New creates new App from Config
@@ -44,11 +44,9 @@ func (a app) checkShare(w http.ResponseWriter, r *http.Request, request *provide
 		request.CanEdit = share.Edit
 		request.Path = strings.TrimPrefix(request.Path, fmt.Sprintf("/%s", share.ID))
 
-		if share.Password != "" {
-			if err := checkSharePassword(r, share); err != nil {
-				w.Header().Add("WWW-Authenticate", "Basic realm=\"Password required\" charset=\"UTF-8\"")
-				return err
-			}
+		if err := checkSharePassword(r, share); err != nil {
+			w.Header().Add("WWW-Authenticate", "Basic realm=\"Password required\" charset=\"UTF-8\"")
+			return err
 		}
 	}
 
@@ -68,10 +66,6 @@ func (a app) handleAnonymousRequest(w http.ResponseWriter, r *http.Request, err 
 
 	w.Header().Add("WWW-Authenticate", "Basic charset=\"UTF-8\"")
 	a.renderer.Error(w, http.StatusUnauthorized, err)
-}
-
-func (a app) checkAllowedMethod(r *http.Request) bool {
-	return r.Method == http.MethodGet || r.Method == http.MethodPost || r.Method == http.MethodPut || r.Method == http.MethodPatch || r.Method == http.MethodDelete
 }
 
 func (a app) checkRequest(w http.ResponseWriter, r *http.Request) *provider.Request {
@@ -122,8 +116,7 @@ func (a app) handleRequest(w http.ResponseWriter, r *http.Request, config *provi
 // Handler for request. Should be use with net/http
 func (a app) Handler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
-		if !a.checkAllowedMethod(r) {
+		if !isMethodAllowed(r) {
 			a.renderer.Error(w, http.StatusMethodNotAllowed, errors.New("you lack of accurate method for calling me"))
 			return
 		}

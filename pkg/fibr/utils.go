@@ -10,7 +10,28 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+func isMethodAllowed(r *http.Request) bool {
+	switch r.Method {
+	case http.MethodGet:
+		fallthrough
+	case http.MethodPost:
+		fallthrough
+	case http.MethodPut:
+		fallthrough
+	case http.MethodPatch:
+		fallthrough
+	case http.MethodDelete:
+		return true
+	default:
+		return false
+	}
+}
+
 func checkSharePassword(r *http.Request, share *provider.Share) error {
+	if share.Password == "" {
+		return nil
+	}
+
 	header := r.Header.Get("Authorization")
 	if header == "" {
 		return errEmptyAuthorizationHeader
