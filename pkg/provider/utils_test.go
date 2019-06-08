@@ -51,23 +51,25 @@ func TestSanitizeName(t *testing.T) {
 	}
 
 	for _, testCase := range cases {
-		result, err := SanitizeName(testCase.name, testCase.removeSlash)
+		t.Run(testCase.intention, func(t *testing.T) {
+			result, err := SanitizeName(testCase.name, testCase.removeSlash)
 
-    failed := false
+			failed := false
 
-		if err == nil && testCase.wantErr != nil {
-			failed = true
-		} else if err != nil && testCase.wantErr == nil {
-			failed = true
-		} else if err != nil && err.Error() != testCase.wantErr.Error() {
-			failed = true
-		} else if result != testCase.want {
-			failed = true
-		}
+			if err == nil && testCase.wantErr != nil {
+				failed = true
+			} else if err != nil && testCase.wantErr == nil {
+				failed = true
+			} else if err != nil && err.Error() != testCase.wantErr.Error() {
+				failed = true
+			} else if result != testCase.want {
+				failed = true
+			}
 
-		if failed {
-			t.Errorf("%s\nSanitizeName(`%s`) = (%#v, %#v), want (%#v, %#v)", testCase.intention, testCase.name, result, err, testCase.want, testCase.wantErr)
-		}
+			if failed {
+				t.Errorf("SanitizeName(`%s`) = (%#v, %#v), want (%#v, %#v)", testCase.name, result, err, testCase.want, testCase.wantErr)
+			}
+		})
 	}
 }
 

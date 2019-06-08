@@ -1,10 +1,12 @@
 cloud.google.com/go v0.34.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 github.com/NYTimes/gziphandler v1.1.1 h1:ZUDjpQae29j0ryrS0u/B8HZfJBtBQHjqw2rQ2cqUQ3I=
 github.com/NYTimes/gziphandler v1.1.1/go.mod h1:n/CVRwUEOgIxrgPvAQhUUr9oeUtvrhMomdKFjzJNB0c=
-github.com/ViBiOh/auth v0.0.0-20190608105719-1b1a9829c808 h1:Rd3VPK+A3vN29d7j/POy3/6Bdt4b4RC6qpa9r4EdFHg=
-github.com/ViBiOh/auth v0.0.0-20190608105719-1b1a9829c808/go.mod h1:uxX0JoKevc2R9LQSHr4GqKVCo6jO4MoJ3B6NJcrsr5w=
+github.com/ViBiOh/auth v0.0.0-20190608130852-22879890dc8c h1:DIvu7E7C8fHHylD1Kds14TOv+i5K7y3XLXCCkPUvsmY=
+github.com/ViBiOh/auth v0.0.0-20190608130852-22879890dc8c/go.mod h1:uxX0JoKevc2R9LQSHr4GqKVCo6jO4MoJ3B6NJcrsr5w=
 github.com/ViBiOh/httputils v0.0.0-20190608105528-8f3f3a69dd1d h1:w6Njbw+BAOuKUc6zvKrBkHXYa3ATWDTtMXlts42WY4o=
 github.com/ViBiOh/httputils v0.0.0-20190608105528-8f3f3a69dd1d/go.mod h1:yRoXQl8nkXLxkxymJMPbys76+nuKD8ZZPLAFXoXhI3o=
+github.com/ViBiOh/httputils v0.0.0-20190608111633-45d915c3266a h1:PGcel0vTCHKkt4xAOxc8xviVIp3EmGJqCrbM67DJnLQ=
+github.com/ViBiOh/httputils v0.0.0-20190608111633-45d915c3266a/go.mod h1:yRoXQl8nkXLxkxymJMPbys76+nuKD8ZZPLAFXoXhI3o=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf/go.mod h1:ybxpYRFXyAe+OPACYpWeL0wqObRcbAqCMya13uyzqw0=
 github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973/go.mod h1:Dwedo/Wpr24TaqPxmxbtue+5NUziq4I4S80YR8gNf3Q=
