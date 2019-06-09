@@ -12,16 +12,13 @@ import (
 )
 
 // Error render error page with given status
-func (a app) Error(w http.ResponseWriter, status int, err error) {
+func (a app) Error(w http.ResponseWriter, err *provider.Error) {
 	builder := &provider.PageBuilder{}
-	page := builder.Config(a.config).Error(&provider.Error{
-		Status:  status,
-		Content: err.Error(),
-	}).Build()
+	page := builder.Config(a.config).Error(err).Build()
 
 	logger.Error("%#v", err)
 
-	if err := templates.WriteHTMLTemplate(a.tpl.Lookup("error"), w, page, status); err != nil {
+	if err := templates.WriteHTMLTemplate(a.tpl.Lookup("error"), w, page, err.Status); err != nil {
 		httperror.InternalServerError(w, err)
 		return
 	}

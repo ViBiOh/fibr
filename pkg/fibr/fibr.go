@@ -55,17 +55,17 @@ func (a app) parseShare(w http.ResponseWriter, r *http.Request, request *provide
 
 func (a app) handleAnonymousRequest(w http.ResponseWriter, r *http.Request, err error) {
 	if auth.ErrForbidden == err {
-		a.renderer.Error(w, http.StatusForbidden, errors.New("you're not authorized to speak to me"))
+		a.renderer.Error(w, provider.NewError(http.StatusForbidden, errors.New("you're not authorized to speak to me")))
 		return
 	}
 
 	if err == ident.ErrMalformedAuth || err == ident.ErrUnknownIdentType {
-		a.renderer.Error(w, http.StatusBadRequest, err)
+		a.renderer.Error(w, provider.NewError(http.StatusBadRequest, err))
 		return
 	}
 
 	w.Header().Add("WWW-Authenticate", "Basic charset=\"UTF-8\"")
-	a.renderer.Error(w, http.StatusUnauthorized, err)
+	a.renderer.Error(w, provider.NewError(http.StatusUnauthorized, err))
 }
 
 func (a app) parseRequest(w http.ResponseWriter, r *http.Request) *provider.Request {
@@ -76,7 +76,7 @@ func (a app) parseRequest(w http.ResponseWriter, r *http.Request) *provider.Requ
 	}
 
 	if err := a.parseShare(w, r, request); err != nil {
-		a.renderer.Error(w, http.StatusUnauthorized, err)
+		a.renderer.Error(w, provider.NewError(http.StatusUnauthorized, err))
 		return nil
 	}
 
@@ -117,12 +117,12 @@ func (a app) handleRequest(w http.ResponseWriter, r *http.Request, config *provi
 func (a app) Handler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !isMethodAllowed(r) {
-			a.renderer.Error(w, http.StatusMethodNotAllowed, errors.New("you lack of accurate method for calling me"))
+			a.renderer.Error(w, provider.NewError(http.StatusMethodNotAllowed, errors.New("you lack of accurate method for calling me")))
 			return
 		}
 
 		if strings.Contains(r.URL.Path, "..") {
-			a.renderer.Error(w, http.StatusForbidden, errors.New("you can't speak to my parent"))
+			a.renderer.Error(w, provider.NewError(http.StatusForbidden, errors.New("you can't speak to my parent")))
 			return
 		}
 

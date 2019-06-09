@@ -10,30 +10,30 @@ import (
 // Delete given path from filesystem
 func (a *app) Delete(w http.ResponseWriter, r *http.Request, request *provider.Request) {
 	if !request.CanEdit {
-		a.renderer.Error(w, http.StatusForbidden, ErrNotAuthorized)
+		a.renderer.Error(w, provider.NewError(http.StatusForbidden, ErrNotAuthorized))
 		return
 	}
 
 	pathname, err := getFilepath(r, request)
 	if err != nil && err == ErrNotAuthorized {
-		a.renderer.Error(w, http.StatusForbidden, err)
+		a.renderer.Error(w, provider.NewError(http.StatusForbidden, err))
 		return
 	}
 
 	info, err := a.storage.Info(pathname)
 	if err != nil {
-		a.renderer.Error(w, http.StatusNotFound, err)
+		a.renderer.Error(w, provider.NewError(http.StatusNotFound, err))
 		return
 	}
 
 	if err := a.storage.Remove(pathname); err != nil {
-		a.renderer.Error(w, http.StatusInternalServerError, err)
+		a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
 
 	if thumbnailPath, ok := a.thumbnailApp.HasThumbnail(pathname); ok {
 		if err := a.storage.Remove(thumbnailPath); err != nil {
-			a.renderer.Error(w, http.StatusInternalServerError, err)
+			a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))
 			return
 		}
 	}

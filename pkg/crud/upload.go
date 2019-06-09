@@ -56,17 +56,17 @@ func (a *app) saveUploadedFile(request *provider.Request, uploadedFile io.ReadCl
 // Upload saves form files to filesystem
 func (a *app) Upload(w http.ResponseWriter, r *http.Request, request *provider.Request) {
 	if !request.CanEdit {
-		a.renderer.Error(w, http.StatusForbidden, ErrNotAuthorized)
+		a.renderer.Error(w, provider.NewError(http.StatusForbidden, ErrNotAuthorized))
 		return
 	}
 
 	if err := r.ParseMultipartForm(defaultMaxMemory); err != nil {
-		a.renderer.Error(w, http.StatusBadRequest, errors.WithStack(err))
+		a.renderer.Error(w, provider.NewError(http.StatusBadRequest, errors.WithStack(err)))
 		return
 	}
 
 	if r.MultipartForm.File == nil || len(r.MultipartForm.File["files[]"]) == 0 {
-		a.renderer.Error(w, http.StatusBadRequest, errors.New("no file provided for save"))
+		a.renderer.Error(w, provider.NewError(http.StatusBadRequest, errors.New("no file provided for save")))
 		return
 	}
 
@@ -83,13 +83,13 @@ func (a *app) Upload(w http.ResponseWriter, r *http.Request, request *provider.R
 		}
 
 		if err != nil {
-			a.renderer.Error(w, http.StatusBadRequest, errors.WithStack(err))
+			a.renderer.Error(w, provider.NewError(http.StatusBadRequest, errors.WithStack(err)))
 			return
 		}
 
 		filename, err := a.saveUploadedFile(request, uploadedFile, file)
 		if err != nil {
-			a.renderer.Error(w, http.StatusInternalServerError, err)
+			a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))
 			return
 		}
 

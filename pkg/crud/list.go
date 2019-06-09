@@ -10,7 +10,7 @@ import (
 func (a *app) List(w http.ResponseWriter, request *provider.Request, display string, message *provider.Message) {
 	files, err := a.storage.List(request.GetPath())
 	if err != nil {
-		a.renderer.Error(w, http.StatusInternalServerError, err)
+		a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
 

@@ -12,24 +12,24 @@ import (
 // Create creates given path directory to filesystem
 func (a *app) Create(w http.ResponseWriter, r *http.Request, request *provider.Request) {
 	if !request.CanEdit {
-		a.renderer.Error(w, http.StatusForbidden, ErrNotAuthorized)
+		a.renderer.Error(w, provider.NewError(http.StatusForbidden, ErrNotAuthorized))
 		return
 	}
 
 	pathname, err := getFilepath(r, request)
 	if err != nil {
-		a.renderer.Error(w, http.StatusForbidden, ErrNotAuthorized)
+		a.renderer.Error(w, provider.NewError(http.StatusForbidden, ErrNotAuthorized))
 		return
 	}
 
 	pathname, err = provider.SanitizeName(pathname, false)
 	if err != nil {
-		a.renderer.Error(w, http.StatusBadRequest, err)
+		a.renderer.Error(w, provider.NewError(http.StatusBadRequest, err))
 		return
 	}
 
 	if err := a.storage.CreateDir(pathname); err != nil {
-		a.renderer.Error(w, http.StatusInternalServerError, err)
+		a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
 

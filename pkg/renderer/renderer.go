@@ -20,7 +20,7 @@ import (
 type App interface {
 	Directory(http.ResponseWriter, *provider.Request, map[string]interface{}, string, *provider.Message)
 	File(http.ResponseWriter, *provider.Request, map[string]interface{}, *provider.Message)
-	Error(http.ResponseWriter, int, error)
+	Error(http.ResponseWriter, *provider.Error)
 	Sitemap(http.ResponseWriter)
 	SVG(http.ResponseWriter, string, string)
 }
@@ -128,7 +128,7 @@ func (a app) Directory(w http.ResponseWriter, request *provider.Request, content
 
 	w.Header().Set("content-language", "en")
 	if err := templates.WriteHTMLTemplate(a.tpl.Lookup("files"), w, page, http.StatusOK); err != nil {
-		a.Error(w, http.StatusInternalServerError, err)
+		a.Error(w, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
 }
@@ -140,7 +140,7 @@ func (a app) File(w http.ResponseWriter, request *provider.Request, content map[
 
 	w.Header().Set("content-language", "en")
 	if err := templates.WriteHTMLTemplate(a.tpl.Lookup("file"), w, page, http.StatusOK); err != nil {
-		a.Error(w, http.StatusInternalServerError, err)
+		a.Error(w, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
 }
