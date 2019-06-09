@@ -38,7 +38,7 @@ func New(crudApp crud.App, rendererApp renderer.App, authApp auth.App) App {
 	}
 }
 
-func (a app) checkShare(w http.ResponseWriter, r *http.Request, request *provider.Request) error {
+func (a app) parseShare(w http.ResponseWriter, r *http.Request, request *provider.Request) error {
 	if share := a.crud.GetShare(request.Path); share != nil {
 		request.Share = share
 		request.CanEdit = share.Edit
@@ -68,14 +68,14 @@ func (a app) handleAnonymousRequest(w http.ResponseWriter, r *http.Request, err 
 	a.renderer.Error(w, http.StatusUnauthorized, err)
 }
 
-func (a app) checkRequest(w http.ResponseWriter, r *http.Request) *provider.Request {
+func (a app) parseRequest(w http.ResponseWriter, r *http.Request) *provider.Request {
 	request := &provider.Request{
 		Path:     r.URL.Path,
 		CanEdit:  false,
 		CanShare: false,
 	}
 
-	if err := a.checkShare(w, r, request); err != nil {
+	if err := a.parseShare(w, r, request); err != nil {
 		a.renderer.Error(w, http.StatusUnauthorized, err)
 		return nil
 	}
@@ -130,7 +130,7 @@ func (a app) Handler() http.Handler {
 			return
 		}
 
-		request := a.checkRequest(w, r)
+		request := a.parseRequest(w, r)
 		if request != nil {
 			a.handleRequest(w, r, request)
 		}

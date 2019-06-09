@@ -13,13 +13,11 @@ import (
 
 // Error render error page with given status
 func (a app) Error(w http.ResponseWriter, status int, err error) {
-	page := provider.Page{
-		Config: a.config,
-		Error: &provider.Error{
-			Status:  status,
-			Content: err.Error(),
-		},
-	}
+	builder := &provider.PageBuilder{}
+	page := builder.Config(a.config).Error(&provider.Error{
+		Status:  status,
+		Content: err.Error(),
+	}).Build()
 
 	logger.Error("%#v", err)
 
@@ -31,9 +29,8 @@ func (a app) Error(w http.ResponseWriter, status int, err error) {
 
 // Sitemap render sitemap.xml
 func (a app) Sitemap(w http.ResponseWriter) {
-	page := provider.Page{
-		Config: a.config,
-	}
+	builder := &provider.PageBuilder{}
+	page := builder.Config(a.config).Build()
 
 	if err := templates.WriteXMLTemplate(a.tpl.Lookup("sitemap"), w, page, http.StatusOK); err != nil {
 		httperror.InternalServerError(w, err)

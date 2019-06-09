@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
@@ -100,7 +101,7 @@ func New(config Config, rootName string, thumbnailApp *thumbnail.App) App {
 		logger.Fatal("%#v", err)
 	}
 
-	publicURL := *config.publicURL
+	publicURL := strings.TrimSpace(*config.publicURL)
 
 	return app{
 		tpl: template.Must(tpl.ParseFiles(fibrTemplates...)),
@@ -120,23 +121,10 @@ func New(config Config, rootName string, thumbnailApp *thumbnail.App) App {
 	}
 }
 
-func (a app) createPageConfiguration(request *provider.Request, message *provider.Message, content map[string]interface{}, layout string) provider.Page {
-	return provider.Page{
-		Config:  a.config,
-		Request: request,
-		Message: message,
-		Content: content,
-		Layout:  layout,
-	}
-}
-
 // Directory render directory listing
 func (a app) Directory(w http.ResponseWriter, request *provider.Request, content map[string]interface{}, layout string, message *provider.Message) {
-	page := a.createPageConfiguration(request, message, content, layout)
-
-	if page.Layout == "" {
-		page.Layout = "grid"
-	}
+	builder := &provider.PageBuilder{}
+	page := builder.Config(a.config).Request(request).Message(message).Layout(layout).Content(content).Build()
 
 	w.Header().Set("content-language", "en")
 	if err := templates.WriteHTMLTemplate(a.tpl.Lookup("files"), w, page, http.StatusOK); err != nil {
@@ -147,7 +135,8 @@ func (a app) Directory(w http.ResponseWriter, request *provider.Request, content
 
 // File render file detail
 func (a app) File(w http.ResponseWriter, request *provider.Request, content map[string]interface{}, message *provider.Message) {
-	page := a.createPageConfiguration(request, message, content, "browser")
+	builder := &provider.PageBuilder{}
+	page := builder.Config(a.config).Request(request).Message(message).Layout("browser").Content(content).Build()
 
 	w.Header().Set("content-language", "en")
 	if err := templates.WriteHTMLTemplate(a.tpl.Lookup("file"), w, page, http.StatusOK); err != nil {
