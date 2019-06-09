@@ -38,14 +38,13 @@ func New(crudApp crud.App, rendererApp renderer.App, authApp auth.App) App {
 	}
 }
 
-func (a app) parseShare(w http.ResponseWriter, r *http.Request, request *provider.Request) error {
+func (a app) parseShare(r *http.Request, request *provider.Request) error {
 	if share := a.crud.GetShare(request.Path); share != nil {
 		request.Share = share
 		request.CanEdit = share.Edit
 		request.Path = strings.TrimPrefix(request.Path, fmt.Sprintf("/%s", share.ID))
 
 		if err := checkSharePassword(r, share); err != nil {
-			w.Header().Add("WWW-Authenticate", "Basic realm=\"Password required\" charset=\"UTF-8\"")
 			return err
 		}
 	}
@@ -53,38 +52,33 @@ func (a app) parseShare(w http.ResponseWriter, r *http.Request, request *provide
 	return nil
 }
 
-func (a app) handleAnonymousRequest(w http.ResponseWriter, r *http.Request, err error) {
+func (a app) handleAnonymousRequest(r *http.Request, err error) *provider.Error {
 	if auth.ErrForbidden == err {
-		a.renderer.Error(w, provider.NewError(http.StatusForbidden, errors.New("you're not authorized to speak to me")))
-		return
+		return provider.NewError(http.StatusForbidden, errors.New("you're not authorized to speak to me"))
 	}
 
 	if err == ident.ErrMalformedAuth || err == ident.ErrUnknownIdentType {
-		a.renderer.Error(w, provider.NewError(http.StatusBadRequest, err))
-		return
+		return provider.NewError(http.StatusBadRequest, err)
 	}
 
-	w.Header().Add("WWW-Authenticate", "Basic charset=\"UTF-8\"")
-	a.renderer.Error(w, provider.NewError(http.StatusUnauthorized, err))
+	return provider.NewError(http.StatusUnauthorized, err)
 }
 
-func (a app) parseRequest(w http.ResponseWriter, r *http.Request) *provider.Request {
+func (a app) parseRequest(r *http.Request) (*provider.Request, *provider.Error) {
 	request := &provider.Request{
 		Path:     r.URL.Path,
 		CanEdit:  false,
 		CanShare: false,
 	}
 
-	if err := a.parseShare(w, r, request); err != nil {
-		a.renderer.Error(w, provider.NewError(http.StatusUnauthorized, err))
-		return nil
+	if err := a.parseShare(r, request); err != nil {
+		return request, provider.NewError(http.StatusUnauthorized, err)
 	}
 
 	if request.Share == nil {
 		user, err := a.auth.IsAuthenticated(r)
 		if err != nil {
-			a.handleAnonymousRequest(w, r, err)
-			return nil
+			return request, a.handleAnonymousRequest(r, err)
 		}
 
 		if user != nil && user.HasProfile("admin") {
@@ -93,7 +87,7 @@ func (a app) parseRequest(w http.ResponseWriter, r *http.Request) *provider.Requ
 		}
 	}
 
-	return request
+	return request, nil
 }
 
 func (a app) handleRequest(w http.ResponseWriter, r *http.Request, config *provider.Request) {
@@ -130,8 +124,9 @@ func (a app) Handler() http.Handler {
 			return
 		}
 
-		request := a.parseRequest(w, r)
-		if request != nil {
+		if request, err := a.parseRequest(r); err != nil {
+			a.renderer.Error(w, err)
+		} else if request != nil {
 			a.handleRequest(w, r, request)
 		}
 	})

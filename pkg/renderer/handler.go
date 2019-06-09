@@ -18,6 +18,10 @@ func (a app) Error(w http.ResponseWriter, err *provider.Error) {
 
 	logger.Error("%#v", err)
 
+	if err.Status == http.StatusUnauthorized {
+		w.Header().Add("WWW-Authenticate", "Basic realm=\"Password required\" charset=\"UTF-8\"")
+	}
+
 	if err := templates.WriteHTMLTemplate(a.tpl.Lookup("error"), w, page, err.Status); err != nil {
 		httperror.InternalServerError(w, err)
 		return

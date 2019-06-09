@@ -46,7 +46,7 @@ func GetPathname(request *Request, name string) string {
 	paths := make([]string, 0)
 
 	if request != nil {
-		paths = append(paths, request.GetPath())
+		paths = append(paths, request.GetFilepath())
 	}
 
 	if name != "" {

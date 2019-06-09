@@ -14,8 +14,8 @@ type Request struct {
 	Share    *Share
 }
 
-// GetPath of request
-func (r Request) GetPath() string {
+// GetFilepath of request
+func (r Request) GetFilepath() string {
 	var prefix string
 
 	if r.Share != nil {
