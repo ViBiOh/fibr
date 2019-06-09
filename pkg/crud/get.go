@@ -88,7 +88,7 @@ func (a *app) GetWithMessage(w http.ResponseWriter, r *http.Request, request *pr
 }
 
 // Get output content
-func (a *app) Get(w http.ResponseWriter, r *http.Request, config *provider.Request) {
+func (a *app) Get(w http.ResponseWriter, r *http.Request, request *provider.Request) {
 	var message *provider.Message
 
 	if messageContent := strings.TrimSpace(r.URL.Query().Get("message")); messageContent != "" {
@@ -98,5 +98,5 @@ func (a *app) Get(w http.ResponseWriter, r *http.Request, config *provider.Reque
 		}
 	}
 
-	a.GetWithMessage(w, r, config, message)
+	a.GetWithMessage(w, r, request, message)
 }

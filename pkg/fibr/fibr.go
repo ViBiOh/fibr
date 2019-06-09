@@ -90,18 +90,18 @@ func (a app) parseRequest(r *http.Request) (*provider.Request, *provider.Error) 
 	return request, nil
 }
 
-func (a app) handleRequest(w http.ResponseWriter, r *http.Request, config *provider.Request) {
+func (a app) handleRequest(w http.ResponseWriter, r *http.Request, request *provider.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		a.crud.Get(w, r, config)
+		a.crud.Get(w, r, request)
 	case http.MethodPost:
-		a.crud.Post(w, r, config)
+		a.crud.Post(w, r, request)
 	case http.MethodPut:
-		a.crud.Create(w, r, config)
+		a.crud.Create(w, r, request)
 	case http.MethodPatch:
-		a.crud.Rename(w, r, config)
+		a.crud.Rename(w, r, request)
 	case http.MethodDelete:
-		a.crud.Delete(w, r, config)
+		a.crud.Delete(w, r, request)
 	default:
 		httperror.NotFound(w)
 	}
