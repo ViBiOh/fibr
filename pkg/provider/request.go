@@ -27,6 +27,19 @@ func (r Request) GetFilepath(name string) string {
 	return path.Join(parts...)
 }
 
+// GetURI of request
+func (r Request) GetURI(name string) string {
+	parts := make([]string, 0)
+
+	if r.Share != nil {
+		parts = append(parts, r.Share.ID)
+	}
+
+	parts = append(parts, r.Path, name)
+
+	return path.Join(parts...)
+}
+
 // Share stores informations about shared paths
 type Share struct {
 	ID       string `json:"id"`

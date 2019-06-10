@@ -12,12 +12,14 @@
         </a>
       </span>
       {{ range $index, $path := .Content.Paths }}
-        <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
-           / 
-          <a href="/{{ if $root.Request.Share }}{{ $root.Request.Share.ID }}/{{ end }}{{ rebuildPaths $root.Content.Paths $index }}/" itemprop="item">
-            <span itemprop="name">{{ $path }}</span>
-          </a>
-        </span>
+        {{ if or (not $root.Request.Share) (ne $index 0) }}
+          <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+             / 
+            <a href="/{{ rebuildPaths $root.Content.Paths $index }}/" itemprop="item">
+              <span itemprop="name">{{ $path }}</span>
+            </a>
+          </span>
+        {{ end }}
       {{ end }}
     </h1>
   </header>

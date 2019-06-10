@@ -34,10 +34,10 @@ func getFormFilepath(r *http.Request, request *provider.Request, formName string
 }
 
 func getPathParts(request *provider.Request) []string {
-	paths := strings.Split(strings.Trim(request.Path, "/"), "/")
-	if len(paths) == 1 && paths[0] == "" {
-		paths = nil
+	cleanURI := strings.TrimSpace(strings.Trim(request.GetURI(""), "/"))
+	if cleanURI == "" {
+		return nil
 	}
 
-	return paths
+	return strings.Split(cleanURI, "/")
 }

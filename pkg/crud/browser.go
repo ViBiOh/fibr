@@ -1,6 +1,7 @@
 package crud
 
 import (
+	"fmt"
 	"net/http"
 	"path"
 
@@ -37,9 +38,12 @@ func (a *app) Browser(w http.ResponseWriter, request *provider.Request, file *pr
 		previous, next = getPreviousAndNext(file, files)
 	}
 
+	pathParts := getPathParts(request)
+
 	content := map[string]interface{}{
-		"Paths":    getPathParts(request),
+		"Paths":    pathParts,
 		"File":     file,
+		"Parent":   fmt.Sprintf("/%s", path.Join(pathParts[:len(pathParts)-1]...)),
 		"Previous": previous,
 		"Next":     next,
 	}
