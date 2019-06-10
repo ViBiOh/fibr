@@ -89,8 +89,8 @@ func New(config Config, rootName string, thumbnail thumbnail.App) App {
 				return "file"
 			}
 		},
-		"hasThumbnail": func(request *provider.Request, file *provider.StorageItem) bool {
-			_, ok := thumbnail.HasThumbnail(request.GetFilepath(file.Name))
+		"hasThumbnail": func(request *provider.Request, item *provider.StorageItem) bool {
+			_, ok := thumbnail.HasThumbnail(item)
 			return ok
 		},
 	})

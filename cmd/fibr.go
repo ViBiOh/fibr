@@ -46,12 +46,6 @@ func main() {
 
 	alcotest.DoAndExit(alcotestConfig)
 
-	storage, err := filesystem.New(filesystemConfig)
-	if err != nil {
-		logger.Error("%#v", err)
-		os.Exit(1)
-	}
-
 	serverApp, err := httputils.New(serverConfig)
 	if err != nil {
 		logger.Fatal("%#v", err)
@@ -62,6 +56,12 @@ func main() {
 	opentracingApp := opentracing.New(opentracingConfig)
 	owaspApp := owasp.New(owaspConfig)
 	gzipApp := gzip.New()
+
+	storage, err := filesystem.New(filesystemConfig)
+	if err != nil {
+		logger.Error("%#v", err)
+		os.Exit(1)
+	}
 
 	thumbnailApp := thumbnail.New(thumbnailConfig, storage)
 	rendererApp := renderer.New(rendererConfig, storage.Root(), thumbnailApp)

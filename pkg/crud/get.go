@@ -52,11 +52,11 @@ func (a *app) GetWithMessage(w http.ResponseWriter, r *http.Request, request *pr
 
 	if isThumbnail(r) {
 		if info.IsDir {
-			a.thumbnail.List(w, r, info.Pathname)
+			a.thumbnail.List(w, r, info)
 			return
 		}
 
-		if a.thumbnail.Serve(w, r, info.Pathname) {
+		if a.thumbnail.Serve(w, r, info) {
 			return
 		}
 	}

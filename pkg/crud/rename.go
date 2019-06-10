@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/fibr/pkg/thumbnail"
 )
 
 // Rename rename given path to a new one
@@ -53,17 +52,12 @@ func (a *app) Rename(w http.ResponseWriter, r *http.Request, request *provider.R
 		return
 	}
 
-	go a.renameThumbnail(oldPath, newPath)
+	newInfo, err := a.storage.Info(newPath)
+	if err != nil {
+		a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))
+	}
+
+	go a.renameThumbnail(oldInfo, newInfo)
 
 	a.List(w, request, r.URL.Query().Get("d"), &provider.Message{Level: "success", Content: fmt.Sprintf("%s successfully renamed to %s", oldInfo.Name, newName)})
-}
-
-func (a *app) renameThumbnail(oldPath, newPath string) {
-	if !a.deleteThumbnail(oldPath) {
-		return
-	}
-
-	if thumbnail.CanHaveThumbnail(newPath) {
-		a.thumbnail.AsyncGenerateThumbnail(newPath)
-	}
 }

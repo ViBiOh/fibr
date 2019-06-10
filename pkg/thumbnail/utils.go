@@ -17,8 +17,8 @@ func getCtx(ctx context.Context) (context.Context, context.CancelFunc) {
 }
 
 // CanHaveThumbnail determine if thumbnail can be generated for given pathname
-func CanHaveThumbnail(pathname string) bool {
-	extension := strings.ToLower(path.Ext(pathname))
+func CanHaveThumbnail(item *provider.StorageItem) bool {
+	extension := strings.ToLower(path.Ext(item.Pathname))
 
 	return provider.ImageExtensions[extension] || provider.PdfExtensions[extension]
 }
@@ -29,8 +29,8 @@ func safeWrite(w io.Writer, content string) {
 	}
 }
 
-func getThumbnailPath(pathname string) string {
-	fullPath := path.Join(provider.MetadataDirectoryName, pathname)
+func getThumbnailPath(item *provider.StorageItem) string {
+	fullPath := path.Join(provider.MetadataDirectoryName, item.Pathname)
 
 	return fmt.Sprintf("%s.jpg", strings.TrimSuffix(fullPath, path.Ext(fullPath)))
 }
