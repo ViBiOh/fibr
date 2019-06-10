@@ -25,7 +25,7 @@ var (
 // App of package
 type App interface {
 	Browser(http.ResponseWriter, *provider.Request, *provider.StorageItem, *provider.Message)
-	CheckAndServeSEO(http.ResponseWriter, *http.Request) bool
+	ServeStatic(http.ResponseWriter, *http.Request) bool
 
 	List(http.ResponseWriter, *provider.Request, string, *provider.Message)
 	Get(http.ResponseWriter, *http.Request, *provider.Request)

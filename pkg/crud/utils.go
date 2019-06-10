@@ -7,14 +7,14 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
-func checkFormName(r *http.Request, formName string) (string, error) {
+func checkFormName(r *http.Request, formName string) (string, *provider.Error) {
 	name := strings.TrimSpace(r.FormValue(formName))
 	if name == "" {
-		return "", ErrEmptyName
+		return "", provider.NewError(http.StatusBadRequest, ErrEmptyName)
 	}
 
 	if name == "/" {
-		return "", ErrNotAuthorized
+		return "", provider.NewError(http.StatusForbidden, ErrNotAuthorized)
 	}
 
 	return name, nil

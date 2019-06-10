@@ -118,7 +118,7 @@ func (a app) Handler() http.Handler {
 			return
 		}
 
-		if a.crud.CheckAndServeSEO(w, r) {
+		if a.crud.ServeStatic(w, r) {
 			return
 		}
 

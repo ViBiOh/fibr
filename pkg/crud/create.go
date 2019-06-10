@@ -16,15 +16,15 @@ func (a *app) Create(w http.ResponseWriter, r *http.Request, request *provider.R
 		return
 	}
 
-	name, err := checkFormName(r, "name")
-	if err != nil && err != ErrEmptyName {
-		a.renderer.Error(w, provider.NewError(http.StatusForbidden, ErrNotAuthorized))
+	name, httpErr := checkFormName(r, "name")
+	if httpErr != nil && httpErr.Err != ErrEmptyName {
+		a.renderer.Error(w, httpErr)
 		return
 	}
 
 	pathname, err := provider.SanitizeName(request.GetFilepath(name), false)
 	if err != nil {
-		a.renderer.Error(w, provider.NewError(http.StatusBadRequest, err))
+		a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
 

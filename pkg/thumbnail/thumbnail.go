@@ -37,7 +37,7 @@ var (
 type App interface {
 	Generate()
 	HasThumbnail(string) (string, bool)
-	ServeIfPresent(http.ResponseWriter, *http.Request, string) bool
+	Serve(http.ResponseWriter, *http.Request, string) bool
 	List(http.ResponseWriter, *http.Request, string)
 	AsyncGenerateThumbnail(string)
 }
@@ -105,8 +105,12 @@ func (a app) HasThumbnail(pathname string) (string, bool) {
 	return thumbnailPath, err == nil
 }
 
-// ServeIfPresent check if thumbnail is present and serve it
-func (a app) ServeIfPresent(w http.ResponseWriter, r *http.Request, pathname string) bool {
+// Serve check if thumbnail is present and serve it
+func (a app) Serve(w http.ResponseWriter, r *http.Request, pathname string) bool {
+	if !CanHaveThumbnail(pathname) {
+		return false
+	}
+
 	if thumbnailPath, ok := a.HasThumbnail(pathname); ok {
 		a.storage.Serve(w, r, thumbnailPath)
 		return true

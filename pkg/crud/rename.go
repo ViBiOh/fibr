@@ -15,20 +15,21 @@ func (a *app) Rename(w http.ResponseWriter, r *http.Request, request *provider.R
 		return
 	}
 
-	newName, err := checkFormName(r, "newName")
-	if err != nil {
-		if err == ErrNotAuthorized {
-			a.renderer.Error(w, provider.NewError(http.StatusForbidden, err))
-			return
-		} else if err == ErrEmptyName {
-			a.renderer.Error(w, provider.NewError(http.StatusBadRequest, err))
-			return
-		}
+	newName, httpErr := checkFormName(r, "newName")
+	if httpErr != nil {
+		a.renderer.Error(w, httpErr)
+		return
 	}
 
-	newName = request.GetFilepath(newName)
-	_, err = a.storage.Info(newName)
-	if err == nil {
+	oldPath, httErr := checkFormName(r, "name")
+	if httErr != nil && httErr.Err != ErrEmptyName {
+		a.renderer.Error(w, httErr)
+		return
+	}
+
+	newPath := request.GetFilepath(newName)
+
+	if _, err := a.storage.Info(newPath); err == nil {
 		a.renderer.Error(w, provider.NewError(http.StatusBadRequest, err))
 		return
 	} else if !provider.IsNotExist(err) {
@@ -36,13 +37,7 @@ func (a *app) Rename(w http.ResponseWriter, r *http.Request, request *provider.R
 		return
 	}
 
-	oldName, err := checkFormName(r, "name")
-	if err != nil && err != ErrEmptyName {
-		a.renderer.Error(w, provider.NewError(http.StatusForbidden, err))
-		return
-	}
-
-	oldInfo, err := a.storage.Info(request.GetFilepath(oldName))
+	oldInfo, err := a.storage.Info(request.GetFilepath(oldPath))
 	if err != nil {
 		if !provider.IsNotExist(err) {
 			a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))
@@ -53,21 +48,22 @@ func (a *app) Rename(w http.ResponseWriter, r *http.Request, request *provider.R
 		return
 	}
 
-	if err := a.storage.Rename(oldInfo.Pathname, newName); err != nil {
+	if err := a.storage.Rename(oldPath, newPath); err != nil {
 		a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
 
-	if thumbnailPath, ok := a.thumbnail.HasThumbnail(oldName); ok {
-		if err := a.storage.Remove(thumbnailPath); err != nil {
-			a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))
-			return
-		}
-
-		if thumbnail.CanHaveThumbnail(newName) {
-			a.thumbnail.AsyncGenerateThumbnail(newName)
-		}
-	}
+	go a.renameThumbnail(oldPath, newPath)
 
 	a.List(w, request, r.URL.Query().Get("d"), &provider.Message{Level: "success", Content: fmt.Sprintf("%s successfully renamed to %s", oldInfo.Name, newName)})
+}
+
+func (a *app) renameThumbnail(oldPath, newPath string) {
+	if !a.deleteThumbnail(oldPath) {
+		return
+	}
+
+	if thumbnail.CanHaveThumbnail(newPath) {
+		a.thumbnail.AsyncGenerateThumbnail(newPath)
+	}
 }

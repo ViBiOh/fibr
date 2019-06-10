@@ -7,12 +7,11 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/pkg/query"
 )
 
-// CheckAndServeSEO check if filename match SEO and serve it, or not
-func (a *app) CheckAndServeSEO(w http.ResponseWriter, r *http.Request) bool {
+// ServeStatic check if filename match SEO or static filename and serve it
+func (a *app) ServeStatic(w http.ResponseWriter, r *http.Request) bool {
 	if r.Method != http.MethodGet {
 		return false
 	}
@@ -39,19 +38,9 @@ func isThumbnail(r *http.Request) bool {
 	return query.GetBool(r, "thumbnail")
 }
 
-func (a *app) checkAndServeThumbnail(w http.ResponseWriter, r *http.Request, info *provider.StorageItem) bool {
-	if isThumbnail(r) && thumbnail.CanHaveThumbnail(info.Pathname) {
-		return a.thumbnail.ServeIfPresent(w, r, info.Pathname)
-	}
-
-	return false
-}
-
 // GetWithMessage output content with given message
 func (a *app) GetWithMessage(w http.ResponseWriter, r *http.Request, request *provider.Request, message *provider.Message) {
-	pathname := request.GetFilepath("")
-
-	info, err := a.storage.Info(pathname)
+	info, err := a.storage.Info(request.GetFilepath(""))
 	if err != nil {
 		if provider.IsNotExist(err) {
 			a.renderer.Error(w, provider.NewError(http.StatusNotFound, err))
@@ -61,17 +50,24 @@ func (a *app) GetWithMessage(w http.ResponseWriter, r *http.Request, request *pr
 		return
 	}
 
-	if !info.IsDir {
-		if a.checkAndServeThumbnail(w, r, info) {
+	if isThumbnail(r) {
+		if info.IsDir {
+			a.thumbnail.List(w, r, info.Pathname)
 			return
 		}
 
+		if a.thumbnail.Serve(w, r, info.Pathname) {
+			return
+		}
+	}
+
+	if !info.IsDir {
 		if query.GetBool(r, "browser") {
 			a.Browser(w, request, info, message)
-			return
+		} else {
+			a.storage.Serve(w, r, info.Pathname)
 		}
 
-		a.storage.Serve(w, r, pathname)
 		return
 	}
 
@@ -80,11 +76,7 @@ func (a *app) GetWithMessage(w http.ResponseWriter, r *http.Request, request *pr
 		return
 	}
 
-	if isThumbnail(r) {
-		a.thumbnail.List(w, r, pathname)
-	} else {
-		a.List(w, request, r.URL.Query().Get("d"), message)
-	}
+	a.List(w, request, r.URL.Query().Get("d"), message)
 }
 
 // Get output content
