@@ -22,14 +22,20 @@
        */
       window.onkeyup = (e) => {
         {{ if .Content.Previous }}
-          if (e.keyCode === 37) {
+          if (e.key === 'ArrowLeft') {
             window.location.href = '{{ .Content.Previous.Name }}?browser=true';
           }
         {{ end }}
 
         {{ if .Content.Next }}
-          if (e.keyCode === 39) {
+          if (e.key === 'ArrowRight') {
             window.location.href = '{{ .Content.Next.Name }}?browser=true';
+          }
+        {{ end }}
+
+        {{ if .Content.Parent }}
+          if (e.key === 'Escape') {
+            window.location.href = '{{ .Content.Parent }}';
           }
         {{ end }}
       };
