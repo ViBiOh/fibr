@@ -41,7 +41,7 @@ func isThumbnail(r *http.Request) bool {
 
 func (a *app) checkAndServeThumbnail(w http.ResponseWriter, r *http.Request, info *provider.StorageItem) bool {
 	if isThumbnail(r) && thumbnail.CanHaveThumbnail(info.Pathname) {
-		return a.thumbnailApp.ServeIfPresent(w, r, info.Pathname)
+		return a.thumbnail.ServeIfPresent(w, r, info.Pathname)
 	}
 
 	return false
@@ -81,7 +81,7 @@ func (a *app) GetWithMessage(w http.ResponseWriter, r *http.Request, request *pr
 	}
 
 	if isThumbnail(r) {
-		a.thumbnailApp.List(w, r, pathname)
+		a.thumbnail.List(w, r, pathname)
 	} else {
 		a.List(w, request, r.URL.Query().Get("d"), message)
 	}

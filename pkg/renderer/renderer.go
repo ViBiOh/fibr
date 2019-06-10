@@ -32,9 +32,8 @@ type Config struct {
 }
 
 type app struct {
-	config       *provider.Config
-	tpl          *template.Template
-	thumbnailApp *thumbnail.App
+	config *provider.Config
+	tpl    *template.Template
 }
 
 // Flags adds flags for configuring package
@@ -46,7 +45,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 }
 
 // New creates new App from Config
-func New(config Config, rootName string, thumbnailApp *thumbnail.App) App {
+func New(config Config, rootName string, thumbnail thumbnail.App) App {
 	tpl := template.New("fibr")
 
 	tpl.Funcs(template.FuncMap{
@@ -91,7 +90,7 @@ func New(config Config, rootName string, thumbnailApp *thumbnail.App) App {
 			}
 		},
 		"hasThumbnail": func(request *provider.Request, file *provider.StorageItem) bool {
-			_, ok := thumbnailApp.HasThumbnail(request.GetFilepath(file.Name))
+			_, ok := thumbnail.HasThumbnail(request.GetFilepath(file.Name))
 			return ok
 		},
 	})
@@ -117,7 +116,6 @@ func New(config Config, rootName string, thumbnailApp *thumbnail.App) App {
 				ImgWidth:    512,
 			},
 		},
-		thumbnailApp: thumbnailApp,
 	}
 }
 

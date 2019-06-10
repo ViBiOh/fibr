@@ -1,9 +1,14 @@
 package provider
 
 import (
+	"encoding/base64"
 	"mime"
+	"net/http"
 	"path"
 	"strings"
+
+	"github.com/ViBiOh/httputils/pkg/errors"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // Request from user
@@ -47,6 +52,37 @@ type Share struct {
 	RootName string `json:"rootName"`
 	Edit     bool   `json:"edit"`
 	Password string `json:"password"`
+}
+
+// CheckPassword verifies that request has correct password for share
+func (s Share) CheckPassword(r *http.Request) error {
+	if s.Password == "" {
+		return nil
+	}
+
+	header := r.Header.Get("Authorization")
+	if header == "" {
+		return errors.New("empty authorization header")
+	}
+
+	data, err := base64.StdEncoding.DecodeString(strings.TrimPrefix(header, "Basic "))
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	dataStr := string(data)
+
+	sepIndex := strings.Index(dataStr, ":")
+	if sepIndex < 0 {
+		return errors.New("invalid format for basic auth")
+	}
+
+	password := dataStr[sepIndex+1:]
+	if err := bcrypt.CompareHashAndPassword([]byte(s.Password), []byte(password)); err != nil {
+		return errors.New("invalid credentials")
+	}
+
+	return nil
 }
 
 // Config data

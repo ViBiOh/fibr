@@ -47,7 +47,7 @@ func (a *app) saveUploadedFile(request *provider.Request, uploadedFile io.ReadCl
 	}
 
 	if thumbnail.CanHaveThumbnail(filePath) {
-		a.thumbnailApp.AsyncGenerateThumbnail(filePath)
+		a.thumbnail.AsyncGenerateThumbnail(filePath)
 	}
 
 	return filename, nil

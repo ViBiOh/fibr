@@ -57,14 +57,14 @@ func (a *app) Rename(w http.ResponseWriter, r *http.Request, request *provider.R
 		return
 	}
 
-	if thumbnailPath, ok := a.thumbnailApp.HasThumbnail(oldName); ok {
+	if thumbnailPath, ok := a.thumbnail.HasThumbnail(oldName); ok {
 		if err := a.storage.Remove(thumbnailPath); err != nil {
 			a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))
 			return
 		}
 
 		if thumbnail.CanHaveThumbnail(newName) {
-			a.thumbnailApp.AsyncGenerateThumbnail(newName)
+			a.thumbnail.AsyncGenerateThumbnail(newName)
 		}
 	}
 

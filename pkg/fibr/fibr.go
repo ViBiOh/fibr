@@ -14,10 +14,6 @@ import (
 	"github.com/ViBiOh/httputils/pkg/httperror"
 )
 
-var (
-	errEmptyAuthorizationHeader = errors.New("empty authorization header")
-)
-
 // App of package
 type App interface {
 	Handler() http.Handler
@@ -44,7 +40,7 @@ func (a app) parseShare(r *http.Request, request *provider.Request) error {
 		request.CanEdit = share.Edit
 		request.Path = strings.TrimPrefix(request.Path, fmt.Sprintf("/%s", share.ID))
 
-		if err := checkSharePassword(r, share); err != nil {
+		if err := share.CheckPassword(r); err != nil {
 			return err
 		}
 	}
@@ -72,7 +68,7 @@ func (a app) parseRequest(r *http.Request) (*provider.Request, *provider.Error) 
 	}
 
 	if err := a.parseShare(r, request); err != nil {
-		return request, provider.NewError(http.StatusUnauthorized, err)
+		return nil, provider.NewError(http.StatusUnauthorized, err)
 	}
 
 	if request.Share != nil {
@@ -81,7 +77,7 @@ func (a app) parseRequest(r *http.Request) (*provider.Request, *provider.Error) 
 
 	user, err := a.auth.IsAuthenticated(r)
 	if err != nil {
-		return request, a.handleAnonymousRequest(r, err)
+		return nil, a.handleAnonymousRequest(r, err)
 	}
 
 	if user != nil && user.HasProfile("admin") {

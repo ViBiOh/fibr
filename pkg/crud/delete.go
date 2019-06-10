@@ -31,7 +31,7 @@ func (a *app) Delete(w http.ResponseWriter, r *http.Request, request *provider.R
 		return
 	}
 
-	if thumbnailPath, ok := a.thumbnailApp.HasThumbnail(pathname); ok {
+	if thumbnailPath, ok := a.thumbnail.HasThumbnail(pathname); ok {
 		if err := a.storage.Remove(thumbnailPath); err != nil {
 			a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))
 			return

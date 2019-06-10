@@ -49,9 +49,10 @@ type app struct {
 	metadataEnabled bool
 	metadatas       []*provider.Share
 	metadataLock    sync.Mutex
-	storage         provider.Storage
-	renderer        provider.Renderer
-	thumbnailApp    *thumbnail.App
+
+	storage   provider.Storage
+	renderer  provider.Renderer
+	thumbnail thumbnail.App
 }
 
 // Flags adds flags for configuring package
@@ -62,13 +63,13 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 }
 
 // New creates new App from Config
-func New(config Config, storage provider.Storage, renderer provider.Renderer, thumbnailApp *thumbnail.App) App {
+func New(config Config, storage provider.Storage, renderer provider.Renderer, thumbnail thumbnail.App) App {
 	app := &app{
 		metadataEnabled: *config.metadata,
 		metadataLock:    sync.Mutex{},
 		storage:         storage,
 		renderer:        renderer,
-		thumbnailApp:    thumbnailApp,
+		thumbnail:       thumbnail,
 	}
 
 	if app.metadataEnabled {
@@ -76,7 +77,7 @@ func New(config Config, storage provider.Storage, renderer provider.Renderer, th
 			logger.Fatal("%#v", err)
 		}
 
-		go thumbnailApp.Generate()
+		go thumbnail.Generate()
 	}
 
 	return app
