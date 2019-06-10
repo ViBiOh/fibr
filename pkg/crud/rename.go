@@ -15,7 +15,7 @@ func (a *app) Rename(w http.ResponseWriter, r *http.Request, request *provider.R
 		return
 	}
 
-	newName, err := getFormFilepath(r, request, "newName")
+	newName, err := checkFormName(r, "newName")
 	if err != nil {
 		if err == ErrNotAuthorized {
 			a.renderer.Error(w, provider.NewError(http.StatusForbidden, err))
@@ -26,6 +26,7 @@ func (a *app) Rename(w http.ResponseWriter, r *http.Request, request *provider.R
 		}
 	}
 
+	newName = request.GetFilepath(newName)
 	_, err = a.storage.Info(newName)
 	if err == nil {
 		a.renderer.Error(w, provider.NewError(http.StatusBadRequest, err))
@@ -35,13 +36,13 @@ func (a *app) Rename(w http.ResponseWriter, r *http.Request, request *provider.R
 		return
 	}
 
-	oldName, err := getFilepath(r, request)
-	if err != nil && err == ErrNotAuthorized {
+	oldName, err := checkFormName(r, "name")
+	if err != nil && err != ErrEmptyName {
 		a.renderer.Error(w, provider.NewError(http.StatusForbidden, err))
 		return
 	}
 
-	info, err := a.storage.Info(oldName)
+	oldInfo, err := a.storage.Info(request.GetFilepath(oldName))
 	if err != nil {
 		if !provider.IsNotExist(err) {
 			a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))
@@ -52,7 +53,7 @@ func (a *app) Rename(w http.ResponseWriter, r *http.Request, request *provider.R
 		return
 	}
 
-	if err := a.storage.Rename(oldName, newName); err != nil {
+	if err := a.storage.Rename(oldInfo.Pathname, newName); err != nil {
 		a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
@@ -68,5 +69,5 @@ func (a *app) Rename(w http.ResponseWriter, r *http.Request, request *provider.R
 		}
 	}
 
-	a.List(w, request, r.URL.Query().Get("d"), &provider.Message{Level: "success", Content: fmt.Sprintf("%s successfully renamed to %s", info.Name, newName)})
+	a.List(w, request, r.URL.Query().Get("d"), &provider.Message{Level: "success", Content: fmt.Sprintf("%s successfully renamed to %s", oldInfo.Name, newName)})
 }

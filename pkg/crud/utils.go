@@ -7,21 +7,8 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
-func getFilepath(r *http.Request, request *provider.Request) (string, error) {
-	name := r.FormValue("name")
-	if name == "" {
-		name = request.Path
-	}
-
-	if name == "/" {
-		return "", ErrNotAuthorized
-	}
-
-	return request.GetFilepath(name), nil
-}
-
-func getFormFilepath(r *http.Request, request *provider.Request, formName string) (string, error) {
-	name := r.FormValue(formName)
+func checkFormName(r *http.Request, formName string) (string, error) {
+	name := strings.TrimSpace(r.FormValue(formName))
 	if name == "" {
 		return "", ErrEmptyName
 	}
@@ -30,7 +17,7 @@ func getFormFilepath(r *http.Request, request *provider.Request, formName string
 		return "", ErrNotAuthorized
 	}
 
-	return request.GetFilepath(name), nil
+	return name, nil
 }
 
 func getPathParts(request *provider.Request) []string {

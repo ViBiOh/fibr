@@ -14,24 +14,24 @@ func (a *app) Delete(w http.ResponseWriter, r *http.Request, request *provider.R
 		return
 	}
 
-	pathname, err := getFilepath(r, request)
-	if err != nil && err == ErrNotAuthorized {
+	name, err := checkFormName(r, "name")
+	if err != nil && err != ErrEmptyName {
 		a.renderer.Error(w, provider.NewError(http.StatusForbidden, err))
 		return
 	}
 
-	info, err := a.storage.Info(pathname)
+	info, err := a.storage.Info(request.GetFilepath(name))
 	if err != nil {
 		a.renderer.Error(w, provider.NewError(http.StatusNotFound, err))
 		return
 	}
 
-	if err := a.storage.Remove(pathname); err != nil {
+	if err := a.storage.Remove(info.Pathname); err != nil {
 		a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
 
-	if thumbnailPath, ok := a.thumbnail.HasThumbnail(pathname); ok {
+	if thumbnailPath, ok := a.thumbnail.HasThumbnail(info.Pathname); ok {
 		if err := a.storage.Remove(thumbnailPath); err != nil {
 			a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))
 			return
