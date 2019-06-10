@@ -15,14 +15,16 @@ type Request struct {
 }
 
 // GetFilepath of request
-func (r Request) GetFilepath() string {
-	var prefix string
+func (r Request) GetFilepath(name string) string {
+	parts := make([]string, 0)
 
 	if r.Share != nil {
-		prefix = r.Share.Path
+		parts = append(parts, r.Share.Path)
 	}
 
-	return path.Join(prefix, r.Path)
+	parts = append(parts, r.Path, name)
+
+	return path.Join(parts...)
 }
 
 // Share stores informations about shared paths
@@ -59,8 +61,8 @@ type Message struct {
 
 // Error rendered to user
 type Error struct {
-	Status  int
-	Content string
+	Status int
+	Err    error
 }
 
 // NewError create an http error
@@ -70,8 +72,8 @@ func NewError(status int, err error) *Error {
 	}
 
 	return &Error{
-		Status:  status,
-		Content: err.Error(),
+		Status: status,
+		Err:    err,
 	}
 }
 

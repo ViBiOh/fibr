@@ -10,8 +10,8 @@ import (
 	"github.com/ViBiOh/fibr/pkg/crud"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/renderer"
+	"github.com/ViBiOh/httputils/pkg/errors"
 	"github.com/ViBiOh/httputils/pkg/httperror"
-	"github.com/pkg/errors"
 )
 
 var (
@@ -75,16 +75,18 @@ func (a app) parseRequest(r *http.Request) (*provider.Request, *provider.Error) 
 		return request, provider.NewError(http.StatusUnauthorized, err)
 	}
 
-	if request.Share == nil {
-		user, err := a.auth.IsAuthenticated(r)
-		if err != nil {
-			return request, a.handleAnonymousRequest(r, err)
-		}
+	if request.Share != nil {
+		return request, nil
+	}
 
-		if user != nil && user.HasProfile("admin") {
-			request.CanEdit = true
-			request.CanShare = true
-		}
+	user, err := a.auth.IsAuthenticated(r)
+	if err != nil {
+		return request, a.handleAnonymousRequest(r, err)
+	}
+
+	if user != nil && user.HasProfile("admin") {
+		request.CanEdit = true
+		request.CanShare = true
 	}
 
 	return request, nil

@@ -49,7 +49,7 @@ func (a *app) checkAndServeThumbnail(w http.ResponseWriter, r *http.Request, inf
 
 // GetWithMessage output content with given message
 func (a *app) GetWithMessage(w http.ResponseWriter, r *http.Request, request *provider.Request, message *provider.Message) {
-	pathname := provider.GetPathname(request, "")
+	pathname := request.GetFilepath("")
 
 	info, err := a.storage.Info(pathname)
 	if err != nil {
@@ -66,7 +66,7 @@ func (a *app) GetWithMessage(w http.ResponseWriter, r *http.Request, request *pr
 			return
 		}
 
-		if r.URL.Query().Get("browser") == "true" {
+		if query.GetBool(r, "browser") {
 			a.Browser(w, request, info, message)
 			return
 		}

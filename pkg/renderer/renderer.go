@@ -91,7 +91,7 @@ func New(config Config, rootName string, thumbnailApp *thumbnail.App) App {
 			}
 		},
 		"hasThumbnail": func(request *provider.Request, file *provider.StorageItem) bool {
-			_, ok := thumbnailApp.HasThumbnail(provider.GetPathname(request, file.Name))
+			_, ok := thumbnailApp.HasThumbnail(request.GetFilepath(file.Name))
 			return ok
 		},
 	})
@@ -123,8 +123,7 @@ func New(config Config, rootName string, thumbnailApp *thumbnail.App) App {
 
 // Directory render directory listing
 func (a app) Directory(w http.ResponseWriter, request *provider.Request, content map[string]interface{}, layout string, message *provider.Message) {
-	builder := &provider.PageBuilder{}
-	page := builder.Config(a.config).Request(request).Message(message).Layout(layout).Content(content).Build()
+	page := (&provider.PageBuilder{}).Config(a.config).Request(request).Message(message).Layout(layout).Content(content).Build()
 
 	w.Header().Set("content-language", "en")
 	if err := templates.WriteHTMLTemplate(a.tpl.Lookup("files"), w, page, http.StatusOK); err != nil {
@@ -135,8 +134,7 @@ func (a app) Directory(w http.ResponseWriter, request *provider.Request, content
 
 // File render file detail
 func (a app) File(w http.ResponseWriter, request *provider.Request, content map[string]interface{}, message *provider.Message) {
-	builder := &provider.PageBuilder{}
-	page := builder.Config(a.config).Request(request).Message(message).Layout("browser").Content(content).Build()
+	page := (&provider.PageBuilder{}).Config(a.config).Request(request).Message(message).Layout("browser").Content(content).Build()
 
 	w.Header().Set("content-language", "en")
 	if err := templates.WriteHTMLTemplate(a.tpl.Lookup("file"), w, page, http.StatusOK); err != nil {

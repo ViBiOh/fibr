@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/pkg/errors"
+	"github.com/ViBiOh/httputils/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 )
 

@@ -1,7 +1,6 @@
 package provider
 
 import (
-	"path"
 	"regexp"
 	"strings"
 	"unicode"
@@ -39,21 +38,6 @@ func SanitizeName(name string, removeSlash bool) (string, error) {
 	}
 
 	return sanitized, nil
-}
-
-// GetPathname return file path from given paths
-func GetPathname(request *Request, name string) string {
-	paths := make([]string, 0)
-
-	if request != nil {
-		paths = append(paths, request.GetFilepath())
-	}
-
-	if name != "" {
-		paths = append(paths, name)
-	}
-
-	return path.Join(paths...)
 }
 
 // IsNotExist checks if error match a not found

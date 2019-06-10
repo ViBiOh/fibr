@@ -27,7 +27,7 @@ func (a *app) saveUploadedFile(request *provider.Request, uploadedFile io.ReadCl
 		return "", err
 	}
 
-	filePath := provider.GetPathname(request, filename)
+	filePath := request.GetFilepath(filename)
 
 	hostFile, err := a.storage.WriterTo(filePath)
 	if hostFile != nil {
