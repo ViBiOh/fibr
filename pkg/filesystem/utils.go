@@ -6,6 +6,7 @@ import (
 	"path"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/pkg/errors"
 )
 
 func getFile(filename string) (io.WriteCloser, error) {
@@ -22,4 +23,16 @@ func convertToItem(pathname string, info os.FileInfo) *provider.StorageItem {
 		Name:     info.Name(),
 		IsDir:    info.IsDir(),
 	}
+}
+
+func convertError(err error) error {
+	if err == nil {
+		return nil
+	}
+
+	if os.IsNotExist(err) {
+		return provider.ErrNotExist(err)
+	}
+
+	return errors.WithStack(err)
 }

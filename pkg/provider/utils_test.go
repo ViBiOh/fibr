@@ -90,8 +90,8 @@ func TestIsNotExist(t *testing.T) {
 			false,
 		},
 		{
-			"empty error",
-			errors.New("index.html: no such file or directory"),
+			"file error",
+			ErrNotExist(errors.New("index.html: no such file or directory")),
 			true,
 		},
 	}
@@ -99,7 +99,7 @@ func TestIsNotExist(t *testing.T) {
 	for _, testCase := range cases {
 		t.Run(testCase.intention, func(t *testing.T) {
 			if result := IsNotExist(testCase.input); result != testCase.want {
-				t.Errorf("IsNotExist(`%#v`) = %#v, want %#v", testCase.input, result, testCase.want)
+				t.Errorf("IsNotExist(%#v) = %#v, want %#v", testCase.input, result, testCase.want)
 			}
 		})
 	}

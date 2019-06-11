@@ -1,7 +1,7 @@
 package filesystem
 
 import (
-	native_errors "errors"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -14,7 +14,6 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/pkg/errors"
 	"github.com/ViBiOh/httputils/pkg/httperror"
 	"github.com/ViBiOh/httputils/pkg/logger"
 	"github.com/ViBiOh/httputils/pkg/tools"
@@ -24,12 +23,7 @@ var (
 	_ provider.Storage = &app{}
 
 	// ErrRelativePath occurs when path is relative (contains ".."")
-	ErrRelativePath = native_errors.New("pathname contains relatives paths")
-
-	// ErrOutsidePath occurs when path is not under served directory
-	ErrOutsidePath = native_errors.New("pathname does not belong to served directory")
-
-	copyBuffer = make([]byte, 32*1024)
+	ErrRelativePath = errors.New("pathname contains relatives paths")
 )
 
 // Config of package
@@ -59,11 +53,11 @@ func New(config Config) (provider.Storage, error) {
 
 	info, err := os.Stat(rootDirectory)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, convertError(err)
 	}
 
 	if !info.IsDir() {
-		return nil, errors.New("path %s is not a directory", rootDirectory)
+		return nil, fmt.Errorf("path %s is not a directory", rootDirectory)
 	}
 
 	logger.Info("Serving file from %s", rootDirectory)
@@ -104,7 +98,7 @@ func (a app) Info(pathname string) (*provider.StorageItem, error) {
 
 	info, err := os.Stat(a.getFullPath(pathname))
 	if err != nil {
-		return nil, err
+		return nil, convertError(err)
 	}
 
 	return convertToItem(path.Dir(pathname), info), nil
@@ -126,7 +120,7 @@ func (a app) ReaderFrom(pathname string) (io.ReadCloser, error) {
 	}
 
 	output, err := os.OpenFile(a.getFullPath(pathname), os.O_RDONLY, 0600)
-	return output, errors.WithStack(err)
+	return output, convertError(err)
 }
 
 // Serve file for given pathname
@@ -147,7 +141,7 @@ func (a app) List(pathname string) ([]*provider.StorageItem, error) {
 
 	files, err := ioutil.ReadDir(a.getFullPath(pathname))
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, convertError(err)
 	}
 
 	items := make([]*provider.StorageItem, len(files))
@@ -162,7 +156,7 @@ func (a app) List(pathname string) ([]*provider.StorageItem, error) {
 
 // Walk browses item recursively
 func (a app) Walk(walkFn func(*provider.StorageItem, error) error) error {
-	return errors.WithStack(filepath.Walk(a.rootDirectory, func(pathname string, info os.FileInfo, err error) error {
+	return convertError(filepath.Walk(a.rootDirectory, func(pathname string, info os.FileInfo, err error) error {
 		return walkFn(convertToItem(path.Dir(strings.TrimPrefix(pathname, a.rootDirectory)), info), err)
 	}))
 }
@@ -173,7 +167,7 @@ func (a app) CreateDir(name string) error {
 		return err
 	}
 
-	return errors.WithStack(os.MkdirAll(a.getFullPath(name), 0700))
+	return convertError(os.MkdirAll(a.getFullPath(name), 0700))
 }
 
 // Store file to storage
@@ -195,8 +189,9 @@ func (a app) Store(pathname string, content io.ReadCloser) error {
 		return err
 	}
 
+	copyBuffer := make([]byte, 32*1024)
 	if _, err = io.CopyBuffer(storageFile, content, copyBuffer); err != nil {
-		return errors.WithStack(err)
+		return convertError(err)
 	}
 
 	return nil
@@ -213,16 +208,16 @@ func (a app) Rename(oldName, newName string) error {
 	}
 
 	if _, err := a.Info(oldName); err != nil {
-		return err
+		return convertError(err)
 	}
 
 	if _, err := a.Info(newName); err == nil {
-		return errors.New("%s already exists", newName)
+		return convertError(fmt.Errorf("%s already exists", newName))
 	} else if !provider.IsNotExist(err) {
-		return err
+		return convertError(err)
 	}
 
-	return errors.WithStack(os.Rename(a.getFullPath(oldName), a.getFullPath(newName)))
+	return convertError(os.Rename(a.getFullPath(oldName), a.getFullPath(newName)))
 }
 
 // Remove file or directory from storage
@@ -231,5 +226,5 @@ func (a app) Remove(pathname string) error {
 		return err
 	}
 
-	return errors.WithStack(os.RemoveAll(a.getFullPath(pathname)))
+	return convertError(os.RemoveAll(a.getFullPath(pathname)))
 }

@@ -40,11 +40,16 @@ func SanitizeName(name string, removeSlash bool) (string, error) {
 	return sanitized, nil
 }
 
+// ErrNotExist create a NotExist error
+func ErrNotExist(err error) error {
+	return errors.Wrap(err, "path not found")
+}
+
 // IsNotExist checks if error match a not found
 func IsNotExist(err error) bool {
 	if err == nil {
 		return false
 	}
 
-	return strings.HasSuffix(err.Error(), "no such file or directory")
+	return err.Error() == "path not found"
 }
