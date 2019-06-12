@@ -1,7 +1,6 @@
 package provider
 
 import (
-	"fmt"
 	"path"
 	"regexp"
 	"strings"
@@ -82,7 +81,7 @@ func (p *PageBuilder) Build() Page {
 	layout := p.layout
 	var publicURL, title, description string
 
-	if p.config != nil && p.request != nil {
+	if p.config != nil {
 		publicURL = computePublicURL(p.config, p.request)
 		title = computeTitle(p.config, p.request)
 		description = computeDescription(p.config, p.request)
@@ -121,38 +120,41 @@ func computePublicURL(config *Config, request *Request) string {
 }
 
 func computeTitle(config *Config, request *Request) string {
-	title := config.Seo.Title
+	parts := []string{config.Seo.Title}
+
+	if request == nil || request.Share == nil {
+		parts = append(parts, config.RootName)
+	} else {
+		parts = append(parts, request.Share.RootName)
+	}
 
 	if request != nil {
-		if request.Share != nil {
-			title = fmt.Sprintf("%s - %s", title, request.Share.RootName)
-		} else {
-			title = fmt.Sprintf("%s - %s", title, config.RootName)
-		}
-
 		path := strings.Trim(request.Path, "/")
+
 		if path != "" {
-			title = fmt.Sprintf("%s - %s", title, path)
+			parts = append(parts, path)
 		}
 	}
 
-	return title
+	return strings.Join(parts, " - ")
 }
 
 func computeDescription(config *Config, request *Request) string {
-	description := config.Seo.Description
+	parts := []string{config.Seo.Description}
+
+	if request == nil || request.Share == nil {
+		parts = append(parts, config.RootName)
+	} else {
+		parts = append(parts, request.Share.RootName)
+	}
 
 	if request != nil {
-		if request.Share != nil {
-			description = fmt.Sprintf("%s - %s", description, request.Share.RootName)
-		} else {
-			description = fmt.Sprintf("%s - %s", description, config.RootName)
-		}
+		path := strings.Trim(request.Path, "/")
 
-		if request.Path != "" {
-			description = fmt.Sprintf("%s/%s", description, strings.Trim(request.Path, "/"))
+		if path != "" {
+			parts = append(parts, path)
 		}
 	}
 
-	return description
+	return strings.Join(parts, " - ")
 }
