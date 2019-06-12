@@ -2,14 +2,105 @@ package provider
 
 import (
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
 
-	"github.com/ViBiOh/httputils/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 )
+
+func TestGetFilepath(t *testing.T) {
+	var cases = []struct {
+		intention string
+		request   Request
+		input     string
+		want      string
+	}{
+		{
+			"simple",
+			Request{
+				Path: "index",
+			},
+			"",
+			"index",
+		},
+		{
+			"with given path",
+			Request{
+				Path: "index",
+			},
+			"root.html",
+			"index/root.html",
+		},
+		{
+			"with share",
+			Request{
+				Path: "index",
+				Share: &Share{
+					Path: "/shared/",
+				},
+			},
+			"root.html",
+			"/shared/index/root.html",
+		},
+	}
+
+	for _, testCase := range cases {
+		t.Run(testCase.intention, func(t *testing.T) {
+			if result := testCase.request.GetFilepath(testCase.input); result != testCase.want {
+				t.Errorf("%#v.GetFilepath(`%s`) = `%s`, want `%s`", testCase.request, testCase.input, result, testCase.want)
+			}
+		})
+	}
+}
+
+func TestGetURI(t *testing.T) {
+	var cases = []struct {
+		intention string
+		request   Request
+		input     string
+		want      string
+	}{
+		{
+			"simple",
+			Request{
+				Path: "index",
+			},
+			"",
+			"index",
+		},
+		{
+			"with given path",
+			Request{
+				Path: "index",
+			},
+			"root.html",
+			"index/root.html",
+		},
+		{
+			"with share",
+			Request{
+				Path: "index",
+				Share: &Share{
+					ID: "abcd1234",
+				},
+			},
+			"root.html",
+			"abcd1234/index/root.html",
+		},
+	}
+
+	for _, testCase := range cases {
+		t.Run(testCase.intention, func(t *testing.T) {
+			if result := testCase.request.GetURI(testCase.input); result != testCase.want {
+				t.Errorf("%#v.GetFilepath(`%s`) = `%s`, want `%s`", testCase.request, testCase.input, result, testCase.want)
+			}
+		})
+	}
+}
 
 func TestCheckPassword(t *testing.T) {
 	password, err := bcrypt.GenerateFromPassword([]byte("test"), bcrypt.DefaultCost)
@@ -99,6 +190,39 @@ func TestCheckPassword(t *testing.T) {
 
 			if failed {
 				t.Errorf("%#v.CheckPassword(%#v) = %#v, want %#v", testCase.share, testCase.request, err, testCase.want)
+			}
+		})
+	}
+}
+
+func TestNewError(t *testing.T) {
+	var cases = []struct {
+		intention string
+		status    int
+		err       error
+		want      *Error
+	}{
+		{
+			"empty",
+			0,
+			nil,
+			nil,
+		},
+		{
+			"given error",
+			500,
+			errors.New("invalid value"),
+			&Error{
+				Status: 500,
+				Err:    errors.New("invalid value"),
+			},
+		},
+	}
+
+	for _, testCase := range cases {
+		t.Run(testCase.intention, func(t *testing.T) {
+			if result := NewError(testCase.status, testCase.err); !reflect.DeepEqual(result, testCase.want) {
+				t.Errorf("NewError(%d, %#v) = %#v, want %#v", testCase.status, testCase.err, result, testCase.want)
 			}
 		})
 	}
