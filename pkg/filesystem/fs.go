@@ -93,7 +93,7 @@ func (a app) Root() string {
 // Info provide metadata about given pathname
 func (a app) Info(pathname string) (*provider.StorageItem, error) {
 	if err := a.checkPathname(pathname); err != nil {
-		return nil, err
+		return nil, convertError(err)
 	}
 
 	info, err := os.Stat(a.getFullPath(pathname))
@@ -107,16 +107,17 @@ func (a app) Info(pathname string) (*provider.StorageItem, error) {
 // WriterTo opens writer for given pathname
 func (a app) WriterTo(pathname string) (io.WriteCloser, error) {
 	if err := a.checkPathname(pathname); err != nil {
-		return nil, err
+		return nil, convertError(err)
 	}
 
-	return getFile(a.getFullPath(pathname))
+	writer, err := a.getFile(pathname)
+	return writer, convertError(err)
 }
 
 // ReaderFrom reads content from given pathname
 func (a app) ReaderFrom(pathname string) (io.ReadCloser, error) {
 	if err := a.checkPathname(pathname); err != nil {
-		return nil, err
+		return nil, convertError(err)
 	}
 
 	output, err := os.OpenFile(a.getFullPath(pathname), os.O_RDONLY, 0600)
@@ -136,7 +137,7 @@ func (a app) Serve(w http.ResponseWriter, r *http.Request, pathname string) {
 // List items in the storage
 func (a app) List(pathname string) ([]*provider.StorageItem, error) {
 	if err := a.checkPathname(pathname); err != nil {
-		return nil, err
+		return nil, convertError(err)
 	}
 
 	files, err := ioutil.ReadDir(a.getFullPath(pathname))
@@ -164,7 +165,7 @@ func (a app) Walk(walkFn func(*provider.StorageItem, error) error) error {
 // Create container in storage
 func (a app) CreateDir(name string) error {
 	if err := a.checkPathname(name); err != nil {
-		return err
+		return convertError(err)
 	}
 
 	return convertError(os.MkdirAll(a.getFullPath(name), 0700))
@@ -173,10 +174,10 @@ func (a app) CreateDir(name string) error {
 // Store file to storage
 func (a app) Store(pathname string, content io.ReadCloser) error {
 	if err := a.checkPathname(pathname); err != nil {
-		return err
+		return convertError(err)
 	}
 
-	storageFile, err := getFile(a.getFullPath(pathname))
+	storageFile, err := a.getFile(pathname)
 	if storageFile != nil {
 		defer func() {
 			if err := storageFile.Close(); err != nil {
@@ -186,7 +187,7 @@ func (a app) Store(pathname string, content io.ReadCloser) error {
 	}
 
 	if err != nil {
-		return err
+		return convertError(err)
 	}
 
 	copyBuffer := make([]byte, 32*1024)
@@ -200,20 +201,10 @@ func (a app) Store(pathname string, content io.ReadCloser) error {
 // Rename file or directory from storage
 func (a app) Rename(oldName, newName string) error {
 	if err := a.checkPathname(oldName); err != nil {
-		return err
-	}
-
-	if err := a.checkPathname(newName); err != nil {
-		return err
-	}
-
-	if _, err := a.Info(oldName); err != nil {
 		return convertError(err)
 	}
 
-	if _, err := a.Info(newName); err == nil {
-		return convertError(fmt.Errorf("%s already exists", newName))
-	} else if !provider.IsNotExist(err) {
+	if err := a.checkPathname(newName); err != nil {
 		return convertError(err)
 	}
 
@@ -223,7 +214,7 @@ func (a app) Rename(oldName, newName string) error {
 // Remove file or directory from storage
 func (a app) Remove(pathname string) error {
 	if err := a.checkPathname(pathname); err != nil {
-		return err
+		return convertError(err)
 	}
 
 	return convertError(os.RemoveAll(a.getFullPath(pathname)))

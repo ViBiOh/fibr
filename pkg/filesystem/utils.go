@@ -9,8 +9,8 @@ import (
 	"github.com/ViBiOh/httputils/pkg/errors"
 )
 
-func getFile(filename string) (io.WriteCloser, error) {
-	return os.OpenFile(filename, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
+func (a app) getFile(filename string) (io.WriteCloser, error) {
+	return os.OpenFile(a.getFullPath(filename), os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 }
 
 func convertToItem(pathname string, info os.FileInfo) *provider.StorageItem {
