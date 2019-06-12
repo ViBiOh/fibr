@@ -78,7 +78,6 @@ func (p *PageBuilder) Content(content map[string]interface{}) *PageBuilder {
 
 // Build Page Object
 func (p *PageBuilder) Build() Page {
-	layout := p.layout
 	var publicURL, title, description string
 
 	if p.config != nil {
@@ -87,7 +86,8 @@ func (p *PageBuilder) Build() Page {
 		description = computeDescription(p.config, p.request)
 	}
 
-	if p.layout == "" {
+	layout := p.layout
+	if layout == "" {
 		layout = "grid"
 	}
 
