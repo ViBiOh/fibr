@@ -2,6 +2,7 @@ SHELL = /bin/sh
 
 APP_NAME = fibr
 PACKAGES ?= ./...
+GO_FILES ?= **/*.go
 
 GOBIN=bin
 BINARY_PATH=$(GOBIN)/$(APP_NAME)
@@ -57,8 +58,8 @@ deps:
 ## format: Format code of app
 .PHONY: format
 format:
-	goimports -w **/*.go
-	gofmt -s -w **/*.go
+	goimports -w $(GO_FILES)
+	gofmt -s -w $(GO_FILES)
 
 ## lint: Lint code of app
 .PHONY: lint

@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+set -o nounset -o pipefail -o errexit
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+main() {
+  local HOOKS_SOURCE_DIR="${SCRIPT_DIR}/hooks"
+  local HOOKS_TARGET_DIR="${SCRIPT_DIR}/../.git/hooks"
+
+  pushd "${HOOKS_SOURCE_DIR}"
+
+  local PWD="$(pwd)"
+
+  for file in *; do
+    ln -s -f "${PWD}/${file}" "${HOOKS_TARGET_DIR}/${file}"
+    echo "${file} hook installed"
+  done
+
+  popd
+}
+
+main

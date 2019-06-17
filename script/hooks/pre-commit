@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+goFiles=$(git diff --cached --name-only --diff-filter=ACMR | grep -E "\.go$" | tr '\n' ' ')
+
+BLUE='\033[0;34m'
+RED='\033[0;31m'
+RESET='\033[0m'
+
+pass=0
+
+diffInitial=$(git diff --name-only --diff-filter=ACMR)
+
+if [[ "${pass}" == "0" ]] && [[ "${goFiles}" != "" ]]; then
+    echo -e "${BLUE}Formating golang files${RESET}"
+    GO_FILES="${goFiles}" make --silent format
+    pass=$?
+fi
+
+if [[ "${pass}" == "0" ]] && [[ "${goFiles}" != "" ]]; then
+    echo -e "${BLUE}Linting golang packages${RESET}"
+    make --silent lint
+    pass=$?
+fi
+
+if ! [[ "$pass" == "0" ]]; then
+    echo -e "${RED}COMMIT FAILED${RESET}"
+    echo -e "${RED}Last check failed during pre-commit. Please fix errors and try committing again.${RESET}"
+
+    exit 1
+fi
+
+diffFinal=$(git diff --name-only --diff-filter=ACMR)
+
+if ! [[ "$diffInitial" == "$diffFinal" ]]; then
+    echo -e "${RED}Pre-commit has changes files${RESET}"
+    echo -e "${RED}Consider adding updated file with ${BLUE}git add -i \&\& git commit --amend${RESET}"
+fi
+
+exit 0
