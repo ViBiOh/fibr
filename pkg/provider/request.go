@@ -119,7 +119,6 @@ func NewError(status int, err error) *Error {
 	if err == nil {
 		return nil
 	}
-
 	return &Error{
 		Status: status,
 		Err:    err,
@@ -146,11 +145,7 @@ func (s StorageItem) Mime() string {
 	}
 
 	if CodeExtensions[extension] {
-		return "text/plain"
-	}
-
-	if mime, ok := VideoExtensions[extension]; ok {
-		return mime
+		return "text/plain; charset=utf-8"
 	}
 
 	return ""
