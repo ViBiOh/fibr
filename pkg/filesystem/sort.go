@@ -45,7 +45,7 @@ func (a ByModTime) Less(i, j int) bool {
 	return lessTime(a[i].Date, a[j].Date)
 }
 
-// ByHybridSort implements Sorter by type then modification time
+// ByHybridSort implements Sorter by type, name then modification time
 type ByHybridSort []*provider.StorageItem
 
 func (a ByHybridSort) Len() int {
@@ -60,8 +60,28 @@ func (a ByHybridSort) Less(i, j int) bool {
 	first := a[i]
 	second := a[j]
 
-	if first.IsImage() == second.IsImage() {
+	if first.IsDir && second.IsDir {
+		return lessString(first.Name, second.Name)
+	}
+
+	if first.IsDir {
+		return true
+	}
+
+	if second.IsDir {
+		return false
+	}
+
+	if first.IsImage() && second.IsImage() {
 		return lessTime(first.Date, second.Date)
+	}
+
+	if first.IsImage() {
+		return false
+	}
+
+	if second.IsImage() {
+		return true
 	}
 
 	return lessString(first.Name, second.Name)
