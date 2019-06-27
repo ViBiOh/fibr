@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/ViBiOh/httputils/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
@@ -130,6 +131,7 @@ type StorageItem struct {
 	Pathname string
 	Name     string
 	IsDir    bool
+	Date     time.Time
 }
 
 // Extension gives extensions of item

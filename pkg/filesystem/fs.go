@@ -150,7 +150,7 @@ func (a app) List(pathname string) ([]*provider.StorageItem, error) {
 		items[index] = convertToItem(pathname, item)
 	}
 
-	sort.Sort(ByName(items))
+	sort.Sort(ByModTime(items))
 
 	return items, nil
 }

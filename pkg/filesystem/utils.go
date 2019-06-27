@@ -22,6 +22,7 @@ func convertToItem(pathname string, info os.FileInfo) *provider.StorageItem {
 		Pathname: path.Join(pathname, info.Name()),
 		Name:     info.Name(),
 		IsDir:    info.IsDir(),
+		Date:     info.ModTime(),
 	}
 }
 
