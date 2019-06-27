@@ -27,6 +27,7 @@ func (a *app) Rename(w http.ResponseWriter, r *http.Request, request *provider.R
 	}
 
 	newPath := request.GetFilepath(newName)
+	oldPath = request.GetFilepath(oldPath)
 
 	if _, err := a.storage.Info(newPath); err == nil {
 		a.renderer.Error(w, provider.NewError(http.StatusBadRequest, err))
@@ -36,7 +37,7 @@ func (a *app) Rename(w http.ResponseWriter, r *http.Request, request *provider.R
 		return
 	}
 
-	oldInfo, err := a.storage.Info(request.GetFilepath(oldPath))
+	oldInfo, err := a.storage.Info(oldPath)
 	if err != nil {
 		if !provider.IsNotExist(err) {
 			a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))
