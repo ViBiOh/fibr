@@ -185,27 +185,22 @@
           return acc;
         }, {});
 
-      const promises = [];
-
+      let success = true;
       [].forEach.call(values.files, file => {
-        promises.push(
-          uploadFile(values.method, file)
+         await uploadFile(values.method, file)
             .then(() => setUploadStatus(file, '✓', 'success'))
             .catch(e => {
               setUploadStatus(file, 'X', 'danger');
+              success = false;
               console.error(e);
-              throw e;
-            }),
+            });
         );
       });
 
-      try {
-        await Promise.all(promises)
+      if (success) {
         document.location.hash = '#upload-success';
-      } catch (e) {
-        if (uploadButton) {
-          uploadButton.innerHTML = 'Upload';
-        }
+      } else if (uploadButton) {
+        uploadButton.innerHTML = 'Upload';
       }
 
       return false;
