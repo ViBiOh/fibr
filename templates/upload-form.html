@@ -186,7 +186,9 @@
         }, {});
 
       let success = true;
-      [].forEach.call(values.files, file => {
+      for (var i = 0; i < values.files.length; i++) {
+        const file = values.files[i];
+
         try {
           await uploadFile(values.method, file)
           setUploadStatus(file, '✓', 'success')
@@ -196,7 +198,7 @@
 
           console.error(e);
         }
-      });
+      };
 
       if (success) {
         document.location.hash = '#upload-success';
