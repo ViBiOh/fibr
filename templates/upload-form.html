@@ -187,14 +187,15 @@
 
       let success = true;
       [].forEach.call(values.files, file => {
-         await uploadFile(values.method, file)
-            .then(() => setUploadStatus(file, '✓', 'success'))
-            .catch(e => {
-              setUploadStatus(file, 'X', 'danger');
-              success = false;
-              console.error(e);
-            });
-        );
+        try {
+          await uploadFile(values.method, file)
+          setUploadStatus(file, '✓', 'success')
+        } catch (e) {
+          setUploadStatus(file, 'X', 'danger');
+          success = false;
+
+          console.error(e);
+        }
       });
 
       if (success) {
