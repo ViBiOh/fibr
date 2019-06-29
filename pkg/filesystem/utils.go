@@ -4,6 +4,7 @@ import (
 	"io"
 	"os"
 	"path"
+	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/pkg/errors"
@@ -19,9 +20,13 @@ func convertToItem(dirname string, info os.FileInfo) *provider.StorageItem {
 	}
 
 	name := info.Name()
+	pathName := path.Join(dirname, name)
+	if strings.EqualFold(pathName, "/") {
+		pathName = dirname
+	}
 
 	return &provider.StorageItem{
-		Pathname: path.Join(dirname, name),
+		Pathname: pathName,
 		Name:     name,
 		IsDir:    info.IsDir(),
 		Date:     info.ModTime(),
