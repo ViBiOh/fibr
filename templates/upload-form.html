@@ -119,22 +119,23 @@
      * @return {Promise}       Promise of upload
      */
     async function uploadFile(method, file) {
-      return new Promise((resolve, reject) => {
-        const messageId = fileMessageId(file);
+      const messageId = await fileMessageId(file);
 
+      const container = document.getElementById(messageId);
+      let progress;
+      if (container) {
+        progress = container.querySelector('progress');
+      }
+
+      return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
 
-        const container = document.getElementById(messageId);
-        if (container) {
-          const progress = container.querySelector('progress');
-
-          if (progress) {
-            xhr.upload.addEventListener(
-              'progress',
-              e => (progress.value = parseInt((e.loaded / e.total) * 100, 10)),
-              false,
-            );
-          }
+        if (progress) {
+          xhr.upload.addEventListener(
+            'progress',
+            e => (progress.value = parseInt((e.loaded / e.total) * 100, 10)),
+            false,
+          );
         }
 
         xhr.onreadystatechange = e => {
