@@ -13,15 +13,23 @@ func (a app) getFile(filename string) (io.WriteCloser, error) {
 	return os.OpenFile(a.getFullPath(filename), os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 }
 
-func convertToItem(pathname string, info os.FileInfo) *provider.StorageItem {
+func convertToItem(dirname string, info os.FileInfo) *provider.StorageItem {
 	if info == nil {
 		return nil
 	}
 
+	pathname := dirname
+	name := info.Name()
+	isDir := info.IsDir()
+
+	if !isDir {
+		pathname = path.Join(dirname, name)
+	}
+
 	return &provider.StorageItem{
-		Pathname: path.Join(pathname, info.Name()),
-		Name:     info.Name(),
-		IsDir:    info.IsDir(),
+		Pathname: pathname,
+		Name:     name,
+		IsDir:    isDir,
 		Date:     info.ModTime(),
 	}
 }
