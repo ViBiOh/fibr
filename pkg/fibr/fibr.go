@@ -65,6 +65,8 @@ func (a app) parseRequest(r *http.Request) (*provider.Request, *provider.Error) 
 		Path:     r.URL.Path,
 		CanEdit:  false,
 		CanShare: false,
+		Display:  r.URL.Query().Get("d"),
+		Order:    r.URL.Query().Get("o"),
 	}
 
 	if err := a.parseShare(r, request); err != nil {

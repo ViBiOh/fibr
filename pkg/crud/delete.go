@@ -33,5 +33,5 @@ func (a *app) Delete(w http.ResponseWriter, r *http.Request, request *provider.R
 
 	go a.deleteThumbnail(info)
 
-	a.List(w, request, r.URL.Query().Get("d"), &provider.Message{Level: "success", Content: fmt.Sprintf("%s successfully deleted", info.Name)})
+	a.List(w, request, &provider.Message{Level: "success", Content: fmt.Sprintf("%s successfully deleted", info.Name)})
 }

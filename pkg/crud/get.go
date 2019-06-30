@@ -76,7 +76,7 @@ func (a *app) GetWithMessage(w http.ResponseWriter, r *http.Request, request *pr
 		return
 	}
 
-	a.List(w, request, r.URL.Query().Get("d"), message)
+	a.List(w, request, message)
 }
 
 // Get output content

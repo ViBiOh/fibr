@@ -7,7 +7,7 @@ import (
 )
 
 // List render directory web view of given dirPath
-func (a *app) List(w http.ResponseWriter, request *provider.Request, display string, message *provider.Message) {
+func (a *app) List(w http.ResponseWriter, request *provider.Request, message *provider.Message) {
 	files, err := a.storage.List(request.GetFilepath(""))
 	if err != nil {
 		a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))
@@ -23,5 +23,5 @@ func (a *app) List(w http.ResponseWriter, request *provider.Request, display str
 		content["Shares"] = a.metadatas
 	}
 
-	a.renderer.Directory(w, request, content, display, message)
+	a.renderer.Directory(w, request, content, message)
 }

@@ -18,7 +18,7 @@ import (
 
 // App of package
 type App interface {
-	Directory(http.ResponseWriter, *provider.Request, map[string]interface{}, string, *provider.Message)
+	Directory(http.ResponseWriter, *provider.Request, map[string]interface{}, *provider.Message)
 	File(http.ResponseWriter, *provider.Request, map[string]interface{}, *provider.Message)
 	Error(http.ResponseWriter, *provider.Error)
 	Sitemap(http.ResponseWriter)
@@ -120,8 +120,8 @@ func New(config Config, rootName string, thumbnail thumbnail.App) App {
 }
 
 // Directory render directory listing
-func (a app) Directory(w http.ResponseWriter, request *provider.Request, content map[string]interface{}, layout string, message *provider.Message) {
-	page := (&provider.PageBuilder{}).Config(a.config).Request(request).Message(message).Layout(layout).Content(content).Build()
+func (a app) Directory(w http.ResponseWriter, request *provider.Request, content map[string]interface{}, message *provider.Message) {
+	page := (&provider.PageBuilder{}).Config(a.config).Request(request).Message(message).Layout(request.Display).Sort(request.Order).Content(content).Build()
 
 	w.Header().Set("content-language", "en")
 	if err := templates.WriteHTMLTemplate(a.tpl.Lookup("files"), w, page, http.StatusOK); err != nil {
