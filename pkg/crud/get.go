@@ -71,6 +71,11 @@ func (a *app) GetWithMessage(w http.ResponseWriter, r *http.Request, request *pr
 		return
 	}
 
+	if query.GetBool(r, "download") {
+		a.Download(w, request)
+		return
+	}
+
 	if !strings.HasSuffix(r.URL.Path, "/") {
 		http.Redirect(w, r, fmt.Sprintf("%s/", r.URL.Path), http.StatusPermanentRedirect)
 		return

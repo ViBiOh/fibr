@@ -31,6 +31,8 @@ func convertToItem(dirname string, info os.FileInfo) *provider.StorageItem {
 		Name:     name,
 		IsDir:    info.IsDir(),
 		Date:     info.ModTime(),
+
+		Info: info,
 	}
 }
 

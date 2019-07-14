@@ -134,6 +134,8 @@ type StorageItem struct {
 	Name     string
 	IsDir    bool
 	Date     time.Time
+
+	Info interface{}
 }
 
 // Extension gives extensions of item

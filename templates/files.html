@@ -65,9 +65,17 @@
   </script>
 
   <div class="content">
-    {{ template "modifiers" . }}
+    <div class="flex flex-center">
+      {{ template "modifiers" . }}
 
-    <span class="padding-left">{{ len .Content.Files }} elements</span>
+      <span class="padding-left">{{ len .Content.Files }} elements</span>
+
+      <span class="flex-grow"></span>
+
+      <a class="modifier padding" href="?download" download>
+        <img class="icon" src="/svg/download?fill=silver" alt="Download">
+      </a>
+    </div>
 
     <ul id="files">
       {{ range .Content.Files }}
