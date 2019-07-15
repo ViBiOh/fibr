@@ -15,7 +15,7 @@ services:
     - -frameOptions
     - SAMEORIGIN
     - -tracingAgent
-    - monitoring_jaeger:6831
+    - monitoring_jaeger_1:6831
     - -tracingName
     - fibr
     labels:
