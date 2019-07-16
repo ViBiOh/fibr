@@ -11,6 +11,20 @@ import (
 	"github.com/ViBiOh/httputils/pkg/logger"
 )
 
+func (a *app) getCoverImage(files []*provider.StorageItem) *provider.StorageItem {
+	for _, file := range files {
+		if !file.IsImage() {
+			continue
+		}
+
+		if _, ok := a.thumbnail.HasThumbnail(file); ok {
+			return file
+		}
+	}
+
+	return nil
+}
+
 // List render directory web view of given dirPath
 func (a *app) List(w http.ResponseWriter, request *provider.Request, message *provider.Message) {
 	files, err := a.storage.List(request.GetFilepath(""))
@@ -22,6 +36,7 @@ func (a *app) List(w http.ResponseWriter, request *provider.Request, message *pr
 	content := map[string]interface{}{
 		"Paths": getPathParts(request),
 		"Files": files,
+		"Cover": a.getCoverImage(files),
 	}
 
 	if request.CanShare {
