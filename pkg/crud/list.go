@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/pkg/errors"
 	"github.com/ViBiOh/httputils/pkg/logger"
 )
@@ -36,7 +37,11 @@ func (a *app) List(w http.ResponseWriter, request *provider.Request, message *pr
 	content := map[string]interface{}{
 		"Paths": getPathParts(request),
 		"Files": files,
-		"Cover": a.getCoverImage(files),
+		"Cover": map[string]interface{}{
+			"Img":       a.getCoverImage(files),
+			"ImgHeight": thumbnail.ThumbnailHeight,
+			"ImgWidth":  thumbnail.ThumbnailWidth,
+		},
 	}
 
 	if request.CanShare {

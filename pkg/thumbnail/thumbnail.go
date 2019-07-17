@@ -21,6 +21,12 @@ import (
 )
 
 const (
+	// ThumbnailWidth is the width of each thumbnail generated
+	ThumbnailWidth = 150
+
+	// ThumbnailHeight is the width of each thumbnail generated
+	ThumbnailHeight = 150
+
 	defaultTimeout = time.Second * 30
 	waitTimeout    = time.Millisecond * 300
 )
@@ -67,7 +73,7 @@ func New(config Config, storage provider.Storage) App {
 	}
 
 	app := &app{
-		imaginaryURL:  fmt.Sprintf("%s/crop?width=150&height=150&stripmeta=true&noprofile=true&quality=80&type=jpeg", *config.imaginaryURL),
+		imaginaryURL:  fmt.Sprintf("%s/crop?width=%d&height=%d&stripmeta=true&noprofile=true&quality=80&type=jpeg", *config.imaginaryURL, ThumbnailWidth, ThumbnailHeight),
 		storage:       storage,
 		pathnameInput: make(chan *provider.StorageItem, 10),
 	}
