@@ -1,39 +1,43 @@
 #!/usr/bin/env bash
 
-goFiles=$(git diff --cached --name-only --diff-filter=ACMR | grep -E "\.go$" | tr '\n' ' ')
+set -o nounset -o pipefail
 
-BLUE='\033[0;34m'
-RED='\033[0;31m'
-RESET='\033[0m'
+main() {
+  local BLUE='\033[0;34m'
+  local RED='\033[0;31m'
+  local RESET='\033[0m'
 
-pass=0
+  local PASS=0
+  local GO_FILES=$(git diff --cached --name-only --diff-filter=ACMR | grep -E "\.go$" | tr '\n' ' ')
+  local INITIAL_DIFF=$(git diff --name-only --diff-filter=ACMR)
 
-diffInitial=$(git diff --name-only --diff-filter=ACMR)
+  if [[ "${PASS}" == "0" ]] && [[ "${GO_FILES}" != "" ]]; then
+      echo -e "${BLUE}Formating golang files${RESET}"
+      GO_FILES="${GO_FILES}" make --silent format
+      PASS=$?
+  fi
 
-if [[ "${pass}" == "0" ]] && [[ "${goFiles}" != "" ]]; then
-    echo -e "${BLUE}Formating golang files${RESET}"
-    GO_FILES="${goFiles}" make --silent format
-    pass=$?
-fi
+  if [[ "${PASS}" == "0" ]] && [[ "${GO_FILES}" != "" ]]; then
+      echo -e "${BLUE}Linting golang packages${RESET}"
+      make --silent lint
+      PASS=$?
+  fi
 
-if [[ "${pass}" == "0" ]] && [[ "${goFiles}" != "" ]]; then
-    echo -e "${BLUE}Linting golang packages${RESET}"
-    make --silent lint
-    pass=$?
-fi
+  if ! [[ "$PASS" == "0" ]]; then
+      echo -e "${RED}COMMIT FAILED${RESET}"
+      echo -e "${RED}Last check failed during pre-commit. Please fix errors and try committing again.${RESET}"
 
-if ! [[ "$pass" == "0" ]]; then
-    echo -e "${RED}COMMIT FAILED${RESET}"
-    echo -e "${RED}Last check failed during pre-commit. Please fix errors and try committing again.${RESET}"
+      exit 1
+  fi
 
-    exit 1
-fi
+  local FINAL_DIFF=$(git diff --name-only --diff-filter=ACMR)
 
-diffFinal=$(git diff --name-only --diff-filter=ACMR)
+  if ! [[ "${INITIAL_DIFF}" == "${FINAL_DIFF}" ]]; then
+      echo -e "${RED}Pre-commit has changes files${RESET}"
+      echo -e "${RED}Consider adding updated file with ${BLUE}git add -i \&\& git commit --amend${RESET}"
+  fi
 
-if ! [[ "$diffInitial" == "$diffFinal" ]]; then
-    echo -e "${RED}Pre-commit has changes files${RESET}"
-    echo -e "${RED}Consider adding updated file with ${BLUE}git add -i \&\& git commit --amend${RESET}"
-fi
+  exit 0
+}
 
-exit 0
+main
