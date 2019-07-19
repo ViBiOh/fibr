@@ -2,10 +2,17 @@
 
 set -o nounset -o pipefail -o errexit
 
-HTTP_STATUS=$(curl -X POST -u "${DEPLOY_CREDENTIALS}" -o output.txt -w "%{http_code}" "https://deploy.vibioh.fr/${1}/${2}/" --data-binary "${3}")
+readonly OUTPUT_TXT="output.txt"
 
-cat output.txt
+main() {
+  HTTP_STATUS=$(curl -X POST -u "${DEPLOY_CREDENTIALS}" -o "${OUTPUT_TXT}" -w "%{http_code}" "https://deploy.vibioh.fr/${1}/${2}/" --data-binary "${3}")
 
-if [[ "${HTTP_STATUS}" != "200" ]]; then
-   exit 1
-fi
+  cat "${OUTPUT_TXT}"
+  rm "${OUTPUT_TXT}"
+
+  if [[ "${HTTP_STATUS}" != "200" ]]; then
+     exit 1
+  fi
+}
+
+main "${@}"
