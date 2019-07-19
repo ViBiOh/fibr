@@ -1,5 +1,7 @@
 # Golang
 bin/
+release/
+output.txt
 coverage.*
 
 # Fibr
