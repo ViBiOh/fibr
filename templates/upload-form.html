@@ -141,6 +141,10 @@
         xhr.onreadystatechange = e => {
           if (xhr.readyState == 4) {
             if (xhr.status < 400) {
+              if (progress) {
+                progress.value = 100;
+              }
+
               resolve(e);
             } else {
               reject(e);
