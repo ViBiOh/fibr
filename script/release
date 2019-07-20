@@ -44,7 +44,7 @@ get_release_body() {
 
   local PREVIOUS_TAG=$(git tag --sort=-creatordate | grep -v "${1}" | head -n 1)
 
-  git log --no-merges --pretty=format:'%h %s' "${1}...${PREVIOUS_TAG}" | awk '!a[substr($0,8)]++' | awk '{printf "* %s\n",$0}'
+  git log --no-merges --pretty=format:'%h %s' "${1}...${PREVIOUS_TAG}" | awk '!a[substr($0,8)]++' | awk '{printf "* %s\\n",$0}'
 }
 
 release() {
@@ -59,6 +59,10 @@ release() {
   local RESET='\033[0m'
 
   echo -e "${BLUE}Creating release ${GIT_TAG} for ${GITHUB_REPOSITORY}...${RESET}"
+
+  local BODY=$(get_release_body "${GIT_TAG}" | sed 's|"|'"'"'|g')
+  echo -e "${GREEN}${BODY}${RESET}"
+
   echo
   local HTTP_STATUS=$(curl \
     -H "Content-Type: application/json" \
