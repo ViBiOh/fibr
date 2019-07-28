@@ -40,16 +40,12 @@ func main() {
 	filesystemConfig := filesystem.Flags(fs, "fs")
 	thumbnailConfig := thumbnail.Flags(fs, "thumbnail")
 
-	if err := fs.Parse(os.Args[1:]); err != nil {
-		logger.Fatal("%#v", err)
-	}
+	logger.Fatal(fs.Parse(os.Args[1:]))
 
 	alcotest.DoAndExit(alcotestConfig)
 
 	serverApp, err := httputils.New(serverConfig)
-	if err != nil {
-		logger.Fatal("%#v", err)
-	}
+	logger.Fatal(err)
 
 	healthcheckApp := healthcheck.New()
 	prometheusApp := prometheus.New(prometheusConfig)
@@ -58,10 +54,7 @@ func main() {
 	gzipApp := gzip.New()
 
 	storage, err := filesystem.New(filesystemConfig)
-	if err != nil {
-		logger.Error("%#v", err)
-		os.Exit(1)
-	}
+	logger.Fatal(err)
 
 	thumbnailApp := thumbnail.New(thumbnailConfig, storage)
 	rendererApp := renderer.New(rendererConfig, storage.Root(), thumbnailApp)

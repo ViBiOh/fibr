@@ -82,7 +82,7 @@ func (a app) parseRequest(r *http.Request) (*provider.Request, *provider.Error) 
 		return nil, a.handleAnonymousRequest(r, err)
 	}
 
-	if user != nil && user.HasProfile("admin") {
+	if user.HasProfile("admin") {
 		request.CanEdit = true
 		request.CanShare = true
 	}
@@ -111,7 +111,7 @@ func (a app) handleRequest(w http.ResponseWriter, r *http.Request, request *prov
 func (a app) Handler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !isMethodAllowed(r) {
-			a.renderer.Error(w, provider.NewError(http.StatusMethodNotAllowed, errors.New("you lack of accurate method for calling me")))
+			a.renderer.Error(w, provider.NewError(http.StatusMethodNotAllowed, errors.New("you lack of method for calling me")))
 			return
 		}
 
@@ -124,10 +124,12 @@ func (a app) Handler() http.Handler {
 			return
 		}
 
-		if request, err := a.parseRequest(r); err != nil {
+		request, err := a.parseRequest(r)
+		if err != nil {
 			a.renderer.Error(w, err)
-		} else if request != nil {
-			a.handleRequest(w, r, request)
+			return
 		}
+
+		a.handleRequest(w, r, request)
 	})
 }

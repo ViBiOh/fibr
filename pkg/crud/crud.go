@@ -73,9 +73,7 @@ func New(config Config, storage provider.Storage, renderer provider.Renderer, th
 	}
 
 	if app.metadataEnabled {
-		if err := app.loadMetadata(); err != nil {
-			logger.Fatal("%#v", err)
-		}
+		logger.Fatal(app.loadMetadata())
 
 		go thumbnail.Generate()
 	}

@@ -96,9 +96,7 @@ func New(config Config, rootName string, thumbnail thumbnail.App) App {
 	})
 
 	fibrTemplates, err := templates.GetTemplates("./templates/", ".html")
-	if err != nil {
-		logger.Fatal("%#v", err)
-	}
+	logger.Fatal(err)
 
 	publicURL := strings.TrimSpace(*config.publicURL)
 
