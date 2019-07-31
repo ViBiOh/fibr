@@ -50,8 +50,3 @@ services:
     mem_limit: 536870912
     security_opt:
     - no-new-privileges
-
-networks:
-  default:
-    external:
-      name: traefik
