@@ -14,10 +14,6 @@ services:
     - "default-src 'self'; base-uri 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:"
     - -frameOptions
     - SAMEORIGIN
-    - -tracingAgent
-    - monitoring_jaeger_1:6831
-    - -tracingName
-    - fibr
     labels:
       traefik.frontend.passHostHeader: 'true'
       traefik.frontend.rule: 'Host: fibr.vibioh.fr'
