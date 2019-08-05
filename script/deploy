@@ -2,10 +2,9 @@
 
 set -o nounset -o pipefail -o errexit
 
-readonly OUTPUT_TXT="output.txt"
-
 main() {
-  HTTP_STATUS=$(curl -X POST -u "${DEPLOY_CREDENTIALS}" -o "${OUTPUT_TXT}" -w "%{http_code}" "https://deploy.vibioh.fr/${1}/" --data-binary "${2}")
+  local OUTPUT_TXT="output.txt"
+  local HTTP_STATUS=$(curl -X POST -u "${DEPLOY_CREDENTIALS}" -o "${OUTPUT_TXT}" -w "%{http_code}" "https://deploy.vibioh.fr/${1}/" --data-binary "${2}")
 
   cat "${OUTPUT_TXT}"
   rm "${OUTPUT_TXT}"
