@@ -37,9 +37,6 @@ services:
     image: h2non/imaginary
     labels:
       traefik.enable: 'false'
-    healthcheck:
-      test: ["CMD", "ps", "-p", "1", "--no-headers"]
-      retries: 10
     restart: on-failure:5
     read_only: true
     cpu_shares: 128
