@@ -14,7 +14,6 @@ import (
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	httputils "github.com/ViBiOh/httputils/pkg"
 	"github.com/ViBiOh/httputils/pkg/alcotest"
-	"github.com/ViBiOh/httputils/pkg/gzip"
 	"github.com/ViBiOh/httputils/pkg/logger"
 	"github.com/ViBiOh/httputils/pkg/opentracing"
 	"github.com/ViBiOh/httputils/pkg/owasp"
@@ -48,7 +47,6 @@ func main() {
 	prometheusApp := prometheus.New(prometheusConfig)
 	opentracingApp := opentracing.New(opentracingConfig)
 	owaspApp := owasp.New(owaspConfig)
-	gzipApp := gzip.New()
 
 	storage, err := filesystem.New(filesystemConfig)
 	logger.Fatal(err)
@@ -59,7 +57,7 @@ func main() {
 	authApp := auth.NewService(authConfig, authService.NewBasic(basicConfig, nil))
 	fibrApp := fibr.New(crudApp, rendererApp, authApp)
 
-	webHandler := httputils.ChainMiddlewares(fibrApp.Handler(), prometheusApp, opentracingApp, gzipApp, owaspApp)
+	webHandler := httputils.ChainMiddlewares(fibrApp.Handler(), prometheusApp, opentracingApp, owaspApp)
 
 	serverApp.ListenAndServe(webHandler, httputils.HealthHandler(nil), nil)
 }
