@@ -51,7 +51,7 @@ func (a *app) List(w http.ResponseWriter, request *provider.Request, message *pr
 	a.renderer.Directory(w, request, content, message)
 }
 
-// List render directory web view of given dirPath
+// Download content of a directory into a streamed zip
 func (a *app) Download(w http.ResponseWriter, request *provider.Request) {
 	files, err := a.storage.List(request.GetFilepath(""))
 	if err != nil {

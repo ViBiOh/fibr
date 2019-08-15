@@ -35,15 +35,18 @@ func New(crudApp crud.App, rendererApp renderer.App, authApp auth.App) App {
 }
 
 func (a app) parseShare(r *http.Request, request *provider.Request) error {
-	if share := a.crud.GetShare(request.Path); share != nil {
-		request.Share = share
-		request.CanEdit = share.Edit
-		request.Path = strings.TrimPrefix(request.Path, fmt.Sprintf("/%s", share.ID))
-
-		if err := share.CheckPassword(r); err != nil {
-			return err
-		}
+	share := a.crud.GetShare(request.Path)
+	if share == nil {
+		return nil
 	}
+
+	if err := share.CheckPassword(r); err != nil {
+		return err
+	}
+
+	request.Share = share
+	request.CanEdit = share.Edit
+	request.Path = strings.TrimPrefix(request.Path, fmt.Sprintf("/%s", share.ID))
 
 	return nil
 }
