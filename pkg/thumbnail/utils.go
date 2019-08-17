@@ -6,10 +6,15 @@ import (
 	"io"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/pkg/errors"
 	"github.com/ViBiOh/httputils/pkg/logger"
+)
+
+const (
+	defaultTimeout = time.Second * 30
 )
 
 func getCtx(ctx context.Context) (context.Context, context.CancelFunc) {

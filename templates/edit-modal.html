@@ -7,10 +7,12 @@
         <input type="hidden" name="type" value="item" />
         <input type="hidden" name="method" value="PATCH" />
         <input type="hidden" name="name" value="{{ .Name }}" />
+
         <p class="center">
           <label for="name">Name</label>
           <input id="name" type="text" name="newName" value="{{ .Name }}" />
         </p>
+
         <p class="center">
           <button type="submit" class="button bg-important">Update</button>
         </p>

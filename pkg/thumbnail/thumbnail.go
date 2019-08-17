@@ -26,9 +26,6 @@ const (
 
 	// ThumbnailHeight is the width of each thumbnail generated
 	ThumbnailHeight = 150
-
-	defaultTimeout = time.Second * 30
-	waitTimeout    = time.Millisecond * 300
 )
 
 var (
@@ -79,6 +76,8 @@ func New(config Config, storage provider.Storage) App {
 	}
 
 	go func() {
+		waitTimeout := time.Millisecond * 300
+
 		for item := range app.pathnameInput {
 			// Do not stress API
 			time.Sleep(waitTimeout)

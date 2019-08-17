@@ -19,7 +19,7 @@ func (a app) Error(w http.ResponseWriter, err *provider.Error) {
 		w.Header().Add("WWW-Authenticate", "Basic realm=\"Password required\" charset=\"UTF-8\"")
 	}
 
-	page := (&provider.PageBuilder{}).Config(a.config).Error(err).Build()
+	page := a.newPageBuilder().Error(err).Build()
 
 	if err := templates.WriteHTMLTemplate(a.tpl.Lookup("error"), w, page, err.Status); err != nil {
 		httperror.InternalServerError(w, err)
@@ -29,7 +29,7 @@ func (a app) Error(w http.ResponseWriter, err *provider.Error) {
 
 // Sitemap render sitemap.xml
 func (a app) Sitemap(w http.ResponseWriter) {
-	page := (&provider.PageBuilder{}).Config(a.config).Build()
+	page := a.newPageBuilder().Build()
 
 	if err := templates.WriteXMLTemplate(a.tpl.Lookup("sitemap"), w, page, http.StatusOK); err != nil {
 		httperror.InternalServerError(w, err)

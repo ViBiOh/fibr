@@ -119,7 +119,7 @@ func New(config Config, rootName string, thumbnail thumbnail.App) App {
 
 // Directory render directory listing
 func (a app) Directory(w http.ResponseWriter, request *provider.Request, content map[string]interface{}, message *provider.Message) {
-	page := (&provider.PageBuilder{}).Config(a.config).Request(request).Message(message).Layout(request.Display).Sort(request.Order).Content(content).Build()
+	page := a.newPageBuilder().Request(request).Message(message).Layout(request.Display).Sort(request.Order).Content(content).Build()
 
 	w.Header().Set("content-language", "en")
 	if err := templates.WriteHTMLTemplate(a.tpl.Lookup("files"), w, page, http.StatusOK); err != nil {
@@ -130,7 +130,7 @@ func (a app) Directory(w http.ResponseWriter, request *provider.Request, content
 
 // File render file detail
 func (a app) File(w http.ResponseWriter, request *provider.Request, content map[string]interface{}, message *provider.Message) {
-	page := (&provider.PageBuilder{}).Config(a.config).Request(request).Message(message).Layout("browser").Content(content).Build()
+	page := a.newPageBuilder().Request(request).Message(message).Layout("browser").Content(content).Build()
 
 	w.Header().Set("content-language", "en")
 	if err := templates.WriteHTMLTemplate(a.tpl.Lookup("file"), w, page, http.StatusOK); err != nil {
