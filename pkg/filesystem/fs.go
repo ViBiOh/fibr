@@ -120,7 +120,7 @@ func (a app) ReaderFrom(pathname string) (io.ReadCloser, error) {
 		return nil, convertError(err)
 	}
 
-	output, err := os.OpenFile(a.getFullPath(pathname), os.O_RDONLY, 0600)
+	output, err := os.OpenFile(a.getFullPath(pathname), os.O_RDONLY, getMode(pathname))
 	return output, convertError(err)
 }
 

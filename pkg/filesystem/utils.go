@@ -10,8 +10,17 @@ import (
 	"github.com/ViBiOh/httputils/pkg/errors"
 )
 
+func getMode(name string) os.FileMode {
+	if strings.HasSuffix(name, "/") {
+		return 0700
+	}
+
+	return 0600
+}
+
 func (a app) getFile(filename string) (io.WriteCloser, error) {
-	return os.OpenFile(a.getFullPath(filename), os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
+
+	return os.OpenFile(a.getFullPath(filename), os.O_RDWR|os.O_CREATE|os.O_TRUNC, getMode(filename))
 }
 
 func convertToItem(dirname string, info os.FileInfo) *provider.StorageItem {
