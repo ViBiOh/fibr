@@ -5,6 +5,7 @@ set -o nounset -o pipefail
 main() {
   local BLUE='\033[0;34m'
   local RED='\033[0;31m'
+  local YELLOW='\033[33m'
   local RESET='\033[0m'
 
   local PASS=0
@@ -35,6 +36,11 @@ main() {
   if ! [[ "${INITIAL_DIFF}" == "${FINAL_DIFF}" ]]; then
       echo -e "${RED}Pre-commit has changes files${RESET}"
       echo -e "${RED}Consider adding updated file with ${BLUE}git add -i \&\& git commit --amend${RESET}"
+  fi
+
+  local COMMITS_SINCE_LAST_TAG="$(git rev-list --count $(git tag --sort=-creatordate | head -n 1)..HEAD)"
+  if [[ "${COMMITS_SINCE_LAST_TAG}" -ne 0 ]]; then
+    echo -e "${YELLOW}${COMMITS_SINCE_LAST_TAG} commits since last tag${RESET}"
   fi
 
   exit 0
