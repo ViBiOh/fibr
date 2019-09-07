@@ -22,7 +22,9 @@ main() {
     fi
   done
 
-  go tool cover -func="${OUTPUT_TXT}"
+  if [[ $(cat "${OUTPUT_TXT}" | wc -l) -ne 1 ]]; then
+     go tool cover -func="${OUTPUT_TXT}"
+  fi
 
   popd
 }
