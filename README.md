@@ -34,8 +34,6 @@ Usage of fibr:
         [owasp] X-Frame-Options (default "deny")
   -fsDirectory string
         [filesystem] Path to served directory (default "/data")
-  -graceful string
-        [http] Graceful close duration (default "35s")
   -hsts
         [owasp] Indicate Strict Transport Security (default true)
   -key string
