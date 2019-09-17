@@ -18,6 +18,8 @@ go get github.com/ViBiOh/fibr/cmd
 
 ```bash
 Usage of fibr:
+  -address string
+        [http] Listen address
   -authDisable
         [auth] Disable auth
   -authUrl string
