@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/pkg/query"
+	"github.com/ViBiOh/httputils/v2/pkg/query"
 )
 
 // ServeStatic check if filename match SEO or static filename and serve it

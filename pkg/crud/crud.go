@@ -2,16 +2,15 @@ package crud
 
 import (
 	"flag"
-	"fmt"
 	"net/http"
 	"strings"
 	"sync"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
-	"github.com/ViBiOh/httputils/pkg/errors"
-	"github.com/ViBiOh/httputils/pkg/logger"
-	"github.com/ViBiOh/httputils/pkg/tools"
+	"github.com/ViBiOh/httputils/v2/pkg/errors"
+	"github.com/ViBiOh/httputils/v2/pkg/logger"
+	"github.com/ViBiOh/httputils/v2/pkg/tools"
 )
 
 var (
@@ -58,7 +57,7 @@ type app struct {
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		metadata: fs.Bool(tools.ToCamel(fmt.Sprintf("%sMetadata", prefix)), true, "Enable metadata storage"),
+		metadata: tools.NewFlag(prefix, "crud").Name("Metadata").Default(true).Label("Enable metadata storage").ToBool(fs),
 	}
 }
 

@@ -13,11 +13,11 @@ import (
 	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/pkg/errors"
-	"github.com/ViBiOh/httputils/pkg/httperror"
-	"github.com/ViBiOh/httputils/pkg/logger"
-	"github.com/ViBiOh/httputils/pkg/request"
-	"github.com/ViBiOh/httputils/pkg/tools"
+	"github.com/ViBiOh/httputils/v2/pkg/errors"
+	"github.com/ViBiOh/httputils/v2/pkg/httperror"
+	"github.com/ViBiOh/httputils/v2/pkg/logger"
+	"github.com/ViBiOh/httputils/v2/pkg/request"
+	"github.com/ViBiOh/httputils/v2/pkg/tools"
 )
 
 const (
@@ -59,7 +59,7 @@ type app struct {
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		imaginaryURL: fs.String(tools.ToCamel(fmt.Sprintf("%sImaginaryURL", prefix)), "http://image:9000", "[thumbnail] Imaginary URL"),
+		imaginaryURL: tools.NewFlag(prefix, "thumbnail").Name("ImaginaryURL").Default("http://image:9000").Label("Imaginary URL").ToString(fs),
 	}
 }
 

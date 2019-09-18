@@ -11,9 +11,9 @@ import (
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
-	"github.com/ViBiOh/httputils/pkg/logger"
-	"github.com/ViBiOh/httputils/pkg/templates"
-	"github.com/ViBiOh/httputils/pkg/tools"
+	"github.com/ViBiOh/httputils/v2/pkg/logger"
+	"github.com/ViBiOh/httputils/v2/pkg/templates"
+	"github.com/ViBiOh/httputils/v2/pkg/tools"
 )
 
 // App of package
@@ -39,8 +39,8 @@ type app struct {
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		publicURL: fs.String(tools.ToCamel(fmt.Sprintf("%sPublicURL", prefix)), "https://fibr.vibioh.fr", "[fibr] Public URL"),
-		version:   fs.String(tools.ToCamel(fmt.Sprintf("%sVersion", prefix)), "", "[fibr] Version (used mainly as a cache-buster)"),
+		publicURL: tools.NewFlag(prefix, "fibr").Name("PublicURL").Default("https://fibr.vibioh.fr").Label("Public URL").ToString(fs),
+		version:   tools.NewFlag(prefix, "fibr").Name("Version").Default("").Label("Version (used mainly as a cache-buster)").ToString(fs),
 	}
 }
 

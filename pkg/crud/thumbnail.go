@@ -3,7 +3,7 @@ package crud
 import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
-	"github.com/ViBiOh/httputils/pkg/logger"
+	"github.com/ViBiOh/httputils/v2/pkg/logger"
 )
 
 func (a *app) renameThumbnail(oldItem, newItem *provider.StorageItem) {

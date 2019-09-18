@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/pkg/errors"
+	"github.com/ViBiOh/httputils/v2/pkg/errors"
 )
 
 func getMode(name string) os.FileMode {

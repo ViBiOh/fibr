@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ViBiOh/httputils/pkg/errors"
+	"github.com/ViBiOh/httputils/v2/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 )
 

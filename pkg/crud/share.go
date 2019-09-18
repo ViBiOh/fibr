@@ -8,9 +8,9 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/pkg/errors"
-	"github.com/ViBiOh/httputils/pkg/tools"
-	"github.com/ViBiOh/httputils/pkg/uuid"
+	"github.com/ViBiOh/httputils/v2/pkg/errors"
+	"github.com/ViBiOh/httputils/v2/pkg/tools"
+	"github.com/ViBiOh/httputils/v2/pkg/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 

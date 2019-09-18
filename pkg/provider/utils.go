@@ -5,7 +5,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/ViBiOh/httputils/pkg/errors"
+	"github.com/ViBiOh/httputils/v2/pkg/errors"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
 )

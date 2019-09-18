@@ -14,9 +14,9 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/pkg/httperror"
-	"github.com/ViBiOh/httputils/pkg/logger"
-	"github.com/ViBiOh/httputils/pkg/tools"
+	"github.com/ViBiOh/httputils/v2/pkg/httperror"
+	"github.com/ViBiOh/httputils/v2/pkg/logger"
+	"github.com/ViBiOh/httputils/v2/pkg/tools"
 )
 
 var (
@@ -39,7 +39,7 @@ type app struct {
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		directory: fs.String(tools.ToCamel(fmt.Sprintf("%sDirectory", prefix)), "/data", "[filesystem] Path to served directory"),
+		directory: tools.NewFlag(prefix, "filesystem").Name("Directory").Default("/data").Label("Path to served directory").ToString(fs),
 	}
 }
 
