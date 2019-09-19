@@ -20,13 +20,11 @@ services:
       traefik.http.routers.fibr-http.middlewares: redirect@file
       traefik.http.routers.fibr-https.rule: Host(`fibr.vibioh.fr`)
       traefik.http.routers.fibr-https.entrypoints: https
-      traefik.http.routers.fibr-https.middlewares: compress@file
+      traefik.http.routers.fibr-https.middlewares: compress@file, web-limit@file
       traefik.http.routers.fibr-https.tls: true
       traefik.http.routers.fibr-https.tls.certResolver: default
       traefik.http.services.fibr-service.loadbalancer.passhostheader: true
       traefik.http.services.fibr-service.loadbalancer.server.port: '1080'
-      traefik.http.middlewares.fibr-rate-limit.ratelimit.average: '10'
-      traefik.http.middlewares.fibr-rate-limit.ratelimit.burst: '50'
     volumes:
     - ${DATA_DIR}:/data
     user: '${DATA_USER_ID}'
