@@ -3,17 +3,6 @@ version: '2.1'
 services:
   site:
     image: vibioh/fibr
-    command:
-    - -authUsers
-    - vibioh:admin
-    - -basicUsers
-    - ${BASIC_USERS}
-    - -version
-    - ${VERSION}
-    - -csp
-    - "default-src 'self'; base-uri 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:"
-    - -frameOptions
-    - SAMEORIGIN
     labels:
       traefik.http.routers.fibr-http.rule: Host(`fibr.vibioh.fr`)
       traefik.http.routers.fibr-http.entrypoints: http
@@ -25,6 +14,13 @@ services:
       traefik.http.routers.fibr-https.tls.certResolver: default
       traefik.http.services.fibr-service.loadbalancer.passhostheader: true
       traefik.http.services.fibr-service.loadbalancer.server.port: '1080'
+    environment:
+      FIBR_AUTH_USERS: vibioh:admin
+      FIBR_BASIC_USERS: ${BASIC_USERS}
+      FIBR_VERSION: ${VERSION}
+      FIBR_VERSION: ${VERSION}
+      FIBR_CSP: "default-src 'self'; base-uri 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:"
+      FIBR_FRAME_OPTIONS: SAMEORIGIN
     volumes:
     - ${DATA_DIR}:/data
     user: '${DATA_USER_ID}'
@@ -38,7 +34,7 @@ services:
   image:
     image: h2non/imaginary
     labels:
-      traefik.enable: 'false'
+      traefik.enable: false
     restart: on-failure:5
     read_only: true
     cpu_shares: 128
