@@ -12,7 +12,6 @@ services:
       traefik.http.routers.fibr-https.middlewares: compress@file, web-limit@file
       traefik.http.routers.fibr-https.tls: true
       traefik.http.routers.fibr-https.tls.certresolver: default
-      traefik.http.services.fibr-service.loadbalancer.passhostheader: true
       traefik.http.services.fibr-service.loadbalancer.server.port: '1080'
     environment:
       FIBR_AUTH_USERS: vibioh:admin
