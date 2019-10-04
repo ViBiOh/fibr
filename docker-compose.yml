@@ -17,7 +17,6 @@ services:
       FIBR_AUTH_USERS: vibioh:admin
       FIBR_BASIC_USERS: ${BASIC_USERS}
       FIBR_VERSION: ${VERSION}
-      FIBR_VERSION: ${VERSION}
       FIBR_CSP: "default-src 'self'; base-uri 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:"
       FIBR_FRAME_OPTIONS: SAMEORIGIN
     volumes:
