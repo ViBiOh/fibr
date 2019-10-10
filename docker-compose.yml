@@ -1,4 +1,4 @@
-version: '2.1'
+version: "2.1"
 
 services:
   site:
@@ -12,16 +12,16 @@ services:
       traefik.http.routers.fibr-https.middlewares: compress@file, web-limit@file
       traefik.http.routers.fibr-https.tls: true
       traefik.http.routers.fibr-https.tls.certresolver: default
-      traefik.http.services.fibr-service.loadbalancer.server.port: '1080'
+      traefik.http.services.fibr-service.loadbalancer.server.port: "1080"
     environment:
       FIBR_AUTH_USERS: vibioh:admin
-      FIBR_BASIC_USERS: ${BASIC_USERS}
-      FIBR_VERSION: ${VERSION}
+      FIBR_BASIC_USERS: "${BASIC_USERS}"
+      FIBR_VERSION: "${VERSION}"
       FIBR_CSP: "default-src 'self'; base-uri 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:"
       FIBR_FRAME_OPTIONS: SAMEORIGIN
     volumes:
     - ${DATA_DIR}:/data
-    user: '${DATA_USER_ID}'
+    user: "${DATA_USER_ID}"
     restart: on-failure:5
     read_only: true
     cpu_shares: 128
