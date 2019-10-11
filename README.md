@@ -5,6 +5,7 @@ Web File Browser and Manager
 [![Build Status](https://travis-ci.org/ViBiOh/fibr.svg?branch=master)](https://travis-ci.org/ViBiOh/fibr)
 [![Go Report Card](https://goreportcard.com/badge/github.com/ViBiOh/fibr)](https://goreportcard.com/report/github.com/ViBiOh/fibr)
 [![codecov](https://codecov.io/gh/ViBiOh/fibr/branch/master/graph/badge.svg)](https://codecov.io/gh/ViBiOh/fibr)
+[![Dependabot Status](https://api.dependabot.com/badges/status?host=github&repo=ViBiOh/fibr)](https://dependabot.com)
 
 Thanks to [FontAwesome](https://fontawesome.com) for providing awesome svg.
 
