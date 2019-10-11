@@ -2,7 +2,7 @@
 
 version: 1
 update_configs:
-- package_manager: "go"
+- package_manager: "go:modules"
   directory: "/"
   update_schedule: "weekly"
   default_reviewers:
