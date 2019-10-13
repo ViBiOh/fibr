@@ -31,7 +31,12 @@ build() {
     local GOOS="${context[0]}"
     local GOARCH="${context[1]}"
 
-    GOOS="${GOOS}" GOARCH="${GOARCH}" CGO_ENABLED=0 go build -ldflags="-s -w" -installsuffix nocgo -o "${OUTPUT_DIR}/${1}_${GOOS}_${GOARCH}" "${SCRIPT_DIR}/../${2}"
+    (
+      export GOOS="${GOOS}"
+      export GOARCH="${GOARCH}"
+      export CGO_ENABLED=0
+      go build -ldflags="-s -w" -installsuffix nocgo -o "${OUTPUT_DIR}/${1}_${GOOS}_${GOARCH}" "${SCRIPT_DIR}/../${2}"
+    )
   done
 }
 
@@ -41,7 +46,8 @@ get_release_body() {
     return 1
   fi
 
-  local PREVIOUS_TAG=$(git tag --sort=-creatordate | grep -v "${1}" | head -n 1)
+  local PREVIOUS_TAG
+  PREVIOUS_TAG=$(git tag --sort=-creatordate | grep -v "${1}" | head -n 1)
 
   git log --no-merges --pretty=format:'%h %s' "${1}...${PREVIOUS_TAG}" | awk '!a[substr($0,8)]++' | awk '{printf "* %s\\n",$0}'
 }
@@ -59,14 +65,16 @@ release() {
 
   echo -e "${BLUE}Creating release ${GIT_TAG} for ${GITHUB_REPOSITORY}...${RESET}"
 
-  local BODY=$(get_release_body "${GIT_TAG}" | sed 's|"|'"'"'|g')
+  local BODY
+  BODY=$(get_release_body "${GIT_TAG}" | sed 's|"|'"'"'|g')
   echo -e "${GREEN}${BODY}${RESET}"
 
   local OUTPUT_TXT="output.txt"
   local CLIENT_ARGS=("curl" "-q" "-sS" "-o" "${OUTPUT_TXT}" "-w" "%{http_code}" "-H" "Authorization: token ${GITHUB_OAUTH_TOKEN}")
 
   echo
-  local HTTP_STATUS="$("${CLIENT_ARGS[@]}" \
+  local HTTP_STATUS
+  HTTP_STATUS="$("${CLIENT_ARGS[@]}" \
     -H "Content-Type: application/json" \
     -X POST \
     "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases" \
@@ -82,14 +90,16 @@ release() {
      exit 1
   fi
 
-  local RESPONSE_URL=$(python -c "import json; data = json.load(open('${OUTPUT_TXT}')); print(data['upload_url']);" | sed 's|{.*||')
+  local RESPONSE_URL
+  RESPONSE_URL=$(python -c "import json; data = json.load(open('${OUTPUT_TXT}')); print(data['upload_url']);" | sed 's|{.*||')
   rm "${OUTPUT_TXT}"
 
   for asset in "${OUTPUT_DIR}"/*; do
     echo -e "${BLUE}Uploading asset ${asset}...${RESET}"
     echo
 
-    local HTTP_STATUS="$("${CLIENT_ARGS[@]}" \
+    local HTTP_STATUS
+  HTTP_STATUS="$("${CLIENT_ARGS[@]}" \
       -H "Content-Type: application/x-executable" \
       -X POST \
       "${RESPONSE_URL}?name=$(basename ${asset})" \
