@@ -9,8 +9,8 @@ APP_NAME = fibr
 PACKAGES ?= ./...
 GO_FILES ?= */*.go */*/*.go
 
-GOBIN=bin
-BINARY_PATH=$(GOBIN)/$(APP_NAME)
+OUTPUR_DIR=bin
+BINARY_PATH=$(OUTPUR_DIR)/$(APP_NAME)
 
 SERVER_SOURCE = cmd/fibr.go
 SERVER_RUNNER = go run $(SERVER_SOURCE)
