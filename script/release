@@ -102,7 +102,7 @@ release() {
   HTTP_STATUS="$("${CLIENT_ARGS[@]}" \
       -H "Content-Type: application/x-executable" \
       -X POST \
-      "${RESPONSE_URL}?name=$(basename ${asset})" \
+      "${RESPONSE_URL}?name=$(basename "${asset}")" \
       --data-binary "@${asset}"
     )"
 

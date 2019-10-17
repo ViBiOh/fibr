@@ -17,12 +17,12 @@ main() {
     go test -race -covermode="${COVER_MODE}" -coverprofile="${COVER_OUTPUT}" "${pkg}"
 
     if [[ -f "${COVER_OUTPUT}" ]]; then
-      cat "${COVER_OUTPUT}" | grep -v "${MODE}" >> "${OUTPUT_TXT}" || true
+      grep -v "${MODE}" "${COVER_OUTPUT}" >> "${OUTPUT_TXT}" || true
       rm "${COVER_OUTPUT}"
     fi
   done
 
-  if [[ $(cat "${OUTPUT_TXT}" | wc -l) -ne 1 ]]; then
+  if [[ "$(wc -l < "${OUTPUT_TXT}")" -ne 1 ]]; then
      go tool cover -func="${OUTPUT_TXT}"
   fi
 
