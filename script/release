@@ -8,9 +8,9 @@ readonly TARGETS=('darwin/amd64' 'linux/amd64' 'linux/arm' 'linux/arm64')
 
 read_variable_if_required() {
   if [[ -z "${!1:-}" ]]; then
-    read -p "${2:-${1}=}" "${1}"
+    read -r -p "${2:-${1}=}" "${1}"
   else
-    echo "${1}="${!1}
+    echo "${1}=${!1}"
   fi
 }
 
