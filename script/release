@@ -14,6 +14,27 @@ read_variable_if_required() {
   fi
 }
 
+get_github_repository() {
+  if [[ "$(git rev-parse --is-inside-work-tree 2>&1)" != "true" ]]; then
+    return
+  fi
+
+  local REMOTE_URL
+  REMOTE_URL="$(git remote get-url --push "$(git remote show | head -1)")"
+
+  if [[ "${REMOTE_URL}" =~ ^.*@.*:(.*)\/(.*).git$ ]]; then
+    echo "${BASH_REMATCH[1]}/${BASH_REMATCH[2]}"
+  fi
+}
+
+get_last_tag() {
+  if [[ "$(git rev-parse --is-inside-work-tree 2>&1)" != "true" ]]; then
+    return
+  fi
+
+  git describe --tag 2> /dev/null | awk -F "-" '{print $1}'
+}
+
 clean() {
   rm -rf "${OUTPUT_DIR}"
   mkdir "${OUTPUT_DIR}"
@@ -25,8 +46,11 @@ build() {
     return 1
   fi
 
-  for os_arch in "${TARGETS[@]}"; do
-    IFS='/' read -ra context <<< "${os_arch}"
+  local BLUE='\033[0;34m'
+  local RESET='\033[0m'
+
+  for OS_ARCH in "${TARGETS[@]}"; do
+    IFS='/' read -ra context <<< "${OS_ARCH}"
 
     local GOOS="${context[0]}"
     local GOARCH="${context[1]}"
@@ -35,6 +59,7 @@ build() {
       export GOOS="${GOOS}"
       export GOARCH="${GOARCH}"
       export CGO_ENABLED=0
+      echo -e "${BLUE}Building binary for ${GOOS}/${GOARCH} to ${OUTPUT_DIR}${RESET}"
       go build -ldflags="-s -w" -installsuffix nocgo -o "${OUTPUT_DIR}/${1}_${GOOS}_${GOARCH}" "${SCRIPT_DIR}/../${2}"
     )
   done
@@ -53,6 +78,13 @@ get_release_body() {
 }
 
 release() {
+  local GITHUB_REPOSITORY
+  GITHUB_REPOSITORY="$(get_github_repository)"
+  local GIT_TAG
+  GIT_TAG="$(get_last_tag)"
+  local RELEASE_NAME
+  RELEASE_NAME="${GIT_TAG}"
+
   read_variable_if_required GITHUB_OAUTH_TOKEN
   read_variable_if_required GITHUB_REPOSITORY
   read_variable_if_required GIT_TAG
