@@ -8,7 +8,8 @@ readonly TARGETS=('darwin/amd64' 'linux/amd64' 'linux/arm' 'linux/arm64')
 
 read_variable_if_required() {
   if [[ -z "${!1:-}" ]]; then
-    read -r -p "${2:-${1}=}" "${1}"
+    read -r -p "${2:-${1}}${3:+ [${3}]}=" READ_VALUE
+    eval "${1}=${READ_VALUE:-${3}}"
   else
     echo "${1}=${!1}"
   fi
@@ -78,17 +79,10 @@ get_release_body() {
 }
 
 release() {
-  local GITHUB_REPOSITORY
-  GITHUB_REPOSITORY="$(get_github_repository)"
-  local GIT_TAG
-  GIT_TAG="$(get_last_tag)"
-  local RELEASE_NAME
-  RELEASE_NAME="${GIT_TAG}"
-
   read_variable_if_required GITHUB_OAUTH_TOKEN
-  read_variable_if_required GITHUB_REPOSITORY
-  read_variable_if_required GIT_TAG
-  read_variable_if_required RELEASE_NAME
+  read_variable_if_required GITHUB_REPOSITORY "Repository" "$(get_github_repository)"
+  read_variable_if_required GIT_TAG "Tag" "$(get_last_tag)"
+  read_variable_if_required RELEASE_NAME "Release name" "$(get_last_tag)"
 
   local RED='\033[0;31m'
   local GREEN='\033[0;32m'
@@ -104,7 +98,6 @@ release() {
   local OUTPUT_TXT="output.txt"
   local CLIENT_ARGS=("curl" "-q" "-sS" "-o" "${OUTPUT_TXT}" "-w" "%{http_code}" "-H" "Authorization: token ${GITHUB_OAUTH_TOKEN}")
 
-  echo
   local HTTP_STATUS
   HTTP_STATUS="$("${CLIENT_ARGS[@]}" \
     -H "Content-Type: application/json" \
@@ -128,7 +121,6 @@ release() {
 
   for asset in "${OUTPUT_DIR}"/*; do
     echo -e "${BLUE}Uploading asset ${asset}...${RESET}"
-    echo
 
     local HTTP_STATUS
   HTTP_STATUS="$("${CLIENT_ARGS[@]}" \
