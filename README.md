@@ -51,10 +51,6 @@ Usage of fibr:
         [fibr] Public URL {FIBR_PUBLIC_URL} (default "https://fibr.vibioh.fr")
   -thumbnailImaginaryURL string
         [thumbnail] Imaginary URL {FIBR_THUMBNAIL_IMAGINARY_URL} (default "http://image:9000")
-  -tracingAgent string
-        [tracing] Jaeger Agent (e.g. host:port) {FIBR_TRACING_AGENT} (default "jaeger:6831")
-  -tracingName string
-        [tracing] Service name {FIBR_TRACING_NAME}
   -url string
         [alcotest] URL to check {FIBR_URL}
   -userAgent string
