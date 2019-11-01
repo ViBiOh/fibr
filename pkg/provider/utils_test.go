@@ -67,7 +67,7 @@ func TestSanitizeName(t *testing.T) {
 			}
 
 			if failed {
-				t.Errorf("SanitizeName(`%s`) = (%#v, %#v), want (%#v, %#v)", testCase.name, result, err, testCase.want, testCase.wantErr)
+				t.Errorf("SanitizeName() = (%#v, %#v), want (%#v, %#v)", result, err, testCase.want, testCase.wantErr)
 			}
 		})
 	}
@@ -99,7 +99,7 @@ func TestIsNotExist(t *testing.T) {
 	for _, testCase := range cases {
 		t.Run(testCase.intention, func(t *testing.T) {
 			if result := IsNotExist(testCase.input); result != testCase.want {
-				t.Errorf("IsNotExist(%#v) = %#v, want %#v", testCase.input, result, testCase.want)
+				t.Errorf("IsNotExist() = %#v, want %#v", result, testCase.want)
 			}
 		})
 	}

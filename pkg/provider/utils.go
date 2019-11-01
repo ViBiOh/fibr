@@ -1,11 +1,11 @@
 package provider
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 	"unicode"
 
-	"github.com/ViBiOh/httputils/v2/pkg/errors"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
 )
@@ -25,7 +25,7 @@ func init() {
 func SanitizeName(name string, removeSlash bool) (string, error) {
 	withoutDiacritics, _, err := transform.String(transformer, name)
 	if err != nil {
-		return "", errors.WithStack(err)
+		return "", err
 	}
 
 	withoutSpecials := specialChars.ReplaceAllString(withoutDiacritics, "")
@@ -42,7 +42,7 @@ func SanitizeName(name string, removeSlash bool) (string, error) {
 
 // ErrNotExist create a NotExist error
 func ErrNotExist(err error) error {
-	return errors.Wrap(err, "path not found")
+	return fmt.Errorf("path not found: %w", err)
 }
 
 // IsNotExist checks if error match a not found
@@ -51,5 +51,5 @@ func IsNotExist(err error) bool {
 		return false
 	}
 
-	return err.Error() == "path not found"
+	return strings.HasPrefix(err.Error(), "path not found")
 }

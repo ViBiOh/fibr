@@ -1,6 +1,7 @@
 package crud
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -8,8 +9,7 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/v2/pkg/errors"
-	"github.com/ViBiOh/httputils/v2/pkg/logger"
+	"github.com/ViBiOh/httputils/v3/pkg/logger"
 )
 
 const (
@@ -42,7 +42,7 @@ func (a *app) saveUploadedFile(request *provider.Request, uploadedFile io.ReadCl
 	}
 
 	if _, err = io.CopyBuffer(hostFile, uploadedFile, copyBuffer); err != nil {
-		return "", errors.WithStack(err)
+		return "", err
 	}
 
 	info, err := a.storage.Info(filePath)
@@ -63,7 +63,7 @@ func (a *app) Upload(w http.ResponseWriter, r *http.Request, request *provider.R
 	}
 
 	if err := r.ParseMultipartForm(defaultMaxMemory); err != nil {
-		a.renderer.Error(w, provider.NewError(http.StatusBadRequest, errors.WithStack(err)))
+		a.renderer.Error(w, provider.NewError(http.StatusBadRequest, err))
 		return
 	}
 
@@ -79,13 +79,13 @@ func (a *app) Upload(w http.ResponseWriter, r *http.Request, request *provider.R
 		if uploadedFile != nil {
 			defer func() {
 				if err := uploadedFile.Close(); err != nil {
-					logger.Error("%#v", errors.WithStack(err))
+					logger.Error("%s", err)
 				}
 			}()
 		}
 
 		if err != nil {
-			a.renderer.Error(w, provider.NewError(http.StatusBadRequest, errors.WithStack(err)))
+			a.renderer.Error(w, provider.NewError(http.StatusBadRequest, err))
 			return
 		}
 

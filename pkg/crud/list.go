@@ -8,8 +8,7 @@ import (
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
-	"github.com/ViBiOh/httputils/v2/pkg/errors"
-	"github.com/ViBiOh/httputils/v2/pkg/logger"
+	"github.com/ViBiOh/httputils/v3/pkg/logger"
 )
 
 func (a *app) getCoverImage(files []*provider.StorageItem) *provider.StorageItem {
@@ -62,7 +61,7 @@ func (a *app) Download(w http.ResponseWriter, request *provider.Request) {
 	zipWriter := zip.NewWriter(w)
 	defer func() {
 		if err := zipWriter.Close(); err != nil {
-			logger.Error("%#v", errors.WithStack(err))
+			logger.Error("%s", err)
 		}
 	}()
 
@@ -81,7 +80,7 @@ func (a *app) Download(w http.ResponseWriter, request *provider.Request) {
 func (a *app) addFileToZip(zipWriter *zip.Writer, file *provider.StorageItem) error {
 	header, err := zip.FileInfoHeader(file.Info.(os.FileInfo))
 	if err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 
 	header.Name = file.Name
@@ -89,7 +88,7 @@ func (a *app) addFileToZip(zipWriter *zip.Writer, file *provider.StorageItem) er
 
 	writer, err := zipWriter.CreateHeader(header)
 	if err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 
 	reader, err := a.storage.ReaderFrom(file.Pathname)
@@ -98,5 +97,5 @@ func (a *app) addFileToZip(zipWriter *zip.Writer, file *provider.StorageItem) er
 	}
 
 	_, err = io.Copy(writer, reader)
-	return errors.WithStack(err)
+	return err
 }

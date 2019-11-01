@@ -1,6 +1,7 @@
 package crud
 
 import (
+	"errors"
 	"flag"
 	"net/http"
 	"strings"
@@ -8,9 +9,8 @@ import (
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
-	"github.com/ViBiOh/httputils/v2/pkg/errors"
-	"github.com/ViBiOh/httputils/v2/pkg/logger"
-	"github.com/ViBiOh/httputils/v2/pkg/tools"
+	"github.com/ViBiOh/httputils/v3/pkg/flags"
+	"github.com/ViBiOh/httputils/v3/pkg/logger"
 )
 
 var (
@@ -57,7 +57,7 @@ type app struct {
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		metadata: tools.NewFlag(prefix, "crud").Name("Metadata").Default(true).Label("Enable metadata storage").ToBool(fs),
+		metadata: flags.New(prefix, "crud").Name("Metadata").Default(true).Label("Enable metadata storage").ToBool(fs),
 	}
 }
 

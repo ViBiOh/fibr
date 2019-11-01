@@ -13,11 +13,11 @@ import (
 	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/v2/pkg/errors"
-	"github.com/ViBiOh/httputils/v2/pkg/httperror"
-	"github.com/ViBiOh/httputils/v2/pkg/logger"
-	"github.com/ViBiOh/httputils/v2/pkg/request"
-	"github.com/ViBiOh/httputils/v2/pkg/tools"
+	"github.com/ViBiOh/fibr/pkg/sha"
+	"github.com/ViBiOh/httputils/v3/pkg/flags"
+	"github.com/ViBiOh/httputils/v3/pkg/httperror"
+	"github.com/ViBiOh/httputils/v3/pkg/logger"
+	"github.com/ViBiOh/httputils/v3/pkg/request"
 )
 
 const (
@@ -59,7 +59,7 @@ type app struct {
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		imaginaryURL: tools.NewFlag(prefix, "thumbnail").Name("ImaginaryURL").Default("http://image:9000").Label("Imaginary URL").ToString(fs),
+		imaginaryURL: flags.New(prefix, "thumbnail").Name("ImaginaryURL").Default("http://image:9000").Label("Imaginary URL").ToString(fs),
 	}
 }
 
@@ -161,7 +161,7 @@ func (a app) List(w http.ResponseWriter, r *http.Request, item *provider.Storage
 
 		content, err := ioutil.ReadAll(file)
 		if err != nil {
-			logger.Error("unable to read %s: %#v", item.Pathname, errors.WithStack(err))
+			logger.Error("unable to read %s: %#v", item.Pathname, err)
 		}
 
 		if commaNeeded {
@@ -170,7 +170,7 @@ func (a app) List(w http.ResponseWriter, r *http.Request, item *provider.Storage
 			commaNeeded = true
 		}
 
-		safeWrite(w, fmt.Sprintf(`"%s":`, tools.Sha1(item.Name)))
+		safeWrite(w, fmt.Sprintf(`"%s":`, sha.Sha1(item.Name)))
 		safeWrite(w, fmt.Sprintf(`"%s"`, base64.StdEncoding.EncodeToString(content)))
 	}
 
@@ -186,7 +186,12 @@ func (a app) generateThumbnail(item *provider.StorageItem) error {
 	ctx, cancel := getCtx(context.Background())
 	defer cancel()
 
-	result, _, _, err := request.Do(ctx, http.MethodPost, a.imaginaryURL, file, nil)
+	req, err := request.New(ctx, http.MethodPost, a.imaginaryURL, file, nil)
+	if err != nil {
+		return err
+	}
+
+	result, _, _, err := request.Do(ctx, req)
 	if err != nil {
 		return err
 	}

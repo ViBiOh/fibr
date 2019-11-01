@@ -8,9 +8,8 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/v2/pkg/errors"
-	"github.com/ViBiOh/httputils/v2/pkg/tools"
-	"github.com/ViBiOh/httputils/v2/pkg/uuid"
+	"github.com/ViBiOh/fibr/pkg/sha"
+	"github.com/ViBiOh/httputils/v3/pkg/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -27,7 +26,7 @@ func (a *app) CreateShare(w http.ResponseWriter, r *http.Request, request *provi
 	if editValue := strings.TrimSpace(r.FormValue("edit")); editValue != "" {
 		edit, err = strconv.ParseBool(editValue)
 		if err != nil {
-			a.renderer.Error(w, provider.NewError(http.StatusBadRequest, errors.WithStack(err)))
+			a.renderer.Error(w, provider.NewError(http.StatusBadRequest, err))
 			return
 		}
 	}
@@ -36,7 +35,7 @@ func (a *app) CreateShare(w http.ResponseWriter, r *http.Request, request *provi
 	if passwordValue := strings.TrimSpace(r.FormValue("password")); passwordValue != "" {
 		hash, err := bcrypt.GenerateFromPassword([]byte(passwordValue), 12)
 		if err != nil {
-			a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, errors.WithStack(err)))
+			a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))
 			return
 		}
 
@@ -48,7 +47,7 @@ func (a *app) CreateShare(w http.ResponseWriter, r *http.Request, request *provi
 		a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
-	id := tools.Sha1(uuid)[:8]
+	id := sha.Sha1(uuid)[:8]
 
 	a.metadataLock.Lock()
 	defer a.metadataLock.Unlock()

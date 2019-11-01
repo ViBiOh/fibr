@@ -5,10 +5,9 @@ import (
 	"net/http"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/v2/pkg/errors"
-	"github.com/ViBiOh/httputils/v2/pkg/httperror"
-	"github.com/ViBiOh/httputils/v2/pkg/logger"
-	"github.com/ViBiOh/httputils/v2/pkg/templates"
+	"github.com/ViBiOh/httputils/v3/pkg/httperror"
+	"github.com/ViBiOh/httputils/v3/pkg/logger"
+	"github.com/ViBiOh/httputils/v3/pkg/templates"
 )
 
 // Error render error page with given status
@@ -48,7 +47,7 @@ func (a app) SVG(w http.ResponseWriter, name, fill string) {
 	w.Header().Set("Content-Type", "image/svg+xml")
 
 	if err := tpl.Execute(w, fill); err != nil {
-		httperror.InternalServerError(w, errors.WithStack(err))
+		httperror.InternalServerError(w, err)
 		return
 	}
 }

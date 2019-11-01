@@ -2,12 +2,13 @@ package crud
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"path"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/v2/pkg/errors"
 )
 
 var (
@@ -34,7 +35,7 @@ func (a *app) loadMetadata() (err error) {
 	if file != nil {
 		defer func() {
 			if closeErr := file.Close(); closeErr != nil {
-				err = errors.New("%s and also %v", err, closeErr)
+				err = fmt.Errorf("%s: %w", err, closeErr)
 			}
 		}()
 	}
@@ -44,12 +45,12 @@ func (a *app) loadMetadata() (err error) {
 
 	rawMeta, err := ioutil.ReadAll(file)
 	if err != nil {
-		return errors.WithStack(err)
+		return err
 
 	}
 
 	if err = json.Unmarshal(rawMeta, &a.metadatas); err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 
 	return nil
@@ -62,14 +63,14 @@ func (a *app) saveMetadata() (err error) {
 
 	content, err := json.MarshalIndent(&a.metadatas, "", "  ")
 	if err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 
 	file, err := a.storage.WriterTo(metadataFilename)
 	if file != nil {
 		defer func() {
 			if closeErr := file.Close(); closeErr != nil {
-				err = errors.New("%s and also %v", err, closeErr)
+				err = fmt.Errorf("%s: %w", err, closeErr)
 			}
 		}()
 	}
@@ -83,7 +84,7 @@ func (a *app) saveMetadata() (err error) {
 	}
 
 	if n < len(content) {
-		return errors.WithStack(io.ErrShortWrite)
+		return io.ErrShortWrite
 	}
 
 	return nil

@@ -2,13 +2,13 @@ package provider
 
 import (
 	"encoding/base64"
+	"errors"
 	"mime"
 	"net/http"
 	"path"
 	"strings"
 	"time"
 
-	"github.com/ViBiOh/httputils/v2/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -70,7 +70,7 @@ func (s Share) CheckPassword(r *http.Request) error {
 
 	data, err := base64.StdEncoding.DecodeString(strings.TrimPrefix(header, "Basic "))
 	if err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 
 	dataStr := string(data)

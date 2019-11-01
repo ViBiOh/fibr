@@ -10,10 +10,11 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/fibr/pkg/sha"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
-	"github.com/ViBiOh/httputils/v2/pkg/logger"
-	"github.com/ViBiOh/httputils/v2/pkg/templates"
-	"github.com/ViBiOh/httputils/v2/pkg/tools"
+	"github.com/ViBiOh/httputils/v3/pkg/flags"
+	"github.com/ViBiOh/httputils/v3/pkg/logger"
+	"github.com/ViBiOh/httputils/v3/pkg/templates"
 )
 
 // App of package
@@ -39,8 +40,8 @@ type app struct {
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		publicURL: tools.NewFlag(prefix, "fibr").Name("PublicURL").Default("https://fibr.vibioh.fr").Label("Public URL").ToString(fs),
-		version:   tools.NewFlag(prefix, "fibr").Name("Version").Default("").Label("Version (used mainly as a cache-buster)").ToString(fs),
+		publicURL: flags.New(prefix, "fibr").Name("PublicURL").Default("https://fibr.vibioh.fr").Label("Public URL").ToString(fs),
+		version:   flags.New(prefix, "fibr").Name("Version").Default("").Label("Version (used mainly as a cache-buster)").ToString(fs),
 	}
 }
 
@@ -53,12 +54,12 @@ func New(config Config, rootName string, thumbnail thumbnail.App) App {
 			return url.PathEscape(path)
 		},
 		"sha1": func(file *provider.StorageItem) string {
-			return tools.Sha1(file.Name)
+			return sha.Sha1(file.Name)
 		},
 		"asyncImage": func(file *provider.StorageItem, version string) map[string]interface{} {
 			return map[string]interface{}{
 				"File":        file,
-				"Fingerprint": template.JS(tools.Sha1(file.Name)),
+				"Fingerprint": template.JS(sha.Sha1(file.Name)),
 				"Version":     version,
 			}
 		},

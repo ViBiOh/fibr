@@ -14,9 +14,9 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/v2/pkg/httperror"
-	"github.com/ViBiOh/httputils/v2/pkg/logger"
-	"github.com/ViBiOh/httputils/v2/pkg/tools"
+	"github.com/ViBiOh/httputils/v3/pkg/flags"
+	"github.com/ViBiOh/httputils/v3/pkg/httperror"
+	"github.com/ViBiOh/httputils/v3/pkg/logger"
 )
 
 var (
@@ -39,7 +39,7 @@ type app struct {
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		directory: tools.NewFlag(prefix, "filesystem").Name("Directory").Default("/data").Label("Path to served directory").ToString(fs),
+		directory: flags.New(prefix, "filesystem").Name("Directory").Default("/data").Label("Path to served directory").ToString(fs),
 	}
 }
 

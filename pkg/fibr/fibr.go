@@ -1,6 +1,7 @@
 package fibr
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -10,8 +11,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/crud"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/renderer"
-	"github.com/ViBiOh/httputils/v2/pkg/errors"
-	"github.com/ViBiOh/httputils/v2/pkg/httperror"
+	"github.com/ViBiOh/httputils/v3/pkg/httperror"
 )
 
 // App of package

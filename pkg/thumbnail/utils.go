@@ -9,8 +9,7 @@ import (
 	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/v2/pkg/errors"
-	"github.com/ViBiOh/httputils/v2/pkg/logger"
+	"github.com/ViBiOh/httputils/v3/pkg/logger"
 )
 
 const (
@@ -30,7 +29,7 @@ func CanHaveThumbnail(item *provider.StorageItem) bool {
 
 func safeWrite(w io.Writer, content string) {
 	if _, err := io.WriteString(w, content); err != nil {
-		logger.Error("%#v", errors.WithStack(err))
+		logger.Error("%s", err)
 	}
 }
 
