@@ -27,7 +27,7 @@ func (a *app) deleteThumbnail(item *provider.StorageItem) bool {
 	}
 
 	if err := a.storage.Remove(thumbnailPath); err != nil {
-		logger.Error("%#v", err)
+		logger.Error("%s", err)
 	}
 
 	return true

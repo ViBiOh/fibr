@@ -83,7 +83,7 @@ func New(config Config, storage provider.Storage) App {
 			time.Sleep(waitTimeout)
 
 			if err := app.generateThumbnail(item); err != nil {
-				logger.Error("%#v", err)
+				logger.Error("%s", err)
 			} else {
 				logger.Info("Thumbnail generated for %s", item.Pathname)
 			}
@@ -191,7 +191,7 @@ func (a app) generateThumbnail(item *provider.StorageItem) error {
 		return err
 	}
 
-	result, _, _, err := request.Do(ctx, req)
+	resp, err := request.Do(ctx, req)
 	if err != nil {
 		return err
 	}
@@ -201,7 +201,7 @@ func (a app) generateThumbnail(item *provider.StorageItem) error {
 		return err
 	}
 
-	if err := a.storage.Store(thumbnailPath, result); err != nil {
+	if err := a.storage.Store(thumbnailPath, resp.Body); err != nil {
 		return err
 	}
 
@@ -233,7 +233,7 @@ func (a app) Generate() {
 	})
 
 	if err != nil {
-		logger.Error("%#v", err)
+		logger.Error("%s", err)
 	}
 }
 
