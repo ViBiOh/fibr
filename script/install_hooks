@@ -8,17 +8,15 @@ main() {
 
   local HOOKS_SOURCE_DIR="${SCRIPT_DIR}/hooks"
   local HOOKS_TARGET_DIR="${SCRIPT_DIR}/../.git/hooks"
-  pushd "${HOOKS_SOURCE_DIR}"
+  
+  (
+    cd "${HOOKS_SOURCE_DIR}"
 
-  local PWD
-  PWD="$(pwd)"
-
-  for file in *; do
-    ln -s -f "${PWD}/${file}" "${HOOKS_TARGET_DIR}/${file}"
-    echo "${file} hook installed"
-  done
-
-  popd
+    for file in *; do
+      ln -s -f "${HOOKS_SOURCE_DIR}/${file}" "${HOOKS_TARGET_DIR}/${file}"
+      echo "${file} hook installed"
+    done
+  )
 }
 
 main "${@:-}"
