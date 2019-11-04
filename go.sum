@@ -1,13 +1,10 @@
 cloud.google.com/go v0.34.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 github.com/NYTimes/gziphandler v1.1.1 h1:ZUDjpQae29j0ryrS0u/B8HZfJBtBQHjqw2rQ2cqUQ3I=
 github.com/NYTimes/gziphandler v1.1.1/go.mod h1:n/CVRwUEOgIxrgPvAQhUUr9oeUtvrhMomdKFjzJNB0c=
-github.com/ViBiOh/auth v1.3.1 h1:aiG/+2GfKQ8AU8imWUL9Kw64lKh/Fma1Jc/dglvP0/E=
-github.com/ViBiOh/auth v1.3.1/go.mod h1:GIcput2GBodiKyrV6Eh+IhD/VwJlg6mo5DTbmNNcjdU=
-github.com/ViBiOh/httputils v1.8.2 h1:ulvdhtq8/Ww4QihYJ5uf0WDTG42yPuwojUCbfv/9W2E=
-github.com/ViBiOh/httputils/v3 v3.0.3 h1:jhK0TGy2aKmiFXXrd4ABhQraHnH+fnikole3jUAoX6Y=
-github.com/ViBiOh/httputils/v3 v3.0.3/go.mod h1:g9OG+/wbsGBevlKCQ7XfSQaLRR06qQoyQXdNcCzvKMo=
-github.com/ViBiOh/httputils/v3 v3.0.4 h1:4c5+VOos7YIP7M8ui8NWdCDnFU9AXLii5CSN/uz96EA=
-github.com/ViBiOh/httputils/v3 v3.0.4/go.mod h1:g9OG+/wbsGBevlKCQ7XfSQaLRR06qQoyQXdNcCzvKMo=
+github.com/ViBiOh/auth v1.4.0 h1:OeyiqEbgqNiZ5AxovWYML15Yi+GTjkftr5YKiApDXUw=
+github.com/ViBiOh/auth v1.4.0/go.mod h1:cBAzOQO/SsntV04Dh2HpFLUTXKqmUvMxB3i8VrXt3wM=
+github.com/ViBiOh/httputils/v3 v3.1.0 h1:c10059hTAGxe/hf03RFKlomJZs0pU+bu+xLDI6hKLew=
+github.com/ViBiOh/httputils/v3 v3.1.0/go.mod h1:g9OG+/wbsGBevlKCQ7XfSQaLRR06qQoyQXdNcCzvKMo=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf/go.mod h1:ybxpYRFXyAe+OPACYpWeL0wqObRcbAqCMya13uyzqw0=
@@ -125,6 +122,8 @@ golang.org/x/sys v0.0.0-20191010194322-b09406accb47 h1:/XfQ9z7ib8eEJX2hdgFTZJ/nt
 golang.org/x/sys v0.0.0-20191010194322-b09406accb47/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20191029155521-f43be2a4598c h1:S/FtSvpNLtFBgjTqcKsRpsa6aVsI6iztaz1bQd9BJwE=
 golang.org/x/sys v0.0.0-20191029155521-f43be2a4598c/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+golang.org/x/sys v0.0.0-20191104094858-e8c54fb511f6 h1:ZJUmhYTp8GbGC0ViZRc2U+MIYQ8xx9MscsdXnclfIhw=
+golang.org/x/sys v0.0.0-20191104094858-e8c54fb511f6/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
 golang.org/x/text v0.3.2 h1:tW2bmiBqwgJj/UpqtC8EpXEZVYOwU0yG4iWbprSVAcs=
 golang.org/x/text v0.3.2/go.mod h1:bEr9sfX3Q8Zfm5fL9x+3itogRgK3+ptLWKqgva+5dAk=

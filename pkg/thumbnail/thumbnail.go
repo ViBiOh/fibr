@@ -186,12 +186,7 @@ func (a app) generateThumbnail(item *provider.StorageItem) error {
 	ctx, cancel := getCtx(context.Background())
 	defer cancel()
 
-	req, err := request.New(ctx, http.MethodPost, a.imaginaryURL, file, nil)
-	if err != nil {
-		return err
-	}
-
-	resp, err := request.Do(ctx, req)
+	resp, err := request.New().Post(a.imaginaryURL).Send(ctx, file)
 	if err != nil {
 		return err
 	}
