@@ -3,8 +3,11 @@ github.com/NYTimes/gziphandler v1.1.1 h1:ZUDjpQae29j0ryrS0u/B8HZfJBtBQHjqw2rQ2cq
 github.com/NYTimes/gziphandler v1.1.1/go.mod h1:n/CVRwUEOgIxrgPvAQhUUr9oeUtvrhMomdKFjzJNB0c=
 github.com/ViBiOh/auth v1.3.1 h1:aiG/+2GfKQ8AU8imWUL9Kw64lKh/Fma1Jc/dglvP0/E=
 github.com/ViBiOh/auth v1.3.1/go.mod h1:GIcput2GBodiKyrV6Eh+IhD/VwJlg6mo5DTbmNNcjdU=
+github.com/ViBiOh/httputils v1.8.2 h1:ulvdhtq8/Ww4QihYJ5uf0WDTG42yPuwojUCbfv/9W2E=
 github.com/ViBiOh/httputils/v3 v3.0.3 h1:jhK0TGy2aKmiFXXrd4ABhQraHnH+fnikole3jUAoX6Y=
 github.com/ViBiOh/httputils/v3 v3.0.3/go.mod h1:g9OG+/wbsGBevlKCQ7XfSQaLRR06qQoyQXdNcCzvKMo=
+github.com/ViBiOh/httputils/v3 v3.0.4 h1:4c5+VOos7YIP7M8ui8NWdCDnFU9AXLii5CSN/uz96EA=
+github.com/ViBiOh/httputils/v3 v3.0.4/go.mod h1:g9OG+/wbsGBevlKCQ7XfSQaLRR06qQoyQXdNcCzvKMo=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf/go.mod h1:ybxpYRFXyAe+OPACYpWeL0wqObRcbAqCMya13uyzqw0=
