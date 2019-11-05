@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
 set -o nounset -o pipefail -o errexit
-readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly OUTPUT_DIR="${SCRIPT_DIR}/../release"
 
 read_variable_if_required() {
   local SECRET_ARG=""
@@ -11,7 +9,7 @@ read_variable_if_required() {
   fi
 
   if [[ -z "${!1:-}" ]]; then
-    read ${SECRET_ARG} -r -p "${1}${2:+ [${2}]}=" READ_VALUE
+    read ${SECRET_ARG?} -r -p "${1}${2:+ [${2}]}=" READ_VALUE
     eval "${1}=${READ_VALUE:-${2}}"
 
     if [[ "${SECRET_ARG}" == "-s" ]]; then
@@ -22,6 +20,15 @@ read_variable_if_required() {
   else
     printf "Using secret %s\n" "${1}"
   fi
+}
+
+git_root() {
+  if [[ "$(git rev-parse --is-inside-work-tree 2>&1)" != "true" ]]; then
+    pwd
+    return
+  fi
+
+  git rev-parse --show-toplevel
 }
 
 get_github_repository() {
@@ -70,8 +77,8 @@ build() {
       export GOOS="${GOOS}"
       export GOARCH="${GOARCH}"
       export CGO_ENABLED=0
-      echo -e "${BLUE}Building binary for ${GOOS}/${GOARCH} to ${OUTPUT_DIR}${RESET}"
-      go build -ldflags="-s -w" -installsuffix nocgo -o "${OUTPUT_DIR}/${1}_${GOOS}_${GOARCH}" "${SCRIPT_DIR}/../${2}"
+      echo -e "${BLUE}Building binary ${1}_${GOOS}_${GOARCH} to ${OUTPUT_DIR}${RESET}"
+      go build -ldflags="-s -w" -installsuffix nocgo -o "${OUTPUT_DIR}/${1}_${GOOS}_${GOARCH}" "${2}"
     )
   done
 }
@@ -96,7 +103,7 @@ release() {
 
   echo -e "${BLUE}Creating release ${GIT_TAG} for ${GITHUB_REPOSITORY}...${RESET}"
 
-  local HTTP_OUTPUT="output.txt"
+  local HTTP_OUTPUT="http_output.txt"
   local HTTP_STATUS
 
   local BODY
@@ -150,7 +157,7 @@ release() {
 usage() {
   printf "Usage of %s\n" "${0}"
   printf "clean\n\tClean output dir %s\n" "${OUTPUT_DIR}"
-  printf "build\n\tBuild binary\n"
+  printf "build\n\tBuild binary for %s\n" "${OUTPUT_BINARIES[*]}"
   printf "release\n\tCreate GitHub release and upload output dir content\n"
 }
 
@@ -160,16 +167,27 @@ main() {
   local RED='\033[0;31m'
   local RESET='\033[0m'
 
+  local ROOT_DIR
+  ROOT_DIR="$(git_root)"
+
+  local OUTPUT_DIR="${ROOT_DIR}/release"
+
+  local OUTPUT_BINARIES
+  mapfile -t OUTPUT_BINARIES < <(go list -f '{{ .Dir }} {{ .Name }}' "${ROOT_DIR}/..." | grep "main" | awk '{print $1}')
+
   for arg in "${@}"; do
     case "${arg}" in
-      "clean")
-        clean
-        ;;
       "build")
-        build "fibr" "cmd/fibr.go"
+        clean
+        for main in "${OUTPUT_BINARIES[@]}"; do
+          build "$(basename "${main}")" "${main}"
+        done
         ;;
       "release")
         release
+        ;;
+      "clean")
+        clean
         ;;
       *)
         usage
@@ -178,4 +196,5 @@ main() {
   done
 }
 
-main "${@:-}"
+DEFAULT_ARGS=("build" "release" "clean")
+main "${@:-${DEFAULT_ARGS[@]}}"
