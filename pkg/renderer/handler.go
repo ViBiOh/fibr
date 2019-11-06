@@ -12,7 +12,7 @@ import (
 
 // Error render error page with given status
 func (a app) Error(w http.ResponseWriter, err *provider.Error) {
-	logger.Error("%#v", err.Err)
+	logger.Error("%s", err.Err)
 
 	if err.Status == http.StatusUnauthorized {
 		w.Header().Add("WWW-Authenticate", "Basic realm=\"Password required\" charset=\"UTF-8\"")

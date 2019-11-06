@@ -60,7 +60,7 @@ func TestBuild(t *testing.T) {
 			result := (&PageBuilder{}).Config(testCase.config).Request(testCase.request).Message(testCase.message).Error(testCase.error).Layout(testCase.layout).Content(testCase.content).Build()
 
 			if !reflect.DeepEqual(result, testCase.want) {
-				t.Errorf("Build(%#v, %#v, %#v, %#v, `%s`, %#v) = %#v, want %#v", testCase.config, testCase.request, testCase.message, testCase.error, testCase.layout, testCase.content, result, testCase.want)
+				t.Errorf("Build() = %#v, want %#v", result, testCase.want)
 			}
 		})
 	}
@@ -119,7 +119,7 @@ func TestComputePublicURL(t *testing.T) {
 	for _, testCase := range cases {
 		t.Run(testCase.intention, func(t *testing.T) {
 			if result := computePublicURL(testCase.config, testCase.request); result != testCase.want {
-				t.Errorf("computePublicURL(%#v, %#v) = `%s`, want `%s`", testCase.config, testCase.request, result, testCase.want)
+				t.Errorf("computePublicURL() = `%s`, want `%s`", result, testCase.want)
 			}
 		})
 	}
@@ -177,7 +177,7 @@ func TestComputeTitle(t *testing.T) {
 	for _, testCase := range cases {
 		t.Run(testCase.intention, func(t *testing.T) {
 			if result := computeTitle(testCase.config, testCase.request); result != testCase.want {
-				t.Errorf("computeTitle(%#v, %#v) = `%s`, want `%s`", testCase.config, testCase.request, result, testCase.want)
+				t.Errorf("computeTitle() = `%s`, want `%s`", result, testCase.want)
 			}
 		})
 	}
@@ -235,7 +235,7 @@ func TestComputeDescription(t *testing.T) {
 	for _, testCase := range cases {
 		t.Run(testCase.intention, func(t *testing.T) {
 			if result := computeDescription(testCase.config, testCase.request); result != testCase.want {
-				t.Errorf("computeDescription(%#v, %#v) = `%s`, want `%s`", testCase.config, testCase.request, result, testCase.want)
+				t.Errorf("computeDescription() = `%s`, want `%s`", result, testCase.want)
 			}
 		})
 	}

@@ -105,7 +105,7 @@ func TestGetURI(t *testing.T) {
 func TestCheckPassword(t *testing.T) {
 	password, err := bcrypt.GenerateFromPassword([]byte("test"), bcrypt.DefaultCost)
 	if err != nil {
-		t.Errorf("unable to create bcrypted password: %#v", err)
+		t.Errorf("unable to create bcrypted password: %s", err)
 	}
 
 	invalidAuth := httptest.NewRequest(http.MethodGet, "/", nil)

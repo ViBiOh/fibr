@@ -156,12 +156,12 @@ func (a app) List(w http.ResponseWriter, r *http.Request, item *provider.Storage
 
 		file, err := a.storage.ReaderFrom(thumbnailPath)
 		if err != nil {
-			logger.Error("unable to open %s: %#v", item.Pathname, err)
+			logger.Error("unable to open %s: %s", item.Pathname, err)
 		}
 
 		content, err := ioutil.ReadAll(file)
 		if err != nil {
-			logger.Error("unable to read %s: %#v", item.Pathname, err)
+			logger.Error("unable to read %s: %s", item.Pathname, err)
 		}
 
 		if commaNeeded {
