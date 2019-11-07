@@ -7,15 +7,14 @@ endif
 
 APP_NAME = fibr
 PACKAGES ?= ./...
-GO_FILES ?= */*.go */*/*.go
+GO_FILES ?= $(shell find . -name "*.go")
 
-OUTPUR_DIR=bin
-BINARY_PATH=$(OUTPUR_DIR)/$(APP_NAME)
+BINARY_PATH=bin/$(APP_NAME)
 
-SERVER_SOURCE = cmd/fibr.go
-SERVER_RUNNER = go run $(SERVER_SOURCE)
+MAIN_SOURCE = cmd/fibr.go
+MAIN_RUNNER = go run $(MAIN_SOURCE)
 ifeq ($(DEBUG), true)
-	SERVER_RUNNER = dlv debug $(SERVER_SOURCE) --
+	MAIN_RUNNER = dlv debug $(MAIN_SOURCE) --
 endif
 
 .DEFAULT_GOAL := app
@@ -28,24 +27,24 @@ help: Makefile
 ## name: Output app name
 .PHONY: name
 name:
-	@echo -n $(APP_NAME)
+	@printf "%s" "$(APP_NAME)"
 
 ## version: Output last commit sha1
 .PHONY: version
 version:
-	@echo -n $(shell git rev-parse --short HEAD)
+	@printf "%s" "$(shell git rev-parse --short HEAD)"
 
-## app: Build app with dependencies download
+## dev: Build app
+.PHONY: dev
+dev: format style test build
+
+## app: Build whole app
 .PHONY: app
-app: deps go
+app: init dev
 
-## go: Build app
-.PHONY: go
-go: format lint test bench build
-
-## deps: Download dependencies
-.PHONY: deps
-deps:
+## init: Download dependencies
+.PHONY: init
+init:
 	go get github.com/kisielk/errcheck
 	go get golang.org/x/lint/golint
 	go get golang.org/x/tools/cmd/goimports
@@ -56,9 +55,9 @@ format:
 	goimports -w $(GO_FILES)
 	gofmt -s -w $(GO_FILES)
 
-## lint: Lint code
-.PHONY: lint
-lint:
+## style: Check code style
+.PHONY: style
+style:
 	golint $(PACKAGES)
 	errcheck -ignoretests $(PACKAGES)
 	go vet $(PACKAGES)
@@ -67,21 +66,17 @@ lint:
 .PHONY: test
 test:
 	script/coverage
-
-## bench: Benchmark code
-.PHONY: bench
-bench:
 	go test $(PACKAGES) -bench . -benchmem -run Benchmark.*
 
 ## build: Build binary
 .PHONY: build
 build:
-	CGO_ENABLED=0 go build -ldflags="-s -w" -installsuffix nocgo -o $(BINARY_PATH) $(SERVER_SOURCE)
+	CGO_ENABLED=0 go build -ldflags="-s -w" -installsuffix nocgo -o $(BINARY_PATH) $(MAIN_SOURCE)
 
-## start: Start app
-.PHONY: start
-start:
-	$(SERVER_RUNNER) \
+## run: Run app
+.PHONY: run
+run:
+	$(MAIN_RUNNER) \
 		-fsDirectory "$(PWD)" \
 		-publicURL "http://localhost:1080" \
 		-authUsers "admin:admin" \
