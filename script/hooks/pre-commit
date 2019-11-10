@@ -22,7 +22,7 @@ main() {
 
   if [[ "${PASS}" == "0" ]] && [[ "${GO_FILES}" != "" ]]; then
       echo -e "${BLUE}Linting golang packages${RESET}"
-      make --silent lint
+      make --silent style
       PASS=$?
   fi
 
