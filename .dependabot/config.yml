@@ -9,3 +9,7 @@ update_configs:
   - "ViBiOh"
   default_assignees:
   - "ViBiOh"
+  automerged_updates:
+  - match:
+      dependency_type: "all"
+      update_type: "all"
