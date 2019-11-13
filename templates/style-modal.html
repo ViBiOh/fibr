@@ -1,11 +1,10 @@
 {{ define "style-modal" }}
   <style>
-    {{ if .Request.CanEdit }}
-      {{ range .Content.Files }}
-        #delete-modal-{{ sha1 . }},
-        #edit-modal-{{ sha1 . }},
-      {{ end }}
-    {{ end }}
+    {{ if .Request.CanEdit -}}
+      {{- range .Content.Files -}}
+        #delete-modal-{{ sha1 . }}, #edit-modal-{{ sha1 . }},
+      {{- end -}}
+    {{- end -}}
     #upload-modal,
     #upload-success,
     #folder-modal,
@@ -14,12 +13,11 @@
       display: none;
     }
 
-    {{ if .Request.CanEdit }}
-      {{ range .Content.Files }}
-        #delete-modal-{{ sha1 . }}:target,
-        #edit-modal-{{ sha1 . }}:target,
-      {{ end }}
-    {{ end }}
+    {{ if .Request.CanEdit -}}
+      {{- range .Content.Files -}}
+        #delete-modal-{{ sha1 . }}:target, #edit-modal-{{ sha1 . }}:target,
+      {{- end -}}
+    {{- end -}}
     #upload-modal:target,
     #upload-success:target,
     #folder-modal:target,
@@ -29,12 +27,11 @@
       z-index: 5;
     }
 
-    {{ if .Request.CanEdit }}
-      {{ range .Content.Files }}
-        #delete-modal-{{ sha1 . }}:target ~ .content,
-        #edit-modal-{{ sha1 . }}:target ~ .content,
-      {{ end }}
-    {{ end }}
+    {{ if .Request.CanEdit -}}
+      {{- range .Content.Files -}}
+        #delete-modal-{{ sha1 . }}:target ~ .content, #edit-modal-{{ sha1 . }}:target ~ .content,
+      {{- end -}}
+    {{- end -}}
     #upload-modal:target ~ .content,
     #upload-success:target ~ .content,
     #folder-modal:target ~ .content,
