@@ -3,11 +3,11 @@
 set -o nounset -o pipefail -o errexit
 
 main() {
-  local OUTPUT_TXT="output.txt"
+  local HTTP_OUTPUT="http_output.txt"
   local HTTP_STATUS
-  HTTP_STATUS=$(curl -q -sS -X POST -u "${DEPLOY_CREDENTIALS}" -o "${OUTPUT_TXT}" -w "%{http_code}" "https://deploy.vibioh.fr/${1}/" --data-binary "${2}")
+  HTTP_STATUS=$(curl -sSqL --max-time 90 -X POST -u "${DEPLOY_CREDENTIALS}" -o "${HTTP_OUTPUT}" -w "%{http_code}" "https://deploy.vibioh.fr/${1}/" --data-binary "${2}")
 
-  cat "${OUTPUT_TXT}" && rm "${OUTPUT_TXT}"
+  cat "${HTTP_OUTPUT}" && rm "${HTTP_OUTPUT}"
 
   if [[ "${HTTP_STATUS}" != "200" ]]; then
      exit 1

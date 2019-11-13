@@ -110,7 +110,7 @@ release() {
   BODY=$(get_release_body "${GIT_TAG}" | sed 's|"|'"'"'|g')
   echo -e "${GREEN}${BODY}${RESET}"
 
-  local CLIENT_ARGS=("curl" "-q" "-sS" "-o" "${HTTP_OUTPUT}" "-w" "%{http_code}" "-H" "Authorization: token ${GITHUB_OAUTH_TOKEN}")
+  local CLIENT_ARGS=("curl" "-sSqL" "--max-time" "10" "-o" "${HTTP_OUTPUT}" "-w" "%{http_code}" "-H" "Authorization: token ${GITHUB_OAUTH_TOKEN}")
 
   HTTP_STATUS="$("${CLIENT_ARGS[@]}" \
     -H "Content-Type: application/json" \
