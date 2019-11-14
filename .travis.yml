@@ -18,8 +18,8 @@ jobs:
     services:
     - docker
     script:
-    - curl -q -sSL --max-time 10 "https://raw.githubusercontent.com/ViBiOh/scripts/master/bootstrap" | bash -s "docker_promote"
     - echo "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin
+    - curl -q -sSL --max-time 10 "https://raw.githubusercontent.com/ViBiOh/scripts/master/bootstrap" | bash -s "docker_promote"
     - scripts/docker_promote "${DOCKER_USER}/$(make name)" "$(make version)"
     after_success:
     - curl -q -sSL --max-time 10 -X POST https://goreportcard.com/checks?repo=github.com/ViBiOh/fibr
