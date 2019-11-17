@@ -54,7 +54,7 @@ Usage of fibr:
   -url string
         [alcotest] URL to check {FIBR_URL}
   -userAgent string
-        [alcotest] User-Agent for check {FIBR_USER_AGENT} (default "Golang alcotest")
+        [alcotest] User-Agent for check {FIBR_USER_AGENT} (default "Alcotest")
   -version string
         [fibr] Version (used mainly as a cache-buster) {FIBR_VERSION}
 ```

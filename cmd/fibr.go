@@ -12,8 +12,8 @@ import (
 	"github.com/ViBiOh/fibr/pkg/filesystem"
 	"github.com/ViBiOh/fibr/pkg/renderer"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
-	httputils "github.com/ViBiOh/httputils/v3/pkg"
 	"github.com/ViBiOh/httputils/v3/pkg/alcotest"
+	"github.com/ViBiOh/httputils/v3/pkg/httputils"
 	"github.com/ViBiOh/httputils/v3/pkg/logger"
 	"github.com/ViBiOh/httputils/v3/pkg/owasp"
 	"github.com/ViBiOh/httputils/v3/pkg/prometheus"
@@ -39,9 +39,6 @@ func main() {
 
 	alcotest.DoAndExit(alcotestConfig)
 
-	prometheusApp := prometheus.New(prometheusConfig)
-	owaspApp := owasp.New(owaspConfig)
-
 	storage, err := filesystem.New(filesystemConfig)
 	logger.Fatal(err)
 
@@ -51,7 +48,8 @@ func main() {
 	authApp := auth.NewService(authConfig, authService.NewBasic(basicConfig, nil))
 	fibrApp := fibr.New(crudApp, rendererApp, authApp)
 
-	webHandler := httputils.ChainMiddlewares(fibrApp.Handler(), prometheusApp, owaspApp)
-
-	httputils.New(serverConfig).ListenAndServe(webHandler, httputils.HealthHandler(nil), nil)
+	server := httputils.New(serverConfig)
+	server.Middleware(prometheus.New(prometheusConfig))
+	server.Middleware(owasp.New(owaspConfig))
+	server.ListenServeWait(fibrApp.Handler())
 }
