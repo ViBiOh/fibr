@@ -29,7 +29,7 @@ jobs:
     language: minimal
     script:
     - curl -q -sSL --max-time 10 "https://raw.githubusercontent.com/ViBiOh/scripts/master/bootstrap" | bash -s "deploy" "env_replace"
-    - scripts/env_replace "docker-compose.yml" DATA_DIR DATA_USER_ID BASIC_USERS VERSION > "docker-compose-env.yml"
+    - VERSION="$(make version)" scripts/env_replace "docker-compose.yml" DATA_DIR DATA_USER_ID BASIC_USERS VERSION > "docker-compose-env.yml"
     - scripts/deploy "$(make name)" "@docker-compose-env.yml"
 
 stages:
