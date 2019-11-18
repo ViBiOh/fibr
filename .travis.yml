@@ -27,16 +27,10 @@ jobs:
   - stage: Deploy
 
     language: minimal
-    script: |
-      sed \
-        -e "s|\${DATA_DIR}|${DATA_DIR}|g" \
-        -e "s|\${DATA_USER_ID}|${DATA_USER_ID}|g" \
-        -e "s|\${BASIC_USERS}|${BASIC_USERS}|g" \
-        -e "s|\${VERSION}|${TRAVIS_COMMIT}|g" \
-        -e "s|\\\$|\$\$|g" \
-        docker-compose.yml > docker-compose-env.yml
-      curl -q -sSL --max-time 10 "https://raw.githubusercontent.com/ViBiOh/scripts/master/bootstrap" | bash -s "deploy"
-      scripts/deploy "$(make name)" "@docker-compose-env.yml"
+    script:
+    - curl -q -sSL --max-time 10 "https://raw.githubusercontent.com/ViBiOh/scripts/master/bootstrap" | bash -s "deploy" "env_replace"
+    - scripts/env_replace "docker-compose.yml" DATA_DIR DATA_USER_ID BASIC_USERS VERSION > "docker-compose-env.yml"
+    - scripts/deploy "$(make name)" "@docker-compose-env.yml"
 
 stages:
   - Build
