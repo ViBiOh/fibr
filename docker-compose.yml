@@ -1,3 +1,5 @@
+---
+
 version: "2.1"
 
 services:
@@ -27,7 +29,7 @@ services:
     cpu_shares: 128
     mem_limit: 134217728
     security_opt:
-    - no-new-privileges
+      - no-new-privileges
 
   image:
     image: h2non/imaginary
@@ -38,4 +40,4 @@ services:
     cpu_shares: 128
     mem_limit: 536870912
     security_opt:
-    - no-new-privileges
+      - no-new-privileges
