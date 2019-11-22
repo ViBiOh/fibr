@@ -1,15 +1,17 @@
+---
+
 # https://dependabot.com/docs/config-file/
 
 version: 1
 update_configs:
-- package_manager: "go:modules"
-  directory: "/"
-  update_schedule: "weekly"
-  default_reviewers:
-  - "ViBiOh"
-  default_assignees:
-  - "ViBiOh"
-  automerged_updates:
-  - match:
-      dependency_type: "all"
-      update_type: "all"
+  - package_manager: "go:modules"
+    directory: "/"
+    update_schedule: "weekly"
+    default_reviewers:
+      - "ViBiOh"
+    default_assignees:
+      - "ViBiOh"
+    automerged_updates:
+      - match:
+        dependency_type: "all"
+        update_type: "all"
