@@ -16,7 +16,7 @@ services:
       traefik.http.routers.fibr-https.tls.certresolver: default
       traefik.http.services.fibr-service.loadbalancer.server.port: "1080"
     environment:
-      FIBR_AUTH_USERS: vibioh:admin
+      FIBR_AUTH_USERS: 1:admin
       FIBR_IDENT_USERS: "${BASIC_USERS}"
       FIBR_VERSION: "${VERSION}"
       FIBR_CSP: "default-src 'self'; base-uri 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:"
