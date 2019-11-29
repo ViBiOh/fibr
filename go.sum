@@ -5,6 +5,8 @@ github.com/ViBiOh/auth v1.4.0 h1:OeyiqEbgqNiZ5AxovWYML15Yi+GTjkftr5YKiApDXUw=
 github.com/ViBiOh/auth v1.4.0/go.mod h1:cBAzOQO/SsntV04Dh2HpFLUTXKqmUvMxB3i8VrXt3wM=
 github.com/ViBiOh/auth v1.5.0 h1:N53zHVE6EIuiTtXVRXVFnPlpyRuuKGd1DhervapHU8U=
 github.com/ViBiOh/auth v1.5.0/go.mod h1:Ede8XNM/sqlmTRRzmZK8edEM1NKe5Qc3g64p+fKIjoE=
+github.com/ViBiOh/auth v1.6.0 h1:5dH3g9mfiOJcPOg2y9E43O2IEyd5VYxnX7qxX4xEdRY=
+github.com/ViBiOh/auth v1.6.0/go.mod h1:nI29gVLOpBirCDIPWELrkmVtOodzousrnRHGRPIqXa4=
 github.com/ViBiOh/httputils v1.8.2 h1:ulvdhtq8/Ww4QihYJ5uf0WDTG42yPuwojUCbfv/9W2E=
 github.com/ViBiOh/httputils/v3 v3.1.0 h1:c10059hTAGxe/hf03RFKlomJZs0pU+bu+xLDI6hKLew=
 github.com/ViBiOh/httputils/v3 v3.1.0/go.mod h1:g9OG+/wbsGBevlKCQ7XfSQaLRR06qQoyQXdNcCzvKMo=
@@ -16,6 +18,7 @@ github.com/ViBiOh/httputils/v3 v3.2.0 h1:bPmkfD0hWusuTDzcuCA4hhRmFkEM156a/vTVL5/
 github.com/ViBiOh/httputils/v3 v3.2.0/go.mod h1:GQ2Eu+PfaYnDeSx0Mqvb28w0sB7/cUOpfdivtIDL87Q=
 github.com/ViBiOh/httputils/v3 v3.2.1 h1:SxmZe5yJIftaAB1C4NYfw3qMut7iwWI57+fMiAK3xvE=
 github.com/ViBiOh/httputils/v3 v3.2.1/go.mod h1:GQ2Eu+PfaYnDeSx0Mqvb28w0sB7/cUOpfdivtIDL87Q=
+github.com/ViBiOh/httputils/v3 v3.2.2/go.mod h1:GQ2Eu+PfaYnDeSx0Mqvb28w0sB7/cUOpfdivtIDL87Q=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf/go.mod h1:ybxpYRFXyAe+OPACYpWeL0wqObRcbAqCMya13uyzqw0=
@@ -121,6 +124,7 @@ golang.org/x/net v0.0.0-20190108225652-1e06a53dbb7e/go.mod h1:mL1N/T3taQHkDXs73r
 golang.org/x/net v0.0.0-20190404232315-eb5bcb51f2a3/go.mod h1:t9HGtf8HONx5eT2rtn7q6eTqICYqUVnKs3thJo3Qplg=
 golang.org/x/net v0.0.0-20190603091049-60506f45cf65/go.mod h1:HSz+uSET+XFnRR8LxR5pz3Of3rY3CfYBVs4xY44aLks=
 golang.org/x/net v0.0.0-20190613194153-d28f0bde5980/go.mod h1:z5CRVTTTmAJ677TzLLGU+0bjPO0LkuOLi4/5GtJWs/s=
+golang.org/x/net v0.0.0-20190620200207-3b0461eec859/go.mod h1:z5CRVTTTmAJ677TzLLGU+0bjPO0LkuOLi4/5GtJWs/s=
 golang.org/x/net v0.0.0-20191101175033-0deb6923b6d9/go.mod h1:z5CRVTTTmAJ677TzLLGU+0bjPO0LkuOLi4/5GtJWs/s=
 golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45/go.mod h1:gOpvHmFTYa4IltrdGE7lF6nIHvwfUNPOp7c8zoXwtLw=
 golang.org/x/sync v0.0.0-20181108010431-42b317875d0f/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
