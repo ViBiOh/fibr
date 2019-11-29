@@ -21,14 +21,8 @@ go get github.com/ViBiOh/fibr/cmd
 Usage of fibr:
   -address string
         [http] Listen address {FIBR_ADDRESS}
-  -authDisable
-        [auth] Disable auth {FIBR_AUTH_DISABLE}
-  -authUrl string
-        [auth] Auth URL, if remote {FIBR_AUTH_URL}
-  -authUsers string
-        [auth] Allowed users and profiles (e.g. user:profile1|profile2,user2:profile3). Empty allow any identified user {FIBR_AUTH_USERS}
-  -basicUsers id:username:password,id2:username2:password2
-        [basic] Users in the form id:username:password,id2:username2:password2 {FIBR_BASIC_USERS}
+  -authUsers id:profile1|profile2,id2:profile1
+        [auth] Users profiles in the form id:profile1|profile2,id2:profile1 {FIBR_AUTH_USERS}
   -cert string
         [http] Certificate file {FIBR_CERT}
   -csp string
@@ -39,6 +33,8 @@ Usage of fibr:
         [fs] Path to served directory {FIBR_FS_DIRECTORY} (default "/data")
   -hsts
         [owasp] Indicate Strict Transport Security {FIBR_HSTS} (default true)
+  -identUsers id:login:password,id2:login2:password2
+        [ident] Users in the form id:login:password,id2:login2:password2 {FIBR_IDENT_USERS}
   -key string
         [http] Key file {FIBR_KEY}
   -metadata

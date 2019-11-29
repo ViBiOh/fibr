@@ -4,9 +4,10 @@ import (
 	"flag"
 	"os"
 
-	"github.com/ViBiOh/auth/pkg/auth"
-	"github.com/ViBiOh/auth/pkg/ident/basic"
-	authService "github.com/ViBiOh/auth/pkg/ident/service"
+	auth "github.com/ViBiOh/auth/v2/pkg/auth/memory"
+	"github.com/ViBiOh/auth/v2/pkg/handler"
+	"github.com/ViBiOh/auth/v2/pkg/ident/basic"
+	basicProvider "github.com/ViBiOh/auth/v2/pkg/ident/basic/memory"
 	"github.com/ViBiOh/fibr/pkg/crud"
 	"github.com/ViBiOh/fibr/pkg/fibr"
 	"github.com/ViBiOh/fibr/pkg/filesystem"
@@ -19,6 +20,17 @@ import (
 	"github.com/ViBiOh/httputils/v3/pkg/prometheus"
 )
 
+func newLoginApp(basicProviderConfig basicProvider.Config, authConfig auth.Config) handler.App {
+	basicProviderApp, err := basicProvider.New(basicProviderConfig)
+	logger.Fatal(err)
+	basicProviderProvider := basic.New(basicProviderApp)
+
+	authApp, err := auth.New(authConfig)
+	logger.Fatal(err)
+
+	return handler.New(authApp, basicProviderProvider)
+}
+
 func main() {
 	fs := flag.NewFlagSet("fibr", flag.ExitOnError)
 
@@ -27,8 +39,9 @@ func main() {
 	prometheusConfig := prometheus.Flags(fs, "prometheus")
 	owaspConfig := owasp.Flags(fs, "")
 
+	basicProviderConfig := basicProvider.Flags(fs, "ident")
 	authConfig := auth.Flags(fs, "auth")
-	basicConfig := basic.Flags(fs, "basic")
+
 	crudConfig := crud.Flags(fs, "")
 	rendererConfig := renderer.Flags(fs, "")
 
@@ -42,11 +55,12 @@ func main() {
 	storage, err := filesystem.New(filesystemConfig)
 	logger.Fatal(err)
 
+	loginApp := newLoginApp(basicProviderConfig, authConfig)
+
 	thumbnailApp := thumbnail.New(thumbnailConfig, storage)
 	rendererApp := renderer.New(rendererConfig, storage.Root(), thumbnailApp)
 	crudApp := crud.New(crudConfig, storage, rendererApp, thumbnailApp)
-	authApp := auth.NewService(authConfig, authService.NewBasic(basicConfig, nil))
-	fibrApp := fibr.New(crudApp, rendererApp, authApp)
+	fibrApp := fibr.New(crudApp, rendererApp, loginApp)
 
 	server := httputils.New(serverConfig)
 	server.Middleware(prometheus.New(prometheusConfig))

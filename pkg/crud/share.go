@@ -1,6 +1,7 @@
 package crud
 
 import (
+	"crypto/rand"
 	"fmt"
 	"net/http"
 	"path"
@@ -9,9 +10,18 @@ import (
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/sha"
-	"github.com/ViBiOh/httputils/v3/pkg/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
+
+func uuid() (string, error) {
+	raw := make([]byte, 16)
+	_, _ = rand.Read(raw)
+
+	raw[8] = raw[8]&^0xc0 | 0x80
+	raw[6] = raw[6]&^0xf0 | 0x40
+
+	return fmt.Sprintf("%x-%x-%x-%x-%x", raw[0:4], raw[4:6], raw[6:8], raw[8:10], raw[10:]), nil
+}
 
 // CreateShare create a share for given URL
 func (a *app) CreateShare(w http.ResponseWriter, r *http.Request, request *provider.Request) {
@@ -42,7 +52,7 @@ func (a *app) CreateShare(w http.ResponseWriter, r *http.Request, request *provi
 		password = string(hash)
 	}
 
-	uuid, err := uuid.New()
+	uuid, err := uuid()
 	if err != nil {
 		a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))
 		return

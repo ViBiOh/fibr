@@ -6,8 +6,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/ViBiOh/auth/pkg/auth"
-	"github.com/ViBiOh/auth/pkg/ident"
+	"github.com/ViBiOh/auth/v2/pkg/auth"
+	login "github.com/ViBiOh/auth/v2/pkg/handler"
+	"github.com/ViBiOh/auth/v2/pkg/ident"
 	"github.com/ViBiOh/fibr/pkg/crud"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/renderer"
@@ -20,17 +21,17 @@ type App interface {
 }
 
 type app struct {
-	auth     auth.App
+	login    login.App
 	crud     crud.App
 	renderer renderer.App
 }
 
 // New creates new App from Config
-func New(crudApp crud.App, rendererApp renderer.App, authApp auth.App) App {
+func New(crudApp crud.App, rendererApp renderer.App, loginApp login.App) App {
 	return &app{
 		crud:     crudApp,
 		renderer: rendererApp,
-		auth:     authApp,
+		login:    loginApp,
 	}
 }
 
@@ -56,7 +57,7 @@ func (a app) handleAnonymousRequest(r *http.Request, err error) *provider.Error 
 		return provider.NewError(http.StatusForbidden, errors.New("you're not authorized to speak to me"))
 	}
 
-	if err == ident.ErrMalformedAuth || err == ident.ErrUnknownIdentType {
+	if err == ident.ErrMalformedAuth {
 		return provider.NewError(http.StatusBadRequest, err)
 	}
 
@@ -80,12 +81,12 @@ func (a app) parseRequest(r *http.Request) (*provider.Request, *provider.Error) 
 		return request, nil
 	}
 
-	user, err := a.auth.IsAuthenticated(r)
+	_, user, err := a.login.IsAuthenticated(r, "")
 	if err != nil {
 		return nil, a.handleAnonymousRequest(r, err)
 	}
 
-	if user.HasProfile("admin") {
+	if a.login.HasProfile(user, "admin") {
 		request.CanEdit = true
 		request.CanShare = true
 	}
