@@ -14,20 +14,29 @@ func (a *app) Rename(w http.ResponseWriter, r *http.Request, request *provider.R
 		return
 	}
 
+	oldName, httErr := checkFormName(r, "name")
+	if httErr != nil && httErr.Err != ErrEmptyName {
+		a.renderer.Error(w, httErr)
+		return
+	}
+
 	newName, httpErr := checkFormName(r, "newName")
 	if httpErr != nil {
 		a.renderer.Error(w, httpErr)
 		return
 	}
 
-	oldPath, httErr := checkFormName(r, "name")
-	if httErr != nil && httErr.Err != ErrEmptyName {
-		a.renderer.Error(w, httErr)
+	oldPath, err := provider.SanitizeName(request.GetFilepath(oldName), false)
+	if err != nil {
+		a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
 
-	newPath := request.GetFilepath(newName)
-	oldPath = request.GetFilepath(oldPath)
+	newPath, err := provider.SanitizeName(request.GetFilepath(newName), false)
+	if err != nil {
+		a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))
+		return
+	}
 
 	if _, err := a.storage.Info(newPath); err == nil {
 		a.renderer.Error(w, provider.NewError(http.StatusBadRequest, err))
