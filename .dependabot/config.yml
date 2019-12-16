@@ -7,6 +7,9 @@ update_configs:
   - package_manager: "go:modules"
     directory: "/"
     update_schedule: "weekly"
+    commit_message:
+      prefix: "chore"
+      include_scope: true
     automerged_updates:
       - match:
           dependency_type: "all"
