@@ -21,8 +21,10 @@ go get github.com/ViBiOh/fibr/cmd
 Usage of fibr:
   -address string
         [http] Listen address {FIBR_ADDRESS}
-  -authUsers id:profile1|profile2,id2:profile1
-        [auth] Users profiles in the form id:profile1|profile2,id2:profile1 {FIBR_AUTH_USERS}
+  -authProfiles id:profile1|profile2,id2:profile1
+        [auth] Users profiles in the form id:profile1|profile2,id2:profile1 {FIBR_AUTH_PROFILES}
+  -authUsers id:login:password,id2:login2:password2
+        [auth] Users credentials in the form id:login:password,id2:login2:password2 {FIBR_AUTH_USERS}
   -cert string
         [http] Certificate file {FIBR_CERT}
   -csp string
@@ -33,13 +35,13 @@ Usage of fibr:
         [fs] Path to served directory {FIBR_FS_DIRECTORY} (default "/data")
   -hsts
         [owasp] Indicate Strict Transport Security {FIBR_HSTS} (default true)
-  -identUsers id:login:password,id2:login2:password2
-        [ident] Users in the form id:login:password,id2:login2:password2 {FIBR_IDENT_USERS}
   -key string
         [http] Key file {FIBR_KEY}
   -metadata
         [crud] Enable metadata storage {FIBR_METADATA} (default true)
-  -port int
+  -okStatus int
+        [http] Healthy HTTP Status code {FIBR_OK_STATUS} (default 204)
+  -port uint
         [http] Listen port {FIBR_PORT} (default 1080)
   -prometheusPath string
         [prometheus] Path for exposing metrics {FIBR_PROMETHEUS_PATH} (default "/metrics")

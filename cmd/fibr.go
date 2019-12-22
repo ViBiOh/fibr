@@ -4,10 +4,9 @@ import (
 	"flag"
 	"os"
 
-	auth "github.com/ViBiOh/auth/v2/pkg/auth/memory"
 	"github.com/ViBiOh/auth/v2/pkg/handler"
 	"github.com/ViBiOh/auth/v2/pkg/ident/basic"
-	basicProvider "github.com/ViBiOh/auth/v2/pkg/ident/basic/memory"
+	basicMemory "github.com/ViBiOh/auth/v2/pkg/provider/memory"
 	"github.com/ViBiOh/fibr/pkg/crud"
 	"github.com/ViBiOh/fibr/pkg/fibr"
 	"github.com/ViBiOh/fibr/pkg/filesystem"
@@ -20,15 +19,12 @@ import (
 	"github.com/ViBiOh/httputils/v3/pkg/prometheus"
 )
 
-func newLoginApp(basicProviderConfig basicProvider.Config, authConfig auth.Config) handler.App {
-	basicProviderApp, err := basicProvider.New(basicProviderConfig)
-	logger.Fatal(err)
-	basicProviderProvider := basic.New(basicProviderApp)
-
-	authApp, err := auth.New(authConfig)
+func newLoginApp(basicConfig basicMemory.Config) handler.App {
+	basicApp, err := basicMemory.New(basicConfig)
 	logger.Fatal(err)
 
-	return handler.New(authApp, basicProviderProvider)
+	basicProviderProvider := basic.New(basicApp)
+	return handler.New(basicApp, basicProviderProvider)
 }
 
 func main() {
@@ -39,8 +35,7 @@ func main() {
 	prometheusConfig := prometheus.Flags(fs, "prometheus")
 	owaspConfig := owasp.Flags(fs, "")
 
-	basicProviderConfig := basicProvider.Flags(fs, "ident")
-	authConfig := auth.Flags(fs, "auth")
+	basicConfig := basicMemory.Flags(fs, "auth")
 
 	crudConfig := crud.Flags(fs, "")
 	rendererConfig := renderer.Flags(fs, "")
@@ -55,7 +50,7 @@ func main() {
 	storage, err := filesystem.New(filesystemConfig)
 	logger.Fatal(err)
 
-	loginApp := newLoginApp(basicProviderConfig, authConfig)
+	loginApp := newLoginApp(basicConfig)
 
 	thumbnailApp := thumbnail.New(thumbnailConfig, storage)
 	rendererApp := renderer.New(rendererConfig, storage.Root(), thumbnailApp)
@@ -63,7 +58,7 @@ func main() {
 	fibrApp := fibr.New(crudApp, rendererApp, loginApp)
 
 	server := httputils.New(serverConfig)
-	server.Middleware(prometheus.New(prometheusConfig))
-	server.Middleware(owasp.New(owaspConfig))
+	server.Middleware(prometheus.New(prometheusConfig).Middleware)
+	server.Middleware(owasp.New(owaspConfig).Middleware)
 	server.ListenServeWait(fibrApp.Handler())
 }
