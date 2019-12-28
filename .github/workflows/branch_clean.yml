@@ -1,0 +1,27 @@
+---
+
+name: Git
+on: [pull_request]
+jobs:
+  build:
+    name: Branch is clean
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Fetch branches
+        run: |
+          git fetch --no-tags --prune --depth=1 origin "+refs/heads/${BASE}:refs/remotes/origin/${BASE}"
+          git fetch --no-tags --prune --depth=1 origin "+refs/heads/${HEAD}:refs/remotes/origin/${HEAD}"
+        env:
+          BASE: ${{ github.base_ref }}
+          HEAD: ${{ github.head_ref }}
+
+      - name: Check no WIP of fixup commit
+        env:
+          BASE: origin/${{ github.base_ref }}
+          HEAD: origin/${{ github.head_ref }}
+        run: |
+          curl -q -sSL "https://raw.githubusercontent.com/ViBiOh/scripts/master/bootstrap" | bash -s "git_branch_clean"
+          scripts/git_branch_clean "${BASE}" "${HEAD}"
