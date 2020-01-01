@@ -24,14 +24,14 @@ jobs:
         - curl -q -sSL --max-time 10 "https://raw.githubusercontent.com/ViBiOh/scripts/master/bootstrap" | bash -s "docker_promote"
         - scripts/docker_promote "${DOCKER_USER}/$(make name)" "$(make version)"
       after_success:
-        - curl -q -sSL --max-time 10 -X POST https://goreportcard.com/checks?repo=github.com/ViBiOh/fibr
+        - curl -q -sSL --max-time 10 -X POST https://goreportcard.com/checks?repo=github.com/${TRAVIS_REPO_SLUG}
 
     - stage: Deploy
 
       language: minimal
       script:
         - curl -q -sSL --max-time 10 "https://raw.githubusercontent.com/ViBiOh/scripts/master/bootstrap" | bash -s "deploy" "env_replace"
-        - VERSION="$(make version)" scripts/env_replace "docker-compose.yml" DATA_DIR DATA_USER_ID BASIC_USERS VERSION | sed "s|\\\$|\$\$|g" > "docker-compose-env.yml"
+        - VERSION="$(make version)" scripts/env_replace "docker-compose.yml" DOCKER_USER DATA_DIR DATA_USER_ID BASIC_USERS VERSION | sed "s|\\\$|\$\$|g" > "docker-compose-env.yml"
         - scripts/deploy "$(make name)" "@docker-compose-env.yml"
 
 stages:

@@ -4,7 +4,7 @@ version: "2.1"
 
 services:
   site:
-    image: vibioh/fibr
+    image: ${DOCKER_USER}/fibr
     labels:
       traefik.http.routers.fibr-http.rule: Host(`fibr.vibioh.fr`)
       traefik.http.routers.fibr-http.entrypoints: http
