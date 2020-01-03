@@ -13,46 +13,6 @@
     {{ end }}
   </div>
 
+  {{ template "navigation" . }}
   {{ template "footer" . }}
-
-  {{ if or .Content.Next .Content.Previous }}
-    <script>
-      /**
-       * Go to the previous item.
-       */
-      function goToPrevious() {
-        {{ if .Content.Previous }}
-          window.location.href = '{{ .Content.Previous.Name }}?browser=true';
-        {{ end }}
-      }
-
-      /**
-       * Go to the next item.
-       */
-      function goToNext() {
-        {{ if .Content.Next }}
-          window.location.href = '{{ .Content.Next.Name }}?browser=true';
-        {{ end }}
-      }
-
-      /**
-       * Handle Previous/next.
-       */
-      window.onkeyup = (e) => {
-        if (e.key === 'ArrowLeft') {
-          goToPrevious();
-        }
-
-        if (e.key === 'ArrowRight') {
-          goToNext();
-        }
-
-        {{ if .Content.Parent }}
-          if (e.key === 'Escape') {
-            window.location.href = '{{ .Content.Parent }}';
-          }
-        {{ end }}
-      };
-    </script>
-  {{ end }}
 {{ end }}

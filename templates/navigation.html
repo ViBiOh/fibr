@@ -1,0 +1,58 @@
+{{ define "navigation" }}
+  <script>
+    /**
+     * Remove hash from URL
+     */
+    function clearHash() {
+      {{ if .Content.Parent }}
+          window.location.href = '{{ .Content.Parent }}';
+      {{ else }}
+        const previousHash = document.location.hash;
+        document.location.hash = '';
+
+        if (/success$/gim.test(previousHash)) {
+          window.location.reload(true);
+        }
+      {{ end }}
+    }
+
+    /**
+     * Go to the previous item.
+     */
+    function goToPrevious() {
+      {{ if .Content.Previous }}
+        window.location.href = '{{ .Content.Previous.Name }}?browser=true';
+      {{ end }}
+    }
+
+    /**
+     * Go to the next item.
+     */
+    function goToNext() {
+      {{ if .Content.Next }}
+        window.location.href = '{{ .Content.Next.Name }}?browser=true';
+      {{ end }}
+    }
+
+
+    /**
+     * Handle Previous/next.
+     */
+    window.onkeyup = e => {
+      switch(e.key) {
+        case 'ArrowLeft':
+          goToPrevious();
+          break;
+
+        case 'ArrowRight':
+          goToNext();
+          break;
+
+        case 'Escape':
+          clearHash();
+          break;
+
+      }
+    };
+  </script>
+{{ end }}

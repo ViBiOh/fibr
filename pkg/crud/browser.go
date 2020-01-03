@@ -10,17 +10,22 @@ import (
 
 func getPreviousAndNext(file *provider.StorageItem, files []*provider.StorageItem) (previous *provider.StorageItem, next *provider.StorageItem) {
 	found := false
+
 	for _, neighbor := range files {
-		if neighbor.Pathname == file.Pathname {
+		if neighbor.Name == file.Name {
 			found = true
 			continue
 		}
 
-		if !found && !neighbor.IsDir {
+		if neighbor.IsDir != file.IsDir {
+			continue
+		}
+
+		if !found {
 			previous = neighbor
 		}
 
-		if found && !neighbor.IsDir {
+		if found {
 			next = neighbor
 			return
 		}
