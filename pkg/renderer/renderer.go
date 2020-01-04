@@ -120,7 +120,7 @@ func New(config Config, rootName string, thumbnail thumbnail.App) App {
 
 // Directory render directory listing
 func (a app) Directory(w http.ResponseWriter, request *provider.Request, content map[string]interface{}, message *provider.Message) {
-	page := a.newPageBuilder().Request(request).Message(message).Layout(request.Display).Sort(request.Order).Content(content).Build()
+	page := a.newPageBuilder().Request(request).Message(message).Layout(request.Display).Content(content).Build()
 
 	w.Header().Set("content-language", "en")
 	if err := templates.WriteHTMLTemplate(a.tpl.Lookup("files"), w, page, http.StatusOK); err != nil {

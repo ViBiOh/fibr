@@ -17,7 +17,6 @@ type Page struct {
 	Message *Message
 	Error   *Error
 	Layout  string
-	Sort    string
 	Content map[string]interface{}
 
 	PublicURL   string
@@ -32,7 +31,6 @@ type PageBuilder struct {
 	message *Message
 	error   *Error
 	layout  string
-	sort    string
 	content map[string]interface{}
 }
 
@@ -67,13 +65,6 @@ func (p *PageBuilder) Error(error *Error) *PageBuilder {
 // Layout set Layout for page
 func (p *PageBuilder) Layout(layout string) *PageBuilder {
 	p.layout = layout
-
-	return p
-}
-
-// Sort set Sort for page
-func (p *PageBuilder) Sort(sort string) *PageBuilder {
-	p.sort = sort
 
 	return p
 }

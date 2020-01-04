@@ -1,14 +1,14 @@
 [
   {
     "id": "no-login",
-    "path": "/",
+    "path": "/pkg/",
     "rootName": "fibr",
     "edit": true,
     "password": ""
   },
   {
     "id": "password",
-    "path": "/",
+    "path": "/templates/",
     "rootName": "fibr",
     "edit": false,
     "password": "$2a$12$SVaRKEx6MrP2ZdUOrBoSg.s/hIT5VJTuimQEQGkReIyYRPX14sV12"

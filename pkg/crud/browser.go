@@ -12,12 +12,12 @@ func getPreviousAndNext(file *provider.StorageItem, files []*provider.StorageIte
 	found := false
 
 	for _, neighbor := range files {
-		if neighbor.Name == file.Name {
-			found = true
+		if neighbor.IsDir != file.IsDir {
 			continue
 		}
 
-		if neighbor.IsDir != file.IsDir {
+		if neighbor.Name == file.Name {
+			found = true
 			continue
 		}
 

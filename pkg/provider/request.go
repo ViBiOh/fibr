@@ -18,7 +18,6 @@ type Request struct {
 	CanEdit  bool
 	CanShare bool
 	Display  string
-	Order    string
 	Share    *Share
 }
 

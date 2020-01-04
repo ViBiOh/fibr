@@ -18,7 +18,6 @@ func getMode(name string) os.FileMode {
 }
 
 func (a app) getFile(filename string) (io.WriteCloser, error) {
-
 	return os.OpenFile(a.getFullPath(filename), os.O_RDWR|os.O_CREATE|os.O_TRUNC, getMode(filename))
 }
 
@@ -28,15 +27,10 @@ func convertToItem(dirname string, info os.FileInfo) *provider.StorageItem {
 	}
 
 	name := info.Name()
-	pathName := path.Join(dirname, name)
-
-	if strings.EqualFold(dirname, "/") {
-		pathName = dirname
-	}
 
 	return &provider.StorageItem{
-		Pathname: pathName,
 		Name:     name,
+		Pathname: path.Join(dirname, name),
 		IsDir:    info.IsDir(),
 		Date:     info.ModTime(),
 
