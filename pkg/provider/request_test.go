@@ -89,14 +89,14 @@ func TestGetURI(t *testing.T) {
 				},
 			},
 			"root.html",
-			"abcd1234/index/root.html",
+			"/abcd1234/index/root.html",
 		},
 	}
 
 	for _, testCase := range cases {
 		t.Run(testCase.intention, func(t *testing.T) {
 			if result := testCase.request.GetURI(testCase.input); result != testCase.want {
-				t.Errorf("%#v.GetFilepath(`%s`) = `%s`, want `%s`", testCase.request, testCase.input, result, testCase.want)
+				t.Errorf("GetFilepath() = `%s`, want `%s`", result, testCase.want)
 			}
 		})
 	}

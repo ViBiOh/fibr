@@ -39,7 +39,7 @@ func (r Request) GetURI(name string) string {
 	parts := make([]string, 0)
 
 	if r.Share != nil {
-		parts = append(parts, r.Share.ID)
+		parts = append(parts, "/", r.Share.ID)
 	}
 
 	parts = append(parts, r.Path, name)

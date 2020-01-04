@@ -10,11 +10,12 @@ import (
 // Post handle post from form
 func (a *app) Post(w http.ResponseWriter, r *http.Request, request *provider.Request) {
 	if r.FormValue("type") == "share" {
-		if r.FormValue("method") == http.MethodPost {
+		switch r.FormValue("method") {
+		case http.MethodPost:
 			a.CreateShare(w, r, request)
-		} else if r.FormValue("method") == http.MethodDelete {
+		case http.MethodDelete:
 			a.DeleteShare(w, r, request)
-		} else {
+		default:
 			a.renderer.Error(w, provider.NewError(http.StatusMethodNotAllowed, errors.New("unknown method")))
 		}
 	} else if r.FormValue("method") == http.MethodPost {
