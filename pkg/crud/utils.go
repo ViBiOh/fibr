@@ -7,6 +7,34 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
+func getPreviousAndNext(file *provider.StorageItem, files []*provider.StorageItem) (*provider.StorageItem, *provider.StorageItem) {
+	var (
+		found    bool
+		previous *provider.StorageItem
+	)
+
+	for _, neighbor := range files {
+		if neighbor.IsDir != file.IsDir {
+			continue
+		}
+
+		if neighbor.Name == file.Name {
+			found = true
+			continue
+		}
+
+		if !found {
+			previous = neighbor
+		}
+
+		if found {
+			return previous, neighbor
+		}
+	}
+
+	return previous, nil
+}
+
 func checkFormName(r *http.Request, formName string) (string, *provider.Error) {
 	name := strings.TrimSpace(r.FormValue(formName))
 	if name == "" {

@@ -21,7 +21,7 @@
      */
     function goToPrevious() {
       {{ if .Content.Previous }}
-        window.location.href = '{{ .Content.Previous.Name }}?browser=true';
+        window.location.href = '{{ .Content.Previous.Name }}{{ if not .Content.Previous.IsDir }}?browser=true{{ end }}';
       {{ end }}
     }
 
@@ -30,7 +30,7 @@
      */
     function goToNext() {
       {{ if .Content.Next }}
-        window.location.href = '{{ .Content.Next.Name }}?browser=true';
+        window.location.href = '{{ .Content.Next.Name }}{{ if not .Content.Previous.IsDir }}?browser=true{{ end }}';
       {{ end }}
     }
 

@@ -6,44 +6,22 @@ import (
 	"path"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/v3/pkg/logger"
 )
-
-func getPreviousAndNext(file *provider.StorageItem, files []*provider.StorageItem) (previous *provider.StorageItem, next *provider.StorageItem) {
-	found := false
-
-	for _, neighbor := range files {
-		if neighbor.IsDir != file.IsDir {
-			continue
-		}
-
-		if neighbor.Name == file.Name {
-			found = true
-			continue
-		}
-
-		if !found {
-			previous = neighbor
-		}
-
-		if found {
-			next = neighbor
-			return
-		}
-	}
-
-	return
-}
 
 // Browser render file web view
 func (a *app) Browser(w http.ResponseWriter, request *provider.Request, file *provider.StorageItem, message *provider.Message) {
-	var previous, next *provider.StorageItem
+	var (
+		previous *provider.StorageItem
+		next     *provider.StorageItem
+	)
+	pathParts := getPathParts(request)
 
-	files, err := a.storage.List(path.Dir(file.Pathname))
-	if err == nil {
+	if files, err := a.storage.List(path.Dir(file.Pathname)); err != nil {
+		logger.Error("unable to list neighbors files: %s", err)
+	} else {
 		previous, next = getPreviousAndNext(file, files)
 	}
-
-	pathParts := getPathParts(request)
 
 	content := map[string]interface{}{
 		"Paths":    pathParts,
