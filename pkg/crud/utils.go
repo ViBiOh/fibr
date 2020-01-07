@@ -48,8 +48,8 @@ func checkFormName(r *http.Request, formName string) (string, *provider.Error) {
 	return name, nil
 }
 
-func getPathParts(request *provider.Request) []string {
-	cleanURI := strings.TrimSpace(strings.Trim(request.GetURI(""), "/"))
+func getPathParts(uri string) []string {
+	cleanURI := strings.TrimSpace(strings.Trim(uri, "/"))
 	if cleanURI == "" {
 		return nil
 	}

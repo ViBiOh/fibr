@@ -5,8 +5,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"path"
-	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
@@ -29,39 +27,20 @@ func (a *app) getCoverImage(files []*provider.StorageItem) *provider.StorageItem
 
 // List render directory web view of given dirPath
 func (a *app) List(w http.ResponseWriter, request *provider.Request, message *provider.Message) {
-	var previous, next *provider.StorageItem
-
-	filepath := request.GetFilepath("")
-	uri := request.GetURI("")
-
-	files, err := a.storage.List(filepath)
+	files, err := a.storage.List(request.GetFilepath(""))
 	if err != nil {
 		a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
 
-	if uri != "" && uri != "/" {
-		parts := strings.Split(filepath, "/")
-
-		if info, err := a.storage.Info(filepath); err != nil {
-			logger.Error("unable to get info of directory: %s", err)
-		} else if files, err := a.storage.List(path.Join(parts[:len(parts)-1]...)); err != nil {
-			logger.Error("unable to list files of parent: %s", err)
-		} else {
-			previous, next = getPreviousAndNext(info, files)
-		}
-	}
-
 	content := map[string]interface{}{
-		"Paths": getPathParts(request),
+		"Paths": getPathParts(request.GetURI("")),
 		"Files": files,
 		"Cover": map[string]interface{}{
 			"Img":       a.getCoverImage(files),
 			"ImgHeight": thumbnail.ThumbnailHeight,
 			"ImgWidth":  thumbnail.ThumbnailWidth,
 		},
-		"Previous": previous,
-		"Next":     next,
 	}
 
 	if request.CanShare {

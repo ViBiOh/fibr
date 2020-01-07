@@ -61,7 +61,7 @@ func TestGetURI(t *testing.T) {
 	var cases = []struct {
 		intention string
 		request   Request
-		input     string
+		name      string
 		want      string
 	}{
 		{
@@ -70,22 +70,23 @@ func TestGetURI(t *testing.T) {
 				Path: "index",
 			},
 			"",
-			"index",
+			"/index",
 		},
 		{
 			"with given path",
 			Request{
-				Path: "index",
+				Path: "index/templates",
 			},
 			"root.html",
-			"index/root.html",
+			"/index/templates/root.html",
 		},
 		{
 			"with share",
 			Request{
 				Path: "index",
 				Share: &Share{
-					ID: "abcd1234",
+					ID:   "abcd1234",
+					Path: "index",
 				},
 			},
 			"root.html",
@@ -95,7 +96,7 @@ func TestGetURI(t *testing.T) {
 
 	for _, testCase := range cases {
 		t.Run(testCase.intention, func(t *testing.T) {
-			if result := testCase.request.GetURI(testCase.input); result != testCase.want {
+			if result := testCase.request.GetURI(testCase.name); result != testCase.want {
 				t.Errorf("GetFilepath() = `%s`, want `%s`", result, testCase.want)
 			}
 		})

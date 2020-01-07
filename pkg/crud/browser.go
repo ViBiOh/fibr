@@ -15,7 +15,7 @@ func (a *app) Browser(w http.ResponseWriter, request *provider.Request, file *pr
 		previous *provider.StorageItem
 		next     *provider.StorageItem
 	)
-	pathParts := getPathParts(request)
+	pathParts := getPathParts(request.GetURI(""))
 
 	if files, err := a.storage.List(path.Dir(file.Pathname)); err != nil {
 		logger.Error("unable to list neighbors files: %s", err)

@@ -29,20 +29,28 @@ func (r Request) GetFilepath(name string) string {
 		parts = append(parts, r.Share.Path)
 	}
 
-	parts = append(parts, r.Path, name)
+	parts = append(parts, r.Path)
+
+	if len(name) > 0 {
+		parts = append(parts, name)
+	}
 
 	return path.Join(parts...)
 }
 
 // GetURI of request
 func (r Request) GetURI(name string) string {
-	parts := make([]string, 0)
+	parts := []string{"/"}
 
 	if r.Share != nil {
-		parts = append(parts, "/", r.Share.ID)
+		parts = append(parts, r.Share.ID)
 	}
 
-	parts = append(parts, r.Path, name)
+	parts = append(parts, r.Path)
+
+	if len(name) > 0 {
+		parts = append(parts, name)
+	}
 
 	return path.Join(parts...)
 }
