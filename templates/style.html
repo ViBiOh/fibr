@@ -67,13 +67,6 @@
         flex-direction: column;
       }
 
-      video, img, object {
-        border: 0;
-        flex: 0 0;
-        max-height: 100%;
-        max-width: 100%;
-      }
-
       .browser {
         align-items: flex-start;
         background-color: var(--white);
@@ -81,6 +74,20 @@
         flex: 1 1;
         justify-content: center;
         position: relative;
+      }
+
+      video, img, object {
+        border: 0;
+        max-height: 100%;
+        max-width: 100%;
+      }
+
+      object {
+        flex: 1 1;
+      }
+
+      video, img  {
+        flex: 0 0;
       }
     {{ end }}
 
