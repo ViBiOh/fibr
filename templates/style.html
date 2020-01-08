@@ -7,8 +7,6 @@
       --dark: #272727;
       --grey: #3b3b3b;
       --white: silver;
-
-      --header-height: 5rem;
     }
 
     * {
@@ -69,31 +67,20 @@
         flex-direction: column;
       }
 
-      object {
+      video, img, object {
         border: 0;
-        flex-basis: auto;
-        flex: 1 1;
-        max-height: 100%;
-        max-width: 100%;
-      }
-
-      video, img {
-        border: 0;
+        flex: 0 0;
         max-height: 100%;
         max-width: 100%;
       }
 
       .browser {
+        align-items: center;
         background-color: var(--white);
+        display: flex;
         flex: 1 1;
-        max-height: calc(100% - var(--header-height));
+        justify-content: center;
         position: relative;
-        text-align: center;
-
-        {{ if not .Content.File.IsImage }}
-          display: flex;
-          flex-direction: column;
-        {{ end }}
       }
     {{ end }}
 
@@ -136,7 +123,6 @@
 
     .header {
       background-color: var(--grey);
-      height: var(--header-height);
       margin-top: 0;
       padding: 0.5rem 1rem;
       text-align: left;
