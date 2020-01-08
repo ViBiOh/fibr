@@ -9,8 +9,8 @@
         <input type="hidden" name="name" value="{{ .Name }}" />
 
         <p class="center">
-          <label for="name">Name</label>
-          <input id="name" type="text" name="newName" value="{{ .Name }}" />
+          <label for="name-{{ sha1 . }}">Name</label>
+          <input id="name-{{ sha1 . }}" type="text" name="newName" value="{{ .Name }}" />
         </p>
 
         <p class="center">

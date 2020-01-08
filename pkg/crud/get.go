@@ -10,15 +10,18 @@ import (
 	"github.com/ViBiOh/httputils/v3/pkg/query"
 )
 
+var (
+	staticRootPath = []string{
+		"/robots.txt",
+		"/browserconfig.xml",
+		"/favicon.ico",
+	}
+)
+
 // ServeStatic check if filename match SEO or static filename and serve it
 func (a *app) ServeStatic(w http.ResponseWriter, r *http.Request) bool {
 	if r.Method != http.MethodGet {
 		return false
-	}
-
-	if r.URL.Path == "/robots.txt" || strings.HasPrefix(r.URL.Path, "/favicon") {
-		http.ServeFile(w, r, path.Join("templates/static", r.URL.Path))
-		return true
 	}
 
 	if r.URL.Path == "/sitemap.xml" {
@@ -29,6 +32,18 @@ func (a *app) ServeStatic(w http.ResponseWriter, r *http.Request) bool {
 	if strings.HasPrefix(r.URL.Path, "/svg") {
 		a.renderer.SVG(w, strings.TrimPrefix(r.URL.Path, "/svg/"), r.URL.Query().Get("fill"))
 		return true
+	}
+
+	if strings.HasPrefix(r.URL.Path, "/favicon") {
+		http.ServeFile(w, r, path.Join("templates/static", r.URL.Path))
+		return true
+	}
+
+	for _, staticPath := range staticRootPath {
+		if r.URL.Path == staticPath {
+			http.ServeFile(w, r, path.Join("templates/static", r.URL.Path))
+			return true
+		}
 	}
 
 	return false

@@ -215,11 +215,10 @@
     }
 
     /**
-     * Close any modal and refresh page.
+     * Refresh page by redirect.
      */
-    function closeAndRefresh() {
-      document.location.hash = '';
-      window.location.reload(true);
+    function refresh() {
+      window.location.href = `${window.location.origin}${window.location.pathname}?redirect`;
     }
   </script>
 
@@ -256,7 +255,7 @@
       <h2 class="header success padding">Upload success ✓</h2>
 
       <p class="center">
-        <a href="#" class="button bg-grey" onclick="closeAndRefresh()">
+        <a href="#" class="button bg-grey" onclick="refresh()">
           Close
         </a>
       </p>

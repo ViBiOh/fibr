@@ -13,6 +13,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/renderer"
 	"github.com/ViBiOh/httputils/v3/pkg/httperror"
+	"github.com/ViBiOh/httputils/v3/pkg/query"
 )
 
 // App of package
@@ -124,6 +125,11 @@ func (a app) Handler() http.Handler {
 		}
 
 		if a.crud.ServeStatic(w, r) {
+			return
+		}
+
+		if query.GetBool(r, "redirect") {
+			http.Redirect(w, r, r.URL.Path, http.StatusFound)
 			return
 		}
 
