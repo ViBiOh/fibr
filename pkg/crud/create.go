@@ -22,11 +22,13 @@ func (a *app) Create(w http.ResponseWriter, r *http.Request, request *provider.R
 		return
 	}
 
-	pathname, err := provider.SanitizeName(request.GetFilepath(name), false)
+	name, err := provider.SanitizeName(name, false)
 	if err != nil {
 		a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
+
+	pathname := request.GetFilepath(name)
 
 	if err := a.storage.CreateDir(pathname); err != nil {
 		a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))

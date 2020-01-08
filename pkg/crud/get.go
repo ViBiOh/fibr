@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/v3/pkg/logger"
 	"github.com/ViBiOh/httputils/v3/pkg/query"
 )
 
@@ -40,7 +41,10 @@ func isThumbnail(r *http.Request) bool {
 
 // GetWithMessage output content with given message
 func (a *app) GetWithMessage(w http.ResponseWriter, r *http.Request, request *provider.Request, message *provider.Message) {
-	info, err := a.storage.Info(request.GetFilepath(""))
+	filepath := request.GetFilepath("")
+	logger.Info("Get of %s", request.GetFilepath(""))
+
+	info, err := a.storage.Info(filepath)
 	if err != nil {
 		if provider.IsNotExist(err) {
 			a.renderer.Error(w, provider.NewError(http.StatusNotFound, err))

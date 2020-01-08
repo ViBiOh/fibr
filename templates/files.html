@@ -72,9 +72,11 @@
 
       <span class="flex-grow"></span>
 
-      <a class="modifier padding" href="?download" download>
-        <img class="icon" src="/svg/download?fill=silver" alt="Download">
-      </a>
+      {{ if gt (len .Content.Files) 0 }}
+        <a class="modifier padding" href="?download" download>
+          <img class="icon" src="/svg/download?fill=silver" alt="Download">
+        </a>
+      {{ end }}
     </div>
 
     <ul id="files">
