@@ -9,6 +9,26 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
+func (a app) checkPathname(pathname string) error {
+	if strings.Contains(pathname, "..") {
+		return ErrRelativePath
+	}
+
+	return nil
+}
+
+func (a app) getFullPath(pathname string) string {
+	return path.Join(a.rootDirectory, pathname)
+}
+
+func (a app) getRelativePath(pathname string) string {
+	return strings.TrimPrefix(pathname, a.rootDirectory)
+}
+
+func (a app) getFile(filename string) (io.WriteCloser, error) {
+	return os.OpenFile(a.getFullPath(filename), os.O_RDWR|os.O_CREATE|os.O_TRUNC, getMode(filename))
+}
+
 func getMode(name string) os.FileMode {
 	if strings.HasSuffix(name, "/") {
 		return 0700
@@ -17,29 +37,17 @@ func getMode(name string) os.FileMode {
 	return 0600
 }
 
-func (a app) getFile(filename string) (io.WriteCloser, error) {
-	return os.OpenFile(a.getFullPath(filename), os.O_RDWR|os.O_CREATE|os.O_TRUNC, getMode(filename))
-}
-
-func convertToItem(dirname string, info os.FileInfo) *provider.StorageItem {
+func convertToItem(pathname string, info os.FileInfo) *provider.StorageItem {
 	if info == nil {
 		return nil
 	}
 
-	name := info.Name()
-	pathname := path.Join(dirname, name)
-
-	if strings.EqualFold(dirname, "/") {
-		pathname = dirname
-	}
-
 	return &provider.StorageItem{
-		Name:     name,
+		Name:     info.Name(),
 		Pathname: pathname,
 		IsDir:    info.IsDir(),
 		Date:     info.ModTime(),
-
-		Info: info,
+		Info:     info,
 	}
 }
 

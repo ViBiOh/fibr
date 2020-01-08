@@ -68,18 +68,6 @@ func New(config Config) (provider.Storage, error) {
 	}, nil
 }
 
-func (a app) checkPathname(pathname string) error {
-	if strings.Contains(pathname, "..") {
-		return ErrRelativePath
-	}
-
-	return nil
-}
-
-func (a app) getFullPath(pathname string) string {
-	return path.Join(a.rootDirectory, pathname)
-}
-
 // Name of the storage
 func (a app) Name() string {
 	return "filesystem"
@@ -96,12 +84,14 @@ func (a app) Info(pathname string) (*provider.StorageItem, error) {
 		return nil, convertError(err)
 	}
 
-	info, err := os.Stat(a.getFullPath(pathname))
+	fullpath := a.getFullPath(pathname)
+
+	info, err := os.Stat(fullpath)
 	if err != nil {
 		return nil, convertError(err)
 	}
 
-	return convertToItem(path.Dir(pathname), info), nil
+	return convertToItem(a.getRelativePath(fullpath), info), nil
 }
 
 // WriterTo opens writer for given pathname
@@ -140,14 +130,16 @@ func (a app) List(pathname string) ([]*provider.StorageItem, error) {
 		return nil, convertError(err)
 	}
 
-	files, err := ioutil.ReadDir(a.getFullPath(pathname))
+	fullpath := a.getFullPath(pathname)
+
+	files, err := ioutil.ReadDir(fullpath)
 	if err != nil {
 		return nil, convertError(err)
 	}
 
 	items := make([]*provider.StorageItem, len(files))
 	for index, item := range files {
-		items[index] = convertToItem(pathname, item)
+		items[index] = convertToItem(a.getRelativePath(path.Join(fullpath, item.Name())), item)
 	}
 
 	sort.Sort(ByHybridSort(items))
@@ -158,7 +150,7 @@ func (a app) List(pathname string) ([]*provider.StorageItem, error) {
 // Walk browses item recursively
 func (a app) Walk(walkFn func(*provider.StorageItem, error) error) error {
 	return convertError(filepath.Walk(a.rootDirectory, func(pathname string, info os.FileInfo, err error) error {
-		return walkFn(convertToItem(path.Dir(strings.TrimPrefix(pathname, a.rootDirectory)), info), err)
+		return walkFn(convertToItem(a.getRelativePath(pathname), info), err)
 	}))
 }
 
