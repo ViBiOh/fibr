@@ -27,10 +27,15 @@ func convertToItem(dirname string, info os.FileInfo) *provider.StorageItem {
 	}
 
 	name := info.Name()
+	pathname := path.Join(dirname, name)
+
+	if strings.EqualFold(dirname, "/") {
+		pathname = dirname
+	}
 
 	return &provider.StorageItem{
 		Name:     name,
-		Pathname: path.Join(dirname, name),
+		Pathname: pathname,
 		IsDir:    info.IsDir(),
 		Date:     info.ModTime(),
 

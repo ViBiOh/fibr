@@ -40,7 +40,7 @@ var (
 type App interface {
 	Generate()
 	HasThumbnail(*provider.StorageItem) (string, bool)
-	Serve(http.ResponseWriter, *http.Request, *provider.StorageItem) bool
+	Serve(http.ResponseWriter, *http.Request, *provider.StorageItem)
 	List(http.ResponseWriter, *http.Request, *provider.StorageItem)
 	AsyncGenerateThumbnail(*provider.StorageItem)
 }
@@ -111,17 +111,15 @@ func (a app) HasThumbnail(item *provider.StorageItem) (string, bool) {
 }
 
 // Serve check if thumbnail is present and serve it
-func (a app) Serve(w http.ResponseWriter, r *http.Request, item *provider.StorageItem) bool {
-	if !CanHaveThumbnail(item) {
-		return false
+func (a app) Serve(w http.ResponseWriter, r *http.Request, item *provider.StorageItem) {
+	if CanHaveThumbnail(item) {
+		if thumbnailPath, ok := a.HasThumbnail(item); ok {
+			a.storage.Serve(w, r, thumbnailPath)
+			return
+		}
 	}
 
-	if thumbnailPath, ok := a.HasThumbnail(item); ok {
-		a.storage.Serve(w, r, thumbnailPath)
-		return true
-	}
-
-	return false
+	w.WriteHeader(http.StatusNoContent)
 }
 
 // List return all thumbnail in a base64 form
