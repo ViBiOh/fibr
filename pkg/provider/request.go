@@ -40,10 +40,10 @@ func (r Request) GetFilepath(name string) string {
 
 // GetURI of request
 func (r Request) GetURI(name string) string {
-	parts := []string{"/"}
+	parts := make([]string, 0)
 
 	if r.Share != nil {
-		parts = append(parts, r.Share.ID)
+		parts = append(parts, "/", r.Share.ID)
 	}
 
 	parts = append(parts, r.Path)

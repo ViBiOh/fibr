@@ -70,7 +70,7 @@ func TestGetURI(t *testing.T) {
 				Path: "index",
 			},
 			"",
-			"/index",
+			"index",
 		},
 		{
 			"with given path",
@@ -78,7 +78,7 @@ func TestGetURI(t *testing.T) {
 				Path: "index/templates",
 			},
 			"root.html",
-			"/index/templates/root.html",
+			"index/templates/root.html",
 		},
 		{
 			"with share",
