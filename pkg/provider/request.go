@@ -164,6 +164,11 @@ func (s StorageItem) Mime() string {
 	return ""
 }
 
+// IsPdf determine if item if a pdf
+func (s StorageItem) IsPdf() bool {
+	return PdfExtensions[s.Extension()]
+}
+
 // IsImage determine if item if an image
 func (s StorageItem) IsImage() bool {
 	return ImageExtensions[s.Extension()]

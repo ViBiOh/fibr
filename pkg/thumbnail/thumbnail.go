@@ -3,6 +3,7 @@ package thumbnail
 import (
 	"context"
 	"encoding/base64"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -52,6 +53,7 @@ type Config struct {
 
 type app struct {
 	imaginaryURL  string
+	thumbnailURL  string
 	storage       provider.Storage
 	pathnameInput chan *provider.StorageItem
 }
@@ -65,12 +67,14 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 
 // New creates new App from Config
 func New(config Config, storage provider.Storage) App {
-	if *config.imaginaryURL == "" {
+	imaginaryURL := strings.TrimSpace(*config.imaginaryURL)
+	if len(imaginaryURL) == 0 {
 		return &app{}
 	}
 
 	app := &app{
-		imaginaryURL:  fmt.Sprintf("%s/crop?width=%d&height=%d&stripmeta=true&noprofile=true&quality=80&type=jpeg", *config.imaginaryURL, ThumbnailWidth, ThumbnailHeight),
+		imaginaryURL:  imaginaryURL,
+		thumbnailURL:  fmt.Sprintf("%s/crop?width=%d&height=%d&stripmeta=true&noprofile=true&quality=80&type=jpeg", imaginaryURL, ThumbnailWidth, ThumbnailHeight),
 		storage:       storage,
 		pathnameInput: make(chan *provider.StorageItem, 10),
 	}
@@ -81,6 +85,12 @@ func New(config Config, storage provider.Storage) App {
 		for item := range app.pathnameInput {
 			// Do not stress API
 			time.Sleep(waitTimeout)
+
+			if CanRotate(item) {
+				if err := app.rotateImage(item); err != nil {
+					logger.Error("unable to rotate image: %s", err)
+				}
+			}
 
 			if err := app.generateThumbnail(item); err != nil {
 				logger.Error("%s", err)
@@ -95,7 +105,7 @@ func New(config Config, storage provider.Storage) App {
 
 // Enabled checks if app is enabled
 func (a app) Enabled() bool {
-	return a.imaginaryURL != "" && a.storage != nil
+	return len(a.thumbnailURL) != 0 && a.storage != nil
 }
 
 // HasThumbnail determine if thumbnail exist for given pathname
@@ -175,6 +185,42 @@ func (a app) List(w http.ResponseWriter, r *http.Request, item *provider.Storage
 	safeWrite(w, "}")
 }
 
+func (a app) rotateImage(item *provider.StorageItem) error {
+	file, err := a.storage.ReaderFrom(item.Pathname)
+	if err != nil {
+		return err
+	}
+
+	ctx, cancel := getCtx(context.Background())
+	defer cancel()
+
+	resp, err := request.New().Post(fmt.Sprintf("%s/info", a.imaginaryURL)).Header("Accept", "application/json").Send(ctx, file)
+	if err != nil {
+		return err
+	}
+
+	payload, err := request.ReadBodyResponse(resp)
+	if err != nil {
+		return err
+	}
+
+	info := make(map[string]interface{}, 0)
+	if err := json.Unmarshal(payload, &info); err != nil {
+		return err
+	}
+
+	resp, err = request.New().Post(fmt.Sprintf("%s/fit?width=%d&height=%d", a.imaginaryURL, info["width"].(int), info["height"].(int))).Send(ctx, file)
+	if err != nil {
+		return err
+	}
+
+	if err := a.storage.Store(item.Pathname, resp.Body); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (a app) generateThumbnail(item *provider.StorageItem) error {
 	file, err := a.storage.ReaderFrom(item.Pathname)
 	if err != nil {
@@ -184,7 +230,7 @@ func (a app) generateThumbnail(item *provider.StorageItem) error {
 	ctx, cancel := getCtx(context.Background())
 	defer cancel()
 
-	resp, err := request.New().Post(a.imaginaryURL).Send(ctx, file)
+	resp, err := request.New().Post(a.thumbnailURL).Send(ctx, file)
 	if err != nil {
 		return err
 	}
