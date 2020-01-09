@@ -209,6 +209,11 @@ func (a app) rotateImage(item *provider.StorageItem) error {
 		return err
 	}
 
+	file, err = a.storage.ReaderFrom(item.Pathname)
+	if err != nil {
+		return err
+	}
+
 	resp, err = request.New().Post(fmt.Sprintf("%s/fit?width=%d&height=%d", a.imaginaryURL, info.Width, info.Height)).Send(ctx, file)
 	if err != nil {
 		return err
