@@ -204,12 +204,12 @@ func (a app) rotateImage(item *provider.StorageItem) error {
 		return err
 	}
 
-	info := make(map[string]interface{}, 0)
+	info := Info{}
 	if err := json.Unmarshal(payload, &info); err != nil {
 		return err
 	}
 
-	resp, err = request.New().Post(fmt.Sprintf("%s/fit?width=%d&height=%d", a.imaginaryURL, info["width"].(int), info["height"].(int))).Send(ctx, file)
+	resp, err = request.New().Post(fmt.Sprintf("%s/fit?width=%d&height=%d", a.imaginaryURL, info.Width, info.Height)).Send(ctx, file)
 	if err != nil {
 		return err
 	}
