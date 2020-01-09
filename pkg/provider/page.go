@@ -12,7 +12,7 @@ var (
 
 // Page renderer to user
 type Page struct {
-	Config  *Config
+	Config  Config
 	Request Request
 	Message *Message
 	Error   *Error
@@ -26,7 +26,7 @@ type Page struct {
 
 // PageBuilder for interactively create page
 type PageBuilder struct {
-	config  *Config
+	config  Config
 	request Request
 	message *Message
 	error   *Error
@@ -35,7 +35,7 @@ type PageBuilder struct {
 }
 
 // Config set Config for page
-func (p *PageBuilder) Config(config *Config) *PageBuilder {
+func (p *PageBuilder) Config(config Config) *PageBuilder {
 	p.config = config
 
 	return p
@@ -78,13 +78,9 @@ func (p *PageBuilder) Content(content map[string]interface{}) *PageBuilder {
 
 // Build Page Object
 func (p *PageBuilder) Build() Page {
-	var publicURL, title, description string
-
-	if p.config != nil {
-		publicURL = computePublicURL(p.config, p.request)
-		title = computeTitle(p.config, p.request)
-		description = computeDescription(p.config, p.request)
-	}
+	publicURL := computePublicURL(p.config, p.request)
+	title := computeTitle(p.config, p.request)
+	description := computeDescription(p.config, p.request)
 
 	layout := p.layout
 	if layout == "" {
@@ -105,7 +101,7 @@ func (p *PageBuilder) Build() Page {
 	}
 }
 
-func computePublicURL(config *Config, request Request) string {
+func computePublicURL(config Config, request Request) string {
 	parts := []string{config.PublicURL}
 
 	if len(request.Path) > 0 {
@@ -119,8 +115,12 @@ func computePublicURL(config *Config, request Request) string {
 	return protocolRegex.ReplaceAllString(path.Join(parts...), "$1://")
 }
 
-func computeTitle(config *Config, request Request) string {
-	parts := []string{config.Seo.Title}
+func computeTitle(config Config, request Request) string {
+	parts := make([]string, 0)
+
+	if len(config.Seo.Title) > 0 {
+		parts = append(parts, config.Seo.Title)
+	}
 
 	if request.Share == nil {
 		parts = append(parts, config.RootName)
@@ -139,8 +139,12 @@ func computeTitle(config *Config, request Request) string {
 	return strings.Join(parts, " - ")
 }
 
-func computeDescription(config *Config, request Request) string {
-	parts := []string{config.Seo.Description}
+func computeDescription(config Config, request Request) string {
+	parts := make([]string, 0)
+
+	if len(config.Seo.Description) > 0 {
+		parts = append(parts, config.Seo.Description)
+	}
 
 	if request.Share == nil {
 		parts = append(parts, config.RootName)

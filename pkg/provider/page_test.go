@@ -6,10 +6,10 @@ import (
 )
 
 func TestBuild(t *testing.T) {
-	config := &Config{
+	config := Config{
 		PublicURL: "http://localhost:1080",
 		RootName:  "test",
-		Seo: &Seo{
+		Seo: Seo{
 			Description: "fibr",
 			Title:       "fibr",
 		},
@@ -17,7 +17,7 @@ func TestBuild(t *testing.T) {
 
 	var cases = []struct {
 		intention string
-		config    *Config
+		config    Config
 		request   Request
 		message   *Message
 		error     *Error
@@ -27,7 +27,7 @@ func TestBuild(t *testing.T) {
 	}{
 		{
 			"default layout",
-			nil,
+			Config{},
 			Request{},
 			nil,
 			nil,
@@ -69,13 +69,13 @@ func TestBuild(t *testing.T) {
 func TestComputePublicURL(t *testing.T) {
 	var cases = []struct {
 		intention string
-		config    *Config
+		config    Config
 		request   Request
 		want      string
 	}{
 		{
 			"simple",
-			&Config{
+			Config{
 				PublicURL: "http://localhost:1080",
 			},
 			Request{},
@@ -83,7 +83,7 @@ func TestComputePublicURL(t *testing.T) {
 		},
 		{
 			"with request",
-			&Config{
+			Config{
 				PublicURL: "http://localhost:1080",
 			},
 			Request{
@@ -93,7 +93,7 @@ func TestComputePublicURL(t *testing.T) {
 		},
 		{
 			"with relative request",
-			&Config{
+			Config{
 				PublicURL: "http://localhost:1080",
 			},
 			Request{
@@ -103,7 +103,7 @@ func TestComputePublicURL(t *testing.T) {
 		},
 		{
 			"with share",
-			&Config{
+			Config{
 				PublicURL: "https://localhost:1080",
 			},
 			Request{
@@ -128,15 +128,15 @@ func TestComputePublicURL(t *testing.T) {
 func TestComputeTitle(t *testing.T) {
 	var cases = []struct {
 		intention string
-		config    *Config
+		config    Config
 		request   Request
 		want      string
 	}{
 		{
 			"simple",
-			&Config{
+			Config{
 				RootName: "test",
-				Seo: &Seo{
+				Seo: Seo{
 					Title: "fibr",
 				},
 			},
@@ -145,9 +145,9 @@ func TestComputeTitle(t *testing.T) {
 		},
 		{
 			"without share",
-			&Config{
+			Config{
 				RootName: "test",
-				Seo: &Seo{
+				Seo: Seo{
 					Title: "fibr",
 				},
 			},
@@ -158,9 +158,9 @@ func TestComputeTitle(t *testing.T) {
 		},
 		{
 			"with share",
-			&Config{
+			Config{
 				RootName: "test",
-				Seo: &Seo{
+				Seo: Seo{
 					Title: "fibr",
 				},
 			},
@@ -186,15 +186,15 @@ func TestComputeTitle(t *testing.T) {
 func TestComputeDescription(t *testing.T) {
 	var cases = []struct {
 		intention string
-		config    *Config
+		config    Config
 		request   Request
 		want      string
 	}{
 		{
 			"simple",
-			&Config{
+			Config{
 				RootName: "test",
-				Seo: &Seo{
+				Seo: Seo{
 					Description: "fibr",
 				},
 			},
@@ -203,9 +203,9 @@ func TestComputeDescription(t *testing.T) {
 		},
 		{
 			"without share",
-			&Config{
+			Config{
 				RootName: "test",
-				Seo: &Seo{
+				Seo: Seo{
 					Description: "fibr",
 				},
 			},
@@ -216,9 +216,9 @@ func TestComputeDescription(t *testing.T) {
 		},
 		{
 			"with share",
-			&Config{
+			Config{
 				RootName: "test",
-				Seo: &Seo{
+				Seo: Seo{
 					Description: "fibr",
 				},
 			},

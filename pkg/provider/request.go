@@ -100,7 +100,7 @@ type Config struct {
 	RootName  string
 	PublicURL string
 	Version   string
-	Seo       *Seo
+	Seo       Seo
 }
 
 // Seo data

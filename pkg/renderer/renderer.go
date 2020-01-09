@@ -33,7 +33,7 @@ type Config struct {
 }
 
 type app struct {
-	config *provider.Config
+	config provider.Config
 	tpl    *template.Template
 }
 
@@ -103,11 +103,11 @@ func New(config Config, rootName string, thumbnail thumbnail.App) App {
 
 	return app{
 		tpl: template.Must(tpl.ParseFiles(fibrTemplates...)),
-		config: &provider.Config{
+		config: provider.Config{
 			RootName:  rootName,
 			PublicURL: publicURL,
 			Version:   *config.version,
-			Seo: &provider.Seo{
+			Seo: provider.Seo{
 				Title:       "fibr",
 				Description: "FIle BRowser",
 				Img:         fmt.Sprintf("%s/favicon/android-chrome-512x512.png", publicURL),
