@@ -7,7 +7,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
-func getPreviousAndNext(file *provider.StorageItem, files []*provider.StorageItem) (*provider.StorageItem, *provider.StorageItem) {
+func getPreviousAndNext(file provider.StorageItem, files []provider.StorageItem) (*provider.StorageItem, *provider.StorageItem) {
 	var (
 		found    bool
 		previous *provider.StorageItem
@@ -24,11 +24,11 @@ func getPreviousAndNext(file *provider.StorageItem, files []*provider.StorageIte
 		}
 
 		if !found {
-			previous = neighbor
+			previous = &neighbor
 		}
 
 		if found {
-			return previous, neighbor
+			return previous, &neighbor
 		}
 	}
 

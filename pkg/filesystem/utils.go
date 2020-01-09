@@ -37,12 +37,8 @@ func getMode(name string) os.FileMode {
 	return 0600
 }
 
-func convertToItem(pathname string, info os.FileInfo) *provider.StorageItem {
-	if info == nil {
-		return nil
-	}
-
-	return &provider.StorageItem{
+func convertToItem(pathname string, info os.FileInfo) provider.StorageItem {
+	return provider.StorageItem{
 		Name:     info.Name(),
 		Pathname: pathname,
 		IsDir:    info.IsDir(),

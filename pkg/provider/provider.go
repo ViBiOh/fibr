@@ -42,12 +42,12 @@ type Renderer interface {
 type Storage interface {
 	Name() string
 	Root() string
-	Info(pathname string) (*StorageItem, error)
+	Info(pathname string) (StorageItem, error)
 	WriterTo(pathname string) (io.WriteCloser, error)
 	ReaderFrom(pathname string) (io.ReadCloser, error)
 	Serve(http.ResponseWriter, *http.Request, string)
-	List(pathname string) ([]*StorageItem, error)
-	Walk(walkFn func(*StorageItem, error) error) error
+	List(pathname string) ([]StorageItem, error)
+	Walk(walkFn func(StorageItem, error) error) error
 	CreateDir(name string) error
 	Store(pathname string, content io.ReadCloser) error
 	Rename(oldName, newName string) error

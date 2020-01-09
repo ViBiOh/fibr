@@ -23,7 +23,7 @@ var (
 
 // App of package
 type App interface {
-	Browser(http.ResponseWriter, provider.Request, *provider.StorageItem, *provider.Message)
+	Browser(http.ResponseWriter, provider.Request, provider.StorageItem, *provider.Message)
 	ServeStatic(http.ResponseWriter, *http.Request) bool
 
 	List(http.ResponseWriter, provider.Request, *provider.Message)

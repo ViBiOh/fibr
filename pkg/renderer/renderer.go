@@ -53,10 +53,10 @@ func New(config Config, rootName string, thumbnail thumbnail.App) App {
 		"urlescape": func(path string) string {
 			return url.PathEscape(path)
 		},
-		"sha1": func(file *provider.StorageItem) string {
+		"sha1": func(file provider.StorageItem) string {
 			return sha.Sha1(file.Name)
 		},
-		"asyncImage": func(file *provider.StorageItem, version string) map[string]interface{} {
+		"asyncImage": func(file provider.StorageItem, version string) map[string]interface{} {
 			return map[string]interface{}{
 				"File":        file,
 				"Fingerprint": template.JS(sha.Sha1(file.Name)),
@@ -66,7 +66,7 @@ func New(config Config, rootName string, thumbnail thumbnail.App) App {
 		"rebuildPaths": func(parts []string, index int) string {
 			return path.Join(parts[:index+1]...)
 		},
-		"iconFromExtension": func(file *provider.StorageItem) string {
+		"iconFromExtension": func(file provider.StorageItem) string {
 			extension := file.Extension()
 
 			switch {
@@ -90,7 +90,7 @@ func New(config Config, rootName string, thumbnail thumbnail.App) App {
 				return "file"
 			}
 		},
-		"hasThumbnail": func(request provider.Request, item *provider.StorageItem) bool {
+		"hasThumbnail": func(request provider.Request, item provider.StorageItem) bool {
 			_, ok := thumbnail.HasThumbnail(item)
 			return ok
 		},

@@ -16,7 +16,7 @@ func moreTime(first, second time.Time) bool {
 }
 
 // ByHybridSort implements Sorter by type, name then modification time
-type ByHybridSort []*provider.StorageItem
+type ByHybridSort []provider.StorageItem
 
 func (a ByHybridSort) Len() int {
 	return len(a)

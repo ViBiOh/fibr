@@ -39,10 +39,10 @@ var (
 // App of package
 type App interface {
 	Generate()
-	HasThumbnail(*provider.StorageItem) (string, bool)
-	Serve(http.ResponseWriter, *http.Request, *provider.StorageItem)
-	List(http.ResponseWriter, *http.Request, *provider.StorageItem)
-	AsyncGenerateThumbnail(*provider.StorageItem)
+	HasThumbnail(provider.StorageItem) (string, bool)
+	Serve(http.ResponseWriter, *http.Request, provider.StorageItem)
+	List(http.ResponseWriter, *http.Request, provider.StorageItem)
+	AsyncGenerateThumbnail(provider.StorageItem)
 }
 
 // Config of package
@@ -53,7 +53,7 @@ type Config struct {
 type app struct {
 	thumbnailURL  string
 	storage       provider.Storage
-	pathnameInput chan *provider.StorageItem
+	pathnameInput chan provider.StorageItem
 }
 
 // Flags adds flags for configuring package
@@ -73,7 +73,7 @@ func New(config Config, storage provider.Storage) App {
 	app := &app{
 		thumbnailURL:  fmt.Sprintf("%s/crop?width=%d&height=%d&stripmeta=true&noprofile=true&quality=80&type=jpeg", imaginaryURL, ThumbnailWidth, ThumbnailHeight),
 		storage:       storage,
-		pathnameInput: make(chan *provider.StorageItem, 10),
+		pathnameInput: make(chan provider.StorageItem, 10),
 	}
 
 	go app.Start()
@@ -87,7 +87,7 @@ func (a app) Enabled() bool {
 }
 
 // HasThumbnail determine if thumbnail exist for given pathname
-func (a app) HasThumbnail(item *provider.StorageItem) (string, bool) {
+func (a app) HasThumbnail(item provider.StorageItem) (string, bool) {
 	if !a.Enabled() {
 		return "", false
 	}
@@ -114,7 +114,7 @@ func (a app) Start() {
 }
 
 // Serve check if thumbnail is present and serve it
-func (a app) Serve(w http.ResponseWriter, r *http.Request, item *provider.StorageItem) {
+func (a app) Serve(w http.ResponseWriter, r *http.Request, item provider.StorageItem) {
 	if CanHaveThumbnail(item) {
 		if thumbnailPath, ok := a.HasThumbnail(item); ok {
 			a.storage.Serve(w, r, thumbnailPath)
@@ -126,7 +126,7 @@ func (a app) Serve(w http.ResponseWriter, r *http.Request, item *provider.Storag
 }
 
 // List return all thumbnail in a base64 form
-func (a app) List(w http.ResponseWriter, r *http.Request, item *provider.StorageItem) {
+func (a app) List(w http.ResponseWriter, r *http.Request, item provider.StorageItem) {
 	if !a.Enabled() {
 		w.WriteHeader(http.StatusNoContent)
 		return
@@ -178,7 +178,7 @@ func (a app) List(w http.ResponseWriter, r *http.Request, item *provider.Storage
 	safeWrite(w, "}")
 }
 
-func (a app) generateThumbnail(item *provider.StorageItem) error {
+func (a app) generateThumbnail(item provider.StorageItem) error {
 	file, err := a.storage.ReaderFrom(item.Pathname)
 	if err != nil {
 		return err
@@ -210,7 +210,7 @@ func (a app) Generate() {
 		return
 	}
 
-	err := a.storage.Walk(func(item *provider.StorageItem, _ error) error {
+	err := a.storage.Walk(func(item provider.StorageItem, _ error) error {
 		if item.IsDir && strings.HasPrefix(item.Name, ".") || ignoredThumbnailDir[item.Name] {
 			return filepath.SkipDir
 		}
@@ -234,7 +234,7 @@ func (a app) Generate() {
 }
 
 // AsyncGenerateThumbnail generate thumbnail image for given path
-func (a app) AsyncGenerateThumbnail(item *provider.StorageItem) {
+func (a app) AsyncGenerateThumbnail(item provider.StorageItem) {
 	if !a.Enabled() {
 		return
 	}

@@ -15,13 +15,13 @@ var (
 	metadataFilename = path.Join(provider.MetadataDirectoryName, ".json")
 )
 
-func (a *app) loadMetadata() (err error) {
-	info, err := a.storage.Info(metadataFilename)
+func (a *app) loadMetadata() error {
+	_, err := a.storage.Info(metadataFilename)
 	if err != nil && !provider.IsNotExist(err) {
 		return err
 	}
 
-	if info == nil {
+	if provider.IsNotExist(err) {
 		if err := a.storage.CreateDir(provider.MetadataDirectoryName); err != nil {
 			return err
 		}

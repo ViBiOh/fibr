@@ -6,7 +6,7 @@ import (
 	"github.com/ViBiOh/httputils/v3/pkg/logger"
 )
 
-func (a *app) renameThumbnail(oldItem, newItem *provider.StorageItem) {
+func (a *app) renameThumbnail(oldItem, newItem provider.StorageItem) {
 	if !a.deleteThumbnail(oldItem) {
 		return
 	}
@@ -14,13 +14,13 @@ func (a *app) renameThumbnail(oldItem, newItem *provider.StorageItem) {
 	a.createThumbnail(newItem)
 }
 
-func (a *app) createThumbnail(item *provider.StorageItem) {
+func (a *app) createThumbnail(item provider.StorageItem) {
 	if thumbnail.CanHaveThumbnail(item) {
 		a.thumbnail.AsyncGenerateThumbnail(item)
 	}
 }
 
-func (a *app) deleteThumbnail(item *provider.StorageItem) bool {
+func (a *app) deleteThumbnail(item provider.StorageItem) bool {
 	thumbnailPath, ok := a.thumbnail.HasThumbnail(item)
 	if !ok {
 		return false

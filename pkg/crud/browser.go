@@ -10,7 +10,7 @@ import (
 )
 
 // Browser render file web view
-func (a *app) Browser(w http.ResponseWriter, request provider.Request, file *provider.StorageItem, message *provider.Message) {
+func (a *app) Browser(w http.ResponseWriter, request provider.Request, file provider.StorageItem, message *provider.Message) {
 	var (
 		previous *provider.StorageItem
 		next     *provider.StorageItem

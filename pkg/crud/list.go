@@ -11,14 +11,14 @@ import (
 	"github.com/ViBiOh/httputils/v3/pkg/logger"
 )
 
-func (a *app) getCoverImage(files []*provider.StorageItem) *provider.StorageItem {
+func (a *app) getCoverImage(files []provider.StorageItem) *provider.StorageItem {
 	for _, file := range files {
 		if !file.IsImage() {
 			continue
 		}
 
 		if _, ok := a.thumbnail.HasThumbnail(file); ok {
-			return file
+			return &file
 		}
 	}
 
@@ -77,7 +77,7 @@ func (a *app) Download(w http.ResponseWriter, request provider.Request) {
 	}
 }
 
-func (a *app) addFileToZip(zipWriter *zip.Writer, file *provider.StorageItem) error {
+func (a *app) addFileToZip(zipWriter *zip.Writer, file provider.StorageItem) error {
 	header, err := zip.FileInfoHeader(file.Info.(os.FileInfo))
 	if err != nil {
 		return err

@@ -79,16 +79,16 @@ func (a app) Root() string {
 }
 
 // Info provide metadata about given pathname
-func (a app) Info(pathname string) (*provider.StorageItem, error) {
+func (a app) Info(pathname string) (provider.StorageItem, error) {
 	if err := a.checkPathname(pathname); err != nil {
-		return nil, convertError(err)
+		return provider.StorageItem{}, convertError(err)
 	}
 
 	fullpath := a.getFullPath(pathname)
 
 	info, err := os.Stat(fullpath)
 	if err != nil {
-		return nil, convertError(err)
+		return provider.StorageItem{}, convertError(err)
 	}
 
 	return convertToItem(a.getRelativePath(fullpath), info), nil
@@ -125,7 +125,7 @@ func (a app) Serve(w http.ResponseWriter, r *http.Request, pathname string) {
 }
 
 // List items in the storage
-func (a app) List(pathname string) ([]*provider.StorageItem, error) {
+func (a app) List(pathname string) ([]provider.StorageItem, error) {
 	if err := a.checkPathname(pathname); err != nil {
 		return nil, convertError(err)
 	}
@@ -137,7 +137,7 @@ func (a app) List(pathname string) ([]*provider.StorageItem, error) {
 		return nil, convertError(err)
 	}
 
-	items := make([]*provider.StorageItem, len(files))
+	items := make([]provider.StorageItem, len(files))
 	for index, item := range files {
 		items[index] = convertToItem(a.getRelativePath(path.Join(fullpath, item.Name())), item)
 	}
@@ -148,7 +148,7 @@ func (a app) List(pathname string) ([]*provider.StorageItem, error) {
 }
 
 // Walk browses item recursively
-func (a app) Walk(walkFn func(*provider.StorageItem, error) error) error {
+func (a app) Walk(walkFn func(provider.StorageItem, error) error) error {
 	return convertError(filepath.Walk(a.rootDirectory, func(pathname string, info os.FileInfo, err error) error {
 		return walkFn(convertToItem(a.getRelativePath(pathname), info), err)
 	}))
