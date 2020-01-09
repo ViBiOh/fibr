@@ -79,26 +79,7 @@ func New(config Config, storage provider.Storage) App {
 		pathnameInput: make(chan *provider.StorageItem, 10),
 	}
 
-	go func() {
-		waitTimeout := time.Millisecond * 300
-
-		for item := range app.pathnameInput {
-			// Do not stress API
-			time.Sleep(waitTimeout)
-
-			if CanRotate(item) {
-				if err := app.rotateImage(item); err != nil {
-					logger.Error("unable to rotate image: %s", err)
-				}
-			}
-
-			if err := app.generateThumbnail(item); err != nil {
-				logger.Error("%s", err)
-			} else {
-				logger.Info("Thumbnail generated for %s", item.Pathname)
-			}
-		}
-	}()
+	go app.Start()
 
 	return app
 }
@@ -118,6 +99,31 @@ func (a app) HasThumbnail(item *provider.StorageItem) (string, bool) {
 
 	_, err := a.storage.Info(thumbnailPath)
 	return thumbnailPath, err == nil
+}
+
+func (a app) Start() {
+	waitTimeout := time.Millisecond * 300
+
+	for item := range a.pathnameInput {
+		// Do not stress API
+		time.Sleep(waitTimeout)
+
+		rotated := false
+
+		if CanRotate(item) {
+			if err := a.rotateImage(item); err != nil {
+				logger.Error("unable to rotate image: %s", err)
+			} else {
+				rotated = true
+			}
+		}
+
+		if err := a.generateThumbnail(item, rotated); err != nil {
+			logger.Error("%s", err)
+		} else {
+			logger.Info("Thumbnail generated for %s", item.Pathname)
+		}
+	}
 }
 
 // Serve check if thumbnail is present and serve it
@@ -226,7 +232,7 @@ func (a app) rotateImage(item *provider.StorageItem) error {
 	return nil
 }
 
-func (a app) generateThumbnail(item *provider.StorageItem) error {
+func (a app) generateThumbnail(item *provider.StorageItem, rotated bool) error {
 	file, err := a.storage.ReaderFrom(item.Pathname)
 	if err != nil {
 		return err
@@ -235,7 +241,7 @@ func (a app) generateThumbnail(item *provider.StorageItem) error {
 	ctx, cancel := getCtx(context.Background())
 	defer cancel()
 
-	resp, err := request.New().Post(a.thumbnailURL).Send(ctx, file)
+	resp, err := request.New().Post(fmt.Sprintf("%s&norotation=%t", a.thumbnailURL, rotated)).Send(ctx, file)
 	if err != nil {
 		return err
 	}
