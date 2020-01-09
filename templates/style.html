@@ -69,24 +69,14 @@
 
       .browser {
         background-color: var(--white);
-        display: flex;
-        flex: 1 1;
-        justify-content: center;
+        max-height: 100%;
+        text-align: center;
       }
 
       video, img, object {
         border: 0;
         max-height: 100%;
         max-width: 100%;
-      }
-
-      object {
-        flex: 1 1;
-      }
-
-      video, img  {
-        align-self: flex-start;
-        flex: 0 0;
       }
     {{ end }}
 

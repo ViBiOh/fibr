@@ -1,7 +1,7 @@
 package crud
 
 import (
-	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -9,24 +9,31 @@ import (
 
 // Post handle post from form
 func (a *app) Post(w http.ResponseWriter, r *http.Request, request *provider.Request) {
+	method := r.FormValue("method")
+
 	if r.FormValue("type") == "share" {
-		switch r.FormValue("method") {
+		switch method {
 		case http.MethodPost:
 			a.CreateShare(w, r, request)
 		case http.MethodDelete:
 			a.DeleteShare(w, r, request)
 		default:
-			a.renderer.Error(w, provider.NewError(http.StatusMethodNotAllowed, errors.New("unknown method")))
+			a.renderer.Error(w, provider.NewError(http.StatusMethodNotAllowed, fmt.Errorf("unknown method %s for %s", method, r.URL.Path)))
 		}
-	} else if r.FormValue("method") == http.MethodPost {
+
+		return
+	}
+
+	switch method {
+	case http.MethodPost:
 		a.Upload(w, r, request)
-	} else if r.FormValue("method") == http.MethodPatch {
+	case http.MethodPatch:
 		a.Rename(w, r, request)
-	} else if r.FormValue("method") == http.MethodPut {
+	case http.MethodPut:
 		a.Create(w, r, request)
-	} else if r.FormValue("method") == http.MethodDelete {
+	case http.MethodDelete:
 		a.Delete(w, r, request)
-	} else {
-		a.renderer.Error(w, provider.NewError(http.StatusMethodNotAllowed, errors.New("unknown method")))
+	default:
+		a.renderer.Error(w, provider.NewError(http.StatusMethodNotAllowed, fmt.Errorf("unknown method %s for %s", method, r.URL.Path)))
 	}
 }

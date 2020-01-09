@@ -1,7 +1,7 @@
 {{ define "file" }}
   {{ template "layout" . }}
 
-  <div class="browser">
+  <div class="browser flex-grow">
     {{ if .Content.File.IsVideo }}
       <video controls src="{{ .Content.File.Name }}" type="{{ .Content.File.Mime }}"></video>
     {{ else }}
