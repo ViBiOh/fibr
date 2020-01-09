@@ -1,17 +1,15 @@
 {{ define "file" }}
   {{ template "layout" . }}
 
-  <div class="browser flex-grow">
-    {{ if .Content.File.IsVideo }}
-      <video controls src="{{ .Content.File.Name }}" type="{{ .Content.File.Mime }}"></video>
+  {{ if .Content.File.IsVideo }}
+    <video controls src="{{ .Content.File.Name }}" type="{{ .Content.File.Mime }}"></video>
+  {{ else }}
+    {{ if .Content.File.IsImage }}
+      <img src="{{ .Content.File.Name }}" alt="{{ .Content.File.Name }}" />
     {{ else }}
-      {{ if .Content.File.IsImage }}
-        <img src="{{ .Content.File.Name }}" alt="{{ .Content.File.Name }}" />
-      {{ else }}
-        <object data="{{ .Content.File.Name }}" type="{{ .Content.File.Mime }}"></object>
-      {{ end }}
+      <object data="{{ .Content.File.Name }}" type="{{ .Content.File.Mime }}"></object>
     {{ end }}
-  </div>
+  {{ end }}
 
   {{ template "navigation" . }}
   {{ template "footer" . }}
