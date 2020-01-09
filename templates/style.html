@@ -231,7 +231,10 @@
 
     .modal-content {
       background-color: var(--dark);
+      max-height: 100%;
       pointer-events: auto;
+      display: flex;
+      flex-direction: column;
     }
 
     @media screen and (max-width: 640px) {
@@ -274,9 +277,17 @@
       width: 100%;
     }
 
-    #uploadList {
+    #upload-form {
+      display: flex;
+      flex-direction: column;
+      flex: 1 1;
+    }
+
+    #upload-list {
       margin: 1rem auto;
       max-width: 30rem;
+      overflow-y: auto;
+      width: 100%;
     }
 
     .upload-item {

@@ -173,7 +173,7 @@
         replaceContent(uploadButton, generateThrobber('throbber-white'));
       }
 
-      const uploadList = document.getElementById('uploadList');
+      const uploadList = document.getElementById('upload-list');
       replaceContent(uploadList);
 
       const values = [].filter
@@ -226,13 +226,13 @@
     <div class="modal-content">
       <h2 class="header">Upload files</h2>
 
-      <form method="post" enctype="multipart/form-data" action="#" onSubmit="return upload(event)">
+      <form id="upload-form" method="post" enctype="multipart/form-data" action="#" onSubmit="return upload(event)">
         <input type="hidden" name="method" value="POST" />
         <p class="center">
           <input id="file" type="file" name="files[]" multiple />
         </p>
 
-        <div id="uploadList">
+        <div id="upload-list">
         </div>
 
         <p class="center">
