@@ -36,7 +36,7 @@ func New(crudApp crud.App, rendererApp renderer.App, loginApp login.App) App {
 	}
 }
 
-func (a app) parseShare(r *http.Request, request provider.Request) error {
+func (a app) parseShare(r *http.Request, request *provider.Request) error {
 	share := a.crud.GetShare(request.Path)
 	if share == nil {
 		return nil
@@ -73,7 +73,7 @@ func (a app) parseRequest(r *http.Request) (provider.Request, *provider.Error) {
 		Display:  r.URL.Query().Get("d"),
 	}
 
-	if err := a.parseShare(r, request); err != nil {
+	if err := a.parseShare(r, &request); err != nil {
 		return request, provider.NewError(http.StatusUnauthorized, err)
 	}
 
