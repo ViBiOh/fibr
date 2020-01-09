@@ -26,7 +26,7 @@ func (a *app) getCoverImage(files []*provider.StorageItem) *provider.StorageItem
 }
 
 // List render directory web view of given dirPath
-func (a *app) List(w http.ResponseWriter, request *provider.Request, message *provider.Message) {
+func (a *app) List(w http.ResponseWriter, request provider.Request, message *provider.Message) {
 	files, err := a.storage.List(request.GetFilepath(""))
 	if err != nil {
 		a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))
@@ -51,7 +51,7 @@ func (a *app) List(w http.ResponseWriter, request *provider.Request, message *pr
 }
 
 // Download content of a directory into a streamed zip
-func (a *app) Download(w http.ResponseWriter, request *provider.Request) {
+func (a *app) Download(w http.ResponseWriter, request provider.Request) {
 	files, err := a.storage.List(request.GetFilepath(""))
 	if err != nil {
 		a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))

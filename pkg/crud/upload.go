@@ -20,7 +20,7 @@ var (
 	copyBuffer = make([]byte, 32*1024)
 )
 
-func (a *app) saveUploadedFile(request *provider.Request, uploadedFile io.ReadCloser, uploadedFileHeader *multipart.FileHeader) (string, error) {
+func (a *app) saveUploadedFile(request provider.Request, uploadedFile io.ReadCloser, uploadedFileHeader *multipart.FileHeader) (string, error) {
 	filename, err := provider.SanitizeName(uploadedFileHeader.Filename, true)
 	if err != nil {
 		return "", err
@@ -56,7 +56,7 @@ func (a *app) saveUploadedFile(request *provider.Request, uploadedFile io.ReadCl
 }
 
 // Upload saves form files to filesystem
-func (a *app) Upload(w http.ResponseWriter, r *http.Request, request *provider.Request) {
+func (a *app) Upload(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !request.CanEdit {
 		a.renderer.Error(w, provider.NewError(http.StatusForbidden, ErrNotAuthorized))
 		return

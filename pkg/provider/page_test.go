@@ -18,7 +18,7 @@ func TestBuild(t *testing.T) {
 	var cases = []struct {
 		intention string
 		config    *Config
-		request   *Request
+		request   Request
 		message   *Message
 		error     *Error
 		layout    string
@@ -28,7 +28,7 @@ func TestBuild(t *testing.T) {
 		{
 			"default layout",
 			nil,
-			nil,
+			Request{},
 			nil,
 			nil,
 			"",
@@ -40,7 +40,7 @@ func TestBuild(t *testing.T) {
 		{
 			"compute metadata",
 			config,
-			nil,
+			Request{},
 			nil,
 			nil,
 			"list",
@@ -70,7 +70,7 @@ func TestComputePublicURL(t *testing.T) {
 	var cases = []struct {
 		intention string
 		config    *Config
-		request   *Request
+		request   Request
 		want      string
 	}{
 		{
@@ -78,7 +78,7 @@ func TestComputePublicURL(t *testing.T) {
 			&Config{
 				PublicURL: "http://localhost:1080",
 			},
-			nil,
+			Request{},
 			"http://localhost:1080",
 		},
 		{
@@ -86,7 +86,7 @@ func TestComputePublicURL(t *testing.T) {
 			&Config{
 				PublicURL: "http://localhost:1080",
 			},
-			&Request{
+			Request{
 				Path: "/photos",
 			},
 			"http://localhost:1080/photos",
@@ -96,7 +96,7 @@ func TestComputePublicURL(t *testing.T) {
 			&Config{
 				PublicURL: "http://localhost:1080",
 			},
-			&Request{
+			Request{
 				Path: "photos",
 			},
 			"http://localhost:1080/photos",
@@ -106,7 +106,7 @@ func TestComputePublicURL(t *testing.T) {
 			&Config{
 				PublicURL: "https://localhost:1080",
 			},
-			&Request{
+			Request{
 				Path: "/photos",
 				Share: &Share{
 					ID: "abcd1234",
@@ -129,7 +129,7 @@ func TestComputeTitle(t *testing.T) {
 	var cases = []struct {
 		intention string
 		config    *Config
-		request   *Request
+		request   Request
 		want      string
 	}{
 		{
@@ -140,7 +140,7 @@ func TestComputeTitle(t *testing.T) {
 					Title: "fibr",
 				},
 			},
-			nil,
+			Request{},
 			"fibr - test",
 		},
 		{
@@ -151,7 +151,7 @@ func TestComputeTitle(t *testing.T) {
 					Title: "fibr",
 				},
 			},
-			&Request{
+			Request{
 				Path: "/subDir/",
 			},
 			"fibr - test - subDir",
@@ -164,7 +164,7 @@ func TestComputeTitle(t *testing.T) {
 					Title: "fibr",
 				},
 			},
-			&Request{
+			Request{
 				Path: "/",
 				Share: &Share{
 					RootName: "abcd1234",
@@ -187,7 +187,7 @@ func TestComputeDescription(t *testing.T) {
 	var cases = []struct {
 		intention string
 		config    *Config
-		request   *Request
+		request   Request
 		want      string
 	}{
 		{
@@ -198,7 +198,7 @@ func TestComputeDescription(t *testing.T) {
 					Description: "fibr",
 				},
 			},
-			nil,
+			Request{},
 			"fibr - test",
 		},
 		{
@@ -209,7 +209,7 @@ func TestComputeDescription(t *testing.T) {
 					Description: "fibr",
 				},
 			},
-			&Request{
+			Request{
 				Path: "/subDir/",
 			},
 			"fibr - test - subDir",
@@ -222,7 +222,7 @@ func TestComputeDescription(t *testing.T) {
 					Description: "fibr",
 				},
 			},
-			&Request{
+			Request{
 				Path: "/",
 				Share: &Share{
 					RootName: "abcd1234",

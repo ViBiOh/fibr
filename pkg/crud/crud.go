@@ -23,20 +23,20 @@ var (
 
 // App of package
 type App interface {
-	Browser(http.ResponseWriter, *provider.Request, *provider.StorageItem, *provider.Message)
+	Browser(http.ResponseWriter, provider.Request, *provider.StorageItem, *provider.Message)
 	ServeStatic(http.ResponseWriter, *http.Request) bool
 
-	List(http.ResponseWriter, *provider.Request, *provider.Message)
-	Get(http.ResponseWriter, *http.Request, *provider.Request)
-	Post(http.ResponseWriter, *http.Request, *provider.Request)
-	Create(http.ResponseWriter, *http.Request, *provider.Request)
-	Upload(http.ResponseWriter, *http.Request, *provider.Request)
-	Rename(http.ResponseWriter, *http.Request, *provider.Request)
-	Delete(http.ResponseWriter, *http.Request, *provider.Request)
+	List(http.ResponseWriter, provider.Request, *provider.Message)
+	Get(http.ResponseWriter, *http.Request, provider.Request)
+	Post(http.ResponseWriter, *http.Request, provider.Request)
+	Create(http.ResponseWriter, *http.Request, provider.Request)
+	Upload(http.ResponseWriter, *http.Request, provider.Request)
+	Rename(http.ResponseWriter, *http.Request, provider.Request)
+	Delete(http.ResponseWriter, *http.Request, provider.Request)
 
 	GetShare(string) *provider.Share
-	CreateShare(http.ResponseWriter, *http.Request, *provider.Request)
-	DeleteShare(http.ResponseWriter, *http.Request, *provider.Request)
+	CreateShare(http.ResponseWriter, *http.Request, provider.Request)
+	DeleteShare(http.ResponseWriter, *http.Request, provider.Request)
 }
 
 // Config of package

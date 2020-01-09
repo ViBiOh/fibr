@@ -24,7 +24,7 @@ func uuid() (string, error) {
 }
 
 // CreateShare create a share for given URL
-func (a *app) CreateShare(w http.ResponseWriter, r *http.Request, request *provider.Request) {
+func (a *app) CreateShare(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !request.CanShare {
 		a.renderer.Error(w, provider.NewError(http.StatusForbidden, ErrNotAuthorized))
 		return
@@ -82,7 +82,7 @@ func (a *app) CreateShare(w http.ResponseWriter, r *http.Request, request *provi
 }
 
 // DeleteShare delete a share from given ID
-func (a *app) DeleteShare(w http.ResponseWriter, r *http.Request, request *provider.Request) {
+func (a *app) DeleteShare(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !request.CanShare {
 		a.renderer.Error(w, provider.NewError(http.StatusForbidden, ErrNotAuthorized))
 		return

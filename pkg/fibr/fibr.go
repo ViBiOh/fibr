@@ -36,7 +36,7 @@ func New(crudApp crud.App, rendererApp renderer.App, loginApp login.App) App {
 	}
 }
 
-func (a app) parseShare(r *http.Request, request *provider.Request) error {
+func (a app) parseShare(r *http.Request, request provider.Request) error {
 	share := a.crud.GetShare(request.Path)
 	if share == nil {
 		return nil
@@ -65,8 +65,8 @@ func (a app) handleAnonymousRequest(r *http.Request, err error) *provider.Error 
 	return provider.NewError(http.StatusUnauthorized, err)
 }
 
-func (a app) parseRequest(r *http.Request) (*provider.Request, *provider.Error) {
-	request := &provider.Request{
+func (a app) parseRequest(r *http.Request) (provider.Request, *provider.Error) {
+	request := provider.Request{
 		Path:     r.URL.Path,
 		CanEdit:  false,
 		CanShare: false,
@@ -74,7 +74,7 @@ func (a app) parseRequest(r *http.Request) (*provider.Request, *provider.Error) 
 	}
 
 	if err := a.parseShare(r, request); err != nil {
-		return nil, provider.NewError(http.StatusUnauthorized, err)
+		return request, provider.NewError(http.StatusUnauthorized, err)
 	}
 
 	if request.Share != nil {
@@ -83,7 +83,7 @@ func (a app) parseRequest(r *http.Request) (*provider.Request, *provider.Error) 
 
 	_, user, err := a.login.IsAuthenticated(r, "")
 	if err != nil {
-		return nil, a.handleAnonymousRequest(r, err)
+		return request, a.handleAnonymousRequest(r, err)
 	}
 
 	if a.login.HasProfile(user, "admin") {
@@ -94,7 +94,7 @@ func (a app) parseRequest(r *http.Request) (*provider.Request, *provider.Error) 
 	return request, nil
 }
 
-func (a app) handleRequest(w http.ResponseWriter, r *http.Request, request *provider.Request) {
+func (a app) handleRequest(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		a.crud.Get(w, r, request)

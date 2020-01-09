@@ -54,7 +54,7 @@ func isThumbnail(r *http.Request) bool {
 }
 
 // GetWithMessage output content with given message
-func (a *app) GetWithMessage(w http.ResponseWriter, r *http.Request, request *provider.Request, message *provider.Message) {
+func (a *app) GetWithMessage(w http.ResponseWriter, r *http.Request, request provider.Request, message *provider.Message) {
 	info, err := a.storage.Info(request.GetFilepath(""))
 	if err != nil {
 		if provider.IsNotExist(err) {
@@ -99,7 +99,7 @@ func (a *app) GetWithMessage(w http.ResponseWriter, r *http.Request, request *pr
 }
 
 // Get output content
-func (a *app) Get(w http.ResponseWriter, r *http.Request, request *provider.Request) {
+func (a *app) Get(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	var message *provider.Message
 
 	if messageContent := strings.TrimSpace(r.URL.Query().Get("message")); messageContent != "" {

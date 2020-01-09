@@ -13,7 +13,7 @@ var (
 // Page renderer to user
 type Page struct {
 	Config  *Config
-	Request *Request
+	Request Request
 	Message *Message
 	Error   *Error
 	Layout  string
@@ -27,7 +27,7 @@ type Page struct {
 // PageBuilder for interactively create page
 type PageBuilder struct {
 	config  *Config
-	request *Request
+	request Request
 	message *Message
 	error   *Error
 	layout  string
@@ -42,7 +42,7 @@ func (p *PageBuilder) Config(config *Config) *PageBuilder {
 }
 
 // Request set Request for page
-func (p *PageBuilder) Request(request *Request) *PageBuilder {
+func (p *PageBuilder) Request(request Request) *PageBuilder {
 	p.request = request
 
 	return p
@@ -105,10 +105,10 @@ func (p *PageBuilder) Build() Page {
 	}
 }
 
-func computePublicURL(config *Config, request *Request) string {
+func computePublicURL(config *Config, request Request) string {
 	parts := []string{config.PublicURL}
 
-	if request != nil {
+	if len(request.Path) > 0 {
 		if request.Share != nil {
 			parts = append(parts, request.Share.ID)
 		}
@@ -119,16 +119,16 @@ func computePublicURL(config *Config, request *Request) string {
 	return protocolRegex.ReplaceAllString(path.Join(parts...), "$1://")
 }
 
-func computeTitle(config *Config, request *Request) string {
+func computeTitle(config *Config, request Request) string {
 	parts := []string{config.Seo.Title}
 
-	if request == nil || request.Share == nil {
+	if request.Share == nil {
 		parts = append(parts, config.RootName)
 	} else {
 		parts = append(parts, request.Share.RootName)
 	}
 
-	if request != nil {
+	if len(request.Path) > 0 {
 		path := strings.Trim(request.Path, "/")
 
 		if path != "" {
@@ -139,16 +139,16 @@ func computeTitle(config *Config, request *Request) string {
 	return strings.Join(parts, " - ")
 }
 
-func computeDescription(config *Config, request *Request) string {
+func computeDescription(config *Config, request Request) string {
 	parts := []string{config.Seo.Description}
 
-	if request == nil || request.Share == nil {
+	if request.Share == nil {
 		parts = append(parts, config.RootName)
 	} else {
 		parts = append(parts, request.Share.RootName)
 	}
 
-	if request != nil {
+	if len(request.Path) > 0 {
 		path := strings.Trim(request.Path, "/")
 
 		if path != "" {

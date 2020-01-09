@@ -129,6 +129,7 @@ func NewError(status int, err error) *Error {
 	if err == nil {
 		return nil
 	}
+
 	return &Error{
 		Status: status,
 		Err:    err,

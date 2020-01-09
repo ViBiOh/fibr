@@ -19,8 +19,8 @@ import (
 
 // App of package
 type App interface {
-	Directory(http.ResponseWriter, *provider.Request, map[string]interface{}, *provider.Message)
-	File(http.ResponseWriter, *provider.Request, map[string]interface{}, *provider.Message)
+	Directory(http.ResponseWriter, provider.Request, map[string]interface{}, *provider.Message)
+	File(http.ResponseWriter, provider.Request, map[string]interface{}, *provider.Message)
 	Error(http.ResponseWriter, *provider.Error)
 	Sitemap(http.ResponseWriter)
 	SVG(http.ResponseWriter, string, string)
@@ -90,7 +90,7 @@ func New(config Config, rootName string, thumbnail thumbnail.App) App {
 				return "file"
 			}
 		},
-		"hasThumbnail": func(request *provider.Request, item *provider.StorageItem) bool {
+		"hasThumbnail": func(request provider.Request, item *provider.StorageItem) bool {
 			_, ok := thumbnail.HasThumbnail(item)
 			return ok
 		},
@@ -119,7 +119,7 @@ func New(config Config, rootName string, thumbnail thumbnail.App) App {
 }
 
 // Directory render directory listing
-func (a app) Directory(w http.ResponseWriter, request *provider.Request, content map[string]interface{}, message *provider.Message) {
+func (a app) Directory(w http.ResponseWriter, request provider.Request, content map[string]interface{}, message *provider.Message) {
 	page := a.newPageBuilder().Request(request).Message(message).Layout(request.Display).Content(content).Build()
 
 	w.Header().Set("content-language", "en")
@@ -130,7 +130,7 @@ func (a app) Directory(w http.ResponseWriter, request *provider.Request, content
 }
 
 // File render file detail
-func (a app) File(w http.ResponseWriter, request *provider.Request, content map[string]interface{}, message *provider.Message) {
+func (a app) File(w http.ResponseWriter, request provider.Request, content map[string]interface{}, message *provider.Message) {
 	page := a.newPageBuilder().Request(request).Message(message).Layout("browser").Content(content).Build()
 
 	w.Header().Set("content-language", "en")
