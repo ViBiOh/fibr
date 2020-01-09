@@ -68,7 +68,7 @@
     <div class="flex flex-center">
       {{ template "modifiers" . }}
 
-      <span class="padding-left">{{ len .Content.Files }} elements</span>
+      <span class="padding-left">{{ len .Content.Files }} element{{ if gt (len .Content.Files) 1 }}s{{ end }}</span>
 
       <span class="flex-grow"></span>
 
