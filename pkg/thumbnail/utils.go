@@ -20,11 +20,6 @@ func getCtx(ctx context.Context) (context.Context, context.CancelFunc) {
 	return context.WithTimeout(ctx, defaultTimeout)
 }
 
-// CanRotate determine if a rotation can be done
-func CanRotate(item *provider.StorageItem) bool {
-	return item.IsImage()
-}
-
 // CanHaveThumbnail determine if thumbnail can be generated for given pathname
 func CanHaveThumbnail(item *provider.StorageItem) bool {
 	return item.IsImage() || item.IsPdf()
