@@ -10,10 +10,10 @@ import (
 func getPreviousAndNext(file provider.StorageItem, files []provider.StorageItem) (*provider.StorageItem, *provider.StorageItem) {
 	var (
 		found    bool
-		previous *provider.StorageItem
+		previous provider.StorageItem
 	)
 
-	for _, neighbor := range files {
+	for index, neighbor := range files {
 		if neighbor.IsDir != file.IsDir {
 			continue
 		}
@@ -24,15 +24,15 @@ func getPreviousAndNext(file provider.StorageItem, files []provider.StorageItem)
 		}
 
 		if !found {
-			previous = &neighbor
+			previous = files[index]
 		}
 
 		if found {
-			return previous, &neighbor
+			return &previous, &files[index]
 		}
 	}
 
-	return previous, nil
+	return &previous, nil
 }
 
 func checkFormName(r *http.Request, formName string) (string, *provider.Error) {
