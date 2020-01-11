@@ -241,7 +241,6 @@
     .message {
       margin: 0;
       padding: 1rem 2rem;
-      text-align: center;
     }
 
     #tools {
@@ -268,10 +267,6 @@
       padding: 0;
     }
 
-    #shares {
-      width: 100%;
-    }
-
     #upload-form {
       display: flex;
       flex-direction: column;
@@ -281,12 +276,11 @@
     #upload-list {
       margin: 1rem auto;
       max-width: 30rem;
-      overflow-y: auto;
-      width: 100%;
     }
 
     .upload-item {
       display: inline-block;
+      width: calc(100% - 2rem);
     }
 
     .upload-name {
@@ -313,7 +307,6 @@
 
     .throbber {
       margin: auto;
-      text-align: center;
     }
 
     .throbber > div {
@@ -370,7 +363,6 @@
       }
 
       .filelink {
-        align-items: center;
         display: inline-flex;
         height: 2.5rem;
         width: 45rem;
@@ -451,11 +443,6 @@
 
       .file {
         padding: 0.5rem;
-      }
-
-      .filelink {
-        text-align: center;
-        width: 100%;
       }
 
       .filelink .icon {

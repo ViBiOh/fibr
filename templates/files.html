@@ -86,7 +86,7 @@
         {{ else }}
           <li class="file">
         {{ end }}
-          <a class="filelink" href="{{ .Name }}{{ if .IsDir }}/{{ if eq $root.Layout "list" }}?d=list{{ end }}{{ else }}?browser{{ end }}" title="{{ .Name }}">
+          <a class="filelink full center" href="{{ .Name }}{{ if .IsDir }}/{{ if eq $root.Layout "list" }}?d=list{{ end }}{{ else }}?browser{{ end }}" title="{{ .Name }}">
             {{ if and (eq $root.Layout "grid") (hasThumbnail $root.Request .) }}
               {{ template "async-image" asyncImage . $root.Config.Version }}
             {{ else }}
@@ -139,7 +139,7 @@
      */
     function generateThrobber(className) {
       const wrapper = document.createElement('div');
-      wrapper.classList.add('throbber', className);
+      wrapper.classList.add('throbber', 'center', className);
 
       for (let i = 1; i < 4; i++) {
         const dot = document.createElement('div');

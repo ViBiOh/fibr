@@ -69,7 +69,7 @@
       item.classList.add('flex', 'flex-center');
 
       const progressWrapper = document.createElement('div');
-      progressWrapper.classList.add('upload-item', 'full');
+      progressWrapper.classList.add('upload-item');
       item.appendChild(progressWrapper);
 
       const filename = document.createElement('div');
@@ -232,7 +232,7 @@
           <input id="file" type="file" name="files[]" multiple />
         </p>
 
-        <div id="upload-list">
+        <div id="upload-list" class="full">
         </div>
 
         <p class="center">
