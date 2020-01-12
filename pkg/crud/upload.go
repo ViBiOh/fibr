@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	defaultMaxMemory = 256 << 20 // 256MB
+	defaultMaxMemory = 128 << 20 // 128MB
 )
 
 var (

@@ -94,7 +94,7 @@
      * @param {File} file    File to generate message
      * @param {Any} content  Content of message
      */
-    async function setUploadStatus(file, content, style) {
+    async function setUploadStatus(file, content, style, error) {
       const messageId = await fileMessageId(file);
 
       const container = document.getElementById(messageId);
@@ -109,6 +109,13 @@
 
       statusContainer.innerHTML = content;
       statusContainer.classList.add(style);
+
+      if (error) {
+        const error = document.createElement('div');
+        error.classList.add('full');
+        error.innerHTML = String(error);
+        container.appendChild(error);
+      }
     }
 
     /**
@@ -137,19 +144,23 @@
           );
         }
 
-        xhr.onreadystatechange = e => {
-          if (xhr.readyState == 4) {
-            if (xhr.status < 400) {
-              if (progress) {
-                progress.value = 100;
-              }
+        xhr.addEventListener(
+          'readystatechange',
+          e => {
+            if (xhr.readyState == XMLHttpRequest.DONE) {
+              if (xhr.status < 400) {
+                if (progress) {
+                  progress.value = 100;
+                }
 
-              resolve(e);
-            } else {
-              reject(e);
+                resolve(e);
+              } else {
+                rejec(e);
+              }
             }
-          }
-        };
+          },
+          false,
+        );
 
         const formData = new FormData();
         formData.append('method', method);
@@ -195,14 +206,14 @@
 
         try {
           await uploadFile(values.method, file)
-          setUploadStatus(file, '✓', 'success')
+          setUploadStatus(file, '✓', 'success');
         } catch (e) {
-          setUploadStatus(file, 'X', 'danger');
+          setUploadStatus(file, 'X', 'danger', e);
           success = false;
 
           console.error(e);
         }
-      };
+      }
 
       if (success) {
         document.location.hash = '#upload-success';
