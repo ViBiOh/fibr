@@ -41,7 +41,6 @@
      */
     async function sha1(data) {
       const buffer = await crypto.subtle.digest('SHA-1', new TextEncoder('utf-8').encode(data))
-
       return bufferToHex(buffer);
     }
 
@@ -131,7 +130,11 @@
         const xhr = new XMLHttpRequest();
 
         if (progress) {
-          xhr.onprogress = e => (progress.value = parseInt((e.loaded / e.total) * 100, 10));
+          xhr.upload.addEventListener(
+            'progress',
+            e => (progress.value = parseInt((e.loaded / e.total) * 100, 10)),
+            false,
+          );
         }
 
         xhr.onreadystatechange = e => {
@@ -146,13 +149,6 @@
               reject(e);
             }
           }
-        };
-
-        xhr.onerror = () => {
-          reject({
-            status: this.status,
-            statusText: xhr.statusText,
-          });
         };
 
         const formData = new FormData();
