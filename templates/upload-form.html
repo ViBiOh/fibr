@@ -131,11 +131,7 @@
         const xhr = new XMLHttpRequest();
 
         if (progress) {
-          xhr.upload.addEventListener(
-            'progress',
-            e => (progress.value = parseInt((e.loaded / e.total) * 100, 10)),
-            false,
-          );
+          xhr.onprogress = e => (progress.value = parseInt((e.loaded / e.total) * 100, 10));
         }
 
         xhr.onreadystatechange = e => {
@@ -150,6 +146,13 @@
               reject(e);
             }
           }
+        };
+
+        xhr.onerror = () => {
+          reject({
+            status: this.status,
+            statusText: xhr.statusText,
+          });
         };
 
         const formData = new FormData();
