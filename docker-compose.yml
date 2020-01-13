@@ -11,7 +11,7 @@ services:
       traefik.http.routers.fibr-http.middlewares: redirect@file
       traefik.http.routers.fibr-https.rule: Host(`fibr.vibioh.fr`)
       traefik.http.routers.fibr-https.entrypoints: https
-      traefik.http.routers.fibr-https.middlewares: compress@file, web-limit@file, fibr-limit
+      traefik.http.routers.fibr-https.middlewares: compress@file, web-limit@file
       traefik.http.routers.fibr-https.tls: true
       traefik.http.routers.fibr-https.tls.certresolver: default
       traefik.http.services.fibr-service.loadbalancer.server.port: "1080"
@@ -21,6 +21,8 @@ services:
       FIBR_VERSION: "${VERSION}"
       FIBR_CSP: "default-src 'self'; base-uri 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:"
       FIBR_FRAME_OPTIONS: SAMEORIGIN
+    ports:
+      3080:1080/tcp
     volumes:
       - ${DATA_DIR}:/data
     user: "${DATA_USER_ID}"
