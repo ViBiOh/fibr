@@ -67,20 +67,18 @@
       item.id = messageId;
       item.classList.add('flex', 'flex-center');
 
-      const progressWrapper = document.createElement('div');
-      progressWrapper.classList.add('upload-item');
-      item.appendChild(progressWrapper);
+      const itemWrapper = document.createElement('div');
+      itemWrapper.classList.add('upload-item');
+      item.appendChild(itemWrapper);
 
       const filename = document.createElement('div');
       filename.classList.add('upload-name');
       filename.innerHTML = file.name;
-      progressWrapper.appendChild(filename);
+      itemWrapper.appendChild(filename);
 
-      const progress = document.createElement('progress');
-      progress.classList.add('full');
-      progress.max = 100;
-      progress.value = 0;
-      progressWrapper.appendChild(progress);
+      const filesize = document.createElement('div');
+      filesize.classList.add('upload-size', 'full');
+      itemWrapper.appendChild(filesize);
 
       const status = document.createElement('span');
       status.classList.add('upload-status');
@@ -121,49 +119,23 @@
       const messageId = await fileMessageId(file);
 
       const container = document.getElementById(messageId);
-      let progress;
       if (container) {
-        progress = container.querySelector('progress');
+        const filesize = container.querySelector('.upload-size')
+        filesize.innerHTML = `${(file.size / 1024 / 1024).toFixed(2)} MB`;
       }
 
-      console.log(`Uploading ${file.name} : ${file.size} bytes`);
+      const formData = new FormData();
+      formData.append('method', method);
+      formData.append('files[]', file);
 
-      return new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-
-        if (progress) {
-          xhr.upload.addEventListener(
-            'progress',
-            e => (progress.value = parseInt((e.loaded / e.total) * 100, 10)),
-            false,
-          );
-        }
-
-        xhr.addEventListener(
-          'readystatechange',
-          e => {
-            if (xhr.readyState == XMLHttpRequest.DONE) {
-              if (xhr.status < 400) {
-                if (progress) {
-                  progress.value = 100;
-                }
-
-                resolve(e);
-              } else {
-                rejec(e);
-              }
-            }
-          },
-          false,
-        );
-
-        const formData = new FormData();
-        formData.append('method', method);
-        formData.append('files[]', file);
-
-        xhr.open('POST', '', true);
-        xhr.send(formData);
+      const response = await fetch('', {
+        method: 'POST',
+        body: formData,
       });
+
+      if (response.status > 400) {
+        throw response.text();
+      }
     }
 
     /**
