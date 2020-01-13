@@ -18,7 +18,7 @@ func (a *app) Post(w http.ResponseWriter, r *http.Request, request provider.Requ
 		case http.MethodDelete:
 			a.DeleteShare(w, r, request)
 		default:
-			a.renderer.Error(w, provider.NewError(http.StatusMethodNotAllowed, fmt.Errorf("unknown method %s for %s: %#v", method, r.URL.Path, request)))
+			a.renderer.Error(w, provider.NewError(http.StatusMethodNotAllowed, fmt.Errorf("unknown method %s for %s", method, r.URL.Path)))
 		}
 
 		return
@@ -34,6 +34,6 @@ func (a *app) Post(w http.ResponseWriter, r *http.Request, request provider.Requ
 	case http.MethodDelete:
 		a.Delete(w, r, request)
 	default:
-		a.renderer.Error(w, provider.NewError(http.StatusMethodNotAllowed, fmt.Errorf("unknown method %s for %s: %#v", method, r.URL.Path, request)))
+		a.renderer.Error(w, provider.NewError(http.StatusMethodNotAllowed, fmt.Errorf("unknown method %s for %s", method, r.URL.Path)))
 	}
 }
