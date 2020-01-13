@@ -94,7 +94,7 @@
      * @param {File} file    File to generate message
      * @param {Any} content  Content of message
      */
-    async function setUploadStatus(file, content, style, error) {
+    async function setUploadStatus(file, content, style) {
       const messageId = await fileMessageId(file);
 
       const container = document.getElementById(messageId);
@@ -109,13 +109,6 @@
 
       statusContainer.innerHTML = content;
       statusContainer.classList.add(style);
-
-      if (error) {
-        const error = document.createElement('div');
-        error.classList.add('full');
-        error.innerHTML = String(error);
-        container.appendChild(error);
-      }
     }
 
     /**
@@ -132,6 +125,8 @@
       if (container) {
         progress = container.querySelector('progress');
       }
+
+      console.log(`Uploading ${file.name} : ${file.size} bytes`);
 
       return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
@@ -208,7 +203,7 @@
           await uploadFile(values.method, file)
           setUploadStatus(file, '✓', 'success');
         } catch (e) {
-          setUploadStatus(file, 'X', 'danger', e);
+          setUploadStatus(file, 'X', 'danger');
           success = false;
 
           console.error(e);
