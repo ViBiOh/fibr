@@ -19,6 +19,7 @@ services:
       FIBR_AUTH_USERS: "${BASIC_USERS}"
       FIBR_AUTH_PROFILES: 1:admin
       FIBR_VERSION: "${VERSION}"
+      FIBR_HSTS: "false"
       FIBR_CSP: "default-src 'self'; base-uri 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:"
       FIBR_FRAME_OPTIONS: SAMEORIGIN
     ports:
