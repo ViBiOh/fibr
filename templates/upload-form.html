@@ -90,6 +90,28 @@
     }
 
     /**
+     * Get list of files to upload.
+     */
+    function getFiles(event) {
+      const uploadList = document.getElementById('upload-list');
+      replaceContent(uploadList);
+
+      return [].filter
+        .call(event.target, e => e.nodeName.toLowerCase() === 'input')
+        .reduce((acc, cur) => {
+          if (cur.type === 'file') {
+            acc.files = cur.files;
+
+            [].forEach.call(acc.files, file => addUploadItem(uploadList, file));
+          } else {
+            acc[cur.name] = cur.value;
+          }
+
+          return acc;
+        }, {});
+    }
+
+    /**
      * Add upload message for file
      * @param {File} file    File to generate message
      * @param {Any} content  Content of message
@@ -111,6 +133,8 @@
       statusContainer.classList.add(style);
     }
 
+    let xhr;
+
     /**
      * Upload file with updating progress indicator.
      * @param  {String} method Method for uploading
@@ -131,7 +155,7 @@
       formData.append('files[]', file);
 
       return new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
+        xhr = new XMLHttpRequest();
 
         if (progress) {
           xhr.upload.addEventListener(
@@ -145,15 +169,18 @@
           'readystatechange',
           e => {
             if (xhr.readyState == XMLHttpRequest.DONE) {
-              if (xhr.status < 400) {
+              if (xhr.status >= 200 && xhr.status < 400) {
                 if (progress) {
                   progress.value = 100;
                 }
 
                 resolve();
+                xhr = undefined;
               } else {
                 reject(e);
               }
+            } else if (xhr.readyState == XMLHttpRequest.UNSENT) {
+              reject(new Error("request aborted"));
             }
           },
           false,
@@ -168,43 +195,29 @@
      * Handle upload submit
      * @param  {Object} e Submit event
      */
-    async function upload(e) {
-      e.preventDefault();
+    async function upload(event) {
+      event.preventDefault();
 
       const uploadButton = document.getElementById('upload-button');
       if (uploadButton) {
         replaceContent(uploadButton, generateThrobber('throbber-white'));
       }
 
-      const uploadList = document.getElementById('upload-list');
-      replaceContent(uploadList);
-
-      const values = [].filter
-        .call(event.target, e => e.nodeName.toLowerCase() === 'input')
-        .reduce((acc, cur) => {
-          if (cur.type === 'file') {
-            acc.files = cur.files;
-
-            [].forEach.call(acc.files, file => addUploadItem(uploadList, file));
-          } else {
-            acc[cur.name] = cur.value;
-          }
-
-          return acc;
-        }, {});
+      const values = getFiles(event);
 
       let success = true;
       for (var i = 0; i < values.files.length; i++) {
         const file = values.files[i];
 
         try {
-          await uploadFile(values.method, file)
+          await uploadFile(values.method, file);
           setUploadStatus(file, '✓', 'success');
-        } catch (e) {
+        } catch (err) {
           setUploadStatus(file, 'X', 'danger');
           success = false;
 
-          console.error(e);
+          console.error(err);
+          break;
         }
       }
 
@@ -223,6 +236,20 @@
     function refresh() {
       window.location.href = `${window.location.origin}${window.location.pathname}?redirect`;
     }
+
+    /**
+     * Abort current upload.
+     */
+    function abort(e) {
+      e.preventDefault();
+
+      if (xhr) {
+        xhr.abort();
+        return false;
+      }
+
+      return true;
+    }
   </script>
 
   <div id="upload-modal" class="modal full flex flex-center">
@@ -239,17 +266,15 @@
         </div>
 
         <p class="center">
+          <a href="#" class="button white" onclick="abort(event)">
+            Cancel
+          </a>
+
           <button id="upload-button" type="submit" class="button bg-important">
             Upload
           </button>
         </p>
       </form>
-
-      <p class="center">
-        <a href="#" class="button white">
-          Cancel
-        </a>
-      </p>
     </div>
   </div>
 
