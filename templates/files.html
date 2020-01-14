@@ -69,7 +69,6 @@
       {{ template "modifiers" . }}
 
       <span class="padding-left">{{ len .Content.Files }} element{{ if gt (len .Content.Files) 1 }}s{{ end }}</span>
-
       <span class="flex-grow"></span>
 
       {{ if gt (len .Content.Files) 0 }}
@@ -86,7 +85,7 @@
         {{ else }}
           <li class="file">
         {{ end }}
-          <a class="filelink full center" href="{{ .Name }}{{ if .IsDir }}/{{ if eq $root.Layout "list" }}?d=list{{ end }}{{ else }}?browser{{ end }}" title="{{ .Name }}">
+          <a class="filelink center" href="{{ .Name }}{{ if .IsDir }}/{{ if eq $root.Layout "list" }}?d=list{{ end }}{{ else }}?browser{{ end }}" title="{{ .Name }}">
             {{ if and (eq $root.Layout "grid") (hasThumbnail $root.Request .) }}
               {{ template "async-image" asyncImage . $root.Config.Version }}
             {{ else }}
@@ -99,16 +98,16 @@
             {{ end }}
 
             {{ if $root.Request.CanEdit }}
-              <a href="#delete-modal-{{ sha1 . }}" class="button button-icon file-delete" alt="Delete">
+              <a href="#delete-modal-{{ sha1 . }}" class="button button-icon no-padding file-delete" alt="Delete">
                 <img class="icon" src="/svg/times?fill=silver" alt="Delete">
               </a>
-              <a href="#edit-modal-{{ sha1 . }}" class="button button-icon file-edit" alt="Edit">
+              <a href="#edit-modal-{{ sha1 . }}" class="button button-icon no-padding file-edit" alt="Edit">
                 <img class="icon" src="/svg/pencil-alt?fill=silver" alt="Edit">
               </a>
             {{ end }}
 
             {{ if not .IsDir }}
-              <a href="{{ .Name }}" class="button button-icon file-download" alt="Download" download>
+              <a href="{{ .Name }}" class="button button-icon no-padding file-download" alt="Download" download>
                 <img class="icon" src="/svg/download?fill=silver" alt="Download">
               </a>
             {{ end }}

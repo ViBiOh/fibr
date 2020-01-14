@@ -61,6 +61,10 @@
       text-decoration: underline;
     }
 
+    picture {
+      margin: 0;
+    }
+
     {{ if eq .Layout "browser" }}
       body {
         background-color: var(--white);
@@ -85,30 +89,6 @@
       }
     {{ end }}
 
-    picture {
-      margin: 0;
-    }
-
-    .center {
-      text-align: center;
-    }
-
-    .full {
-      width: 100%;
-    }
-
-    .padding {
-      padding: 1rem;
-    }
-
-    .padding-left {
-      padding-left: 1rem;
-    }
-
-    .no-margin-bottom {
-      margin-bottom: 0;
-    }
-
     .flex {
       display: flex;
     }
@@ -131,7 +111,12 @@
 
     .title {
       margin: 0;
-      padding: 0;
+    }
+
+    @media screen and (max-width: 640px) {
+      .title {
+        font-size: 1.2rem;
+      }
     }
 
     .icon {
@@ -143,16 +128,6 @@
       text-decoration: none;
       vertical-align: middle;
       width: 2rem;
-    }
-
-    .icon-medium {
-      height: 3rem;
-      width: 3rem;
-    }
-
-    .icon-large {
-      height: 4rem;
-      width: 4rem;
     }
 
     .thumbnail {
@@ -172,7 +147,6 @@
       background-color: transparent;
       border: 0;
       margin: 0;
-      padding: 0;
     }
 
     .important {
@@ -228,12 +202,13 @@
       background-color: var(--dark);
       display: flex;
       flex-direction: column;
-      max-height: calc(100% - (1px + 4rem + 1rem + 2rem)*2); /* Icon on the bottom * 2*/
+      max-height: calc(100% - (1px + 4rem + 2rem)*2); /* Icon on the bottom * 2*/
       pointer-events: auto;
     }
 
     @media screen and (max-width: 640px) {
       .modal-content {
+        max-height: calc(100% - (1px + 2rem + 2rem)*2); /* Icon on the bottom * 2*/
         width: 100%;
       }
     }
@@ -241,6 +216,10 @@
     .message {
       margin: 0;
       padding: 1rem 2rem;
+    }
+
+    .content {
+      padding-bottom: 7rem;
     }
 
     #tools {
@@ -251,14 +230,6 @@
       position: fixed;
       right: 0;
       z-index: 10;
-    }
-
-    #tools a {
-      margin: 0.5rem 1rem;
-    }
-
-    .content {
-      padding-bottom: 7rem;
     }
 
     #files {
@@ -446,6 +417,10 @@
         padding: 0.5rem;
       }
 
+      .filelink {
+        width: 100%;
+      }
+
       .filelink .icon {
         height: 6rem;
         width: 6rem;
@@ -494,6 +469,30 @@
         display: block;
       }
     {{ end }}
+
+    .center {
+      text-align: center;
+    }
+
+    .full {
+      width: 100%;
+    }
+
+    .padding {
+      padding: 1rem;
+    }
+
+    .no-padding {
+      padding: 0;
+    }
+
+    .padding-left {
+      padding-left: 1rem;
+    }
+
+    .no-margin-bottom {
+      margin-bottom: 0;
+    }
 
     @media print {
       body::before {

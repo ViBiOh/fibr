@@ -4,9 +4,9 @@
   {{ $root := . }}
 
   <header class="header">
-    <h1 class="title" itemscope itemtype="http://schema.org/BreadcrumbList">
+    <h1 class="title no-padding" itemscope itemtype="http://schema.org/BreadcrumbList">
       <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
-        
+
         <a href="/{{ if .Request.Share }}{{ .Request.Share.ID }}/{{ end }}" itemprop="item">
           <span itemprop="name">{{ if .Request.Share }}{{ .Request.Share.RootName }}{{ else }}{{ .Config.RootName }}{{ end }}</span>
         </a>
