@@ -245,10 +245,12 @@
 
       if (xhr) {
         xhr.abort();
-        return false;
+        xhr = undefined;
+      } else {
+        window.location.hash = '';
       }
 
-      return true;
+      return false;
     }
   </script>
 
