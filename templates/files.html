@@ -1,6 +1,5 @@
 {{ define "files" }}
   {{ template "layout" . }}
-  {{ template "menu" . }}
 
   {{ $root := . }}
 
@@ -65,11 +64,31 @@
   </script>
 
   <div class="content">
-    <div class="flex flex-center">
-      {{ template "modifiers" . }}
+    <div id="menu" class="flex flex-center">
+      <a id="list-display" class="button button-icon" href="?d=list">
+        <img class="icon" src="/svg/list?fill=silver" alt="List">
+      </a>
+      <a id="grid-display" class="button button-icon" href="?d=grid">
+        <img class="icon" src="/svg/th?fill=silver" alt="Grid">
+      </a>
 
       <span class="padding-left">{{ len .Content.Files }} element{{ if gt (len .Content.Files) 1 }}s{{ end }}</span>
       <span class="flex-grow"></span>
+
+      {{ if .Request.CanEdit }}
+        <a href="#upload-modal" class="button button-icon">
+          <img class="icon" src="/svg/cloud-upload-alt?fill=silver" alt="Upload">
+        </a>
+        <a href="#folder-modal" class="button button-icon">
+          <img class="icon" src="/svg/folder?fill=silver" alt="Create folder">
+        </a>
+      {{ end }}
+
+      {{ if .Request.CanShare }}
+        <a href="#share-list" class="button button-icon">
+          <img class="icon" src="/svg/share-alt-square?fill=silver" alt="Share">
+        </a>
+      {{ end }}
 
       {{ if gt (len .Content.Files) 0 }}
         <a class="modifier padding" href="?download" download>
@@ -98,16 +117,16 @@
             {{ end }}
 
             {{ if $root.Request.CanEdit }}
-              <a href="#delete-modal-{{ sha1 . }}" class="button button-icon no-padding file-delete" alt="Delete">
+              <a href="#delete-modal-{{ sha1 . }}" class="button button-icon file-delete" alt="Delete">
                 <img class="icon" src="/svg/times?fill=silver" alt="Delete">
               </a>
-              <a href="#edit-modal-{{ sha1 . }}" class="button button-icon no-padding file-edit" alt="Edit">
+              <a href="#edit-modal-{{ sha1 . }}" class="button button-icon file-edit" alt="Edit">
                 <img class="icon" src="/svg/pencil-alt?fill=silver" alt="Edit">
               </a>
             {{ end }}
 
             {{ if not .IsDir }}
-              <a href="{{ .Name }}" class="button button-icon no-padding file-download" alt="Download" download>
+              <a href="{{ .Name }}" class="button button-icon file-download" alt="Download" download>
                 <img class="icon" src="/svg/download?fill=silver" alt="Download">
               </a>
             {{ end }}

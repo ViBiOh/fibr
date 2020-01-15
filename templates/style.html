@@ -113,21 +113,15 @@
       margin: 0;
     }
 
-    @media screen and (max-width: 640px) {
-      .title {
-        font-size: 1.2rem;
-      }
-    }
-
     .icon {
       background-position: center center;
       background-repeat: no-repeat;
       color: var(--white);
       display: inline-block;
-      height: 2rem;
+      height: 2.4rem;
       text-decoration: none;
       vertical-align: middle;
-      width: 2rem;
+      width: 2.4rem;
     }
 
     .thumbnail {
@@ -145,8 +139,8 @@
 
     .button-icon {
       background-color: transparent;
-      border: 0;
       margin: 0;
+      padding: 1.2rem;
     }
 
     .important {
@@ -182,11 +176,6 @@
 
     .modifier {
       display: inline-block;
-      margin-top: 0.5rem;
-    }
-
-    .modifier:first-of-type {
-      margin-left: 0.5rem;
     }
 
     .modal {
@@ -202,15 +191,8 @@
       background-color: var(--dark);
       display: flex;
       flex-direction: column;
-      max-height: calc(100% - (1px + 4rem + 2rem)*2); /* Icon on the bottom * 2*/
+      max-height: 100%;
       pointer-events: auto;
-    }
-
-    @media screen and (max-width: 640px) {
-      .modal-content {
-        max-height: calc(100% - (1px + 2rem + 2rem)*2); /* Icon on the bottom * 2*/
-        width: 100%;
-      }
     }
 
     .message {
@@ -222,14 +204,9 @@
       padding-bottom: 7rem;
     }
 
-    #tools {
-      background-color: var(--grey);
-      border-left: 1px solid var(--white);
-      border-top: 1px solid var(--white);
-      bottom: 0;
-      position: fixed;
-      right: 0;
-      z-index: 10;
+    #menu {
+      padding-top: 0.5rem;
+      padding-left: 0.5rem;
     }
 
     #files {
@@ -317,11 +294,6 @@
       }
     }
 
-    #list-display,
-    #grid-display {
-      background-color: var(--grey);
-    }
-
     {{ if eq .Layout "list" }}
       #list-display {
         background-color: var(--primary);
@@ -379,7 +351,7 @@
       @media screen and (max-width: 640px) {
         .filelink {
           {{ if .Request.CanEdit }}
-            width: calc(100% - 7rem);
+            width: calc(100% - 10.1rem);
           {{ else }}
             width: calc(100% - 2.5rem);
           {{ end }}
@@ -460,7 +432,7 @@
       }
 
       .file-delete {
-        top: 4rem;
+        top: 5rem;
       }
 
       #files > *:hover .file-edit,
