@@ -107,6 +107,7 @@
       margin-top: 0;
       padding: 0.5rem 1rem;
       text-align: left;
+      width: 100vw;
     }
 
     .title {
@@ -235,10 +236,7 @@
 
     .upload-name {
       flex: 1 1;
-      overflow: hidden;
       text-align: left;
-      text-overflow: ellipsis;
-      white-space: nowrap;
     }
 
     .upload-status {
@@ -307,6 +305,12 @@
         margin: 0.5rem 1rem 0;
       }
 
+      @media screen and (min-width: 640px) {
+        .file .button-icon {
+          padding: 0;
+        }
+      }
+
       .filelink {
         display: inline-flex;
         height: 2.5rem;
@@ -316,10 +320,7 @@
       .filename {
         display: inline-block;
         flex: 1 1;
-        overflow: hidden;
         text-align: left;
-        text-overflow: ellipsis;
-        white-space: nowrap;
       }
 
       .filelink .icon {
@@ -407,10 +408,7 @@
       .filename {
         display: block;
         margin-top: 1rem;
-        overflow: hidden;
         text-align: center;
-        text-overflow: ellipsis;
-        white-space: nowrap;
       }
 
       .file-edit,
@@ -451,6 +449,10 @@
       width: 100%;
     }
 
+    .small {
+      font-size: 1.6rem;
+    }
+
     .padding {
       padding: 1rem;
     }
@@ -463,8 +465,18 @@
       padding-left: 1rem;
     }
 
+    .no-margin {
+      margin: 0;
+    }
+
     .no-margin-bottom {
       margin-bottom: 0;
+    }
+
+    .ellipsis {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     @media screen and (max-width: 374px) {

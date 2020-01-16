@@ -113,7 +113,7 @@
               {{ else }}
                 <img class="icon" src="/svg/{{ iconFromExtension . }}?fill=silver" alt="File">
               {{ end }}
-              <span class="filename">{{ .Name }}</span>
+              <span class="filename ellipsis">{{ .Name }}</span>
             {{ end }}
 
             {{ if $root.Request.CanEdit }}

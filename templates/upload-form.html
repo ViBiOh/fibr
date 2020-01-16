@@ -72,7 +72,7 @@
       item.appendChild(itemWrapper);
 
       const filename = document.createElement('div');
-      filename.classList.add('upload-name');
+      filename.classList.add('upload-name', 'ellipsis');
       filename.innerHTML = file.name;
       itemWrapper.appendChild(filename);
 

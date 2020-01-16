@@ -11,6 +11,7 @@
           <span itemprop="name">{{ if .Request.Share }}{{ .Request.Share.RootName }}{{ else }}{{ .Config.RootName }}{{ end }}</span>
         </a>
       </span>
+
       {{ range $index, $path := .Content.Paths }}
         {{ if or (not $root.Request.Share) (ne $index 0) }}
           <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
@@ -20,6 +21,10 @@
             </a>
           </span>
         {{ end }}
+      {{ end }}
+
+      {{ if .Content.File }}
+        <h2 class="small bg-grey no-margin full ellipsis">↳ <a href="{{ .Content.File.Name }}">{{ .Content.File.Name }}</a></h2>
       {{ end }}
     </h1>
   </header>
