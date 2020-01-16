@@ -1,7 +1,6 @@
 package crud
 
 import (
-	"fmt"
 	"net/http"
 	"path"
 
@@ -16,6 +15,7 @@ func (a *app) Browser(w http.ResponseWriter, request provider.Request, file prov
 		next     *provider.StorageItem
 	)
 	pathParts := getPathParts(request.GetURI(""))
+	breadcrumbs := pathParts[:len(pathParts)-1]
 
 	if files, err := a.storage.List(path.Dir(file.Pathname)); err != nil {
 		logger.Error("unable to list neighbors files: %s", err)
@@ -24,9 +24,9 @@ func (a *app) Browser(w http.ResponseWriter, request provider.Request, file prov
 	}
 
 	content := map[string]interface{}{
-		"Paths":    pathParts,
+		"Paths":    breadcrumbs,
 		"File":     file,
-		"Parent":   fmt.Sprintf("/%s", path.Join(pathParts[:len(pathParts)-1]...)),
+		"Parent":   path.Join(breadcrumbs...),
 		"Previous": previous,
 		"Next":     next,
 	}

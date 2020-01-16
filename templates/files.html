@@ -72,7 +72,7 @@
         <img class="icon" src="/svg/th?fill=silver" alt="Grid">
       </a>
 
-      <span class="padding-left">{{ len .Content.Files }} element{{ if gt (len .Content.Files) 1 }}s{{ end }}</span>
+      <span class="padding-left">{{ len .Content.Files }}<span class="hide-xs"> element{{ if gt (len .Content.Files) 1 }}s{{ end }}</span></span>
       <span class="flex-grow"></span>
 
       {{ if .Request.CanEdit }}
