@@ -6,18 +6,13 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
-	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v3/pkg/logger"
 )
 
-const (
-	defaultMaxMemory = 512 << 20 // 512MB
-)
-
-func (a *app) saveUploadedFile(request provider.Request, uploadedFile io.ReadCloser, uploadedFileHeader *multipart.FileHeader) (string, error) {
-	filename, err := provider.SanitizeName(uploadedFileHeader.Filename, true)
+func (a *app) saveUploadedFile(request provider.Request, part *multipart.Part) (string, error) {
+	filename, err := provider.SanitizeName(part.FileName(), true)
 	if err != nil {
 		return "", err
 	}
@@ -38,7 +33,7 @@ func (a *app) saveUploadedFile(request provider.Request, uploadedFile io.ReadClo
 	}
 
 	copyBuffer := make([]byte, 32*1024)
-	if _, err = io.CopyBuffer(hostFile, uploadedFile, copyBuffer); err != nil {
+	if _, err = io.CopyBuffer(hostFile, part, copyBuffer); err != nil {
 		return "", err
 	}
 
@@ -53,52 +48,22 @@ func (a *app) saveUploadedFile(request provider.Request, uploadedFile io.ReadClo
 }
 
 // Upload saves form files to filesystem
-func (a *app) Upload(w http.ResponseWriter, r *http.Request, request provider.Request) {
+func (a *app) Upload(w http.ResponseWriter, r *http.Request, request provider.Request, part *multipart.Part) {
 	if !request.CanEdit {
 		a.renderer.Error(w, provider.NewError(http.StatusForbidden, ErrNotAuthorized))
 		return
 	}
 
-	if err := r.ParseMultipartForm(defaultMaxMemory); err != nil {
-		a.renderer.Error(w, provider.NewError(http.StatusBadRequest, err))
-		return
-	}
-
-	if r.MultipartForm.File == nil || len(r.MultipartForm.File["files[]"]) == 0 {
+	if part == nil {
 		a.renderer.Error(w, provider.NewError(http.StatusBadRequest, errors.New("no file provided for save")))
 		return
 	}
 
-	filenames := make([]string, len(r.MultipartForm.File["files[]"]))
-
-	for index, file := range r.MultipartForm.File["files[]"] {
-		uploadedFile, err := file.Open()
-		if uploadedFile != nil {
-			defer func() {
-				if err := uploadedFile.Close(); err != nil {
-					logger.Error("%s", err)
-				}
-			}()
-		}
-
-		if err != nil {
-			a.renderer.Error(w, provider.NewError(http.StatusBadRequest, err))
-			return
-		}
-
-		filename, err := a.saveUploadedFile(request, uploadedFile, file)
-		if err != nil {
-			a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))
-			return
-		}
-
-		filenames[index] = filename
+	filename, err := a.saveUploadedFile(request, part)
+	if err != nil {
+		a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))
+		return
 	}
 
-	message := fmt.Sprintf("File %s successfully uploaded", filenames[0])
-	if len(filenames) > 1 {
-		message = fmt.Sprintf("Files %s successfully uploaded", strings.Join(filenames, ", "))
-	}
-
-	a.List(w, request, &provider.Message{Level: "success", Content: message})
+	a.List(w, request, &provider.Message{Level: "success", Content: fmt.Sprintf("File %s successfully uploaded", filename)})
 }

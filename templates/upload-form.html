@@ -152,7 +152,7 @@
 
       const formData = new FormData();
       formData.append('method', method);
-      formData.append('files[]', file);
+      formData.append('file', file);
 
       return new Promise((resolve, reject) => {
         xhr = new XMLHttpRequest();
@@ -252,6 +252,16 @@
 
       return false;
     }
+
+    window.addEventListener(
+      'load',
+      () => {
+        const fileInput = document.getElementById("file");
+        if (fileInput) {
+          fileInput.multiple = true;
+        }
+      }
+    );
   </script>
 
   <div id="upload-modal" class="modal full flex flex-center">
@@ -261,7 +271,7 @@
       <form id="upload-form" method="post" enctype="multipart/form-data" action="#" onSubmit="return upload(event)">
         <input type="hidden" name="method" value="POST" />
         <p class="center">
-          <input id="file" class="full" type="file" name="files[]" multiple />
+          <input id="file" class="full" type="file" name="file" />
         </p>
 
         <div id="upload-list" class="full">

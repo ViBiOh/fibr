@@ -3,6 +3,7 @@ package crud
 import (
 	"errors"
 	"flag"
+	"mime/multipart"
 	"net/http"
 	"strings"
 	"sync"
@@ -30,7 +31,7 @@ type App interface {
 	Get(http.ResponseWriter, *http.Request, provider.Request)
 	Post(http.ResponseWriter, *http.Request, provider.Request)
 	Create(http.ResponseWriter, *http.Request, provider.Request)
-	Upload(http.ResponseWriter, *http.Request, provider.Request)
+	Upload(http.ResponseWriter, *http.Request, provider.Request, *multipart.Part)
 	Rename(http.ResponseWriter, *http.Request, provider.Request)
 	Delete(http.ResponseWriter, *http.Request, provider.Request)
 
