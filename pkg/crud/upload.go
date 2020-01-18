@@ -65,5 +65,15 @@ func (a *app) Upload(w http.ResponseWriter, r *http.Request, request provider.Re
 		return
 	}
 
-	a.List(w, request, &provider.Message{Level: "success", Content: fmt.Sprintf("File %s successfully uploaded", filename)})
+	content := fmt.Sprintf("File %s successfully uploaded", filename)
+
+	if r.Header.Get("Accept") == "text/plain" {
+		w.WriteHeader(http.StatusOK)
+		if _, err := w.Write([]byte(content)); err != nil {
+			logger.Error("unable to write upload message: %s", err)
+		}
+		return
+	}
+
+	a.List(w, request, &provider.Message{Level: "success", Content: content})
 }

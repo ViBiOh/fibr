@@ -26,17 +26,14 @@ func (a *app) Rename(w http.ResponseWriter, r *http.Request, request provider.Re
 		return
 	}
 
-	oldPath, err := provider.SanitizeName(request.GetFilepath(oldName), false)
+	newSafeName, err := provider.SanitizeName(newName, false)
 	if err != nil {
 		a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
 
-	newPath, err := provider.SanitizeName(request.GetFilepath(newName), false)
-	if err != nil {
-		a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))
-		return
-	}
+	oldPath := request.GetFilepath(oldName)
+	newPath := request.GetFilepath(newSafeName)
 
 	if _, err := a.storage.Info(newPath); err == nil {
 		a.renderer.Error(w, provider.NewError(http.StatusBadRequest, err))
@@ -69,5 +66,5 @@ func (a *app) Rename(w http.ResponseWriter, r *http.Request, request provider.Re
 
 	go a.renameThumbnail(oldInfo, newInfo)
 
-	a.List(w, request, &provider.Message{Level: "success", Content: fmt.Sprintf("%s successfully renamed to %s", oldInfo.Name, newName)})
+	a.List(w, request, &provider.Message{Level: "success", Content: fmt.Sprintf("%s successfully renamed to %s", oldInfo.Name, newInfo.Name)})
 }

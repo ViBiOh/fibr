@@ -169,6 +169,7 @@
           'readystatechange',
           e => {
             if (xhr.readyState == XMLHttpRequest.DONE) {
+
               if (xhr.status >= 200 && xhr.status < 400) {
                 if (progress) {
                   progress.value = 100;
@@ -178,15 +179,18 @@
                 xhr = undefined;
               } else {
                 reject(e);
+                xhr = undefined;
               }
             } else if (xhr.readyState == XMLHttpRequest.UNSENT) {
               reject(new Error("request aborted"));
+              xhr = undefined;
             }
           },
           false,
         );
 
         xhr.open('POST', '', true);
+        xhr.setRequestHeader('Accept', 'text/plain');
         xhr.send(formData);
       });
     }

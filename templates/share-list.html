@@ -39,7 +39,9 @@
                         <input type="hidden" name="type" value="share" />
                         <input type="hidden" name="method" value="DELETE" />
                         <input type="hidden" name="id" value="{{ .ID }}" />
-                        <button type="submit" onclick="javascript:return confirm('Are you sure you want to delete share for {{ .Path }}?')" class="button-icon icon icon-times" alt="Delete"></button>
+                        <button type="submit" onclick="javascript:return confirm('Are you sure you want to delete share for {{ .Path }}?')" class="button button-icon" alt="Delete">
+                          <img class="icon" src="/svg/times?fill=silver" alt="Delete">
+                        </button>
                       </form>
                     </td>
                 </tr>
