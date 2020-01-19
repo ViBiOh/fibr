@@ -2,10 +2,12 @@ package provider
 
 import (
 	"fmt"
+	"io"
 	"regexp"
 	"strings"
 	"unicode"
 
+	"github.com/ViBiOh/httputils/v3/pkg/logger"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
 )
@@ -38,6 +40,13 @@ func SanitizeName(name string, removeSlash bool) (string, error) {
 	}
 
 	return sanitized, nil
+}
+
+// SafeWrite writes content to  writer with error handling
+func SafeWrite(w io.Writer, content string) {
+	if _, err := io.WriteString(w, content); err != nil {
+		logger.Error("unable to write content: %s", err)
+	}
 }
 
 // ErrNotExist create a NotExist error

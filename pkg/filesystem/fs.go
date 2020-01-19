@@ -173,7 +173,7 @@ func (a app) Store(pathname string, content io.ReadCloser) error {
 	if storageFile != nil {
 		defer func() {
 			if err := storageFile.Close(); err != nil {
-				logger.Error("%s", err)
+				logger.Error("unable to close stored file: %s", err)
 			}
 		}()
 	}

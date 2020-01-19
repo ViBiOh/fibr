@@ -106,7 +106,7 @@ func (a app) Start() {
 		time.Sleep(waitTimeout)
 
 		if err := a.generateThumbnail(item); err != nil {
-			logger.Error("%s", err)
+			logger.Error("unable to generate thumbnail: %s", err)
 		} else {
 			logger.Info("Thumbnail generated for %s", item.Pathname)
 		}
@@ -143,7 +143,7 @@ func (a app) List(w http.ResponseWriter, r *http.Request, item provider.StorageI
 	w.WriteHeader(http.StatusOK)
 
 	commaNeeded := false
-	safeWrite(w, "{")
+	provider.SafeWrite(w, "{")
 
 	for _, item := range items {
 		if item.IsDir {
@@ -166,16 +166,16 @@ func (a app) List(w http.ResponseWriter, r *http.Request, item provider.StorageI
 		}
 
 		if commaNeeded {
-			safeWrite(w, ",")
+			provider.SafeWrite(w, ",")
 		} else {
 			commaNeeded = true
 		}
 
-		safeWrite(w, fmt.Sprintf(`"%s":`, sha.Sha1(item.Name)))
-		safeWrite(w, fmt.Sprintf(`"%s"`, base64.StdEncoding.EncodeToString(content)))
+		provider.SafeWrite(w, fmt.Sprintf(`"%s":`, sha.Sha1(item.Name)))
+		provider.SafeWrite(w, fmt.Sprintf(`"%s"`, base64.StdEncoding.EncodeToString(content)))
 	}
 
-	safeWrite(w, "}")
+	provider.SafeWrite(w, "}")
 }
 
 func (a app) generateThumbnail(item provider.StorageItem) error {
@@ -229,7 +229,7 @@ func (a app) Generate() {
 	})
 
 	if err != nil {
-		logger.Error("%s", err)
+		logger.Error("unable to walk dir: %s", err)
 	}
 }
 

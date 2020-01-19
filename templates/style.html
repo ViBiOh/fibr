@@ -21,7 +21,6 @@
       -webkit-overflow-scrolling: touch;
       background-color: var(--dark);
       height: 100vh;
-      margin: 0;
     }
 
     body,
@@ -59,10 +58,6 @@
     a:hover {
       color: var(--primary);
       text-decoration: underline;
-    }
-
-    picture {
-      margin: 0;
     }
 
     {{ if eq .Layout "browser" }}
@@ -193,7 +188,6 @@
     }
 
     .message {
-      margin: 0;
       padding: 1rem 2rem;
     }
 
@@ -208,8 +202,6 @@
 
     #files {
       list-style: none;
-      margin: 0;
-      padding: 0;
     }
 
     #upload-form {
@@ -296,7 +288,6 @@
       .file {
         align-items: center;
         display: flex;
-        flex-wrap: wrap;
         margin: 0.5rem 1rem 0;
       }
 
@@ -347,11 +338,8 @@
 
       @media screen and (max-width: 640px) {
         .filelink {
-          {{ if .Request.CanEdit }}
-            width: calc(100% - 15.4rem);
-          {{ else }}
-            width: calc(100% - 5.4rem);
-          {{ end }}
+          flex: 1 1;
+          width: auto;
         }
 
         .file-edit,

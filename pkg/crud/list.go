@@ -61,7 +61,7 @@ func (a *app) Download(w http.ResponseWriter, request provider.Request) {
 	zipWriter := zip.NewWriter(w)
 	defer func() {
 		if err := zipWriter.Close(); err != nil {
-			logger.Error("%s", err)
+			logger.Error("unable to close zip: %s", err)
 		}
 	}()
 

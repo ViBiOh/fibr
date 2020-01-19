@@ -14,6 +14,7 @@ func (a *app) Browser(w http.ResponseWriter, request provider.Request, file prov
 		previous *provider.StorageItem
 		next     *provider.StorageItem
 	)
+
 	pathParts := getPathParts(request.GetURI(""))
 	breadcrumbs := pathParts[:len(pathParts)-1]
 

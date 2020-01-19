@@ -72,7 +72,7 @@
         <img class="icon" src="/svg/th?fill=silver" alt="Grid">
       </a>
 
-      <span class="padding-left">{{ len .Content.Files }}<span class="hide-xs"> element{{ if gt (len .Content.Files) 1 }}s{{ end }}</span></span>
+      <span class="padding-left">{{ len .Content.Files }}<span {{ if .Request.CanEdit }}class="hide-xs"{{ end }}> element{{ if gt (len .Content.Files) 1 }}s{{ end }}</span></span>
       <span class="flex-grow"></span>
 
       {{ if .Request.CanEdit }}
@@ -97,14 +97,14 @@
       {{ end }}
     </div>
 
-    <ul id="files">
+    <ul id="files" class="no-margin no-padding">
       {{ range .Content.Files }}
         {{ if and (.IsImage) (eq $root.Layout "grid") }}
           <li class="image">
         {{ else }}
           <li class="file">
         {{ end }}
-          <a class="filelink center" href="{{ .Name }}{{ if .IsDir }}/{{ if eq $root.Layout "list" }}?d=list{{ end }}{{ else }}?browser{{ end }}" title="{{ .Name }}">
+          <a class="filelink center ellipsis" href="{{ .Name }}{{ if .IsDir }}/{{ if eq $root.Layout "list" }}?d=list{{ end }}{{ else }}?browser{{ end }}" title="{{ .Name }}">
             {{ if and (eq $root.Layout "grid") (hasThumbnail $root.Request .) }}
               {{ template "async-image" asyncImage . $root.Config.Version }}
             {{ else }}

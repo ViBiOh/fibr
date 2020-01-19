@@ -23,7 +23,7 @@ func (a *app) saveUploadedFile(request provider.Request, part *multipart.Part) (
 	if hostFile != nil {
 		defer func() {
 			if err := hostFile.Close(); err != nil {
-				logger.Error("%s", err)
+				logger.Error("unable to close host file: %s", err)
 			}
 		}()
 	}
@@ -69,9 +69,8 @@ func (a *app) Upload(w http.ResponseWriter, r *http.Request, request provider.Re
 
 	if r.Header.Get("Accept") == "text/plain" {
 		w.WriteHeader(http.StatusOK)
-		if _, err := w.Write([]byte(content)); err != nil {
-			logger.Error("unable to write upload message: %s", err)
-		}
+		provider.SafeWrite(w, content)
+
 		return
 	}
 
