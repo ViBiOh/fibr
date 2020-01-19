@@ -3,6 +3,7 @@ package crud
 import (
 	"crypto/rand"
 	"fmt"
+	"html/template"
 	"net/http"
 	"path"
 	"strconv"
@@ -77,7 +78,7 @@ func (a *app) CreateShare(w http.ResponseWriter, r *http.Request, request provid
 
 	a.GetWithMessage(w, r, request, &provider.Message{
 		Level:   "success",
-		Content: fmt.Sprintf("Share successfully created with ID: %s", id),
+		Content: template.HTML(fmt.Sprintf("Share successfully created with ID: <a href=\"/%s\" alt=\"New share URL\">%s</a>", id, id)),
 	})
 }
 

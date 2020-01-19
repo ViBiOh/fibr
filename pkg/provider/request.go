@@ -115,7 +115,7 @@ type Seo struct {
 // Message rendered to user
 type Message struct {
 	Level   string
-	Content string
+	Content interface{}
 }
 
 // Error rendered to user
