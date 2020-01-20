@@ -4,8 +4,8 @@
      * Remove hash from URL
      */
     function clearHash() {
-      {{ if .Content.Parent }}
-          window.location.href = '{{ .Content.Parent }}';
+      {{ if eq .Layout "browser" }}
+        window.location.href = '/{{ .Content.Parent }}';
       {{ else }}
         const previousHash = document.location.hash;
         document.location.hash = '';
