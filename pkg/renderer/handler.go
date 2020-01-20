@@ -11,14 +11,14 @@ import (
 )
 
 // Error render error page with given status
-func (a app) Error(w http.ResponseWriter, err *provider.Error) {
+func (a app) Error(w http.ResponseWriter, request provider.Request, err *provider.Error) {
 	logger.Error("%s", err.Err)
 
 	if err.Status == http.StatusUnauthorized {
 		w.Header().Add("WWW-Authenticate", "Basic realm=\"Password required\" charset=\"UTF-8\"")
 	}
 
-	page := a.newPageBuilder().Error(err).Build()
+	page := a.newPageBuilder().Request(request).Error(err).Build()
 
 	if err := templates.WriteHTMLTemplate(a.tpl.Lookup("error"), w, page, err.Status); err != nil {
 		httperror.InternalServerError(w, err)

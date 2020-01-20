@@ -27,7 +27,7 @@ func uuid() (string, error) {
 // CreateShare create a share for given URL
 func (a *app) CreateShare(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !request.CanShare {
-		a.renderer.Error(w, provider.NewError(http.StatusForbidden, ErrNotAuthorized))
+		a.renderer.Error(w, request, provider.NewError(http.StatusForbidden, ErrNotAuthorized))
 		return
 	}
 
@@ -37,7 +37,7 @@ func (a *app) CreateShare(w http.ResponseWriter, r *http.Request, request provid
 	if editValue := strings.TrimSpace(r.FormValue("edit")); editValue != "" {
 		edit, err = strconv.ParseBool(editValue)
 		if err != nil {
-			a.renderer.Error(w, provider.NewError(http.StatusBadRequest, err))
+			a.renderer.Error(w, request, provider.NewError(http.StatusBadRequest, err))
 			return
 		}
 	}
@@ -46,7 +46,7 @@ func (a *app) CreateShare(w http.ResponseWriter, r *http.Request, request provid
 	if passwordValue := strings.TrimSpace(r.FormValue("password")); passwordValue != "" {
 		hash, err := bcrypt.GenerateFromPassword([]byte(passwordValue), 12)
 		if err != nil {
-			a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))
+			a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
 			return
 		}
 
@@ -55,7 +55,7 @@ func (a *app) CreateShare(w http.ResponseWriter, r *http.Request, request provid
 
 	uuid, err := uuid()
 	if err != nil {
-		a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))
+		a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
 	id := sha.Sha1(uuid)[:8]
@@ -72,7 +72,7 @@ func (a *app) CreateShare(w http.ResponseWriter, r *http.Request, request provid
 	})
 
 	if err = a.saveMetadata(); err != nil {
-		a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))
+		a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
 
@@ -85,7 +85,7 @@ func (a *app) CreateShare(w http.ResponseWriter, r *http.Request, request provid
 // DeleteShare delete a share from given ID
 func (a *app) DeleteShare(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !request.CanShare {
-		a.renderer.Error(w, provider.NewError(http.StatusForbidden, ErrNotAuthorized))
+		a.renderer.Error(w, request, provider.NewError(http.StatusForbidden, ErrNotAuthorized))
 		return
 	}
 
@@ -102,7 +102,7 @@ func (a *app) DeleteShare(w http.ResponseWriter, r *http.Request, request provid
 	}
 
 	if err := a.saveMetadata(); err != nil {
-		a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))
+		a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
 

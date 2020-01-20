@@ -40,7 +40,7 @@
      * @return {Promise<String>}      Promise that will resolve the sha1 string
      */
     async function sha1(data) {
-      const buffer = await crypto.subtle.digest('SHA-1', new TextEncoder('utf-8').encode(data))
+      const buffer = await crypto.subtle.digest('SHA-1', new TextEncoder('utf-8').encode(data));
       return bufferToHex(buffer);
     }
 
@@ -169,7 +169,6 @@
           'readystatechange',
           e => {
             if (xhr.readyState == XMLHttpRequest.DONE) {
-
               if (xhr.status >= 200 && xhr.status < 400) {
                 if (progress) {
                   progress.value = 100;
@@ -182,7 +181,7 @@
                 xhr = undefined;
               }
             } else if (xhr.readyState == XMLHttpRequest.UNSENT) {
-              reject(new Error("request aborted"));
+              reject(new Error('request aborted'));
               xhr = undefined;
             }
           },
@@ -235,13 +234,6 @@
     }
 
     /**
-     * Refresh page by redirect.
-     */
-    function refresh() {
-      window.location.href = `${window.location.origin}${window.location.pathname}?redirect`;
-    }
-
-    /**
      * Abort current upload.
      */
     function abort(e) {
@@ -257,38 +249,35 @@
       return false;
     }
 
-    window.addEventListener(
-      'load',
-      () => {
-        const fileInput = document.getElementById("file");
-        if (fileInput) {
-          fileInput.multiple = true;
-        }
+    window.addEventListener('load', () => {
+      const fileInput = document.getElementById('file');
+      if (fileInput) {
+        fileInput.multiple = true;
       }
-    );
+    });
   </script>
 
   <div id="upload-modal" class="modal full flex flex-center">
     <div class="modal-content">
       <h2 class="header">Upload files</h2>
 
-      <form id="upload-form" method="post" enctype="multipart/form-data" action="#" onSubmit="return upload(event)">
+      <form
+        id="upload-form"
+        method="post"
+        enctype="multipart/form-data"
+        action="#"
+        onSubmit="return upload(event)"
+      >
         <input type="hidden" name="method" value="POST" />
         <p class="center">
           <input id="file" class="full" type="file" name="file" />
         </p>
 
-        <div id="upload-list" class="full">
-        </div>
+        <div id="upload-list" class="full"></div>
 
         <p class="center">
-          <a href="#" class="button white" onclick="abort(event)">
-            Cancel
-          </a>
-
-          <button id="upload-button" type="submit" class="button bg-important">
-            Upload
-          </button>
+          <a href="#" class="button white" onclick="abort(event)">Cancel</a>
+          <button id="upload-button" type="submit" class="button bg-important">Upload</button>
         </p>
       </form>
     </div>
@@ -299,9 +288,7 @@
       <h2 class="header success padding">Upload success ✓</h2>
 
       <p class="center">
-        <a href="#" class="button bg-grey" onclick="refresh()">
-          Close
-        </a>
+        <a href="?redirect" class="button bg-grey">Close</a>
       </p>
     </div>
   </div>

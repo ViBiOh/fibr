@@ -1,9 +1,9 @@
 {{ define "error" }}
-  {{ template "header" . }}
+  {{ template "head" . }}
 
   <header class="header center">
     <h1 class="no-margin no-padding">
-      <a href="/">fibr</a>
+      <a href="/{{ if .Request.Share }}{{ .Request.Share.ID }}/{{ end }}">{{ if .Request.Share }}{{ .Request.Share.RootName }}{{ else }}fibr{{ end }}</a>
     </h1>
   </header>
 

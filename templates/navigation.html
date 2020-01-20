@@ -1,9 +1,9 @@
 {{ define "navigation" }}
   <script>
     /**
-     * Remove hash from URL
+     * Go back from state.
      */
-    function clearHash() {
+    function goBack() {
       {{ if eq .Layout "browser" }}
         window.location.href = '/{{ .Content.Parent }}';
       {{ else }}
@@ -34,7 +34,6 @@
       {{ end }}
     }
 
-
     /**
      * Handle Previous/next.
      */
@@ -49,9 +48,8 @@
           break;
 
         case 'Escape':
-          clearHash();
+          goBack();
           break;
-
       }
     };
   </script>

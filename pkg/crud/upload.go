@@ -50,18 +50,18 @@ func (a *app) saveUploadedFile(request provider.Request, part *multipart.Part) (
 // Upload saves form files to filesystem
 func (a *app) Upload(w http.ResponseWriter, r *http.Request, request provider.Request, part *multipart.Part) {
 	if !request.CanEdit {
-		a.renderer.Error(w, provider.NewError(http.StatusForbidden, ErrNotAuthorized))
+		a.renderer.Error(w, request, provider.NewError(http.StatusForbidden, ErrNotAuthorized))
 		return
 	}
 
 	if part == nil {
-		a.renderer.Error(w, provider.NewError(http.StatusBadRequest, errors.New("no file provided for save")))
+		a.renderer.Error(w, request, provider.NewError(http.StatusBadRequest, errors.New("no file provided for save")))
 		return
 	}
 
 	filename, err := a.saveUploadedFile(request, part)
 	if err != nil {
-		a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))
+		a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
 

@@ -29,7 +29,7 @@ func (a *app) getCoverImage(files []provider.StorageItem) *provider.StorageItem 
 func (a *app) List(w http.ResponseWriter, request provider.Request, message *provider.Message) {
 	files, err := a.storage.List(request.GetFilepath(""))
 	if err != nil {
-		a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))
+		a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
 
@@ -54,7 +54,7 @@ func (a *app) List(w http.ResponseWriter, request provider.Request, message *pro
 func (a *app) Download(w http.ResponseWriter, request provider.Request) {
 	files, err := a.storage.List(request.GetFilepath(""))
 	if err != nil {
-		a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))
+		a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
 
@@ -71,7 +71,7 @@ func (a *app) Download(w http.ResponseWriter, request provider.Request) {
 		}
 
 		if err = a.addFileToZip(zipWriter, file); err != nil {
-			a.renderer.Error(w, provider.NewError(http.StatusInternalServerError, err))
+			a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
 			return
 		}
 	}

@@ -115,12 +115,12 @@ func (a app) handleRequest(w http.ResponseWriter, r *http.Request, request provi
 func (a app) Handler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !isMethodAllowed(r) {
-			a.renderer.Error(w, provider.NewError(http.StatusMethodNotAllowed, errors.New("you lack of method for calling me")))
+			a.renderer.Error(w, provider.Request{}, provider.NewError(http.StatusMethodNotAllowed, errors.New("you lack of method for calling me")))
 			return
 		}
 
 		if strings.Contains(r.URL.Path, "..") {
-			a.renderer.Error(w, provider.NewError(http.StatusForbidden, errors.New("you can't speak to my parent")))
+			a.renderer.Error(w, provider.Request{}, provider.NewError(http.StatusForbidden, errors.New("you can't speak to my parent")))
 			return
 		}
 
@@ -135,7 +135,7 @@ func (a app) Handler() http.Handler {
 
 		request, err := a.parseRequest(r)
 		if err != nil {
-			a.renderer.Error(w, err)
+			a.renderer.Error(w, request, err)
 			return
 		}
 

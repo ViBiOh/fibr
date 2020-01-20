@@ -31,11 +31,11 @@ var (
 
 // Renderer interface for return rich content to user
 type Renderer interface {
-	Error(http.ResponseWriter, *Error)
-	Sitemap(http.ResponseWriter)
-	SVG(http.ResponseWriter, string, string)
 	Directory(http.ResponseWriter, Request, map[string]interface{}, *Message)
 	File(http.ResponseWriter, Request, map[string]interface{}, *Message)
+	Error(http.ResponseWriter, Request, *Error)
+	Sitemap(http.ResponseWriter)
+	SVG(http.ResponseWriter, string, string)
 }
 
 // Storage describe action on a storage provider
