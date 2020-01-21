@@ -20,7 +20,7 @@ func getCtx(ctx context.Context) (context.Context, context.CancelFunc) {
 
 // CanHaveThumbnail determine if thumbnail can be generated for given pathname
 func CanHaveThumbnail(item provider.StorageItem) bool {
-	return item.IsImage() || item.IsPdf()
+	return item.IsImage() || item.IsPdf() || item.IsVideo()
 }
 
 func getThumbnailPath(item provider.StorageItem) string {

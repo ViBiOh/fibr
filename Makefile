@@ -9,13 +9,16 @@ APP_NAME = fibr
 PACKAGES ?= ./...
 GO_FILES ?= $(shell find . -name "*.go")
 
-BINARY_PATH=bin/$(APP_NAME)
+MAIN_SOURCE = cmd/fibr/fibr.go
+MAIN_BINARY=bin/$(APP_NAME)
 
-MAIN_SOURCE = cmd/fibr.go
 MAIN_RUNNER = go run $(MAIN_SOURCE)
 ifeq ($(DEBUG), true)
 	MAIN_RUNNER = dlv debug $(MAIN_SOURCE) --
 endif
+
+VITH_SOURCE = cmd/vith/vith.go
+VITH_BINARY=bin/vith
 
 .DEFAULT_GOAL := app
 
@@ -73,7 +76,8 @@ test:
 ## build: Build binary
 .PHONY: build
 build:
-	CGO_ENABLED=0 go build -ldflags="-s -w" -installsuffix nocgo -o $(BINARY_PATH) $(MAIN_SOURCE)
+	CGO_ENABLED=0 go build -ldflags="-s -w" -installsuffix nocgo -o $(MAIN_BINARY) $(MAIN_SOURCE)
+	CGO_ENABLED=0 go build -ldflags="-s -w" -installsuffix nocgo -o $(VITH_BINARY) $(VITH_SOURCE)
 
 ## run: Run app
 .PHONY: run

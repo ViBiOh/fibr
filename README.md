@@ -17,6 +17,8 @@ go get github.com/ViBiOh/fibr/cmd
 
 ## Usage
 
+### File Browser (fibr)
+
 ```bash
 Usage of fibr:
   -address string
@@ -49,10 +51,32 @@ Usage of fibr:
         [fibr] Public URL {FIBR_PUBLIC_URL} (default "https://fibr.vibioh.fr")
   -thumbnailImaginaryURL string
         [thumbnail] Imaginary URL {FIBR_THUMBNAIL_IMAGINARY_URL} (default "http://image:9000")
+  -thumbnailVideo Thumbnail URL string
+        [thumbnail] Video Thumbnail URL {FIBR_THUMBNAIL_VIDEO _THUMBNAIL _URL} (default "http://video:1080")
   -url string
         [alcotest] URL to check {FIBR_URL}
   -userAgent string
         [alcotest] User-Agent for check {FIBR_USER_AGENT} (default "Alcotest")
   -version string
         [fibr] Version (used mainly as a cache-buster) {FIBR_VERSION}
+```
+
+### Video Thumbnail (vith)
+
+```bash
+Usage of vith:
+  -address string
+        [http] Listen address {VITH_ADDRESS}
+  -cert string
+        [http] Certificate file {VITH_CERT}
+  -key string
+        [http] Key file {VITH_KEY}
+  -okStatus int
+        [http] Healthy HTTP Status code {VITH_OK_STATUS} (default 204)
+  -port uint
+        [http] Listen port {VITH_PORT} (default 1080)
+  -url string
+        [alcotest] URL to check {VITH_URL}
+  -userAgent string
+        [alcotest] User-Agent for check {VITH_USER_AGENT} (default "Alcotest")
 ```
