@@ -3,7 +3,7 @@ FROM golang:1.13 as builder
 WORKDIR /app
 COPY . .
 
-RUN make vith \
+RUN make \
  && git diff -- *.go \
  && git diff --quiet -- *.go
 
