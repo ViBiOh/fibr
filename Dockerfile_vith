@@ -27,5 +27,7 @@ ENTRYPOINT [ "/vith" ]
 ARG APP_VERSION
 ENV VERSION=${APP_VERSION}
 
+VOLUME /tmp
+
 COPY --from=fetcher /app/cacert.pem /etc/ssl/certs/ca-certificates.crt
 COPY --from=builder /app/bin/vith /vith

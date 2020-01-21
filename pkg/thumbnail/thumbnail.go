@@ -115,7 +115,7 @@ func (a app) Start() {
 		time.Sleep(waitTimeout)
 
 		if err := a.generateThumbnail(item); err != nil {
-			logger.Error("unable to generate thumbnail: %s", err)
+			logger.Error("unable to generate thumbnail for %s: %s", item.Pathname, err)
 		} else {
 			logger.Info("Thumbnail generated for %s", item.Pathname)
 		}
