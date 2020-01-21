@@ -30,7 +30,7 @@ func Handler() http.Handler {
 
 		outputName := fmt.Sprintf("/tmp/%s.jpeg", sha.Sha1(time.Now()))
 
-		cmd := exec.Command("ffmpeg", "-i", "pipe:0", "-vf", fmt.Sprintf("thumbnail,scale=%s:%s", width, height), "-frames:v", "1", "-f", "jpeg", outputName)
+		cmd := exec.Command("ffmpeg", "-i", "pipe:0", "-vf", fmt.Sprintf("thumbnail,scale=%s:%s", width, height), "-frames:v", "1", outputName)
 		cmd.Stdin = r.Body
 
 		var out bytes.Buffer
