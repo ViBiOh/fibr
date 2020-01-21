@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"strings"
 	"time"
 
 	"github.com/ViBiOh/fibr/pkg/sha"
@@ -23,14 +22,9 @@ type App interface {
 // Handler for request. Should be use with net/http
 func Handler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		query := r.URL.Query()
-
-		width := strings.TrimSpace(query.Get("width"))
-		height := strings.TrimSpace(query.Get("height"))
-
 		outputName := fmt.Sprintf("/tmp/%s.jpeg", sha.Sha1(time.Now()))
 
-		cmd := exec.Command("ffmpeg", "-i", "pipe:0", "-vf", fmt.Sprintf("thumbnail,scale=%s:%s", width, height), "-frames:v", "1", outputName)
+		cmd := exec.Command("ffmpeg", "-vf", "thumbnail", "-frames:v", "1", "-i", "pipe:0", outputName)
 		cmd.Stdin = r.Body
 
 		var out bytes.Buffer

@@ -198,17 +198,16 @@ func (a app) generateThumbnail(item provider.StorageItem) error {
 
 	var resp *http.Response
 
-	if item.IsImage() || item.IsPdf() {
-		resp, err = request.New().Post(a.imaginaryURL).Send(ctx, file)
-	} else if item.IsVideo() {
-		resp, err = request.New().Post(fmt.Sprintf("%s/?width=%d&height=%d", a.vithURL, ThumbnailWidth, ThumbnailHeight)).Send(ctx, file)
-	} else {
-		err = fmt.Errorf("unable to generate thubmnail for %s", item.Pathname)
+	if item.IsVideo() {
+		resp, err = request.New().Post(fmt.Sprintf("%s/", a.vithURL)).Send(ctx, file)
+		if err != nil {
+			return err
+		}
+
+		file = resp.Body
 	}
 
-	if err != nil {
-		return err
-	}
+	resp, err = request.New().Post(a.imaginaryURL).Send(ctx, file)
 
 	thumbnailPath := getThumbnailPath(item)
 	if err := a.storage.CreateDir(path.Dir(thumbnailPath)); err != nil {
