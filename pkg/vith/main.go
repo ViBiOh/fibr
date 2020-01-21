@@ -22,10 +22,23 @@ type App interface {
 // Handler for request. Should be use with net/http
 func Handler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		outputName := fmt.Sprintf("/tmp/%s.jpeg", sha.Sha1(time.Now()))
+		name := sha.Sha1(time.Now())
+		inputName := fmt.Sprintf("/tmp/input_%s.jpeg", name)
+		outputName := fmt.Sprintf("/tmp/output_%s.jpeg", name)
+		copyBuffer := make([]byte, 32*1024)
 
-		cmd := exec.Command("ffmpeg", "-i", "pipe:0", "-vf", "thumbnail", "-frames:v", "1", outputName)
-		cmd.Stdin = r.Body
+		inputFile, err := os.OpenFile(inputName, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
+		if err != nil {
+			httperror.InternalServerError(w, err)
+			return
+		}
+
+		if _, err := io.CopyBuffer(inputFile, r.Body, copyBuffer); err != nil {
+			httperror.InternalServerError(w, err)
+			return
+		}
+
+		cmd := exec.Command("ffmpeg", "-i", inputName, "-vf", "thumbnail", "-frames:v", "1", outputName)
 
 		var out bytes.Buffer
 		cmd.Stdout = &out
@@ -46,7 +59,7 @@ func Handler() http.Handler {
 		}
 
 		w.WriteHeader(http.StatusOK)
-		if _, err := io.Copy(w, thumbnail); err != nil {
+		if _, err := io.CopyBuffer(w, thumbnail, copyBuffer); err != nil {
 			logger.Error("%s", err)
 		}
 
