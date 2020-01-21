@@ -43,7 +43,7 @@ func Handler() http.Handler {
 			return
 		}
 
-		logger.Info("Thumbnail generated for %s", r.URL.Path)
+		logger.Info("%s", out.String())
 
 		thumbnail, err := os.OpenFile(outputName, os.O_RDONLY, 0600)
 		if err != nil {
