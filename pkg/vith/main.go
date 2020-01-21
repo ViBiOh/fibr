@@ -24,7 +24,7 @@ func Handler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		outputName := fmt.Sprintf("/tmp/%s.jpeg", sha.Sha1(time.Now()))
 
-		cmd := exec.Command("ffmpeg", "-vf", "thumbnail", "-frames:v", "1", "-i", "pipe:0", outputName)
+		cmd := exec.Command("ffmpeg", "-i", "pipe:0", "-vf", "thumbnail", "-frames:v", "1", outputName)
 		cmd.Stdin = r.Body
 
 		var out bytes.Buffer
