@@ -23,6 +23,9 @@ services:
       FIBR_FRAME_OPTIONS: SAMEORIGIN
     volumes:
       - ${DATA_DIR}:/data
+    depends_on:
+      - image
+      - video
     user: "${DATA_USER_ID}"
     restart: on-failure:5
     read_only: true
