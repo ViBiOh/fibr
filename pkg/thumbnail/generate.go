@@ -19,6 +19,8 @@ const (
 )
 
 func (a app) generateDir(pathname string) error {
+	logger.Info("Generating thumbnails for %s dir", pathname)
+
 	return a.storage.Walk(pathname, func(item provider.StorageItem, _ error) error {
 		if item.IsDir && strings.HasPrefix(item.Name, ".") || ignoredThumbnailDir[item.Name] {
 			return filepath.SkipDir
@@ -86,7 +88,7 @@ func (a app) Generate() {
 	}
 
 	if err := a.generateDir(""); err != nil {
-		logger.Error("unable to walk dir: %s", err)
+		logger.Error("error while walking root dir: %s", err)
 	}
 }
 
@@ -105,13 +107,13 @@ func (a app) Start() {
 	}
 
 	for item := range a.pathnameInput {
-		// Do not stress API
-		time.Sleep(waitTimeout)
-
 		if err := a.generateThumbnail(item); err != nil {
 			logger.Error("unable to generate thumbnail for %s: %s", item.Pathname, err)
 		} else {
 			logger.Info("Thumbnail generated for %s", item.Pathname)
 		}
+
+		// Do not stress API
+		time.Sleep(waitTimeout)
 	}
 }

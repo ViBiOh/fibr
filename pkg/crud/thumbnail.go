@@ -12,17 +12,15 @@ func (a *app) createThumbnail(item provider.StorageItem) {
 	}
 }
 
-func (a *app) deleteThumbnail(item provider.StorageItem) bool {
+func (a *app) deleteThumbnail(item provider.StorageItem) {
 	thumbnailPath, ok := a.thumbnail.HasThumbnail(item)
 	if !ok {
-		return false
+		return
 	}
 
 	if err := a.storage.Remove(thumbnailPath); err != nil {
 		logger.Error("unable to delete thumbnail: %s", err)
 	}
-
-	return true
 }
 
 func (a *app) renameThumbnail(oldItem, newItem provider.StorageItem) {
