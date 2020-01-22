@@ -22,6 +22,8 @@ func (a app) generateDir(pathname string) error {
 	logger.Info("Generating thumbnails for %s dir", pathname)
 
 	return a.storage.Walk(pathname, func(item provider.StorageItem, _ error) error {
+		logger.Info("Walked to %s : %t", item.Pathname, item.IsDir)
+
 		if item.IsDir && strings.HasPrefix(item.Name, ".") || ignoredThumbnailDir[item.Name] {
 			return filepath.SkipDir
 		}
