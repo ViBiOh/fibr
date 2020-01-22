@@ -26,9 +26,6 @@ func (a *app) deleteThumbnail(item provider.StorageItem) bool {
 }
 
 func (a *app) renameThumbnail(oldItem, newItem provider.StorageItem) {
-	if !a.deleteThumbnail(oldItem) {
-		return
-	}
-
+	a.deleteThumbnail(oldItem)
 	a.createThumbnail(newItem)
 }
