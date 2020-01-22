@@ -51,8 +51,8 @@ Usage of fibr:
         [fibr] Public URL {FIBR_PUBLIC_URL} (default "https://fibr.vibioh.fr")
   -thumbnailImaginaryURL string
         [thumbnail] Imaginary URL {FIBR_THUMBNAIL_IMAGINARY_URL} (default "http://image:9000")
-  -thumbnailVideo Thumbnail URL string
-        [thumbnail] Video Thumbnail URL {FIBR_THUMBNAIL_VIDEO _THUMBNAIL _URL} (default "http://video:1080")
+  -thumbnailVideoURL string
+        [thumbnail] Video Thumbnail URL {FIBR_THUMBNAIL_VIDEO_URL} (default "http://video:1080")
   -url string
         [alcotest] URL to check {FIBR_URL}
   -userAgent string

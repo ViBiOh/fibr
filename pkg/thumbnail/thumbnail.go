@@ -62,7 +62,7 @@ type app struct {
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
 		imaginaryURL: flags.New(prefix, "thumbnail").Name("ImaginaryURL").Default("http://image:9000").Label("Imaginary URL").ToString(fs),
-		vithURL:      flags.New(prefix, "vith").Name("Video Thumbnail URL").Default("http://video:1080").Label("Video Thumbnail URL").ToString(fs),
+		vithURL:      flags.New(prefix, "vith").Name("VideoURL").Default("http://video:1080").Label("Video Thumbnail URL").ToString(fs),
 	}
 }
 
@@ -108,6 +108,10 @@ func (a app) HasThumbnail(item provider.StorageItem) (string, bool) {
 }
 
 func (a app) Start() {
+	if !a.Enabled() {
+		return
+	}
+
 	waitTimeout := time.Millisecond * 300
 
 	for item := range a.pathnameInput {

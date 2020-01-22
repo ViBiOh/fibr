@@ -99,7 +99,7 @@
 
     <ul id="files" class="no-margin no-padding">
       {{ range .Content.Files }}
-        {{ if and (.IsImage) (eq $root.Layout "grid") }}
+        {{ if and (eq $root.Layout "grid") (hasThumbnail $root.Request .) }}
           <li class="image">
         {{ else }}
           <li class="file">
