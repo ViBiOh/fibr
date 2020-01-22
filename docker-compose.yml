@@ -40,7 +40,7 @@ services:
       traefik.enable: false
     restart: on-failure:5
     cpu_shares: 128
-    mem_limit: 1073741824
+    mem_limit: 2147483648
     security_opt:
       - no-new-privileges
 
