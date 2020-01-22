@@ -100,7 +100,7 @@
     <ul id="files" class="no-margin no-padding">
       {{ range .Content.Files }}
         {{ if and (eq $root.Layout "grid") (hasThumbnail $root.Request .) }}
-          <li class="image">
+          <li class="image relative">
         {{ else }}
           <li class="file">
         {{ end }}
@@ -129,6 +129,10 @@
               <a href="{{ .Name }}" class="button button-icon file-download" alt="Download" download>
                 <img class="icon" src="/svg/download?fill=silver" alt="Download">
               </a>
+            {{ end }}
+
+            {{ if and (eq $root.Layout "grid") (hasThumbnail $root.Request .) .IsVideo }}
+                <img class="icon icon-overlay" src="/svg/{{ iconFromExtension . }}?fill=royalblue" alt="Video icon">
             {{ end }}
           </a>
         </li>

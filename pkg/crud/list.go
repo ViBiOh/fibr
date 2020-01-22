@@ -13,10 +13,6 @@ import (
 
 func (a *app) getCoverImage(files []provider.StorageItem) *provider.StorageItem {
 	for _, file := range files {
-		if !file.IsImage() {
-			continue
-		}
-
 		if _, ok := a.thumbnail.HasThumbnail(file); ok {
 			return &file
 		}
