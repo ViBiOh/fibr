@@ -18,7 +18,7 @@ ifeq ($(DEBUG), true)
 endif
 
 VITH_SOURCE = cmd/vith/vith.go
-VITH_BINARY=bin/vith
+VITH_BINARY = bin/vith
 
 .DEFAULT_GOAL := app
 
