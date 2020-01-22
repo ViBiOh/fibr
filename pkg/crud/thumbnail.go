@@ -7,7 +7,7 @@ import (
 )
 
 func (a *app) createThumbnail(item provider.StorageItem) {
-	if thumbnail.CanHaveThumbnail(item) {
+	if item.IsDir || thumbnail.CanHaveThumbnail(item) {
 		a.thumbnail.AsyncGenerateThumbnail(item)
 	}
 }

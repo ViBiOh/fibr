@@ -148,8 +148,12 @@ func (a app) List(pathname string) ([]provider.StorageItem, error) {
 }
 
 // Walk browses item recursively
-func (a app) Walk(walkFn func(provider.StorageItem, error) error) error {
-	return convertError(filepath.Walk(a.rootDirectory, func(pathname string, info os.FileInfo, err error) error {
+func (a app) Walk(pathname string, walkFn func(provider.StorageItem, error) error) error {
+	if pathname == "" {
+		pathname = a.rootDirectory
+	}
+
+	return convertError(filepath.Walk(pathname, func(pathname string, info os.FileInfo, err error) error {
 		return walkFn(convertToItem(a.getRelativePath(pathname), info), err)
 	}))
 }

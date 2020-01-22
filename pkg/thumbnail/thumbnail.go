@@ -1,23 +1,18 @@
 package thumbnail
 
 import (
-	"context"
 	"encoding/base64"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"path"
-	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/sha"
 	"github.com/ViBiOh/httputils/v3/pkg/flags"
 	"github.com/ViBiOh/httputils/v3/pkg/httperror"
 	"github.com/ViBiOh/httputils/v3/pkg/logger"
-	"github.com/ViBiOh/httputils/v3/pkg/request"
 )
 
 const (
@@ -107,25 +102,6 @@ func (a app) HasThumbnail(item provider.StorageItem) (string, bool) {
 	return thumbnailPath, err == nil
 }
 
-func (a app) Start() {
-	if !a.Enabled() {
-		return
-	}
-
-	waitTimeout := time.Millisecond * 300
-
-	for item := range a.pathnameInput {
-		// Do not stress API
-		time.Sleep(waitTimeout)
-
-		if err := a.generateThumbnail(item); err != nil {
-			logger.Error("unable to generate thumbnail for %s: %s", item.Pathname, err)
-		} else {
-			logger.Info("Thumbnail generated for %s", item.Pathname)
-		}
-	}
-}
-
 // Serve check if thumbnail is present and serve it
 func (a app) Serve(w http.ResponseWriter, r *http.Request, item provider.StorageItem) {
 	if CanHaveThumbnail(item) {
@@ -189,76 +165,4 @@ func (a app) List(w http.ResponseWriter, r *http.Request, item provider.StorageI
 	}
 
 	provider.SafeWrite(w, "}")
-}
-
-func (a app) generateThumbnail(item provider.StorageItem) error {
-	file, err := a.storage.ReaderFrom(item.Pathname)
-	if err != nil {
-		return err
-	}
-
-	ctx, cancel := getCtx(context.Background())
-	defer cancel()
-
-	var resp *http.Response
-
-	if item.IsVideo() {
-		resp, err = request.New().Post(fmt.Sprintf("%s/", a.vithURL)).Send(ctx, file)
-		if err != nil {
-			return err
-		}
-
-		file = resp.Body
-	}
-
-	resp, err = request.New().Post(a.imaginaryURL).Send(ctx, file)
-
-	thumbnailPath := getThumbnailPath(item)
-	if err := a.storage.CreateDir(path.Dir(thumbnailPath)); err != nil {
-		return err
-	}
-
-	if err := a.storage.Store(thumbnailPath, resp.Body); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// Generate thumbnail for all storage
-func (a app) Generate() {
-	if !a.Enabled() {
-		return
-	}
-
-	err := a.storage.Walk(func(item provider.StorageItem, _ error) error {
-		if item.IsDir && strings.HasPrefix(item.Name, ".") || ignoredThumbnailDir[item.Name] {
-			return filepath.SkipDir
-		}
-
-		if !CanHaveThumbnail(item) {
-			return nil
-		}
-
-		if _, ok := a.HasThumbnail(item); ok {
-			return nil
-		}
-
-		a.AsyncGenerateThumbnail(item)
-
-		return nil
-	})
-
-	if err != nil {
-		logger.Error("unable to walk dir: %s", err)
-	}
-}
-
-// AsyncGenerateThumbnail generate thumbnail image for given path
-func (a app) AsyncGenerateThumbnail(item provider.StorageItem) {
-	if !a.Enabled() {
-		return
-	}
-
-	a.pathnameInput <- item
 }

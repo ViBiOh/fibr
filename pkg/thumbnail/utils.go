@@ -25,5 +25,9 @@ func CanHaveThumbnail(item provider.StorageItem) bool {
 
 func getThumbnailPath(item provider.StorageItem) string {
 	fullPath := path.Join(provider.MetadataDirectoryName, item.Pathname)
+	if item.IsDir {
+		return fullPath
+	}
+
 	return fmt.Sprintf("%s.jpg", strings.TrimSuffix(fullPath, path.Ext(fullPath)))
 }

@@ -47,7 +47,7 @@ type Storage interface {
 	ReaderFrom(pathname string) (io.ReadCloser, error)
 	Serve(http.ResponseWriter, *http.Request, string)
 	List(pathname string) ([]StorageItem, error)
-	Walk(walkFn func(StorageItem, error) error) error
+	Walk(pathname string, walkFn func(StorageItem, error) error) error
 	CreateDir(name string) error
 	Store(pathname string, content io.ReadCloser) error
 	Rename(oldName, newName string) error

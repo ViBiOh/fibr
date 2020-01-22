@@ -46,7 +46,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 }
 
 // New creates new App from Config
-func New(config Config, rootName string, thumbnail thumbnail.App) App {
+func New(config Config, rootName string, thumbnailApp thumbnail.App) App {
 	tpl := template.New("fibr")
 
 	tpl.Funcs(template.FuncMap{
@@ -91,7 +91,11 @@ func New(config Config, rootName string, thumbnail thumbnail.App) App {
 			}
 		},
 		"hasThumbnail": func(request provider.Request, item provider.StorageItem) bool {
-			_, ok := thumbnail.HasThumbnail(item)
+			if !thumbnail.CanHaveThumbnail(item) {
+				return false
+			}
+
+			_, ok := thumbnailApp.HasThumbnail(item)
 			return ok
 		},
 	})
