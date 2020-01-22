@@ -49,12 +49,7 @@ func (a *app) ServeStatic(w http.ResponseWriter, r *http.Request) bool {
 	return false
 }
 
-func isThumbnail(r *http.Request) bool {
-	return query.GetBool(r, "thumbnail")
-}
-
-// GetWithMessage output content with given message
-func (a *app) GetWithMessage(w http.ResponseWriter, r *http.Request, request provider.Request, message *provider.Message) {
+func (a *app) getWithMessage(w http.ResponseWriter, r *http.Request, request provider.Request, message *provider.Message) {
 	info, err := a.storage.Info(request.GetFilepath(""))
 	if err != nil {
 		if provider.IsNotExist(err) {
@@ -65,7 +60,7 @@ func (a *app) GetWithMessage(w http.ResponseWriter, r *http.Request, request pro
 		return
 	}
 
-	if isThumbnail(r) {
+	if query.GetBool(r, "thumbnail") {
 		if info.IsDir {
 			a.thumbnail.List(w, r, info)
 		} else {
@@ -109,5 +104,5 @@ func (a *app) Get(w http.ResponseWriter, r *http.Request, request provider.Reque
 		}
 	}
 
-	a.GetWithMessage(w, r, request, message)
+	a.getWithMessage(w, r, request, message)
 }

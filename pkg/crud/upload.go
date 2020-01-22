@@ -6,6 +6,7 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
+	"net/url"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
@@ -77,5 +78,5 @@ func (a *app) Upload(w http.ResponseWriter, r *http.Request, request provider.Re
 		return
 	}
 
-	a.List(w, request, &provider.Message{Level: "success", Content: content})
+	http.Redirect(w, r, fmt.Sprintf("%s/?message=%s&messageLevel=success", request.GetURI(""), url.QueryEscape(content)), http.StatusFound)
 }

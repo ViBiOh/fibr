@@ -3,8 +3,8 @@ package crud
 import (
 	"crypto/rand"
 	"fmt"
-	"html/template"
 	"net/http"
+	"net/url"
 	"path"
 	"strconv"
 	"strings"
@@ -76,10 +76,7 @@ func (a *app) CreateShare(w http.ResponseWriter, r *http.Request, request provid
 		return
 	}
 
-	a.GetWithMessage(w, r, request, &provider.Message{
-		Level:   "success",
-		Content: template.HTML(fmt.Sprintf("Share successfully created with ID: <a href=\"/%s\" alt=\"New share URL\">%s</a>", id, id)),
-	})
+	http.Redirect(w, r, fmt.Sprintf("%s/?message=%s&messageLevel=success", request.GetURI(""), url.QueryEscape(fmt.Sprintf("Share successfully created with ID: %s", id))), http.StatusFound)
 }
 
 // DeleteShare delete a share from given ID
@@ -106,8 +103,5 @@ func (a *app) DeleteShare(w http.ResponseWriter, r *http.Request, request provid
 		return
 	}
 
-	a.GetWithMessage(w, r, request, &provider.Message{
-		Level:   "success",
-		Content: fmt.Sprintf("Share with id %s successfully deleted", id),
-	})
+	http.Redirect(w, r, fmt.Sprintf("%s/?message=%s&messageLevel=success", request.GetURI(""), url.QueryEscape(fmt.Sprintf("Share with id %s successfully deleted", id))), http.StatusFound)
 }
