@@ -19,13 +19,8 @@ const (
 )
 
 func (a app) generateDir(pathname string) error {
-	logger.Info("Generating thumbnails for %s dir", pathname)
-
 	return a.storage.Walk(pathname, func(item provider.StorageItem, _ error) error {
-		logger.Info("Walked to %s : \nIsDir: %t\nCanHaveThumbnail: %t\n", item.Pathname, item.IsDir, CanHaveThumbnail(item))
-
 		if item.IsDir && strings.HasPrefix(item.Name, ".") || ignoredThumbnailDir[item.Name] {
-			logger.Info("Skipping dir %s", item.Name)
 			return filepath.SkipDir
 		}
 
