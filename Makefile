@@ -10,7 +10,7 @@ PACKAGES ?= ./...
 GO_FILES ?= $(shell find . -name "*.go")
 
 MAIN_SOURCE = cmd/fibr/fibr.go
-MAIN_BINARY=bin/$(APP_NAME)
+MAIN_BINARY = bin/$(APP_NAME)
 
 MAIN_RUNNER = go run $(MAIN_SOURCE)
 ifeq ($(DEBUG), true)
