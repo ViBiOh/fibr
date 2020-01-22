@@ -50,8 +50,6 @@ func Handler() http.Handler {
 			return
 		}
 
-		logger.Info("%s", out.String())
-
 		thumbnail, err := os.OpenFile(outputName, os.O_RDONLY, 0600)
 		if err != nil {
 			httperror.InternalServerError(w, err)
