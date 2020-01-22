@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v3/pkg/logger"
 )
 
@@ -42,7 +43,9 @@ func (a *app) saveUploadedFile(request provider.Request, part *multipart.Part) (
 		return "", err
 	}
 
-	go a.createThumbnail(info)
+	if thumbnail.CanHaveThumbnail(info) {
+		a.thumbnail.AsyncGenerateThumbnail(info)
+	}
 
 	return filename, nil
 }

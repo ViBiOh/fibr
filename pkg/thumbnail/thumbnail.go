@@ -34,7 +34,9 @@ var (
 // App of package
 type App interface {
 	Generate()
-	HasThumbnail(provider.StorageItem) (string, bool)
+	Remove(provider.StorageItem)
+	Rename(provider.StorageItem, provider.StorageItem)
+	HasThumbnail(provider.StorageItem) bool
 	Serve(http.ResponseWriter, *http.Request, provider.StorageItem)
 	List(http.ResponseWriter, *http.Request, provider.StorageItem)
 	AsyncGenerateThumbnail(provider.StorageItem)
@@ -90,23 +92,11 @@ func (a app) Enabled() bool {
 	return len(a.imaginaryURL) != 0 && len(a.vithURL) != 0 && a.storage != nil
 }
 
-// HasThumbnail determine if thumbnail exist for given pathname
-func (a app) HasThumbnail(item provider.StorageItem) (string, bool) {
-	if !a.Enabled() {
-		return "", false
-	}
-
-	thumbnailPath := getThumbnailPath(item)
-
-	_, err := a.storage.Info(thumbnailPath)
-	return thumbnailPath, err == nil
-}
-
 // Serve check if thumbnail is present and serve it
 func (a app) Serve(w http.ResponseWriter, r *http.Request, item provider.StorageItem) {
 	if CanHaveThumbnail(item) {
-		if thumbnailPath, ok := a.HasThumbnail(item); ok {
-			a.storage.Serve(w, r, thumbnailPath)
+		if a.HasThumbnail(item) {
+			a.storage.Serve(w, r, getThumbnailPath(item))
 			return
 		}
 	}
@@ -139,12 +129,11 @@ func (a app) List(w http.ResponseWriter, r *http.Request, item provider.StorageI
 			continue
 		}
 
-		thumbnailPath, ok := a.HasThumbnail(item)
-		if !ok {
+		if !a.HasThumbnail(item) {
 			continue
 		}
 
-		file, err := a.storage.ReaderFrom(thumbnailPath)
+		file, err := a.storage.ReaderFrom(getThumbnailPath(item))
 		if err != nil {
 			logger.Error("unable to open %s: %s", item.Pathname, err)
 		}

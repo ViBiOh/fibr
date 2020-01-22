@@ -32,7 +32,7 @@ func (a *app) Delete(w http.ResponseWriter, r *http.Request, request provider.Re
 		return
 	}
 
-	go a.deleteThumbnail(info)
+	go a.thumbnail.Remove(info)
 
 	http.Redirect(w, r, fmt.Sprintf("%s/?message=%s&messageLevel=success", request.GetURI(""), url.QueryEscape(fmt.Sprintf("%s successfully deleted", info.Name))), http.StatusFound)
 }

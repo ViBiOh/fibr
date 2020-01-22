@@ -13,7 +13,7 @@ import (
 
 func (a *app) getCoverImage(files []provider.StorageItem) *provider.StorageItem {
 	for _, file := range files {
-		if _, ok := a.thumbnail.HasThumbnail(file); ok {
+		if a.thumbnail.HasThumbnail(file) {
 			return &file
 		}
 	}

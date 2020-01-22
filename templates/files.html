@@ -99,13 +99,13 @@
 
     <ul id="files" class="no-margin no-padding">
       {{ range .Content.Files }}
-        {{ if and (eq $root.Layout "grid") (hasThumbnail $root.Request .) }}
+        {{ if and (eq $root.Layout "grid") (hasThumbnail .) }}
           <li class="image relative">
         {{ else }}
           <li class="file">
         {{ end }}
           <a class="filelink center ellipsis" href="{{ .Name }}{{ if .IsDir }}/{{ if eq $root.Layout "list" }}?d=list{{ end }}{{ else }}?browser{{ end }}" title="{{ .Name }}">
-            {{ if and (eq $root.Layout "grid") (hasThumbnail $root.Request .) }}
+            {{ if and (eq $root.Layout "grid") (hasThumbnail .) }}
               {{ template "async-image" asyncImage . $root.Config.Version }}
             {{ else }}
               {{ if .IsDir }}
@@ -131,7 +131,7 @@
               </a>
             {{ end }}
 
-            {{ if and (eq $root.Layout "grid") (hasThumbnail $root.Request .) .IsVideo }}
+            {{ if and (eq $root.Layout "grid") (hasThumbnail .) .IsVideo }}
                 <img class="icon icon-overlay" src="/svg/{{ iconFromExtension . }}?fill=royalblue" alt="Video icon">
             {{ end }}
           </a>

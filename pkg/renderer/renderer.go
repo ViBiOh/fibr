@@ -90,13 +90,8 @@ func New(config Config, rootName string, thumbnailApp thumbnail.App) App {
 				return "file"
 			}
 		},
-		"hasThumbnail": func(request provider.Request, item provider.StorageItem) bool {
-			if !thumbnail.CanHaveThumbnail(item) {
-				return false
-			}
-
-			_, ok := thumbnailApp.HasThumbnail(item)
-			return ok
+		"hasThumbnail": func(item provider.StorageItem) bool {
+			return thumbnail.CanHaveThumbnail(item) && thumbnailApp.HasThumbnail(item)
 		},
 	})
 

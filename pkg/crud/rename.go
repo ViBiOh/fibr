@@ -64,7 +64,7 @@ func (a *app) Rename(w http.ResponseWriter, r *http.Request, request provider.Re
 		a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
 	}
 
-	go a.renameThumbnail(oldInfo, newInfo)
+	go a.thumbnail.Rename(oldInfo, newInfo)
 
 	a.List(w, request, &provider.Message{Level: "success", Content: fmt.Sprintf("%s successfully renamed to %s", oldInfo.Name, newInfo.Name)})
 }

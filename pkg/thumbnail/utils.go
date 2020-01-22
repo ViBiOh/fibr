@@ -23,6 +23,16 @@ func CanHaveThumbnail(item provider.StorageItem) bool {
 	return item.IsImage() || item.IsPdf() || item.IsVideo()
 }
 
+// HasThumbnail determine if thumbnail exist for given pathname
+func (a app) HasThumbnail(item provider.StorageItem) bool {
+	if !a.Enabled() {
+		return false
+	}
+
+	_, err := a.storage.Info(getThumbnailPath(item))
+	return err == nil
+}
+
 func getThumbnailPath(item provider.StorageItem) string {
 	fullPath := path.Join(provider.MetadataDirectoryName, item.Pathname)
 	if item.IsDir {

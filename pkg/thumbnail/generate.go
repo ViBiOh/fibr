@@ -24,11 +24,7 @@ func (a app) generateDir(pathname string) error {
 			return filepath.SkipDir
 		}
 
-		if !CanHaveThumbnail(item) {
-			return nil
-		}
-
-		if _, ok := a.HasThumbnail(item); ok {
+		if !CanHaveThumbnail(item) || a.HasThumbnail(item) {
 			return nil
 		}
 
@@ -39,10 +35,6 @@ func (a app) generateDir(pathname string) error {
 }
 
 func (a app) generateThumbnail(item provider.StorageItem) error {
-	if item.IsDir {
-		return a.generateDir(item.Pathname)
-	}
-
 	file, err := a.storage.ReaderFrom(item.Pathname)
 	if err != nil {
 		return err
