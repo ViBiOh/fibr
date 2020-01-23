@@ -118,7 +118,6 @@
     .icon-overlay {
       bottom: 0.7rem;
       height: 5rem;
-      pointer-events: none;
       position: absolute;
       right: 0;
       width: 5rem;
@@ -177,7 +176,6 @@
       background-color: rgba(84, 84, 84, 0.75);
       height: 100%;
       left: 0;
-      pointer-events: none;
       position: fixed;
       top: 0;
     }
@@ -423,6 +421,10 @@
         display: block;
       }
     {{ end }}
+
+    .no-pointer {
+      pointer-events: none;
+    }
 
     .center {
       text-align: center;

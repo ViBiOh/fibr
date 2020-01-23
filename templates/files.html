@@ -132,7 +132,7 @@
             {{ end }}
 
             {{ if and (eq $root.Layout "grid") (hasThumbnail .) .IsVideo }}
-                <img class="icon icon-overlay" src="/svg/{{ iconFromExtension . }}?fill=royalblue" alt="Video icon">
+                <img class="icon icon-overlay no-pointer" src="/svg/{{ iconFromExtension . }}?fill=royalblue" alt="Video icon">
             {{ end }}
           </a>
         </li>
