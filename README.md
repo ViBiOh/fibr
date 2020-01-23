@@ -1,6 +1,13 @@
 # fibr
 
-Web File Browser and Manager
+Web File Browser and Manager.
+
+* Lightweight (11MB self-sufficient binary, low memory consumption at runtime).
+* Mobile-first interface.
+* Thumbnail generation for Image, PDF and Video (with help of sidecar)
+* Works in pure HTML or with very little javascript for improved file upload
+* Can share directory with ou without password and with or without edit right.
+* Support multiple storage backend (basic filesystem implemented, but can be anything like Minio or S3)
 
 [![Build Status](https://travis-ci.org/ViBiOh/fibr.svg?branch=master)](https://travis-ci.org/ViBiOh/fibr)
 [![Go Report Card](https://goreportcard.com/badge/github.com/ViBiOh/fibr)](https://goreportcard.com/report/github.com/ViBiOh/fibr)
@@ -12,7 +19,7 @@ Thanks to [FontAwesome](https://fontawesome.com) for providing awesome svg.
 ## Installation
 
 ```bash
-go get github.com/ViBiOh/fibr/cmd
+go get github.com/ViBiOh/fibr/cmd/fibr
 ```
 
 ## Usage
