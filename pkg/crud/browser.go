@@ -28,7 +28,7 @@ func (a *app) Browser(w http.ResponseWriter, request provider.Request, file prov
 	content := map[string]interface{}{
 		"Paths":    breadcrumbs,
 		"File":     file,
-		"Cover":    a.getCover(files, &file),
+		"Cover":    a.getCover(files),
 		"Parent":   path.Join(breadcrumbs...),
 		"Previous": previous,
 		"Next":     next,
