@@ -18,7 +18,8 @@ func (a *app) Browser(w http.ResponseWriter, request provider.Request, file prov
 	pathParts := getPathParts(request.GetURI(""))
 	breadcrumbs := pathParts[:len(pathParts)-1]
 
-	if files, err := a.storage.List(path.Dir(file.Pathname)); err != nil {
+	files, err := a.storage.List(path.Dir(file.Pathname))
+	if err != nil {
 		logger.Error("unable to list neighbors files: %s", err)
 	} else {
 		previous, next = getPreviousAndNext(file, files)
@@ -27,6 +28,7 @@ func (a *app) Browser(w http.ResponseWriter, request provider.Request, file prov
 	content := map[string]interface{}{
 		"Paths":    breadcrumbs,
 		"File":     file,
+		"Cover":    a.getCover(files, &file),
 		"Parent":   path.Join(breadcrumbs...),
 		"Previous": previous,
 		"Next":     next,

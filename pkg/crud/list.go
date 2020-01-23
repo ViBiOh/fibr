@@ -11,10 +11,22 @@ import (
 	"github.com/ViBiOh/httputils/v3/pkg/logger"
 )
 
-func (a *app) getCoverImage(files []provider.StorageItem) *provider.StorageItem {
+func (a *app) getCover(files []provider.StorageItem, item *provider.StorageItem) map[string]interface{} {
+	if item != nil && a.thumbnail.HasThumbnail(*item) {
+		return map[string]interface{}{
+			"Img":       item,
+			"ImgHeight": thumbnail.ThumbnailHeight,
+			"ImgWidth":  thumbnail.ThumbnailWidth,
+		}
+	}
+
 	for _, file := range files {
 		if a.thumbnail.HasThumbnail(file) {
-			return &file
+			return map[string]interface{}{
+				"Img":       file,
+				"ImgHeight": thumbnail.ThumbnailHeight,
+				"ImgWidth":  thumbnail.ThumbnailWidth,
+			}
 		}
 	}
 
@@ -32,11 +44,7 @@ func (a *app) List(w http.ResponseWriter, request provider.Request, message *pro
 	content := map[string]interface{}{
 		"Paths": getPathParts(request.GetURI("")),
 		"Files": files,
-		"Cover": map[string]interface{}{
-			"Img":       a.getCoverImage(files),
-			"ImgHeight": thumbnail.ThumbnailHeight,
-			"ImgWidth":  thumbnail.ThumbnailWidth,
-		},
+		"Cover": a.getCover(files, nil),
 	}
 
 	if request.CanShare {
