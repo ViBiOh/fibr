@@ -56,8 +56,8 @@ Usage of fibr:
         [prometheus] Path for exposing metrics {FIBR_PROMETHEUS_PATH} (default "/metrics")
   -publicURL string
         [fibr] Public URL {FIBR_PUBLIC_URL} (default "https://fibr.vibioh.fr")
-  -thumbnailImaginaryURL string
-        [thumbnail] Imaginary URL {FIBR_THUMBNAIL_IMAGINARY_URL} (default "http://image:9000")
+  -thumbnailImageURL string
+        [thumbnail] Imaginary URL {FIBR_THUMBNAIL_IMAGE_URL} (default "http://image:9000")
   -thumbnailVideoURL string
         [thumbnail] Video Thumbnail URL {FIBR_THUMBNAIL_VIDEO_URL} (default "http://video:1080")
   -url string

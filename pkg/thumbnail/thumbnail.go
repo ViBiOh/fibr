@@ -44,13 +44,13 @@ type App interface {
 
 // Config of package
 type Config struct {
-	imaginaryURL *string
-	vithURL      *string
+	imageURL *string
+	videoURL *string
 }
 
 type app struct {
-	imaginaryURL  string
-	vithURL       string
+	imageURL      string
+	videoURL      string
 	storage       provider.Storage
 	pathnameInput chan provider.StorageItem
 }
@@ -58,26 +58,26 @@ type app struct {
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		imaginaryURL: flags.New(prefix, "thumbnail").Name("ImaginaryURL").Default("http://image:9000").Label("Imaginary URL").ToString(fs),
-		vithURL:      flags.New(prefix, "vith").Name("VideoURL").Default("http://video:1080").Label("Video Thumbnail URL").ToString(fs),
+		imageURL: flags.New(prefix, "thumbnail").Name("imageURL").Default("http://image:9000").Label("Imaginary URL").ToString(fs),
+		videoURL: flags.New(prefix, "vith").Name("VideoURL").Default("http://video:1080").Label("Video Thumbnail URL").ToString(fs),
 	}
 }
 
 // New creates new App from Config
 func New(config Config, storage provider.Storage) App {
-	imaginaryURL := strings.TrimSpace(*config.imaginaryURL)
-	if len(imaginaryURL) == 0 {
+	imageURL := strings.TrimSpace(*config.imageURL)
+	if len(imageURL) == 0 {
 		return &app{}
 	}
 
-	vithURL := strings.TrimSpace(*config.vithURL)
-	if len(vithURL) == 0 {
+	videoURL := strings.TrimSpace(*config.videoURL)
+	if len(videoURL) == 0 {
 		return &app{}
 	}
 
 	app := &app{
-		imaginaryURL:  fmt.Sprintf("%s/crop?width=%d&height=%d&stripmeta=true&noprofile=true&quality=80&type=jpeg", imaginaryURL, ThumbnailWidth, ThumbnailHeight),
-		vithURL:       vithURL,
+		imageURL:      fmt.Sprintf("%s/crop?width=%d&height=%d&stripmeta=true&noprofile=true&quality=80&type=jpeg", imageURL, ThumbnailWidth, ThumbnailHeight),
+		videoURL:      videoURL,
 		storage:       storage,
 		pathnameInput: make(chan provider.StorageItem, 10),
 	}
@@ -89,7 +89,7 @@ func New(config Config, storage provider.Storage) App {
 
 // Enabled checks if app is enabled
 func (a app) Enabled() bool {
-	return len(a.imaginaryURL) != 0 && len(a.vithURL) != 0 && a.storage != nil
+	return len(a.imageURL) != 0 && len(a.videoURL) != 0 && a.storage != nil
 }
 
 // Serve check if thumbnail is present and serve it
@@ -125,11 +125,7 @@ func (a app) List(w http.ResponseWriter, r *http.Request, item provider.StorageI
 	provider.SafeWrite(w, "{")
 
 	for _, item := range items {
-		if item.IsDir {
-			continue
-		}
-
-		if !a.HasThumbnail(item) {
+		if item.IsDir || !a.HasThumbnail(item) {
 			continue
 		}
 

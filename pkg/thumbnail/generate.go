@@ -46,7 +46,7 @@ func (a app) generateThumbnail(item provider.StorageItem) error {
 	var resp *http.Response
 
 	if item.IsVideo() {
-		resp, err = request.New().Post(fmt.Sprintf("%s/", a.vithURL)).Send(ctx, file)
+		resp, err = request.New().Post(fmt.Sprintf("%s/", a.videoURL)).Send(ctx, file)
 		if err != nil {
 			return err
 		}
@@ -54,7 +54,7 @@ func (a app) generateThumbnail(item provider.StorageItem) error {
 		file = resp.Body
 	}
 
-	resp, err = request.New().Post(a.imaginaryURL).Send(ctx, file)
+	resp, err = request.New().Post(a.imageURL).Send(ctx, file)
 	if err != nil {
 		return err
 	}

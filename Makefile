@@ -93,7 +93,7 @@ run:
 
 .PHONY: run-imaginary
 run-imaginary:
-	docker run -d \
+	docker run --rm \
 		--name "imaginary" \
 		-p "9000:9000/tcp" \
 		h2non/imaginary
