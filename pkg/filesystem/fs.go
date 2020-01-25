@@ -10,6 +10,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 
@@ -29,23 +30,27 @@ var (
 // Config of package
 type Config struct {
 	directory *string
+	ignore    *string
 }
 
 type app struct {
 	rootDirectory string
 	rootDirname   string
+	ignorePattern *regexp.Regexp
 }
 
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
 		directory: flags.New(prefix, "filesystem").Name("Directory").Default("/data").Label("Path to served directory").ToString(fs),
+		ignore:    flags.New(prefix, "filesystem").Name("IgnorePattern").Default("").Label("Ignore pattern when listing files or directory").ToString(fs),
 	}
 }
 
 // New creates new App from Config
 func New(config Config) (provider.Storage, error) {
 	rootDirectory := strings.TrimSpace(*config.directory)
+	ignore := strings.TrimSpace(*config.ignore)
 
 	if rootDirectory == "" {
 		return nil, errors.New("no directory provided")
@@ -60,11 +65,22 @@ func New(config Config) (provider.Storage, error) {
 		return nil, fmt.Errorf("path %s is not a directory", rootDirectory)
 	}
 
+	var ignorePattern *regexp.Regexp
+	if len(ignore) != 0 {
+		pattern, err := regexp.Compile(ignore)
+		if err != nil {
+			return nil, err
+		}
+
+		ignorePattern = pattern
+	}
+
 	logger.Info("Serving file from %s", rootDirectory)
 
 	return &app{
 		rootDirectory: rootDirectory,
 		rootDirname:   info.Name(),
+		ignorePattern: ignorePattern,
 	}, nil
 }
 
@@ -137,9 +153,13 @@ func (a app) List(pathname string) ([]provider.StorageItem, error) {
 		return nil, convertError(err)
 	}
 
-	items := make([]provider.StorageItem, len(files))
-	for index, item := range files {
-		items[index] = convertToItem(a.getRelativePath(path.Join(fullpath, item.Name())), item)
+	items := make([]provider.StorageItem, 0)
+	for _, item := range files {
+		if a.ignorePattern != nil && a.ignorePattern.MatchString(item.Name()) {
+			continue
+		}
+
+		items = append(items, convertToItem(a.getRelativePath(path.Join(fullpath, item.Name())), item))
 	}
 
 	sort.Sort(ByHybridSort(items))

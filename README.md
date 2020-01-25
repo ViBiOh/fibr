@@ -42,6 +42,8 @@ Usage of fibr:
         [owasp] X-Frame-Options {FIBR_FRAME_OPTIONS} (default "deny")
   -fsDirectory string
         [fs] Path to served directory {FIBR_FS_DIRECTORY} (default "/data")
+  -fsIgnorePattern string
+        [fs] Ignore pattern when listing files or directory {FIBR_FS_IGNORE_PATTERN}
   -hsts
         [owasp] Indicate Strict Transport Security {FIBR_HSTS} (default true)
   -key string
