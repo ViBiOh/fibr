@@ -22,13 +22,27 @@
 
   <script>
     /**
+     * Remove all child and append given one
+     * @param {DOMNode} element Element to clear
+     */
+    function replaceContent(element, newContent) {
+      while (element.firstChild) {
+        element.removeChild(element.firstChild);
+      }
+
+      if (newContent) {
+        element.appendChild(newContent);
+      }
+    }
+
+    /**
      * Async image loading
      */
     async function getThumbnails() {
       const response = await fetch('?thumbnail', { credentials: 'same-origin' })
 
       if (response.status >= 400) {
-        return Promise.reject('unable to load thumbnails');
+        throw new Error('unable to load thumbnails');
       }
 
       if (response.status === 204) {
@@ -38,6 +52,23 @@
       return response.json();
     }
 
+    /**
+     * Generate a throbber.
+     * @return {DOMNode}
+     */
+    function generateThrobber(className) {
+      const wrapper = document.createElement('div');
+      wrapper.classList.add('throbber', 'center', className);
+
+      for (let i = 1; i < 4; i++) {
+        const dot = document.createElement('div');
+        dot.classList.add(`bounce${i}`);
+        wrapper.appendChild(dot);
+      }
+
+      return wrapper;
+    }
+
     window.addEventListener(
       'load',
       async () => {
@@ -45,19 +76,24 @@
           replaceContent(picture, generateThrobber());
         });
 
-        const thumbnails = await getThumbnails();
+        try {
+          const thumbnails = await getThumbnails();
 
-        Object.keys(thumbnails).forEach(id => {
-          const picture = document.getElementById(`picture-${id}`);
+          Object.keys(thumbnails).forEach(id => {
+            const picture = document.getElementById(`picture-${id}`);
+            if (!picture) {
+              return
+            }
 
-          if (picture) {
             const img = new Image();
             img.src = `data:image/jpeg;base64,${thumbnails[id]}`;
             img.alt = picture.dataset.alt;
 
             replaceContent(picture, img);
-          }
-        });
+          });
+        } catch (e) {
+          console.error(e);
+        }
       },
       false,
     );
@@ -109,9 +145,9 @@
               {{ template "async-image" asyncImage . $root.Config.Version }}
             {{ else }}
               {{ if .IsDir }}
-                <img class="icon" src="/svg/folder?fill=silver" alt="Folder">
+                <img class="icon {{ if eq $root.Layout "grid" }}icon-large{{ else }}margin-right{{ end }}" src="/svg/folder?fill=silver" alt="Folder">
               {{ else }}
-                <img class="icon" src="/svg/{{ iconFromExtension . }}?fill=silver" alt="File">
+                <img class="icon {{ if eq $root.Layout "grid" }}icon-large{{ else }}margin-right{{ end }}" src="/svg/{{ iconFromExtension . }}?fill=silver" alt="File">
               {{ end }}
               <span class="filename ellipsis">{{ .Name }}</span>
             {{ end }}
@@ -132,46 +168,13 @@
             {{ end }}
 
             {{ if and (eq $root.Layout "grid") (hasThumbnail .) .IsVideo }}
-                <img class="icon icon-overlay no-pointer" src="/svg/{{ iconFromExtension . }}?fill=royalblue" alt="Video icon">
+              <img class="icon icon-overlay" src="/svg/play?fill=rgba(192, 192, 192, 0.5)" alt="Play video">
             {{ end }}
           </a>
         </li>
       {{ end }}
     </ul>
   </div>
-
-  <script>
-    /**
-     * Remove all child and append given one
-     * @param {DOMNode} element Element to clear
-     */
-    function replaceContent(element, newContent) {
-      while (element.firstChild) {
-        element.removeChild(element.firstChild);
-      }
-
-      if (newContent) {
-        element.appendChild(newContent);
-      }
-    }
-
-    /**
-     * Generate a throbber.
-     * @return {DOMNode}
-     */
-    function generateThrobber(className) {
-      const wrapper = document.createElement('div');
-      wrapper.classList.add('throbber', 'center', className);
-
-      for (let i = 1; i < 4; i++) {
-        const dot = document.createElement('div');
-        dot.classList.add(`bounce${i}`);
-        wrapper.appendChild(dot);
-      }
-
-      return wrapper;
-    }
-  </script>
 
   {{ template "navigation" . }}
   {{ template "footer" . }}

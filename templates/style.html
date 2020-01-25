@@ -1,14 +1,5 @@
 {{ define "style" }}
   <style>
-    :root {
-      --primary: royalblue;
-      --success: limegreen;
-      --danger: crimson;
-      --dark: #272727;
-      --grey: #3b3b3b;
-      --white: silver;
-    }
-
     * {
       box-sizing: border-box;
     }
@@ -104,89 +95,8 @@
       text-align: left;
     }
 
-    .icon {
-      background-position: center center;
-      background-repeat: no-repeat;
-      color: var(--white);
-      display: inline-block;
-      height: 2.4rem;
-      text-decoration: none;
-      vertical-align: middle;
-      width: 2.4rem;
-    }
-
-    .icon-overlay {
-      bottom: 0.7rem;
-      height: 5rem;
-      position: absolute;
-      right: 0;
-      width: 5rem;
-    }
-
     .thumbnail {
       max-height: 100%;
-    }
-
-    .button {
-      border-radius: 4px;
-      border: 0;
-      color: var(--dark);
-      cursor: pointer;
-      display: inline-block;
-      padding: 1rem;
-      text-decoration: none;
-    }
-
-    .button-icon {
-      background-color: transparent;
-      margin: 0;
-      padding: 1.2rem;
-    }
-
-    .bg-important,
-    .bg-important:hover {
-      background-color: var(--primary);
-      color: var(--white);
-      text-decoration: none;
-    }
-
-    .success {
-      color: var(--success);
-    }
-
-    .danger {
-      color: var(--danger);
-    }
-
-    .bg-danger {
-      background-color: var(--danger);
-      color: var(--white);
-    }
-
-    .white {
-      color: var(--white);
-    }
-
-    .bg-grey {
-      background-color: var(--grey);
-      color: var(--white);
-    }
-
-    .modal {
-      background-color: rgba(84, 84, 84, 0.75);
-      height: 100%;
-      left: 0;
-      position: fixed;
-      top: 0;
-    }
-
-    .modal-content {
-      background-color: var(--dark);
-      display: flex;
-      flex-direction: column;
-      max-height: 100%;
-      max-width: 100%;
-      pointer-events: auto;
     }
 
     .message {
@@ -238,46 +148,6 @@
       background-color: var(--grey);
     }
 
-    .throbber {
-      margin: auto;
-    }
-
-    .throbber > div {
-      background-color: var(--dark);
-    }
-
-    .throbber-white > div {
-      background-color: var(--white);
-    }
-
-    .throbber > div {
-      animation: sk-bouncedelay 1.4s infinite ease-in-out both;
-      border-radius: 100%;
-      display: inline-block;
-      height: 1rem;
-      width: 1rem;
-    }
-
-    .throbber .bounce1 {
-      animation-delay: -0.32s;
-    }
-
-    .throbber .bounce2 {
-      animation-delay: -0.16s;
-    }
-
-    @keyframes sk-bouncedelay {
-      0%,
-      80%,
-      100% {
-        transform: scale(0);
-      }
-
-      40% {
-        transform: scale(1);
-      }
-    }
-
     {{ if eq .Layout "list" }}
       #list-display {
         background-color: var(--primary);
@@ -305,10 +175,6 @@
         display: inline-block;
         flex: 1 1;
         text-align: left;
-      }
-
-      .filelink .icon {
-        margin-right: 1rem;
       }
 
       .file-edit,
@@ -376,11 +242,6 @@
         width: 100%;
       }
 
-      .filelink .icon {
-        height: 6rem;
-        width: 6rem;
-      }
-
       .filelink picture img {
         vertical-align: middle;
         width: 100%;
@@ -422,10 +283,6 @@
       }
     {{ end }}
 
-    .no-pointer {
-      pointer-events: none;
-    }
-
     .center {
       text-align: center;
     }
@@ -460,6 +317,10 @@
 
     .padding-left {
       padding-left: 1rem;
+    }
+
+    .margin-right {
+      margin-right: 1rem;
     }
 
     .no-margin {

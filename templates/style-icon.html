@@ -1,0 +1,33 @@
+{{ define "style-icon" }}
+  <style>
+    :root {
+      --icon-size: 2.4rem;
+      --icon-large: 4.8rem;
+    }
+
+    .icon {
+      background-position: center center;
+      background-repeat: no-repeat;
+      color: var(--white);
+      display: inline-block;
+      height: var(--icon-size);
+      text-decoration: none;
+      vertical-align: middle;
+      width: var(--icon-size);
+    }
+
+    .icon-large {
+      height: var(--icon-large);
+      width: var(--icon-large);
+    }
+
+    .icon-overlay {
+      height: var(--icon-large);
+      left: calc((100% - var(--icon-large)) / 2);
+      position: absolute;
+      top: calc((100% - var(--icon-large)) / 2);
+      width: var(--icon-large);
+      pointer-events: none;
+    }
+  </style>
+{{ end }}

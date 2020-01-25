@@ -1,0 +1,21 @@
+{{ define "style-button" }}
+  <style>
+    :root {
+      --button-radius: 4px;
+    }
+
+    .button {
+      border-radius: var(--button-radius);
+      border: 0;
+      cursor: pointer;
+      display: inline-block;
+      margin: 0;
+      padding: 1rem;
+      text-decoration: none;
+    }
+
+    .button-icon {
+      background-color: transparent;
+    }
+  </style>
+{{ end }}

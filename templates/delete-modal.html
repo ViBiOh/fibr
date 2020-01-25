@@ -1,5 +1,5 @@
 {{ define "delete-modal" }}
-  <div id="delete-modal-{{ sha1 . }}" class="modal no-pointer full flex flex-center">
+  <div id="delete-modal-{{ sha1 . }}" class="modal">
     <div class="modal-content">
       <h2 class="header">Confirmation</h2>
 
@@ -14,7 +14,7 @@
 
         <p class="center">
           <a href="#" class="button white">Cancel</a>
-          <button type="submit" class="button bg-important">Confirm</button>
+          <button type="submit" class="button bg-primary">Confirm</button>
         </p>
       </form>
     </div>

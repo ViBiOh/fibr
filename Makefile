@@ -88,7 +88,7 @@ run:
 		-authProfiles "1:admin" \
 		-authUsers "1:`htpasswd -nBb admin admin`" \
 		-frameOptions "SAMEORIGIN" \
-		-thumbnailImaginaryURL "http://localhost:9000" \
+		-thumbnailImageURL "http://localhost:9000" \
 		-csp "default-src 'self'; base-uri 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:"
 
 .PHONY: run-imaginary

@@ -1,0 +1,43 @@
+{{ define "style-throbber" }}
+  <style>
+    .throbber {
+      margin: auto;
+    }
+
+    .throbber > div {
+      background-color: var(--dark);
+    }
+
+    .throbber-white > div {
+      background-color: var(--white);
+    }
+
+    .throbber > div {
+      animation: bouncingdot 1.4s infinite ease-in-out both;
+      border-radius: 100%;
+      display: inline-block;
+      height: 1rem;
+      width: 1rem;
+    }
+
+    .throbber .bounce1 {
+      animation-delay: -0.32s;
+    }
+
+    .throbber .bounce2 {
+      animation-delay: -0.16s;
+    }
+
+    @keyframes bouncingdot {
+      0%,
+      80%,
+      100% {
+        transform: scale(0);
+      }
+
+      40% {
+        transform: scale(1);
+      }
+    }
+  </style>
+{{ end }}
