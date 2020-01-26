@@ -7,15 +7,6 @@
       <meta name="viewport" content="width=device-width, initial-scale=1">
       {{ template "favicon" . }}
       {{ template "seo" . }}
-
-      {{ if .Request }}
-        {{ template "style-button" . }}
-        {{ template "style-color" . }}
-        {{ template "style-icon" . }}
-        {{ template "style-modal" . }}
-        {{ template "style-throbber" . }}
-      {{ end }}
-
       {{ template "style" . }}
     </head>
     <body class="no-margin">

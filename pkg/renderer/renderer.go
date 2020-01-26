@@ -122,7 +122,7 @@ func (a app) Directory(w http.ResponseWriter, request provider.Request, content 
 	page := a.newPageBuilder().Request(request).Message(message).Layout(request.Display).Content(content).Build()
 
 	w.Header().Set("content-language", "en")
-	if err := templates.WriteHTMLTemplate(a.tpl.Lookup("files"), w, page, http.StatusOK); err != nil {
+	if err := templates.ResponseHTMLTemplate(a.tpl.Lookup("files"), w, page, http.StatusOK); err != nil {
 		a.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
@@ -133,7 +133,7 @@ func (a app) File(w http.ResponseWriter, request provider.Request, content map[s
 	page := a.newPageBuilder().Request(request).Message(message).Layout("browser").Content(content).Build()
 
 	w.Header().Set("content-language", "en")
-	if err := templates.WriteHTMLTemplate(a.tpl.Lookup("file"), w, page, http.StatusOK); err != nil {
+	if err := templates.ResponseHTMLTemplate(a.tpl.Lookup("file"), w, page, http.StatusOK); err != nil {
 		a.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}

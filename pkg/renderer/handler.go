@@ -20,7 +20,7 @@ func (a app) Error(w http.ResponseWriter, request provider.Request, err *provide
 
 	page := a.newPageBuilder().Request(request).Error(err).Build()
 
-	if err := templates.WriteHTMLTemplate(a.tpl.Lookup("error"), w, page, err.Status); err != nil {
+	if err := templates.ResponseHTMLTemplate(a.tpl.Lookup("error"), w, page, err.Status); err != nil {
 		httperror.InternalServerError(w, err)
 		return
 	}
@@ -30,7 +30,7 @@ func (a app) Error(w http.ResponseWriter, request provider.Request, err *provide
 func (a app) Sitemap(w http.ResponseWriter) {
 	page := a.newPageBuilder().Build()
 
-	if err := templates.WriteXMLTemplate(a.tpl.Lookup("sitemap"), w, page, http.StatusOK); err != nil {
+	if err := templates.ResponseXMLTemplate(a.tpl.Lookup("sitemap"), w, page, http.StatusOK); err != nil {
 		httperror.InternalServerError(w, err)
 		return
 	}

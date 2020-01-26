@@ -1,4 +1,12 @@
 {{ define "style" }}
+  {{ if .Request }}
+    {{ template "style-button" . }}
+    {{ template "style-color" . }}
+    {{ template "style-icon" . }}
+    {{ template "style-modal" . }}
+    {{ template "style-throbber" . }}
+  {{ end }}
+
   <style>
     * {
       box-sizing: border-box;
