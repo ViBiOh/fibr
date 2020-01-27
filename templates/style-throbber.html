@@ -5,19 +5,16 @@
     }
 
     .throbber > div {
-      background-color: var(--dark);
-    }
-
-    .throbber-white > div {
-      background-color: var(--white);
-    }
-
-    .throbber > div {
       animation: bouncingdot 1.4s infinite ease-in-out both;
+      background-color: var(--dark);
       border-radius: 100%;
       display: inline-block;
       height: 1rem;
       width: 1rem;
+    }
+
+    .throbber-white > div {
+      background-color: var(--white);
     }
 
     .throbber .bounce1 {
