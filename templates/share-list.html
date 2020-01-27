@@ -11,12 +11,12 @@
 
           <thead>
             <tr class="share-content">
-              <th>ID</th>
-              <th>Path</th>
-              <th>
+              <th scope="col">ID</th>
+              <th scope="col">Path</th>
+              <td>
                 <img class="icon" src="/svg/edit?fill=silver" alt="Edit">
-              </th>
-              <th></th>
+              </td>
+              <td></td>
             </tr>
           </thead>
 
@@ -28,9 +28,9 @@
                     <code>{{ .ID }}</code>
                   </a>
                 </td>
-                <td>
+                <th scope="row">
                   <code>{{ .Path }}</code>
-                </td>
+                </th>
                 <td>
                   {{ if .Edit }}
                     <img class="icon" src="/svg/check?fill=silver" alt="Edit allowed">
