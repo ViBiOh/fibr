@@ -68,24 +68,13 @@
 
       img, video, object {
         border: 0;
-        max-height: 100%;
-        max-width: 100%;
-      }
-
-      object {
         height: 100%;
+        image-orientation: from-image;
+        margin: 0 auto;
+        object-fit: scale-down;
         width: 100%;
       }
 
-      img, video {
-        image-orientation: from-image;
-        margin: 0 auto;
-      }
-
-      video {
-        height: 100%;
-        object-fit: scale-down;
-      }
     {{ end }}
 
     .flex {
