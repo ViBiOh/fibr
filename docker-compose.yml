@@ -38,8 +38,6 @@ services:
     image: ${DOCKER_USER}/vith
     labels:
       traefik.enable: false
-    volumes:
-      - /tmp/vith:/tmp
     restart: on-failure:5
     cpu_shares: 128
     mem_limit: 1073741824
