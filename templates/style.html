@@ -263,24 +263,31 @@
         display: none;
         padding: 0.5rem;
         position: absolute;
-        top: 0.5rem;
       }
 
       .file-download {
         left: 0.5rem;
+        top: 0.5rem;
       }
 
-      .file-edit,
-      .file-delete {
+      .file-share {
+        bottom: 0.5rem;
+        left: 0.5rem;
+      }
+
+      .file-edit {
         right: 0.5rem;
+        top: 0.5rem;
       }
 
       .file-delete {
-        top: 5rem;
+        bottom: 0.5rem;
+        right: 0.5rem;
       }
 
       #files > *:hover .file-edit,
       #files > *:hover .file-download,
+      #files > *:hover .file-share,
       #files > *:hover .file-delete {
         display: block;
       }
