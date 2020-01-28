@@ -60,7 +60,7 @@ func (a *app) Post(w http.ResponseWriter, r *http.Request, request provider.Requ
 			case http.MethodDelete:
 				a.DeleteShare(w, r, request)
 			default:
-				a.renderer.Error(w, request, provider.NewError(http.StatusMethodNotAllowed, fmt.Errorf("unknown method %s for %s", method, r.URL.Path)))
+				a.renderer.Error(w, request, provider.NewError(http.StatusMethodNotAllowed, fmt.Errorf("unknown share method `%s` for %s", method, r.URL.Path)))
 			}
 		} else {
 			switch method {
@@ -71,7 +71,7 @@ func (a *app) Post(w http.ResponseWriter, r *http.Request, request provider.Requ
 			case http.MethodDelete:
 				a.Delete(w, r, request)
 			default:
-				a.renderer.Error(w, request, provider.NewError(http.StatusMethodNotAllowed, fmt.Errorf("unknown method %s for %s", method, r.URL.Path)))
+				a.renderer.Error(w, request, provider.NewError(http.StatusMethodNotAllowed, fmt.Errorf("unknown method `%s` for %s", method, r.URL.Path)))
 			}
 		}
 
@@ -86,7 +86,7 @@ func (a *app) Post(w http.ResponseWriter, r *http.Request, request provider.Requ
 		}
 
 		if method != http.MethodPost {
-			a.renderer.Error(w, request, provider.NewError(http.StatusMethodNotAllowed, fmt.Errorf("unknown method %s for multipart", method)))
+			a.renderer.Error(w, request, provider.NewError(http.StatusMethodNotAllowed, fmt.Errorf("unknown method `%s` for multipart", method)))
 			return
 		}
 
