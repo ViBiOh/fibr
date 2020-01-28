@@ -156,6 +156,10 @@
               <span class="filename ellipsis">{{ .Name }}</span>
             {{ end }}
 
+            <a href="{{ .Name }}?download" class="button button-icon file-download" alt="Download" download>
+              <img class="icon" src="/svg/download?fill=silver" alt="Download">
+            </a>
+
             {{ if $root.Request.CanEdit }}
               <a href="#delete-modal-{{ sha1 . }}" class="button button-icon file-delete" alt="Delete">
                 <img class="icon" src="/svg/times?fill=silver" alt="Delete">
@@ -168,12 +172,6 @@
             {{ if $root.Request.CanShare }}
               <a href="#share-form-{{ sha1 . }}" class="button button-icon file-share" alt="Share">
                 <img class="icon" src="/svg/share-alt-square?fill=silver" alt="Share {{ .Name }}">
-              </a>
-            {{ end }}
-
-            {{ if not .IsDir }}
-              <a href="{{ .Name }}" class="button button-icon file-download" alt="Download" download>
-                <img class="icon" src="/svg/download?fill=silver" alt="Download">
               </a>
             {{ end }}
 

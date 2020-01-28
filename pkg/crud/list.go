@@ -2,9 +2,11 @@ package crud
 
 import (
 	"archive/zip"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
+	"path"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
@@ -53,6 +55,8 @@ func (a *app) Download(w http.ResponseWriter, request provider.Request) {
 		a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
+
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s.zip", path.Base(request.Path)))
 
 	zipWriter := zip.NewWriter(w)
 	defer func() {
