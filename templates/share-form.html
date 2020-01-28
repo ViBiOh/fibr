@@ -1,26 +1,42 @@
-{{ define "share-form" }}
+{{ define "share-directory" }}
   <div id="share-form" class="modal">
     <div class="modal-content">
       <h2 class="header">Share this directory</h2>
 
       <form method="post" action="#">
-        <input type="hidden" name="type" value="share" />
-        <input type="hidden" name="method" value="POST" />
-
-        <p class="center">
-          <input id="edit" type="checkbox" name="edit" value="true" />
-          <label for="edit">Edit right</label>
-        </p>
-
-        <p class="center">
-          <input id="password" type="text" name="password" value="" placeholder="Password" />
-        </p>
-
-        <p class="center">
-          <a href="#" class="button white">Cancel</a>
-          <button type="submit" class="button bg-primary">Share</button>
-        </p>
+        {{ template "share-form" . }}
       </form>
     </div>
   </div>
+{{ end }}
+
+{{ define "share-file" }}
+  <div id="share-form-{{ sha1 . }}" class="modal">
+    <div class="modal-content">
+      <h2 class="header">Share {{ .Name }}</h2>
+
+      <form method="post" action="{{ .Name }}">
+        {{ template "share-form" . }}
+      </form>
+    </div>
+  </div>
+{{ end }}
+
+{{ define "share-form" }}
+  <input type="hidden" name="type" value="share" />
+  <input type="hidden" name="method" value="POST" />
+
+  <p class="center">
+    <input id="edit" type="checkbox" name="edit" value="true" />
+    <label for="edit">Edit right</label>
+  </p>
+
+  <p class="center">
+    <input id="password" type="text" name="password" value="" placeholder="Password" />
+  </p>
+
+  <p class="center">
+    <a href="#" class="button white">Cancel</a>
+    <button type="submit" class="button bg-primary">Share</button>
+  </p>
 {{ end }}

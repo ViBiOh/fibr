@@ -62,6 +62,7 @@ type Share struct {
 	RootName string `json:"rootName"`
 	Edit     bool   `json:"edit"`
 	Password string `json:"password"`
+	File     bool   `json:"file"`
 }
 
 // CheckPassword verifies that request has correct password for share

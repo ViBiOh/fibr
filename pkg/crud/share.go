@@ -63,12 +63,23 @@ func (a *app) CreateShare(w http.ResponseWriter, r *http.Request, request provid
 	a.metadataLock.Lock()
 	defer a.metadataLock.Unlock()
 
+	info, err := a.storage.Info(request.Path)
+	if err != nil {
+		if provider.IsNotExist(err) {
+			a.renderer.Error(w, request, provider.NewError(http.StatusNotFound, err))
+		} else {
+			a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
+		}
+		return
+	}
+
 	a.metadatas = append(a.metadatas, &provider.Share{
 		ID:       id,
 		Path:     request.Path,
 		RootName: path.Base(request.Path),
 		Edit:     edit,
 		Password: password,
+		File:     !info.IsDir,
 	})
 
 	if err = a.saveMetadata(); err != nil {
@@ -76,7 +87,7 @@ func (a *app) CreateShare(w http.ResponseWriter, r *http.Request, request provid
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("%s/?message=%s&messageLevel=success#share-list", request.GetURI(""), url.QueryEscape(fmt.Sprintf("Share successfully created with ID: %s", id))), http.StatusFound)
+	http.Redirect(w, r, fmt.Sprintf("%s/?message=%s&messageLevel=success#share-list", path.Dir(request.GetURI("")), url.QueryEscape(fmt.Sprintf("Share successfully created with ID: %s", id))), http.StatusFound)
 }
 
 // DeleteShare delete a share from given ID

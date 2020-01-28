@@ -7,19 +7,26 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/url"
+	"path"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v3/pkg/logger"
 )
 
-func (a *app) saveUploadedFile(request provider.Request, part *multipart.Part) (string, error) {
-	filename, err := provider.SanitizeName(part.FileName(), true)
-	if err != nil {
-		return "", err
-	}
+func (a *app) saveUploadedFile(request provider.Request, part *multipart.Part) (filename string, err error) {
+	var filePath string
 
-	filePath := request.GetFilepath(filename)
+	if request.Share != nil && request.Share.File {
+		filename = path.Base(request.Share.Path)
+		filePath = request.Share.Path
+	} else {
+		filename, err = provider.SanitizeName(part.FileName(), true)
+		if err != nil {
+			return "", err
+		}
+		filePath = request.GetFilepath(filename)
+	}
 
 	hostFile, err := a.storage.WriterTo(filePath)
 	if hostFile != nil {

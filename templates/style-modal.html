@@ -1,4 +1,6 @@
 {{ define "style-modal" }}
+  {{ $root := . }}
+
   <style>
     .modal {
       align-items: center;
@@ -22,9 +24,14 @@
       pointer-events: auto;
     }
 
-    {{ if .Request.CanEdit -}}
-      {{- range .Content.Files -}}
-        #delete-modal-{{ sha1 . }}, #edit-modal-{{ sha1 . }},
+    {{- range .Content.Files -}}
+      {{ if $root.Request.CanEdit -}}
+        #delete-modal-{{ sha1 . }},
+        #edit-modal-{{ sha1 . }},
+      {{- end -}}
+
+      {{ if $root.Request.CanShare -}}
+        #share-form-{{ sha1 . }},
       {{- end -}}
     {{- end -}}
     #upload-modal,
@@ -35,9 +42,14 @@
       display: none;
     }
 
-    {{ if .Request.CanEdit -}}
-      {{- range .Content.Files -}}
-        #delete-modal-{{ sha1 . }}:target, #edit-modal-{{ sha1 . }}:target,
+    {{- range .Content.Files -}}
+      {{ if $root.Request.CanEdit -}}
+        #delete-modal-{{ sha1 . }}:target,
+        #edit-modal-{{ sha1 . }}:target,
+      {{- end -}}
+
+      {{ if $root.Request.CanShare -}}
+        #share-form-{{ sha1 . }}:target,
       {{- end -}}
     {{- end -}}
     #upload-modal:target,
@@ -49,9 +61,14 @@
       z-index: 5;
     }
 
-    {{ if .Request.CanEdit -}}
-      {{- range .Content.Files -}}
-        #delete-modal-{{ sha1 . }}:target ~ .content, #edit-modal-{{ sha1 . }}:target ~ .content,
+    {{- range .Content.Files -}}
+      {{ if $root.Request.CanEdit -}}
+        #delete-modal-{{ sha1 . }}:target ~ .content,
+        #edit-modal-{{ sha1 . }}:target ~ .content,
+      {{- end -}}
+
+      {{ if $root.Request.CanShare -}}
+        #share-form-{{ sha1 . }}:target ~ .content,
       {{- end -}}
     {{- end -}}
     #upload-modal:target ~ .content,

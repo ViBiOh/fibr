@@ -9,14 +9,18 @@
   {{ end }}
 
   {{ if .Request.CanShare }}
-    {{ template "share-form" . }}
+    {{ template "share-directory" . }}
     {{ template "share-list" . }}
   {{ end }}
 
-  {{ if .Request.CanEdit }}
-    {{ range .Content.Files }}
+  {{ range .Content.Files }}
+    {{ if $root.Request.CanEdit }}
       {{ template "edit-modal" . }}
       {{ template "delete-modal" . }}
+    {{ end }}
+
+    {{ if $root.Request.CanShare }}
+      {{ template "share-file" . }}
     {{ end }}
   {{ end }}
 
@@ -158,6 +162,12 @@
               </a>
               <a href="#edit-modal-{{ sha1 . }}" class="button button-icon file-edit" alt="Edit">
                 <img class="icon" src="/svg/pencil-alt?fill=silver" alt="Edit">
+              </a>
+            {{ end }}
+
+            {{ if $root.Request.CanShare }}
+              <a href="#share-form-{{ sha1 . }}" class="button button-icon file-share" alt="Share">
+                <img class="icon" src="/svg/share-alt-square?fill=silver" alt="Share {{ .Name }}">
               </a>
             {{ end }}
 
