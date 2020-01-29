@@ -180,26 +180,30 @@
         text-align: left;
       }
 
-      .file-edit,
       .file-download,
-      .file-delete {
+      .file-edit,
+      .file-delete,
+      .file-share {
         display: none;
       }
 
       .file-edit,
-      .file-download {
+      .file-delete,
+      .file-share {
         margin-left: 0.5rem;
       }
 
-      .file:hover .file-edit,
       .file:hover .file-download,
-      .file:hover .file-delete {
+      .file:hover .file-edit,
+      .file:hover .file-delete,
+      .file:hover .file-share {
         display: inline-block;
       }
 
-      .file-edit .icon,
       .file-download .icon,
-      .file-delete .icon {
+      .file-edit .icon,
+      .file-delete .icon,
+      .file-share .icon {
         margin: 0;
       }
 
@@ -209,9 +213,10 @@
           width: auto;
         }
 
-        .file-edit,
         .file-download,
-        .file-delete {
+        .file-edit,
+        .file-delete,
+        .file-share {
           display: inline-block;
         }
       }
@@ -256,8 +261,8 @@
         text-align: center;
       }
 
-      .file-edit,
       .file-download,
+      .file-edit,
       .file-delete,
       .file-share {
         background-color: var(--dark);
