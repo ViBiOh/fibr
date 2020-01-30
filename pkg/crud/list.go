@@ -39,7 +39,7 @@ func (a *app) List(w http.ResponseWriter, request provider.Request, message *pro
 	items := make([]provider.RenderItem, len(files))
 	for index, file := range files {
 		items[index] = provider.RenderItem{
-			ID:          sha.Sha1(file),
+			ID:          sha.Sha1(file.Name),
 			StorageItem: file,
 		}
 	}
