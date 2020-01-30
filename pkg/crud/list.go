@@ -9,6 +9,7 @@ import (
 	"path"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/fibr/pkg/sha"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v3/pkg/logger"
 )
@@ -35,9 +36,17 @@ func (a *app) List(w http.ResponseWriter, request provider.Request, message *pro
 		return
 	}
 
+	items := make([]provider.RenderItem, len(files))
+	for index, file := range files {
+		items[index] = provider.RenderItem{
+			ID:          sha.Sha1(file),
+			StorageItem: file,
+		}
+	}
+
 	content := map[string]interface{}{
 		"Paths": getPathParts(request.GetURI("")),
-		"Files": files,
+		"Files": items,
 		"Cover": a.getCover(files),
 	}
 

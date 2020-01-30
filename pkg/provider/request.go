@@ -180,3 +180,9 @@ func (s StorageItem) IsImage() bool {
 func (s StorageItem) IsVideo() bool {
 	return VideoExtensions[s.Extension()] != ""
 }
+
+// RenderItem is a storage item with an id
+type RenderItem struct {
+	ID string
+	StorageItem
+}

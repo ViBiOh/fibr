@@ -1,5 +1,5 @@
 {{ define "async-image" }}
-  <picture id="picture-{{ .Fingerprint }}" class="no-margin" data-picture data-alt="Thumbnail of {{ .File.Name }}">
+  <picture id="picture-{{ .File.ID }}" class="no-margin" data-picture data-alt="Thumbnail of {{ .File.Name }}">
     <noscript>
       <img class="thumbnail full" src="{{ urlescape (.File.Name) }}?thumbnail&v={{ .Version }}" alt="Thumbnail of {{ .File.Name }}" />
     </noscript>

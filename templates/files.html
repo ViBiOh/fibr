@@ -161,16 +161,16 @@
             </a>
 
             {{ if $root.Request.CanEdit }}
-              <a href="#delete-modal-{{ sha1 . }}" class="button button-icon file-delete" alt="Delete">
+              <a href="#delete-modal-{{ .ID }}" class="button button-icon file-delete" alt="Delete">
                 <img class="icon" src="/svg/times?fill=silver" alt="Delete">
               </a>
-              <a href="#edit-modal-{{ sha1 . }}" class="button button-icon file-edit" alt="Edit">
+              <a href="#edit-modal-{{ .ID }}" class="button button-icon file-edit" alt="Edit">
                 <img class="icon" src="/svg/pencil-alt?fill=silver" alt="Edit">
               </a>
             {{ end }}
 
             {{ if $root.Request.CanShare }}
-              <a href="#share-form-{{ sha1 . }}" class="button button-icon file-share" alt="Share">
+              <a href="#share-form-{{ .ID }}" class="button button-icon file-share" alt="Share">
                 <img class="icon" src="/svg/share-alt-square?fill=silver" alt="Share {{ .Name }}">
               </a>
             {{ end }}

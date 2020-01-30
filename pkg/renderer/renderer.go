@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/fibr/pkg/sha"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v3/pkg/flags"
 	"github.com/ViBiOh/httputils/v3/pkg/logger"
@@ -53,20 +52,16 @@ func New(config Config, rootName string, thumbnailApp thumbnail.App) App {
 		"urlescape": func(path string) string {
 			return url.PathEscape(path)
 		},
-		"sha1": func(file provider.StorageItem) string {
-			return sha.Sha1(file.Name)
-		},
-		"asyncImage": func(file provider.StorageItem, version string) map[string]interface{} {
+		"asyncImage": func(file provider.RenderItem, version string) map[string]interface{} {
 			return map[string]interface{}{
-				"File":        file,
-				"Fingerprint": template.JS(sha.Sha1(file.Name)),
-				"Version":     version,
+				"File":    file,
+				"Version": version,
 			}
 		},
 		"rebuildPaths": func(parts []string, index int) string {
 			return path.Join(parts[:index+1]...)
 		},
-		"iconFromExtension": func(file provider.StorageItem) string {
+		"iconFromExtension": func(file provider.RenderItem) string {
 			extension := file.Extension()
 
 			switch {
@@ -90,8 +85,8 @@ func New(config Config, rootName string, thumbnailApp thumbnail.App) App {
 				return "file"
 			}
 		},
-		"hasThumbnail": func(item provider.StorageItem) bool {
-			return thumbnail.CanHaveThumbnail(item) && thumbnailApp.HasThumbnail(item)
+		"hasThumbnail": func(item provider.RenderItem) bool {
+			return thumbnail.CanHaveThumbnail(item.StorageItem) && thumbnailApp.HasThumbnail(item.StorageItem)
 		},
 	})
 

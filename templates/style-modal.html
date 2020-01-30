@@ -5,7 +5,7 @@
     .modal {
       align-items: center;
       background-color: rgba(84, 84, 84, 0.75);
-      display: flex;
+      display: none;
       height: 100vh;
       justify-content: center;
       left: 0;
@@ -26,30 +26,12 @@
 
     {{- range .Content.Files -}}
       {{ if $root.Request.CanEdit -}}
-        #delete-modal-{{ sha1 . }},
-        #edit-modal-{{ sha1 . }},
+        #delete-modal-{{ .ID }}:target,
+        #edit-modal-{{ .ID }}:target,
       {{- end -}}
 
       {{ if $root.Request.CanShare -}}
-        #share-form-{{ sha1 . }},
-      {{- end -}}
-    {{- end -}}
-    #upload-modal,
-    #upload-success,
-    #folder-modal,
-    #share-form,
-    #share-list {
-      display: none;
-    }
-
-    {{- range .Content.Files -}}
-      {{ if $root.Request.CanEdit -}}
-        #delete-modal-{{ sha1 . }}:target,
-        #edit-modal-{{ sha1 . }}:target,
-      {{- end -}}
-
-      {{ if $root.Request.CanShare -}}
-        #share-form-{{ sha1 . }}:target,
+        #share-form-{{ .ID }}:target,
       {{- end -}}
     {{- end -}}
     #upload-modal:target,
@@ -63,12 +45,12 @@
 
     {{- range .Content.Files -}}
       {{ if $root.Request.CanEdit -}}
-        #delete-modal-{{ sha1 . }}:target ~ .content,
-        #edit-modal-{{ sha1 . }}:target ~ .content,
+        #delete-modal-{{ .ID }}:target ~ .content,
+        #edit-modal-{{ .ID }}:target ~ .content,
       {{- end -}}
 
       {{ if $root.Request.CanShare -}}
-        #share-form-{{ sha1 . }}:target ~ .content,
+        #share-form-{{ .ID }}:target ~ .content,
       {{- end -}}
     {{- end -}}
     #upload-modal:target ~ .content,

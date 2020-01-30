@@ -1,5 +1,5 @@
 {{ define "edit-modal" }}
-  <div id="edit-modal-{{ sha1 . }}" class="modal">
+  <div id="edit-modal-{{ .ID }}" class="modal">
     <div class="modal-content">
       <h2 class="header">Rename</h2>
 
@@ -9,8 +9,8 @@
         <input type="hidden" name="name" value="{{ .Name }}" />
 
         <p class="center">
-          <label for="name-{{ sha1 . }}">Name</label>
-          <input id="name-{{ sha1 . }}" type="text" name="newName" value="{{ .Name }}" />
+          <label for="name-{{ .ID }}">Name</label>
+          <input id="name-{{ .ID }}" type="text" name="newName" value="{{ .Name }}" />
         </p>
 
         <p class="center">
