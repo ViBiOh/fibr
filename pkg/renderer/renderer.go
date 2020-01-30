@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
-	"net/url"
 	"path"
 	"strings"
 
@@ -49,9 +48,6 @@ func New(config Config, rootName string, thumbnailApp thumbnail.App) App {
 	tpl := template.New("fibr")
 
 	tpl.Funcs(template.FuncMap{
-		"urlescape": func(path string) string {
-			return url.PathEscape(path)
-		},
 		"asyncImage": func(file provider.RenderItem, version string) map[string]interface{} {
 			return map[string]interface{}{
 				"File":    file,
