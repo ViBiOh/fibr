@@ -5,6 +5,7 @@ import (
 	"path"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/fibr/pkg/sha"
 	"github.com/ViBiOh/httputils/v3/pkg/logger"
 )
 
@@ -26,8 +27,11 @@ func (a *app) Browser(w http.ResponseWriter, request provider.Request, file prov
 	}
 
 	content := map[string]interface{}{
-		"Paths":    breadcrumbs,
-		"File":     file,
+		"Paths": breadcrumbs,
+		"File": provider.RenderItem{
+			ID:          sha.Sha1(file.Name),
+			StorageItem: file,
+		},
 		"Cover":    a.getCover(files),
 		"Parent":   path.Join(breadcrumbs...),
 		"Previous": previous,
