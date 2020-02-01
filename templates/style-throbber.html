@@ -1,7 +1,27 @@
 {{ define "style-throbber" }}
+  <script>
+    /**
+     * Generate a throbber.
+     * @return {DOMNode}
+     */
+    function generateThrobber(className) {
+      const wrapper = document.createElement('div');
+      wrapper.classList.add('throbber', className);
+
+      for (let i = 1; i < 4; i++) {
+        const dot = document.createElement('div');
+        dot.classList.add(`throbber-dot-${i}`);
+        wrapper.appendChild(dot);
+      }
+
+      return wrapper;
+    }
+  </script>
+
   <style>
     .throbber {
       margin: auto;
+      text-align: center;
     }
 
     .throbber > div {
@@ -17,11 +37,11 @@
       background-color: var(--white);
     }
 
-    .throbber .bounce1 {
+    .throbber-dot-1 {
       animation-delay: -0.32s;
     }
 
-    .throbber .bounce2 {
+    .throbber-dot-2 {
       animation-delay: -0.16s;
     }
 

@@ -56,23 +56,6 @@
       return response.json();
     }
 
-    /**
-     * Generate a throbber.
-     * @return {DOMNode}
-     */
-    function generateThrobber(className) {
-      const wrapper = document.createElement('div');
-      wrapper.classList.add('throbber', 'center', className);
-
-      for (let i = 1; i < 4; i++) {
-        const dot = document.createElement('div');
-        dot.classList.add(`bounce${i}`);
-        wrapper.appendChild(dot);
-      }
-
-      return wrapper;
-    }
-
     window.addEventListener(
       'load',
       async () => {
