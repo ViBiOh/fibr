@@ -17,9 +17,6 @@ ifeq ($(DEBUG), true)
 	MAIN_RUNNER = dlv debug $(MAIN_SOURCE) --
 endif
 
-VITH_SOURCE = cmd/vith/vith.go
-VITH_BINARY = bin/vith
-
 .DEFAULT_GOAL := app
 
 ## help: Display list of commands
@@ -77,7 +74,6 @@ test:
 .PHONY: build
 build:
 	CGO_ENABLED=0 go build -ldflags="-s -w" -installsuffix nocgo -o $(MAIN_BINARY) $(MAIN_SOURCE)
-	CGO_ENABLED=0 go build -ldflags="-s -w" -installsuffix nocgo -o $(VITH_BINARY) $(VITH_SOURCE)
 
 ## run: Run app
 .PHONY: run
@@ -89,6 +85,7 @@ run:
 		-authUsers "1:`htpasswd -nBb admin admin`" \
 		-frameOptions "SAMEORIGIN" \
 		-thumbnailImageURL "http://localhost:9000" \
+		-thumbnailVideoURL "http://localhost:2080" \
 		-csp "default-src 'self'; base-uri 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:"
 
 .PHONY: run-imaginary
@@ -97,3 +94,10 @@ run-imaginary:
 		--name "imaginary" \
 		-p "9000:9000/tcp" \
 		h2non/imaginary
+
+.PHONY: run-vith
+run-vith:
+	docker run --rm \
+		--name "vith" \
+		-p "2080:1080/tcp" \
+		vibioh/vith

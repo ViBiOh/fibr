@@ -70,23 +70,3 @@ Usage of fibr:
   -version string
         [fibr] Version (used mainly as a cache-buster) {FIBR_VERSION}
 ```
-
-### Video Thumbnail (vith)
-
-```bash
-Usage of vith:
-  -address string
-        [http] Listen address {VITH_ADDRESS}
-  -cert string
-        [http] Certificate file {VITH_CERT}
-  -key string
-        [http] Key file {VITH_KEY}
-  -okStatus int
-        [http] Healthy HTTP Status code {VITH_OK_STATUS} (default 204)
-  -port uint
-        [http] Listen port {VITH_PORT} (default 1080)
-  -url string
-        [alcotest] URL to check {VITH_URL}
-  -userAgent string
-        [alcotest] User-Agent for check {VITH_USER_AGENT} (default "Alcotest")
-```
