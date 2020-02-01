@@ -6,11 +6,14 @@
      */
     function generateThrobber(className) {
       const wrapper = document.createElement('div');
-      wrapper.classList.add('throbber', className);
+      wrapper.classList.add('throbber');
+      if (className) {
+        wrapper.classList.add(className);
+      }
 
       for (let i = 1; i < 4; i++) {
         const dot = document.createElement('div');
-        dot.classList.add(`throbber-dot-${i}`);
+        dot.classList.add('throbber-dot', `throbber-dot-${i}`);
         wrapper.appendChild(dot);
       }
 
@@ -24,8 +27,8 @@
       text-align: center;
     }
 
-    .throbber > div {
-      animation: bouncingdot 1.4s infinite ease-in-out both;
+    .throbber-dot {
+      animation: throbber-dot 1.4s infinite ease-in-out both;
       background-color: var(--dark);
       border-radius: 100%;
       display: inline-block;
@@ -33,7 +36,7 @@
       width: 1rem;
     }
 
-    .throbber-white > div {
+    .throbber-white .throbber-dot {
       background-color: var(--white);
     }
 
@@ -45,7 +48,7 @@
       animation-delay: -0.16s;
     }
 
-    @keyframes bouncingdot {
+    @keyframes throbber-dot {
       0%,
       80%,
       100% {
