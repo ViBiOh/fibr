@@ -1,5 +1,6 @@
 {{ define "files" }}
   {{ template "layout" . }}
+  {{ template "throbber" . }}
 
   {{ $root := . }}
 
@@ -85,6 +86,169 @@
       false,
     );
   </script>
+
+  <style>
+    #menu {
+      padding-left: 0.5rem;
+      padding-top: 0.5rem;
+    }
+
+    #files {
+      list-style: none;
+    }
+
+    .thumbnail {
+      max-height: 100%;
+    }
+
+    {{ if eq .Layout "list" }}
+      #list-display {
+        background-color: var(--primary);
+      }
+
+      .file {
+        align-items: center;
+        display: flex;
+        margin: 0.5rem 1rem 0;
+      }
+
+      @media screen and (min-width: 640px) {
+        .file .button-icon {
+          padding: 0;
+        }
+      }
+
+      .filelink {
+        display: inline-flex;
+        height: 2.5rem;
+        width: 45rem;
+      }
+
+      .filename {
+        display: inline-block;
+        flex: 1 1;
+        text-align: left;
+      }
+
+      .file-download,
+      .file-edit,
+      .file-delete,
+      .file-share {
+        display: none;
+      }
+
+      .file-edit,
+      .file-delete,
+      .file-share {
+        margin-left: 0.5rem;
+      }
+
+      .file:hover .file-download,
+      .file:hover .file-edit,
+      .file:hover .file-delete,
+      .file:hover .file-share {
+        display: inline-block;
+      }
+
+      .file-download .icon,
+      .file-edit .icon,
+      .file-delete .icon,
+      .file-share .icon {
+        margin: 0;
+      }
+
+      @media screen and (max-width: 640px) {
+        .filelink {
+          flex: 1 1;
+          width: auto;
+        }
+
+        .file-download,
+        .file-edit,
+        .file-delete,
+        .file-share {
+          display: inline-block;
+        }
+      }
+    {{ end }}
+
+    {{ if eq .Layout "grid" }}
+      #grid-display {
+        background-color: var(--primary);
+      }
+
+      #files {
+        display: grid;
+        grid-gap: .5rem;
+        grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+        margin: .5rem;
+      }
+
+      #files > * {
+        align-items: center;
+        background-color: var(--grey);
+        display: flex;
+        min-height: 12rem;
+        position: relative;
+      }
+
+      .file {
+        padding: 0.5rem;
+      }
+
+      .filelink {
+        width: 100%;
+      }
+
+      .filelink picture img {
+        vertical-align: middle;
+        width: 100%;
+      }
+
+      .filename {
+        display: block;
+        margin-top: 1rem;
+        text-align: center;
+      }
+
+      .file-download,
+      .file-edit,
+      .file-delete,
+      .file-share {
+        background-color: var(--dark);
+        display: none;
+        padding: 0.5rem;
+        position: absolute;
+      }
+
+      .file-download {
+        left: 0.5rem;
+        top: 0.5rem;
+      }
+
+      .file-share {
+        left: 0.5rem;
+        top: 4.5rem;
+      }
+
+      .file-edit {
+        right: 0.5rem;
+        top: 0.5rem;
+      }
+
+      .file-delete {
+        right: 0.5rem;
+        top: 4.5rem;
+      }
+
+      #files > *:hover .file-edit,
+      #files > *:hover .file-download,
+      #files > *:hover .file-share,
+      #files > *:hover .file-delete {
+        display: block;
+      }
+    {{ end }}
+  </style>
 
   <div class="content">
     <div id="menu" class="flex flex-center">

@@ -4,7 +4,6 @@
     {{ template "style-color" . }}
     {{ template "style-icon" . }}
     {{ template "style-modal" . }}
-    {{ template "style-throbber" . }}
   {{ end }}
 
   <style>
@@ -59,23 +58,16 @@
       text-decoration: underline;
     }
 
-    {{ if eq .Layout "browser" }}
-      body {
-        background-color: var(--white);
-        display: grid;
-        grid-template-rows: auto 1fr;
-      }
+    .header {
+      background-color: var(--grey);
+      margin-top: 0;
+      padding: 0.5rem 1rem;
+      text-align: left;
+    }
 
-      img, video, object {
-        border: 0;
-        height: 100%;
-        image-orientation: from-image;
-        margin: 0 auto;
-        object-fit: scale-down;
-        width: 100%;
-      }
-
-    {{ end }}
+    .message {
+      padding: 1rem 2rem;
+    }
 
     .flex {
       display: flex;
@@ -90,214 +82,9 @@
       flex: 1 1;
     }
 
-    .header {
-      background-color: var(--grey);
-      margin-top: 0;
-      padding: 0.5rem 1rem;
-      text-align: left;
-    }
-
-    .thumbnail {
-      max-height: 100%;
-    }
-
-    .message {
-      padding: 1rem 2rem;
-    }
-
-    #menu {
-      padding-left: 0.5rem;
-      padding-top: 0.5rem;
-    }
-
-    #files {
-      list-style: none;
-    }
-
-    #upload-form {
-      display: flex;
+    .flex-column {
       flex-direction: column;
-      flex: 1 1;
     }
-
-    #upload-list {
-      margin: 1rem auto;
-      max-width: 30rem;
-      overflow-y: auto;
-    }
-
-    #shares {
-      border-collapse: separate;
-      border-spacing: 1rem;
-    }
-
-    .upload-item {
-      display: inline-block;
-      width: calc(100% - 2rem);
-    }
-
-    .upload-name {
-      flex: 1 1;
-      text-align: left;
-    }
-
-    .upload-status {
-      margin-left: 0.5rem;
-      text-align: right;
-      width: 2rem;
-    }
-
-    .share-content:hover {
-      background-color: var(--grey);
-    }
-
-    {{ if eq .Layout "list" }}
-      #list-display {
-        background-color: var(--primary);
-      }
-
-      .file {
-        align-items: center;
-        display: flex;
-        margin: 0.5rem 1rem 0;
-      }
-
-      @media screen and (min-width: 640px) {
-        .file .button-icon {
-          padding: 0;
-        }
-      }
-
-      .filelink {
-        display: inline-flex;
-        height: 2.5rem;
-        width: 45rem;
-      }
-
-      .filename {
-        display: inline-block;
-        flex: 1 1;
-        text-align: left;
-      }
-
-      .file-download,
-      .file-edit,
-      .file-delete,
-      .file-share {
-        display: none;
-      }
-
-      .file-edit,
-      .file-delete,
-      .file-share {
-        margin-left: 0.5rem;
-      }
-
-      .file:hover .file-download,
-      .file:hover .file-edit,
-      .file:hover .file-delete,
-      .file:hover .file-share {
-        display: inline-block;
-      }
-
-      .file-download .icon,
-      .file-edit .icon,
-      .file-delete .icon,
-      .file-share .icon {
-        margin: 0;
-      }
-
-      @media screen and (max-width: 640px) {
-        .filelink {
-          flex: 1 1;
-          width: auto;
-        }
-
-        .file-download,
-        .file-edit,
-        .file-delete,
-        .file-share {
-          display: inline-block;
-        }
-      }
-    {{ end }}
-
-    {{ if eq .Layout "grid" }}
-      #grid-display {
-        background-color: var(--primary);
-      }
-
-      #files {
-        display: grid;
-        grid-gap: .5rem;
-        grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
-        margin: .5rem;
-      }
-
-      #files > * {
-        align-items: center;
-        background-color: var(--grey);
-        display: flex;
-        min-height: 12rem;
-        position: relative;
-      }
-
-      .file {
-        padding: 0.5rem;
-      }
-
-      .filelink {
-        width: 100%;
-      }
-
-      .filelink picture img {
-        vertical-align: middle;
-        width: 100%;
-      }
-
-      .filename {
-        display: block;
-        margin-top: 1rem;
-        text-align: center;
-      }
-
-      .file-download,
-      .file-edit,
-      .file-delete,
-      .file-share {
-        background-color: var(--dark);
-        display: none;
-        padding: 0.5rem;
-        position: absolute;
-      }
-
-      .file-download {
-        left: 0.5rem;
-        top: 0.5rem;
-      }
-
-      .file-share {
-        left: 0.5rem;
-        top: 4.5rem;
-      }
-
-      .file-edit {
-        right: 0.5rem;
-        top: 0.5rem;
-      }
-
-      .file-delete {
-        right: 0.5rem;
-        top: 4.5rem;
-      }
-
-      #files > *:hover .file-edit,
-      #files > *:hover .file-download,
-      #files > *:hover .file-share,
-      #files > *:hover .file-delete {
-        display: block;
-      }
-    {{ end }}
 
     .center {
       text-align: center;

@@ -1,6 +1,23 @@
 {{ define "file" }}
   {{ template "layout" . }}
 
+  <style>
+    body {
+      background-color: var(--white);
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    img, video, object {
+      border: 0;
+      height: 100%;
+      image-orientation: from-image;
+      margin: 0 auto;
+      object-fit: scale-down;
+      width: 100%;
+    }
+  </style>
+
   {{ if .Content.File.IsVideo }}
     <video controls src="{{ .Content.File.Name }}" type="{{ .Content.File.Mime }}"></video>
   {{ else }}

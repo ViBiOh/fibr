@@ -1,4 +1,15 @@
 {{ define "share-list" }}
+  <style>
+    #shares {
+      border-collapse: separate;
+      border-spacing: 1rem;
+    }
+
+    .share-content:hover {
+      background-color: var(--grey);
+    }
+  </style>
+
   <div id="share-list" class="modal">
     <div class="modal-content">
       <h2 class="header">Shared folders</h2>

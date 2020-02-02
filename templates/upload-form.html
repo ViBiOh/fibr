@@ -72,7 +72,7 @@
       item.appendChild(itemWrapper);
 
       const filename = document.createElement('div');
-      filename.classList.add('upload-name', 'ellipsis');
+      filename.classList.add('upload-name', 'flex-grow', 'ellipsis');
       filename.innerHTML = file.name;
       itemWrapper.appendChild(filename);
 
@@ -257,12 +257,36 @@
     });
   </script>
 
+  <style>
+    #upload-list {
+      margin: 1rem auto;
+      max-width: 30rem;
+      overflow-y: auto;
+    }
+
+    .upload-item {
+      display: inline-block;
+      width: calc(100% - 2rem);
+    }
+
+    .upload-name {
+      text-align: left;
+    }
+
+    .upload-status {
+      margin-left: 0.5rem;
+      text-align: right;
+      width: 2rem;
+    }
+  </style>
+
   <div id="upload-modal" class="modal">
     <div class="modal-content">
       <h2 class="header">Upload files</h2>
 
       <form
         id="upload-form"
+        class="flex flex-column flex-grow"
         method="post"
         enctype="multipart/form-data"
         action="#"
