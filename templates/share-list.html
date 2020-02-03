@@ -1,8 +1,12 @@
 {{ define "share-list" }}
   <style>
     #shares {
-      border-collapse: separate;
-      border-spacing: 1rem;
+      border-spacing: 0;
+    }
+
+    #shares th,
+    #shares td {
+      padding: 1rem;
     }
 
     .share-content:hover {
@@ -21,7 +25,7 @@
           <caption>List of existing shares</caption>
 
           <thead>
-            <tr class="share-content">
+            <tr>
               <th scope="col">ID</th>
               <th scope="col">Path</th>
               <td>
