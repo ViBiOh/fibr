@@ -278,7 +278,7 @@
       {{ end }}
 
       {{ if gt (len .Content.Files) 0 }}
-        <a class="inline padding" href="?download" download>
+        <a class="padding" href="?download" download>
           <img class="icon" src="/svg/download?fill=silver" alt="Download">
         </a>
       {{ end }}
@@ -296,11 +296,11 @@
               {{ template "async-image" asyncImage . $root.Config.Version }}
             {{ else }}
               {{ if .IsDir }}
-                <img class="icon {{ if eq $root.Layout "grid" }}icon-large{{ else }}margin-right{{ end }}" src="/svg/folder?fill=silver" alt="Folder">
+                <img class="icon {{ if eq $root.Layout "grid" }}icon-large{{ end }}" src="/svg/folder?fill=silver" alt="Folder">
               {{ else }}
-                <img class="icon {{ if eq $root.Layout "grid" }}icon-large{{ else }}margin-right{{ end }}" src="/svg/{{ iconFromExtension . }}?fill=silver" alt="File">
+                <img class="icon {{ if eq $root.Layout "grid" }}icon-large{{ end }}" src="/svg/{{ iconFromExtension . }}?fill=silver" alt="File">
               {{ end }}
-              <span class="filename ellipsis">{{ .Name }}</span>
+              <span class="filename ellipsis {{ if eq $root.Layout "list" }}padding-left{{ end }}">{{ .Name }}</span>
             {{ end }}
 
             <a href="{{ .Name }}?download" class="button button-icon file-download" alt="Download" download>

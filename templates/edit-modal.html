@@ -8,12 +8,12 @@
         <input type="hidden" name="method" value="PATCH" />
         <input type="hidden" name="name" value="{{ .Name }}" />
 
-        <p class="center">
+        <p class="padding center">
           <label for="name-{{ .ID }}">Name</label>
           <input id="name-{{ .ID }}" type="text" name="newName" value="{{ .Name }}" />
         </p>
 
-        <p class="center">
+        <p class="padding center">
           <a href="#" class="button white">Cancel</a>
           <button type="submit" class="button bg-primary">Update</button>
         </p>

@@ -1,7 +1,8 @@
 {{ define "style" }}
+  {{ template "style-color" . }}
+
   {{ if .Request }}
     {{ template "style-button" . }}
-    {{ template "style-color" . }}
     {{ template "style-icon" . }}
     {{ template "style-modal" . }}
   {{ end }}
@@ -44,10 +45,6 @@
       color: var(--dark);
     }
 
-    p {
-      margin: 1rem;
-    }
-
     a {
       color: var(--white);
       text-decoration: none;
@@ -63,10 +60,6 @@
       margin-top: 0;
       padding: 0.5rem 1rem;
       text-align: left;
-    }
-
-    .message {
-      padding: 1rem 2rem;
     }
 
     .flex {
@@ -98,10 +91,6 @@
       max-width: 100vw;
     }
 
-    .inline {
-      display: inline-block;
-    }
-
     .medium {
       font-size: 2.4rem;
     }
@@ -122,16 +111,8 @@
       padding-left: 1rem;
     }
 
-    .margin-right {
-      margin-right: 1rem;
-    }
-
     .no-margin {
       margin: 0;
-    }
-
-    .no-margin-bottom {
-      margin-bottom: 0;
     }
 
     .ellipsis {

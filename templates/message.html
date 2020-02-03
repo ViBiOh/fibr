@@ -1,6 +1,6 @@
 {{ define "message" }}
   {{ if . }}
-    <p class="message full no-margin center {{ if eq .Level "success" }}success{{ else if eq .Level "error" }}danger{{ end }}">
+    <p class="padding center full no-margin {{ if eq .Level "success" }}success{{ else if eq .Level "error" }}danger{{ end }}">
       {{ .Content }}
     </p>
   {{ end }}

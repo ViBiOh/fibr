@@ -7,9 +7,8 @@
     </h1>
   </header>
 
-  <h2 class="center">Error {{ .Error.Status }}</h2>
+  <h2 class="padding no-margin center bg-danger">Error {{ .Error.Status }}</h2>
 
-  <h2 class="padding bg-danger no-margin-bottom">Error message</h2>
   <code class="bg-grey flex padding">
     {{ .Error.Err }}
   </code>
