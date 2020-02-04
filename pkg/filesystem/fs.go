@@ -84,11 +84,6 @@ func New(config Config) (provider.Storage, error) {
 	}, nil
 }
 
-// Name of the storage
-func (a app) Name() string {
-	return "filesystem"
-}
-
 // Root name of the storage
 func (a app) Root() string {
 	return a.rootDirname

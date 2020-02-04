@@ -40,7 +40,6 @@ type Renderer interface {
 
 // Storage describe action on a storage provider
 type Storage interface {
-	Name() string
 	Root() string
 	Info(pathname string) (StorageItem, error)
 	WriterTo(pathname string) (io.WriteCloser, error)
@@ -48,7 +47,7 @@ type Storage interface {
 	Serve(http.ResponseWriter, *http.Request, string)
 	List(pathname string) ([]StorageItem, error)
 	Walk(pathname string, walkFn func(StorageItem, error) error) error
-	CreateDir(name string) error
+	CreateDir(pathname string) error
 	Store(pathname string, content io.ReadCloser) error
 	Rename(oldName, newName string) error
 	Remove(pathname string) error
