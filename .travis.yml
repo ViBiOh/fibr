@@ -4,7 +4,6 @@ jobs:
   include:
     - stage: Build
 
-      sudo: required
       language: minimal
       services:
         - docker

@@ -12,13 +12,13 @@ jobs:
 
       - name: Fetch branches
         run: |
-          git fetch --no-tags --prune --depth=50 origin "+refs/heads/${BASE}:refs/remotes/origin/${BASE}"
-          git fetch --no-tags --prune --depth=50 origin "+refs/heads/${HEAD}:refs/remotes/origin/${HEAD}"
+          git fetch --no-tags --prune --depth=1 origin "+refs/heads/${BASE}:refs/remotes/origin/${BASE}"
+          git fetch --no-tags --prune --depth=100 origin "+refs/heads/${HEAD}:refs/remotes/origin/${HEAD}"
         env:
           BASE: ${{ github.base_ref }}
           HEAD: ${{ github.head_ref }}
 
-      - name: Check no WIP or fixup commit
+      - name: Check commits description
         env:
           BASE: origin/${{ github.base_ref }}
           HEAD: origin/${{ github.head_ref }}
