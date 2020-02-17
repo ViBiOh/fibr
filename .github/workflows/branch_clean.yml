@@ -12,8 +12,8 @@ jobs:
 
       - name: Fetch branches
         run: |
-          git fetch --no-tags --prune --depth=1 origin "+refs/heads/${BASE}:refs/remotes/origin/${BASE}"
-          git fetch --no-tags --prune --depth=100 origin "+refs/heads/${HEAD}:refs/remotes/origin/${HEAD}"
+          git fetch --no-tags --prune origin "+refs/heads/${BASE}:refs/remotes/origin/${BASE}"
+          git fetch --no-tags --prune origin "+refs/heads/${HEAD}:refs/remotes/origin/${HEAD}"
         env:
           BASE: ${{ github.base_ref }}
           HEAD: ${{ github.head_ref }}
