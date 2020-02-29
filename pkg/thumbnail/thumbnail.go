@@ -94,14 +94,18 @@ func (a app) Enabled() bool {
 
 // Serve check if thumbnail is present and serve it
 func (a app) Serve(w http.ResponseWriter, r *http.Request, item provider.StorageItem) {
-	if CanHaveThumbnail(item) {
-		if a.HasThumbnail(item) {
-			a.storage.Serve(w, r, getThumbnailPath(item))
-			return
-		}
+	if !CanHaveThumbnail(item) || !a.HasThumbnail(item) {
+		w.WriteHeader(http.StatusNoContent)
+		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	file, err := a.storage.ReaderFrom(getThumbnailPath(item))
+	if err != nil {
+		httperror.InternalServerError(w, err)
+		return
+	}
+
+	http.ServeContent(w, r, item.Name, item.Date, file)
 }
 
 // List return all thumbnail in a base64 form

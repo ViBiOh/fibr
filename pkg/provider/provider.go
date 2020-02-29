@@ -29,6 +29,13 @@ var (
 	WordExtensions = map[string]bool{".doc": true, ".docx": true, ".docm": true}
 )
 
+// ReadSeekerCloser is a combination of io.Reader, io.Seeker and io.Closer
+type ReadSeekerCloser interface {
+	Read([]byte) (int, error)
+	Seek(int64, int) (int64, error)
+	Close() error
+}
+
 // Renderer interface for return rich content to user
 type Renderer interface {
 	Directory(http.ResponseWriter, Request, map[string]interface{}, *Message)
@@ -40,12 +47,10 @@ type Renderer interface {
 
 // Storage describe action on a storage provider
 type Storage interface {
-	Root() string
 	Info(pathname string) (StorageItem, error)
-	WriterTo(pathname string) (io.WriteCloser, error)
-	ReaderFrom(pathname string) (io.ReadCloser, error)
-	Serve(http.ResponseWriter, *http.Request, string)
 	List(pathname string) ([]StorageItem, error)
+	WriterTo(pathname string) (io.WriteCloser, error)
+	ReaderFrom(pathname string) (ReadSeekerCloser, error)
 	Walk(pathname string, walkFn func(StorageItem, error) error) error
 	CreateDir(pathname string) error
 	Store(pathname string, content io.ReadCloser) error

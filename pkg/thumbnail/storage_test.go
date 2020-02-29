@@ -4,19 +4,25 @@ import (
 	"bytes"
 	"errors"
 	"io"
-	"io/ioutil"
-	"net/http"
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
-type stubStorage struct {
-	root string
+type stubReadCloserSeeker struct {
+	bytes.Buffer
 }
 
-func (ss stubStorage) Root() string {
-	return ss.root
+func (s stubReadCloserSeeker) Seek(a int64, b int) (int64, error) {
+	return 0, nil
+}
+
+func (s stubReadCloserSeeker) Close() error {
+	return nil
+}
+
+type stubStorage struct {
+	root string
 }
 
 func (ss stubStorage) Info(pathname string) (provider.StorageItem, error) {
@@ -37,24 +43,15 @@ func (ss stubStorage) WriterTo(pathname string) (io.WriteCloser, error) {
 	return nil, nil
 }
 
-func (ss stubStorage) ReaderFrom(pathname string) (io.ReadCloser, error) {
+func (ss stubStorage) ReaderFrom(pathname string) (provider.ReadSeekerCloser, error) {
 	if strings.HasSuffix(pathname, "error") {
 		return nil, errors.New("error on reader from")
 	}
 
-	buffer := bytes.Buffer{}
+	buffer := stubReadCloserSeeker{}
 	buffer.WriteString("ok")
 
-	return ioutil.NopCloser(&buffer), nil
-}
-
-func (ss stubStorage) Serve(w http.ResponseWriter, r *http.Request, pathname string) {
-	if r.URL.Path == "error" || strings.HasSuffix(pathname, "error") {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
+	return &buffer, nil
 }
 
 func (ss stubStorage) List(pathname string) ([]provider.StorageItem, error) {

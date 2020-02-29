@@ -73,8 +73,10 @@ func (a *app) getWithMessage(w http.ResponseWriter, r *http.Request, request pro
 	if !info.IsDir {
 		if query.GetBool(r, "browser") {
 			a.Browser(w, request, info, message)
+		} else if file, err := a.storage.ReaderFrom(info.Pathname); err != nil {
+			a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
 		} else {
-			a.storage.Serve(w, r, info.Pathname)
+			http.ServeContent(w, r, info.Name, info.Date, file)
 		}
 
 		return
