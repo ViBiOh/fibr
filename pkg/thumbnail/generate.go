@@ -3,6 +3,7 @@ package thumbnail
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"path"
 	"path/filepath"
@@ -35,7 +36,12 @@ func (a app) generateDir(pathname string) error {
 }
 
 func (a app) generateThumbnail(item provider.StorageItem) error {
-	file, err := a.storage.ReaderFrom(item.Pathname)
+	var (
+		file io.ReadCloser
+		err  error
+	)
+
+	file, err = a.storage.ReaderFrom(item.Pathname)
 	if err != nil {
 		return err
 	}

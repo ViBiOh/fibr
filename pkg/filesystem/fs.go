@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"net/http"
 	"os"
 	"path"
 	"path/filepath"
@@ -16,7 +15,6 @@ import (
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v3/pkg/flags"
-	"github.com/ViBiOh/httputils/v3/pkg/httperror"
 	"github.com/ViBiOh/httputils/v3/pkg/logger"
 )
 
@@ -84,11 +82,6 @@ func New(config Config) (provider.Storage, error) {
 	}, nil
 }
 
-// Root name of the storage
-func (a app) Root() string {
-	return a.rootDirname
-}
-
 // Info provide metadata about given pathname
 func (a app) Info(pathname string) (provider.StorageItem, error) {
 	if err := a.checkPathname(pathname); err != nil {
@@ -116,23 +109,13 @@ func (a app) WriterTo(pathname string) (io.WriteCloser, error) {
 }
 
 // ReaderFrom reads content from given pathname
-func (a app) ReaderFrom(pathname string) (io.ReadCloser, error) {
+func (a app) ReaderFrom(pathname string) (provider.ReadSeekerCloser, error) {
 	if err := a.checkPathname(pathname); err != nil {
 		return nil, convertError(err)
 	}
 
 	output, err := os.OpenFile(a.getFullPath(pathname), os.O_RDONLY, getMode(pathname))
 	return output, convertError(err)
-}
-
-// Serve file for given pathname
-func (a app) Serve(w http.ResponseWriter, r *http.Request, pathname string) {
-	if err := a.checkPathname(pathname); err != nil {
-		httperror.Forbidden(w)
-		return
-	}
-
-	http.ServeFile(w, r, a.getFullPath(pathname))
 }
 
 // List items in the storage

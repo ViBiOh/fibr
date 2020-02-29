@@ -52,8 +52,11 @@ func main() {
 
 	loginApp := newLoginApp(basicConfig)
 
+	info, err := storage.Info("")
+	logger.Fatal(err)
+
 	thumbnailApp := thumbnail.New(thumbnailConfig, storage)
-	rendererApp := renderer.New(rendererConfig, storage.Root(), thumbnailApp)
+	rendererApp := renderer.New(rendererConfig, thumbnailApp, info.Name)
 	crudApp := crud.New(crudConfig, storage, rendererApp, thumbnailApp)
 	fibrApp := fibr.New(crudApp, rendererApp, loginApp)
 
