@@ -5,7 +5,7 @@ jobs:
     - stage: Build
 
       language: go
-      go: 1.13
+      go: 1.14
       services:
         - docker
       before_install:
