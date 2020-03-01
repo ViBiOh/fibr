@@ -122,9 +122,7 @@ func computeTitle(config Config, request Request) string {
 		parts = append(parts, config.Seo.Title)
 	}
 
-	if request.Share == nil {
-		parts = append(parts, config.RootName)
-	} else {
+	if request.Share != nil {
 		parts = append(parts, request.Share.RootName)
 	}
 
@@ -146,9 +144,7 @@ func computeDescription(config Config, request Request) string {
 		parts = append(parts, config.Seo.Description)
 	}
 
-	if request.Share == nil {
-		parts = append(parts, config.RootName)
-	} else {
+	if request.Share != nil {
 		parts = append(parts, request.Share.RootName)
 	}
 

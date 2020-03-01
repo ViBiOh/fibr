@@ -8,7 +8,7 @@
       <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
 
         <a href="/{{ if .Request.Share }}{{ .Request.Share.ID }}/{{ end }}" itemprop="item">
-          <span itemprop="name">{{ if .Request.Share }}{{ .Request.Share.RootName }}{{ else }}{{ .Config.RootName }}{{ end }}</span>
+          <span itemprop="name">{{ if .Request.Share }}{{ .Request.Share.RootName }}{{ else }}fibr{{ end }}</span>
         </a>
       </span>
 

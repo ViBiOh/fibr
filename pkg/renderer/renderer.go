@@ -44,7 +44,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 }
 
 // New creates new App from Config
-func New(config Config, thumbnailApp thumbnail.App, rootName string) App {
+func New(config Config, thumbnailApp thumbnail.App) App {
 	tpl := template.New("fibr")
 
 	tpl.Funcs(template.FuncMap{
@@ -95,7 +95,6 @@ func New(config Config, thumbnailApp thumbnail.App, rootName string) App {
 		tpl: template.Must(tpl.ParseFiles(fibrTemplates...)),
 		config: provider.Config{
 			PublicURL: publicURL,
-			RootName:  rootName,
 			Version:   *config.version,
 			Seo: provider.Seo{
 				Title:       "fibr",
