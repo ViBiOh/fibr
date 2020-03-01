@@ -19,8 +19,6 @@ import (
 )
 
 var (
-	_ provider.Storage = &app{}
-
 	// ErrRelativePath occurs when path is relative (contains ".."")
 	ErrRelativePath = errors.New("pathname contains relatives paths")
 )
@@ -50,7 +48,7 @@ func New(config Config) (provider.Storage, error) {
 	rootDirectory := strings.TrimSpace(*config.directory)
 	ignore := strings.TrimSpace(*config.ignore)
 
-	if rootDirectory == "" {
+	if len(rootDirectory) == 0 {
 		return nil, errors.New("no directory provided")
 	}
 
@@ -98,26 +96,6 @@ func (a app) Info(pathname string) (provider.StorageItem, error) {
 	return convertToItem(a.getRelativePath(fullpath), info), nil
 }
 
-// WriterTo opens writer for given pathname
-func (a app) WriterTo(pathname string) (io.WriteCloser, error) {
-	if err := a.checkPathname(pathname); err != nil {
-		return nil, convertError(err)
-	}
-
-	writer, err := a.getFile(pathname)
-	return writer, convertError(err)
-}
-
-// ReaderFrom reads content from given pathname
-func (a app) ReaderFrom(pathname string) (provider.ReadSeekerCloser, error) {
-	if err := a.checkPathname(pathname); err != nil {
-		return nil, convertError(err)
-	}
-
-	output, err := os.OpenFile(a.getFullPath(pathname), os.O_RDONLY, getMode(pathname))
-	return output, convertError(err)
-}
-
 // List items in the storage
 func (a app) List(pathname string) ([]provider.StorageItem, error) {
 	if err := a.checkPathname(pathname); err != nil {
@@ -143,6 +121,26 @@ func (a app) List(pathname string) ([]provider.StorageItem, error) {
 	sort.Sort(ByHybridSort(items))
 
 	return items, nil
+}
+
+// WriterTo opens writer for given pathname
+func (a app) WriterTo(pathname string) (io.WriteCloser, error) {
+	if err := a.checkPathname(pathname); err != nil {
+		return nil, convertError(err)
+	}
+
+	writer, err := a.getFile(pathname)
+	return writer, convertError(err)
+}
+
+// ReaderFrom reads content from given pathname
+func (a app) ReaderFrom(pathname string) (provider.ReadSeekerCloser, error) {
+	if err := a.checkPathname(pathname); err != nil {
+		return nil, convertError(err)
+	}
+
+	output, err := os.OpenFile(a.getFullPath(pathname), os.O_RDONLY, getMode(pathname))
+	return output, convertError(err)
 }
 
 // Walk browses item recursively
