@@ -98,7 +98,6 @@ func (s Share) CheckPassword(r *http.Request) error {
 
 // Config data
 type Config struct {
-	RootName  string
 	PublicURL string
 	Version   string
 	Seo       Seo

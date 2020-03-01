@@ -8,7 +8,6 @@ import (
 func TestBuild(t *testing.T) {
 	config := Config{
 		PublicURL: "http://localhost:1080",
-		RootName:  "test",
 		Seo: Seo{
 			Description: "fibr",
 			Title:       "fibr",
@@ -49,8 +48,8 @@ func TestBuild(t *testing.T) {
 				Config:      config,
 				Layout:      "list",
 				PublicURL:   "http://localhost:1080",
-				Title:       "fibr - test",
-				Description: "fibr - test",
+				Title:       "fibr",
+				Description: "fibr",
 			},
 		},
 	}
@@ -135,18 +134,16 @@ func TestComputeTitle(t *testing.T) {
 		{
 			"simple",
 			Config{
-				RootName: "test",
 				Seo: Seo{
 					Title: "fibr",
 				},
 			},
 			Request{},
-			"fibr - test",
+			"fibr",
 		},
 		{
 			"without share",
 			Config{
-				RootName: "test",
 				Seo: Seo{
 					Title: "fibr",
 				},
@@ -154,12 +151,11 @@ func TestComputeTitle(t *testing.T) {
 			Request{
 				Path: "/subDir/",
 			},
-			"fibr - test - subDir",
+			"fibr - subDir",
 		},
 		{
 			"with share",
 			Config{
-				RootName: "test",
 				Seo: Seo{
 					Title: "fibr",
 				},
@@ -193,18 +189,16 @@ func TestComputeDescription(t *testing.T) {
 		{
 			"simple",
 			Config{
-				RootName: "test",
 				Seo: Seo{
 					Description: "fibr",
 				},
 			},
 			Request{},
-			"fibr - test",
+			"fibr",
 		},
 		{
 			"without share",
 			Config{
-				RootName: "test",
 				Seo: Seo{
 					Description: "fibr",
 				},
@@ -212,12 +206,11 @@ func TestComputeDescription(t *testing.T) {
 			Request{
 				Path: "/subDir/",
 			},
-			"fibr - test - subDir",
+			"fibr - subDir",
 		},
 		{
 			"with share",
 			Config{
-				RootName: "test",
 				Seo: Seo{
 					Description: "fibr",
 				},
