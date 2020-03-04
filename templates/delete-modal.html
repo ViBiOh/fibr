@@ -8,14 +8,11 @@
         <input type="hidden" name="method" value="DELETE" />
         <input type="hidden" name="name" value="{{ .Name }}" />
 
-        <p class="padding center">
+        <p class="padding no-margin center">
           Are you sure you want to delete <strong>{{ .Name }}</strong>?
         </p>
 
-        <p class="padding center">
-          <a href="#" class="button white">Cancel</a>
-          <button type="submit" class="button bg-primary">Confirm</button>
-        </p>
+        {{ template "form_buttons" "Confirm" }}
       </form>
     </div>
   </div>

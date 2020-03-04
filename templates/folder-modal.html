@@ -6,14 +6,13 @@
       <form method="post" action="#">
         <input type="hidden" name="type" value="folder" />
         <input type="hidden" name="method" value="PUT" />
-        <p class="padding center">
+
+        <p class="padding no-margin center">
           <label for="name">Name</label>
           <input id="name" type="text" name="name" />
         </p>
-        <p class="padding center">
-          <a href="#" class="button white">Cancel</a>
-          <button type="submit" class="button bg-primary">Create</button>
-        </p>
+
+        {{ template "form_buttons" "Create" }}
       </form>
     </div>
   </div>

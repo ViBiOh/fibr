@@ -66,15 +66,12 @@
           </tbody>
         </table>
       {{ else }}
-        <p class="padding center">
+        <p class="padding no-margin center">
           <em>No shared folder yet.</em>
         </p>
       {{ end }}
 
-      <p class="padding center">
-        <a href="#" class="button white">Cancel</a>
-        <a href="#share-form" class="button bg-primary">Add</a>
-      </p>
+      {{ template "form_buttons" "Add" }}
     </div>
   </div>
 {{ end }}

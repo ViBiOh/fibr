@@ -293,13 +293,13 @@
         onSubmit="return upload(event)"
       >
         <input type="hidden" name="method" value="POST" />
-        <p class="padding center">
+        <p class="padding no-margin center">
           <input id="file" class="full" type="file" name="file" />
         </p>
 
         <div id="upload-list" class="full"></div>
 
-        <p class="padding center">
+        <p class="padding no-margin center">
           <a href="#" class="button white" onclick="abort(event)">Cancel</a>
           <button id="upload-button" type="submit" class="button bg-primary">Upload</button>
         </p>
@@ -311,7 +311,7 @@
     <div class="modal-content">
       <h2 class="header success padding">Upload success ✓</h2>
 
-      <p class="padding center">
+      <p class="padding no-margin center">
         <a href="?redirect" class="button bg-grey">Close</a>
       </p>
     </div>
