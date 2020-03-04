@@ -1,4 +1,5 @@
 {{ define "file" }}
+  {{ template "header" . }}
   {{ template "layout" . }}
 
   <style>
@@ -28,6 +29,5 @@
     {{ end }}
   {{ end }}
 
-  {{ template "navigation" . }}
   {{ template "footer" . }}
 {{ end }}

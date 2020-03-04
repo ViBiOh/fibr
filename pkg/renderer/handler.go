@@ -15,7 +15,7 @@ func (a app) Error(w http.ResponseWriter, request provider.Request, err *provide
 	logger.Error("%s", err.Err)
 
 	if err.Status == http.StatusUnauthorized {
-		w.Header().Add("WWW-Authenticate", "Basic realm=\"Password required\" charset=\"UTF-8\"")
+		w.Header().Add("WWW-Authenticate", `Basic realm="Password required" charset="UTF-8"`)
 	}
 
 	page := a.newPageBuilder().Request(request).Error(err).Build()
@@ -28,9 +28,7 @@ func (a app) Error(w http.ResponseWriter, request provider.Request, err *provide
 
 // Sitemap render sitemap.xml
 func (a app) Sitemap(w http.ResponseWriter) {
-	page := a.newPageBuilder().Build()
-
-	if err := templates.ResponseXMLTemplate(a.tpl.Lookup("sitemap"), w, page, http.StatusOK); err != nil {
+	if err := templates.ResponseXMLTemplate(a.tpl.Lookup("sitemap"), w, a.newPageBuilder().Build(), http.StatusOK); err != nil {
 		httperror.InternalServerError(w, err)
 		return
 	}
@@ -46,7 +44,7 @@ func (a app) SVG(w http.ResponseWriter, name, fill string) {
 
 	w.Header().Set("Content-Type", "image/svg+xml")
 
-	if err := tpl.Execute(w, fill); err != nil {
+	if err := templates.WriteTemplate(tpl, w, fill, "text/xml"); err != nil {
 		httperror.InternalServerError(w, err)
 		return
 	}

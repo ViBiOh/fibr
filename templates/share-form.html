@@ -26,17 +26,14 @@
   <input type="hidden" name="type" value="share" />
   <input type="hidden" name="method" value="POST" />
 
-  <p class="padding center">
+  <p class="padding no-margin center">
     <input id="edit" type="checkbox" name="edit" value="true" />
     <label for="edit">Edit right</label>
   </p>
 
-  <p class="padding center">
+  <p class="padding no-margin center">
     <input id="password" type="text" name="password" value="" placeholder="Password" />
   </p>
 
-  <p class="padding center">
-    <a href="#" class="button white">Cancel</a>
-    <button type="submit" class="button bg-primary">Share</button>
-  </p>
+  {{ template "form_buttons" "Share" }}
 {{ end }}

@@ -1,15 +1,12 @@
 {{ define "layout" }}
-  {{ template "head" . }}
-
   {{ $root := . }}
+
+  {{ template "navigation" . }}
 
   <header class="header full-screen">
     <h1 class="medium no-margin no-padding" itemscope itemtype="http://schema.org/BreadcrumbList">
       <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
-
-        <a href="/{{ if .Request.Share }}{{ .Request.Share.ID }}/{{ end }}" itemprop="item">
-          <span itemprop="name">{{ if .Request.Share }}{{ .Request.Share.RootName }}{{ else }}fibr{{ end }}</span>
-        </a>
+        {{ template "root_link" . }}
       </span>
 
       {{ range $index, $path := .Content.Paths }}
