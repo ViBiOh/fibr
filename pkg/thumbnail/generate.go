@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	waitTimeout = time.Millisecond * 300
+	defaultTimeout = time.Second * 30
 )
 
 func (a app) generateDir(pathname string) error {
@@ -29,13 +29,13 @@ func (a app) generateDir(pathname string) error {
 			return nil
 		}
 
-		a.AsyncGenerateThumbnail(item)
+		a.GenerateThumbnail(item)
 
 		return nil
 	})
 }
 
-func (a app) generateThumbnail(item provider.StorageItem) error {
+func (a app) generateFile(item provider.StorageItem) error {
 	var (
 		file io.ReadCloser
 		err  error
@@ -46,7 +46,7 @@ func (a app) generateThumbnail(item provider.StorageItem) error {
 		return err
 	}
 
-	ctx, cancel := getCtx(context.Background())
+	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
 	defer cancel()
 
 	var resp *http.Response
@@ -77,19 +77,8 @@ func (a app) generateThumbnail(item provider.StorageItem) error {
 	return nil
 }
 
-// Generate thumbnail for all storage
-func (a app) Generate() {
-	if !a.Enabled() {
-		return
-	}
-
-	if err := a.generateDir(""); err != nil {
-		logger.Error("error while walking root dir: %s", err)
-	}
-}
-
-// AsyncGenerateThumbnail generate thumbnail image for given path
-func (a app) AsyncGenerateThumbnail(item provider.StorageItem) {
+// GenerateThumbnail generate thumbnail image for given path
+func (a app) GenerateThumbnail(item provider.StorageItem) {
 	if !a.Enabled() {
 		return
 	}
@@ -102,8 +91,21 @@ func (a app) Start() {
 		return
 	}
 
+	if _, err := a.storage.Info(provider.MetadataDirectoryName); err != nil {
+		logger.Warn("no thumbnail generation because %s has error: %s", provider.MetadataDirectoryName, err)
+		return
+	}
+
+	go func() {
+		if err := a.generateDir(""); err != nil {
+			logger.Error("error while walking root dir: %s", err)
+		}
+	}()
+
+	waitTimeout := time.Millisecond * 300
+
 	for item := range a.pathnameInput {
-		if err := a.generateThumbnail(item); err != nil {
+		if err := a.generateFile(item); err != nil {
 			logger.Error("unable to generate thumbnail for %s: %s", item.Pathname, err)
 		} else {
 			logger.Info("Thumbnail generated for %s", item.Pathname)

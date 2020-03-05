@@ -1,4 +1,4 @@
-package thumbnail
+package providertest
 
 import (
 	"bytes"
@@ -21,11 +21,13 @@ func (s stubReadCloserSeeker) Close() error {
 	return nil
 }
 
-type stubStorage struct {
+// Storage fakes implementation
+type Storage struct {
 	root string
 }
 
-func (ss stubStorage) Info(pathname string) (provider.StorageItem, error) {
+// Info fakes implementation
+func (s Storage) Info(pathname string) (provider.StorageItem, error) {
 	if strings.HasSuffix(pathname, "error") {
 		return provider.StorageItem{}, errors.New("error on info")
 	}
@@ -35,7 +37,8 @@ func (ss stubStorage) Info(pathname string) (provider.StorageItem, error) {
 	}, nil
 }
 
-func (ss stubStorage) WriterTo(pathname string) (io.WriteCloser, error) {
+// WriterTo fakes implementation
+func (s Storage) WriterTo(pathname string) (io.WriteCloser, error) {
 	if strings.HasSuffix(pathname, "error") {
 		return nil, errors.New("error on writer to")
 	}
@@ -43,7 +46,8 @@ func (ss stubStorage) WriterTo(pathname string) (io.WriteCloser, error) {
 	return nil, nil
 }
 
-func (ss stubStorage) ReaderFrom(pathname string) (provider.ReadSeekerCloser, error) {
+// ReaderFrom fakes implementation
+func (s Storage) ReaderFrom(pathname string) (provider.ReadSeekerCloser, error) {
 	if strings.HasSuffix(pathname, "error") {
 		return nil, errors.New("error on reader from")
 	}
@@ -54,7 +58,8 @@ func (ss stubStorage) ReaderFrom(pathname string) (provider.ReadSeekerCloser, er
 	return &buffer, nil
 }
 
-func (ss stubStorage) List(pathname string) ([]provider.StorageItem, error) {
+// List fakes implementation
+func (s Storage) List(pathname string) ([]provider.StorageItem, error) {
 	if strings.HasSuffix(pathname, "error") {
 		return nil, errors.New("error on list")
 	}
@@ -65,7 +70,8 @@ func (ss stubStorage) List(pathname string) ([]provider.StorageItem, error) {
 	}, nil
 }
 
-func (ss stubStorage) Walk(pathname string, walkFn func(provider.StorageItem, error) error) error {
+// Walk fakes implementation
+func (s Storage) Walk(pathname string, walkFn func(provider.StorageItem, error) error) error {
 	if strings.HasSuffix(pathname, "error") {
 		return errors.New("error on create dir")
 	}
@@ -73,7 +79,8 @@ func (ss stubStorage) Walk(pathname string, walkFn func(provider.StorageItem, er
 	return nil
 }
 
-func (ss stubStorage) CreateDir(pathname string) error {
+// CreateDir fakes implementation
+func (s Storage) CreateDir(pathname string) error {
 	if strings.HasSuffix(pathname, "error") {
 		return errors.New("error on create dir")
 	}
@@ -81,7 +88,8 @@ func (ss stubStorage) CreateDir(pathname string) error {
 	return nil
 }
 
-func (ss stubStorage) Store(pathname string, content io.ReadCloser) error {
+// Store fakes implementation
+func (s Storage) Store(pathname string, content io.ReadCloser) error {
 	if strings.HasSuffix(pathname, "error") {
 		return errors.New("error on store")
 	}
@@ -93,7 +101,8 @@ func (ss stubStorage) Store(pathname string, content io.ReadCloser) error {
 	return nil
 }
 
-func (ss stubStorage) Rename(oldName, newName string) error {
+// Rename fakes implementation
+func (s Storage) Rename(oldName, newName string) error {
 	if oldName == "error" {
 		return errors.New("error on rename")
 	}
@@ -101,7 +110,8 @@ func (ss stubStorage) Rename(oldName, newName string) error {
 	return nil
 }
 
-func (ss stubStorage) Remove(pathname string) error {
+// Remove fakes implementation
+func (s Storage) Remove(pathname string) error {
 	if strings.HasSuffix(pathname, "error") {
 		return errors.New("error on remove")
 	}

@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/fibr/pkg/provider/providertest"
 )
 
 func TestCanHaveThumbnail(t *testing.T) {
@@ -65,7 +66,7 @@ func TestHasThumbnail(t *testing.T) {
 		{
 			"not found",
 			app{
-				storage:  stubStorage{},
+				storage:  providertest.Storage{},
 				imageURL: "http://localhost",
 				videoURL: "http://localhost",
 			},
@@ -78,7 +79,7 @@ func TestHasThumbnail(t *testing.T) {
 		{
 			"found",
 			app{
-				storage:  stubStorage{},
+				storage:  providertest.Storage{},
 				imageURL: "http://localhost",
 				videoURL: "http://localhost",
 			},

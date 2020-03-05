@@ -128,3 +128,7 @@ func (a app) File(w http.ResponseWriter, request provider.Request, content map[s
 		return
 	}
 }
+
+func (a app) newPageBuilder() *provider.PageBuilder {
+	return (&provider.PageBuilder{}).Config(a.config)
+}

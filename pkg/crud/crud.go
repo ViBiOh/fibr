@@ -74,8 +74,6 @@ func New(config Config, storage provider.Storage, renderer provider.Renderer, th
 
 	if app.metadataEnabled {
 		logger.Fatal(app.loadMetadata())
-
-		go thumbnail.Generate()
 	}
 
 	return app
