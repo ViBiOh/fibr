@@ -52,7 +52,7 @@ func (a *app) saveUploadedFile(request provider.Request, part *multipart.Part) (
 	}
 
 	if thumbnail.CanHaveThumbnail(info) {
-		a.thumbnail.AsyncGenerateThumbnail(info)
+		a.thumbnail.GenerateThumbnail(info)
 	}
 
 	return filename, nil

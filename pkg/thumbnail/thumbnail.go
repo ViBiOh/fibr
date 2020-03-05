@@ -33,13 +33,12 @@ var (
 
 // App of package
 type App interface {
-	Generate()
 	Remove(provider.StorageItem)
 	Rename(provider.StorageItem, provider.StorageItem)
 	HasThumbnail(provider.StorageItem) bool
 	Serve(http.ResponseWriter, *http.Request, provider.StorageItem)
 	List(http.ResponseWriter, *http.Request, provider.StorageItem)
-	AsyncGenerateThumbnail(provider.StorageItem)
+	GenerateThumbnail(provider.StorageItem)
 }
 
 // Config of package
