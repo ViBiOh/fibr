@@ -119,8 +119,8 @@ func (a *app) Start() {
 			logger.Error("unable to sanitize name %s: %s", item.Pathname, err)
 		} else if name != item.Pathname {
 			if a.sanitizeOnStart {
-				logger.Info("Renaming `%s` to `%s`", item.Name, name)
-				if err := a.storage.Rename(item.Pathname, name); err != nil {
+				logger.Info("Renaming `%s` to `%s`", item.Pathname, name)
+				if _, err := a.doRename(item.Pathname, name, item); err != nil {
 					logger.Error("%s", err)
 				}
 			} else {

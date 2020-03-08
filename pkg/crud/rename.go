@@ -9,6 +9,21 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
+func (a *app) doRename(oldPath, newPath string, oldItem provider.StorageItem) (provider.StorageItem, error) {
+	if err := a.storage.Rename(oldPath, newPath); err != nil {
+		return provider.StorageItem{}, err
+	}
+
+	newItem, err := a.storage.Info(newPath)
+	if err != nil {
+		return provider.StorageItem{}, err
+	}
+
+	go a.thumbnail.Rename(oldItem, newItem)
+
+	return newItem, nil
+}
+
 // Rename rename given path to a new one
 func (a *app) Rename(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !request.CanEdit {
@@ -45,7 +60,7 @@ func (a *app) Rename(w http.ResponseWriter, r *http.Request, request provider.Re
 		return
 	}
 
-	oldInfo, err := a.storage.Info(oldPath)
+	oldItem, err := a.storage.Info(oldPath)
 	if err != nil {
 		if !provider.IsNotExist(err) {
 			a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
@@ -56,17 +71,11 @@ func (a *app) Rename(w http.ResponseWriter, r *http.Request, request provider.Re
 		return
 	}
 
-	if err := a.storage.Rename(oldPath, newPath); err != nil {
+	newItem, err := a.doRename(oldPath, newPath, oldItem)
+	if err != nil {
 		a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
 
-	newInfo, err := a.storage.Info(newPath)
-	if err != nil {
-		a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
-	}
-
-	go a.thumbnail.Rename(oldInfo, newInfo)
-
-	http.Redirect(w, r, fmt.Sprintf("%s/?message=%s&messageLevel=success", request.GetURI(""), url.QueryEscape(fmt.Sprintf("%s successfully renamed to %s", oldInfo.Name, newInfo.Name))), http.StatusFound)
+	http.Redirect(w, r, fmt.Sprintf("%s/?message=%s&messageLevel=success", request.GetURI(""), url.QueryEscape(fmt.Sprintf("%s successfully renamed to %s", oldItem.Name, newItem.Name))), http.StatusFound)
 }
