@@ -149,6 +149,10 @@ func (a app) Walk(pathname string, walkFn func(provider.StorageItem, error) erro
 	pathname = path.Join(a.rootDirectory, pathname)
 
 	return convertError(filepath.Walk(pathname, func(path string, info os.FileInfo, err error) error {
+		if info.IsDir() && info.Name() == provider.MetadataDirectoryName {
+			return filepath.SkipDir
+		}
+
 		if a.ignorePattern != nil && a.ignorePattern.MatchString(path) {
 			return nil
 		}
