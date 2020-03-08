@@ -16,8 +16,9 @@ services:
       traefik.http.routers.fibr-https.tls.certresolver: default
       traefik.http.services.fibr-service.loadbalancer.server.port: "1080"
     environment:
-      FIBR_AUTH_USERS: "${BASIC_USERS}"
       FIBR_AUTH_PROFILES: 1:admin
+      FIBR_AUTH_USERS: "${BASIC_USERS}"
+      FIBR_SANITIZE_ON_START: "true"
     volumes:
       - ${DATA_DIR}:/data
     depends_on:
