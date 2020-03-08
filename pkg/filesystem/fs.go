@@ -9,7 +9,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"regexp"
 	"sort"
 	"strings"
 
@@ -26,27 +25,25 @@ var (
 // Config of package
 type Config struct {
 	directory *string
-	ignore    *string
 }
 
 type app struct {
 	rootDirectory string
 	rootDirname   string
-	ignorePattern *regexp.Regexp
+
+	ignoreFn func(provider.StorageItem) bool
 }
 
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
 		directory: flags.New(prefix, "filesystem").Name("Directory").Default("/data").Label("Path to served directory").ToString(fs),
-		ignore:    flags.New(prefix, "filesystem").Name("IgnorePattern").Default("").Label("Ignore pattern when listing files or directory").ToString(fs),
 	}
 }
 
 // New creates new App from Config
 func New(config Config) (provider.Storage, error) {
 	rootDirectory := strings.TrimSpace(*config.directory)
-	ignore := strings.TrimSpace(*config.ignore)
 
 	if len(rootDirectory) == 0 {
 		return nil, errors.New("no directory provided")
@@ -61,28 +58,20 @@ func New(config Config) (provider.Storage, error) {
 		return nil, fmt.Errorf("path %s is not a directory", rootDirectory)
 	}
 
-	var ignorePattern *regexp.Regexp
-	if len(ignore) != 0 {
-		pattern, err := regexp.Compile(ignore)
-		if err != nil {
-			return nil, err
-		}
-
-		ignorePattern = pattern
-		logger.Info("Ignoring files with pattern `%s`", ignore)
-	}
-
 	logger.Info("Serving file from %s", rootDirectory)
 
 	return &app{
 		rootDirectory: rootDirectory,
 		rootDirname:   info.Name(),
-		ignorePattern: ignorePattern,
 	}, nil
 }
 
+func (a *app) SetIgnoreFn(ignoreFn func(provider.StorageItem) bool) {
+	a.ignoreFn = ignoreFn
+}
+
 // Info provide metadata about given pathname
-func (a app) Info(pathname string) (provider.StorageItem, error) {
+func (a *app) Info(pathname string) (provider.StorageItem, error) {
 	if err := a.checkPathname(pathname); err != nil {
 		return provider.StorageItem{}, convertError(err)
 	}
@@ -98,7 +87,7 @@ func (a app) Info(pathname string) (provider.StorageItem, error) {
 }
 
 // List items in the storage
-func (a app) List(pathname string) ([]provider.StorageItem, error) {
+func (a *app) List(pathname string) ([]provider.StorageItem, error) {
 	if err := a.checkPathname(pathname); err != nil {
 		return nil, convertError(err)
 	}
@@ -111,12 +100,13 @@ func (a app) List(pathname string) ([]provider.StorageItem, error) {
 	}
 
 	items := make([]provider.StorageItem, 0)
-	for _, item := range files {
-		if a.ignorePattern != nil && a.ignorePattern.MatchString(item.Name()) {
+	for _, file := range files {
+		item := convertToItem(a.getRelativePath(path.Join(fullpath, file.Name())), file)
+		if a.ignoreFn != nil && a.ignoreFn(item) {
 			continue
 		}
 
-		items = append(items, convertToItem(a.getRelativePath(path.Join(fullpath, item.Name())), item))
+		items = append(items, item)
 	}
 
 	sort.Sort(ByHybridSort(items))
@@ -125,7 +115,7 @@ func (a app) List(pathname string) ([]provider.StorageItem, error) {
 }
 
 // WriterTo opens writer for given pathname
-func (a app) WriterTo(pathname string) (io.WriteCloser, error) {
+func (a *app) WriterTo(pathname string) (io.WriteCloser, error) {
 	if err := a.checkPathname(pathname); err != nil {
 		return nil, convertError(err)
 	}
@@ -135,7 +125,7 @@ func (a app) WriterTo(pathname string) (io.WriteCloser, error) {
 }
 
 // ReaderFrom reads content from given pathname
-func (a app) ReaderFrom(pathname string) (provider.ReadSeekerCloser, error) {
+func (a *app) ReaderFrom(pathname string) (provider.ReadSeekerCloser, error) {
 	if err := a.checkPathname(pathname); err != nil {
 		return nil, convertError(err)
 	}
@@ -145,29 +135,29 @@ func (a app) ReaderFrom(pathname string) (provider.ReadSeekerCloser, error) {
 }
 
 // Walk browses item recursively
-func (a app) Walk(pathname string, walkFn func(provider.StorageItem, error) error) error {
+func (a *app) Walk(pathname string, walkFn func(provider.StorageItem, error) error) error {
 	pathname = path.Join(a.rootDirectory, pathname)
 
 	return convertError(filepath.Walk(pathname, func(path string, info os.FileInfo, err error) error {
-		if info.IsDir() && info.Name() == provider.MetadataDirectoryName {
-			return filepath.SkipDir
-		}
-
-		if a.ignorePattern != nil && a.ignorePattern.MatchString(path) {
-			return nil
-		}
-
 		if err != nil {
 			logger.Error("%s", err)
 			return walkFn(provider.StorageItem{}, err)
 		}
 
-		return walkFn(convertToItem(a.getRelativePath(path), info), err)
+		item := convertToItem(a.getRelativePath(path), info)
+		if a.ignoreFn != nil && a.ignoreFn(item) {
+			if item.IsDir {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+
+		return walkFn(item, err)
 	}))
 }
 
 // Create container in storage
-func (a app) CreateDir(name string) error {
+func (a *app) CreateDir(name string) error {
 	if err := a.checkPathname(name); err != nil {
 		return convertError(err)
 	}
@@ -176,7 +166,7 @@ func (a app) CreateDir(name string) error {
 }
 
 // Store file to storage
-func (a app) Store(pathname string, content io.ReadCloser) error {
+func (a *app) Store(pathname string, content io.ReadCloser) error {
 	if err := a.checkPathname(pathname); err != nil {
 		return convertError(err)
 	}
@@ -203,7 +193,7 @@ func (a app) Store(pathname string, content io.ReadCloser) error {
 }
 
 // Rename file or directory from storage
-func (a app) Rename(oldName, newName string) error {
+func (a *app) Rename(oldName, newName string) error {
 	if err := a.checkPathname(oldName); err != nil {
 		return convertError(err)
 	}
@@ -216,7 +206,7 @@ func (a app) Rename(oldName, newName string) error {
 }
 
 // Remove file or directory from storage
-func (a app) Remove(pathname string) error {
+func (a *app) Remove(pathname string) error {
 	if err := a.checkPathname(pathname); err != nil {
 		return convertError(err)
 	}
