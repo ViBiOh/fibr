@@ -69,6 +69,7 @@ func New(config Config) (provider.Storage, error) {
 		}
 
 		ignorePattern = pattern
+		logger.Info("Ignoring files with pattern `%s`", ignore)
 	}
 
 	logger.Info("Serving file from %s", rootDirectory)
@@ -148,6 +149,10 @@ func (a app) Walk(pathname string, walkFn func(provider.StorageItem, error) erro
 	pathname = path.Join(a.rootDirectory, pathname)
 
 	return convertError(filepath.Walk(pathname, func(path string, info os.FileInfo, err error) error {
+		if a.ignorePattern != nil && a.ignorePattern.MatchString(path) {
+			return nil
+		}
+
 		if err != nil {
 			logger.Error("%s", err)
 			return walkFn(provider.StorageItem{}, err)

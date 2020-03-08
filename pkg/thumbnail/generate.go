@@ -6,8 +6,6 @@ import (
 	"io"
 	"net/http"
 	"path"
-	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -19,23 +17,7 @@ const (
 	defaultTimeout = time.Second * 30
 )
 
-func (a app) generateDir(pathname string) error {
-	return a.storage.Walk(pathname, func(item provider.StorageItem, _ error) error {
-		if item.IsDir && strings.HasPrefix(item.Name, ".") || ignoredThumbnailDir[item.Name] {
-			return filepath.SkipDir
-		}
-
-		if !CanHaveThumbnail(item) || a.HasThumbnail(item) {
-			return nil
-		}
-
-		a.GenerateThumbnail(item)
-
-		return nil
-	})
-}
-
-func (a app) generateFile(item provider.StorageItem) error {
+func (a app) generate(item provider.StorageItem) error {
 	var (
 		file io.ReadCloser
 		err  error
@@ -96,16 +78,10 @@ func (a app) Start() {
 		return
 	}
 
-	go func() {
-		if err := a.generateDir(""); err != nil {
-			logger.Error("error while walking root dir: %s", err)
-		}
-	}()
-
 	waitTimeout := time.Millisecond * 300
 
 	for item := range a.pathnameInput {
-		if err := a.generateFile(item); err != nil {
+		if err := a.generate(item); err != nil {
 			logger.Error("unable to generate thumbnail for %s: %s", item.Pathname, err)
 		} else {
 			logger.Info("Thumbnail generated for %s", item.Pathname)

@@ -31,7 +31,7 @@ func TestSanitizeName(t *testing.T) {
 			"should replace diacritics and special chars",
 			`Le terme "où", l'ouïe fine`,
 			true,
-			"le_terme_ou,_louie_fine",
+			"le_terme_ou_louie_fine",
 			nil,
 		},
 		{

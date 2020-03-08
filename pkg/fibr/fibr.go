@@ -119,11 +119,6 @@ func (a app) Handler() http.Handler {
 			return
 		}
 
-		if strings.Contains(r.URL.Path, "..") {
-			a.renderer.Error(w, provider.Request{}, provider.NewError(http.StatusForbidden, errors.New("you can't speak to my parent")))
-			return
-		}
-
 		if a.crud.ServeStatic(w, r) {
 			return
 		}

@@ -42,15 +42,15 @@ func (a ByHybridSort) Less(i, j int) bool {
 		return false
 	}
 
-	if first.IsImage() && second.IsImage() {
+	if (first.IsImage() || first.IsVideo()) && (second.IsImage() || second.IsVideo()) {
 		return moreTime(first.Date, second.Date)
 	}
 
-	if first.IsImage() {
+	if first.IsImage() || first.IsVideo() {
 		return false
 	}
 
-	if second.IsImage() {
+	if second.IsImage() || first.IsVideo() {
 		return true
 	}
 

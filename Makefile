@@ -77,6 +77,7 @@ build:
 run:
 	$(MAIN_RUNNER) \
 		-fsDirectory "$(PWD)" \
+		-fsIgnorePattern ".git" \
 		-publicURL "http://localhost:1080" \
 		-authProfiles "1:admin" \
 		-authUsers "1:`htpasswd -nBb admin admin`" \

@@ -10,6 +10,32 @@ import (
 	"github.com/ViBiOh/httputils/v3/pkg/templates"
 )
 
+func (a app) newPageBuilder() *provider.PageBuilder {
+	return (&provider.PageBuilder{}).Config(a.config)
+}
+
+// Directory render directory listing
+func (a app) Directory(w http.ResponseWriter, request provider.Request, content map[string]interface{}, message *provider.Message) {
+	page := a.newPageBuilder().Request(request).Message(message).Layout(request.Display).Content(content).Build()
+
+	w.Header().Set("content-language", "en")
+	if err := templates.ResponseHTMLTemplate(a.tpl.Lookup("files"), w, page, http.StatusOK); err != nil {
+		a.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
+		return
+	}
+}
+
+// File render file detail
+func (a app) File(w http.ResponseWriter, request provider.Request, content map[string]interface{}, message *provider.Message) {
+	page := a.newPageBuilder().Request(request).Message(message).Layout("browser").Content(content).Build()
+
+	w.Header().Set("content-language", "en")
+	if err := templates.ResponseHTMLTemplate(a.tpl.Lookup("file"), w, page, http.StatusOK); err != nil {
+		a.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
+		return
+	}
+}
+
 // Error render error page with given status
 func (a app) Error(w http.ResponseWriter, request provider.Request, err *provider.Error) {
 	logger.Error("%s", err.Err)

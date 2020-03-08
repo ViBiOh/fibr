@@ -28,7 +28,7 @@ func (a *app) Rename(w http.ResponseWriter, r *http.Request, request provider.Re
 		return
 	}
 
-	newSafeName, err := provider.SanitizeName(newName, false)
+	newSafeName, err := provider.SanitizeName(newName, true)
 	if err != nil {
 		a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
 		return
