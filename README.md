@@ -43,10 +43,12 @@ Usage of fibr:
         [owasp] X-Frame-Options {FIBR_FRAME_OPTIONS} (default "deny")
   -fsDirectory string
         [fs] Path to served directory {FIBR_FS_DIRECTORY} (default "/data")
-  -fsIgnorePattern string
-        [fs] Ignore pattern when listing files or directory {FIBR_FS_IGNORE_PATTERN}
+  -graceDuration string
+        [http] Grace duration when SIGTERM received {FIBR_GRACE_DURATION} (default "15s")
   -hsts
         [owasp] Indicate Strict Transport Security {FIBR_HSTS} (default true)
+  -ignorePattern string
+        [filesystem] Ignore pattern when listing files or directory {FIBR_IGNORE_PATTERN}
   -key string
         [http] Key file {FIBR_KEY}
   -metadata
@@ -59,6 +61,8 @@ Usage of fibr:
         [prometheus] Path for exposing metrics {FIBR_PROMETHEUS_PATH} (default "/metrics")
   -publicURL string
         [fibr] Public URL {FIBR_PUBLIC_URL} (default "https://fibr.vibioh.fr")
+  -sanitizeOnStart
+        [crud] Sanitize name on start {FIBR_SANITIZE_ON_START}
   -thumbnailImageURL string
         [thumbnail] Imaginary URL {FIBR_THUMBNAIL_IMAGE_URL} (default "http://image:9000")
   -thumbnailVideoURL string

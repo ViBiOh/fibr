@@ -54,7 +54,9 @@ func main() {
 
 	thumbnailApp := thumbnail.New(thumbnailConfig, storage)
 	rendererApp := renderer.New(rendererConfig, thumbnailApp)
-	crudApp := crud.New(crudConfig, storage, rendererApp, thumbnailApp)
+	crudApp, err := crud.New(crudConfig, storage, rendererApp, thumbnailApp)
+	logger.Fatal(err)
+
 	fibrApp := fibr.New(crudApp, rendererApp, loginApp)
 
 	go thumbnailApp.Start()

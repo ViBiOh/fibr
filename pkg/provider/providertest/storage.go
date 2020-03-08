@@ -26,6 +26,10 @@ type Storage struct {
 	root string
 }
 
+// SetIgnoreFn fakes implementation
+func (s Storage) SetIgnoreFn(func(provider.StorageItem) bool) {
+}
+
 // Info fakes implementation
 func (s Storage) Info(pathname string) (provider.StorageItem, error) {
 	if strings.HasSuffix(pathname, "error") {

@@ -47,6 +47,7 @@ type Renderer interface {
 
 // Storage describe action on a storage provider
 type Storage interface {
+	SetIgnoreFn(ignoreFn func(StorageItem) bool)
 	Info(pathname string) (StorageItem, error)
 	List(pathname string) ([]StorageItem, error)
 	WriterTo(pathname string) (io.WriteCloser, error)

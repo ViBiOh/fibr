@@ -5,6 +5,7 @@ import (
 	"flag"
 	"mime/multipart"
 	"net/http"
+	"regexp"
 	"strings"
 	"sync"
 
@@ -44,13 +45,16 @@ type App interface {
 
 // Config of package
 type Config struct {
-	metadata *bool
+	metadata        *bool
+	ignore          *string
+	sanitizeOnStart *bool
 }
 
 type app struct {
 	metadataEnabled bool
 	metadatas       []*provider.Share
 	metadataLock    sync.Mutex
+	sanitizeOnStart bool
 
 	storage   provider.Storage
 	renderer  provider.Renderer
@@ -60,33 +64,68 @@ type app struct {
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		metadata: flags.New(prefix, "crud").Name("Metadata").Default(true).Label("Enable metadata storage").ToBool(fs),
+		metadata:        flags.New(prefix, "crud").Name("Metadata").Default(true).Label("Enable metadata storage").ToBool(fs),
+		ignore:          flags.New(prefix, "crud").Name("IgnorePattern").Default("").Label("Ignore pattern when listing files or directory").ToString(fs),
+		sanitizeOnStart: flags.New(prefix, "crud").Name("SanitizeOnStart").Default(false).Label("Sanitize name on start").ToBool(fs),
 	}
 }
 
 // New creates new App from Config
-func New(config Config, storage provider.Storage, renderer provider.Renderer, thumbnail thumbnail.App) App {
+func New(config Config, storage provider.Storage, renderer provider.Renderer, thumbnail thumbnail.App) (App, error) {
 	app := &app{
 		metadataEnabled: *config.metadata,
 		metadataLock:    sync.Mutex{},
-		storage:         storage,
-		renderer:        renderer,
-		thumbnail:       thumbnail,
+		sanitizeOnStart: *config.sanitizeOnStart,
+
+		storage:   storage,
+		renderer:  renderer,
+		thumbnail: thumbnail,
 	}
 
 	if app.metadataEnabled {
 		logger.Fatal(app.loadMetadata())
 	}
 
-	return app
+	var ignorePattern *regexp.Regexp
+	ignore := strings.TrimSpace(*config.ignore)
+	if len(ignore) != 0 {
+		pattern, err := regexp.Compile(ignore)
+		if err != nil {
+			return nil, err
+		}
+
+		ignorePattern = pattern
+		logger.Info("Ignoring files with pattern `%s`", ignore)
+	}
+
+	storage.SetIgnoreFn(func(item provider.StorageItem) bool {
+		if item.IsDir && item.Name == provider.MetadataDirectoryName {
+			return true
+		}
+
+		if ignorePattern != nil && ignorePattern.MatchString(item.Name) {
+			return true
+		}
+
+		return false
+	})
+
+	return app, nil
 }
 
 func (a *app) Start() {
 	err := a.storage.Walk("", func(item provider.StorageItem, _ error) error {
-		if name, err := provider.SanitizeName(item.Name, false); err != nil {
-			logger.Error("unable to sanitize name %s: %s", item.Name, err)
-		} else if name != item.Name {
-			logger.Info("File with name `%s` should be renamed to `%s`", item.Name, name)
+		if name, err := provider.SanitizeName(item.Pathname, false); err != nil {
+			logger.Error("unable to sanitize name %s: %s", item.Pathname, err)
+		} else if name != item.Pathname {
+			if a.sanitizeOnStart {
+				logger.Info("Renaming `%s` to `%s`", item.Name, name)
+				if err := a.storage.Rename(item.Pathname, name); err != nil {
+					logger.Error("%s", err)
+				}
+			} else {
+				logger.Info("File with name `%s` should be renamed to `%s`", item.Pathname, name)
+			}
 		}
 
 		if thumbnail.CanHaveThumbnail(item) && !a.thumbnail.HasThumbnail(item) {
