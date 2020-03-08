@@ -14,7 +14,7 @@ import (
 
 var (
 	transformer  transform.Transformer
-	specialChars = regexp.MustCompile(`[[\](){}&"'§!$*€^%+=\\;?\x60](?m)`)
+	specialChars = regexp.MustCompile(`[^a-z0-9.\-_/](?m)`)
 )
 
 func init() {
@@ -25,16 +25,15 @@ func init() {
 
 // SanitizeName return sanitized name (remove diacritics)
 func SanitizeName(name string, removeSlash bool) (string, error) {
-	withoutDiacritics, _, err := transform.String(transformer, name)
+	withoutDiacritics, _, err := transform.String(transformer, strings.ToLower(name))
 	if err != nil {
 		return "", err
 	}
 
-	withoutSpecials := specialChars.ReplaceAllString(withoutDiacritics, "")
-	withoutSpaces := strings.Replace(withoutSpecials, " ", "_", -1)
-	toLower := strings.ToLower(withoutSpaces)
+	withoutSpaces := strings.Replace(withoutDiacritics, " ", "_", -1)
+	withoutSpecials := specialChars.ReplaceAllString(withoutSpaces, "")
 
-	sanitized := toLower
+	sanitized := withoutSpecials
 	if removeSlash {
 		sanitized = strings.Replace(sanitized, "/", "_", -1)
 	}
@@ -42,7 +41,7 @@ func SanitizeName(name string, removeSlash bool) (string, error) {
 	return sanitized, nil
 }
 
-// SafeWrite writes content to  writer with error handling
+// SafeWrite writes content to writer with error handling
 func SafeWrite(w io.Writer, content string) {
 	if _, err := io.WriteString(w, content); err != nil {
 		logger.Error("unable to write content: %s", err)

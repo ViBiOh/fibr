@@ -33,6 +33,7 @@ var (
 
 // App of package
 type App interface {
+	Start()
 	Remove(provider.StorageItem)
 	Rename(provider.StorageItem, provider.StorageItem)
 	HasThumbnail(provider.StorageItem) bool
@@ -80,8 +81,6 @@ func New(config Config, storage provider.Storage) App {
 		storage:       storage,
 		pathnameInput: make(chan provider.StorageItem, 10),
 	}
-
-	go app.Start()
 
 	return app
 }

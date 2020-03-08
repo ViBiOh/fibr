@@ -57,6 +57,9 @@ func main() {
 	crudApp := crud.New(crudConfig, storage, rendererApp, thumbnailApp)
 	fibrApp := fibr.New(crudApp, rendererApp, loginApp)
 
+	go thumbnailApp.Start()
+	go crudApp.Start()
+
 	server := httputils.New(serverConfig)
 	server.Middleware(prometheus.New(prometheusConfig).Middleware)
 	server.Middleware(owasp.New(owaspConfig).Middleware)

@@ -24,6 +24,8 @@ var (
 
 // App of package
 type App interface {
+	Start()
+
 	Browser(http.ResponseWriter, provider.Request, provider.StorageItem, *provider.Message)
 	ServeStatic(http.ResponseWriter, *http.Request) bool
 
@@ -77,6 +79,26 @@ func New(config Config, storage provider.Storage, renderer provider.Renderer, th
 	}
 
 	return app
+}
+
+func (a *app) Start() {
+	err := a.storage.Walk("", func(item provider.StorageItem, _ error) error {
+		if name, err := provider.SanitizeName(item.Name, false); err != nil {
+			logger.Error("unable to sanitize name %s: %s", item.Name, err)
+		} else if name != item.Name {
+			logger.Info("File with name `%s` should be renamed to `%s`", item.Name, name)
+		}
+
+		if thumbnail.CanHaveThumbnail(item) && !a.thumbnail.HasThumbnail(item) {
+			a.thumbnail.GenerateThumbnail(item)
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		logger.Error("%s", err)
+	}
 }
 
 // GetShare returns share configuration if request path match

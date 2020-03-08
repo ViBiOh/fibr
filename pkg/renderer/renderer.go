@@ -90,6 +90,7 @@ func New(config Config, thumbnailApp thumbnail.App) App {
 	logger.Fatal(err)
 
 	publicURL := strings.TrimSpace(*config.publicURL)
+	imgSize := uint(512)
 
 	return app{
 		tpl: template.Must(tpl.ParseFiles(fibrTemplates...)),
@@ -99,36 +100,10 @@ func New(config Config, thumbnailApp thumbnail.App) App {
 			Seo: provider.Seo{
 				Title:       "fibr",
 				Description: "FIle BRowser",
-				Img:         fmt.Sprintf("%s/favicon/android-chrome-512x512.png", publicURL),
-				ImgHeight:   512,
-				ImgWidth:    512,
+				Img:         fmt.Sprintf("%s/favicon/android-chrome-%dx%d.png", publicURL, imgSize, imgSize),
+				ImgHeight:   imgSize,
+				ImgWidth:    imgSize,
 			},
 		},
 	}
-}
-
-// Directory render directory listing
-func (a app) Directory(w http.ResponseWriter, request provider.Request, content map[string]interface{}, message *provider.Message) {
-	page := a.newPageBuilder().Request(request).Message(message).Layout(request.Display).Content(content).Build()
-
-	w.Header().Set("content-language", "en")
-	if err := templates.ResponseHTMLTemplate(a.tpl.Lookup("files"), w, page, http.StatusOK); err != nil {
-		a.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
-		return
-	}
-}
-
-// File render file detail
-func (a app) File(w http.ResponseWriter, request provider.Request, content map[string]interface{}, message *provider.Message) {
-	page := a.newPageBuilder().Request(request).Message(message).Layout("browser").Content(content).Build()
-
-	w.Header().Set("content-language", "en")
-	if err := templates.ResponseHTMLTemplate(a.tpl.Lookup("file"), w, page, http.StatusOK); err != nil {
-		a.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
-		return
-	}
-}
-
-func (a app) newPageBuilder() *provider.PageBuilder {
-	return (&provider.PageBuilder{}).Config(a.config)
 }
