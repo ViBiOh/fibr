@@ -19,6 +19,7 @@ jobs:
         - make
         - git --no-pager diff -- ':(exclude)go.sum' && git diff --quiet -- ':(exclude)go.sum'
         - curl -q -sSL --max-time 10 -o cacert.pem https://curl.haxx.se/ca/cacert.pem
+        - curl -q -sSL --max-time 10 -o mime.types "https://svn.apache.org/viewvc/httpd/httpd/trunk/docs/conf/mime.types?view=co"
         - curl -q -sSL --max-time 10 "https://raw.githubusercontent.com/ViBiOh/scripts/master/bootstrap" | bash -s "release"
         - echo "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin
         - DOCKER_IMAGE="${DOCKER_USER}/$(make name)" IMAGE_VERSION="$(make version)" ./scripts/release build docker
