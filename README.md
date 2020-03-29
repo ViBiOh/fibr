@@ -48,7 +48,7 @@ Usage of fibr:
   -hsts
         [owasp] Indicate Strict Transport Security {FIBR_HSTS} (default true)
   -ignorePattern string
-        [filesystem] Ignore pattern when listing files or directory {FIBR_IGNORE_PATTERN}
+        [crud] Ignore pattern when listing files or directory {FIBR_IGNORE_PATTERN}
   -key string
         [http] Key file {FIBR_KEY}
   -metadata
