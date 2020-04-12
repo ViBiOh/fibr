@@ -6,6 +6,8 @@ github.com/ViBiOh/httputils/v3 v3.11.0 h1:HXtl5bCEQjU7LvNYtKUhjmI7qQCEEGmbhoORh9
 github.com/ViBiOh/httputils/v3 v3.11.0/go.mod h1:AJ2YCjFMMPwElU7m9+6R/4Sob3SWNg3nOrgLNM4q9i8=
 github.com/ViBiOh/httputils/v3 v3.12.0 h1:BhSgGoBAaM1dKvcDp0dRJEmE0FlizTg/uWMfFRZeLqA=
 github.com/ViBiOh/httputils/v3 v3.12.0/go.mod h1:exwp/UNyjMLfZTIl8i7x+AfBc4+9x2ar1VDvV0qWbv0=
+github.com/ViBiOh/httputils/v3 v3.13.0 h1:AMsqtoQREdNeTTJToJyZ6SfmcZyuEN8uhD14Ym7BgtI=
+github.com/ViBiOh/httputils/v3 v3.13.0/go.mod h1:exwp/UNyjMLfZTIl8i7x+AfBc4+9x2ar1VDvV0qWbv0=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf/go.mod h1:ybxpYRFXyAe+OPACYpWeL0wqObRcbAqCMya13uyzqw0=
