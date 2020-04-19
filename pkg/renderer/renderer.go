@@ -45,9 +45,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 
 // New creates new App from Config
 func New(config Config, thumbnailApp thumbnail.App) App {
-	tpl := template.New("fibr")
-
-	tpl.Funcs(template.FuncMap{
+	tpl := template.New("fibr").Funcs(template.FuncMap{
 		"asyncImage": func(file provider.RenderItem, version string) map[string]interface{} {
 			return map[string]interface{}{
 				"File":    file,
