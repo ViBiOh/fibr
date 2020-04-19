@@ -102,6 +102,43 @@
       max-height: 100%;
     }
 
+    {{- range .Content.Files -}}
+      {{ if $root.Request.CanEdit -}}
+        #delete-modal-{{ .ID }}:target,
+        #edit-modal-{{ .ID }}:target,
+      {{- end -}}
+
+      {{ if $root.Request.CanShare -}}
+        #share-form-{{ .ID }}:target,
+      {{- end -}}
+    {{- end -}}
+    #upload-modal:target,
+    #upload-success:target,
+    #folder-modal:target,
+    #share-form:target,
+    #share-list:target {
+      display: flex;
+      z-index: 5;
+    }
+
+    {{- range .Content.Files -}}
+      {{ if $root.Request.CanEdit -}}
+        #delete-modal-{{ .ID }}:target ~ .content,
+        #edit-modal-{{ .ID }}:target ~ .content,
+      {{- end -}}
+
+      {{ if $root.Request.CanShare -}}
+        #share-form-{{ .ID }}:target ~ .content,
+      {{- end -}}
+    {{- end -}}
+    #upload-modal:target ~ .content,
+    #upload-success:target ~ .content,
+    #folder-modal:target ~ .content,
+    #share-form:target ~ .content,
+    #share-list:target ~ .content {
+      pointer-events: none;
+    }
+
     {{ if eq .Layout "list" }}
       #list-display {
         background-color: var(--primary);

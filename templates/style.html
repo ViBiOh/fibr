@@ -1,0 +1,260 @@
+{{ define "style" }}
+  <style>
+    :root {
+      --primary: royalblue;
+      --success: limegreen;
+      --danger: crimson;
+      --dark: #272727;
+      --grey: #3b3b3b;
+      --white: silver;
+
+      --icon-size: 2.4rem;
+      --icon-large: 4.8rem;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      font-size: 62.5%;
+    }
+
+    body {
+      -webkit-overflow-scrolling: touch;
+      background-color: var(--dark);
+      height: 100vh;
+    }
+
+    body,
+    button,
+    input {
+      color: var(--white);
+      font-family:
+        -apple-system,
+        'Segoe UI',
+        'Roboto',
+        'Oxygen-Sans',
+        'Ubuntu',
+        'Cantarell',
+        'Helvetica Nue',
+        sans-serif;
+      font-size: 1.6rem;
+      font-style: normal;
+      font-weight: 400;
+    }
+
+    input {
+      color: var(--dark);
+    }
+
+    a {
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    a:hover {
+      color: var(--primary);
+      text-decoration: underline;
+    }
+
+    .primary {
+      color: var(--success);
+    }
+
+    .success {
+      color: var(--success);
+    }
+
+    .danger {
+      color: var(--danger);
+    }
+
+    .grey {
+      color: var(--grey);
+    }
+
+    .white {
+      color: var(--white);
+    }
+
+    .bg-primary,
+    .bg-primary:hover {
+      background-color: var(--primary);
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    .bg-success,
+    .bg-success:hover {
+      background-color: var(--success);
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    .bg-danger,
+    .bg-danger:hover {
+      background-color: var(--danger);
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    .bg-grey,
+    .bg-grey:hover {
+      background-color: var(--grey);
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    .button {
+      border-radius: 4px;
+      border: 0;
+      cursor: pointer;
+      display: inline-block;
+      margin: 0;
+      padding: 1rem;
+      text-decoration: none;
+    }
+
+    .button-icon {
+      background-color: transparent;
+    }
+
+    .icon {
+      background-position: center center;
+      background-repeat: no-repeat;
+      color: var(--white);
+      display: inline-block;
+      height: var(--icon-size);
+      text-decoration: none;
+      vertical-align: middle;
+      width: var(--icon-size);
+    }
+
+    .icon-large {
+      height: var(--icon-large);
+      width: var(--icon-large);
+    }
+
+    .icon-overlay {
+      height: var(--icon-large);
+      left: calc((100% - var(--icon-large)) / 2);
+      position: absolute;
+      top: calc((100% - var(--icon-large)) / 2);
+      width: var(--icon-large);
+      pointer-events: none;
+    }
+
+    .modal {
+      align-items: center;
+      background-color: rgba(84, 84, 84, 0.75);
+      display: none;
+      height: 100vh;
+      justify-content: center;
+      left: 0;
+      pointer-events: none;
+      position: fixed;
+      top: 0;
+      width: 100vw;
+    }
+
+    .modal-content {
+      background-color: var(--dark);
+      display: flex;
+      flex-direction: column;
+      max-height: 100%;
+      max-width: 100%;
+      pointer-events: auto;
+    }
+
+    .header {
+      background-color: var(--grey);
+      margin-top: 0;
+      padding: 0.5rem 1rem;
+      text-align: left;
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    .padding {
+      padding: 1rem;
+    }
+
+    .no-padding {
+      padding: 0;
+    }
+
+    .margin {
+      margin: 1rem;
+    }
+
+    .no-margin {
+      margin: 0;
+    }
+
+    @media print {
+      body::before {
+        content: 'Save ink, share link. {{ .PublicURL }}{{ if .Request.Share }}/{{ .Request.Share.ID }}/{{ end }}';
+      }
+
+      body > * {
+        display: none;
+      }
+    }
+
+    .flex {
+      display: flex;
+    }
+
+    .flex-center {
+      align-items: center;
+      justify-content: center;
+    }
+
+    .flex-grow {
+      flex: 1 1;
+    }
+
+    .flex-column {
+      flex-direction: column;
+    }
+
+    .full {
+      width: 100%;
+    }
+
+    .full-screen {
+      max-width: 100vw;
+    }
+
+    .medium {
+      font-size: 2.4rem;
+    }
+
+    .small {
+      font-size: 1.6rem;
+    }
+
+    .padding-left {
+      padding-left: 1rem;
+    }
+
+    .ellipsis {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .relative {
+      position: relative;
+    }
+
+    @media screen and (max-width: 374px) {
+      .hide-xs {
+        display: none;
+      }
+    }
+  </style>
+{{ end }}
