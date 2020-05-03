@@ -4,9 +4,9 @@ import (
 	"flag"
 	"os"
 
-	"github.com/ViBiOh/auth/v2/pkg/handler"
 	"github.com/ViBiOh/auth/v2/pkg/ident/basic"
-	basicMemory "github.com/ViBiOh/auth/v2/pkg/provider/memory"
+	authMiddleware "github.com/ViBiOh/auth/v2/pkg/middleware"
+	basicMemory "github.com/ViBiOh/auth/v2/pkg/store/memory"
 	"github.com/ViBiOh/fibr/pkg/crud"
 	"github.com/ViBiOh/fibr/pkg/fibr"
 	"github.com/ViBiOh/fibr/pkg/filesystem"
@@ -19,12 +19,12 @@ import (
 	"github.com/ViBiOh/httputils/v3/pkg/prometheus"
 )
 
-func newLoginApp(basicConfig basicMemory.Config) handler.App {
+func newLoginApp(basicConfig basicMemory.Config) authMiddleware.App {
 	basicApp, err := basicMemory.New(basicConfig)
 	logger.Fatal(err)
 
 	basicProviderProvider := basic.New(basicApp)
-	return handler.New(basicApp, basicProviderProvider)
+	return authMiddleware.New(basicApp, basicProviderProvider)
 }
 
 func main() {
@@ -50,14 +50,12 @@ func main() {
 	storage, err := filesystem.New(filesystemConfig)
 	logger.Fatal(err)
 
-	loginApp := newLoginApp(basicConfig)
-
 	thumbnailApp := thumbnail.New(thumbnailConfig, storage)
 	rendererApp := renderer.New(rendererConfig, thumbnailApp)
 	crudApp, err := crud.New(crudConfig, storage, rendererApp, thumbnailApp)
 	logger.Fatal(err)
 
-	fibrApp := fibr.New(crudApp, rendererApp, loginApp)
+	fibrApp := fibr.New(crudApp, rendererApp, newLoginApp(basicConfig))
 
 	go thumbnailApp.Start()
 	go crudApp.Start()
