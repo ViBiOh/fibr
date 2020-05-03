@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/auth/v2/pkg/auth"
-	login "github.com/ViBiOh/auth/v2/pkg/handler"
 	"github.com/ViBiOh/auth/v2/pkg/ident"
+	authMiddleware "github.com/ViBiOh/auth/v2/pkg/middleware"
 	"github.com/ViBiOh/fibr/pkg/crud"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/renderer"
@@ -22,22 +22,22 @@ type App interface {
 }
 
 type app struct {
-	login    login.App
-	crud     crud.App
-	renderer renderer.App
+	loginApp    authMiddleware.App
+	crudApp     crud.App
+	rendererApp renderer.App
 }
 
 // New creates new App from Config
-func New(crudApp crud.App, rendererApp renderer.App, loginApp login.App) App {
+func New(crudApp crud.App, rendererApp renderer.App, loginApp authMiddleware.App) App {
 	return &app{
-		crud:     crudApp,
-		renderer: rendererApp,
-		login:    loginApp,
+		crudApp:     crudApp,
+		rendererApp: rendererApp,
+		loginApp:    loginApp,
 	}
 }
 
 func (a app) parseShare(r *http.Request, request *provider.Request) error {
-	share := a.crud.GetShare(request.Path)
+	share := a.crudApp.GetShare(request.Path)
 	if share == nil {
 		return nil
 	}
@@ -81,12 +81,12 @@ func (a app) parseRequest(r *http.Request) (provider.Request, *provider.Error) {
 		return request, nil
 	}
 
-	_, user, err := a.login.IsAuthenticated(r, "")
+	_, user, err := a.loginApp.IsAuthenticated(r, "")
 	if err != nil {
 		return request, a.handleAnonymousRequest(r, err)
 	}
 
-	if a.login.HasProfile(user, "admin") {
+	if a.loginApp.HasProfile(r.Context(), user, "admin") {
 		request.CanEdit = true
 		request.CanShare = true
 	}
@@ -97,15 +97,15 @@ func (a app) parseRequest(r *http.Request) (provider.Request, *provider.Error) {
 func (a app) handleRequest(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		a.crud.Get(w, r, request)
+		a.crudApp.Get(w, r, request)
 	case http.MethodPost:
-		a.crud.Post(w, r, request)
+		a.crudApp.Post(w, r, request)
 	case http.MethodPut:
-		a.crud.Create(w, r, request)
+		a.crudApp.Create(w, r, request)
 	case http.MethodPatch:
-		a.crud.Rename(w, r, request)
+		a.crudApp.Rename(w, r, request)
 	case http.MethodDelete:
-		a.crud.Delete(w, r, request)
+		a.crudApp.Delete(w, r, request)
 	default:
 		httperror.NotFound(w)
 	}
@@ -115,11 +115,11 @@ func (a app) handleRequest(w http.ResponseWriter, r *http.Request, request provi
 func (a app) Handler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !isMethodAllowed(r) {
-			a.renderer.Error(w, provider.Request{}, provider.NewError(http.StatusMethodNotAllowed, errors.New("you lack of method for calling me")))
+			a.rendererApp.Error(w, provider.Request{}, provider.NewError(http.StatusMethodNotAllowed, errors.New("you lack of method for calling me")))
 			return
 		}
 
-		if a.crud.ServeStatic(w, r) {
+		if a.crudApp.ServeStatic(w, r) {
 			return
 		}
 
@@ -130,7 +130,7 @@ func (a app) Handler() http.Handler {
 
 		request, err := a.parseRequest(r)
 		if err != nil {
-			a.renderer.Error(w, request, err)
+			a.rendererApp.Error(w, request, err)
 			return
 		}
 
