@@ -1,6 +1,9 @@
 github.com/DATA-DOG/go-sqlmock v1.4.1/go.mod h1:f/Ixk793poVmq4qj/V1dPUg2JEAKC73Q5eFN3EC/SaM=
+github.com/ViBiOh/auth v1.6.0 h1:5dH3g9mfiOJcPOg2y9E43O2IEyd5VYxnX7qxX4xEdRY=
 github.com/ViBiOh/auth/v2 v2.2.0 h1:vQWiIMfQPPI2SQHzj+BKK8Klc2pqmAiQcMZrychbkZE=
 github.com/ViBiOh/auth/v2 v2.2.0/go.mod h1:aH3mwJIRJ3zD8kBgZVnUCzJGEAOZuWhnddRn675QHnM=
+github.com/ViBiOh/auth/v2 v2.4.2 h1:YWDAz6LKobs6brxbGD7iJwNdO4alM/bb5Oc9RWaxpXA=
+github.com/ViBiOh/auth/v2 v2.4.2/go.mod h1:9eMGfYkNQ+7ekSiORzDRHRk1UfIFJ7g+R4R9tFACSOY=
 github.com/ViBiOh/httputils v1.8.2 h1:ulvdhtq8/Ww4QihYJ5uf0WDTG42yPuwojUCbfv/9W2E=
 github.com/ViBiOh/httputils/v3 v3.7.0/go.mod h1:ebC0FwtuUkNTlhh2g/NxhHZBGeHYefsBNCFy/wQa6PM=
 github.com/ViBiOh/httputils/v3 v3.11.0 h1:HXtl5bCEQjU7LvNYtKUhjmI7qQCEEGmbhoORh9X8XQE=
@@ -115,6 +118,7 @@ golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACk
 golang.org/x/crypto v0.0.0-20191206172530-e9b2fee46413/go.mod h1:LzIPMQfyMNhhGPhUkYOs5KpL4U8rLKemX1yGLhDgUto=
 golang.org/x/crypto v0.0.0-20200117160349-530e935923ad h1:Jh8cai0fqIK+f6nG0UgPW5wFk8wmiMhM3AyciDBdtQg=
 golang.org/x/crypto v0.0.0-20200117160349-530e935923ad/go.mod h1:LzIPMQfyMNhhGPhUkYOs5KpL4U8rLKemX1yGLhDgUto=
+golang.org/x/crypto v0.0.0-20200423211502-4bdfaf469ed5/go.mod h1:LzIPMQfyMNhhGPhUkYOs5KpL4U8rLKemX1yGLhDgUto=
 golang.org/x/net v0.0.0-20181114220301-adae6a3d119a/go.mod h1:mL1N/T3taQHkDXs73rZJwtUhF3w3ftmwwsq0BUmARs4=
 golang.org/x/net v0.0.0-20190404232315-eb5bcb51f2a3/go.mod h1:t9HGtf8HONx5eT2rtn7q6eTqICYqUVnKs3thJo3Qplg=
 golang.org/x/net v0.0.0-20190613194153-d28f0bde5980/go.mod h1:z5CRVTTTmAJ677TzLLGU+0bjPO0LkuOLi4/5GtJWs/s=
