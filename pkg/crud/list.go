@@ -66,7 +66,12 @@ func (a *app) Download(w http.ResponseWriter, request provider.Request) {
 		}
 	}()
 
-	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s.zip", path.Base(request.Path)))
+	filename := path.Base(request.Path)
+	if filename == "/" && request.Share != nil {
+		filename = path.Base(path.Join(request.Share.RootName, request.Path))
+	}
+
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s.zip", filename))
 
 	if err := a.zipFiles(request, zipWriter, ""); err != nil {
 		a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
