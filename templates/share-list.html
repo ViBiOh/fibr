@@ -15,6 +15,34 @@
     .share-content:hover {
       background-color: var(--grey);
     }
+
+    .path {
+      max-width: 30rem;
+    }
+
+    @media screen and (max-width: 485px) {
+      .path {
+        max-width: 20rem;
+      }
+    }
+
+    @media screen and (max-width: 430px) {
+      .path {
+        max-width: 16rem;
+      }
+    }
+
+    @media screen and (max-width: 375px) {
+      .path {
+        max-width: 12rem;
+      }
+    }
+
+    @media screen and (max-width: 320px) {
+      .path {
+        max-width: 8rem;
+      }
+    }
   </style>
 
   <div id="share-list" class="modal">
@@ -46,7 +74,7 @@
                     <code>{{ .ID }}</code>
                   </a>
                 </td>
-                <th scope="row">
+                <th scope="row" class="ellipsis path">
                   <code>{{ .Path }}</code>
                 </th>
                 <td>
@@ -54,7 +82,7 @@
                     <img class="icon" src="/svg/check?fill=silver" alt="Edit allowed">
                   {{ end }}
                 </td>
-                <td>
+                <td >
                   <form method="post">
                     <input type="hidden" name="type" value="share" />
                     <input type="hidden" name="method" value="DELETE" />
