@@ -1,4 +1,4 @@
-FROM scratch
+FROM vibioh/scratch
 
 ENV FIBR_CSP "default-src 'self'; base-uri 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:"
 ENV FIBR_FRAME_OPTIONS SAMEORIGIN
