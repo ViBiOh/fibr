@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
@@ -28,6 +29,22 @@ func (a *app) Delete(w http.ResponseWriter, r *http.Request, request provider.Re
 	}
 
 	if err := a.storage.Remove(info.Pathname); err != nil {
+		a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
+		return
+	}
+
+	a.metadataLock.Lock()
+	defer a.metadataLock.Unlock()
+
+	newMetas := make([]*provider.Share, 0)
+	for _, metadata := range a.metadatas {
+		if !strings.HasPrefix(metadata.Path, info.Pathname) {
+			newMetas = append(newMetas, metadata)
+		}
+	}
+
+	a.metadatas = newMetas
+	if err := a.saveMetadata(); err != nil {
 		a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
