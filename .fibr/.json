@@ -4,13 +4,15 @@
     "path": "/pkg/",
     "rootName": "fibr",
     "edit": true,
-    "password": ""
+    "password": "",
+    "file": false
   },
   {
     "id": "password",
     "path": "/templates/",
     "rootName": "templates",
     "edit": false,
-    "password": "$2a$12$SVaRKEx6MrP2ZdUOrBoSg.s/hIT5VJTuimQEQGkReIyYRPX14sV12"
+    "password": "$2a$12$SVaRKEx6MrP2ZdUOrBoSg.s/hIT5VJTuimQEQGkReIyYRPX14sV12",
+    "file": false
   }
 ]
