@@ -81,6 +81,12 @@ func (a app) parseRequest(r *http.Request) (provider.Request, *provider.Error) {
 		return request, nil
 	}
 
+	if a.loginApp == nil {
+		request.CanEdit = true
+		request.CanShare = true
+		return request, nil
+	}
+
 	_, user, err := a.loginApp.IsAuthenticated(r, "")
 	if err != nil {
 		return request, a.handleAnonymousRequest(r, err)

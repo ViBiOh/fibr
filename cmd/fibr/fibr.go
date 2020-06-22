@@ -13,6 +13,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/renderer"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v3/pkg/alcotest"
+	"github.com/ViBiOh/httputils/v3/pkg/flags"
 	"github.com/ViBiOh/httputils/v3/pkg/httputils"
 	"github.com/ViBiOh/httputils/v3/pkg/logger"
 	"github.com/ViBiOh/httputils/v3/pkg/owasp"
@@ -43,6 +44,8 @@ func main() {
 	filesystemConfig := filesystem.Flags(fs, "fs")
 	thumbnailConfig := thumbnail.Flags(fs, "thumbnail")
 
+	disableAuth := flags.New("", "auth").Name("NoAuth").Default(false).Label("Disable basic authentification").ToBool(fs)
+
 	logger.Fatal(fs.Parse(os.Args[1:]))
 
 	alcotest.DoAndExit(alcotestConfig)
@@ -55,7 +58,12 @@ func main() {
 	crudApp, err := crud.New(crudConfig, storage, rendererApp, thumbnailApp)
 	logger.Fatal(err)
 
-	fibrApp := fibr.New(crudApp, rendererApp, newLoginApp(basicConfig))
+	var middlewareApp authMiddleware.App
+	if !*disableAuth {
+		middlewareApp = newLoginApp(basicConfig)
+	}
+
+	fibrApp := fibr.New(crudApp, rendererApp, middlewareApp)
 
 	go thumbnailApp.Start()
 	go crudApp.Start()
