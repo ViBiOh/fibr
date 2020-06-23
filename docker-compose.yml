@@ -1,10 +1,10 @@
 ---
 
-version: "2.1"
+version: 2.1
 
 services:
   site:
-    image: ${DOCKER_USER}/fibr
+    image: vibioh/fibr
     labels:
       traefik.http.routers.fibr-http.rule: Host(`fibr.vibioh.fr`)
       traefik.http.routers.fibr-http.entrypoints: http
@@ -34,7 +34,7 @@ services:
       - no-new-privileges
 
   video:
-    image: ${DOCKER_USER}/vith
+    image: vibioh/vith
     labels:
       traefik.enable: false
     restart: on-failure:5

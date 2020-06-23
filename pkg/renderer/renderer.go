@@ -28,6 +28,7 @@ type App interface {
 type Config struct {
 	publicURL *string
 	version   *string
+	templates *string
 }
 
 type app struct {
@@ -40,6 +41,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
 		publicURL: flags.New(prefix, "fibr").Name("PublicURL").Default("https://fibr.vibioh.fr").Label("Public URL").ToString(fs),
 		version:   flags.New(prefix, "fibr").Name("Version").Default("").Label("Version (used mainly as a cache-buster)").ToString(fs),
+		templates: flags.New(prefix, "fibr").Name("Templates").Default("./templates/").Label("HTML Templates folder").ToString(fs),
 	}
 }
 
@@ -84,7 +86,7 @@ func New(config Config, thumbnailApp thumbnail.App) App {
 		},
 	})
 
-	fibrTemplates, err := templates.GetTemplates("./templates/", ".html")
+	fibrTemplates, err := templates.GetTemplates(strings.TrimSpace(*config.templates), ".html")
 	logger.Fatal(err)
 
 	publicURL := strings.TrimSpace(*config.publicURL)
