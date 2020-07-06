@@ -16,19 +16,11 @@ import (
 )
 
 const (
-	// ThumbnailWidth is the width of each thumbnail generated
-	ThumbnailWidth = 150
+	// Width is the width of each thumbnail generated
+	Width = 150
 
-	// ThumbnailHeight is the width of each thumbnail generated
-	ThumbnailHeight = 150
-)
-
-var (
-	ignoredThumbnailDir = map[string]bool{
-		"vendor":       true,
-		"vendors":      true,
-		"node_modules": true,
-	}
+	// Height is the width of each thumbnail generated
+	Height = 150
 )
 
 // App of package
@@ -76,7 +68,7 @@ func New(config Config, storage provider.Storage) App {
 	}
 
 	app := &app{
-		imageURL:      fmt.Sprintf("%s/crop?width=%d&height=%d&stripmeta=true&noprofile=true&quality=80&type=jpeg", imageURL, ThumbnailWidth, ThumbnailHeight),
+		imageURL:      fmt.Sprintf("%s/crop?width=%d&height=%d&stripmeta=true&noprofile=true&quality=80&type=jpeg", imageURL, Width, Height),
 		videoURL:      videoURL,
 		storage:       storage,
 		pathnameInput: make(chan provider.StorageItem, 10),
@@ -107,7 +99,7 @@ func (a app) Serve(w http.ResponseWriter, r *http.Request, item provider.Storage
 }
 
 // List return all thumbnail in a base64 form
-func (a app) List(w http.ResponseWriter, r *http.Request, item provider.StorageItem) {
+func (a app) List(w http.ResponseWriter, _ *http.Request, item provider.StorageItem) {
 	if !a.Enabled() {
 		w.WriteHeader(http.StatusNoContent)
 		return

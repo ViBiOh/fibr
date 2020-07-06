@@ -53,7 +53,7 @@ func (a app) parseShare(r *http.Request, request *provider.Request) error {
 	return nil
 }
 
-func (a app) handleAnonymousRequest(r *http.Request, err error) *provider.Error {
+func (a app) handleAnonymousRequest(_ *http.Request, err error) *provider.Error {
 	if auth.ErrForbidden == err {
 		return provider.NewError(http.StatusForbidden, errors.New("you're not authorized to speak to me"))
 	}

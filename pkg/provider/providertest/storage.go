@@ -13,7 +13,7 @@ type stubReadCloserSeeker struct {
 	bytes.Buffer
 }
 
-func (s stubReadCloserSeeker) Seek(a int64, b int) (int64, error) {
+func (s stubReadCloserSeeker) Seek(_ int64, _ int) (int64, error) {
 	return 0, nil
 }
 
@@ -57,7 +57,9 @@ func (s Storage) ReaderFrom(pathname string) (provider.ReadSeekerCloser, error) 
 	}
 
 	buffer := stubReadCloserSeeker{}
-	buffer.WriteString("ok")
+	if _, err := buffer.WriteString("ok"); err != nil {
+		return nil, err
+	}
 
 	return &buffer, nil
 }
@@ -75,7 +77,7 @@ func (s Storage) List(pathname string) ([]provider.StorageItem, error) {
 }
 
 // Walk fakes implementation
-func (s Storage) Walk(pathname string, walkFn func(provider.StorageItem, error) error) error {
+func (s Storage) Walk(pathname string, _ func(provider.StorageItem, error) error) error {
 	if strings.HasSuffix(pathname, "error") {
 		return errors.New("error on create dir")
 	}
@@ -106,7 +108,7 @@ func (s Storage) Store(pathname string, content io.ReadCloser) error {
 }
 
 // Rename fakes implementation
-func (s Storage) Rename(oldName, newName string) error {
+func (s Storage) Rename(oldName, _ string) error {
 	if oldName == "error" {
 		return errors.New("error on rename")
 	}
