@@ -19,8 +19,8 @@ func (a *app) getCover(files []provider.StorageItem) map[string]interface{} {
 		if a.thumbnail.HasThumbnail(file) {
 			return map[string]interface{}{
 				"Img":       file,
-				"ImgHeight": thumbnail.ThumbnailHeight,
-				"ImgWidth":  thumbnail.ThumbnailWidth,
+				"ImgHeight": thumbnail.Height,
+				"ImgWidth":  thumbnail.Width,
 			}
 		}
 	}

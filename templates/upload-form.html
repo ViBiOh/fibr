@@ -56,9 +56,8 @@
 
     /**
      * Add upload item content to container.
-     * @param  {DOMNode} container Container to append item
+     * @param  {Element} container Container to append item
      * @param  {File}    file      File to generate an item
-     * @param  {Number}  index     Index of generated file
      */
     async function addUploadItem(container, file) {
       const messageId = await fileMessageId(file);
@@ -113,8 +112,9 @@
 
     /**
      * Add upload message for file
-     * @param {File} file    File to generate message
-     * @param {Any} content  Content of message
+     * @param {File}    file    File to generate message
+     * @param {Element} content Content of message
+     * @param {String}  style   Style of status
      */
     async function setUploadStatus(file, content, style) {
       const messageId = await fileMessageId(file);
@@ -168,7 +168,7 @@
         xhr.addEventListener(
           'readystatechange',
           e => {
-            if (xhr.readyState == XMLHttpRequest.DONE) {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
               if (xhr.status >= 200 && xhr.status < 400) {
                 if (progress) {
                   progress.value = 100;
@@ -180,7 +180,7 @@
                 reject(e);
                 xhr = undefined;
               }
-            } else if (xhr.readyState == XMLHttpRequest.UNSENT) {
+            } else if (xhr.readyState === XMLHttpRequest.UNSENT) {
               reject(new Error('request aborted'));
               xhr = undefined;
             }
@@ -196,7 +196,7 @@
 
     /**
      * Handle upload submit
-     * @param  {Object} e Submit event
+     * @param  {Object} event Submit event
      */
     async function upload(event) {
       event.preventDefault();
@@ -209,14 +209,14 @@
       const values = getFiles(event);
 
       let success = true;
-      for (var i = 0; i < values.files.length; i++) {
+      for (let i = 0; i < values.files.length; i++) {
         const file = values.files[i];
 
         try {
           await uploadFile(values.method, file);
-          setUploadStatus(file, '✓', 'success');
+          await setUploadStatus(file, '✓', 'success');
         } catch (err) {
-          setUploadStatus(file, 'X', 'danger');
+          await setUploadStatus(file, 'X', 'danger');
           success = false;
 
           console.error(err);

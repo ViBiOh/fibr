@@ -127,10 +127,10 @@ func computeTitle(config Config, request Request) string {
 	}
 
 	if len(request.Path) > 0 {
-		path := strings.Trim(request.Path, "/")
+		requestPath := strings.Trim(request.Path, "/")
 
-		if path != "" {
-			parts = append(parts, path)
+		if requestPath != "" {
+			parts = append(parts, requestPath)
 		}
 	}
 
@@ -149,10 +149,10 @@ func computeDescription(config Config, request Request) string {
 	}
 
 	if len(request.Path) > 0 {
-		path := strings.Trim(request.Path, "/")
+		requestPath := strings.Trim(request.Path, "/")
 
-		if path != "" {
-			parts = append(parts, path)
+		if requestPath != "" {
+			parts = append(parts, requestPath)
 		}
 	}
 

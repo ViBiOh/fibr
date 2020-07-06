@@ -154,8 +154,8 @@ func (s StorageItem) Extension() string {
 // Mime gives Mime Type of item
 func (s StorageItem) Mime() string {
 	extension := s.Extension()
-	if mime := mime.TypeByExtension(extension); mime != "" {
-		return mime
+	if mimeType := mime.TypeByExtension(extension); mimeType != "" {
+		return mimeType
 	}
 
 	if CodeExtensions[extension] {
