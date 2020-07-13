@@ -8,6 +8,7 @@ import (
 	"unicode"
 
 	"github.com/ViBiOh/httputils/v3/pkg/logger"
+	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
 )
@@ -18,9 +19,7 @@ var (
 )
 
 func init() {
-	transformer = transform.Chain(norm.NFD, transform.RemoveFunc(func(r rune) bool {
-		return unicode.Is(unicode.Mn, r)
-	}), norm.NFC)
+	transformer = transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
 }
 
 // SanitizeName return sanitized name (remove diacritics)
