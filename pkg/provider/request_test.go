@@ -291,6 +291,37 @@ func TestMime(t *testing.T) {
 	}
 }
 
+func TestIsPdf(t *testing.T) {
+	var cases = []struct {
+		intention string
+		input     StorageItem
+		want      bool
+	}{
+		{
+			"simple",
+			StorageItem{
+				Name: "test.pdf",
+			},
+			true,
+		},
+		{
+			"raw image",
+			StorageItem{
+				Name: "test.raw",
+			},
+			false,
+		},
+	}
+
+	for _, testCase := range cases {
+		t.Run(testCase.intention, func(t *testing.T) {
+			if result := testCase.input.IsPdf(); result != testCase.want {
+				t.Errorf("IsPdf() = `%v`, want `%v`", result, testCase.want)
+			}
+		})
+	}
+}
+
 func TestIsImage(t *testing.T) {
 	var cases = []struct {
 		intention string
