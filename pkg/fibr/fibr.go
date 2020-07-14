@@ -53,12 +53,12 @@ func (a app) parseShare(r *http.Request, request *provider.Request) error {
 	return nil
 }
 
-func (a app) handleAnonymousRequest(_ *http.Request, err error) *provider.Error {
-	if auth.ErrForbidden == err {
+func convertAuthenticationError(err error) *provider.Error {
+	if errors.Is(err, auth.ErrForbidden) {
 		return provider.NewError(http.StatusForbidden, errors.New("you're not authorized to speak to me"))
 	}
 
-	if err == ident.ErrMalformedAuth {
+	if errors.Is(err, ident.ErrMalformedAuth) {
 		return provider.NewError(http.StatusBadRequest, err)
 	}
 
@@ -89,7 +89,7 @@ func (a app) parseRequest(r *http.Request) (provider.Request, *provider.Error) {
 
 	_, user, err := a.loginApp.IsAuthenticated(r, "")
 	if err != nil {
-		return request, a.handleAnonymousRequest(r, err)
+		return request, convertAuthenticationError(err)
 	}
 
 	if a.loginApp.HasProfile(r.Context(), user, "admin") {
