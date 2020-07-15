@@ -4,7 +4,6 @@ import (
 	"encoding/base64"
 	"errors"
 	"mime"
-	"net/http"
 	"path"
 	"strings"
 	"time"
@@ -66,17 +65,16 @@ type Share struct {
 }
 
 // CheckPassword verifies that request has correct password for share
-func (s Share) CheckPassword(r *http.Request) error {
+func (s Share) CheckPassword(authorizationHeader string) error {
 	if s.Password == "" {
 		return nil
 	}
 
-	header := r.Header.Get("Authorization")
-	if header == "" {
+	if authorizationHeader == "" {
 		return errors.New("empty authorization header")
 	}
 
-	data, err := base64.StdEncoding.DecodeString(strings.TrimPrefix(header, "Basic "))
+	data, err := base64.StdEncoding.DecodeString(strings.TrimPrefix(authorizationHeader, "Basic "))
 	if err != nil {
 		return err
 	}

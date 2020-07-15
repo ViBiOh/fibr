@@ -4,8 +4,6 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"net/http"
-	"net/http/httptest"
 	"reflect"
 	"testing"
 
@@ -109,28 +107,16 @@ func TestCheckPassword(t *testing.T) {
 		t.Errorf("unable to create bcrypted password: %s", err)
 	}
 
-	invalidAuth := httptest.NewRequest(http.MethodGet, "/", nil)
-	invalidAuth.Header.Set("Authorization", "invalid")
-
-	invalidFormat := httptest.NewRequest(http.MethodGet, "/", nil)
-	invalidFormat.Header.Set("Authorization", fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte("test"))))
-
-	invalidPassword := httptest.NewRequest(http.MethodGet, "/", nil)
-	invalidPassword.Header.Set("Authorization", fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte("test:password"))))
-
-	valid := httptest.NewRequest(http.MethodGet, "/", nil)
-	valid.Header.Set("Authorization", fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte("test:test"))))
-
 	var cases = []struct {
 		intention string
 		share     *Share
-		request   *http.Request
+		header    string
 		want      error
 	}{
 		{
 			"no password",
 			&Share{},
-			httptest.NewRequest(http.MethodGet, "/", nil),
+			"",
 			nil,
 		},
 		{
@@ -138,7 +124,7 @@ func TestCheckPassword(t *testing.T) {
 			&Share{
 				Password: string(password),
 			},
-			httptest.NewRequest(http.MethodGet, "/", nil),
+			"",
 			errors.New("empty authorization header"),
 		},
 		{
@@ -146,7 +132,7 @@ func TestCheckPassword(t *testing.T) {
 			&Share{
 				Password: string(password),
 			},
-			invalidAuth,
+			"invalid",
 			errors.New("illegal base64 data at input byte 4"),
 		},
 		{
@@ -154,7 +140,7 @@ func TestCheckPassword(t *testing.T) {
 			&Share{
 				Password: string(password),
 			},
-			invalidFormat,
+			fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte("test"))),
 			errors.New("invalid format for basic auth"),
 		},
 		{
@@ -162,7 +148,7 @@ func TestCheckPassword(t *testing.T) {
 			&Share{
 				Password: string(password),
 			},
-			invalidPassword,
+			fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte("test:password"))),
 			errors.New("invalid credentials"),
 		},
 		{
@@ -170,14 +156,14 @@ func TestCheckPassword(t *testing.T) {
 			&Share{
 				Password: string(password),
 			},
-			valid,
+			fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte("test:test"))),
 			nil,
 		},
 	}
 
 	for _, testCase := range cases {
 		t.Run(testCase.intention, func(t *testing.T) {
-			err := testCase.share.CheckPassword(testCase.request)
+			err := testCase.share.CheckPassword(testCase.header)
 
 			failed := false
 
@@ -190,7 +176,7 @@ func TestCheckPassword(t *testing.T) {
 			}
 
 			if failed {
-				t.Errorf("%#v.CheckPassword(%#v) = %#v, want %#v", testCase.share, testCase.request, err, testCase.want)
+				t.Errorf("CheckPassword() = `%s`, want `%s`", err, testCase.want)
 			}
 		})
 	}
