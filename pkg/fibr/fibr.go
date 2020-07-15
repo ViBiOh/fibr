@@ -36,13 +36,13 @@ func New(crudApp crud.App, rendererApp renderer.App, loginApp authMiddleware.App
 	}
 }
 
-func (a app) parseShare(r *http.Request, request *provider.Request) error {
+func (a app) parseShare(request *provider.Request, authorizationHeader string) error {
 	share := a.crudApp.GetShare(request.Path)
 	if share == nil {
 		return nil
 	}
 
-	if err := share.CheckPassword(r); err != nil {
+	if err := share.CheckPassword(authorizationHeader); err != nil {
 		return err
 	}
 
@@ -73,7 +73,7 @@ func (a app) parseRequest(r *http.Request) (provider.Request, *provider.Error) {
 		Display:  r.URL.Query().Get("d"),
 	}
 
-	if err := a.parseShare(r, &request); err != nil {
+	if err := a.parseShare(&request, r.Header.Get("Authorization")); err != nil {
 		return request, provider.NewError(http.StatusUnauthorized, err)
 	}
 
