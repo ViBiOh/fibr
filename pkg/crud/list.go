@@ -16,6 +16,10 @@ import (
 
 func (a *app) getCover(files []provider.StorageItem) map[string]interface{} {
 	for _, file := range files {
+		if file.IsVideo() {
+			continue
+		}
+
 		if a.thumbnail.HasThumbnail(file) {
 			return map[string]interface{}{
 				"Img":       file,
