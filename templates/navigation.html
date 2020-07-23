@@ -41,7 +41,6 @@
      */
     function addSwipe(touchSurface, callback = () => null) {
       const threshold = 150;
-      const restraint = 100;
       const allowedTime = 300;
 
       let startX;
@@ -50,7 +49,6 @@
       touchSurface.addEventListener(
         'touchstart',
         (e) => {
-          console.log('e', typeof e, e);
           startX = e.changedTouches[0].pageX;
           startTime = new Date().getTime();
 
@@ -68,12 +66,11 @@
           }
 
           const distX = e.changedTouches[0].pageX - startX;
-
-          if (Math.abs(distX) >= threshold) {
-            direction = distX < 0 ? 'left' : 'right';
+          if (Math.abs(distX) < threshold) {
+            return;
           }
 
-          callback(direction);
+          callback(distX < 0 ? 'left' : 'right');
           e.preventDefault();
         },
         false,
