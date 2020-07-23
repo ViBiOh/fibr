@@ -3,7 +3,11 @@
 
   {{ template "navigation" . }}
 
-  <header class="header full-screen">
+  <header class="header full-screen{{ if .Content.File }} flex flex-center{{ end }}">
+    {{ if .Content.File }}
+      <span>
+    {{ end }}
+
     <h1 class="medium no-margin no-padding" itemscope itemtype="http://schema.org/BreadcrumbList">
       <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
         {{ template "root_link" . }}
@@ -19,23 +23,33 @@
           </span>
         {{ end }}
       {{ end }}
+    </h1>
 
-      {{ if .Content.File }}
-        <h2 class="small bg-grey no-margin full ellipsis">↳ <a href="{{ .Content.File.Name }}">{{ .Content.File.Name }}</a></h2>
+    {{ if .Content.File }}
+        <h2 class="small bg-grey no-margin full ellipsis flex">
+          ↳&nbsp;
+          <a href="{{ .Content.File.Name }}">{{ .Content.File.Name }}</a>
+        </h2>
+      </span>
 
+      <span class="flex-grow"></span>
+
+      {{ if or .Content.Previous .Content.Next }}
         <nav class="flex">
           {{ if .Content.Previous }}
-            <a href="{{ .Content.Previous.Name }}{{ if not .Content.Previous.IsDir }}?browser{{ end }}" title="Previous file">←</a>
+            <a class="button button-icon" href="{{ .Content.Previous.Name }}{{ if not .Content.Previous.IsDir }}?browser{{ end }}">
+              <img class="icon" src="/svg/arrow-left?fill=silver" alt="Previous file">
+            </a>
           {{ end }}
 
-          <span class="flex-grow"></span>
-
           {{ if .Content.Next }}
-            <a href="{{ .Content.Next.Name }}{{ if not .Content.Next.IsDir }}?browser{{ end }}" title="Previous file">→</a>
+            <a class="button button-icon" href="{{ .Content.Next.Name }}{{ if not .Content.Next.IsDir }}?browser{{ end }}">
+              <img class="icon" src="/svg/arrow-right?fill=silver" alt="Next file">
+            </a>
           {{ end }}
         </nav>
       {{ end }}
-    </h1>
+    {{ end }}
   </header>
 
   {{ template "message" .Message }}
