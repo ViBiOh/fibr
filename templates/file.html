@@ -20,12 +20,12 @@
   </style>
 
   {{ if .Content.File.IsVideo }}
-    <video controls src="{{ .Content.File.Name }}" type="{{ .Content.File.Mime }}"></video>
+    <video id="content" controls src="{{ .Content.File.Name }}" type="{{ .Content.File.Mime }}"></video>
   {{ else }}
     {{ if .Content.File.IsImage }}
-      <img src="{{ .Content.File.Name }}" alt="{{ .Content.File.Name }}" />
+      <img id="content" src="{{ .Content.File.Name }}" alt="{{ .Content.File.Name }}" />
     {{ else }}
-      <object data="{{ .Content.File.Name }}" type="{{ .Content.File.Mime }}"></object>
+      <object id="content" data="{{ .Content.File.Name }}" type="{{ .Content.File.Mime }}"></object>
     {{ end }}
   {{ end }}
 
