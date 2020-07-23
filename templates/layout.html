@@ -22,6 +22,18 @@
 
       {{ if .Content.File }}
         <h2 class="small bg-grey no-margin full ellipsis">↳ <a href="{{ .Content.File.Name }}">{{ .Content.File.Name }}</a></h2>
+
+        <nav class="flex">
+          {{ if .Content.Previous }}
+            <a href="{{ .Content.Previous.Name }}{{ if not .Content.Previous.IsDir }}?browser{{ end }}" title="Previous file">←</a>
+          {{ end }}
+
+          <span class="flex-grow"></span>
+
+          {{ if .Content.Next }}
+            <a href="{{ .Content.Next.Name }}{{ if not .Content.Next.IsDir }}?browser{{ end }}" title="Previous file">→</a>
+          {{ end }}
+        </nav>
       {{ end }}
     </h1>
   </header>

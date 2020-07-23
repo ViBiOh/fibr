@@ -35,64 +35,6 @@
     }
 
     /**
-     * Handle swipe event.
-     * @param  {Element}  touchSurface DOM Element that will handle swipe
-     * @param  {Function} callback     Callback called when swipe in detected
-     */
-    function addSwipe(touchSurface, callback = () => null) {
-      const threshold = 150;
-      const allowedTime = 300;
-
-      let startX;
-      let startTime;
-
-      touchSurface.addEventListener(
-        'touchstart',
-        (e) => {
-          startX = e.changedTouches[0].pageX;
-          startTime = new Date().getTime();
-
-          e.preventDefault();
-        },
-        false,
-      );
-
-      touchSurface.addEventListener('touchmove', (e) => e.preventDefault(), false);
-      touchSurface.addEventListener(
-        'touchend',
-        (e) => {
-          if (new Date().getTime() - startTime > allowedTime) {
-            return;
-          }
-
-          const distX = e.changedTouches[0].pageX - startX;
-          if (Math.abs(distX) < threshold) {
-            return;
-          }
-
-          callback(distX < 0 ? 'left' : 'right');
-          e.preventDefault();
-        },
-        false,
-      );
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      const content = document.getElementById('content');
-      if (!content) {
-        return;
-      }
-
-      addSwipe(content, (direction) => {
-        if (direction === 'right') {
-          goToPrevious();
-        } else if (direction === 'left') {
-          goToNext();
-        }
-      });
-    });
-
-    /**
      * Handle Previous/next.
      */
     window.onkeyup = e => {
