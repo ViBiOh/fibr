@@ -1,7 +1,7 @@
 {{ define "seo" }}
   <title>{{ .Title }}</title>
   <meta name="description" content="{{ .Description }}">
-  <link rel="canonical" href="{{ .PublicURL }}">
+  <link rel="canonical" href="{{ .PublicURL }}{{ if .Content.File }}{{ if not .Content.File.IsDir }}?browser{{ end }}{{ end }}">
 
   <meta property="og:type" content="website">
   <meta property="og:url" content="{{ .PublicURL }}">
