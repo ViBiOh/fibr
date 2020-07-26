@@ -1,10 +1,13 @@
 github.com/DATA-DOG/go-sqlmock v1.4.1/go.mod h1:f/Ixk793poVmq4qj/V1dPUg2JEAKC73Q5eFN3EC/SaM=
 github.com/ViBiOh/auth/v2 v2.5.3 h1:FisivpGiutKpvIBbTjuZhAWWdC/ewTvuwvZ9EqmTl6I=
 github.com/ViBiOh/auth/v2 v2.5.3/go.mod h1:VxqOoSQX8ef03esVsr5YMbVRBV6919rNgn+mFhkl9ok=
+github.com/ViBiOh/httputils v1.8.2 h1:ulvdhtq8/Ww4QihYJ5uf0WDTG42yPuwojUCbfv/9W2E=
 github.com/ViBiOh/httputils/v3 v3.20.0 h1:cmMdVAeAVPyx9W0wUI44NOJomddF55i20dXjv6/FCbU=
 github.com/ViBiOh/httputils/v3 v3.20.0/go.mod h1:pdjuWUsUok7HrnbqSKGduQ6YnwQiZSYh8MshoytImd8=
 github.com/ViBiOh/httputils/v3 v3.21.0 h1:ST64N5xLQDMCK5ipQ3Sm14pYa/0cmwxbENuz8ZmBT9U=
 github.com/ViBiOh/httputils/v3 v3.21.0/go.mod h1:zGAsgsanf8SlTNWfQ/7taOTOJSYax2b7krZ9RCaQRgc=
+github.com/ViBiOh/httputils/v3 v3.22.0 h1:1gCBclILIMOSVJx+vcEXCVCBm2c0MA1GD/YR8q1+29M=
+github.com/ViBiOh/httputils/v3 v3.22.0/go.mod h1:zGAsgsanf8SlTNWfQ/7taOTOJSYax2b7krZ9RCaQRgc=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf/go.mod h1:ybxpYRFXyAe+OPACYpWeL0wqObRcbAqCMya13uyzqw0=
