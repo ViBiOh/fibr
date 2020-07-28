@@ -2,12 +2,12 @@
 
 Web File Browser and Manager.
 
-* Lightweight (11MB self-sufficient binary, low memory consumption at runtime).
-* Mobile-first interface, with light payload. Dark themed.
-* Thumbnail generation for image, PDF and video (with help of sidecars)
-* Works in pure HTML or with very little javascript for improved file upload
-* Can share directory with ou without password and with or without edit right.
-* Support multiple storage backend (basic filesystem implemented, but can be anything like Minio or S3)
+- Lightweight (11MB self-sufficient binary, low memory consumption at runtime).
+- Mobile-first interface, with light payload. Dark themed.
+- Thumbnail generation for image, PDF and video (with help of sidecars)
+- Works in pure HTML or with very little javascript for improved file upload
+- Can share directory with ou without password and with or without edit right.
+- Support multiple storage backend (basic filesystem implemented, but can be anything like Minio or S3)
 
 ![](docs/fibr.png)
 
@@ -30,7 +30,7 @@ Fibr browses files of given `-data` option folder, called "root folder". For sec
 
 It aims to be consistent accross all existing filesystem (block storage, object storage, etc.) and thus enforces filenames in lowercase, with no space or special character. At start, it walks every files and reports names that breaks its policy. It doesn't modify existing files unless you set `-sanitizeOnStart` option.
 
-Fibr creates a `.fibr` folder in *root folder* for storing its metadata: shares' configuration and thumbnails. If you want to stop using *fibr* or start with a fresh installation (e.g. regenerating thumbnails), you can delete this folder.
+Fibr creates a `.fibr` folder in _root folder_ for storing its metadata: shares' configuration and thumbnails. If you want to stop using _fibr_ or start with a fresh installation (e.g. regenerating thumbnails), you can delete this folder.
 
 ### Files
 
@@ -40,7 +40,7 @@ You can refer to these projects for installing and configuring them and set `-th
 
 ### Security
 
-Authentication is made with [Basic Auth](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication), compatible with all browsers and CLI tools such as `curl`. I *strongly recommend configuring HTTPS* in order to avoid exposing your credentials in plain text.
+Authentication is made with [Basic Auth](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication), compatible with all browsers and CLI tools such as `curl`. I _strongly recommend configuring HTTPS_ in order to avoid exposing your credentials in plain text.
 
 You can set `-cert` and `-key` options, it uses [Golang's standard net/http#ServeTLS](https://golang.org/pkg/net/http/#ServeTLS) under the hood.
 
@@ -50,7 +50,7 @@ You can also configure a reverse proxy with Let's Encrypt to manage encryption, 
 
 You can share folders or just one file: it generates a short link that gain access to shared object and is considered as "root folder" with no parent escalation.
 
-It can be password-protected: user *has to* enter password to see content (login is not used, you can leave it blank).
+It can be password-protected: user _has to_ enter password to see content (login is not used, you can leave it blank).
 
 It can be read-only or with edit right. With edit-right, user can do anything as you, uploading, deleting, renaming, except generating new shares.
 
@@ -66,12 +66,13 @@ Fibr provides [OpenGraph metadatas](https://ogp.me) to have nice preview of link
 
 ### Users
 
-You can start `fibr` with no user, with the `-noAuth` option. Although available, I don't recommend using it in public Internet. Anybody has access to the *root folder* for viewing, uploading, deleting or sharing content with anybody.
+You can start `fibr` with no user, with the `-noAuth` option. Although available, I don't recommend using it in public Internet. Anybody has access to the _root folder_ for viewing, uploading, deleting or sharing content with anybody.
 
 Users are set with the `-authUsers` option and are in the form `[id]:[login]:[bcrypted password]`.
-* `id` is used to add profile to your user
-* `login` is the user for Basic Auth prompt
-* `bcrypted password` is the password for Basic Auth prompt, [encrypted with `bcrypt`](https://en.wikipedia.org/wiki/Bcrypt)
+
+- `id` is used to add profile to your user
+- `login` is the user for Basic Auth prompt
+- `bcrypted password` is the password for Basic Auth prompt, [encrypted with `bcrypt`](https://en.wikipedia.org/wiki/Bcrypt)
 
 You can easily encrypt your `login:password` value with [`htpasswd`](https://httpd.apache.org/docs/2.4/programs/htpasswd.html)
 
@@ -79,7 +80,7 @@ You can easily encrypt your `login:password` value with [`htpasswd`](https://htt
 htpasswd -nBb login password
 ```
 
-In order to work, your user *must have* `admin` profile sets with the `-authProfiles` option.
+In order to work, your user _must have_ `admin` profile sets with the `-authProfiles` option.
 
 ## Getting started
 
@@ -115,7 +116,7 @@ docker run -d \
 
 ### As a docker-compose stack
 
-For prod-ready run with thumbnails generation of image, PDF and videos, *this is the recommended approach*.
+For prod-ready run with thumbnails generation of image, PDF and videos, _this is the recommended approach_.
 
 You can inspire yourself from the [docker-compose.yml](docker-compose.yml) file I personnaly use. Beware of `-authUsers` option: bcrypted passwords contain dollar sign, which `docker-compose` tries to resolve as a shell variable, [you must escape it](https://docs.docker.com/compose/compose-file/compose-file-v2/#variable-substitution).
 

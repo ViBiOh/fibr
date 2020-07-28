@@ -1,6 +1,6 @@
 {{ define "upload-modal" }}
   <script>
-    /**
+     /**
      * Drag'n drop.
      */
     const dropZone = document.getElementsByTagName('body')[0];
@@ -16,7 +16,7 @@
 
     dropZone.addEventListener('dragover', eventNoop);
     dropZone.addEventListener('dragleave', eventNoop);
-    dropZone.addEventListener('drop', e => {
+    dropZone.addEventListener('drop', (e) => {
       eventNoop(e);
 
       window.location.hash = '#upload-modal';
@@ -30,7 +30,7 @@
      */
     function bufferToHex(buffer) {
       return Array.prototype.map
-        .call(new Uint8Array(buffer), x => `00${x.toString(16)}`.slice(-2))
+        .call(new Uint8Array(buffer), (x) => `00${x.toString(16)}`.slice(-2))
         .join('');
     }
 
@@ -40,7 +40,10 @@
      * @return {Promise<String>}      Promise that will resolve the sha1 string
      */
     async function sha1(data) {
-      const buffer = await crypto.subtle.digest('SHA-1', new TextEncoder('utf-8').encode(data));
+      const buffer = await crypto.subtle.digest(
+        'SHA-1',
+        new TextEncoder('utf-8').encode(data),
+      );
       return bufferToHex(buffer);
     }
 
@@ -96,12 +99,12 @@
       replaceContent(uploadList);
 
       return [].filter
-        .call(event.target, e => e.nodeName.toLowerCase() === 'input')
+        .call(event.target, (e) => e.nodeName.toLowerCase() === 'input')
         .reduce((acc, cur) => {
           if (cur.type === 'file') {
             acc.files = cur.files;
 
-            [].forEach.call(acc.files, file => addUploadItem(uploadList, file));
+            [].forEach.call(acc.files, (file) => addUploadItem(uploadList, file));
           } else {
             acc[cur.name] = cur.value;
           }
@@ -160,14 +163,14 @@
         if (progress) {
           xhr.upload.addEventListener(
             'progress',
-            e => (progress.value = parseInt((e.loaded / e.total) * 100, 10)),
+            (e) => (progress.value = parseInt((e.loaded / e.total) * 100, 10)),
             false,
           );
         }
 
         xhr.addEventListener(
           'readystatechange',
-          e => {
+          (e) => {
             if (xhr.readyState === XMLHttpRequest.DONE) {
               if (xhr.status >= 200 && xhr.status < 400) {
                 if (progress) {

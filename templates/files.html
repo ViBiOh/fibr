@@ -27,7 +27,7 @@
   {{ end }}
 
   <script>
-    /**
+        /**
      * Remove all child and append given one
      * @param {Element} element Element to clear
      * @param {Element} newContent Element to put in place
@@ -46,7 +46,7 @@
      * Async image loading
      */
     async function getThumbnails() {
-      const response = await fetch('?thumbnail', { credentials: 'same-origin' })
+      const response = await fetch('?thumbnail', { credentials: 'same-origin' });
 
       if (response.status >= 400) {
         throw new Error('unable to load thumbnails');
@@ -62,17 +62,17 @@
     window.addEventListener(
       'load',
       async () => {
-        document.querySelectorAll('[data-picture]').forEach(picture => {
+        document.querySelectorAll('[data-picture]').forEach((picture) => {
           replaceContent(picture, generateThrobber());
         });
 
         try {
           const thumbnails = await getThumbnails();
 
-          Object.keys(thumbnails).forEach(id => {
+          Object.keys(thumbnails).forEach((id) => {
             const picture = document.getElementById(`picture-${id}`);
             if (!picture) {
-              return
+              return;
             }
 
             const img = new Image();

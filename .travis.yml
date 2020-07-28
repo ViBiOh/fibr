@@ -1,5 +1,4 @@
 ---
-
 jobs:
   include:
     - stage: Build
