@@ -17,6 +17,7 @@ type Request struct {
 	CanEdit  bool
 	CanShare bool
 	Display  string
+	Prefs    string
 	Share    *Share
 }
 
