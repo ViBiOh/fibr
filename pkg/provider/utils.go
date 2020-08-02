@@ -60,3 +60,23 @@ func IsNotExist(err error) bool {
 
 	return strings.HasPrefix(err.Error(), "path not found")
 }
+
+// FindIndex finds index of given value into array, or -1 if not found
+func FindIndex(arr []string, value string) int {
+	for index, item := range arr {
+		if item == value {
+			return index
+		}
+	}
+
+	return -1
+}
+
+// RemoveIndex removes element at given index, if valid
+func RemoveIndex(arr []string, index int) []string {
+	if len(arr) == 0 || index < 0 || index >= len(arr) {
+		return arr
+	}
+
+	return append(arr[:index], arr[index+1:]...)
+}
