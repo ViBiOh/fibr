@@ -66,17 +66,19 @@ func convertAuthenticationError(err error) *provider.Error {
 }
 
 func (a app) parseRequest(r *http.Request) (provider.Request, *provider.Error) {
-	prefs := ""
-	if cookie, err := r.Cookie("fibr"); err == nil {
-		prefs = cookie.Value
+	preferences := provider.Preferences{}
+	if cookie, err := r.Cookie("list_layout_paths"); err == nil {
+		if value := cookie.Value; len(value) > 0 {
+			preferences.ListLayoutPath = strings.Split(value, ",")
+		}
 	}
 
 	request := provider.Request{
-		Path:     r.URL.Path,
-		CanEdit:  false,
-		CanShare: false,
-		Display:  r.URL.Query().Get("d"),
-		Prefs:    prefs,
+		Path:        r.URL.Path,
+		CanEdit:     false,
+		CanShare:    false,
+		Display:     r.URL.Query().Get("d"),
+		Preferences: preferences,
 	}
 
 	if err := a.parseShare(&request, r.Header.Get("Authorization")); err != nil {

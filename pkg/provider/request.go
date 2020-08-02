@@ -11,14 +11,19 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// Preferences holds preferences of the user
+type Preferences struct {
+	ListLayoutPath []string
+}
+
 // Request from user
 type Request struct {
-	Path     string
-	CanEdit  bool
-	CanShare bool
-	Display  string
-	Prefs    string
-	Share    *Share
+	Path        string
+	CanEdit     bool
+	CanShare    bool
+	Display     string
+	Preferences Preferences
+	Share       *Share
 }
 
 // GetFilepath of request

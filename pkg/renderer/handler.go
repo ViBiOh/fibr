@@ -3,7 +3,7 @@ package renderer
 import (
 	"fmt"
 	"net/http"
-	"time"
+	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v3/pkg/httperror"
@@ -15,11 +15,44 @@ func (a app) newPageBuilder() *provider.PageBuilder {
 	return (&provider.PageBuilder{}).Config(a.config)
 }
 
-func setPrefsCookie(w http.ResponseWriter, request provider.Request) {
+func findIndex(arr []string, value string) int {
+	for index, item := range arr {
+		if item == value {
+			return index
+		}
+	}
+
+	return -1
+}
+
+func removeIndex(arr []string, index int) []string {
+	if len(arr) == 0 || index < 0 || index >= len(arr) {
+		return arr
+	}
+
+	return append(arr[:index], arr[index+1:]...)
+}
+
+func computeListLayoutPaths(request provider.Request, page provider.Page) string {
+	listLayoutPaths := request.Preferences.ListLayoutPath
+
+	switch page.Layout {
+	case "list":
+		if index := findIndex(listLayoutPaths, request.Path); index == -1 {
+			listLayoutPaths = append(listLayoutPaths, request.Path)
+		}
+	case "grid":
+		listLayoutPaths = removeIndex(listLayoutPaths, findIndex(listLayoutPaths, request.Path))
+	}
+
+	return strings.Join(listLayoutPaths, ",")
+}
+
+func setPrefsCookie(w http.ResponseWriter, request provider.Request, page provider.Page) {
 	http.SetCookie(w, &http.Cookie{
-		Name:     "fibr",
-		Value:    request.Prefs,
-		Expires:  time.Now().Add(time.Hour * 24 * 31),
+		Name:     "list_layout_paths",
+		Value:    computeListLayoutPaths(request, page),
+		Path:     "/",
 		HttpOnly: true,
 		SameSite: http.SameSiteStrictMode,
 	})
@@ -30,7 +63,7 @@ func (a app) Directory(w http.ResponseWriter, request provider.Request, content 
 	page := a.newPageBuilder().Request(request).Message(message).Layout(request.Display).Content(content).Build()
 
 	w.Header().Set("content-language", "en")
-	setPrefsCookie(w, request)
+	setPrefsCookie(w, request, page)
 
 	if err := templates.ResponseHTMLTemplate(a.tpl.Lookup("files"), w, page, http.StatusOK); err != nil {
 		a.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
@@ -43,7 +76,7 @@ func (a app) File(w http.ResponseWriter, request provider.Request, content map[s
 	page := a.newPageBuilder().Request(request).Message(message).Layout("browser").Content(content).Build()
 
 	w.Header().Set("content-language", "en")
-	setPrefsCookie(w, request)
+	setPrefsCookie(w, request, page)
 
 	if err := templates.ResponseHTMLTemplate(a.tpl.Lookup("file"), w, page, http.StatusOK); err != nil {
 		a.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
