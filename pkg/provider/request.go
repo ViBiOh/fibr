@@ -60,6 +60,19 @@ func (r Request) GetURI(name string) string {
 	return path.Join(parts...)
 }
 
+// Layout returns layout of given name based on preferences
+func (r Request) Layout(name string) string {
+	return r.LayoutPath(strings.Trim(r.GetURI(name), "/"))
+}
+
+// LayoutPath returns layout of given path based on preferences
+func (r Request) LayoutPath(path string) string {
+	if FindIndex(r.Preferences.ListLayoutPath, path) != -1 {
+		return "list"
+	}
+	return "grid"
+}
+
 // Share stores informations about shared paths
 type Share struct {
 	ID       string `json:"id"`

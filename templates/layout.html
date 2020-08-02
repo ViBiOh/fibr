@@ -15,9 +15,11 @@
 
       {{ range $index, $path := .Content.Paths }}
         {{ if or (not $root.Request.Share) (ne $index 0) }}
+          {{ $fullPath := rebuildPaths $root.Content.Paths $index }}
+
           <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
              / 
-            <a href="/{{ rebuildPaths $root.Content.Paths $index }}/" itemprop="item">
+            <a href="/{{ $fullPath }}/?d={{ $root.Request.LayoutPath $fullPath }}" itemprop="item">
               <span itemprop="name">{{ $path }}</span>
             </a>
           </span>

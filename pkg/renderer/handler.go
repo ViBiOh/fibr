@@ -15,34 +15,17 @@ func (a app) newPageBuilder() *provider.PageBuilder {
 	return (&provider.PageBuilder{}).Config(a.config)
 }
 
-func findIndex(arr []string, value string) int {
-	for index, item := range arr {
-		if item == value {
-			return index
-		}
-	}
-
-	return -1
-}
-
-func removeIndex(arr []string, index int) []string {
-	if len(arr) == 0 || index < 0 || index >= len(arr) {
-		return arr
-	}
-
-	return append(arr[:index], arr[index+1:]...)
-}
-
 func computeListLayoutPaths(request provider.Request, page provider.Page) string {
 	listLayoutPaths := request.Preferences.ListLayoutPath
+	path := strings.Trim(request.Path, "/")
 
 	switch page.Layout {
 	case "list":
-		if index := findIndex(listLayoutPaths, request.Path); index == -1 {
-			listLayoutPaths = append(listLayoutPaths, request.Path)
+		if index := provider.FindIndex(listLayoutPaths, path); index == -1 {
+			listLayoutPaths = append(listLayoutPaths, path)
 		}
 	case "grid":
-		listLayoutPaths = removeIndex(listLayoutPaths, findIndex(listLayoutPaths, request.Path))
+		listLayoutPaths = provider.RemoveIndex(listLayoutPaths, provider.FindIndex(listLayoutPaths, path))
 	}
 
 	return strings.Join(listLayoutPaths, ",")

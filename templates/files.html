@@ -330,7 +330,7 @@
         {{ else }}
           <li class="file">
         {{ end }}
-          <a class="filelink center ellipsis" href="{{ .Name }}{{ if .IsDir }}/{{ if eq $root.Layout "list" }}?d=list{{ end }}{{ else }}?browser{{ end }}" title="{{ .Name }}">
+          <a class="filelink center ellipsis" href="{{ .Name }}{{ if .IsDir }}/?d={{ $root.Request.Layout .Name }}{{ else }}?browser{{ end }}" title="{{ .Name }}">
             {{ if and (eq $root.Layout "grid") (hasThumbnail .) }}
               {{ template "async-image" asyncImage . $root.Config.Version }}
             {{ else }}

@@ -84,7 +84,7 @@ func (p *PageBuilder) Build() Page {
 
 	layout := p.layout
 	if layout == "" {
-		layout = "grid"
+		layout = p.request.Layout("")
 	}
 
 	return Page{
