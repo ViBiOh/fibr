@@ -17,7 +17,7 @@ func (a app) newPageBuilder() *provider.PageBuilder {
 
 func computeListLayoutPaths(request provider.Request, page provider.Page) string {
 	listLayoutPaths := request.Preferences.ListLayoutPath
-	path := strings.Trim(request.Path, "/")
+	path := strings.Trim(request.GetURI(""), "/")
 
 	switch page.Layout {
 	case "list":
