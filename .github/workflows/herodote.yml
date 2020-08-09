@@ -19,8 +19,8 @@ jobs:
         run: |
           curl -q -sSL --max-time 30 "https://raw.githubusercontent.com/ViBiOh/herodote/master/herodote.sh" | bash
         env:
-          ALGOLIA_APP: ${{ secrets.HERODOTE_ALGOLIA_APP }}
-          ALGOLIA_KEY: ${{ secrets.HERODOTE_ALGOLIA_KEY }}
+          HERODOTE_API: https://herodote-api.vibioh.fr
+          HERODOTE_SECRET: ${{ secrets.HERODOTE_SECRET }}
           GIT_HOST: github.com
           GIT_REPOSITORY: ${{ github.repository }}
           SCRIPTS_NO_INTERACTIVE: "1"
