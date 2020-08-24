@@ -3,6 +3,7 @@ package provider
 import (
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"mime"
 	"path"
 	"strings"
@@ -28,36 +29,12 @@ type Request struct {
 
 // GetFilepath of request
 func (r Request) GetFilepath(name string) string {
-	parts := make([]string, 0)
-
-	if r.Share != nil {
-		parts = append(parts, r.Share.Path)
-	}
-
-	parts = append(parts, r.Path)
-
-	if len(name) > 0 {
-		parts = append(parts, name)
-	}
-
-	return path.Join(parts...)
+	return GetPathname(r.Path, name, r.Share)
 }
 
 // GetURI of request
 func (r Request) GetURI(name string) string {
-	parts := make([]string, 0)
-
-	if r.Share != nil {
-		parts = append(parts, "/", r.Share.ID)
-	}
-
-	parts = append(parts, r.Path)
-
-	if len(name) > 0 {
-		parts = append(parts, name)
-	}
-
-	return path.Join(parts...)
+	return GetURI(r.Path, name, r.Share)
 }
 
 // Layout returns layout of given name based on preferences
@@ -153,6 +130,11 @@ func NewError(status int, err error) *Error {
 	}
 }
 
+// Error convert error to string
+func (e Error) Error() string {
+	return fmt.Sprintf("HTTP/%d: %s", e.Status, e.Err)
+}
+
 // StorageItem describe item on a storage provider
 type StorageItem struct {
 	Pathname string
@@ -199,6 +181,7 @@ func (s StorageItem) IsVideo() bool {
 
 // RenderItem is a storage item with an id
 type RenderItem struct {
-	ID string
+	ID  string
+	URI string
 	StorageItem
 }

@@ -40,16 +40,19 @@ func (a *app) List(w http.ResponseWriter, request provider.Request, message *pro
 		return
 	}
 
+	uri := request.GetURI("")
+
 	items := make([]provider.RenderItem, len(files))
 	for index, file := range files {
 		items[index] = provider.RenderItem{
 			ID:          sha.Sha1(file.Name),
+			URI:         uri,
 			StorageItem: file,
 		}
 	}
 
 	content := map[string]interface{}{
-		"Paths": getPathParts(request.GetURI("")),
+		"Paths": getPathParts(uri),
 		"Files": items,
 		"Cover": a.getCover(files),
 	}

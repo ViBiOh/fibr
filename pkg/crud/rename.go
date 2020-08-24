@@ -37,9 +37,21 @@ func (a *app) Rename(w http.ResponseWriter, r *http.Request, request provider.Re
 		return
 	}
 
+	newFolder, httpErr := checkFolderName(r.FormValue("newFolder"), request)
+	if httpErr != nil {
+		a.renderer.Error(w, request, httpErr)
+		return
+	}
+
 	newName, httpErr := checkFormName(r, "newName")
 	if httpErr != nil {
 		a.renderer.Error(w, request, httpErr)
+		return
+	}
+
+	newSafeFolder, err := provider.SanitizeName(newFolder, false)
+	if err != nil {
+		a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
 
@@ -50,7 +62,7 @@ func (a *app) Rename(w http.ResponseWriter, r *http.Request, request provider.Re
 	}
 
 	oldPath := request.GetFilepath(oldName)
-	newPath := request.GetFilepath(newSafeName)
+	newPath := provider.GetPathname(newSafeFolder, newSafeName, request.Share)
 
 	if _, err := a.storage.Info(newPath); err == nil {
 		a.renderer.Error(w, request, provider.NewError(http.StatusBadRequest, errors.New("new name already exist")))
@@ -77,5 +89,14 @@ func (a *app) Rename(w http.ResponseWriter, r *http.Request, request provider.Re
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("%s/?message=%s&messageLevel=success", request.GetURI(""), url.QueryEscape(fmt.Sprintf("%s successfully renamed to %s", oldItem.Name, newItem.Name))), http.StatusFound)
+	var message string
+	uri := request.GetURI("")
+
+	if newSafeFolder != uri {
+		message = fmt.Sprintf("%s successfully moved to %s", oldItem.Name, provider.GetURI(newSafeFolder, newSafeName, request.Share))
+	} else {
+		message = fmt.Sprintf("%s successfully renamed to %s", oldItem.Name, newItem.Name)
+	}
+
+	http.Redirect(w, r, fmt.Sprintf("%s/?message=%s&messageLevel=success", uri, url.QueryEscape(message)), http.StatusFound)
 }

@@ -202,6 +202,10 @@ func (a *app) Rename(oldName, newName string) error {
 		return convertError(err)
 	}
 
+	if err := a.CreateDir(filepath.Dir(newName)); err != nil {
+		return convertError(err)
+	}
+
 	return convertError(os.Rename(a.getFullPath(oldName), a.getFullPath(newName)))
 }
 
