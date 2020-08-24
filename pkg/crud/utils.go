@@ -1,6 +1,7 @@
 package crud
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -43,6 +44,29 @@ func checkFormName(r *http.Request, formName string) (string, *provider.Error) {
 
 	if name == "/" {
 		return "", provider.NewError(http.StatusForbidden, ErrNotAuthorized)
+	}
+
+	return name, nil
+}
+
+func checkFolderName(formName string, request provider.Request) (string, *provider.Error) {
+	name := strings.TrimSpace(formName)
+	if name == "" {
+		return "", provider.NewError(http.StatusBadRequest, ErrEmptyFolder)
+	}
+
+	if !strings.HasPrefix(name, "/") {
+		return "", provider.NewError(http.StatusBadRequest, ErrAbsoluteFolder)
+	}
+
+	if request.Share != nil {
+		shareURIPrefix := fmt.Sprintf("/%s", request.Share.ID)
+
+		if !strings.HasPrefix(name, shareURIPrefix) {
+			return "", provider.NewError(http.StatusForbidden, ErrNotAuthorized)
+		}
+
+		name = strings.TrimPrefix(name, shareURIPrefix)
 	}
 
 	return name, nil

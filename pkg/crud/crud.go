@@ -20,7 +20,13 @@ var (
 	ErrNotAuthorized = errors.New("you're not authorized to do this ⛔")
 
 	// ErrEmptyName error returned when user does not provide a name
-	ErrEmptyName = errors.New("provided name is empty")
+	ErrEmptyName = errors.New("name is empty")
+
+	// ErrEmptyFolder error returned when user does not provide a folder
+	ErrEmptyFolder = errors.New("folder is empty")
+
+	// ErrAbsoluteFolder error returned when user provide a relative folder
+	ErrAbsoluteFolder = errors.New("folder has to be absolute")
 )
 
 // App of package

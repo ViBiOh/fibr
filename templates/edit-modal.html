@@ -9,6 +9,11 @@
         <input type="hidden" name="name" value="{{ .Name }}" />
 
         <p class="padding no-margin center">
+          <label for="folder-{{ .ID }}">Folder</label>
+          <input id="folder-{{ .ID }}" type="text" name="newFolder" value="{{ .URI }}" />
+        </p>
+
+        <p class="padding no-margin center">
           <label for="name-{{ .ID }}">Name</label>
           <input id="name-{{ .ID }}" type="text" name="newName" value="{{ .Name }}" />
         </p>

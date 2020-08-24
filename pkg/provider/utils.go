@@ -3,6 +3,7 @@ package provider
 import (
 	"fmt"
 	"io"
+	"path"
 	"regexp"
 	"strings"
 	"unicode"
@@ -20,6 +21,40 @@ var (
 
 func init() {
 	transformer = transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
+}
+
+// GetPathname computes pathname for given params
+func GetPathname(folder, name string, share *Share) string {
+	parts := make([]string, 0)
+
+	if share != nil {
+		parts = append(parts, share.Path)
+	}
+
+	parts = append(parts, folder)
+
+	if len(name) > 0 {
+		parts = append(parts, name)
+	}
+
+	return path.Join(parts...)
+}
+
+// GetURI computes public URI for given params
+func GetURI(folder, name string, share *Share) string {
+	parts := make([]string, 0)
+
+	if share != nil {
+		parts = append(parts, "/", share.ID)
+	}
+
+	parts = append(parts, folder)
+
+	if len(name) > 0 {
+		parts = append(parts, name)
+	}
+
+	return path.Join(parts...)
 }
 
 // SanitizeName return sanitized name (remove diacritics)
