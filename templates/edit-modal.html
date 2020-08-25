@@ -8,13 +8,13 @@
         <input type="hidden" name="method" value="PATCH" />
         <input type="hidden" name="name" value="{{ .Name }}" />
 
-        <p class="padding no-margin center">
-          <label for="folder-{{ .ID }}">Folder</label>
+        <p class="padding no-margin">
+          <label for="folder-{{ .ID }}" class="block">Folder</label>
           <input id="folder-{{ .ID }}" type="text" name="newFolder" value="{{ .URI }}" />
         </p>
 
-        <p class="padding no-margin center">
-          <label for="name-{{ .ID }}">Name</label>
+        <p class="padding no-margin">
+          <label for="name-{{ .ID }}" class="block">Name</label>
           <input id="name-{{ .ID }}" type="text" name="newName" value="{{ .Name }}" />
         </p>
 
