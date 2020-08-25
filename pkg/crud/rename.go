@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
@@ -17,6 +18,19 @@ func (a *app) doRename(oldPath, newPath string, oldItem provider.StorageItem) (p
 	newItem, err := a.storage.Info(newPath)
 	if err != nil {
 		return provider.StorageItem{}, err
+	}
+
+	a.metadataLock.Lock()
+	defer a.metadataLock.Unlock()
+
+	for _, metadata := range a.metadatas {
+		if strings.HasPrefix(metadata.Path, oldPath) {
+			metadata.Path = strings.Replace(metadata.Path, oldPath, newPath, 1)
+		}
+	}
+
+	if err := a.saveMetadata(); err != nil {
+		return newItem, fmt.Errorf("error while updating metadatas: %s", err)
 	}
 
 	go a.thumbnail.Rename(oldItem, newItem)
