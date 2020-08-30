@@ -2,10 +2,7 @@ github.com/DATA-DOG/go-sqlmock v1.4.1/go.mod h1:f/Ixk793poVmq4qj/V1dPUg2JEAKC73Q
 github.com/DATA-DOG/go-sqlmock v1.5.0/go.mod h1:f/Ixk793poVmq4qj/V1dPUg2JEAKC73Q5eFN3EC/SaM=
 github.com/ViBiOh/auth/v2 v2.5.5 h1:zYTNre9UYLpaJzY8hq2V4N6iokiGGMgLlRta3M0dWxI=
 github.com/ViBiOh/auth/v2 v2.5.5/go.mod h1:9wqxMtKlW2IrN7I7SNszZA4VY3DKvWW+Q9o6iQFAsco=
-github.com/ViBiOh/httputils v1.8.2 h1:ulvdhtq8/Ww4QihYJ5uf0WDTG42yPuwojUCbfv/9W2E=
 github.com/ViBiOh/httputils/v3 v3.22.2/go.mod h1:S5I+pz+Ec4KkDKIlaLfv/UcSl2BxfSLf/NO7KhzBYyU=
-github.com/ViBiOh/httputils/v3 v3.24.0 h1:G00jyhjkucG2H5g+AdBi+6+ckrH9IZRisyse/oyBlYc=
-github.com/ViBiOh/httputils/v3 v3.24.0/go.mod h1:CyghGXY/VuG6Geo/h0jaEFFokrnB+1JEgKh/s+uaB1E=
 github.com/ViBiOh/httputils/v3 v3.25.1 h1:SzjVqtqNULy9wyfJYuk1Z7LCCU2PB9b+MpBFXzJ/H6M=
 github.com/ViBiOh/httputils/v3 v3.25.1/go.mod h1:KsBEvHr3HAUCV7GwQCP6OdQUJeMP6nnOXLKVS09Pq2U=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
@@ -92,9 +89,11 @@ github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UV
 github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
 github.com/tdewolff/minify/v2 v2.8.0 h1:t3tOPWkTpKhsgxm3IM9Sy8hE2eIt30Oaa+2havJGGIE=
 github.com/tdewolff/minify/v2 v2.8.0/go.mod h1:6zN8VLhMfFxNrwHROcboYNo2+huPNu4SV8DPh3PUQ8E=
+github.com/tdewolff/minify/v2 v2.9.0 h1:9c078np6EmaBWPteq/bp43YgIlfylH8qEt+FaMfNWBo=
 github.com/tdewolff/minify/v2 v2.9.0/go.mod h1:dkCdk+keSmcckneKfxOgf8/X/3iyCnz1tjIas5Sn1Cs=
 github.com/tdewolff/parse/v2 v2.4.4 h1:uMdbQRtYbKR/msP9CbI7li9wK6pionYiH6s7ipltyGY=
 github.com/tdewolff/parse/v2 v2.4.4/go.mod h1:WzaJpRSbwq++EIQHYIRTpbYKNA3gn9it1Ik++q4zyho=
+github.com/tdewolff/parse/v2 v2.5.0 h1:SE6eIhpSLAEgYx1EpGXIcGyggfw4omUOcSCaeaH7WJU=
 github.com/tdewolff/parse/v2 v2.5.0/go.mod h1:WzaJpRSbwq++EIQHYIRTpbYKNA3gn9it1Ik++q4zyho=
 github.com/tdewolff/test v1.0.6 h1:76mzYJQ83Op284kMT+63iCNCI7NEERsIN8dLM+RiKr4=
 github.com/tdewolff/test v1.0.6/go.mod h1:6DAvZliBAAnD7rhVgwaM7DE5/d9NMOAJ09SqYqeK4QE=

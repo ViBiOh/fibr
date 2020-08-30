@@ -146,6 +146,16 @@ Usage of fibr:
         [crud] Ignore pattern when listing files or directory {FIBR_IGNORE_PATTERN}
   -key string
         [http] Key file {FIBR_KEY}
+  -loggerJson
+        [logger] Log format as JSON {FIBR_LOGGER_JSON}
+  -loggerLevel string
+        [logger] Logger level {FIBR_LOGGER_LEVEL} (default "INFO")
+  -loggerLevelKey string
+        [logger] Key for level in JSON {FIBR_LOGGER_LEVEL_KEY} (default "level")
+  -loggerMessageKey string
+        [logger] Key for message in JSON {FIBR_LOGGER_MESSAGE_KEY} (default "message")
+  -loggerTimeKey string
+        [logger] Key for timestam in JSON {FIBR_LOGGER_TIME_KEY} (default "time")
   -metadata
         [crud] Enable metadata storage {FIBR_METADATA} (default true)
   -noAuth
