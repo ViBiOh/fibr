@@ -155,7 +155,7 @@ Usage of fibr:
   -loggerMessageKey string
         [logger] Key for message in JSON {FIBR_LOGGER_MESSAGE_KEY} (default "message")
   -loggerTimeKey string
-        [logger] Key for timestam in JSON {FIBR_LOGGER_TIME_KEY} (default "time")
+        [logger] Key for timestamp in JSON {FIBR_LOGGER_TIME_KEY} (default "time")
   -metadata
         [crud] Enable metadata storage {FIBR_METADATA} (default true)
   -noAuth
