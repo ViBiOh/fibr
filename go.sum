@@ -8,9 +8,12 @@ github.com/Shopify/sarama v1.19.0/go.mod h1:FVkBWblsNy7DGZRfXLU0O9RCGt5g3g3yEuWX
 github.com/Shopify/toxiproxy v2.1.4+incompatible/go.mod h1:OXgGpZ6Cli1/URJOF1DMxUHB2q5Ap20/P/eIdh4G0pI=
 github.com/ViBiOh/auth/v2 v2.5.5 h1:zYTNre9UYLpaJzY8hq2V4N6iokiGGMgLlRta3M0dWxI=
 github.com/ViBiOh/auth/v2 v2.5.5/go.mod h1:9wqxMtKlW2IrN7I7SNszZA4VY3DKvWW+Q9o6iQFAsco=
+github.com/ViBiOh/httputils v1.8.2 h1:ulvdhtq8/Ww4QihYJ5uf0WDTG42yPuwojUCbfv/9W2E=
 github.com/ViBiOh/httputils/v3 v3.22.2/go.mod h1:S5I+pz+Ec4KkDKIlaLfv/UcSl2BxfSLf/NO7KhzBYyU=
 github.com/ViBiOh/httputils/v3 v3.25.2 h1:wCXfMfZ/NQMQ75iKWwbMYWb1j/j7S0VD98vMtui2m5k=
 github.com/ViBiOh/httputils/v3 v3.25.2/go.mod h1:FX8np0QJDX1pWE+SBgkciLu2s1TWHJ6V3egYyPbduhc=
+github.com/ViBiOh/httputils/v3 v3.26.0 h1:4yGBfbVGYiaVYzrPC+pl2rmaYm56aalv5GRsS38Vqkc=
+github.com/ViBiOh/httputils/v3 v3.26.0/go.mod h1:LbWaMuSXrQdIG3fqXKrlyGG/XyS8IOnAT2vpghcjj8Q=
 github.com/VividCortex/gohistogram v1.0.0/go.mod h1:Pf5mBqqDxYaXu3hDrrU+w6nw50o/4+TcAqDqk/vUH7g=
 github.com/afex/hystrix-go v0.0.0-20180502004556-fa1af6a1f4f5/go.mod h1:SkGFH1ia65gfNATL8TAiHDNxPzPdmEL5uirI2Uyuz6c=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
@@ -267,6 +270,7 @@ github.com/tdewolff/minify/v2 v2.8.0/go.mod h1:6zN8VLhMfFxNrwHROcboYNo2+huPNu4SV
 github.com/tdewolff/minify/v2 v2.9.0/go.mod h1:dkCdk+keSmcckneKfxOgf8/X/3iyCnz1tjIas5Sn1Cs=
 github.com/tdewolff/minify/v2 v2.9.2 h1:paeFMZEtrmWVJSmvZ+htMQ5RhbkBbLVyXdzs6f8Es+s=
 github.com/tdewolff/minify/v2 v2.9.2/go.mod h1:njYNbXhVTAhI1hARVHCbHAgRd44j+AEt0LdW+menKsY=
+github.com/tdewolff/minify/v2 v2.9.3/go.mod h1:njYNbXhVTAhI1hARVHCbHAgRd44j+AEt0LdW+menKsY=
 github.com/tdewolff/parse/v2 v2.4.4/go.mod h1:WzaJpRSbwq++EIQHYIRTpbYKNA3gn9it1Ik++q4zyho=
 github.com/tdewolff/parse/v2 v2.5.0/go.mod h1:WzaJpRSbwq++EIQHYIRTpbYKNA3gn9it1Ik++q4zyho=
 github.com/tdewolff/parse/v2 v2.5.1 h1:1PxbcgMxb8RWH1nmeQjBC+lZIOTUEjiYQ3u8RpzndN0=
