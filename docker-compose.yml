@@ -19,6 +19,7 @@ services:
       FIBR_AUTH_USERS: '${BASIC_USERS}'
       FIBR_SANITIZE_ON_START: 'true'
       FIBR_IGNORE_PATTERN: '.st(folder|ignore)'
+      FIBR_LOGGER_JSON: 'true'
     volumes:
       - ${DATA_DIR}:/data
     depends_on:
@@ -36,6 +37,8 @@ services:
     image: vibioh/vith
     labels:
       traefik.enable: false
+    environment:
+      VITH_LOGGER_JSON: 'true'
     restart: on-failure:5
     cpu_shares: 128
     mem_limit: 1073741824
