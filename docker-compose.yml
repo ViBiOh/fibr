@@ -29,7 +29,7 @@ services:
     restart: on-failure:5
     read_only: true
     cpu_shares: 128
-    mem_limit: 67108864
+    mem_limit: '67108864'
     security_opt:
       - no-new-privileges
 
@@ -41,7 +41,7 @@ services:
       VITH_LOGGER_JSON: 'true'
     restart: on-failure:5
     cpu_shares: 128
-    mem_limit: 1073741824
+    mem_limit: '1073741824'
     security_opt:
       - no-new-privileges
 
@@ -52,6 +52,6 @@ services:
     restart: on-failure:5
     read_only: true
     cpu_shares: 128
-    mem_limit: 1073741824
+    mem_limit: '1073741824'
     security_opt:
       - no-new-privileges
