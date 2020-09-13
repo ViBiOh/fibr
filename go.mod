@@ -3,7 +3,7 @@ module github.com/ViBiOh/fibr
 go 1.15
 
 require (
-	github.com/ViBiOh/auth/v2 v2.5.5
+	github.com/ViBiOh/auth/v2 v2.5.6
 	github.com/ViBiOh/httputils/v3 v3.26.0
 	github.com/prometheus/common v0.13.0 // indirect
 	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
