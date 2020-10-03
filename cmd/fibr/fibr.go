@@ -51,6 +51,7 @@ func main() {
 
 	alcotest.DoAndExit(alcotestConfig)
 	logger.Global(logger.New(loggerConfig))
+	defer logger.Close()
 
 	storage, err := filesystem.New(filesystemConfig)
 	logger.Fatal(err)
