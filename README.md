@@ -139,7 +139,7 @@ Usage of fibr:
   -fsDirectory string
         [fs] Path to served directory {FIBR_FS_DIRECTORY} (default "/data")
   -graceDuration string
-        [http] Grace duration when SIGTERM received {FIBR_GRACE_DURATION} (default "15s")
+        [http] Grace duration when SIGTERM received {FIBR_GRACE_DURATION} (default "30s")
   -hsts
         [owasp] Indicate Strict Transport Security {FIBR_HSTS} (default true)
   -ignorePattern string

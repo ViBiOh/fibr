@@ -65,6 +65,11 @@ style:
 .PHONY: test
 test:
 	scripts/coverage
+	$(MAKE) bench
+
+## bench: Shortcut to launch benchmark tests.
+.PHONY: bench
+bench:
 	go test $(PACKAGES) -bench . -benchmem -run Benchmark.*
 
 ## build: Build the application.
