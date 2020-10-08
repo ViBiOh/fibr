@@ -16,6 +16,7 @@ import (
 	"github.com/ViBiOh/httputils/v3/pkg/flags"
 	"github.com/ViBiOh/httputils/v3/pkg/httputils"
 	"github.com/ViBiOh/httputils/v3/pkg/logger"
+	"github.com/ViBiOh/httputils/v3/pkg/model"
 	"github.com/ViBiOh/httputils/v3/pkg/owasp"
 	"github.com/ViBiOh/httputils/v3/pkg/prometheus"
 )
@@ -71,8 +72,8 @@ func main() {
 	go thumbnailApp.Start()
 	go crudApp.Start()
 
-	server := httputils.New(serverConfig)
-	server.Middleware(prometheus.New(prometheusConfig).Middleware)
-	server.Middleware(owasp.New(owaspConfig).Middleware)
-	server.ListenServeWait(fibrApp.Handler())
+	httputils.New(serverConfig).ListenAndServe(fibrApp.Handler(), []model.Middleware{
+		prometheus.New(prometheusConfig).Middleware,
+		owasp.New(owaspConfig).Middleware,
+	})
 }
