@@ -142,6 +142,8 @@ Usage of fibr:
         [http] Grace duration when SIGTERM received {FIBR_GRACE_DURATION} (default "30s")
   -hsts
         [owasp] Indicate Strict Transport Security {FIBR_HSTS} (default true)
+  -idleTimeout string
+        [http] Idle Timeout {FIBR_IDLE_TIMEOUT} (default "2m")
   -ignorePattern string
         [crud] Ignore pattern when listing files or directory {FIBR_IGNORE_PATTERN}
   -key string
@@ -168,8 +170,12 @@ Usage of fibr:
         [prometheus] Path for exposing metrics {FIBR_PROMETHEUS_PATH} (default "/metrics")
   -publicURL string
         [fibr] Public URL {FIBR_PUBLIC_URL} (default "https://fibr.vibioh.fr")
+  -readTimeout string
+        [http] Read Timeout {FIBR_READ_TIMEOUT} (default "5s")
   -sanitizeOnStart
         [crud] Sanitize name on start {FIBR_SANITIZE_ON_START}
+  -shutdownTimeout string
+        [http] Shutdown Timeout {FIBR_SHUTDOWN_TIMEOUT} (default "10s")
   -templates string
         [fibr] HTML Templates folder {FIBR_TEMPLATES} (default "./templates/")
   -thumbnailImageURL string
@@ -182,4 +188,6 @@ Usage of fibr:
         [alcotest] User-Agent for check {FIBR_USER_AGENT} (default "Alcotest")
   -version string
         [fibr] Version (used mainly as a cache-buster) {FIBR_VERSION}
+  -writeTimeout string
+        [http] Write Timeout {FIBR_WRITE_TIMEOUT} (default "10s")
 ```
