@@ -133,9 +133,9 @@ Usage of fibr:
   -cert string
         [http] Certificate file {FIBR_CERT}
   -csp string
-        [owasp] Content-Security-Policy {FIBR_CSP} (default "default-src 'self'; base-uri 'self'")
+        [owasp] Content-Security-Policy {FIBR_CSP} (default "default-src 'self'; base-uri 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:")
   -frameOptions string
-        [owasp] X-Frame-Options {FIBR_FRAME_OPTIONS} (default "deny")
+        [owasp] X-Frame-Options {FIBR_FRAME_OPTIONS} (default "SAMEORIGIN")
   -fsDirectory string
         [fs] Path to served directory {FIBR_FS_DIRECTORY} (default "/data")
   -graceDuration string
@@ -171,7 +171,7 @@ Usage of fibr:
   -publicURL string
         [fibr] Public URL {FIBR_PUBLIC_URL} (default "https://fibr.vibioh.fr")
   -readTimeout string
-        [http] Read Timeout {FIBR_READ_TIMEOUT} (default "5s")
+        [http] Read Timeout {FIBR_READ_TIMEOUT} (default "1m")
   -sanitizeOnStart
         [crud] Sanitize name on start {FIBR_SANITIZE_ON_START}
   -shutdownTimeout string
@@ -189,5 +189,5 @@ Usage of fibr:
   -version string
         [fibr] Version (used mainly as a cache-buster) {FIBR_VERSION}
   -writeTimeout string
-        [http] Write Timeout {FIBR_WRITE_TIMEOUT} (default "10s")
+        [http] Write Timeout {FIBR_WRITE_TIMEOUT} (default "1m")
 ```

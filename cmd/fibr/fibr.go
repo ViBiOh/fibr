@@ -16,7 +16,6 @@ import (
 	"github.com/ViBiOh/httputils/v3/pkg/flags"
 	"github.com/ViBiOh/httputils/v3/pkg/httputils"
 	"github.com/ViBiOh/httputils/v3/pkg/logger"
-	"github.com/ViBiOh/httputils/v3/pkg/model"
 	"github.com/ViBiOh/httputils/v3/pkg/owasp"
 	"github.com/ViBiOh/httputils/v3/pkg/prometheus"
 )
@@ -32,11 +31,11 @@ func newLoginApp(basicConfig basicMemory.Config) authMiddleware.App {
 func main() {
 	fs := flag.NewFlagSet("fibr", flag.ExitOnError)
 
-	serverConfig := httputils.Flags(fs, "")
+	serverConfig := httputils.Flags(fs, "", flags.NewOverride("ReadTimeout", "1m"), flags.NewOverride("WriteTimeout", "1m"))
 	alcotestConfig := alcotest.Flags(fs, "")
 	loggerConfig := logger.Flags(fs, "logger")
 	prometheusConfig := prometheus.Flags(fs, "prometheus")
-	owaspConfig := owasp.Flags(fs, "")
+	owaspConfig := owasp.Flags(fs, "", flags.NewOverride("FrameOptions", "SAMEORIGIN"), flags.NewOverride("Csp", "default-src 'self'; base-uri 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:"))
 
 	basicConfig := basicMemory.Flags(fs, "auth")
 
@@ -72,8 +71,5 @@ func main() {
 	go thumbnailApp.Start()
 	go crudApp.Start()
 
-	httputils.New(serverConfig).ListenAndServe(fibrApp.Handler(), []model.Middleware{
-		prometheus.New(prometheusConfig).Middleware,
-		owasp.New(owaspConfig).Middleware,
-	})
+	httputils.New(serverConfig).ListenAndServe(fibrApp.Handler(), nil, prometheus.New(prometheusConfig).Middleware, owasp.New(owaspConfig).Middleware)
 }
