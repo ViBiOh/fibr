@@ -20,8 +20,6 @@ services:
       FIBR_SANITIZE_ON_START: 'true'
       FIBR_IGNORE_PATTERN: '.st(folder|ignore)'
       FIBR_LOGGER_JSON: 'true'
-      FIBR_READ_TIMEOUT: '1m'
-      FIBR_WRITE_TIMEOUT: '1m'
     volumes:
       - ${DATA_DIR}:/data
     depends_on:
@@ -41,8 +39,6 @@ services:
       traefik.enable: false
     environment:
       VITH_LOGGER_JSON: 'true'
-      VITH_READ_TIMEOUT: '1m'
-      VITH_WRITE_TIMEOUT: '1m'
     restart: on-failure:5
     cpu_shares: 128
     mem_limit: '1073741824'
