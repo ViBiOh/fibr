@@ -94,7 +94,7 @@ fibr \
   -noAuth \
   -templates "${GOPATH}/src/github.com/ViBiOh/fibr/templates/" \
   -fsDirectory "$(pwd)" \
-  -publicURL "http://localhost:1080" \
+  -publicURL "http://localhost:1080"
 ```
 
 ### As a single Docker container, with admin/password user
