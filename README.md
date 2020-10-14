@@ -95,7 +95,6 @@ fibr \
   -templates "${GOPATH}/src/github.com/ViBiOh/fibr/templates/" \
   -fsDirectory "$(pwd)" \
   -publicURL "http://localhost:1080" \
-  -csp "default-src 'self'; base-uri 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:"
 ```
 
 ### As a single Docker container, with admin/password user
@@ -108,7 +107,6 @@ docker run -d \
   --name fibr \
   -v ${PWD}:/data/ \
   -e FIBR_PUBLIC_URL="http://localhost:1080" \
-  -e FIBR_CSP="default-src 'self'; base-uri 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:" \
   -e FIBR_AUTH_PROFILES="1:admin" \
   -e FIBR_AUTH_USERS="1:$(htpasswd -nBb login password)" \
   vibioh/fibr

@@ -89,7 +89,6 @@ run:
 		-frameOptions "SAMEORIGIN" \
 		-thumbnailImageURL "http://localhost:9000" \
 		-thumbnailVideoURL "http://localhost:2080" \
-		-csp "default-src 'self'; base-uri 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:"
 
 .PHONY: run-imaginary
 run-imaginary:
