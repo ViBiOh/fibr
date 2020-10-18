@@ -5,9 +5,8 @@ github.com/DATA-DOG/go-sqlmock v1.5.0/go.mod h1:f/Ixk793poVmq4qj/V1dPUg2JEAKC73Q
 github.com/Knetic/govaluate v3.0.1-0.20171022003610-9aa49832a739+incompatible/go.mod h1:r7JcOSlj0wfOMncg0iLm8Leh48TZaKVeNIfJntJ2wa0=
 github.com/Shopify/sarama v1.19.0/go.mod h1:FVkBWblsNy7DGZRfXLU0O9RCGt5g3g3yEuWXgklEdEo=
 github.com/Shopify/toxiproxy v2.1.4+incompatible/go.mod h1:OXgGpZ6Cli1/URJOF1DMxUHB2q5Ap20/P/eIdh4G0pI=
-github.com/ViBiOh/auth/v2 v2.5.6 h1:IPPMKsVK+Rk1pFrikFccEbzqvvZ1EymHayv2nZ9RDVU=
-github.com/ViBiOh/auth/v2 v2.5.6/go.mod h1:oe4q1yQTRqA2UklKva41gn7zEum60Qkp+YWkuyBii5o=
-github.com/ViBiOh/httputils/v3 v3.26.0/go.mod h1:LbWaMuSXrQdIG3fqXKrlyGG/XyS8IOnAT2vpghcjj8Q=
+github.com/ViBiOh/auth/v2 v2.6.0 h1:T/V/kjHVXIeTNxW+ylx8Vu5vhqJmQR9QKxupUcR8z84=
+github.com/ViBiOh/auth/v2 v2.6.0/go.mod h1:+g1l2LqheaRb+9Rm8cmLnU7FStAwBD9xHQQNezOZono=
 github.com/ViBiOh/httputils/v3 v3.32.0 h1:S1NwU8cmsV3F9/naHf2v6TPfbL5PvkMfjXh0eNW9BOc=
 github.com/ViBiOh/httputils/v3 v3.32.0/go.mod h1:IbxKsKy648CmB0UfYloWRDh4pdENvT/s8JiWgYiuLqs=
 github.com/VividCortex/gohistogram v1.0.0/go.mod h1:Pf5mBqqDxYaXu3hDrrU+w6nw50o/4+TcAqDqk/vUH7g=
@@ -263,10 +262,8 @@ github.com/stretchr/objx v0.1.1/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+
 github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=
 github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
-github.com/tdewolff/minify/v2 v2.9.3/go.mod h1:njYNbXhVTAhI1hARVHCbHAgRd44j+AEt0LdW+menKsY=
 github.com/tdewolff/minify/v2 v2.9.7 h1:r8ewdcX8VYUoNj+s9WSy4FtNNNqNPevWOkb/MksAtzQ=
 github.com/tdewolff/minify/v2 v2.9.7/go.mod h1:AcJ/ggtHex5N/QiafLI8rlIO3qwSlgbPNLi27VZSYz8=
-github.com/tdewolff/parse/v2 v2.5.1/go.mod h1:WzaJpRSbwq++EIQHYIRTpbYKNA3gn9it1Ik++q4zyho=
 github.com/tdewolff/parse/v2 v2.5.4 h1:ggaQ1SVE8wErRrZwUs49I6iQ1zL/tFlb7KtYsk2I8Yk=
 github.com/tdewolff/parse/v2 v2.5.4/go.mod h1:WzaJpRSbwq++EIQHYIRTpbYKNA3gn9it1Ik++q4zyho=
 github.com/tdewolff/test v1.0.6 h1:76mzYJQ83Op284kMT+63iCNCI7NEERsIN8dLM+RiKr4=
@@ -294,8 +291,8 @@ golang.org/x/crypto v0.0.0-20190510104115-cbcb75029529/go.mod h1:yigFU9vqHzYiE8U
 golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4/go.mod h1:yigFU9vqHzYiE8UmvKecakEJjdnWj3jj499lnFckfCI=
 golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550/go.mod h1:yigFU9vqHzYiE8UmvKecakEJjdnWj3jj499lnFckfCI=
 golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9/go.mod h1:LzIPMQfyMNhhGPhUkYOs5KpL4U8rLKemX1yGLhDgUto=
-golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a h1:vclmkQCjlDX5OydZ9wv8rBCcS0QyQY66Mpf/7BZbInM=
-golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a/go.mod h1:LzIPMQfyMNhhGPhUkYOs5KpL4U8rLKemX1yGLhDgUto=
+golang.org/x/crypto v0.0.0-20201002170205-7f63de1d35b0 h1:hb9wdF1z5waM+dSIICn1l0DkLVDT3hqhhQsDNUmHPRE=
+golang.org/x/crypto v0.0.0-20201002170205-7f63de1d35b0/go.mod h1:LzIPMQfyMNhhGPhUkYOs5KpL4U8rLKemX1yGLhDgUto=
 golang.org/x/exp v0.0.0-20190121172915-509febef88a4/go.mod h1:CJ0aWSM057203Lf6IL+f9T1iT9GByDxfZKAQTCR3kQA=
 golang.org/x/lint v0.0.0-20181026193005-c67002cb31c3/go.mod h1:UVdnD1Gm6xHRNCYTkRU2/jEulfH38KcIWyp/GAMgvoE=
 golang.org/x/lint v0.0.0-20190227174305-5b3e6a55c961/go.mod h1:wehouNa3lNwaWXcvxsM5YxQ5yQlVC4a0KAMCusXpPoU=
