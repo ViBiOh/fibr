@@ -1,0 +1,90 @@
+---
+name: Build
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+env:
+  SCRIPTS_NO_INTERACTIVE: 'true'
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    name: Golang
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '^1.15'
+      - run: |
+          make
+          git --no-pager diff -- ':(exclude)go.sum' && git diff --quiet -- ':(exclude)go.sum'
+      - uses: codecov/codecov-action@v1
+
+  package:
+    name: Docker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_PASS }}
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '^1.15'
+      - name: Build
+        run: |
+          curl -q -sSL --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/master/bootstrap" | bash -s "release"
+          curl -q -sSL --max-time 30 -o mime.types "https://svn.apache.org/viewvc/httpd/httpd/trunk/docs/conf/mime.types?view=co"
+          DOCKER_IMAGE="${{ secrets.DOCKER_USER }}/$(make name)" IMAGE_VERSION="$(make version)" ./scripts/release build docker
+
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+    needs: package
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Publish
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_USER }}
+          DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
+        run: |
+          curl -q -sSL --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/master/bootstrap" | bash -s "docker_promote"
+          scripts/docker_promote "${{ secrets.DOCKER_USER }}/$(make name)" "$(make version)"
+      - name: GoReport
+        run: |
+          curl -q -sSL --max-time 30 -X POST https://goreportcard.com/checks?repo=github.com/${GITHUB_REPOSITORY}
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: publish
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Deploy
+        env:
+          BASIC_USERS: ${{ secrets.BASIC_USERS }}
+          DATA_DIR: ${{ secrets.DATA_DIR }}
+          DATA_USER_ID: ${{ secrets.DATA_USER_ID }}
+          DEPLOY_CREDENTIALS: ${{ secrets.DEPLOY_CREDENTIALS }}
+          DEPLOY_URL: ${{ secrets.DEPLOY_URL }}
+          DOCKER_USER: ${{ secrets.DOCKER_USER }}
+        run: |
+          curl -q -sSL --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/master/bootstrap" | bash -s "deploy" "env_replace"
+          VERSION="$(make version)" scripts/env_replace "docker-compose.yml" DOCKER_USER DATA_DIR DATA_USER_ID BASIC_USERS VERSION | sed "s|\\\$|\$\$|g" > "docker-compose-env.yml"
+          scripts/deploy "$(make name)" "@docker-compose-env.yml"
