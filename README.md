@@ -164,6 +164,8 @@ Usage of fibr:
         [http] Healthy HTTP Status code {FIBR_OK_STATUS} (default 204)
   -port uint
         [http] Listen port {FIBR_PORT} (default 1080)
+  -prometheusIgnore string
+        [prometheus] Ignored path prefixes for metrics, comma separated {FIBR_PROMETHEUS_IGNORE}
   -prometheusPath string
         [prometheus] Path for exposing metrics {FIBR_PROMETHEUS_PATH} (default "/metrics")
   -publicURL string
