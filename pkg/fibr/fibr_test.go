@@ -37,11 +37,7 @@ func (amt authMiddlewareTest) IsAuthenticated(r *http.Request, _ string) (ident.
 }
 
 func (amt authMiddlewareTest) HasProfile(_ context.Context, user model.User, _ string) bool {
-	if user.ID == 8000 {
-		return true
-	}
-
-	return false
+	return user.ID == 8000
 }
 
 func TestParseShare(t *testing.T) {

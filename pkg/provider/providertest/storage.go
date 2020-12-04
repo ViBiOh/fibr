@@ -23,7 +23,6 @@ func (s stubReadCloserSeeker) Close() error {
 
 // Storage fakes implementation
 type Storage struct {
-	root string
 }
 
 // SetIgnoreFn fakes implementation
