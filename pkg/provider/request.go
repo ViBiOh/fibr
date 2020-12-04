@@ -19,12 +19,12 @@ type Preferences struct {
 
 // Request from user
 type Request struct {
-	Path        string
-	CanEdit     bool
-	CanShare    bool
-	Display     string
 	Preferences Preferences
 	Share       *Share
+	Path        string
+	Display     string
+	CanShare    bool
+	CanEdit     bool
 }
 
 // GetFilepath of request
@@ -55,8 +55,8 @@ type Share struct {
 	ID       string `json:"id"`
 	Path     string `json:"path"`
 	RootName string `json:"rootName"`
-	Edit     bool   `json:"edit"`
 	Password string `json:"password"`
+	Edit     bool   `json:"edit"`
 	File     bool   `json:"file"`
 }
 
@@ -108,14 +108,14 @@ type Seo struct {
 
 // Message rendered to user
 type Message struct {
-	Level   string
 	Content interface{}
+	Level   string
 }
 
 // Error rendered to user
 type Error struct {
-	Status int
 	Err    error
+	Status int
 }
 
 // NewError create an http error
@@ -137,12 +137,12 @@ func (e Error) Error() string {
 
 // StorageItem describe item on a storage provider
 type StorageItem struct {
+	Info     interface{}
+	Date     time.Time
 	Pathname string
 	Name     string
-	IsDir    bool
-	Date     time.Time
 
-	Info interface{}
+	IsDir bool
 }
 
 // Extension gives extensions of item

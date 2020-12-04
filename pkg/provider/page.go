@@ -12,13 +12,15 @@ var (
 
 // Page renderer to user
 type Page struct {
-	Config  Config
-	Request Request
-	Message *Message
-	Error   *Error
-	Layout  string
 	Content map[string]interface{}
 
+	Config  Config
+	Request Request
+
+	Message *Message
+	Error   *Error
+
+	Layout      string
 	PublicURL   string
 	Title       string
 	Description string
@@ -26,12 +28,12 @@ type Page struct {
 
 // PageBuilder for interactively create page
 type PageBuilder struct {
+	content map[string]interface{}
 	config  Config
 	request Request
 	message *Message
 	error   *Error
 	layout  string
-	content map[string]interface{}
 }
 
 // Config set Config for page
