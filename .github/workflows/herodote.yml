@@ -17,9 +17,9 @@ jobs:
 
       - name: Push history
         run: |
-          curl -q -sSL --max-time 30 "https://raw.githubusercontent.com/ViBiOh/herodote/master/herodote.sh" | bash
+          curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/herodote/master/herodote.sh" | bash
         env:
-          HERODOTE_API: https://herodote-api.vibioh.fr
+          HERODOTE_API: https://herodote.vibioh.fr
           HERODOTE_SECRET: ${{ secrets.HERODOTE_SECRET }}
           GIT_HOST: github.com
           GIT_REPOSITORY: ${{ github.repository }}
