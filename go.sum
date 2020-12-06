@@ -5,10 +5,8 @@ github.com/DATA-DOG/go-sqlmock v1.5.0/go.mod h1:f/Ixk793poVmq4qj/V1dPUg2JEAKC73Q
 github.com/Knetic/govaluate v3.0.1-0.20171022003610-9aa49832a739+incompatible/go.mod h1:r7JcOSlj0wfOMncg0iLm8Leh48TZaKVeNIfJntJ2wa0=
 github.com/Shopify/sarama v1.19.0/go.mod h1:FVkBWblsNy7DGZRfXLU0O9RCGt5g3g3yEuWXgklEdEo=
 github.com/Shopify/toxiproxy v2.1.4+incompatible/go.mod h1:OXgGpZ6Cli1/URJOF1DMxUHB2q5Ap20/P/eIdh4G0pI=
-github.com/ViBiOh/auth/v2 v2.6.1 h1:tV8iVuRSYZjScKzzsbfjq0FIxhCm6PMPNaDlbSsBHhM=
-github.com/ViBiOh/auth/v2 v2.6.1/go.mod h1:8ULXKFCqHLFLnrXFfoKJak+HbLds3LeClwfIpbS067s=
-github.com/ViBiOh/httputils/v3 v3.32.1 h1:DW6/scwCakIcwmAmmFbxwSZ8O2vk5dA8OPyzaJXk52k=
-github.com/ViBiOh/httputils/v3 v3.32.1/go.mod h1:ffTlN9fluR9rndw60Y171UwoaZ0rSGqvdlpoTwHuHkQ=
+github.com/ViBiOh/auth/v2 v2.6.2 h1:ySbqXsTh8xLRsnLOPaDrNVjj5oTTOXr58aZTlLmlBRk=
+github.com/ViBiOh/auth/v2 v2.6.2/go.mod h1:j763v2jyQiq0xNnuYKJuE/TbTKBYo3E7nKxAug2YWjM=
 github.com/ViBiOh/httputils/v3 v3.33.1 h1:7Q5MnpDA7YkOk10b+Z4+amqZN/j8BqSNahOY3/bPgbE=
 github.com/ViBiOh/httputils/v3 v3.33.1/go.mod h1:5us7bX9EW4QpRZvyIwJ6K8v7Iokow3k799qpBOuZkk0=
 github.com/VividCortex/gohistogram v1.0.0/go.mod h1:Pf5mBqqDxYaXu3hDrrU+w6nw50o/4+TcAqDqk/vUH7g=
@@ -156,7 +154,6 @@ github.com/kr/logfmt v0.0.0-20140226030751-b84e30acd515/go.mod h1:+0opPa2QZZtGFB
 github.com/kr/pretty v0.1.0/go.mod h1:dAy3ld7l9f0ibDNOQOHHMYYIIbhfbHSm3C4ZsoJORNo=
 github.com/kr/pty v1.1.1/go.mod h1:pFQYn66WHrOpPYNljwOMqo10TkYh1fy3cYio2l3bCsQ=
 github.com/kr/text v0.1.0/go.mod h1:4Jbv+DJW3UT/LiOwJeYQe1efqtUx/iVham/4vfdArNI=
-github.com/lib/pq v1.8.0/go.mod h1:AlVN5x4E4T544tWzH6hKfbfQvm3HdbOxrmggDNAPY9o=
 github.com/lib/pq v1.9.0/go.mod h1:AlVN5x4E4T544tWzH6hKfbfQvm3HdbOxrmggDNAPY9o=
 github.com/lightstep/lightstep-tracer-common/golang/gogo v0.0.0-20190605223551-bc2310a04743/go.mod h1:qklhhLq1aX+mtWk9cPHPzaBjWImj5ULL6C7HFJtXQMM=
 github.com/lightstep/lightstep-tracer-go v0.18.1/go.mod h1:jlF1pusYV4pidLvZ+XD0UBX0ZE6WURAspgAczcDHrL4=
