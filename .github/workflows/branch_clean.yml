@@ -23,5 +23,5 @@ jobs:
           BASE: origin/${{ github.base_ref }}
           HEAD: HEAD
         run: |
-          curl -q -sSL --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/master/bootstrap" | bash -s "git_branch_clean"
+          curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/master/bootstrap" | bash -s "git_branch_clean"
           scripts/git_branch_clean "${BASE}" "${HEAD}"
