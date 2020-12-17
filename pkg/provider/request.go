@@ -106,12 +106,6 @@ type Seo struct {
 	ImgWidth    uint
 }
 
-// Message rendered to user
-type Message struct {
-	Content interface{}
-	Level   string
-}
-
 // Error rendered to user
 type Error struct {
 	Err    error

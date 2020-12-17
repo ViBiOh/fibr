@@ -13,6 +13,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v3/pkg/flags"
 	"github.com/ViBiOh/httputils/v3/pkg/logger"
+	rendererModel "github.com/ViBiOh/httputils/v3/pkg/renderer/model"
 )
 
 var (
@@ -33,10 +34,10 @@ var (
 type App interface {
 	Start()
 
-	Browser(http.ResponseWriter, provider.Request, provider.StorageItem, *provider.Message)
+	Browser(http.ResponseWriter, provider.Request, provider.StorageItem, rendererModel.Message)
 	ServeStatic(http.ResponseWriter, *http.Request) bool
 
-	List(http.ResponseWriter, provider.Request, *provider.Message)
+	List(http.ResponseWriter, provider.Request, rendererModel.Message)
 	Get(http.ResponseWriter, *http.Request, provider.Request)
 	Post(http.ResponseWriter, *http.Request, provider.Request)
 	Create(http.ResponseWriter, *http.Request, provider.Request)

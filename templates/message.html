@@ -1,5 +1,5 @@
 {{ define "message" }}
-  {{ if . }}
+  {{ if gt (len .Content) 0 }}
     <p class="padding center full no-margin {{ if eq .Level "success" }}success{{ else if eq .Level "error" }}danger{{ end }}">
       {{ .Content }}
     </p>

@@ -3,10 +3,10 @@ package crud
 import (
 	"fmt"
 	"net/http"
-	"net/url"
 	"path"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	rendererModel "github.com/ViBiOh/httputils/v3/pkg/renderer/model"
 )
 
 // Create creates given path directory to filesystem
@@ -35,5 +35,5 @@ func (a *app) Create(w http.ResponseWriter, r *http.Request, request provider.Re
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("%s/?message=%s&messageLevel=success", request.GetURI(name), url.QueryEscape(fmt.Sprintf("Directory %s successfully created", path.Base(pathname)))), http.StatusMovedPermanently)
+	http.Redirect(w, r, fmt.Sprintf("%s/?%s", request.GetURI(name), rendererModel.NewSuccessMessage(fmt.Sprintf("Directory %s successfully created", path.Base(pathname)))), http.StatusMovedPermanently)
 }

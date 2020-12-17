@@ -7,10 +7,11 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/sha"
 	"github.com/ViBiOh/httputils/v3/pkg/logger"
+	rendererModel "github.com/ViBiOh/httputils/v3/pkg/renderer/model"
 )
 
 // Browser render file web view
-func (a *app) Browser(w http.ResponseWriter, request provider.Request, file provider.StorageItem, message *provider.Message) {
+func (a *app) Browser(w http.ResponseWriter, request provider.Request, file provider.StorageItem, message rendererModel.Message) {
 	var (
 		previous *provider.StorageItem
 		next     *provider.StorageItem

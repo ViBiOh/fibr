@@ -3,6 +3,8 @@ package provider
 import (
 	"reflect"
 	"testing"
+
+	rendererModel "github.com/ViBiOh/httputils/v3/pkg/renderer/model"
 )
 
 func TestBuild(t *testing.T) {
@@ -18,7 +20,7 @@ func TestBuild(t *testing.T) {
 		intention string
 		config    Config
 		request   Request
-		message   *Message
+		message   rendererModel.Message
 		error     *Error
 		layout    string
 		content   map[string]interface{}
@@ -28,7 +30,7 @@ func TestBuild(t *testing.T) {
 			"default layout",
 			Config{},
 			Request{},
-			nil,
+			rendererModel.Message{},
 			nil,
 			"",
 			nil,
@@ -40,7 +42,7 @@ func TestBuild(t *testing.T) {
 			"compute metadata",
 			config,
 			Request{},
-			nil,
+			rendererModel.Message{},
 			nil,
 			"list",
 			nil,

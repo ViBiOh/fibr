@@ -8,6 +8,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v3/pkg/httperror"
 	"github.com/ViBiOh/httputils/v3/pkg/logger"
+	rendererModel "github.com/ViBiOh/httputils/v3/pkg/renderer/model"
 	"github.com/ViBiOh/httputils/v3/pkg/templates"
 )
 
@@ -42,7 +43,7 @@ func setPrefsCookie(w http.ResponseWriter, request provider.Request, page provid
 }
 
 // Directory render directory listing
-func (a app) Directory(w http.ResponseWriter, request provider.Request, content map[string]interface{}, message *provider.Message) {
+func (a app) Directory(w http.ResponseWriter, request provider.Request, content map[string]interface{}, message rendererModel.Message) {
 	page := a.newPageBuilder().Request(request).Message(message).Layout(request.Display).Content(content).Build()
 
 	w.Header().Set("content-language", "en")
@@ -55,7 +56,7 @@ func (a app) Directory(w http.ResponseWriter, request provider.Request, content 
 }
 
 // File render file detail
-func (a app) File(w http.ResponseWriter, request provider.Request, content map[string]interface{}, message *provider.Message) {
+func (a app) File(w http.ResponseWriter, request provider.Request, content map[string]interface{}, message rendererModel.Message) {
 	page := a.newPageBuilder().Request(request).Message(message).Layout("browser").Content(content).Build()
 
 	w.Header().Set("content-language", "en")

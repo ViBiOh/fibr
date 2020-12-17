@@ -3,6 +3,8 @@ package provider
 import (
 	"io"
 	"net/http"
+
+	rendererModel "github.com/ViBiOh/httputils/v3/pkg/renderer/model"
 )
 
 const (
@@ -38,8 +40,8 @@ type ReadSeekerCloser interface {
 
 // Renderer interface for return rich content to user
 type Renderer interface {
-	Directory(http.ResponseWriter, Request, map[string]interface{}, *Message)
-	File(http.ResponseWriter, Request, map[string]interface{}, *Message)
+	Directory(http.ResponseWriter, Request, map[string]interface{}, rendererModel.Message)
+	File(http.ResponseWriter, Request, map[string]interface{}, rendererModel.Message)
 	Error(http.ResponseWriter, Request, *Error)
 	Sitemap(http.ResponseWriter)
 	SVG(http.ResponseWriter, string, string)

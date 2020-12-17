@@ -4,13 +4,13 @@ import (
 	"crypto/rand"
 	"fmt"
 	"net/http"
-	"net/url"
 	"path"
 	"strconv"
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/sha"
+	rendererModel "github.com/ViBiOh/httputils/v3/pkg/renderer/model"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -87,7 +87,7 @@ func (a *app) CreateShare(w http.ResponseWriter, r *http.Request, request provid
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("%s/?message=%s&messageLevel=success#share-list", path.Dir(request.GetURI("")), url.QueryEscape(fmt.Sprintf("Share successfully created with ID: %s", id))), http.StatusFound)
+	http.Redirect(w, r, fmt.Sprintf("%s/?%s#share-list", path.Dir(request.GetURI("")), rendererModel.NewSuccessMessage(fmt.Sprintf("Share successfully created with ID: %s", id))), http.StatusFound)
 }
 
 // DeleteShare delete a share from given ID
@@ -114,5 +114,5 @@ func (a *app) DeleteShare(w http.ResponseWriter, r *http.Request, request provid
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("%s/?message=%s&messageLevel=success#share-list", request.GetURI(""), url.QueryEscape(fmt.Sprintf("Share with id %s successfully deleted", id))), http.StatusFound)
+	http.Redirect(w, r, fmt.Sprintf("%s/?%s#share-list", request.GetURI(""), rendererModel.NewSuccessMessage(fmt.Sprintf("Share with id %s successfully deleted", id))), http.StatusFound)
 }

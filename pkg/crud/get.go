@@ -8,6 +8,7 @@ import (
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v3/pkg/query"
+	rendererModel "github.com/ViBiOh/httputils/v3/pkg/renderer/model"
 )
 
 var (
@@ -49,7 +50,7 @@ func (a *app) ServeStatic(w http.ResponseWriter, r *http.Request) bool {
 	return false
 }
 
-func (a *app) getWithMessage(w http.ResponseWriter, r *http.Request, request provider.Request, message *provider.Message) {
+func (a *app) getWithMessage(w http.ResponseWriter, r *http.Request, request provider.Request, message rendererModel.Message) {
 	info, err := a.storage.Info(request.GetFilepath(""))
 	if err != nil {
 		if provider.IsNotExist(err) {
@@ -97,14 +98,5 @@ func (a *app) getWithMessage(w http.ResponseWriter, r *http.Request, request pro
 
 // Get output content
 func (a *app) Get(w http.ResponseWriter, r *http.Request, request provider.Request) {
-	var message *provider.Message
-
-	if messageContent := strings.TrimSpace(r.URL.Query().Get("message")); messageContent != "" {
-		message = &provider.Message{
-			Level:   r.URL.Query().Get("messageLevel"),
-			Content: messageContent,
-		}
-	}
-
-	a.getWithMessage(w, r, request, message)
+	a.getWithMessage(w, r, request, rendererModel.ParseMessage(r))
 }

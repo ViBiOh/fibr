@@ -3,16 +3,16 @@
     "id": "no-login",
     "path": "/pkg/",
     "rootName": "fibr",
-    "edit": true,
     "password": "",
+    "edit": true,
     "file": false
   },
   {
     "id": "password",
     "path": "/templates/",
     "rootName": "templates",
-    "edit": false,
     "password": "$2a$12$SVaRKEx6MrP2ZdUOrBoSg.s/hIT5VJTuimQEQGkReIyYRPX14sV12",
+    "edit": false,
     "file": false
   }
 ]

@@ -4,10 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"net/url"
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	rendererModel "github.com/ViBiOh/httputils/v3/pkg/renderer/model"
 )
 
 func (a *app) doRename(oldPath, newPath string, oldItem provider.StorageItem) (provider.StorageItem, error) {
@@ -112,5 +112,5 @@ func (a *app) Rename(w http.ResponseWriter, r *http.Request, request provider.Re
 		message = fmt.Sprintf("%s successfully renamed to %s", oldItem.Name, newItem.Name)
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("%s/?message=%s&messageLevel=success", uri, url.QueryEscape(message)), http.StatusFound)
+	http.Redirect(w, r, fmt.Sprintf("%s/?%s", uri, rendererModel.NewSuccessMessage(message)), http.StatusFound)
 }

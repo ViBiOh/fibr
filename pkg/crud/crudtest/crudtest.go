@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	rendererModel "github.com/ViBiOh/httputils/v3/pkg/renderer/model"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -45,7 +46,7 @@ func (a App) Start() {
 }
 
 // Browser mocked implementation
-func (a App) Browser(http.ResponseWriter, provider.Request, provider.StorageItem, *provider.Message) {
+func (a App) Browser(http.ResponseWriter, provider.Request, provider.StorageItem, rendererModel.Message) {
 }
 
 // ServeStatic mocked implementation
@@ -54,7 +55,7 @@ func (a App) ServeStatic(http.ResponseWriter, *http.Request) bool {
 }
 
 // List mocked implementation
-func (a App) List(http.ResponseWriter, provider.Request, *provider.Message) {
+func (a App) List(http.ResponseWriter, provider.Request, rendererModel.Message) {
 }
 
 // Get mocked implementation
