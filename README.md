@@ -118,7 +118,13 @@ For prod-ready run with thumbnails generation of image, PDF and videos, _this is
 
 You can inspire yourself from the [docker-compose.yml](docker-compose.yml) file I personnaly use. Beware of `-authUsers` option: bcrypted passwords contain dollar sign, which `docker-compose` tries to resolve as a shell variable, [you must escape it](https://docs.docker.com/compose/compose-file/compose-file-v2/#variable-substitution).
 
-## CLI Usage
+## Endpoints
+
+- `GET /health`: healthcheck of server, respond [`okStatus (default 204)`](#usage) or `503` during [`graceDuration`](#usage) when SIGTERM is received
+- `GET /version`: value of `VERSION` environment variable
+- `GET /metrics`: Prometheus metrics values
+
+## Usage
 
 ```bash
 Usage of fibr:
