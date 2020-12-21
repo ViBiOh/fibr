@@ -43,7 +43,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 
 // New creates new App from Config
 func New(config Config) (provider.Storage, error) {
-	rootDirectory := strings.TrimSpace(*config.directory)
+	rootDirectory := strings.TrimSuffix(strings.TrimSpace(*config.directory), "/")
 
 	if len(rootDirectory) == 0 {
 		return nil, errors.New("no directory provided")
@@ -72,7 +72,7 @@ func (a *app) SetIgnoreFn(ignoreFn func(provider.StorageItem) bool) {
 
 // Info provide metadata about given pathname
 func (a *app) Info(pathname string) (provider.StorageItem, error) {
-	if err := a.checkPathname(pathname); err != nil {
+	if err := checkPathname(pathname); err != nil {
 		return provider.StorageItem{}, convertError(err)
 	}
 
@@ -88,7 +88,7 @@ func (a *app) Info(pathname string) (provider.StorageItem, error) {
 
 // List items in the storage
 func (a *app) List(pathname string) ([]provider.StorageItem, error) {
-	if err := a.checkPathname(pathname); err != nil {
+	if err := checkPathname(pathname); err != nil {
 		return nil, convertError(err)
 	}
 
@@ -116,17 +116,17 @@ func (a *app) List(pathname string) ([]provider.StorageItem, error) {
 
 // WriterTo opens writer for given pathname
 func (a *app) WriterTo(pathname string) (io.WriteCloser, error) {
-	if err := a.checkPathname(pathname); err != nil {
+	if err := checkPathname(pathname); err != nil {
 		return nil, convertError(err)
 	}
 
-	writer, err := a.getFile(pathname)
+	writer, err := a.getWritableFile(pathname)
 	return writer, convertError(err)
 }
 
 // ReaderFrom reads content from given pathname
 func (a *app) ReaderFrom(pathname string) (provider.ReadSeekerCloser, error) {
-	if err := a.checkPathname(pathname); err != nil {
+	if err := checkPathname(pathname); err != nil {
 		return nil, convertError(err)
 	}
 
@@ -158,7 +158,7 @@ func (a *app) Walk(pathname string, walkFn func(provider.StorageItem, error) err
 
 // Create container in storage
 func (a *app) CreateDir(name string) error {
-	if err := a.checkPathname(name); err != nil {
+	if err := checkPathname(name); err != nil {
 		return convertError(err)
 	}
 
@@ -167,11 +167,11 @@ func (a *app) CreateDir(name string) error {
 
 // Store file to storage
 func (a *app) Store(pathname string, content io.ReadCloser) error {
-	if err := a.checkPathname(pathname); err != nil {
+	if err := checkPathname(pathname); err != nil {
 		return convertError(err)
 	}
 
-	storageFile, err := a.getFile(pathname)
+	storageFile, err := a.getWritableFile(pathname)
 	if storageFile != nil {
 		defer func() {
 			if err := storageFile.Close(); err != nil {
@@ -194,11 +194,11 @@ func (a *app) Store(pathname string, content io.ReadCloser) error {
 
 // Rename file or directory from storage
 func (a *app) Rename(oldName, newName string) error {
-	if err := a.checkPathname(oldName); err != nil {
+	if err := checkPathname(oldName); err != nil {
 		return convertError(err)
 	}
 
-	if err := a.checkPathname(newName); err != nil {
+	if err := checkPathname(newName); err != nil {
 		return convertError(err)
 	}
 
@@ -211,7 +211,7 @@ func (a *app) Rename(oldName, newName string) error {
 
 // Remove file or directory from storage
 func (a *app) Remove(pathname string) error {
-	if err := a.checkPathname(pathname); err != nil {
+	if err := checkPathname(pathname); err != nil {
 		return convertError(err)
 	}
 

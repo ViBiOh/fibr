@@ -9,7 +9,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
-func (a app) checkPathname(pathname string) error {
+func checkPathname(pathname string) error {
 	if strings.Contains(pathname, "..") {
 		return ErrRelativePath
 	}
@@ -25,7 +25,7 @@ func (a app) getRelativePath(pathname string) string {
 	return strings.TrimPrefix(pathname, a.rootDirectory)
 }
 
-func (a app) getFile(filename string) (io.WriteCloser, error) {
+func (a app) getWritableFile(filename string) (io.WriteCloser, error) {
 	return os.OpenFile(a.getFullPath(filename), os.O_RDWR|os.O_CREATE|os.O_TRUNC, getMode(filename))
 }
 
