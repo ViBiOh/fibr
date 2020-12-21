@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"net/http"
 	"reflect"
 	"testing"
 
@@ -96,6 +97,48 @@ func TestGetURI(t *testing.T) {
 		t.Run(testCase.intention, func(t *testing.T) {
 			if result := testCase.request.GetURI(testCase.name); result != testCase.want {
 				t.Errorf("GetFilepath() = `%s`, want `%s`", result, testCase.want)
+			}
+		})
+	}
+}
+
+func TestLayoutPath(t *testing.T) {
+	type args struct {
+		path string
+	}
+
+	var cases = []struct {
+		intention string
+		instance  Request
+		args      args
+		want      string
+	}{
+		{
+			"empty list",
+			Request{},
+			args{
+				path: "/reports",
+			},
+			"grid",
+		},
+		{
+			"empty list",
+			Request{
+				Preferences: Preferences{
+					ListLayoutPath: []string{"/sheets", "/reports"},
+				},
+			},
+			args{
+				path: "/reports",
+			},
+			"list",
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.intention, func(t *testing.T) {
+			if got := tc.instance.LayoutPath(tc.args.path); got != tc.want {
+				t.Errorf("LayoutPath() = `%s`, want `%s`", got, tc.want)
 			}
 		})
 	}
@@ -210,6 +253,32 @@ func TestNewError(t *testing.T) {
 		t.Run(testCase.intention, func(t *testing.T) {
 			if result := NewError(testCase.status, testCase.err); !reflect.DeepEqual(result, testCase.want) {
 				t.Errorf("NewError(%d, %#v) = %#v, want %#v", testCase.status, testCase.err, result, testCase.want)
+			}
+		})
+	}
+}
+
+func TestError(t *testing.T) {
+	type args struct {
+		content string
+	}
+
+	var cases = []struct {
+		intention string
+		instance  *Error
+		want      string
+	}{
+		{
+			"simple",
+			NewError(http.StatusTeapot, errors.New("I'm a teapot")),
+			"HTTP/418: I'm a teapot",
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.intention, func(t *testing.T) {
+			if got := tc.instance.Error(); got != tc.want {
+				t.Errorf("Error() = `%s`, want `%s`", got, tc.want)
 			}
 		})
 	}

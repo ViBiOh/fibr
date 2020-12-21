@@ -2,6 +2,8 @@ package provider
 
 import (
 	"errors"
+	"io"
+	"io/ioutil"
 	"reflect"
 	"testing"
 )
@@ -30,9 +32,9 @@ func TestSanitizeName(t *testing.T) {
 		},
 		{
 			"should replace diacritics and special chars",
-			`Le terme "où", l'ouïe fine`,
+			`L'Œil "où", l'ouïe fine au Ø`,
 			true,
-			"le_terme_ou_louie_fine",
+			"l_oeil_ou_l_ouie_fine_au_oe",
 			nil,
 		},
 		{
@@ -70,6 +72,32 @@ func TestSanitizeName(t *testing.T) {
 			if failed {
 				t.Errorf("SanitizeName() = (%#v, `%s`), want (%#v, `%s`)", result, err, testCase.want, testCase.wantErr)
 			}
+		})
+	}
+}
+
+func TestSafeWrite(t *testing.T) {
+	type args struct {
+		writer  io.Writer
+		content string
+	}
+
+	var cases = []struct {
+		intention string
+		args      args
+	}{
+		{
+			"no panic",
+			args{
+				writer:  ioutil.Discard,
+				content: "test",
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.intention, func(t *testing.T) {
+			SafeWrite(tc.args.writer, tc.args.content)
 		})
 	}
 }

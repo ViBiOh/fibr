@@ -15,13 +15,23 @@ import (
 )
 
 var (
-	transformer  transform.Transformer
+	transformer      = transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
+	transliterations = map[string]string{
+		"Ð": "D",
+		"Ł": "l",
+		"Ø": "oe",
+		"Þ": "Th",
+		"ß": "ss",
+		"æ": "ae",
+		"ð": "d",
+		"ł": "l",
+		"ø": "oe",
+		"þ": "th",
+		"œ": "oe",
+	}
+	quotesChar   = regexp.MustCompile(`["'` + "`" + `](?m)`)
 	specialChars = regexp.MustCompile(`[^a-z0-9.\-_/](?m)`)
 )
-
-func init() {
-	transformer = transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
-}
 
 // GetPathname computes pathname for given params
 func GetPathname(folder, name string, share *Share) string {
@@ -59,20 +69,28 @@ func GetURI(folder, name string, share *Share) string {
 
 // SanitizeName return sanitized name (remove diacritics)
 func SanitizeName(name string, removeSlash bool) (string, error) {
-	withoutDiacritics, _, err := transform.String(transformer, strings.ToLower(name))
+	withoutLigatures := strings.ToLower(name)
+	for key, value := range transliterations {
+		if strings.Contains(withoutLigatures, key) {
+			withoutLigatures = strings.ReplaceAll(withoutLigatures, key, value)
+		}
+	}
+
+	withoutDiacritics, _, err := transform.String(transformer, withoutLigatures)
 	if err != nil {
 		return "", err
 	}
 
 	withoutSpaces := strings.Replace(withoutDiacritics, " ", "_", -1)
-	withoutSpecials := specialChars.ReplaceAllString(withoutSpaces, "")
+	withoutQuotes := quotesChar.ReplaceAllString(withoutSpaces, "_")
+	withoutSpecials := specialChars.ReplaceAllString(withoutQuotes, "")
 
 	sanitized := withoutSpecials
 	if removeSlash {
 		sanitized = strings.Replace(sanitized, "/", "_", -1)
 	}
 
-	return sanitized, nil
+	return strings.Replace(sanitized, "__", "_", -1), nil
 }
 
 // SafeWrite writes content to writer with error handling
