@@ -31,7 +31,7 @@ func newLoginApp(basicConfig basicMemory.Config) authMiddleware.App {
 func main() {
 	fs := flag.NewFlagSet("fibr", flag.ExitOnError)
 
-	serverConfig := httputils.Flags(fs, "", flags.NewOverride("ReadTimeout", "1m"), flags.NewOverride("WriteTimeout", "1m"))
+	serverConfig := httputils.Flags(fs, "", flags.NewOverride("ReadTimeout", "2m"), flags.NewOverride("WriteTimeout", "2m"))
 	alcotestConfig := alcotest.Flags(fs, "")
 	loggerConfig := logger.Flags(fs, "logger")
 	prometheusConfig := prometheus.Flags(fs, "prometheus")
