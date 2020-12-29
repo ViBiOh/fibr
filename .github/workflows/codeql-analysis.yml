@@ -1,5 +1,5 @@
 ---
-name: "CodeQL"
+name: 'CodeQL'
 
 on:
   push:
@@ -7,18 +7,19 @@ on:
   pull_request:
     branches: [master]
   schedule:
-    - cron: "0 0 * * 6"
+    - cron: '0 0 * * 6'
 
 jobs:
   analyze:
     name: Analyze
+    if: "! contains(toJSON(github.event.commits.*.message), '[skip-ci]')"
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
         # Supported options are ['csharp', 'cpp', 'go', 'java', 'javascript', 'python']
-        language: ["go"]
+        language: ['go']
 
     steps:
       - name: Checkout repository
