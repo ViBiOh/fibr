@@ -18,7 +18,7 @@ services:
     cpu_shares: 128
     mem_limit: '1073741824'
     security_opt:
-    - no-new-privileges
+      - no-new-privileges
   image:
     image: h2non/imaginary
     labels:
@@ -30,10 +30,10 @@ services:
       traefik.http.routers.imaginary-https.middlewares: compress@file, web-limit@file
       traefik.http.routers.imaginary-https.tls: 'true'
       traefik.http.routers.imaginary-https.tls.certresolver: default
-      traefik.http.services.imaginary-service.loadbalancer.server.port: '1080'
+      traefik.http.services.imaginary-service.loadbalancer.server.port: '9000'
     restart: on-failure:5
     read_only: true
     cpu_shares: 128
     mem_limit: '1073741824'
     security_opt:
-    - no-new-privileges
+      - no-new-privileges
