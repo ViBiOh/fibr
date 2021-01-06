@@ -18,7 +18,7 @@ services:
     cpu_shares: 256
     mem_limit: '1610612736'
     security_opt:
-      - no-new-privileges
+    - no-new-privileges
   image:
     image: h2non/imaginary
     labels:
@@ -36,4 +36,4 @@ services:
     cpu_shares: 256
     mem_limit: '536870912'
     security_opt:
-      - no-new-privileges
+    - no-new-privileges
