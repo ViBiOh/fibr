@@ -15,8 +15,8 @@ services:
     environment:
       VITH_LOGGER_JSON: 'true'
     restart: on-failure:5
-    cpu_shares: 128
-    mem_limit: '1073741824'
+    cpu_shares: 256
+    mem_limit: '536870912'
     security_opt:
     - no-new-privileges
   image:
@@ -33,7 +33,7 @@ services:
       traefik.http.services.imaginary-service.loadbalancer.server.port: '9000'
     restart: on-failure:5
     read_only: true
-    cpu_shares: 128
-    mem_limit: '1073741824'
+    cpu_shares: 256
+    mem_limit: '1610612736'
     security_opt:
     - no-new-privileges
