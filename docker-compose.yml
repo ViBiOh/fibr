@@ -2,41 +2,18 @@
 version: '2.1'
 
 services:
-  site:
-    image: vibioh/fibr
-    labels:
-      traefik.http.routers.fibr-http.rule: Host(`fibr.vibioh.fr`)
-      traefik.http.routers.fibr-http.entrypoints: http
-      traefik.http.routers.fibr-http.middlewares: redirect@file
-      traefik.http.routers.fibr-https.rule: Host(`fibr.vibioh.fr`)
-      traefik.http.routers.fibr-https.entrypoints: https
-      traefik.http.routers.fibr-https.middlewares: compress@file, web-limit@file
-      traefik.http.routers.fibr-https.tls: 'true'
-      traefik.http.routers.fibr-https.tls.certresolver: default
-      traefik.http.services.fibr-service.loadbalancer.server.port: '1080'
-    environment:
-      FIBR_AUTH_PROFILES: 1:admin
-      FIBR_AUTH_USERS: '${BASIC_USERS}'
-      FIBR_SANITIZE_ON_START: 'true'
-      FIBR_IGNORE_PATTERN: '.st(folder|ignore)'
-      FIBR_LOGGER_JSON: 'true'
-    volumes:
-      - ${DATA_DIR}:/data
-    depends_on:
-      - image
-      - video
-    user: '${DATA_USER_ID}'
-    restart: on-failure:5
-    read_only: true
-    cpu_shares: 128
-    mem_limit: '67108864'
-    security_opt:
-      - no-new-privileges
-
   video:
     image: vibioh/vith
     labels:
-      traefik.enable: false
+      traefik.http.routers.vith-http.rule: Host(`vith.vibioh.fr`)
+      traefik.http.routers.vith-http.entrypoints: http
+      traefik.http.routers.vith-http.middlewares: redirect@file
+      traefik.http.routers.vith-https.rule: Host(`vith.vibioh.fr`)
+      traefik.http.routers.vith-https.entrypoints: https
+      traefik.http.routers.vith-https.middlewares: compress@file, web-limit@file
+      traefik.http.routers.vith-https.tls: 'true'
+      traefik.http.routers.vith-https.tls.certresolver: default
+      traefik.http.services.vith-service.loadbalancer.server.port: '1080'
     environment:
       VITH_LOGGER_JSON: 'true'
     restart: on-failure:5
@@ -48,7 +25,15 @@ services:
   image:
     image: h2non/imaginary
     labels:
-      traefik.enable: false
+      traefik.http.routers.imaginary-http.rule: Host(`imaginary.vibioh.fr`)
+      traefik.http.routers.imaginary-http.entrypoints: http
+      traefik.http.routers.imaginary-http.middlewares: redirect@file
+      traefik.http.routers.imaginary-https.rule: Host(`imaginary.vibioh.fr`)
+      traefik.http.routers.imaginary-https.entrypoints: https
+      traefik.http.routers.imaginary-https.middlewares: compress@file, web-limit@file
+      traefik.http.routers.imaginary-https.tls: 'true'
+      traefik.http.routers.imaginary-https.tls.certresolver: default
+      traefik.http.services.imaginary-service.loadbalancer.server.port: '1080'
     restart: on-failure:5
     read_only: true
     cpu_shares: 128
