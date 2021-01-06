@@ -14,8 +14,15 @@ import (
 )
 
 const (
-	defaultTimeout = time.Second * 30
+	defaultTimeout = time.Minute * 2
 )
+
+var thumbnailClient = http.Client{
+	Timeout: 2 * time.Minute,
+	CheckRedirect: func(*http.Request, []*http.Request) error {
+		return http.ErrUseLastResponse
+	},
+}
 
 func (a app) generate(item provider.StorageItem) error {
 	var (
@@ -31,10 +38,11 @@ func (a app) generate(item provider.StorageItem) error {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
 	defer cancel()
 
+	req := request.New().WithClient(thumbnailClient)
 	var resp *http.Response
 
 	if item.IsVideo() {
-		resp, err = request.New().Post(fmt.Sprintf("%s/", a.videoURL)).Send(ctx, file)
+		resp, err = req.Post(fmt.Sprintf("%s/", a.videoURL)).Send(ctx, file)
 		if err != nil {
 			return err
 		}
@@ -42,7 +50,7 @@ func (a app) generate(item provider.StorageItem) error {
 		file = resp.Body
 	}
 
-	resp, err = request.New().Post(a.imageURL).Send(ctx, file)
+	resp, err = req.Post(a.imageURL).Send(ctx, file)
 	if err != nil {
 		return err
 	}
