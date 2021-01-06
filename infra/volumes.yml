@@ -1,11 +1,9 @@
----
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: custom-local-storage
 provisioner: kubernetes.io/no-provisioner
 volumeBindingMode: WaitForFirstConsumer
-
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -17,7 +15,7 @@ spec:
     storage: 30Gi
   volumeMode: Filesystem
   accessModes:
-    - ReadWriteOnce
+  - ReadWriteOnce
   storageClassName: custom-local-storage
   persistentVolumeReclaimPolicy: Retain
   local:
@@ -25,12 +23,11 @@ spec:
   nodeAffinity:
     required:
       nodeSelectorTerms:
-        - matchExpressions:
-            - key: kubernetes.io/hostname
-              operator: In
-              values:
-                - bob
-
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - bob
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -39,7 +36,7 @@ metadata:
   namespace: default
 spec:
   accessModes:
-    - ReadWriteOnce
+  - ReadWriteOnce
   storageClassName: custom-local-storage
   resources:
     requests:
