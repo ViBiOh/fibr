@@ -48,6 +48,13 @@ spec:
       runAsUser: 1000
       runAsNonRoot: true
       allowPrivilegeEscalation: false
+    resources:
+      limits:
+        cpu: 400m
+        memory: 128Mi
+      requests:
+        cpu: 100m
+        memory: 64Mi
     ingress:
       enabled: true
       hosts:
