@@ -43,6 +43,13 @@ spec:
               operator: In
               values:
               - bob
+    resources:
+      limits:
+        cpu: 400m
+        memory: 64Mi
+      requests:
+        cpu: 400m
+        memory: 64Mi
     securityContext:
       runAsGroup: 1000
       runAsUser: 1000
