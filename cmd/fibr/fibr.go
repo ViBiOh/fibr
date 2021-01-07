@@ -56,7 +56,8 @@ func main() {
 	storage, err := filesystem.New(filesystemConfig)
 	logger.Fatal(err)
 
-	thumbnailApp := thumbnail.New(thumbnailConfig, storage)
+	prometheusApp := prometheus.New(prometheusConfig)
+	thumbnailApp := thumbnail.New(thumbnailConfig, storage, prometheusApp.Registerer())
 	rendererApp := renderer.New(rendererConfig, thumbnailApp)
 	crudApp, err := crud.New(crudConfig, storage, rendererApp, thumbnailApp)
 	logger.Fatal(err)
@@ -71,5 +72,5 @@ func main() {
 	go thumbnailApp.Start()
 	go crudApp.Start()
 
-	httputils.New(serverConfig).ListenAndServe(fibrApp.Handler(), nil, prometheus.New(prometheusConfig).Middleware, owasp.New(owaspConfig).Middleware)
+	httputils.New(serverConfig).ListenAndServe(fibrApp.Handler(), nil, prometheusApp.Middleware, owasp.New(owaspConfig).Middleware)
 }

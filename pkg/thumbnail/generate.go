@@ -11,6 +11,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v3/pkg/logger"
 	"github.com/ViBiOh/httputils/v3/pkg/request"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 const (
@@ -88,11 +89,22 @@ func (a app) Start() {
 
 	waitTimeout := time.Millisecond * 300
 
+	thumbnailCount := prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: "fibr",
+		Subsystem: "thumbnail",
+		Name:      "total",
+	}, []string{"status"})
+	if a.prometheus != nil {
+		a.prometheus.MustRegister(thumbnailCount)
+	}
+
 	for item := range a.pathnameInput {
 		if err := a.generate(item); err != nil {
 			logger.Error("unable to generate thumbnail for %s: %s", item.Pathname, err)
+			thumbnailCount.WithLabelValues("error").Add(1.0)
 		} else {
 			logger.Info("Thumbnail generated for %s", item.Pathname)
+			thumbnailCount.WithLabelValues("success").Add(1.0)
 		}
 
 		// Do not stress API

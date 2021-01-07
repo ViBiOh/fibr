@@ -13,6 +13,7 @@ import (
 	"github.com/ViBiOh/httputils/v3/pkg/flags"
 	"github.com/ViBiOh/httputils/v3/pkg/httperror"
 	"github.com/ViBiOh/httputils/v3/pkg/logger"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 const (
@@ -41,9 +42,11 @@ type Config struct {
 }
 
 type app struct {
-	imageURL      string
-	videoURL      string
+	imageURL string
+	videoURL string
+
 	storage       provider.Storage
+	prometheus    prometheus.Registerer
 	pathnameInput chan provider.StorageItem
 }
 
@@ -56,7 +59,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 }
 
 // New creates new App from Config
-func New(config Config, storage provider.Storage) App {
+func New(config Config, storage provider.Storage, prometheusApp prometheus.Registerer) App {
 	imageURL := strings.TrimSpace(*config.imageURL)
 	if len(imageURL) == 0 {
 		return &app{}
@@ -68,9 +71,12 @@ func New(config Config, storage provider.Storage) App {
 	}
 
 	app := &app{
-		imageURL:      fmt.Sprintf("%s/crop?width=%d&height=%d&stripmeta=true&noprofile=true&quality=80&type=jpeg", imageURL, Width, Height),
-		videoURL:      videoURL,
-		storage:       storage,
+		imageURL: fmt.Sprintf("%s/crop?width=%d&height=%d&stripmeta=true&noprofile=true&quality=80&type=jpeg", imageURL, Width, Height),
+		videoURL: videoURL,
+
+		storage:    storage,
+		prometheus: prometheusApp,
+
 		pathnameInput: make(chan provider.StorageItem, 10),
 	}
 
