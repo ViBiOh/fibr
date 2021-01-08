@@ -91,7 +91,7 @@ func (a app) Start() {
 
 	thumbnailCount := prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: "fibr",
-		Subsystem: "thumbnail",
+		Subsystem: "thumbnail_generations",
 		Name:      "total",
 	}, []string{"status"})
 	if a.prometheus != nil {

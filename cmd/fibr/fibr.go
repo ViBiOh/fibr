@@ -57,9 +57,11 @@ func main() {
 	logger.Fatal(err)
 
 	prometheusApp := prometheus.New(prometheusConfig)
-	thumbnailApp := thumbnail.New(thumbnailConfig, storage, prometheusApp.Registerer())
+	prometheusRegister := prometheusApp.Registerer()
+
+	thumbnailApp := thumbnail.New(thumbnailConfig, storage, prometheusRegister)
 	rendererApp := renderer.New(rendererConfig, thumbnailApp)
-	crudApp, err := crud.New(crudConfig, storage, rendererApp, thumbnailApp)
+	crudApp, err := crud.New(crudConfig, storage, rendererApp, thumbnailApp, prometheusRegister)
 	logger.Fatal(err)
 
 	var middlewareApp authMiddleware.App

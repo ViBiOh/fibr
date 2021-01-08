@@ -14,6 +14,7 @@ import (
 	"github.com/ViBiOh/httputils/v3/pkg/flags"
 	"github.com/ViBiOh/httputils/v3/pkg/logger"
 	rendererModel "github.com/ViBiOh/httputils/v3/pkg/renderer/model"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 var (
@@ -63,9 +64,10 @@ type app struct {
 	metadataLock    sync.Mutex
 	sanitizeOnStart bool
 
-	storage   provider.Storage
-	renderer  provider.Renderer
-	thumbnail thumbnail.App
+	storage    provider.Storage
+	renderer   provider.Renderer
+	thumbnail  thumbnail.App
+	prometheus prometheus.Registerer
 }
 
 // Flags adds flags for configuring package
@@ -78,15 +80,16 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 }
 
 // New creates new App from Config
-func New(config Config, storage provider.Storage, renderer provider.Renderer, thumbnail thumbnail.App) (App, error) {
+func New(config Config, storage provider.Storage, renderer provider.Renderer, thumbnail thumbnail.App, prometheus prometheus.Registerer) (App, error) {
 	app := &app{
 		metadataEnabled: *config.metadata,
 		metadataLock:    sync.Mutex{},
 		sanitizeOnStart: *config.sanitizeOnStart,
 
-		storage:   storage,
-		renderer:  renderer,
-		thumbnail: thumbnail,
+		storage:    storage,
+		renderer:   renderer,
+		thumbnail:  thumbnail,
+		prometheus: prometheus,
 	}
 
 	if app.metadataEnabled {
@@ -121,14 +124,28 @@ func New(config Config, storage provider.Storage, renderer provider.Renderer, th
 }
 
 func (a *app) Start() {
+	renameCount := prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: "fibr",
+		Subsystem: "renames",
+		Name:      "total",
+	}, []string{"status"})
+	if a.prometheus != nil {
+		a.prometheus.MustRegister(renameCount)
+	}
+
 	err := a.storage.Walk("", func(item provider.StorageItem, _ error) error {
 		if name, err := provider.SanitizeName(item.Pathname, false); err != nil {
 			logger.Error("unable to sanitize name %s: %s", item.Pathname, err)
 		} else if name != item.Pathname {
 			if a.sanitizeOnStart {
 				logger.Info("Renaming `%s` to `%s`", item.Pathname, name)
-				if _, err := a.doRename(item.Pathname, name, item); err != nil {
+
+				if renamedItem, err := a.doRename(item.Pathname, name, item); err != nil {
+					renameCount.WithLabelValues("error").Add(1.0)
 					logger.Error("%s", err)
+				} else {
+					renameCount.WithLabelValues("success").Add(1.0)
+					item = renamedItem
 				}
 			} else {
 				logger.Info("File with name `%s` should be renamed to `%s`", item.Pathname, name)
