@@ -1,0 +1,55 @@
+---
+version: '2.1'
+
+services:
+  site:
+    image: vibioh/fibr
+    labels:
+      traefik.http.routers.fibr-http.rule: Host(`fibr.vibioh.fr`)
+      traefik.http.routers.fibr-http.entrypoints: http
+      traefik.http.routers.fibr-https.rule: Host(`fibr.vibioh.fr`)
+      traefik.http.routers.fibr-https.entrypoints: https
+      traefik.http.routers.fibr-https.tls: 'true'
+      traefik.http.routers.fibr-https.tls.certresolver: default
+      traefik.http.services.fibr-service.loadbalancer.server.port: '1080'
+    environment:
+      FIBR_AUTH_PROFILES: 1:admin
+      FIBR_AUTH_USERS: '${BASIC_USERS}'
+      FIBR_SANITIZE_ON_START: 'true'
+      FIBR_IGNORE_PATTERN: '.st(folder|ignore)'
+      FIBR_LOGGER_JSON: 'true'
+    volumes:
+      - ${DATA_DIR}:/data
+    depends_on:
+      - image
+      - video
+    user: '${DATA_USER_ID}'
+    restart: on-failure:5
+    read_only: true
+    cpu_shares: 128
+    mem_limit: '67108864'
+    security_opt:
+      - no-new-privileges
+
+  video:
+    image: vibioh/vith
+    labels:
+      traefik.enable: false
+    environment:
+      VITH_LOGGER_JSON: 'true'
+    restart: on-failure:5
+    cpu_shares: 128
+    mem_limit: '1073741824'
+    security_opt:
+      - no-new-privileges
+
+  image:
+    image: h2non/imaginary
+    labels:
+      traefik.enable: false
+    restart: on-failure:5
+    read_only: true
+    cpu_shares: 128
+    mem_limit: '1073741824'
+    security_opt:
+      - no-new-privileges
