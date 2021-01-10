@@ -12,14 +12,14 @@ import (
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v3/pkg/flags"
 	"github.com/ViBiOh/httputils/v3/pkg/logger"
-	rendererModel "github.com/ViBiOh/httputils/v3/pkg/renderer/model"
+	"github.com/ViBiOh/httputils/v3/pkg/renderer"
 	"github.com/ViBiOh/httputils/v3/pkg/templates"
 )
 
 // App of package
 type App interface {
-	Directory(http.ResponseWriter, provider.Request, map[string]interface{}, rendererModel.Message)
-	File(http.ResponseWriter, provider.Request, map[string]interface{}, rendererModel.Message)
+	Directory(http.ResponseWriter, provider.Request, map[string]interface{}, renderer.Message)
+	File(http.ResponseWriter, provider.Request, map[string]interface{}, renderer.Message)
 	Error(http.ResponseWriter, provider.Request, *provider.Error)
 	Sitemap(http.ResponseWriter)
 	SVG(http.ResponseWriter, string, string)
@@ -33,8 +33,8 @@ type Config struct {
 }
 
 type app struct {
-	config provider.Config
 	tpl    *template.Template
+	config provider.Config
 }
 
 // Flags adds flags for configuring package

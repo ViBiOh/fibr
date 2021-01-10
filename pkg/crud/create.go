@@ -6,7 +6,7 @@ import (
 	"path"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	rendererModel "github.com/ViBiOh/httputils/v3/pkg/renderer/model"
+	"github.com/ViBiOh/httputils/v3/pkg/renderer"
 )
 
 // Create creates given path directory to filesystem
@@ -35,5 +35,5 @@ func (a *app) Create(w http.ResponseWriter, r *http.Request, request provider.Re
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("%s/?%s", request.GetURI(name), rendererModel.NewSuccessMessage(fmt.Sprintf("Directory %s successfully created", path.Base(pathname)))), http.StatusMovedPermanently)
+	http.Redirect(w, r, fmt.Sprintf("%s/?%s", request.GetURI(name), renderer.NewSuccessMessage(fmt.Sprintf("Directory %s successfully created", path.Base(pathname)))), http.StatusMovedPermanently)
 }

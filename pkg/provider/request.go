@@ -19,12 +19,12 @@ type Preferences struct {
 
 // Request from user
 type Request struct {
-	Preferences Preferences
 	Share       *Share
-	Path        string
-	Display     string
 	CanShare    bool
 	CanEdit     bool
+	Path        string
+	Display     string
+	Preferences Preferences
 }
 
 // GetFilepath of request

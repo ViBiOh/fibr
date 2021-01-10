@@ -28,10 +28,10 @@ type Config struct {
 }
 
 type app struct {
+	ignoreFn func(provider.StorageItem) bool
+
 	rootDirectory string
 	rootDirname   string
-
-	ignoreFn func(provider.StorageItem) bool
 }
 
 // Flags adds flags for configuring package

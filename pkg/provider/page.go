@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	rendererModel "github.com/ViBiOh/httputils/v3/pkg/renderer/model"
+	"github.com/ViBiOh/httputils/v3/pkg/renderer"
 )
 
 var (
@@ -19,7 +19,7 @@ type Page struct {
 	Config  Config
 	Request Request
 
-	Message rendererModel.Message
+	Message renderer.Message
 	Error   *Error
 
 	Layout      string
@@ -33,7 +33,7 @@ type PageBuilder struct {
 	content map[string]interface{}
 	config  Config
 	request Request
-	message rendererModel.Message
+	message renderer.Message
 	error   *Error
 	layout  string
 }
@@ -53,7 +53,7 @@ func (p *PageBuilder) Request(request Request) *PageBuilder {
 }
 
 // Message set Message for page
-func (p *PageBuilder) Message(message rendererModel.Message) *PageBuilder {
+func (p *PageBuilder) Message(message renderer.Message) *PageBuilder {
 	p.message = message
 
 	return p

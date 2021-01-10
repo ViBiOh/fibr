@@ -12,7 +12,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/sha"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v3/pkg/logger"
-	rendererModel "github.com/ViBiOh/httputils/v3/pkg/renderer/model"
+	"github.com/ViBiOh/httputils/v3/pkg/renderer"
 )
 
 func (a *app) getCover(files []provider.StorageItem) map[string]interface{} {
@@ -34,7 +34,7 @@ func (a *app) getCover(files []provider.StorageItem) map[string]interface{} {
 }
 
 // List render directory web view of given dirPath
-func (a *app) List(w http.ResponseWriter, request provider.Request, message rendererModel.Message) {
+func (a *app) List(w http.ResponseWriter, request provider.Request, message renderer.Message) {
 	files, err := a.storage.List(request.GetFilepath(""))
 	if err != nil {
 		a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
