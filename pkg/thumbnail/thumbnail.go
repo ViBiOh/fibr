@@ -42,12 +42,12 @@ type Config struct {
 }
 
 type app struct {
-	imageURL string
-	videoURL string
-
 	storage       provider.Storage
 	prometheus    prometheus.Registerer
 	pathnameInput chan provider.StorageItem
+
+	imageURL string
+	videoURL string
 }
 
 // Flags adds flags for configuring package

@@ -11,7 +11,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v3/pkg/logger"
-	rendererModel "github.com/ViBiOh/httputils/v3/pkg/renderer/model"
+	"github.com/ViBiOh/httputils/v3/pkg/renderer"
 )
 
 func (a *app) saveUploadedFile(request provider.Request, part *multipart.Part) (filename string, err error) {
@@ -85,5 +85,5 @@ func (a *app) Upload(w http.ResponseWriter, r *http.Request, request provider.Re
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("%s/?%s", request.GetURI(""), rendererModel.NewSuccessMessage(content)), http.StatusFound)
+	http.Redirect(w, r, fmt.Sprintf("%s/?%s", request.GetURI(""), renderer.NewSuccessMessage(content)), http.StatusFound)
 }

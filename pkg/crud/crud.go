@@ -13,7 +13,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v3/pkg/flags"
 	"github.com/ViBiOh/httputils/v3/pkg/logger"
-	rendererModel "github.com/ViBiOh/httputils/v3/pkg/renderer/model"
+	"github.com/ViBiOh/httputils/v3/pkg/renderer"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -35,10 +35,10 @@ var (
 type App interface {
 	Start()
 
-	Browser(http.ResponseWriter, provider.Request, provider.StorageItem, rendererModel.Message)
+	Browser(http.ResponseWriter, provider.Request, provider.StorageItem, renderer.Message)
 	ServeStatic(http.ResponseWriter, *http.Request) bool
 
-	List(http.ResponseWriter, provider.Request, rendererModel.Message)
+	List(http.ResponseWriter, provider.Request, renderer.Message)
 	Get(http.ResponseWriter, *http.Request, provider.Request)
 	Post(http.ResponseWriter, *http.Request, provider.Request)
 	Create(http.ResponseWriter, *http.Request, provider.Request)
@@ -59,15 +59,16 @@ type Config struct {
 }
 
 type app struct {
-	metadataEnabled bool
-	metadatas       []*provider.Share
-	metadataLock    sync.Mutex
-	sanitizeOnStart bool
-
+	prometheus prometheus.Registerer
 	storage    provider.Storage
 	renderer   provider.Renderer
 	thumbnail  thumbnail.App
-	prometheus prometheus.Registerer
+
+	metadatas    []*provider.Share
+	metadataLock sync.Mutex
+
+	metadataEnabled bool
+	sanitizeOnStart bool
 }
 
 // Flags adds flags for configuring package

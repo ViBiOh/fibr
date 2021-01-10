@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	rendererModel "github.com/ViBiOh/httputils/v3/pkg/renderer/model"
+	"github.com/ViBiOh/httputils/v3/pkg/renderer"
 )
 
 // Delete given path from filesystem
@@ -51,5 +51,5 @@ func (a *app) Delete(w http.ResponseWriter, r *http.Request, request provider.Re
 
 	go a.thumbnail.Remove(info)
 
-	http.Redirect(w, r, fmt.Sprintf("%s/?%s", request.GetURI(""), rendererModel.NewSuccessMessage(fmt.Sprintf("%s successfully deleted", info.Name))), http.StatusFound)
+	http.Redirect(w, r, fmt.Sprintf("%s/?%s", request.GetURI(""), renderer.NewSuccessMessage(fmt.Sprintf("%s successfully deleted", info.Name))), http.StatusFound)
 }
