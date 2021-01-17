@@ -5,12 +5,10 @@ github.com/DATA-DOG/go-sqlmock v1.5.0/go.mod h1:f/Ixk793poVmq4qj/V1dPUg2JEAKC73Q
 github.com/Knetic/govaluate v3.0.1-0.20171022003610-9aa49832a739+incompatible/go.mod h1:r7JcOSlj0wfOMncg0iLm8Leh48TZaKVeNIfJntJ2wa0=
 github.com/Shopify/sarama v1.19.0/go.mod h1:FVkBWblsNy7DGZRfXLU0O9RCGt5g3g3yEuWXgklEdEo=
 github.com/Shopify/toxiproxy v2.1.4+incompatible/go.mod h1:OXgGpZ6Cli1/URJOF1DMxUHB2q5Ap20/P/eIdh4G0pI=
-github.com/ViBiOh/auth/v2 v2.6.4 h1:32IYV3V36Vvz9Xw4LCG9OeykMvqvJG4AP8VZ5p0yW4g=
-github.com/ViBiOh/auth/v2 v2.6.4/go.mod h1:pnDaSKnCWBHSywykdj2npC9M1OHG5rciZGvdHkszg8c=
-github.com/ViBiOh/httputils/v3 v3.35.1 h1:CJ3BcpYzxlI2MoxJbUwqzBXTe7BHXoAFkFDwCOrra1Y=
-github.com/ViBiOh/httputils/v3 v3.35.1/go.mod h1:l4sdVJfRu99dY7rNJfMinJHYb0pJZU9FEz7C83dX6gE=
-github.com/ViBiOh/httputils/v3 v3.36.4 h1:ddehKRmFWe0x7rjVAVEiG/E9hszEQEe4K7ssdMjht6Q=
-github.com/ViBiOh/httputils/v3 v3.36.4/go.mod h1:l4sdVJfRu99dY7rNJfMinJHYb0pJZU9FEz7C83dX6gE=
+github.com/ViBiOh/auth/v2 v2.6.5 h1:GpohroB7/YL/lwHDBpN4TYApfuQcK3xKxmLilhAEIJU=
+github.com/ViBiOh/auth/v2 v2.6.5/go.mod h1:N8OK4xQoqR2LCuqBTlkCoFb0lyrwClgrnYsPnbiQ6ok=
+github.com/ViBiOh/httputils/v3 v3.36.5 h1:SdhmLyZ0GGTyG+gpqJp3kl3bGz4Ci/q6snE67OicS7s=
+github.com/ViBiOh/httputils/v3 v3.36.5/go.mod h1:l4sdVJfRu99dY7rNJfMinJHYb0pJZU9FEz7C83dX6gE=
 github.com/VividCortex/gohistogram v1.0.0/go.mod h1:Pf5mBqqDxYaXu3hDrrU+w6nw50o/4+TcAqDqk/vUH7g=
 github.com/afex/hystrix-go v0.0.0-20180502004556-fa1af6a1f4f5/go.mod h1:SkGFH1ia65gfNATL8TAiHDNxPzPdmEL5uirI2Uyuz6c=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
