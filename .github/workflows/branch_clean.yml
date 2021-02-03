@@ -5,20 +5,20 @@ jobs:
     name: Branch is clean
     runs-on: ubuntu-latest
     steps:
-    - name: Check out code
-      uses: actions/checkout@v2
-      with:
-        ref: ${{ github.event.pull_request.head.sha }}
-        fetch-depth: 0
-    - name: Fetch branches
-      run: |
-        git fetch --no-tags --prune origin "+refs/heads/${BASE}:refs/remotes/origin/${BASE}"
-      env:
-        BASE: ${{ github.base_ref }}
-    - name: Check commits description
-      env:
-        BASE: origin/${{ github.base_ref }}
-        HEAD: HEAD
-      run: |
-        curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/master/bootstrap" | bash -s "git_branch_clean"
-        scripts/git_branch_clean "${BASE}" "${HEAD}"
+      - name: Check out code
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      - name: Fetch branches
+        run: |
+          git fetch --no-tags --prune origin "+refs/heads/${BASE}:refs/remotes/origin/${BASE}"
+        env:
+          BASE: ${{ github.base_ref }}
+      - name: Check commits description
+        env:
+          BASE: origin/${{ github.base_ref }}
+          HEAD: HEAD
+        run: |
+          curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap" | bash -s "git_branch_clean"
+          scripts/git_branch_clean "${BASE}" "${HEAD}"
