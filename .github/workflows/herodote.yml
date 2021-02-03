@@ -2,23 +2,23 @@ name: Herodote
 on:
   push:
     branches:
-    - master
+      - main
 jobs:
   build:
     name: Feed
     runs-on: ubuntu-latest
     steps:
-    - name: Fetch history
-      uses: actions/checkout@v2
-      with:
-        ref: ${{ github.event.pull_request.head.sha }}
-        fetch-depth: 0
-    - name: Push history
-      run: |
-        curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/herodote/master/herodote.sh" | bash
-      env:
-        HERODOTE_API: https://herodote.vibioh.fr
-        HERODOTE_SECRET: ${{ secrets.HERODOTE_SECRET }}
-        GIT_HOST: github.com
-        GIT_REPOSITORY: ${{ github.repository }}
-        SCRIPTS_NO_INTERACTIVE: "1"
+      - name: Fetch history
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      - name: Push history
+        run: |
+          curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/herodote/main/herodote.sh" | bash
+        env:
+          HERODOTE_API: https://herodote.vibioh.fr
+          HERODOTE_SECRET: ${{ secrets.HERODOTE_SECRET }}
+          GIT_HOST: github.com
+          GIT_REPOSITORY: ${{ github.repository }}
+          SCRIPTS_NO_INTERACTIVE: "1"
