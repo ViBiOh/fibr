@@ -64,7 +64,7 @@ jobs:
         run: |
           curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap" | bash -s "docker_promote"
           scripts/docker_promote "${{ secrets.DOCKER_USER }}/$(make name)" "$(make version)"
-          curl --header "X-Signature: sha1=$(printf "{}" | openssl dgst -sha1 -hmac "${FLUX_TOKEN}")" --data "{}" "${FLUX_WEBHOOK_URL}"
+          curl --disable --silent --show-error --location --max-time 30 --header "X-Signature: sha1=$(printf "{}" | openssl dgst -sha1 -hmac "${FLUX_TOKEN}")" --data "{}" "${FLUX_WEBHOOK_URL}"
       - name: GoReport
         run: |
           curl --disable --silent --show-error --location --max-time 30 -X POST https://goreportcard.com/checks?repo=github.com/${GITHUB_REPOSITORY}
