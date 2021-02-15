@@ -135,22 +135,20 @@ func (a *app) Start() {
 	}
 
 	err := a.storage.Walk("", func(item provider.StorageItem, _ error) error {
-		if name, err := provider.SanitizeName(item.Pathname, false); err != nil {
+		name, err := provider.SanitizeName(item.Pathname, false)
+		if err != nil {
 			logger.Error("unable to sanitize name %s: %s", item.Pathname, err)
-		} else if name != item.Pathname {
-			if a.sanitizeOnStart {
-				logger.Info("Renaming `%s` to `%s`", item.Pathname, name)
+			return nil
+		}
 
-				if renamedItem, err := a.doRename(item.Pathname, name, item); err != nil {
-					renameCount.WithLabelValues("error").Add(1.0)
-					logger.Error("%s", err)
-				} else {
-					renameCount.WithLabelValues("success").Add(1.0)
-					item = renamedItem
-				}
-			} else {
-				logger.Info("File with name `%s` should be renamed to `%s`", item.Pathname, name)
-			}
+		if name == item.Pathname {
+			return nil
+		}
+
+		if a.sanitizeOnStart {
+			a.rename(item, name, renameCount)
+		} else {
+			logger.Info("File with name `%s` should be renamed to `%s`", item.Pathname, name)
 		}
 
 		if thumbnail.CanHaveThumbnail(item) && !a.thumbnail.HasThumbnail(item) {
@@ -163,6 +161,19 @@ func (a *app) Start() {
 	if err != nil {
 		logger.Error("%s", err)
 	}
+}
+
+func (a *app) rename(item provider.StorageItem, name string, guage *prometheus.GaugeVec) {
+	logger.Info("Renaming `%s` to `%s`", item.Pathname, name)
+
+	if renamedItem, err := a.doRename(item.Pathname, name, item); err != nil {
+		guage.WithLabelValues("error").Add(1.0)
+		logger.Error("%s", err)
+	} else {
+		guage.WithLabelValues("success").Add(1.0)
+		item = renamedItem
+	}
+
 }
 
 // GetShare returns share configuration if request path match

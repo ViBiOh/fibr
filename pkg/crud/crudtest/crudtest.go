@@ -43,10 +43,12 @@ func New() App {
 
 // Start mocked implementation
 func (a App) Start() {
+	// mock implementation
 }
 
 // Browser mocked implementation
 func (a App) Browser(http.ResponseWriter, provider.Request, provider.StorageItem, renderer.Message) {
+	// mock implementation
 }
 
 // ServeStatic mocked implementation
@@ -56,30 +58,37 @@ func (a App) ServeStatic(http.ResponseWriter, *http.Request) bool {
 
 // List mocked implementation
 func (a App) List(http.ResponseWriter, provider.Request, renderer.Message) {
+	// mock implementation
 }
 
 // Get mocked implementation
 func (a App) Get(http.ResponseWriter, *http.Request, provider.Request) {
+	// mock implementation
 }
 
 // Post mocked implementation
 func (a App) Post(http.ResponseWriter, *http.Request, provider.Request) {
+	// mock implementation
 }
 
 // Create mocked implementation
 func (a App) Create(http.ResponseWriter, *http.Request, provider.Request) {
+	// mock implementation
 }
 
 // Upload mocked implementation
 func (a App) Upload(http.ResponseWriter, *http.Request, provider.Request, *multipart.Part) {
+	// mock implementation
 }
 
 // Rename mocked implementation
 func (a App) Rename(http.ResponseWriter, *http.Request, provider.Request) {
+	// mock implementation
 }
 
 // Delete mocked implementation
 func (a App) Delete(http.ResponseWriter, *http.Request, provider.Request) {
+	// mock implementation
 }
 
 // GetShare mocked implementation
@@ -97,8 +106,10 @@ func (a App) GetShare(path string) *provider.Share {
 
 // CreateShare mocked implementation
 func (a App) CreateShare(http.ResponseWriter, *http.Request, provider.Request) {
+	// mock implementation
 }
 
 // DeleteShare mocked implementation
 func (a App) DeleteShare(http.ResponseWriter, *http.Request, provider.Request) {
+	// mock implementation
 }
