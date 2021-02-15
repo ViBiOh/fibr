@@ -27,6 +27,7 @@ type Storage struct {
 
 // SetIgnoreFn fakes implementation
 func (s Storage) SetIgnoreFn(func(provider.StorageItem) bool) {
+	// mock implementation
 }
 
 // Info fakes implementation
