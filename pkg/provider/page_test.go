@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/ViBiOh/httputils/v3/pkg/renderer"
+	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
 func TestBuild(t *testing.T) {

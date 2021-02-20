@@ -12,12 +12,14 @@ import (
 	"github.com/ViBiOh/fibr/pkg/filesystem"
 	"github.com/ViBiOh/fibr/pkg/renderer"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
-	"github.com/ViBiOh/httputils/v3/pkg/alcotest"
-	"github.com/ViBiOh/httputils/v3/pkg/flags"
-	"github.com/ViBiOh/httputils/v3/pkg/httputils"
-	"github.com/ViBiOh/httputils/v3/pkg/logger"
-	"github.com/ViBiOh/httputils/v3/pkg/owasp"
-	"github.com/ViBiOh/httputils/v3/pkg/prometheus"
+	"github.com/ViBiOh/httputils/v4/pkg/alcotest"
+	"github.com/ViBiOh/httputils/v4/pkg/flags"
+	"github.com/ViBiOh/httputils/v4/pkg/health"
+	"github.com/ViBiOh/httputils/v4/pkg/httputils"
+	"github.com/ViBiOh/httputils/v4/pkg/logger"
+	"github.com/ViBiOh/httputils/v4/pkg/owasp"
+	"github.com/ViBiOh/httputils/v4/pkg/prometheus"
+	"github.com/ViBiOh/httputils/v4/pkg/server"
 )
 
 func newLoginApp(basicConfig basicMemory.Config) authMiddleware.App {
@@ -31,7 +33,10 @@ func newLoginApp(basicConfig basicMemory.Config) authMiddleware.App {
 func main() {
 	fs := flag.NewFlagSet("fibr", flag.ExitOnError)
 
-	serverConfig := httputils.Flags(fs, "", flags.NewOverride("ReadTimeout", "2m"), flags.NewOverride("WriteTimeout", "2m"))
+	appServerConfig := server.Flags(fs, "", flags.NewOverride("ReadTimeout", "2m"), flags.NewOverride("WriteTimeout", "2m"))
+	promServerConfig := server.Flags(fs, "prometheus", flags.NewOverride("Port", 9090), flags.NewOverride("IdleTimeout", "10s"), flags.NewOverride("ShutdownTimeout", "5s"))
+	healthConfig := health.Flags(fs, "")
+
 	alcotestConfig := alcotest.Flags(fs, "")
 	loggerConfig := logger.Flags(fs, "logger")
 	prometheusConfig := prometheus.Flags(fs, "prometheus")
@@ -53,10 +58,14 @@ func main() {
 	logger.Global(logger.New(loggerConfig))
 	defer logger.Close()
 
+	appServer := server.New(appServerConfig)
+	promServer := server.New(promServerConfig)
+	prometheusApp := prometheus.New(prometheusConfig)
+	healthApp := health.New(healthConfig)
+
 	storage, err := filesystem.New(filesystemConfig)
 	logger.Fatal(err)
 
-	prometheusApp := prometheus.New(prometheusConfig)
 	prometheusRegister := prometheusApp.Registerer()
 
 	thumbnailApp := thumbnail.New(thumbnailConfig, storage, prometheusRegister)
@@ -74,5 +83,9 @@ func main() {
 	go thumbnailApp.Start()
 	go crudApp.Start()
 
-	httputils.New(serverConfig).ListenAndServe(fibrApp.Handler(), nil, prometheusApp.Middleware, owasp.New(owaspConfig).Middleware)
+	go promServer.Start("prometheus", healthApp.End(), prometheusApp.Handler())
+	go appServer.Start("http", healthApp.End(), httputils.Handler(fibrApp.Handler(), healthApp, prometheusApp.Middleware, owasp.New(owaspConfig).Middleware))
+
+	healthApp.WaitForTermination(appServer.Done())
+	server.GracefulWait(appServer.Done(), promServer.Done())
 }

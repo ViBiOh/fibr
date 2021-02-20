@@ -6,7 +6,7 @@ import (
 	"path"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/v3/pkg/renderer"
+	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
 // Create creates given path directory to filesystem

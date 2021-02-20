@@ -124,20 +124,20 @@ You'll find a Kubernetes exemple in the [`infra/`](infra/) folder, using my [`ap
 
 - `GET /health`: healthcheck of server, respond [`okStatus (default 204)`](#usage) or `503` during [`graceDuration`](#usage) when SIGTERM is received
 - `GET /version`: value of `VERSION` environment variable
-- `GET /metrics`: Prometheus metrics values
+- `GET /metrics`: Prometheus metrics values, on a dedicated port
 
 ## Usage
 
 ```bash
 Usage of fibr:
   -address string
-        [http] Listen address {FIBR_ADDRESS}
+        [server] Listen address {FIBR_ADDRESS}
   -authProfiles string
         [auth] Users profiles in the form 'id:profile1|profile2,id2:profile1' {FIBR_AUTH_PROFILES}
   -authUsers string
         [auth] Users credentials in the form 'id:login:password,id2:login2:password2' {FIBR_AUTH_USERS}
   -cert string
-        [http] Certificate file {FIBR_CERT}
+        [server] Certificate file {FIBR_CERT}
   -csp string
         [owasp] Content-Security-Policy {FIBR_CSP} (default "default-src 'self'; base-uri 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:")
   -frameOptions string
@@ -149,11 +149,11 @@ Usage of fibr:
   -hsts
         [owasp] Indicate Strict Transport Security {FIBR_HSTS} (default true)
   -idleTimeout string
-        [http] Idle Timeout {FIBR_IDLE_TIMEOUT} (default "2m")
+        [server] Idle Timeout {FIBR_IDLE_TIMEOUT} (default "2m")
   -ignorePattern string
         [crud] Ignore pattern when listing files or directory {FIBR_IGNORE_PATTERN}
   -key string
-        [http] Key file {FIBR_KEY}
+        [server] Key file {FIBR_KEY}
   -loggerJson
         [logger] Log format as JSON {FIBR_LOGGER_JSON}
   -loggerLevel string
@@ -171,19 +171,33 @@ Usage of fibr:
   -okStatus int
         [http] Healthy HTTP Status code {FIBR_OK_STATUS} (default 204)
   -port uint
-        [http] Listen port {FIBR_PORT} (default 1080)
+        [server] Listen port {FIBR_PORT} (default 1080)
+  -prometheusAddress string
+        [prometheus] Listen address {FIBR_PROMETHEUS_ADDRESS}
+  -prometheusCert string
+        [prometheus] Certificate file {FIBR_PROMETHEUS_CERT}
+  -prometheusIdleTimeout string
+        [prometheus] Idle Timeout {FIBR_PROMETHEUS_IDLE_TIMEOUT} (default "10s")
   -prometheusIgnore string
         [prometheus] Ignored path prefixes for metrics, comma separated {FIBR_PROMETHEUS_IGNORE}
-  -prometheusPath string
-        [prometheus] Path for exposing metrics {FIBR_PROMETHEUS_PATH} (default "/metrics")
+  -prometheusKey string
+        [prometheus] Key file {FIBR_PROMETHEUS_KEY}
+  -prometheusPort uint
+        [prometheus] Listen port {FIBR_PROMETHEUS_PORT} (default 9090)
+  -prometheusReadTimeout string
+        [prometheus] Read Timeout {FIBR_PROMETHEUS_READ_TIMEOUT} (default "5s")
+  -prometheusShutdownTimeout string
+        [prometheus] Shutdown Timeout {FIBR_PROMETHEUS_SHUTDOWN_TIMEOUT} (default "5s")
+  -prometheusWriteTimeout string
+        [prometheus] Write Timeout {FIBR_PROMETHEUS_WRITE_TIMEOUT} (default "10s")
   -publicURL string
         [fibr] Public URL {FIBR_PUBLIC_URL} (default "https://fibr.vibioh.fr")
   -readTimeout string
-        [http] Read Timeout {FIBR_READ_TIMEOUT} (default "1m")
+        [server] Read Timeout {FIBR_READ_TIMEOUT} (default "2m")
   -sanitizeOnStart
         [crud] Sanitize name on start {FIBR_SANITIZE_ON_START}
   -shutdownTimeout string
-        [http] Shutdown Timeout {FIBR_SHUTDOWN_TIMEOUT} (default "10s")
+        [server] Shutdown Timeout {FIBR_SHUTDOWN_TIMEOUT} (default "10s")
   -templates string
         [fibr] HTML Templates folder {FIBR_TEMPLATES} (default "./templates/")
   -thumbnailImageURL string
@@ -197,5 +211,5 @@ Usage of fibr:
   -version string
         [fibr] Version (used mainly as a cache-buster) {FIBR_VERSION}
   -writeTimeout string
-        [http] Write Timeout {FIBR_WRITE_TIMEOUT} (default "1m")
+        [server] Write Timeout {FIBR_WRITE_TIMEOUT} (default "2m")
 ```

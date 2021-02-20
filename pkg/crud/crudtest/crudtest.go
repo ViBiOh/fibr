@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/v3/pkg/renderer"
+	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 	"golang.org/x/crypto/bcrypt"
 )
 

@@ -4,7 +4,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/ViBiOh/httputils/v3/pkg/renderer"
+	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
 const (

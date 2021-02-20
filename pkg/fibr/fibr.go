@@ -12,8 +12,8 @@ import (
 	"github.com/ViBiOh/fibr/pkg/crud"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/renderer"
-	"github.com/ViBiOh/httputils/v3/pkg/httperror"
-	"github.com/ViBiOh/httputils/v3/pkg/query"
+	"github.com/ViBiOh/httputils/v4/pkg/httperror"
+	"github.com/ViBiOh/httputils/v4/pkg/query"
 )
 
 // App of package

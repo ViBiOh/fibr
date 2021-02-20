@@ -2,7 +2,7 @@ package thumbnail
 
 import (
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/v3/pkg/logger"
+	"github.com/ViBiOh/httputils/v4/pkg/logger"
 )
 
 // Remove thumbnail of given item
