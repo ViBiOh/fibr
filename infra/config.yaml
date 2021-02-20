@@ -19,12 +19,12 @@ spec:
     image:
       repository: vibioh/fibr:202102171918 # {"$imagepolicy": "default:fibr"}
     volumes:
-      - name: data
-        persistentVolumeClaim:
-          claimName: fibr
+    - name: data
+      persistentVolumeClaim:
+        claimName: fibr
     volumeMounts:
-      - name: data
-        mountPath: /data
+    - name: data
+      mountPath: /data
     config:
       FIBR_AUTH_PROFILES: 1:admin
       FIBR_IGNORE_PATTERN: '.st(folder|ignore)'
@@ -38,11 +38,11 @@ spec:
       nodeAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
           nodeSelectorTerms:
-            - matchExpressions:
-                - key: kubernetes.io/hostname
-                  operator: In
-                  values:
-                    - bob
+          - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+              - bob
     resources:
       limits:
         memory: 64Mi
@@ -57,4 +57,4 @@ spec:
     ingress:
       enabled: true
       hosts:
-        - fibr.vibioh.fr
+      - fibr.vibioh.fr
