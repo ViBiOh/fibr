@@ -14,6 +14,13 @@ spec:
         name: vibioh
         namespace: flux-system
       interval: 120m
+  install:
+    skipCRDs: true
+  upgrade:
+    remediation:
+      retries: 3
+  rollback:
+    cleanupOnFail: true
   values:
     nameOverride: fibr
     image:
