@@ -1,7 +1,6 @@
 FROM vibioh/scratch
 
 EXPOSE 1080
-COPY templates/ templates/
 
 HEALTHCHECK --retries=10 CMD [ "/fibr", "-url", "http://localhost:1080/health" ]
 ENTRYPOINT [ "/fibr" ]

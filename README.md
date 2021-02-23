@@ -20,7 +20,7 @@ Thanks to [FontAwesome](https://fontawesome.com) for providing awesome svg.
 
 ## Concepts
 
-Fibr aims to provide simple browsing of your filesystem. It's a single static binary with html templates. No Javascript framework. HTTP and HTML have all we need.
+Fibr aims to provide simple browsing of your filesystem. It's a single static binary with embed html templates. No Javascript framework. HTTP and HTML have all we need.
 
 Fibr aims to be compatible with the most platforms available, on a best-effort basis. Fibr itself is already compatible with `x86_64`, `arm`, `arm64` architectures. But sidecars, which depends on system library, are not all ready yet.
 
@@ -92,7 +92,6 @@ This is for local purpose with simple and hassle-free sharing in a private netwo
 go get github.com/ViBiOh/fibr/cmd/fibr
 fibr \
   -noAuth \
-  -templates "${GOPATH}/src/github.com/ViBiOh/fibr/templates/" \
   -fsDirectory "$(pwd)" \
   -publicURL "http://localhost:1080"
 ```
@@ -198,8 +197,6 @@ Usage of fibr:
         [crud] Sanitize name on start {FIBR_SANITIZE_ON_START}
   -shutdownTimeout string
         [server] Shutdown Timeout {FIBR_SHUTDOWN_TIMEOUT} (default "10s")
-  -templates string
-        [fibr] HTML Templates folder {FIBR_TEMPLATES} (default "./templates/")
   -thumbnailImageURL string
         [thumbnail] Imaginary URL {FIBR_THUMBNAIL_IMAGE_URL} (default "http://image:9000")
   -thumbnailVideoURL string

@@ -1,8 +1,11 @@
 package crud
 
 import (
+	"embed"
 	"errors"
 	"flag"
+	"fmt"
+	"io/fs"
 	"mime/multipart"
 	"net/http"
 	"regexp"
@@ -30,6 +33,9 @@ var (
 	// ErrAbsoluteFolder error returned when user provide a relative folder
 	ErrAbsoluteFolder = errors.New("folder has to be absolute")
 )
+
+//go:embed static
+var filesystem embed.FS
 
 // App of package
 type App interface {
@@ -64,6 +70,8 @@ type app struct {
 	renderer   provider.Renderer
 	thumbnail  thumbnail.App
 
+	staticHandler http.Handler
+
 	metadatas    []*provider.Share
 	metadataLock sync.Mutex
 
@@ -92,6 +100,12 @@ func New(config Config, storage provider.Storage, renderer provider.Renderer, th
 		thumbnail:  thumbnail,
 		prometheus: prometheus,
 	}
+
+	staticFS, err := fs.Sub(filesystem, "static")
+	if err != nil {
+		return nil, fmt.Errorf("unable to get static/ filesystem: %s", err)
+	}
+	app.staticHandler = http.FileServer(http.FS(staticFS))
 
 	if app.metadataEnabled {
 		logger.Fatal(app.loadMetadata())
