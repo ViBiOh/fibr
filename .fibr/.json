@@ -9,8 +9,8 @@
   },
   {
     "id": "password",
-    "path": "/templates/",
-    "rootName": "templates",
+    "path": "/infra/",
+    "rootName": "infra",
     "password": "$2a$12$SVaRKEx6MrP2ZdUOrBoSg.s/hIT5VJTuimQEQGkReIyYRPX14sV12",
     "edit": false,
     "file": false

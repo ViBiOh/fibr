@@ -3,7 +3,6 @@ package crud
 import (
 	"fmt"
 	"net/http"
-	"path"
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -36,13 +35,13 @@ func (a *app) ServeStatic(w http.ResponseWriter, r *http.Request) bool {
 	}
 
 	if strings.HasPrefix(r.URL.Path, "/favicon") {
-		http.ServeFile(w, r, path.Join("templates/static", r.URL.Path))
+		a.staticHandler.ServeHTTP(w, r)
 		return true
 	}
 
 	for _, staticPath := range staticRootPath {
 		if r.URL.Path == staticPath {
-			http.ServeFile(w, r, path.Join("templates/static", r.URL.Path))
+			a.staticHandler.ServeHTTP(w, r)
 			return true
 		}
 	}

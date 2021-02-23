@@ -1,6 +1,7 @@
 package renderer
 
 import (
+	"embed"
 	"flag"
 	"fmt"
 	"html/template"
@@ -13,8 +14,10 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
-	"github.com/ViBiOh/httputils/v4/pkg/templates"
 )
+
+//go:embed templates
+var filesystem embed.FS
 
 // App of package
 type App interface {
@@ -29,7 +32,6 @@ type App interface {
 type Config struct {
 	publicURL *string
 	version   *string
-	templates *string
 }
 
 type app struct {
@@ -42,13 +44,12 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
 		publicURL: flags.New(prefix, "fibr").Name("PublicURL").Default("https://fibr.vibioh.fr").Label("Public URL").ToString(fs),
 		version:   flags.New(prefix, "fibr").Name("Version").Default("").Label("Version (used mainly as a cache-buster)").ToString(fs),
-		templates: flags.New(prefix, "fibr").Name("Templates").Default("./templates/").Label("HTML Templates folder").ToString(fs),
 	}
 }
 
 // New creates new App from Config
 func New(config Config, thumbnailApp thumbnail.App) App {
-	tpl := template.New("fibr").Funcs(template.FuncMap{
+	tpl, err := template.New("fibr").Funcs(template.FuncMap{
 		"asyncImage": func(file provider.RenderItem, version string) map[string]interface{} {
 			return map[string]interface{}{
 				"File":    file,
@@ -85,16 +86,14 @@ func New(config Config, thumbnailApp thumbnail.App) App {
 		"hasThumbnail": func(item provider.RenderItem) bool {
 			return thumbnail.CanHaveThumbnail(item.StorageItem) && thumbnailApp.HasThumbnail(item.StorageItem)
 		},
-	})
-
-	fibrTemplates, err := templates.GetTemplates(strings.TrimSpace(*config.templates), ".html")
+	}).ParseFS(filesystem, "templates/*.html")
 	logger.Fatal(err)
 
 	publicURL := strings.TrimSpace(*config.publicURL)
 	imgSize := uint(512)
 
 	return app{
-		tpl: template.Must(tpl.ParseFiles(fibrTemplates...)),
+		tpl: tpl,
 		config: provider.Config{
 			PublicURL: publicURL,
 			Version:   *config.version,
