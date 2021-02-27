@@ -24,7 +24,7 @@ spec:
   values:
     nameOverride: fibr
     image:
-      repository: vibioh/fibr:202102231334 # {"$imagepolicy": "default:flux-fibr-web"}
+      repository: vibioh/fibr:202102271715 # {"$imagepolicy": "default:flux-fibr-web"}
     volumes:
     - name: data
       persistentVolumeClaim:
