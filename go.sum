@@ -7,6 +7,8 @@ github.com/Shopify/sarama v1.19.0/go.mod h1:FVkBWblsNy7DGZRfXLU0O9RCGt5g3g3yEuWX
 github.com/Shopify/toxiproxy v2.1.4+incompatible/go.mod h1:OXgGpZ6Cli1/URJOF1DMxUHB2q5Ap20/P/eIdh4G0pI=
 github.com/ViBiOh/auth/v2 v2.6.7 h1:TS6bNHCvozTmpgU0ttq7fji7cCNIbXvjPHwKfepoo2E=
 github.com/ViBiOh/auth/v2 v2.6.7/go.mod h1:yiSggirLxzFEN25dHrQ3NHyZsgTXFFZ12qbWMLNsbaI=
+github.com/ViBiOh/auth/v2 v2.6.8 h1:5igJZZXuesuVc1ptf3KKzxMUWvdR7jzAT+hEyXcyBcs=
+github.com/ViBiOh/auth/v2 v2.6.8/go.mod h1:YDaNFl3h7jdvxTNLAZsIwNkpzRL5vkz9X36CrjxhUOQ=
 github.com/ViBiOh/httputils/v3 v3.37.1 h1:TQU5DC20RttMASVzK88DYNonADdnJko/ri220d067VI=
 github.com/ViBiOh/httputils/v3 v3.37.1/go.mod h1:ySOLanXZ/Ll0UGnBFZjLd0aTtf3eVQe56yurhkDeR1Q=
 github.com/ViBiOh/httputils/v4 v4.2.0 h1:Gam5Q9sb2Dw4EDDEpYEBIMOpqTRw9sp+Zb30aPF6UP4=
