@@ -8,11 +8,11 @@ spec:
   chart:
     spec:
       chart: app
-      version: '0.0.46'
+      version: '0.0.47'
       sourceRef:
         kind: HelmRepository
         name: vibioh
-        namespace: flux-system
+        namespace: default
       interval: 120m
   install:
     skipCRDs: true
