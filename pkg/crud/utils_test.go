@@ -11,6 +11,12 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
+var (
+	filename      = "README.md"
+	otherFilename = "CONTRIBUTING.md"
+	templatesPath = "/templates"
+)
+
 func TestGetPreviousAndNext(t *testing.T) {
 	type args struct {
 		file  provider.StorageItem
@@ -26,9 +32,9 @@ func TestGetPreviousAndNext(t *testing.T) {
 		{
 			"one item",
 			args{
-				file: provider.StorageItem{Name: "README.MD"},
+				file: provider.StorageItem{Name: filename},
 				files: []provider.StorageItem{
-					{Name: "README.MD"},
+					{Name: filename},
 				},
 			},
 			nil,
@@ -37,28 +43,28 @@ func TestGetPreviousAndNext(t *testing.T) {
 		{
 			"no next item",
 			args{
-				file: provider.StorageItem{Name: "README.MD"},
+				file: provider.StorageItem{Name: filename},
 				files: []provider.StorageItem{
 					{Name: ".git", IsDir: true},
-					{Name: "CONTRIBUTING.MD"},
-					{Name: "README.MD"},
+					{Name: otherFilename},
+					{Name: filename},
 				},
 			},
-			&provider.StorageItem{Name: "CONTRIBUTING.MD"},
+			&provider.StorageItem{Name: otherFilename},
 			nil,
 		},
 		{
 			"full items",
 			args{
-				file: provider.StorageItem{Name: "README.MD"},
+				file: provider.StorageItem{Name: filename},
 				files: []provider.StorageItem{
 					{Name: ".git", IsDir: true},
-					{Name: "CONTRIBUTING.MD"},
-					{Name: "README.MD"},
+					{Name: otherFilename},
+					{Name: filename},
 					{Name: "main.go"},
 				},
 			},
-			&provider.StorageItem{Name: "CONTRIBUTING.MD"},
+			&provider.StorageItem{Name: otherFilename},
 			&provider.StorageItem{Name: "main.go"},
 		},
 	}
@@ -179,7 +185,7 @@ func TestCheckFolderName(t *testing.T) {
 		{
 			"share",
 			args{
-				folderName: "/templates",
+				folderName: templatesPath,
 				request: provider.Request{
 					Share: &provider.Share{
 						ID: "abcdef1234",
@@ -199,15 +205,15 @@ func TestCheckFolderName(t *testing.T) {
 					},
 				},
 			},
-			"/templates",
+			templatesPath,
 			nil,
 		},
 		{
 			"valid",
 			args{
-				folderName: "/templates",
+				folderName: templatesPath,
 			},
-			"/templates",
+			templatesPath,
 			nil,
 		},
 	}

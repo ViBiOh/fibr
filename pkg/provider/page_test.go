@@ -7,9 +7,13 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
+var (
+	publicURL = "http://localhost:1080"
+)
+
 func TestBuild(t *testing.T) {
 	config := Config{
-		PublicURL: "http://localhost:1080",
+		PublicURL: publicURL,
 		Seo: Seo{
 			Description: "fibr",
 			Title:       "fibr",
@@ -49,7 +53,7 @@ func TestBuild(t *testing.T) {
 			Page{
 				Config:      config,
 				Layout:      "list",
-				PublicURL:   "http://localhost:1080",
+				PublicURL:   publicURL,
 				Title:       "fibr",
 				Description: "fibr",
 			},
@@ -77,15 +81,15 @@ func TestComputePublicURL(t *testing.T) {
 		{
 			"simple",
 			Config{
-				PublicURL: "http://localhost:1080",
+				PublicURL: publicURL,
 			},
 			Request{},
-			"http://localhost:1080",
+			publicURL,
 		},
 		{
 			"with request",
 			Config{
-				PublicURL: "http://localhost:1080",
+				PublicURL: publicURL,
 			},
 			Request{
 				Path: "/photos",
@@ -95,7 +99,7 @@ func TestComputePublicURL(t *testing.T) {
 		{
 			"with relative request",
 			Config{
-				PublicURL: "http://localhost:1080",
+				PublicURL: publicURL,
 			},
 			Request{
 				Path: "photos",
