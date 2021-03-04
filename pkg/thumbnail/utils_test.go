@@ -7,6 +7,10 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider/providertest"
 )
 
+var (
+	publicPath = "http://localhost"
+)
+
 func TestCanHaveThumbnail(t *testing.T) {
 	var cases = []struct {
 		intention string
@@ -67,8 +71,8 @@ func TestHasThumbnail(t *testing.T) {
 			"not found",
 			app{
 				storage:  providertest.Storage{},
-				imageURL: "http://localhost",
-				videoURL: "http://localhost",
+				imageURL: publicPath,
+				videoURL: publicPath,
 			},
 			provider.StorageItem{
 				Pathname: "path/to/error",
@@ -80,8 +84,8 @@ func TestHasThumbnail(t *testing.T) {
 			"found",
 			app{
 				storage:  providertest.Storage{},
-				imageURL: "http://localhost",
-				videoURL: "http://localhost",
+				imageURL: publicPath,
+				videoURL: publicPath,
 			},
 			provider.StorageItem{
 				Pathname: "path/to/valid",

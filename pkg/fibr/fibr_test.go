@@ -18,6 +18,11 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
+var (
+	invalidPath = "/invalid"
+	adminPath   = "/admin"
+)
+
 type authMiddlewareTest struct{}
 
 func (amt authMiddlewareTest) Middleware(http.Handler) http.Handler {
@@ -25,11 +30,11 @@ func (amt authMiddlewareTest) Middleware(http.Handler) http.Handler {
 }
 
 func (amt authMiddlewareTest) IsAuthenticated(r *http.Request, _ string) (ident.Provider, model.User, error) {
-	if r.URL.Path == "/invalid" {
+	if r.URL.Path == invalidPath {
 		return nil, model.NoneUser, errors.New("authentication failed")
 	}
 
-	if r.URL.Path == "/admin" {
+	if r.URL.Path == adminPath {
 		return nil, model.User{ID: 8000}, nil
 	}
 
@@ -208,13 +213,13 @@ func TestConvertAuthenticationError(t *testing.T) {
 }
 
 func TestParseRequest(t *testing.T) {
-	adminRequestWithEmptyCookie := httptest.NewRequest(http.MethodGet, "/admin", nil)
+	adminRequestWithEmptyCookie := httptest.NewRequest(http.MethodGet, adminPath, nil)
 	adminRequestWithEmptyCookie.AddCookie(&http.Cookie{
 		Name:  "list_layout_paths",
 		Value: "",
 	})
 
-	adminRequestWithCookie := httptest.NewRequest(http.MethodGet, "/admin", nil)
+	adminRequestWithCookie := httptest.NewRequest(http.MethodGet, adminPath, nil)
 	adminRequestWithCookie.AddCookie(&http.Cookie{
 		Name:  "list_layout_paths",
 		Value: "assets,documents/monthly",
@@ -284,10 +289,10 @@ func TestParseRequest(t *testing.T) {
 				loginApp: authMiddlewareTest{},
 			},
 			args{
-				r: httptest.NewRequest(http.MethodGet, "/invalid", nil),
+				r: httptest.NewRequest(http.MethodGet, invalidPath, nil),
 			},
 			provider.Request{
-				Path:     "/invalid",
+				Path:     invalidPath,
 				CanEdit:  false,
 				CanShare: false,
 			},
@@ -316,10 +321,10 @@ func TestParseRequest(t *testing.T) {
 				loginApp: authMiddlewareTest{},
 			},
 			args{
-				r: httptest.NewRequest(http.MethodGet, "/admin", nil),
+				r: httptest.NewRequest(http.MethodGet, adminPath, nil),
 			},
 			provider.Request{
-				Path:     "/admin",
+				Path:     adminPath,
 				CanEdit:  true,
 				CanShare: true,
 			},
@@ -335,7 +340,7 @@ func TestParseRequest(t *testing.T) {
 				r: adminRequestWithEmptyCookie,
 			},
 			provider.Request{
-				Path:     "/admin",
+				Path:     adminPath,
 				CanEdit:  true,
 				CanShare: true,
 			},
@@ -351,7 +356,7 @@ func TestParseRequest(t *testing.T) {
 				r: adminRequestWithCookie,
 			},
 			provider.Request{
-				Path:     "/admin",
+				Path:     adminPath,
 				CanEdit:  true,
 				CanShare: true,
 				Preferences: provider.Preferences{
