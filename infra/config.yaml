@@ -8,11 +8,10 @@ spec:
   chart:
     spec:
       chart: app
-      version: "0.0.51"
+      version: "0.0.52"
       sourceRef:
         kind: HelmRepository
         name: vibioh
-        namespace: default
       interval: 120m
   install:
     skipCRDs: true
