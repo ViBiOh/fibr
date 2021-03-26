@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -94,14 +93,19 @@ func (a *app) List(pathname string) ([]provider.StorageItem, error) {
 
 	fullpath := a.getFullPath(pathname)
 
-	files, err := ioutil.ReadDir(fullpath)
+	files, err := os.ReadDir(fullpath)
 	if err != nil {
 		return nil, convertError(err)
 	}
 
 	items := make([]provider.StorageItem, 0)
 	for _, file := range files {
-		item := convertToItem(a.getRelativePath(path.Join(fullpath, file.Name())), file)
+		fileInfo, err := file.Info()
+		if err != nil {
+			return nil, fmt.Errorf("unable to read file metadata: %s", err)
+		}
+
+		item := convertToItem(a.getRelativePath(path.Join(fullpath, file.Name())), fileInfo)
 		if a.ignoreFn != nil && a.ignoreFn(item) {
 			continue
 		}

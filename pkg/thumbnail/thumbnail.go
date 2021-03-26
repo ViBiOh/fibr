@@ -4,7 +4,7 @@ import (
 	"encoding/base64"
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 
@@ -134,7 +134,7 @@ func (a app) List(w http.ResponseWriter, _ *http.Request, item provider.StorageI
 			logger.Error("unable to open %s: %s", item.Pathname, err)
 		}
 
-		content, err := ioutil.ReadAll(file)
+		content, err := io.ReadAll(file)
 		if err != nil {
 			logger.Error("unable to read %s: %s", item.Pathname, err)
 		}

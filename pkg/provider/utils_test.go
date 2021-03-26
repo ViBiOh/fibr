@@ -3,7 +3,6 @@ package provider
 import (
 	"errors"
 	"io"
-	"io/ioutil"
 	"reflect"
 	"testing"
 )
@@ -89,7 +88,7 @@ func TestSafeWrite(t *testing.T) {
 		{
 			"no panic",
 			args{
-				writer:  ioutil.Discard,
+				writer:  io.Discard,
 				content: "test",
 			},
 		},

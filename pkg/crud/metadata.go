@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"path"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -43,7 +42,7 @@ func (a *app) loadMetadata() error {
 		return err
 	}
 
-	rawMeta, err := ioutil.ReadAll(file)
+	rawMeta, err := io.ReadAll(file)
 	if err != nil {
 		return err
 

@@ -3,7 +3,6 @@ package crud
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"strings"
@@ -30,7 +29,7 @@ func parseMultipart(r *http.Request) (string, *multipart.Part, error) {
 
 		switch part.FormName() {
 		case "method":
-			value, err := ioutil.ReadAll(part)
+			value, err := io.ReadAll(part)
 			if err != nil {
 				return "", nil, err
 			}
