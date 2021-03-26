@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: app
-      version: "0.0.62"
+      version: '0.0.62'
       sourceRef:
         kind: HelmRepository
         name: vibioh
@@ -27,17 +27,17 @@ spec:
       name: vibioh/fibr
       tag: "202103280806" # {"$imagepolicy": "default:flux-fibr-web:tag"}
     volumes:
-    - name: data
-      persistentVolumeClaim:
-        claimName: fibr
+      - name: data
+        persistentVolumeClaim:
+          claimName: fibr
     volumeMounts:
-    - name: data
-      mountPath: /data
+      - name: data
+        mountPath: /data
     config:
       FIBR_AUTH_PROFILES: 1:admin
-      FIBR_IGNORE_PATTERN: ".st(folder|ignore)"
-      FIBR_LOGGER_JSON: "true"
-      FIBR_SANITIZE_ON_START: "true"
+      FIBR_IGNORE_PATTERN: '.st(folder|ignore)'
+      FIBR_LOGGER_JSON: 'true'
+      FIBR_SANITIZE_ON_START: 'true'
       FIBR_THUMBNAIL_VIDEO_URL: https://vith.vibioh.fr
       FIBR_THUMBNAIL_IMAGE_URL: https://imaginary.vibioh.fr
     secrets:
@@ -46,11 +46,11 @@ spec:
       nodeAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
           nodeSelectorTerms:
-          - matchExpressions:
-            - key: kubernetes.io/hostname
-              operator: In
-              values:
-              - bob
+            - matchExpressions:
+                - key: kubernetes.io/hostname
+                  operator: In
+                  values:
+                    - bob
     resources:
       limits:
         memory: 64Mi
@@ -65,4 +65,4 @@ spec:
     ingress:
       enabled: true
       hosts:
-      - fibr.vibioh.fr
+        - fibr.vibioh.fr
