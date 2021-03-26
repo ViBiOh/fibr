@@ -259,10 +259,6 @@ func TestNewError(t *testing.T) {
 }
 
 func TestError(t *testing.T) {
-	type args struct {
-		content string
-	}
-
 	var cases = []struct {
 		intention string
 		instance  *Error
