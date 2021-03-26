@@ -6,11 +6,14 @@ on:
   pull_request:
     branches:
       - main
+
 env:
   SCRIPTS_NO_INTERACTIVE: 'true'
+
 defaults:
   run:
     shell: bash
+
 jobs:
   build:
     name: Golang
@@ -25,6 +28,7 @@ jobs:
           make
           git --no-pager diff -- ':(exclude)go.sum' && git diff --quiet -- ':(exclude)go.sum'
       - uses: codecov/codecov-action@v1
+
   package:
     name: Docker
     if: "! contains(toJSON(github.event.commits.*.message), '[skip ci]')"
@@ -46,6 +50,7 @@ jobs:
           curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap" | bash -s "release"
           curl --disable --silent --show-error --location --max-time 30 -o mime.types "https://svn.apache.org/viewvc/httpd/httpd/trunk/docs/conf/mime.types?view=co"
           DOCKER_IMAGE="${{ secrets.DOCKER_USER }}/$(make name)" IMAGE_VERSION="$(make version)" ./scripts/release build docker
+
   publish:
     name: Publish
     if:
@@ -71,6 +76,7 @@ jobs:
       - name: GoReport
         run: |
           curl --disable --silent --show-error --location --max-time 30 -X POST https://goreportcard.com/checks?repo=github.com/${GITHUB_REPOSITORY}
+
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
@@ -90,5 +96,5 @@ jobs:
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
         run: |
           curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap" | bash -s "deploy" "env_replace"
-          VERSION="$(make version)" scripts/env_replace "docker-compose.yml" DOCKER_USER DATA_DIR DATA_USER_ID BASIC_USERS VERSION | sed "s|\\\$|\$\$|g" > "docker-compose-env.yml"
-          scripts/deploy "$(make name)" "@docker-compose-env.yml"
+          VERSION="$(make version)" scripts/env_replace "docker-compose.yaml" DOCKER_USER DATA_DIR DATA_USER_ID BASIC_USERS VERSION | sed "s|\\\$|\$\$|g" > "docker-compose-env.yaml"
+          scripts/deploy "$(make name)" "@docker-compose-env.yaml"
