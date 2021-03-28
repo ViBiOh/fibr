@@ -7,8 +7,9 @@ github.com/Shopify/sarama v1.19.0/go.mod h1:FVkBWblsNy7DGZRfXLU0O9RCGt5g3g3yEuWX
 github.com/Shopify/toxiproxy v2.1.4+incompatible/go.mod h1:OXgGpZ6Cli1/URJOF1DMxUHB2q5Ap20/P/eIdh4G0pI=
 github.com/ViBiOh/auth/v2 v2.6.11 h1:fBXOib0mR5v7X+ZHidV+wCX5Ep0yZqI6t6xzp/pC+FY=
 github.com/ViBiOh/auth/v2 v2.6.11/go.mod h1:vZzRjYN0G89mi8W5i4GhKfEmL9XnFPh+TFa7Xd8TeTY=
-github.com/ViBiOh/httputils/v4 v4.4.0 h1:+mJ6pyoUp4Xzy/mu2rb0+tO/rRrOFb+705hAna9XrMo=
 github.com/ViBiOh/httputils/v4 v4.4.0/go.mod h1:Lck0W7mKmGvqZOof/QokuJDJv4OuCKve6TRe6NrEy5U=
+github.com/ViBiOh/httputils/v4 v4.5.1 h1:RHO/7eGUJPpPh1ApjWw5xz0+RKkmmHt61otYyjka1uw=
+github.com/ViBiOh/httputils/v4 v4.5.1/go.mod h1:Lck0W7mKmGvqZOof/QokuJDJv4OuCKve6TRe6NrEy5U=
 github.com/VividCortex/gohistogram v1.0.0/go.mod h1:Pf5mBqqDxYaXu3hDrrU+w6nw50o/4+TcAqDqk/vUH7g=
 github.com/afex/hystrix-go v0.0.0-20180502004556-fa1af6a1f4f5/go.mod h1:SkGFH1ia65gfNATL8TAiHDNxPzPdmEL5uirI2Uyuz6c=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
