@@ -7,6 +7,6 @@ require (
 	github.com/ViBiOh/httputils/v4 v4.5.1
 	github.com/prometheus/client_golang v1.10.0
 	golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad
-	golang.org/x/text v0.3.5
+	golang.org/x/text v0.3.6
 	google.golang.org/protobuf v1.25.0 // indirect
 )
