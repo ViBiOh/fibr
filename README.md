@@ -122,6 +122,7 @@ You'll find a Kubernetes exemple in the [`infra/`](infra/) folder, using my [`ap
 ## Endpoints
 
 - `GET /health`: healthcheck of server, respond [`okStatus (default 204)`](#usage) or `503` during [`graceDuration`](#usage) when SIGTERM is received
+- `GET /ready`: same response than `/health` but it also checks external dependencies availability
 - `GET /version`: value of `VERSION` environment variable
 - `GET /metrics`: Prometheus metrics values, on a dedicated port
 
