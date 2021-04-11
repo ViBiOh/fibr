@@ -9,7 +9,7 @@ on:
     branches:
       - main
   schedule:
-    - cron: "0 0 * * 6"
+    - cron: '0 0 * * 6'
 
 jobs:
   analyze:
@@ -31,7 +31,7 @@ jobs:
       - name: Setup Golang
         uses: actions/setup-go@v2
         with:
-          go-version: "^1.16"
+          go-version: '^1.16'
       - name: Build
         run: make build
       - name: CodeQL
