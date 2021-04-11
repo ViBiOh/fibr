@@ -1,19 +1,22 @@
+---
 name: Herodote
+
 on:
   push:
     branches:
       - main
+
 jobs:
   build:
     name: Feed
     runs-on: ubuntu-latest
     steps:
-      - name: Fetch history
+      - name: Checkout
         uses: actions/checkout@v2
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
-      - name: Push history
+      - name: Push
         run: |
           curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/herodote/main/herodote.sh" | bash
         env:

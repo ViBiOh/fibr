@@ -1,11 +1,15 @@
+---
 name: Git
-on: [pull_request]
+
+on:
+  - pull_request
+
 jobs:
   build:
     name: Branch is clean
     runs-on: ubuntu-latest
     steps:
-      - name: Check out code
+      - name: Checkout
         uses: actions/checkout@v2
         with:
           ref: ${{ github.event.pull_request.head.sha }}
@@ -15,7 +19,7 @@ jobs:
           git fetch --no-tags --prune origin "+refs/heads/${BASE}:refs/remotes/origin/${BASE}"
         env:
           BASE: ${{ github.base_ref }}
-      - name: Check commits description
+      - name: Check commits
         env:
           BASE: origin/${{ github.base_ref }}
           HEAD: HEAD
