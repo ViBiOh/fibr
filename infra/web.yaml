@@ -62,6 +62,8 @@ spec:
       runAsUser: 1000
       runAsNonRoot: true
       allowPrivilegeEscalation: false
+    autoscaling:
+      enabled: false
     ingress:
       enabled: true
       hosts:
