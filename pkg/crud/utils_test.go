@@ -187,7 +187,7 @@ func TestCheckFolderName(t *testing.T) {
 			args{
 				folderName: templatesPath,
 				request: provider.Request{
-					Share: &provider.Share{
+					Share: provider.Share{
 						ID: "abcdef1234",
 					},
 				},
@@ -200,7 +200,7 @@ func TestCheckFolderName(t *testing.T) {
 			args{
 				folderName: "/abcdef1234/templates",
 				request: provider.Request{
-					Share: &provider.Share{
+					Share: provider.Share{
 						ID: "abcdef1234",
 					},
 				},

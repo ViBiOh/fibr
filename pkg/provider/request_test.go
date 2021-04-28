@@ -38,7 +38,8 @@ func TestGetFilepath(t *testing.T) {
 			"with share",
 			Request{
 				Path: "index",
-				Share: &Share{
+				Share: Share{
+					ID:   "a1b2c3d4",
 					Path: "/shared/",
 				},
 			},
@@ -83,7 +84,7 @@ func TestGetURI(t *testing.T) {
 			"with share",
 			Request{
 				Path: "index",
-				Share: &Share{
+				Share: Share{
 					ID:   "abcd1234",
 					Path: "index",
 				},
@@ -152,19 +153,22 @@ func TestCheckPassword(t *testing.T) {
 
 	var cases = []struct {
 		intention string
-		share     *Share
+		share     Share
 		header    string
 		want      error
 	}{
 		{
 			"no password",
-			&Share{},
+			Share{
+				ID: "a1b2c3d4",
+			},
 			"",
 			nil,
 		},
 		{
 			"password no auth",
-			&Share{
+			Share{
+				ID:       "a1b2c3d4",
 				Password: string(password),
 			},
 			"",
@@ -172,7 +176,8 @@ func TestCheckPassword(t *testing.T) {
 		},
 		{
 			"invalid authorization",
-			&Share{
+			Share{
+				ID:       "a1b2c3d4",
 				Password: string(password),
 			},
 			"invalid",
@@ -180,7 +185,8 @@ func TestCheckPassword(t *testing.T) {
 		},
 		{
 			"invalid format",
-			&Share{
+			Share{
+				ID:       "a1b2c3d4",
 				Password: string(password),
 			},
 			fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte("test"))),
@@ -188,7 +194,8 @@ func TestCheckPassword(t *testing.T) {
 		},
 		{
 			"invalid password",
-			&Share{
+			Share{
+				ID:       "a1b2c3d4",
 				Password: string(password),
 			},
 			fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte("test:password"))),
@@ -196,7 +203,8 @@ func TestCheckPassword(t *testing.T) {
 		},
 		{
 			"valid",
-			&Share{
+			Share{
+				ID:       "a1b2c3d4",
 				Password: string(password),
 			},
 			fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte("test:test"))),

@@ -19,7 +19,7 @@ type Preferences struct {
 
 // Request from user
 type Request struct {
-	Share       *Share
+	Share       Share
 	CanShare    bool
 	CanEdit     bool
 	Path        string

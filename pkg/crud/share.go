@@ -72,9 +72,6 @@ func (a *app) CreateShare(w http.ResponseWriter, r *http.Request, request provid
 	}
 	id := sha.Sha1(uuid)[:8]
 
-	a.metadataLock.Lock()
-	defer a.metadataLock.Unlock()
-
 	info, err := a.storage.Info(request.Path)
 	if err != nil {
 		if provider.IsNotExist(err) {
@@ -85,7 +82,7 @@ func (a *app) CreateShare(w http.ResponseWriter, r *http.Request, request provid
 		return
 	}
 
-	a.metadatas = append(a.metadatas, &provider.Share{
+	a.metadatas.Store(id, provider.Share{
 		ID:       id,
 		Path:     request.Path,
 		RootName: path.Base(request.Path),
@@ -112,16 +109,7 @@ func (a *app) DeleteShare(w http.ResponseWriter, r *http.Request, request provid
 	}
 
 	id := r.FormValue("id")
-
-	a.metadataLock.Lock()
-	defer a.metadataLock.Unlock()
-
-	for i, metadata := range a.metadatas {
-		if metadata.ID == id {
-			a.metadatas = append(a.metadatas[:i], a.metadatas[i+1:]...)
-			break
-		}
-	}
+	a.metadatas.Delete(id)
 
 	if err := a.saveMetadata(); err != nil {
 		a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, err))

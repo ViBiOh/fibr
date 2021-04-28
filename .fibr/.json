@@ -1,5 +1,5 @@
-[
-  {
+{
+  "no-login": {
     "id": "no-login",
     "path": "/pkg/",
     "rootName": "fibr",
@@ -9,7 +9,7 @@
     "creation": "2021-04-28T11:50:51.991262+02:00",
     "duration": 0
   },
-  {
+  "password": {
     "id": "password",
     "path": "/infra/",
     "rootName": "infra",
@@ -19,4 +19,4 @@
     "creation": "2021-04-28T11:50:51.991262+02:00",
     "duration": 0
   }
-]
+}

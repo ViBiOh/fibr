@@ -55,7 +55,7 @@ type App interface {
 	Rename(http.ResponseWriter, *http.Request, provider.Request)
 	Delete(http.ResponseWriter, *http.Request, provider.Request)
 
-	GetShare(string) *provider.Share
+	GetShare(string) provider.Share
 	CreateShare(http.ResponseWriter, *http.Request, provider.Request)
 	DeleteShare(http.ResponseWriter, *http.Request, provider.Request)
 }
@@ -76,8 +76,7 @@ type app struct {
 	staticHandler http.Handler
 	clock         *Clock
 
-	metadatas    []*provider.Share
-	metadataLock sync.Mutex
+	metadatas sync.Map
 
 	metadataEnabled bool
 	sanitizeOnStart bool
@@ -96,7 +95,6 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 func New(config Config, storage provider.Storage, renderer provider.Renderer, thumbnail thumbnail.App, prometheus prometheus.Registerer) (App, error) {
 	app := &app{
 		metadataEnabled: *config.metadata,
-		metadataLock:    sync.Mutex{},
 		sanitizeOnStart: *config.sanitizeOnStart,
 
 		storage:    storage,
@@ -201,14 +199,17 @@ func (a *app) rename(item provider.StorageItem, name string, guage *prometheus.G
 }
 
 // GetShare returns share configuration if request path match
-func (a *app) GetShare(requestPath string) *provider.Share {
+func (a *app) GetShare(requestPath string) (share provider.Share) {
 	cleanPath := strings.TrimPrefix(requestPath, "/")
 
-	for _, share := range a.metadatas {
-		if strings.HasPrefix(cleanPath, share.ID) {
-			return share
+	a.metadatas.Range(func(key interface{}, value interface{}) bool {
+		if strings.HasPrefix(cleanPath, key.(string)) {
+			share = value.(provider.Share)
+			return false
 		}
-	}
 
-	return nil
+		return true
+	})
+
+	return
 }

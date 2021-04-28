@@ -12,7 +12,7 @@ import (
 
 var (
 	// PasswordLessShare instance
-	PasswordLessShare = &provider.Share{
+	PasswordLessShare = provider.Share{
 		ID:       "a1b2c3d4f5",
 		Edit:     false,
 		RootName: "public",
@@ -23,7 +23,7 @@ var (
 	passwordHash, _ = bcrypt.GenerateFromPassword([]byte("password"), 12)
 
 	// PasswordShare instance
-	PasswordShare = &provider.Share{
+	PasswordShare = provider.Share{
 		ID:       "f5d4c3b2a1",
 		Edit:     true,
 		RootName: "private",
@@ -92,7 +92,7 @@ func (a App) Delete(http.ResponseWriter, *http.Request, provider.Request) {
 }
 
 // GetShare mocked implementation
-func (a App) GetShare(path string) *provider.Share {
+func (a App) GetShare(path string) provider.Share {
 	if strings.HasPrefix(path, "/a1b2c3d4f5") {
 		return PasswordLessShare
 	}
@@ -101,7 +101,7 @@ func (a App) GetShare(path string) *provider.Share {
 		return PasswordShare
 	}
 
-	return nil
+	return provider.Share{}
 }
 
 // CreateShare mocked implementation

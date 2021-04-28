@@ -109,7 +109,7 @@ func computePublicURL(config Config, request Request) string {
 	parts := []string{config.PublicURL}
 
 	if len(request.Path) > 0 {
-		if request.Share != nil {
+		if len(request.Share.ID) != 0 {
 			parts = append(parts, request.Share.ID)
 		}
 
@@ -126,7 +126,7 @@ func computeTitle(config Config, request Request) string {
 		parts = append(parts, config.Seo.Title)
 	}
 
-	if request.Share != nil {
+	if len(request.Share.ID) != 0 {
 		parts = append(parts, request.Share.RootName)
 	}
 
@@ -148,7 +148,7 @@ func computeDescription(config Config, request Request) string {
 		parts = append(parts, config.Seo.Description)
 	}
 
-	if request.Share != nil {
+	if len(request.Share.ID) != 0 {
 		parts = append(parts, request.Share.RootName)
 	}
 

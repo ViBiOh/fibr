@@ -211,3 +211,11 @@ Usage of fibr:
   -writeTimeout string
         [server] Write Timeout {FIBR_WRITE_TIMEOUT} (default "2m")
 ```
+
+# ToDo
+
+Converting old metadatas format (array) into the new one (map).
+
+```bash
+cat <<<"$(jq 'map({ (.id): . }) | add' .json)" > .json
+```
