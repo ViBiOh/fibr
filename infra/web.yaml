@@ -62,6 +62,8 @@ spec:
       runAsUser: 1000
       runAsNonRoot: true
       allowPrivilegeEscalation: false
+    podDisruption:
+      enabled: false
     autoscaling:
       enabled: false
     ingress:
