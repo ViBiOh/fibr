@@ -14,7 +14,7 @@
       </span>
 
       {{ range $index, $path := .Content.Paths }}
-        {{ if or (not $root.Request.Share) (ne $index 0) }}
+        {{ if or (not $root.Request.Share.ID) (ne $index 0) }}
           {{ $fullPath := rebuildPaths $root.Content.Paths $index }}
 
           <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">

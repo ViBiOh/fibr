@@ -200,7 +200,7 @@
 
     @media print {
       body::before {
-        content: 'Save ink, share link. {{ .PublicURL }}{{ if .Request.Share }}/{{ .Request.Share.ID }}/{{ end }}';
+        content: 'Save ink, share link. {{ .PublicURL }}{{ if .Request.Share.ID }}/{{ .Request.Share.ID }}/{{ end }}';
       }
 
       body > * {
