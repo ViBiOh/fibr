@@ -51,6 +51,7 @@ type Renderer interface {
 type Storage interface {
 	SetIgnoreFn(ignoreFn func(StorageItem) bool)
 	Info(pathname string) (StorageItem, error)
+	Semaphore(pathname string) (bool, error)
 	List(pathname string) ([]StorageItem, error)
 	WriterTo(pathname string) (io.WriteCloser, error)
 	ReaderFrom(pathname string) (ReadSeekerCloser, error)

@@ -5,7 +5,9 @@
     "rootName": "fibr",
     "password": "",
     "edit": true,
-    "file": false
+    "file": false,
+    "creation": "2021-04-28T11:50:51.991262+02:00",
+    "duration": 0
   },
   {
     "id": "password",
@@ -13,6 +15,8 @@
     "rootName": "infra",
     "password": "$2a$12$SVaRKEx6MrP2ZdUOrBoSg.s/hIT5VJTuimQEQGkReIyYRPX14sV12",
     "edit": false,
-    "file": false
+    "file": false,
+    "creation": "2021-04-28T11:50:51.991262+02:00",
+    "duration": 0
   }
 ]

@@ -81,7 +81,7 @@ func main() {
 	fibrApp := fibr.New(crudApp, rendererApp, middlewareApp)
 
 	go thumbnailApp.Start()
-	go crudApp.Start()
+	go crudApp.Start(appServer.Done())
 
 	go promServer.Start("prometheus", healthApp.End(), prometheusApp.Handler())
 	go appServer.Start("http", healthApp.End(), httputils.Handler(fibrApp.Handler(), healthApp, prometheusApp.Middleware, owasp.New(owaspConfig).Middleware))
