@@ -99,8 +99,6 @@ func New(config Config, storage provider.Storage, renderer provider.Renderer, th
 		metadataLock:    sync.Mutex{},
 		sanitizeOnStart: *config.sanitizeOnStart,
 
-		clock: Clock{},
-
 		storage:    storage,
 		renderer:   renderer,
 		thumbnail:  thumbnail,
