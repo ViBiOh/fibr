@@ -7,6 +7,7 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/sha"
@@ -40,6 +41,17 @@ func (a *app) CreateShare(w http.ResponseWriter, r *http.Request, request provid
 			a.renderer.Error(w, request, provider.NewError(http.StatusBadRequest, err))
 			return
 		}
+	}
+
+	var duration time.Duration
+	if durationValue := strings.TrimSpace(r.FormValue("duration")); durationValue != "" {
+		durationTime, err := time.ParseDuration(fmt.Sprintf("%sh", durationValue))
+		if err != nil {
+			a.renderer.Error(w, request, provider.NewError(http.StatusBadRequest, err))
+			return
+		}
+
+		duration = durationTime
 	}
 
 	password := ""
@@ -80,6 +92,8 @@ func (a *app) CreateShare(w http.ResponseWriter, r *http.Request, request provid
 		Edit:     edit,
 		Password: password,
 		File:     !info.IsDir,
+		Creation: a.clock.Now(),
+		Duration: duration,
 	})
 
 	if err = a.saveMetadata(); err != nil {

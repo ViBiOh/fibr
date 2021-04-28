@@ -182,7 +182,7 @@ func (a *app) Start(done <-chan struct{}) {
 
 	if a.metadataEnabled {
 		cron.New().Each(time.Hour).OnError(func(err error) {
-			logger.Error("unable to purge metadata: %s", err)
+			logger.Error("unable to purge metadatas: %s", err)
 		}).OnSignal(syscall.SIGUSR1).Now().Start(a.cleanMetadatas, done)
 	}
 }
