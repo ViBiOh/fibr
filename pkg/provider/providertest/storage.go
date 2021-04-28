@@ -41,6 +41,11 @@ func (s Storage) Info(pathname string) (provider.StorageItem, error) {
 	}, nil
 }
 
+// Semaphore fakes implementation
+func (s Storage) Semaphore(pathname string) (bool, error) {
+	return false, nil
+}
+
 // WriterTo fakes implementation
 func (s Storage) WriterTo(pathname string) (io.WriteCloser, error) {
 	if strings.HasSuffix(pathname, "error") {

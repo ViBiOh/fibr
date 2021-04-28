@@ -11,9 +11,12 @@ import (
 	"regexp"
 	"strings"
 	"sync"
+	"syscall"
+	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
+	"github.com/ViBiOh/httputils/v4/pkg/cron"
 	"github.com/ViBiOh/httputils/v4/pkg/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
@@ -39,7 +42,7 @@ var filesystem embed.FS
 
 // App of package
 type App interface {
-	Start()
+	Start(done <-chan struct{})
 
 	Browser(http.ResponseWriter, provider.Request, provider.StorageItem, renderer.Message)
 	ServeStatic(http.ResponseWriter, *http.Request) bool
@@ -71,6 +74,7 @@ type app struct {
 	thumbnail  thumbnail.App
 
 	staticHandler http.Handler
+	clock         Clock
 
 	metadatas    []*provider.Share
 	metadataLock sync.Mutex
@@ -95,6 +99,8 @@ func New(config Config, storage provider.Storage, renderer provider.Renderer, th
 		metadataLock:    sync.Mutex{},
 		sanitizeOnStart: *config.sanitizeOnStart,
 
+		clock: Clock{},
+
 		storage:    storage,
 		renderer:   renderer,
 		thumbnail:  thumbnail,
@@ -108,7 +114,7 @@ func New(config Config, storage provider.Storage, renderer provider.Renderer, th
 	app.staticHandler = http.FileServer(http.FS(staticFS))
 
 	if app.metadataEnabled {
-		logger.Fatal(app.loadMetadata())
+		logger.Fatal(app.refreshMetadatas())
 	}
 
 	var ignorePattern *regexp.Regexp
@@ -138,7 +144,7 @@ func New(config Config, storage provider.Storage, renderer provider.Renderer, th
 	return app, nil
 }
 
-func (a *app) Start() {
+func (a *app) Start(done <-chan struct{}) {
 	renameCount := prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: "fibr",
 		Subsystem: "renames",
@@ -174,6 +180,12 @@ func (a *app) Start() {
 
 	if err != nil {
 		logger.Error("%s", err)
+	}
+
+	if a.metadataEnabled {
+		cron.New().Each(time.Hour).OnError(func(e error) {
+			logger.Error("unable to purge metadata: %s", err)
+		}).OnSignal(syscall.SIGUSR1).Now().Start(a.cleanMetadatas, done)
 	}
 }
 

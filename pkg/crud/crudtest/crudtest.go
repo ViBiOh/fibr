@@ -42,7 +42,7 @@ func New() App {
 }
 
 // Start mocked implementation
-func (a App) Start() {
+func (a App) Start(<-chan struct{}) {
 	// mock implementation
 }
 

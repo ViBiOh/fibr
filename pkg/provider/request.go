@@ -52,12 +52,14 @@ func (r Request) LayoutPath(path string) string {
 
 // Share stores informations about shared paths
 type Share struct {
-	ID       string `json:"id"`
-	Path     string `json:"path"`
-	RootName string `json:"rootName"`
-	Password string `json:"password"`
-	Edit     bool   `json:"edit"`
-	File     bool   `json:"file"`
+	ID       string        `json:"id"`
+	Path     string        `json:"path"`
+	RootName string        `json:"rootName"`
+	Password string        `json:"password"`
+	Edit     bool          `json:"edit"`
+	File     bool          `json:"file"`
+	Creation time.Time     `json:"creation"`
+	Duration time.Duration `json:"duration"`
 }
 
 // CheckPassword verifies that request has correct password for share
