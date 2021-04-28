@@ -74,7 +74,7 @@ type app struct {
 	thumbnail  thumbnail.App
 
 	staticHandler http.Handler
-	clock         Clock
+	clock         *Clock
 
 	metadatas    []*provider.Share
 	metadataLock sync.Mutex

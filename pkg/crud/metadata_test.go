@@ -65,7 +65,7 @@ func TestPurgeExpiredMetadatas(t *testing.T) {
 				metadataEnabled: true,
 				metadataLock:    sync.Mutex{},
 				metadatas:       tc.current,
-				clock: Clock{
+				clock: &Clock{
 					now: time.Date(2021, 05, 01, 14, 00, 00, 0, time.UTC),
 				},
 			}
