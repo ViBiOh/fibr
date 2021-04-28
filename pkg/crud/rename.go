@@ -20,14 +20,16 @@ func (a *app) doRename(oldPath, newPath string, oldItem provider.StorageItem) (p
 		return provider.StorageItem{}, err
 	}
 
-	a.metadataLock.Lock()
-	defer a.metadataLock.Unlock()
+	a.metadatas.Range(func(key interface{}, value interface{}) bool {
+		share := value.(provider.Share)
 
-	for _, metadata := range a.metadatas {
-		if strings.HasPrefix(metadata.Path, oldPath) {
-			metadata.Path = strings.Replace(metadata.Path, oldPath, newPath, 1)
+		if strings.HasPrefix(share.Path, oldPath) {
+			share.Path = strings.Replace(share.Path, oldPath, newPath, 1)
+			a.metadatas.Store(key, share)
 		}
-	}
+
+		return true
+	})
 
 	if err := a.saveMetadata(); err != nil {
 		return newItem, fmt.Errorf("error while updating metadatas: %s", err)

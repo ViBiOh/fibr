@@ -34,10 +34,10 @@ var (
 )
 
 // GetPathname computes pathname for given params
-func GetPathname(folder, name string, share *Share) string {
+func GetPathname(folder, name string, share Share) string {
 	parts := make([]string, 0)
 
-	if share != nil {
+	if len(share.ID) != 0 {
 		parts = append(parts, share.Path)
 	}
 
@@ -51,10 +51,10 @@ func GetPathname(folder, name string, share *Share) string {
 }
 
 // GetURI computes public URI for given params
-func GetURI(folder, name string, share *Share) string {
+func GetURI(folder, name string, share Share) string {
 	parts := make([]string, 0)
 
-	if share != nil {
+	if len(share.ID) != 0 {
 		parts = append(parts, "/", share.ID)
 	}
 

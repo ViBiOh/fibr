@@ -59,7 +59,7 @@ func (a *app) List(w http.ResponseWriter, request provider.Request, message rend
 	}
 
 	if request.CanShare {
-		content["Shares"] = a.metadatas
+		content["Shares"] = a.dumpMetadatas()
 	}
 
 	a.renderer.Directory(w, request, content, message)
@@ -75,7 +75,7 @@ func (a *app) Download(w http.ResponseWriter, request provider.Request) {
 	}()
 
 	filename := path.Base(request.Path)
-	if filename == "/" && request.Share != nil {
+	if filename == "/" && len(request.Share.ID) != 0 {
 		filename = path.Base(path.Join(request.Share.RootName, request.Path))
 	}
 

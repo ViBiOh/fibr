@@ -33,17 +33,16 @@ func (a *app) Delete(w http.ResponseWriter, r *http.Request, request provider.Re
 		return
 	}
 
-	a.metadataLock.Lock()
-	defer a.metadataLock.Unlock()
+	a.metadatas.Range(func(key interface{}, value interface{}) bool {
+		share := value.(provider.Share)
 
-	newMetas := make([]*provider.Share, 0)
-	for _, metadata := range a.metadatas {
-		if !strings.HasPrefix(metadata.Path, info.Pathname) {
-			newMetas = append(newMetas, metadata)
+		if strings.HasPrefix(share.Path, info.Pathname) {
+			a.metadatas.Delete(key)
 		}
-	}
 
-	a.metadatas = newMetas
+		return true
+	})
+
 	if err := a.saveMetadata(); err != nil {
 		a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
 		return

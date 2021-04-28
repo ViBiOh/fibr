@@ -17,7 +17,7 @@ import (
 func (a *app) saveUploadedFile(request provider.Request, part *multipart.Part) (filename string, err error) {
 	var filePath string
 
-	if request.Share != nil && request.Share.File {
+	if len(request.Share.ID) != 0 && request.Share.File {
 		filename = path.Base(request.Share.Path)
 		filePath = request.Share.Path
 	} else {

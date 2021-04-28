@@ -113,7 +113,7 @@ func TestComputePublicURL(t *testing.T) {
 			},
 			Request{
 				Path: "/photos",
-				Share: &Share{
+				Share: Share{
 					ID: "abcd1234",
 				},
 			},
@@ -168,7 +168,8 @@ func TestComputeTitle(t *testing.T) {
 			},
 			Request{
 				Path: "/",
-				Share: &Share{
+				Share: Share{
+					ID:       "a1b2c3d4",
 					RootName: "abcd1234",
 				},
 			},
@@ -223,7 +224,8 @@ func TestComputeDescription(t *testing.T) {
 			},
 			Request{
 				Path: "/",
-				Share: &Share{
+				Share: Share{
+					ID:       "a1b2c3d4",
 					RootName: "abcd1234",
 				},
 			},

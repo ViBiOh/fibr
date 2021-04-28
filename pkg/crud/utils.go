@@ -59,7 +59,7 @@ func checkFolderName(formName string, request provider.Request) (string, *provid
 		return "", provider.NewError(http.StatusBadRequest, ErrAbsoluteFolder)
 	}
 
-	if request.Share != nil {
+	if len(request.Share.ID) != 0 {
 		shareURIPrefix := fmt.Sprintf("/%s", request.Share.ID)
 
 		if !strings.HasPrefix(name, shareURIPrefix) {

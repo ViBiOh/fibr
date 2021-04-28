@@ -38,7 +38,7 @@ func New(crudApp crud.App, rendererApp renderer.App, loginApp authMiddleware.App
 
 func (a app) parseShare(request *provider.Request, authorizationHeader string) error {
 	share := a.crudApp.GetShare(request.Path)
-	if share == nil {
+	if len(share.ID) == 0 {
 		return nil
 	}
 
@@ -85,7 +85,7 @@ func (a app) parseRequest(r *http.Request) (provider.Request, *provider.Error) {
 		return request, provider.NewError(http.StatusUnauthorized, err)
 	}
 
-	if request.Share != nil {
+	if len(request.Share.ID) != 0 {
 		return request, nil
 	}
 

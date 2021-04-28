@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"path"
+	"sync"
 	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -30,6 +31,17 @@ func (c *Clock) Now() time.Time {
 	return c.now
 }
 
+func (a *app) dumpMetadatas() map[string]provider.Share {
+	metadatas := make(map[string]provider.Share, 0)
+
+	a.metadatas.Range(func(key interface{}, value interface{}) bool {
+		metadatas[key.(string)] = value.(provider.Share)
+		return true
+	})
+
+	return metadatas
+}
+
 func (a *app) refreshMetadatas() error {
 	_, err := a.storage.Info(metadataFilename)
 	if err != nil && !provider.IsNotExist(err) {
@@ -40,8 +52,6 @@ func (a *app) refreshMetadatas() error {
 		if err := a.storage.CreateDir(provider.MetadataDirectoryName); err != nil {
 			return err
 		}
-
-		a.metadatas = make([]*provider.Share, 0)
 
 		return nil
 	}
@@ -59,15 +69,15 @@ func (a *app) refreshMetadatas() error {
 	}
 
 	decoder := json.NewDecoder(file)
-	if err = decoder.Decode(&a.metadatas); err != nil {
-		return err
+	var metadatas map[string]provider.Share
+	if err = decoder.Decode(&metadatas); err != nil {
+		return fmt.Errorf("unable to decode metadatas: %s", err)
 	}
 
-	now := a.clock.Now()
-	for _, metadata := range a.metadatas {
-		if metadata.Creation.IsZero() {
-			metadata.Creation = now
-		}
+	// TODO this can lead to a race condition
+	a.metadatas = sync.Map{}
+	for _, metadata := range metadatas {
+		a.metadatas.Store(metadata.ID, metadata)
 	}
 
 	return nil
@@ -76,21 +86,18 @@ func (a *app) refreshMetadatas() error {
 func (a *app) purgeExpiredMetadatas() {
 	now := a.clock.Now()
 
-	count := 0
-	for _, metadata := range a.metadatas {
-		if metadata.Duration == 0 || metadata.Creation.Add(metadata.Duration).After(now) {
-			a.metadatas[count] = metadata
-			count++
-		}
-	}
+	a.metadatas.Range(func(key interface{}, value interface{}) bool {
+		share := value.(provider.Share)
 
-	a.metadatas = a.metadatas[:count]
+		if share.Duration != 0 && share.Creation.Add(share.Duration).Before(now) {
+			a.metadatas.Delete(key)
+		}
+
+		return true
+	})
 }
 
 func (a *app) cleanMetadatas(_ context.Context) error {
-	a.metadataLock.Lock()
-	defer a.metadataLock.Unlock()
-
 	if err := a.refreshMetadatas(); err != nil {
 		return fmt.Errorf("unable to refresh metadatas: %s", err)
 	}
@@ -126,7 +133,7 @@ func (a *app) saveMetadata() (err error) {
 		return errors.New("metadata not enabled")
 	}
 
-	content, err := json.MarshalIndent(&a.metadatas, "", "  ")
+	content, err := json.MarshalIndent(a.dumpMetadatas(), "", "  ")
 	if err != nil {
 		return err
 	}
