@@ -59,9 +59,7 @@
             <tr>
               <th scope="col">ID</th>
               <th scope="col">Path</th>
-              <td>
-                <img class="icon" src="/svg/edit?fill=silver" alt="Edit">
-              </td>
+              <th scope="col">Options</th>
               <td></td>
             </tr>
           </thead>
@@ -77,9 +75,16 @@
                 <th scope="row" class="ellipsis path">
                   <code>{{ .Path }}</code>
                 </th>
-                <td>
+                <td class="center">
                   {{ if .Edit }}
-                    <img class="icon" src="/svg/check?fill=silver" alt="Edit allowed">
+                    <img class="icon" src="/svg/edit?fill=silver" alt="Editable">
+                  {{ end }}
+                  {{ if .Password }}
+                    <img class="icon" src="/svg/lock?fill=silver" alt="Password protected">
+                  {{ end }}
+                  {{ if .Duration }}
+                    <img class="icon" src="/svg/hourglass?fill=silver" alt="Duration">
+                    {{ .Duration.Hours }}h
                   {{ end }}
                 </td>
                 <td >
