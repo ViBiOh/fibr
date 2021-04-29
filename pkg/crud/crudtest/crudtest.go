@@ -77,7 +77,7 @@ func (a App) Create(http.ResponseWriter, *http.Request, provider.Request) {
 }
 
 // Upload mocked implementation
-func (a App) Upload(http.ResponseWriter, *http.Request, provider.Request, *multipart.Part) {
+func (a App) Upload(http.ResponseWriter, *http.Request, provider.Request, map[string]string, *multipart.Part) {
 	// mock implementation
 }
 

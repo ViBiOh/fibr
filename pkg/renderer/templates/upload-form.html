@@ -1,6 +1,6 @@
 {{ define "upload-modal" }}
   <script>
-     /**
+    /**
      * Drag'n drop.
      */
     const dropZone = document.getElementsByTagName('body')[0];
@@ -67,7 +67,7 @@
 
       const item = document.createElement('div');
       item.id = messageId;
-      item.classList.add('flex', 'flex-center');
+      item.classList.add('flex', 'flex-center', 'margin');
 
       const itemWrapper = document.createElement('div');
       itemWrapper.classList.add('upload-item');
@@ -103,12 +103,17 @@
 
       const icon = document.createElement('img');
       icon.classList.add('icon');
-      icon.src = '/svg/share-alt-square?fill=silver'
-      icon.alt = `Share ${file.name}`
+      icon.src = '/svg/share-alt-square?fill=silver';
+      icon.alt = `Share ${file.name}`;
       item.appendChild(icon);
 
       const filename = document.createElement('div');
-      filename.classList.add('upload-name', 'flex-grow', 'ellipsis', 'padding-left');
+      filename.classList.add(
+        'upload-name',
+        'flex-grow',
+        'ellipsis',
+        'padding-left',
+      );
 
       const link = document.createElement('a');
       link.href = `/${id}/`;
@@ -168,45 +173,14 @@
     let xhr;
 
     /**
-     * UCreate a share for given file and duration
-     * @param  {File}   file     File to upload
-     * @param  {Number} duration Duration of share
-     * @return {Promise}         Promise of upload
-     */
-    async function createShare(file, duration) {
-      xhr = new XMLHttpRequest();
-
-      return new Promise((resolve, reject) => {
-        xhr.addEventListener(
-          'readystatechange',
-          (e) => {
-            if (xhr.readyState === XMLHttpRequest.DONE) {
-              if (xhr.status >= 200 && xhr.status < 400) {
-                resolve(xhr.responseText);
-                xhr = undefined;
-              } else {
-                reject(e);
-                xhr = undefined;
-              }
-            }
-          },
-          false,
-        );
-
-        xhr.open('POST', file, true);
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        xhr.setRequestHeader('Accept', 'text/plain');
-        xhr.send(`type=share&method=POST&edit=false&duration=${encodeURIComponent(duration)}`);
-      });
-    }
-
-    /**
      * Upload file with updating progress indicator.
-     * @param  {String} method Method for uploading
-     * @param  {File} file     File to upload
+     * @param  {String} method   Method for uploading
+     * @param  {File} file       File to upload
+     * @param  {Boolean} shared  Shared option
+     * @param  {Number} duration Duration of share
      * @return {Promise}       Promise of upload
      */
-    async function uploadFile(method, file) {
+    async function uploadFile(method, file, shared, duration) {
       const messageId = await fileMessageId(file);
 
       const container = document.getElementById(messageId);
@@ -217,6 +191,8 @@
 
       const formData = new FormData();
       formData.append('method', method);
+      formData.append('share', shared);
+      formData.append('duration', duration);
       formData.append('file', file);
 
       return new Promise((resolve, reject) => {
@@ -271,17 +247,17 @@
         replaceContent(uploadButton, generateThrobber('throbber-white'));
       }
 
-      let shared = false;
+      let share = false;
       const uploadShare = document.getElementById('upload-share');
       if (uploadShare) {
-        shared = uploadShare.checked
+        share = uploadShare.checked;
       }
 
       let duration = 0;
-      if (shared) {
+      if (share) {
         const shareDuration = document.getElementById('upload-duration');
         if (shareDuration) {
-          duration = shareDuration.value
+          duration = shareDuration.value;
         }
       }
 
@@ -293,11 +269,13 @@
         const file = values.files[i];
 
         try {
-          const uploadFilename = await uploadFile(values.method, file);
-          await setUploadStatus(file, '✓', 'success');
-          if (shared) {
-            shares.set(await createShare(uploadFilename, duration), file);
+          const uploadFilename = await uploadFile(values.method, file, share, duration);
+          const parts = uploadFilename.split("\n")
+          if (parts.length > 1) {
+            shares.set(parts[1], file);
           }
+
+          await setUploadStatus(file, '✓', 'success');
         } catch (err) {
           await setUploadStatus(file, 'X', 'danger');
           success = false;
@@ -308,7 +286,7 @@
       }
 
       if (success) {
-        if (shared) {
+        if (shares.size) {
           const shareList = document.getElementById('upload-share-list');
           if (shareList) {
             shares.forEach((value, key) => addShareItem(shareList, key, value));
@@ -343,6 +321,11 @@
       const fileInput = document.getElementById('file');
       if (fileInput) {
         fileInput.multiple = true;
+      }
+
+      const shareLabel = document.getElementById('upload-share-label');
+      if (shareLabel) {
+        shareLabel.innerHTML = 'Create a public read-only share on each file for';
       }
     });
   </script>
@@ -390,18 +373,19 @@
         onSubmit="return upload(event)"
       >
         <input type="hidden" name="method" value="POST" />
-        <p class="padding no-margin center upload-width">
-          <input id="file" class="full" type="file" name="file" />
-        </p>
 
         {{ if .Request.CanShare }}
           <p class="padding no-margin center upload-width">
             <input id="upload-share" type="checkbox" name="share" value="true" />
-            <label for="upload-share">Create a public read-only share on each file for</label>
+            <label id="upload-share-label" for="upload-share">Create a public read-only share for</label>
             <input id="upload-duration" type="number" name="duration" value="1" placeholder="Duration" />
             <label for="upload-duration">hours</label>
           </p>
         {{ end }}
+
+        <p class="padding no-margin center upload-width">
+          <input id="file" class="full" type="file" name="file" />
+        </p>
 
         <div id="upload-list" class="upload-width full"></div>
 

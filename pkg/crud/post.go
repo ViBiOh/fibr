@@ -10,37 +10,33 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
-func parseMultipart(r *http.Request) (string, *multipart.Part, error) {
+func parseMultipart(r *http.Request) (map[string]string, *multipart.Part, error) {
 	reader, err := r.MultipartReader()
 	if err != nil {
-		return "", nil, err
+		return nil, nil, err
 	}
 
-	var (
-		method   string
-		filePart *multipart.Part
-	)
+	var filePart *multipart.Part
+	values := make(map[string]string, 0)
 
 	for {
 		part, err := reader.NextPart()
 		if err == io.EOF {
-			return method, filePart, nil
+			return values, filePart, nil
 		}
 
-		switch part.FormName() {
-		case "method":
+		formName := part.FormName()
+		switch formName {
+		case "file":
+			return values, part, nil
+
+		default:
 			value, err := io.ReadAll(part)
 			if err != nil {
-				return "", nil, err
+				return nil, nil, fmt.Errorf("unable to read form value `%s`: %s", formName, err)
 			}
 
-			method = string(value)
-
-		case "file":
-			if len(method) != 0 {
-				return method, part, nil
-			}
-			filePart = part
+			values[formName] = string(value)
 		}
 	}
 }
@@ -78,18 +74,18 @@ func (a *app) Post(w http.ResponseWriter, r *http.Request, request provider.Requ
 	}
 
 	if strings.HasPrefix(contentType, "multipart/form-data") {
-		method, file, err := parseMultipart(r)
+		values, file, err := parseMultipart(r)
 		if err != nil {
 			a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, fmt.Errorf("unable to parse multipart request: %s", err)))
 			return
 		}
 
-		if method != http.MethodPost {
-			a.renderer.Error(w, request, provider.NewError(http.StatusMethodNotAllowed, fmt.Errorf("unknown method `%s` for multipart", method)))
+		if values["method"] != http.MethodPost {
+			a.renderer.Error(w, request, provider.NewError(http.StatusMethodNotAllowed, fmt.Errorf("unknown method `%s` for multipart", values["method"])))
 			return
 		}
 
-		a.Upload(w, r, request, file)
+		a.Upload(w, r, request, values, file)
 		return
 	}
 

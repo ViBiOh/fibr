@@ -3,7 +3,9 @@ package crud
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
@@ -79,4 +81,22 @@ func getPathParts(uri string) []string {
 	}
 
 	return strings.Split(cleanURI, "/")
+}
+
+func getFormBool(val string) (bool, error) {
+	value := strings.TrimSpace(val)
+	if len(value) == 0 {
+		return false, nil
+	}
+
+	return strconv.ParseBool(value)
+}
+
+func getFormDuration(val string) (time.Duration, error) {
+	value := strings.TrimSpace(val)
+	if len(value) == 0 {
+		return 0, nil
+	}
+
+	return time.ParseDuration(fmt.Sprintf("%sh", value))
 }

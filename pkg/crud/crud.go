@@ -51,7 +51,7 @@ type App interface {
 	Get(http.ResponseWriter, *http.Request, provider.Request)
 	Post(http.ResponseWriter, *http.Request, provider.Request)
 	Create(http.ResponseWriter, *http.Request, provider.Request)
-	Upload(http.ResponseWriter, *http.Request, provider.Request, *multipart.Part)
+	Upload(http.ResponseWriter, *http.Request, provider.Request, map[string]string, *multipart.Part)
 	Rename(http.ResponseWriter, *http.Request, provider.Request)
 	Delete(http.ResponseWriter, *http.Request, provider.Request)
 
