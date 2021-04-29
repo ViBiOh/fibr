@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"path"
-	"sync"
 	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -74,8 +73,6 @@ func (a *app) refreshMetadatas() error {
 		return fmt.Errorf("unable to decode metadatas: %s", err)
 	}
 
-	// TODO this can lead to a race condition
-	a.metadatas = sync.Map{}
 	for _, metadata := range metadatas {
 		a.metadatas.Store(metadata.ID, metadata)
 	}
@@ -98,10 +95,6 @@ func (a *app) purgeExpiredMetadatas() {
 }
 
 func (a *app) cleanMetadatas(_ context.Context) error {
-	if err := a.refreshMetadatas(); err != nil {
-		return fmt.Errorf("unable to refresh metadatas: %s", err)
-	}
-
 	lockFilename := path.Join(provider.MetadataDirectoryName, ".lock")
 	acquired, err := a.storage.Semaphore(lockFilename)
 	if err != nil {
