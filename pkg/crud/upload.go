@@ -76,14 +76,12 @@ func (a *app) Upload(w http.ResponseWriter, r *http.Request, request provider.Re
 		return
 	}
 
-	content := fmt.Sprintf("File %s successfully uploaded", filename)
-
 	if r.Header.Get("Accept") == "text/plain" {
-		w.WriteHeader(http.StatusOK)
-		provider.SafeWrite(w, content)
+		w.WriteHeader(http.StatusCreated)
+		provider.SafeWrite(w, filename)
 
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("%s/?%s", request.GetURI(""), renderer.NewSuccessMessage(content)), http.StatusFound)
+	http.Redirect(w, r, fmt.Sprintf("%s/?%s", request.GetURI(""), renderer.NewSuccessMessage("File %s successfully uploaded", filename)), http.StatusFound)
 }
