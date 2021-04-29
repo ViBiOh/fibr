@@ -98,6 +98,13 @@ func (a *app) CreateShare(w http.ResponseWriter, r *http.Request, request provid
 		return
 	}
 
+	if r.Header.Get("Accept") == "text/plain" {
+		w.WriteHeader(http.StatusCreated)
+		provider.SafeWrite(w, id)
+
+		return
+	}
+
 	http.Redirect(w, r, fmt.Sprintf("%s/?%s#share-list", path.Dir(request.GetURI("")), renderer.NewSuccessMessage(fmt.Sprintf("Share successfully created with ID: %s", id))), http.StatusFound)
 }
 
@@ -113,6 +120,11 @@ func (a *app) DeleteShare(w http.ResponseWriter, r *http.Request, request provid
 
 	if err := a.saveMetadata(); err != nil {
 		a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
+		return
+	}
+
+	if r.Header.Get("Accept") == "text/plain" {
+		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 

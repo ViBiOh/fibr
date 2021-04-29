@@ -92,6 +92,35 @@
     }
 
     /**
+     * Add upload item content to container.
+     * @param  {Element} container Container to append item
+     * @param  {File}    file      File to generate an item
+     * @param  {File}    id        Share ID to generate an item
+     */
+    async function addShareItem(container, id, file) {
+      const item = document.createElement('div');
+      item.classList.add('flex', 'flex-center', 'margin');
+
+      const icon = document.createElement('img');
+      icon.classList.add('icon');
+      icon.src = '/svg/share-alt-square?fill=silver'
+      icon.alt = `Share ${file.name}`
+      item.appendChild(icon);
+
+      const filename = document.createElement('div');
+      filename.classList.add('upload-name', 'flex-grow', 'ellipsis', 'padding-left');
+
+      const link = document.createElement('a');
+      link.href = `/${id}/`;
+      link.innerHTML = file.name;
+      filename.appendChild(link);
+
+      item.appendChild(filename);
+
+      container.appendChild(item);
+    }
+
+    /**
      * Get list of files to upload.
      */
     function getFiles(event) {
@@ -139,6 +168,39 @@
     let xhr;
 
     /**
+     * UCreate a share for given file and duration
+     * @param  {File}   file     File to upload
+     * @param  {Number} duration Duration of share
+     * @return {Promise}         Promise of upload
+     */
+    async function createShare(file, duration) {
+      xhr = new XMLHttpRequest();
+
+      return new Promise((resolve, reject) => {
+        xhr.addEventListener(
+          'readystatechange',
+          (e) => {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+              if (xhr.status >= 200 && xhr.status < 400) {
+                resolve(xhr.responseText);
+                xhr = undefined;
+              } else {
+                reject(e);
+                xhr = undefined;
+              }
+            }
+          },
+          false,
+        );
+
+        xhr.open('POST', file, true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.setRequestHeader('Accept', 'text/plain');
+        xhr.send(`type=share&method=POST&edit=false&duration=${encodeURIComponent(duration)}`);
+      });
+    }
+
+    /**
      * Upload file with updating progress indicator.
      * @param  {String} method Method for uploading
      * @param  {File} file     File to upload
@@ -177,7 +239,7 @@
                   progress.value = 100;
                 }
 
-                resolve();
+                resolve(xhr.responseText);
                 xhr = undefined;
               } else {
                 reject(e);
@@ -209,15 +271,33 @@
         replaceContent(uploadButton, generateThrobber('throbber-white'));
       }
 
+      let shared = false;
+      const uploadShare = document.getElementById('upload-share');
+      if (uploadShare) {
+        shared = uploadShare.checked
+      }
+
+      let duration = 0;
+      if (shared) {
+        const shareDuration = document.getElementById('upload-duration');
+        if (shareDuration) {
+          duration = shareDuration.value
+        }
+      }
+
       const values = getFiles(event);
+      const shares = new Map();
 
       let success = true;
       for (let i = 0; i < values.files.length; i++) {
         const file = values.files[i];
 
         try {
-          await uploadFile(values.method, file);
+          const uploadFilename = await uploadFile(values.method, file);
           await setUploadStatus(file, '✓', 'success');
+          if (shared) {
+            shares.set(await createShare(uploadFilename, duration), file);
+          }
         } catch (err) {
           await setUploadStatus(file, 'X', 'danger');
           success = false;
@@ -228,6 +308,13 @@
       }
 
       if (success) {
+        if (shared) {
+          const shareList = document.getElementById('upload-share-list');
+          if (shareList) {
+            shares.forEach((value, key) => addShareItem(shareList, key, value));
+          }
+        }
+
         document.location.hash = '#upload-success';
       } else if (uploadButton) {
         uploadButton.innerHTML = 'Upload';
@@ -263,8 +350,15 @@
   <style>
     #upload-list {
       margin: 1rem auto;
-      max-width: 30rem;
       overflow-y: auto;
+    }
+
+    #upload-duration {
+      width: 5rem;
+    }
+
+    .upload-width {
+      max-width: 30rem;
     }
 
     .upload-item {
@@ -289,18 +383,27 @@
 
       <form
         id="upload-form"
-        class="flex flex-column flex-grow"
+        class="flex flex-column flex-grow flex-center"
         method="post"
         enctype="multipart/form-data"
         action="#"
         onSubmit="return upload(event)"
       >
         <input type="hidden" name="method" value="POST" />
-        <p class="padding no-margin center">
+        <p class="padding no-margin center upload-width">
           <input id="file" class="full" type="file" name="file" />
         </p>
 
-        <div id="upload-list" class="full"></div>
+        {{ if .Request.CanShare }}
+          <p class="padding no-margin center upload-width">
+            <input id="upload-share" type="checkbox" name="share" value="true" />
+            <label for="upload-share">Create a public read-only share on each file for</label>
+            <input id="upload-duration" type="number" name="duration" value="1" placeholder="Duration" />
+            <label for="upload-duration">hours</label>
+          </p>
+        {{ end }}
+
+        <div id="upload-list" class="upload-width full"></div>
 
         <p class="padding no-margin center">
           <a href="#" class="button white" onclick="abort(event)">Cancel</a>
@@ -313,6 +416,8 @@
   <div id="upload-success" class="modal">
     <div class="modal-content">
       <h2 class="header success padding">Upload success ✓</h2>
+
+      <div id="upload-share-list" class="upload-width full"></div>
 
       <p class="padding no-margin center">
         <a href="?redirect" class="button bg-grey">Close</a>
