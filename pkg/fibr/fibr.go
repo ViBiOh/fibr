@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/ViBiOh/auth/v2/pkg/auth"
 	"github.com/ViBiOh/auth/v2/pkg/ident"
@@ -86,6 +87,10 @@ func (a app) parseRequest(r *http.Request) (provider.Request, *provider.Error) {
 	}
 
 	if len(request.Share.ID) != 0 {
+		if request.Share.IsExpired(time.Now()) {
+			return request, provider.NewError(http.StatusNotFound, errors.New("link has expired"))
+		}
+
 		return request, nil
 	}
 

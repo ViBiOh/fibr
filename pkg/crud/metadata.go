@@ -86,7 +86,7 @@ func (a *app) purgeExpiredMetadatas() {
 	a.metadatas.Range(func(key interface{}, value interface{}) bool {
 		share := value.(provider.Share)
 
-		if share.Duration != 0 && share.Creation.Add(share.Duration).Before(now) {
+		if share.IsExpired(now) {
 			a.metadatas.Delete(key)
 		}
 

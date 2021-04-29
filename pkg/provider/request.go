@@ -92,6 +92,11 @@ func (s Share) CheckPassword(authorizationHeader string) error {
 	return nil
 }
 
+// IsExpired check if given share is expired
+func (s Share) IsExpired(now time.Time) bool {
+	return s.Duration != 0 && s.Creation.Add(s.Duration).Before(now)
+}
+
 // Config data
 type Config struct {
 	PublicURL string
