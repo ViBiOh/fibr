@@ -91,7 +91,7 @@ func (a *app) Semaphore(pathname string) (bool, error) {
 		return false, convertError(err)
 	}
 
-	if _, err := os.OpenFile(a.getFullPath(pathname), os.O_RDONLY|os.O_CREATE|os.O_EXCL, getMode(pathname)); err != nil {
+	if _, err := a.getFile(pathname, os.O_RDONLY|os.O_CREATE|os.O_EXCL); err != nil {
 		if !os.IsExist(err) {
 			return false, err
 		}
@@ -151,7 +151,7 @@ func (a *app) ReaderFrom(pathname string) (provider.ReadSeekerCloser, error) {
 		return nil, convertError(err)
 	}
 
-	output, err := os.OpenFile(a.getFullPath(pathname), os.O_RDONLY, getMode(pathname))
+	output, err := a.getFile(pathname, os.O_RDONLY)
 	return output, convertError(err)
 }
 

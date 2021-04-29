@@ -9,6 +9,10 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
+const (
+	writeFlags = os.O_RDWR | os.O_CREATE | os.O_TRUNC
+)
+
 func checkPathname(pathname string) error {
 	if strings.Contains(pathname, "..") {
 		return ErrRelativePath
@@ -25,8 +29,12 @@ func (a app) getRelativePath(pathname string) string {
 	return strings.TrimPrefix(pathname, a.rootDirectory)
 }
 
+func (a app) getFile(filename string, flags int) (*os.File, error) {
+	return os.OpenFile(a.getFullPath(filename), flags, getMode(filename))
+}
+
 func (a app) getWritableFile(filename string) (io.WriteCloser, error) {
-	return os.OpenFile(a.getFullPath(filename), os.O_RDWR|os.O_CREATE|os.O_TRUNC, getMode(filename))
+	return a.getFile(filename, writeFlags)
 }
 
 func getMode(name string) os.FileMode {
