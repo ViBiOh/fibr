@@ -31,7 +31,7 @@ func (a *app) doRename(oldPath, newPath string, oldItem provider.StorageItem) (p
 		return true
 	})
 
-	if err := a.saveMetadata(); err != nil {
+	if err := a.saveMetadatas(); err != nil {
 		return newItem, fmt.Errorf("error while updating metadatas: %s", err)
 	}
 

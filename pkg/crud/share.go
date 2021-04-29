@@ -106,7 +106,7 @@ func (a *app) CreateShare(w http.ResponseWriter, r *http.Request, request provid
 		return
 	}
 
-	if err = a.saveMetadata(); err != nil {
+	if err = a.saveMetadatas(); err != nil {
 		a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
@@ -131,7 +131,7 @@ func (a *app) DeleteShare(w http.ResponseWriter, r *http.Request, request provid
 	id := r.FormValue("id")
 	a.metadatas.Delete(id)
 
-	if err := a.saveMetadata(); err != nil {
+	if err := a.saveMetadatas(); err != nil {
 		a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}

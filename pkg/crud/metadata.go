@@ -80,18 +80,22 @@ func (a *app) refreshMetadatas() error {
 	return nil
 }
 
-func (a *app) purgeExpiredMetadatas() {
+func (a *app) purgeExpiredMetadatas() bool {
 	now := a.clock.Now()
+	changed := false
 
 	a.metadatas.Range(func(key interface{}, value interface{}) bool {
 		share := value.(provider.Share)
 
 		if share.IsExpired(now) {
+			changed = true
 			a.metadatas.Delete(key)
 		}
 
 		return true
 	})
+
+	return changed
 }
 
 func (a *app) cleanMetadatas(_ context.Context) error {
@@ -112,16 +116,16 @@ func (a *app) cleanMetadatas(_ context.Context) error {
 		}
 	}()
 
-	a.purgeExpiredMetadatas()
-
-	if err := a.saveMetadata(); err != nil {
-		return fmt.Errorf("unable to save metadatas: %s", err)
+	if a.purgeExpiredMetadatas() {
+		if err := a.saveMetadatas(); err != nil {
+			return fmt.Errorf("unable to save metadatas: %s", err)
+		}
 	}
 
 	return nil
 }
 
-func (a *app) saveMetadata() (err error) {
+func (a *app) saveMetadatas() (err error) {
 	if !a.metadataEnabled {
 		return errors.New("metadata not enabled")
 	}

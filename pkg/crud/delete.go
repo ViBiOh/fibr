@@ -43,7 +43,7 @@ func (a *app) Delete(w http.ResponseWriter, r *http.Request, request provider.Re
 		return true
 	})
 
-	if err := a.saveMetadata(); err != nil {
+	if err := a.saveMetadatas(); err != nil {
 		a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
