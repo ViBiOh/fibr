@@ -19,12 +19,12 @@ type Preferences struct {
 
 // Request from user
 type Request struct {
-	Share       Share
-	CanShare    bool
-	CanEdit     bool
 	Path        string
 	Display     string
 	Preferences Preferences
+	Share       Share
+	CanEdit     bool
+	CanShare    bool
 }
 
 // GetFilepath of request
@@ -52,14 +52,14 @@ func (r Request) LayoutPath(path string) string {
 
 // Share stores informations about shared paths
 type Share struct {
+	Creation time.Time     `json:"creation"`
 	ID       string        `json:"id"`
 	Path     string        `json:"path"`
 	RootName string        `json:"rootName"`
 	Password string        `json:"password"`
+	Duration time.Duration `json:"duration"`
 	Edit     bool          `json:"edit"`
 	File     bool          `json:"file"`
-	Creation time.Time     `json:"creation"`
-	Duration time.Duration `json:"duration"`
 }
 
 // CheckPassword verifies that request has correct password for share

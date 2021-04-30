@@ -212,13 +212,13 @@ Usage of fibr:
         [server] Write Timeout {FIBR_WRITE_TIMEOUT} (default "2m")
 ```
 
-# Troubleshooting
+# Caveats
 
 ## Multiples instances
 
-Fibr doesn't handle properly multiple instances running at the same time on the same `rootFolder` if you make intensive use of sharing.
+Fibr doesn't handle multiple instances running at the same time on the same `rootFolder`, if you use [Sharing feature](#sharing).
 
-Shares metadatas are stored in a file, loaded at the start of the application. If an _instance A_ adds a share, _instance B_ can't see it. If they are both behind the same load-balancer, it can leads to erratic behavior.
+Shares' metadatas are stored in a file, loaded at the start of the application. If an _instance A_ adds a share, _instance B_ can't see it. If they are both behind the same load-balancer, it can leads to an erratic behavior.
 
 Fibr has also an internal cron that purge expired shares and write the new metadatas to the file. If _instance A_ adds a share and _instance B_ runs the cron, the share added in _instance A_ is lost. It's a known limitation I need to work on, without adding an external tool like Redis and without being I/O intensive on filesystem.
 

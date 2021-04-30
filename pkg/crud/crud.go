@@ -78,8 +78,9 @@ type app struct {
 
 	metadatas sync.Map
 
-	metadataEnabled bool
-	sanitizeOnStart bool
+	metadataEnabled  bool
+	sanitizeOnStart  bool
+	highAvailability bool
 }
 
 // Flags adds flags for configuring package

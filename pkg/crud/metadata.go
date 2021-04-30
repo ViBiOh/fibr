@@ -99,22 +99,24 @@ func (a *app) purgeExpiredMetadatas() bool {
 }
 
 func (a *app) cleanMetadatas(_ context.Context) error {
-	lockFilename := path.Join(provider.MetadataDirectoryName, ".lock")
-	acquired, err := a.storage.Semaphore(lockFilename)
-	if err != nil {
-		return fmt.Errorf("unable to create lock file: %s", err)
-	}
-
-	if !acquired {
-		logger.Info("metadatas purge is already in progress: lock file creation failed")
-		return nil
-	}
-
-	defer func() {
-		if err := a.storage.Remove(lockFilename); err != nil {
-			logger.WithField("filename", lockFilename).Error("unable to remove lock file: %s", err)
+	if a.highAvailability {
+		lockFilename := path.Join(provider.MetadataDirectoryName, ".lock")
+		acquired, err := a.storage.Semaphore(lockFilename)
+		if err != nil {
+			return fmt.Errorf("unable to create lock file: %s", err)
 		}
-	}()
+
+		if !acquired {
+			logger.Info("metadatas purge is already in progress: lock file creation failed")
+			return nil
+		}
+
+		defer func() {
+			if err := a.storage.Remove(lockFilename); err != nil {
+				logger.WithField("filename", lockFilename).Error("unable to remove lock file: %s", err)
+			}
+		}()
+	}
 
 	if a.purgeExpiredMetadatas() {
 		if err := a.saveMetadatas(); err != nil {
