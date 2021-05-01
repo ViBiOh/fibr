@@ -21,7 +21,7 @@ func (a *app) getCover(files []provider.StorageItem) map[string]interface{} {
 			continue
 		}
 
-		if a.thumbnail.HasThumbnail(file) {
+		if a.thumbnailApp.HasThumbnail(file) {
 			return map[string]interface{}{
 				"Img":       file,
 				"ImgHeight": thumbnail.Height,
@@ -35,9 +35,9 @@ func (a *app) getCover(files []provider.StorageItem) map[string]interface{} {
 
 // List render directory web view of given dirPath
 func (a *app) List(w http.ResponseWriter, request provider.Request, message renderer.Message) {
-	files, err := a.storage.List(request.GetFilepath(""))
+	files, err := a.storageApp.List(request.GetFilepath(""))
 	if err != nil {
-		a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
+		a.rendererApp.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
 
@@ -59,10 +59,10 @@ func (a *app) List(w http.ResponseWriter, request provider.Request, message rend
 	}
 
 	if request.CanShare {
-		content["Shares"] = a.dumpMetadatas()
+		content["Shares"] = a.metadataApp.Dump()
 	}
 
-	a.renderer.Directory(w, request, content, message)
+	a.rendererApp.Directory(w, request, content, message)
 }
 
 // Download content of a directory into a streamed zip
@@ -82,12 +82,12 @@ func (a *app) Download(w http.ResponseWriter, request provider.Request) {
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s.zip", filename))
 
 	if err := a.zipFiles(request, zipWriter, ""); err != nil {
-		a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
+		a.rendererApp.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
 	}
 }
 
 func (a *app) zipFiles(request provider.Request, zipWriter *zip.Writer, pathname string) error {
-	files, err := a.storage.List(request.GetFilepath(pathname))
+	files, err := a.storageApp.List(request.GetFilepath(pathname))
 	if err != nil {
 		return err
 	}
@@ -119,7 +119,7 @@ func (a *app) addFileToZip(zipWriter *zip.Writer, file provider.StorageItem, pat
 		return err
 	}
 
-	reader, err := a.storage.ReaderFrom(file.Pathname)
+	reader, err := a.storageApp.ReaderFrom(file.Pathname)
 	if err != nil {
 		return err
 	}

@@ -85,23 +85,6 @@ func (a *app) Info(pathname string) (provider.StorageItem, error) {
 	return convertToItem(a.getRelativePath(fullpath), info), nil
 }
 
-// Semaphore create an exclusive file as a distributed lock
-func (a *app) Semaphore(pathname string) (bool, error) {
-	if err := checkPathname(pathname); err != nil {
-		return false, convertError(err)
-	}
-
-	if _, err := a.getFile(pathname, os.O_RDONLY|os.O_CREATE|os.O_EXCL); err != nil {
-		if !os.IsExist(err) {
-			return false, err
-		}
-
-		return false, nil
-	}
-
-	return true, nil
-}
-
 // List items in the storage
 func (a *app) List(pathname string) ([]provider.StorageItem, error) {
 	if err := checkPathname(pathname); err != nil {

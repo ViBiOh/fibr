@@ -20,7 +20,7 @@ func (a *app) Browser(w http.ResponseWriter, request provider.Request, file prov
 	pathParts := getPathParts(request.GetURI(""))
 	breadcrumbs := pathParts[:len(pathParts)-1]
 
-	files, err := a.storage.List(path.Dir(file.Pathname))
+	files, err := a.storageApp.List(path.Dir(file.Pathname))
 	if err != nil {
 		logger.Error("unable to list neighbors files: %s", err)
 	} else {
@@ -39,5 +39,5 @@ func (a *app) Browser(w http.ResponseWriter, request provider.Request, file prov
 		"Next":     next,
 	}
 
-	a.renderer.File(w, request, content, message)
+	a.rendererApp.File(w, request, content, message)
 }

@@ -25,12 +25,12 @@ func (a *app) ServeStatic(w http.ResponseWriter, r *http.Request) bool {
 	}
 
 	if r.URL.Path == "/sitemap.xml" {
-		a.renderer.Sitemap(w)
+		a.rendererApp.Sitemap(w)
 		return true
 	}
 
 	if strings.HasPrefix(r.URL.Path, "/svg") {
-		a.renderer.SVG(w, strings.TrimPrefix(r.URL.Path, "/svg/"), r.URL.Query().Get("fill"))
+		a.rendererApp.SVG(w, strings.TrimPrefix(r.URL.Path, "/svg/"), r.URL.Query().Get("fill"))
 		return true
 	}
 
@@ -50,21 +50,21 @@ func (a *app) ServeStatic(w http.ResponseWriter, r *http.Request) bool {
 }
 
 func (a *app) getWithMessage(w http.ResponseWriter, r *http.Request, request provider.Request, message renderer.Message) {
-	info, err := a.storage.Info(request.GetFilepath(""))
+	info, err := a.storageApp.Info(request.GetFilepath(""))
 	if err != nil {
 		if provider.IsNotExist(err) {
-			a.renderer.Error(w, request, provider.NewError(http.StatusNotFound, err))
+			a.rendererApp.Error(w, request, provider.NewError(http.StatusNotFound, err))
 		} else {
-			a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
+			a.rendererApp.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
 		}
 		return
 	}
 
 	if query.GetBool(r, "thumbnail") {
 		if info.IsDir {
-			a.thumbnail.List(w, r, info)
+			a.thumbnailApp.List(w, r, info)
 		} else {
-			a.thumbnail.Serve(w, r, info)
+			a.thumbnailApp.Serve(w, r, info)
 		}
 
 		return
@@ -73,8 +73,8 @@ func (a *app) getWithMessage(w http.ResponseWriter, r *http.Request, request pro
 	if !info.IsDir {
 		if query.GetBool(r, "browser") {
 			a.Browser(w, request, info, message)
-		} else if file, err := a.storage.ReaderFrom(info.Pathname); err != nil {
-			a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
+		} else if file, err := a.storageApp.ReaderFrom(info.Pathname); err != nil {
+			a.rendererApp.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
 		} else {
 			http.ServeContent(w, r, info.Name, info.Date, file)
 		}

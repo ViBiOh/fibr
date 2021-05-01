@@ -10,6 +10,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/crud"
 	"github.com/ViBiOh/fibr/pkg/fibr"
 	"github.com/ViBiOh/fibr/pkg/filesystem"
+	"github.com/ViBiOh/fibr/pkg/metadata"
 	"github.com/ViBiOh/fibr/pkg/renderer"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v4/pkg/alcotest"
@@ -45,6 +46,7 @@ func main() {
 	basicConfig := basicMemory.Flags(fs, "auth")
 
 	crudConfig := crud.Flags(fs, "")
+	metadataConfig := metadata.Flags(fs, "")
 	rendererConfig := renderer.Flags(fs, "")
 
 	filesystemConfig := filesystem.Flags(fs, "fs")
@@ -63,14 +65,15 @@ func main() {
 	prometheusApp := prometheus.New(prometheusConfig)
 	healthApp := health.New(healthConfig)
 
-	storage, err := filesystem.New(filesystemConfig)
+	storageApp, err := filesystem.New(filesystemConfig)
 	logger.Fatal(err)
 
 	prometheusRegister := prometheusApp.Registerer()
 
-	thumbnailApp := thumbnail.New(thumbnailConfig, storage, prometheusRegister)
+	metadataApp := metadata.New(metadataConfig, storageApp)
+	thumbnailApp := thumbnail.New(thumbnailConfig, storageApp, prometheusRegister)
 	rendererApp := renderer.New(rendererConfig, thumbnailApp)
-	crudApp, err := crud.New(crudConfig, storage, rendererApp, thumbnailApp, prometheusRegister)
+	crudApp, err := crud.New(crudConfig, storageApp, rendererApp, metadataApp, thumbnailApp, prometheusRegister)
 	logger.Fatal(err)
 
 	var middlewareApp authMiddleware.App
@@ -78,9 +81,10 @@ func main() {
 		middlewareApp = newLoginApp(basicConfig)
 	}
 
-	fibrApp := fibr.New(crudApp, rendererApp, middlewareApp)
+	fibrApp := fibr.New(crudApp, rendererApp, metadataApp, middlewareApp)
 
 	go thumbnailApp.Start()
+	go metadataApp.Start(appServer.Done())
 	go crudApp.Start(appServer.Done())
 
 	go promServer.Start("prometheus", healthApp.End(), prometheusApp.Handler())

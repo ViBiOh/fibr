@@ -15,6 +15,7 @@ import (
 	"github.com/ViBiOh/auth/v2/pkg/ident"
 	"github.com/ViBiOh/auth/v2/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/crud/crudtest"
+	"github.com/ViBiOh/fibr/pkg/metadata/metadatatest"
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
@@ -61,7 +62,8 @@ func TestParseShare(t *testing.T) {
 		{
 			"no share",
 			app{
-				crudApp: crudtest.New(),
+				crudApp:     crudtest.New(),
+				metadataApp: metadatatest.New(),
 			},
 			args{
 				request: &provider.Request{
@@ -82,7 +84,8 @@ func TestParseShare(t *testing.T) {
 		{
 			"passwordless share",
 			app{
-				crudApp: crudtest.New(),
+				crudApp:     crudtest.New(),
+				metadataApp: metadatatest.New().SetGetShare(metadatatest.PasswordLessShare),
 			},
 			args{
 				request: &provider.Request{
@@ -97,14 +100,15 @@ func TestParseShare(t *testing.T) {
 				CanEdit:  false,
 				CanShare: false,
 				Display:  "grid",
-				Share:    crudtest.PasswordLessShare,
+				Share:    metadatatest.PasswordLessShare,
 			},
 			nil,
 		},
 		{
 			"empty password",
 			app{
-				crudApp: crudtest.New(),
+				crudApp:     crudtest.New(),
+				metadataApp: metadatatest.New().SetGetShare(metadatatest.PasswordShare),
 			},
 			args{
 				request: &provider.Request{
@@ -125,7 +129,8 @@ func TestParseShare(t *testing.T) {
 		{
 			"valid",
 			app{
-				crudApp: crudtest.New(),
+				crudApp:     crudtest.New(),
+				metadataApp: metadatatest.New().SetGetShare(metadatatest.PasswordShare),
 			},
 			args{
 				request: &provider.Request{
@@ -141,7 +146,7 @@ func TestParseShare(t *testing.T) {
 				CanEdit:  true,
 				CanShare: false,
 				Display:  "grid",
-				Share:    crudtest.PasswordShare,
+				Share:    metadatatest.PasswordShare,
 			},
 			nil,
 		},
@@ -239,7 +244,8 @@ func TestParseRequest(t *testing.T) {
 		{
 			"share error",
 			app{
-				crudApp: crudtest.New(),
+				crudApp:     crudtest.New(),
+				metadataApp: metadatatest.New().SetEnabled(true).SetGetShare(metadatatest.PasswordShare),
 			},
 			args{
 				r: httptest.NewRequest(http.MethodGet, "/f5d4c3b2a1/", nil),
@@ -254,7 +260,8 @@ func TestParseRequest(t *testing.T) {
 		{
 			"share",
 			app{
-				crudApp: crudtest.New(),
+				crudApp:     crudtest.New(),
+				metadataApp: metadatatest.New().SetEnabled(true).SetGetShare(metadatatest.PasswordLessShare),
 			},
 			args{
 				r: httptest.NewRequest(http.MethodGet, "/a1b2c3d4f5/", nil),
@@ -263,14 +270,15 @@ func TestParseRequest(t *testing.T) {
 				Path:     "/",
 				CanEdit:  false,
 				CanShare: false,
-				Share:    crudtest.PasswordLessShare,
+				Share:    metadatatest.PasswordLessShare,
 			},
 			nil,
 		},
 		{
 			"no auth",
 			app{
-				crudApp: crudtest.New(),
+				crudApp:     crudtest.New(),
+				metadataApp: metadatatest.New(),
 			},
 			args{
 				r: httptest.NewRequest(http.MethodGet, "/", nil),
@@ -278,15 +286,16 @@ func TestParseRequest(t *testing.T) {
 			provider.Request{
 				Path:     "/",
 				CanEdit:  true,
-				CanShare: true,
+				CanShare: false,
 			},
 			nil,
 		},
 		{
 			"invalid auth",
 			app{
-				crudApp:  crudtest.New(),
-				loginApp: authMiddlewareTest{},
+				crudApp:     crudtest.New(),
+				metadataApp: metadatatest.New(),
+				loginApp:    authMiddlewareTest{},
 			},
 			args{
 				r: httptest.NewRequest(http.MethodGet, invalidPath, nil),
@@ -301,8 +310,9 @@ func TestParseRequest(t *testing.T) {
 		{
 			"non admin user",
 			app{
-				crudApp:  crudtest.New(),
-				loginApp: authMiddlewareTest{},
+				crudApp:     crudtest.New(),
+				metadataApp: metadatatest.New(),
+				loginApp:    authMiddlewareTest{},
 			},
 			args{
 				r: httptest.NewRequest(http.MethodGet, "/guest", nil),
@@ -317,8 +327,9 @@ func TestParseRequest(t *testing.T) {
 		{
 			"admin user",
 			app{
-				crudApp:  crudtest.New(),
-				loginApp: authMiddlewareTest{},
+				crudApp:     crudtest.New(),
+				metadataApp: metadatatest.New().SetEnabled(true),
+				loginApp:    authMiddlewareTest{},
 			},
 			args{
 				r: httptest.NewRequest(http.MethodGet, adminPath, nil),
@@ -333,8 +344,9 @@ func TestParseRequest(t *testing.T) {
 		{
 			"empty cookie",
 			app{
-				crudApp:  crudtest.New(),
-				loginApp: authMiddlewareTest{},
+				crudApp:     crudtest.New(),
+				metadataApp: metadatatest.New(),
+				loginApp:    authMiddlewareTest{},
 			},
 			args{
 				r: adminRequestWithEmptyCookie,
@@ -342,15 +354,16 @@ func TestParseRequest(t *testing.T) {
 			provider.Request{
 				Path:     adminPath,
 				CanEdit:  true,
-				CanShare: true,
+				CanShare: false,
 			},
 			nil,
 		},
 		{
 			"cookie value",
 			app{
-				crudApp:  crudtest.New(),
-				loginApp: authMiddlewareTest{},
+				crudApp:     crudtest.New(),
+				metadataApp: metadatatest.New(),
+				loginApp:    authMiddlewareTest{},
 			},
 			args{
 				r: adminRequestWithCookie,
@@ -358,7 +371,7 @@ func TestParseRequest(t *testing.T) {
 			provider.Request{
 				Path:     adminPath,
 				CanEdit:  true,
-				CanShare: true,
+				CanShare: false,
 				Preferences: provider.Preferences{
 					ListLayoutPath: []string{"assets", "documents/monthly"},
 				},
