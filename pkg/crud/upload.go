@@ -28,7 +28,7 @@ func (a *app) saveUploadedFile(request provider.Request, part *multipart.Part) (
 		filePath = request.GetFilepath(filename)
 	}
 
-	hostFile, err := a.storage.WriterTo(filePath)
+	hostFile, err := a.storageApp.WriterTo(filePath)
 	if hostFile != nil {
 		defer func() {
 			if err := hostFile.Close(); err != nil {
@@ -46,13 +46,13 @@ func (a *app) saveUploadedFile(request provider.Request, part *multipart.Part) (
 		return "", err
 	}
 
-	info, err := a.storage.Info(filePath)
+	info, err := a.storageApp.Info(filePath)
 	if err != nil {
 		return "", err
 	}
 
 	if thumbnail.CanHaveThumbnail(info) {
-		a.thumbnail.GenerateThumbnail(info)
+		a.thumbnailApp.GenerateThumbnail(info)
 	}
 
 	return filename, nil
@@ -61,38 +61,38 @@ func (a *app) saveUploadedFile(request provider.Request, part *multipart.Part) (
 // Upload saves form files to filesystem
 func (a *app) Upload(w http.ResponseWriter, r *http.Request, request provider.Request, values map[string]string, part *multipart.Part) {
 	if !request.CanEdit {
-		a.renderer.Error(w, request, provider.NewError(http.StatusForbidden, ErrNotAuthorized))
+		a.rendererApp.Error(w, request, provider.NewError(http.StatusForbidden, ErrNotAuthorized))
 		return
 	}
 
 	if part == nil {
-		a.renderer.Error(w, request, provider.NewError(http.StatusBadRequest, errors.New("no file provided for save")))
+		a.rendererApp.Error(w, request, provider.NewError(http.StatusBadRequest, errors.New("no file provided for save")))
 		return
 	}
 
 	shared, err := getFormBool(values["share"])
 	if err != nil {
-		a.renderer.Error(w, request, provider.NewError(http.StatusBadRequest, err))
+		a.rendererApp.Error(w, request, provider.NewError(http.StatusBadRequest, err))
 		return
 	}
 
 	duration, err := getFormDuration(values["duration"])
 	if err != nil {
-		a.renderer.Error(w, request, provider.NewError(http.StatusBadRequest, err))
+		a.rendererApp.Error(w, request, provider.NewError(http.StatusBadRequest, err))
 		return
 	}
 
 	filename, err := a.saveUploadedFile(request, part)
 	if err != nil {
-		a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
+		a.rendererApp.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
 
 	var shareID string
 	if shared {
-		id, err := a.createShare(path.Join(request.Path, filename), false, "", false, duration)
+		id, err := a.metadataApp.CreateShare(path.Join(request.Path, filename), false, "", false, duration)
 		if err != nil {
-			a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
+			a.rendererApp.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
 			return
 		}
 

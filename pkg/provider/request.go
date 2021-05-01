@@ -12,6 +12,11 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+var (
+	// NoneShare is an undefined Share
+	NoneShare = Share{}
+)
+
 // Preferences holds preferences of the user
 type Preferences struct {
 	ListLayoutPath []string

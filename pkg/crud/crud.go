@@ -10,13 +10,10 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
-	"sync"
-	"syscall"
-	"time"
 
+	"github.com/ViBiOh/fibr/pkg/metadata"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
-	"github.com/ViBiOh/httputils/v4/pkg/cron"
 	"github.com/ViBiOh/httputils/v4/pkg/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
@@ -55,53 +52,45 @@ type App interface {
 	Rename(http.ResponseWriter, *http.Request, provider.Request)
 	Delete(http.ResponseWriter, *http.Request, provider.Request)
 
-	GetShare(string) provider.Share
 	CreateShare(http.ResponseWriter, *http.Request, provider.Request)
 	DeleteShare(http.ResponseWriter, *http.Request, provider.Request)
 }
 
 // Config of package
 type Config struct {
-	metadata        *bool
 	ignore          *string
 	sanitizeOnStart *bool
 }
 
 type app struct {
-	prometheus prometheus.Registerer
-	storage    provider.Storage
-	renderer   provider.Renderer
-	thumbnail  thumbnail.App
+	prometheus   prometheus.Registerer
+	storageApp   provider.Storage
+	rendererApp  provider.Renderer
+	metadataApp  metadata.App
+	thumbnailApp thumbnail.App
 
-	staticHandler http.Handler
-	clock         *Clock
-
-	metadatas sync.Map
-
-	metadataEnabled  bool
-	sanitizeOnStart  bool
-	highAvailability bool
+	staticHandler   http.Handler
+	sanitizeOnStart bool
 }
 
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		metadata:        flags.New(prefix, "crud").Name("Metadata").Default(true).Label("Enable metadata storage").ToBool(fs),
 		ignore:          flags.New(prefix, "crud").Name("IgnorePattern").Default("").Label("Ignore pattern when listing files or directory").ToString(fs),
 		sanitizeOnStart: flags.New(prefix, "crud").Name("SanitizeOnStart").Default(false).Label("Sanitize name on start").ToBool(fs),
 	}
 }
 
 // New creates new App from Config
-func New(config Config, storage provider.Storage, renderer provider.Renderer, thumbnail thumbnail.App, prometheus prometheus.Registerer) (App, error) {
+func New(config Config, storage provider.Storage, renderer provider.Renderer, metadata metadata.App, thumbnail thumbnail.App, prometheus prometheus.Registerer) (App, error) {
 	app := &app{
-		metadataEnabled: *config.metadata,
 		sanitizeOnStart: *config.sanitizeOnStart,
 
-		storage:    storage,
-		renderer:   renderer,
-		thumbnail:  thumbnail,
-		prometheus: prometheus,
+		storageApp:   storage,
+		rendererApp:  renderer,
+		thumbnailApp: thumbnail,
+		metadataApp:  metadata,
+		prometheus:   prometheus,
 	}
 
 	staticFS, err := fs.Sub(filesystem, "static")
@@ -109,10 +98,6 @@ func New(config Config, storage provider.Storage, renderer provider.Renderer, th
 		return nil, fmt.Errorf("unable to get static/ filesystem: %s", err)
 	}
 	app.staticHandler = http.FileServer(http.FS(staticFS))
-
-	if app.metadataEnabled {
-		logger.Fatal(app.refreshMetadatas())
-	}
 
 	var ignorePattern *regexp.Regexp
 	ignore := strings.TrimSpace(*config.ignore)
@@ -151,7 +136,7 @@ func (a *app) Start(done <-chan struct{}) {
 		a.prometheus.MustRegister(renameCount)
 	}
 
-	err := a.storage.Walk("", func(item provider.StorageItem, _ error) error {
+	err := a.storageApp.Walk("", func(item provider.StorageItem, _ error) error {
 		name, err := provider.SanitizeName(item.Pathname, false)
 		if err != nil {
 			logger.Error("unable to sanitize name %s: %s", item.Pathname, err)
@@ -168,8 +153,8 @@ func (a *app) Start(done <-chan struct{}) {
 			logger.Info("File with name `%s` should be renamed to `%s`", item.Pathname, name)
 		}
 
-		if thumbnail.CanHaveThumbnail(item) && !a.thumbnail.HasThumbnail(item) {
-			a.thumbnail.GenerateThumbnail(item)
+		if thumbnail.CanHaveThumbnail(item) && !a.thumbnailApp.HasThumbnail(item) {
+			a.thumbnailApp.GenerateThumbnail(item)
 		}
 
 		return nil
@@ -177,12 +162,6 @@ func (a *app) Start(done <-chan struct{}) {
 
 	if err != nil {
 		logger.Error("%s", err)
-	}
-
-	if a.metadataEnabled {
-		cron.New().Each(time.Hour).OnError(func(err error) {
-			logger.Error("unable to purge metadatas: %s", err)
-		}).OnSignal(syscall.SIGUSR1).Now().Start(a.cleanMetadatas, done)
 	}
 }
 
@@ -196,21 +175,4 @@ func (a *app) rename(item provider.StorageItem, name string, guage *prometheus.G
 		guage.WithLabelValues("success").Add(1.0)
 		item = renamedItem
 	}
-
-}
-
-// GetShare returns share configuration if request path match
-func (a *app) GetShare(requestPath string) (share provider.Share) {
-	cleanPath := strings.TrimPrefix(requestPath, "/")
-
-	a.metadatas.Range(func(key interface{}, value interface{}) bool {
-		if strings.HasPrefix(cleanPath, key.(string)) {
-			share = value.(provider.Share)
-			return false
-		}
-
-		return true
-	})
-
-	return
 }

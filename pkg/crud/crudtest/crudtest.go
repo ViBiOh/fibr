@@ -3,34 +3,9 @@ package crudtest
 import (
 	"mime/multipart"
 	"net/http"
-	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
-	"golang.org/x/crypto/bcrypt"
-)
-
-var (
-	// PasswordLessShare instance
-	PasswordLessShare = provider.Share{
-		ID:       "a1b2c3d4f5",
-		Edit:     false,
-		RootName: "public",
-		File:     false,
-		Path:     "/public",
-	}
-
-	passwordHash, _ = bcrypt.GenerateFromPassword([]byte("password"), 12)
-
-	// PasswordShare instance
-	PasswordShare = provider.Share{
-		ID:       "f5d4c3b2a1",
-		Edit:     true,
-		RootName: "private",
-		File:     false,
-		Path:     "/private",
-		Password: string(passwordHash),
-	}
 )
 
 // App for mocked calls
@@ -89,19 +64,6 @@ func (a App) Rename(http.ResponseWriter, *http.Request, provider.Request) {
 // Delete mocked implementation
 func (a App) Delete(http.ResponseWriter, *http.Request, provider.Request) {
 	// mock implementation
-}
-
-// GetShare mocked implementation
-func (a App) GetShare(path string) provider.Share {
-	if strings.HasPrefix(path, "/a1b2c3d4f5") {
-		return PasswordLessShare
-	}
-
-	if strings.HasPrefix(path, "/f5d4c3b2a1") {
-		return PasswordShare
-	}
-
-	return provider.Share{}
 }
 
 // CreateShare mocked implementation

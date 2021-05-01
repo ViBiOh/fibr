@@ -4,38 +4,26 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
 func (a *app) doRename(oldPath, newPath string, oldItem provider.StorageItem) (provider.StorageItem, error) {
-	if err := a.storage.Rename(oldPath, newPath); err != nil {
+	if err := a.storageApp.Rename(oldPath, newPath); err != nil {
 		return provider.StorageItem{}, err
 	}
 
-	newItem, err := a.storage.Info(newPath)
+	newItem, err := a.storageApp.Info(newPath)
 	if err != nil {
 		return provider.StorageItem{}, err
 	}
 
-	a.metadatas.Range(func(key interface{}, value interface{}) bool {
-		share := value.(provider.Share)
-
-		if strings.HasPrefix(share.Path, oldPath) {
-			share.Path = strings.Replace(share.Path, oldPath, newPath, 1)
-			a.metadatas.Store(key, share)
-		}
-
-		return true
-	})
-
-	if err := a.saveMetadatas(); err != nil {
+	if err := a.metadataApp.RenameSharePath(oldPath, newPath); err != nil {
 		return newItem, fmt.Errorf("error while updating metadatas: %s", err)
 	}
 
-	go a.thumbnail.Rename(oldItem, newItem)
+	go a.thumbnailApp.Rename(oldItem, newItem)
 
 	return newItem, nil
 }
@@ -43,45 +31,45 @@ func (a *app) doRename(oldPath, newPath string, oldItem provider.StorageItem) (p
 // Rename rename given path to a new one
 func (a *app) Rename(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !request.CanEdit {
-		a.renderer.Error(w, request, provider.NewError(http.StatusForbidden, ErrNotAuthorized))
+		a.rendererApp.Error(w, request, provider.NewError(http.StatusForbidden, ErrNotAuthorized))
 		return
 	}
 
 	oldName, httErr := checkFormName(r, "name")
 	if httErr != nil && httErr.Err != ErrEmptyName {
-		a.renderer.Error(w, request, httErr)
+		a.rendererApp.Error(w, request, httErr)
 		return
 	}
 
 	newFolder, err := getNewFolder(r, request)
 	if err != nil {
-		a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
+		a.rendererApp.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
 
 	newName, err := getNewName(r)
 	if err != nil {
-		a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
+		a.rendererApp.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
 
 	oldPath := request.GetFilepath(oldName)
 	newPath := provider.GetPathname(newFolder, newName, request.Share)
 
-	if _, err := a.storage.Info(newPath); err == nil {
-		a.renderer.Error(w, request, provider.NewError(http.StatusBadRequest, errors.New("new name already exist")))
+	if _, err := a.storageApp.Info(newPath); err == nil {
+		a.rendererApp.Error(w, request, provider.NewError(http.StatusBadRequest, errors.New("new name already exist")))
 		return
 	} else if !provider.IsNotExist(err) {
-		a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
+		a.rendererApp.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
 
-	oldItem, err := a.storage.Info(oldPath)
+	oldItem, err := a.storageApp.Info(oldPath)
 	if err != nil {
 		if !provider.IsNotExist(err) {
-			a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
+			a.rendererApp.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
 		} else {
-			a.renderer.Error(w, request, provider.NewError(http.StatusNotFound, err))
+			a.rendererApp.Error(w, request, provider.NewError(http.StatusNotFound, err))
 		}
 
 		return
@@ -89,7 +77,7 @@ func (a *app) Rename(w http.ResponseWriter, r *http.Request, request provider.Re
 
 	newItem, err := a.doRename(oldPath, newPath, oldItem)
 	if err != nil {
-		a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
+		a.rendererApp.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
 

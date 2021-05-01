@@ -55,7 +55,7 @@ func (a *app) Post(w http.ResponseWriter, r *http.Request, request provider.Requ
 			case http.MethodDelete:
 				a.DeleteShare(w, r, request)
 			default:
-				a.renderer.Error(w, request, provider.NewError(http.StatusMethodNotAllowed, fmt.Errorf("unknown share method `%s` for %s", method, r.URL.Path)))
+				a.rendererApp.Error(w, request, provider.NewError(http.StatusMethodNotAllowed, fmt.Errorf("unknown share method `%s` for %s", method, r.URL.Path)))
 			}
 		} else {
 			switch method {
@@ -66,7 +66,7 @@ func (a *app) Post(w http.ResponseWriter, r *http.Request, request provider.Requ
 			case http.MethodDelete:
 				a.Delete(w, r, request)
 			default:
-				a.renderer.Error(w, request, provider.NewError(http.StatusMethodNotAllowed, fmt.Errorf("unknown method `%s` for %s", method, r.URL.Path)))
+				a.rendererApp.Error(w, request, provider.NewError(http.StatusMethodNotAllowed, fmt.Errorf("unknown method `%s` for %s", method, r.URL.Path)))
 			}
 		}
 
@@ -76,12 +76,12 @@ func (a *app) Post(w http.ResponseWriter, r *http.Request, request provider.Requ
 	if strings.HasPrefix(contentType, "multipart/form-data") {
 		values, file, err := parseMultipart(r)
 		if err != nil {
-			a.renderer.Error(w, request, provider.NewError(http.StatusInternalServerError, fmt.Errorf("unable to parse multipart request: %s", err)))
+			a.rendererApp.Error(w, request, provider.NewError(http.StatusInternalServerError, fmt.Errorf("unable to parse multipart request: %s", err)))
 			return
 		}
 
 		if values["method"] != http.MethodPost {
-			a.renderer.Error(w, request, provider.NewError(http.StatusMethodNotAllowed, fmt.Errorf("unknown method `%s` for multipart", values["method"])))
+			a.rendererApp.Error(w, request, provider.NewError(http.StatusMethodNotAllowed, fmt.Errorf("unknown method `%s` for multipart", values["method"])))
 			return
 		}
 
@@ -89,5 +89,5 @@ func (a *app) Post(w http.ResponseWriter, r *http.Request, request provider.Requ
 		return
 	}
 
-	a.renderer.Error(w, request, provider.NewError(http.StatusMethodNotAllowed, fmt.Errorf("unknown content-type %s", contentType)))
+	a.rendererApp.Error(w, request, provider.NewError(http.StatusMethodNotAllowed, fmt.Errorf("unknown content-type %s", contentType)))
 }

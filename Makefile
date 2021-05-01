@@ -88,7 +88,7 @@ run:
 		-authUsers "1:`htpasswd -nBb admin admin`" \
 		-frameOptions "SAMEORIGIN" \
 		-thumbnailImageURL "http://localhost:9000" \
-		-thumbnailVideoURL "http://localhost:2080" \
+		-thumbnailVideoURL "http://localhost:2080"
 
 .PHONY: run-imaginary
 run-imaginary:

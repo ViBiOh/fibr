@@ -14,8 +14,13 @@
       height: 100%;
       image-orientation: from-image;
       margin: 0 auto;
-      object-fit: scale-down;
+      object-fit: contain;
+      object-position: top left;
       width: 100%;
+    }
+
+    img, video {
+      object-position: center center;
     }
   </style>
 
