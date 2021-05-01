@@ -1,22 +1,22 @@
 {
   "no-login": {
+    "creation": "2021-04-28T11:50:51.991262+02:00",
     "id": "no-login",
     "path": "/pkg/",
     "rootName": "fibr",
     "password": "",
+    "duration": 0,
     "edit": true,
-    "file": false,
-    "creation": "2021-04-28T11:50:51.991262+02:00",
-    "duration": 0
+    "file": false
   },
   "password": {
+    "creation": "2021-04-28T11:50:51.991262+02:00",
     "id": "password",
     "path": "/infra/",
     "rootName": "infra",
     "password": "$2a$12$SVaRKEx6MrP2ZdUOrBoSg.s/hIT5VJTuimQEQGkReIyYRPX14sV12",
+    "duration": 0,
     "edit": false,
-    "file": false,
-    "creation": "2021-04-28T11:50:51.991262+02:00",
-    "duration": 0
+    "file": false
   }
 }

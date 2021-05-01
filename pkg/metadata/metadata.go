@@ -77,6 +77,9 @@ func (a *app) GetShare(requestPath string) provider.Share {
 
 	cleanPath := strings.TrimPrefix(requestPath, "/")
 
+	a.mutex.RLock()
+	defer a.mutex.RUnlock()
+
 	for key, share := range a.metadatas {
 		if strings.HasPrefix(cleanPath, key) {
 			return share
@@ -113,9 +116,6 @@ func (a *app) Start(done <-chan struct{}) {
 }
 
 func (a *app) refreshMetadatas() error {
-	a.mutex.Lock()
-	defer a.mutex.Unlock()
-
 	_, err := a.storageApp.Info(metadataFilename)
 	if err != nil && !provider.IsNotExist(err) {
 		return err
@@ -141,6 +141,9 @@ func (a *app) refreshMetadatas() error {
 		return err
 	}
 
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
+
 	decoder := json.NewDecoder(file)
 	if err = decoder.Decode(&a.metadatas); err != nil {
 		return fmt.Errorf("unable to decode metadatas: %s", err)
@@ -150,9 +153,6 @@ func (a *app) refreshMetadatas() error {
 }
 
 func (a *app) purgeExpiredMetadatas() bool {
-	a.mutex.Lock()
-	defer a.mutex.Unlock()
-
 	now := a.clock.Now()
 	changed := false
 
@@ -167,19 +167,21 @@ func (a *app) purgeExpiredMetadatas() bool {
 }
 
 func (a *app) cleanMetadatas(_ context.Context) error {
-	if a.purgeExpiredMetadatas() {
-		if err := a.saveMetadatas(); err != nil {
-			return fmt.Errorf("unable to save metadatas: %s", err)
-		}
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
+
+	if !a.purgeExpiredMetadatas() {
+		return nil
+	}
+
+	if err := a.saveMetadatas(); err != nil {
+		return fmt.Errorf("unable to save metadatas: %s", err)
 	}
 
 	return nil
 }
 
 func (a *app) saveMetadatas() (err error) {
-	a.mutex.RLock()
-	defer a.mutex.RUnlock()
-
 	file, err := a.storageApp.WriterTo(metadataFilename)
 	if file != nil {
 		defer func() {
