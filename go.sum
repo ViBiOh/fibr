@@ -5,10 +5,10 @@ github.com/DATA-DOG/go-sqlmock v1.5.0/go.mod h1:f/Ixk793poVmq4qj/V1dPUg2JEAKC73Q
 github.com/Knetic/govaluate v3.0.1-0.20171022003610-9aa49832a739+incompatible/go.mod h1:r7JcOSlj0wfOMncg0iLm8Leh48TZaKVeNIfJntJ2wa0=
 github.com/Shopify/sarama v1.19.0/go.mod h1:FVkBWblsNy7DGZRfXLU0O9RCGt5g3g3yEuWXgklEdEo=
 github.com/Shopify/toxiproxy v2.1.4+incompatible/go.mod h1:OXgGpZ6Cli1/URJOF1DMxUHB2q5Ap20/P/eIdh4G0pI=
-github.com/ViBiOh/auth/v2 v2.6.14 h1:0LK+/3RImpc2uWV23830oj5G/vjXnO9PU3dI1OFVxMw=
-github.com/ViBiOh/auth/v2 v2.6.14/go.mod h1:X9PL4AW0oH/mgUv2bL1pohlqPL/C4DfSQ9Y9+FU/Z5s=
-github.com/ViBiOh/httputils/v4 v4.7.1 h1:pgT69uNNMLRxc6TTPFlQVLMBXW0NDPEf6nfFJNwRcPE=
-github.com/ViBiOh/httputils/v4 v4.7.1/go.mod h1:1hyt/nMC1kLiB9sm+qfHaQY9TIxS7gcUQZTV0DZ/nwc=
+github.com/ViBiOh/auth/v2 v2.6.15 h1:P7T5TjpMOrAXF5wQ5x4ihl0jXp5AXtaoTb487mJFDVE=
+github.com/ViBiOh/auth/v2 v2.6.15/go.mod h1:ai96/8BXLiV7t748W7AVDANbmrM0QTNDsPOVZKPLYvk=
+github.com/ViBiOh/httputils/v4 v4.8.0 h1:fs2fjkBnmElYyPbM5vqDz00SyJsomUmKQIwTxSLw+kM=
+github.com/ViBiOh/httputils/v4 v4.8.0/go.mod h1:1hyt/nMC1kLiB9sm+qfHaQY9TIxS7gcUQZTV0DZ/nwc=
 github.com/VividCortex/gohistogram v1.0.0/go.mod h1:Pf5mBqqDxYaXu3hDrrU+w6nw50o/4+TcAqDqk/vUH7g=
 github.com/afex/hystrix-go v0.0.0-20180502004556-fa1af6a1f4f5/go.mod h1:SkGFH1ia65gfNATL8TAiHDNxPzPdmEL5uirI2Uyuz6c=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
