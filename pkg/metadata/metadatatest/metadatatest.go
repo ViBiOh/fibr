@@ -143,5 +143,4 @@ func (a *App) Dump() map[string]provider.Share {
 
 // Start mocks implementation
 func (a *App) Start(<-chan struct{}) {
-	return
 }

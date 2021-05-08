@@ -17,7 +17,7 @@ func parseMultipart(r *http.Request) (map[string]string, *multipart.Part, error)
 	}
 
 	var filePart *multipart.Part
-	values := make(map[string]string, 0)
+	values := make(map[string]string)
 
 	for {
 		part, err := reader.NextPart()

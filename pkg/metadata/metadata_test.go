@@ -20,9 +20,9 @@ func TestPurgeExpiredMetadatas(t *testing.T) {
 				clock: &Clock{
 					now: time.Date(2021, 05, 01, 14, 00, 00, 0, time.UTC),
 				},
-				metadatas: make(map[string]provider.Share, 0),
+				metadatas: make(map[string]provider.Share),
 			},
-			make(map[string]provider.Share, 0),
+			make(map[string]provider.Share),
 		},
 		{
 			"purge at boundaries",
