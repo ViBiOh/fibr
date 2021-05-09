@@ -27,7 +27,7 @@ func newLoginApp(basicConfig basicMemory.Config) authMiddleware.App {
 	basicApp, err := basicMemory.New(basicConfig)
 	logger.Fatal(err)
 
-	basicProviderProvider := basic.New(basicApp)
+	basicProviderProvider := basic.New(basicApp, "fibr")
 	return authMiddleware.New(basicApp, basicProviderProvider)
 }
 
