@@ -14,7 +14,7 @@ spec:
         name: vibioh
       interval: 120m
   install:
-    skipCRDs: true
+    crds: Skip
   maxHistory: 3
   upgrade:
     remediation:
