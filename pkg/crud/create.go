@@ -35,5 +35,5 @@ func (a *app) Create(w http.ResponseWriter, r *http.Request, request provider.Re
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("%s/?%s", request.GetURI(name), renderer.NewSuccessMessage(fmt.Sprintf("Directory %s successfully created", path.Base(pathname)))), http.StatusMovedPermanently)
+	http.Redirect(w, r, fmt.Sprintf("%s%s", a.publicURL, path.Join(request.GetURI(name), fmt.Sprintf("?%s", renderer.NewSuccessMessage(fmt.Sprintf("Directory %s successfully created", path.Base(pathname)))))), http.StatusMovedPermanently)
 }

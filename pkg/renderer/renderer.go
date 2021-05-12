@@ -26,6 +26,7 @@ type App interface {
 	Error(http.ResponseWriter, provider.Request, *provider.Error)
 	Sitemap(http.ResponseWriter)
 	SVG(http.ResponseWriter, string, string)
+	PublicURL() string
 }
 
 // Config of package

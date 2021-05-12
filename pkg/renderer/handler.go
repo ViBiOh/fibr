@@ -107,3 +107,8 @@ func (a app) SVG(w http.ResponseWriter, name, fill string) {
 		return
 	}
 }
+
+// PublicURL returns public URL
+func (a app) PublicURL() string {
+	return a.config.PublicURL
+}

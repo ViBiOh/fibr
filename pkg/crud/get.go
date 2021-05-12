@@ -88,7 +88,7 @@ func (a *app) getWithMessage(w http.ResponseWriter, r *http.Request, request pro
 	}
 
 	if !strings.HasSuffix(r.URL.Path, "/") {
-		http.Redirect(w, r, fmt.Sprintf("%s/", r.URL.Path), http.StatusPermanentRedirect)
+		http.Redirect(w, r, fmt.Sprintf("%s%s/", a.publicURL, r.URL.Path), http.StatusPermanentRedirect)
 		return
 	}
 
