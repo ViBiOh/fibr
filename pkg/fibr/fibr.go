@@ -28,15 +28,18 @@ type app struct {
 	crudApp     crud.App
 	rendererApp renderer.App
 	metadataApp metadata.App
+
+	publicURL string
 }
 
 // New creates new App from Config
-func New(crudApp crud.App, rendererApp renderer.App, metadataApp metadata.App, loginApp authMiddleware.App) App {
+func New(crudApp crud.App, rendererApp renderer.App, metadataApp metadata.App, loginApp authMiddleware.App, publicURL string) App {
 	return &app{
 		crudApp:     crudApp,
 		rendererApp: rendererApp,
 		loginApp:    loginApp,
 		metadataApp: metadataApp,
+		publicURL:   publicURL,
 	}
 }
 
@@ -146,7 +149,7 @@ func (a app) Handler() http.Handler {
 		}
 
 		if query.GetBool(r, "redirect") {
-			http.Redirect(w, r, r.URL.Path, http.StatusFound)
+			http.Redirect(w, r, fmt.Sprintf("%s%s", a.publicURL, r.URL.Path), http.StatusFound)
 			return
 		}
 

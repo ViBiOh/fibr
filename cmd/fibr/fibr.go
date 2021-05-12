@@ -73,7 +73,7 @@ func main() {
 	metadataApp := metadata.New(metadataConfig, storageApp)
 	thumbnailApp := thumbnail.New(thumbnailConfig, storageApp, prometheusRegister)
 	rendererApp := renderer.New(rendererConfig, thumbnailApp)
-	crudApp, err := crud.New(crudConfig, storageApp, rendererApp, metadataApp, thumbnailApp, prometheusRegister)
+	crudApp, err := crud.New(crudConfig, storageApp, rendererApp, metadataApp, thumbnailApp, prometheusRegister, rendererApp.PublicURL())
 	logger.Fatal(err)
 
 	var middlewareApp authMiddleware.App
@@ -81,7 +81,7 @@ func main() {
 		middlewareApp = newLoginApp(basicConfig)
 	}
 
-	fibrApp := fibr.New(crudApp, rendererApp, metadataApp, middlewareApp)
+	fibrApp := fibr.New(crudApp, rendererApp, metadataApp, middlewareApp, rendererApp.PublicURL())
 
 	go thumbnailApp.Start()
 	go metadataApp.Start(appServer.Done())

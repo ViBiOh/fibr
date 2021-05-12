@@ -70,6 +70,7 @@ type app struct {
 	thumbnailApp thumbnail.App
 
 	staticHandler   http.Handler
+	publicURL       string
 	sanitizeOnStart bool
 }
 
@@ -82,9 +83,10 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 }
 
 // New creates new App from Config
-func New(config Config, storage provider.Storage, renderer provider.Renderer, metadata metadata.App, thumbnail thumbnail.App, prometheus prometheus.Registerer) (App, error) {
+func New(config Config, storage provider.Storage, renderer provider.Renderer, metadata metadata.App, thumbnail thumbnail.App, prometheus prometheus.Registerer, publicURL string) (App, error) {
 	app := &app{
 		sanitizeOnStart: *config.sanitizeOnStart,
+		publicURL:       publicURL,
 
 		storageApp:   storage,
 		rendererApp:  renderer,
