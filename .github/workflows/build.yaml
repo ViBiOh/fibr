@@ -10,7 +10,7 @@ on:
       - main
 
 env:
-  SCRIPTS_NO_INTERACTIVE: 'true'
+  SCRIPTS_NO_INTERACTIVE: "true"
 
 defaults:
   run:
@@ -27,7 +27,7 @@ jobs:
       - name: Setup Golang
         uses: actions/setup-go@v2
         with:
-          go-version: '^1.16'
+          go-version: "^1.16"
       - name: Build
         run: |
           make
@@ -45,7 +45,7 @@ jobs:
       - name: Setup Golang
         uses: actions/setup-go@v2
         with:
-          go-version: '^1.16'
+          go-version: "^1.16"
       - name: Build
         run: |
           curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap" | bash -s "release"
@@ -93,9 +93,6 @@ jobs:
           FLUX_WEBHOOK_URL: ${{ secrets.FLUX_WEBHOOK_URL }}
         run: |
           curl --disable --silent --show-error --location --max-time 30 --header "X-Signature: sha1=$(printf "{}" | openssl dgst -sha1 -r -hmac "${FLUX_TOKEN}"| awk '{print $1}')" --data "{}" "${FLUX_WEBHOOK_URL}"
-      - name: GoReport
-        run: |
-          curl --disable --silent --show-error --location --max-time 30 -X POST https://goreportcard.com/checks?repo=github.com/${GITHUB_REPOSITORY}
 
   deploy:
     name: Deploy
