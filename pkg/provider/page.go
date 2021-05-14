@@ -14,29 +14,25 @@ var (
 
 // Page renderer to user
 type Page struct {
-	Layout      string
+	Content     map[string]interface{}
+	Error       *Error
+	Message     renderer.Message
 	PublicURL   string
 	Title       string
 	Description string
-
-	Content map[string]interface{}
-	Error   *Error
-
-	Message renderer.Message
-	Request Request
-	Config  Config
+	Layout      string
+	Config      Config
+	Request     Request
 }
 
 // PageBuilder for interactively create page
 type PageBuilder struct {
-	layout string
-
 	content map[string]interface{}
 	error   *Error
-
 	message renderer.Message
-	request Request
+	layout  string
 	config  Config
+	request Request
 }
 
 // Config set Config for page
