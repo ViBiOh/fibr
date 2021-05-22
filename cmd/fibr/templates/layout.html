@@ -3,8 +3,8 @@
 
   {{ template "navigation" . }}
 
-  <header class="header full-screen{{ if .Content.File }} flex flex-center{{ end }}">
-    {{ if .Content.File }}
+  <header class="header full-screen{{ if .File }} flex flex-center{{ end }}">
+    {{ if .File }}
       <span class="flex-grow flex-ellipsis">
     {{ end }}
 
@@ -13,9 +13,9 @@
         {{ template "root_link" . }}
       </span>
 
-      {{ range $index, $path := .Content.Paths }}
+      {{ range $index, $path := .Paths }}
         {{ if or (not $root.Request.Share.ID) (ne $index 0) }}
-          {{ $fullPath := rebuildPaths $root.Content.Paths $index }}
+          {{ $fullPath := rebuildPaths $root.Paths $index }}
 
           <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
              / 
@@ -27,23 +27,23 @@
       {{ end }}
     </h1>
 
-    {{ if .Content.File }}
+    {{ if .File }}
         <h2 class="small bg-grey no-margin full ellipsis">
           ↳&nbsp;
-          <a href="{{ .Content.File.Name }}">{{ .Content.File.Name }}</a>
+          <a href="{{ .File.Name }}">{{ .File.Name }}</a>
         </h2>
       </span>
 
-      {{ if or .Content.Previous .Content.Next }}
+      {{ if or .Previous .Next }}
         <nav class="flex">
-          {{ if .Content.Previous }}
-            <a class="button button-icon" href="{{ $root.Config.PublicURL }}/{{ .Content.Previous.Name }}{{ if not .Content.Previous.IsDir }}?browser{{ end }}">
+          {{ if .Previous }}
+            <a class="button button-icon" href="{{ $root.Config.PublicURL }}/{{ .Previous.Name }}{{ if not .Previous.IsDir }}?browser{{ end }}">
               <img class="icon" src="{{ .Config.PublicURL }}/svg/arrow-left?fill=silver" alt="Previous file">
             </a>
           {{ end }}
 
-          {{ if .Content.Next }}
-            <a class="button button-icon" href="{{ $root.Config.PublicURL }}/{{ .Content.Next.Name }}{{ if not .Content.Next.IsDir }}?browser{{ end }}">
+          {{ if .Next }}
+            <a class="button button-icon" href="{{ $root.Config.PublicURL }}/{{ .Next.Name }}{{ if not .Next.IsDir }}?browser{{ end }}">
               <img class="icon" src="{{ .Config.PublicURL }}/svg/arrow-right?fill=silver" alt="Next file">
             </a>
           {{ end }}

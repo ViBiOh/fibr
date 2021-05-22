@@ -11,7 +11,7 @@ import (
 )
 
 // Browser render file web view
-func (a *app) Browser(w http.ResponseWriter, request provider.Request, file provider.StorageItem, message renderer.Message) {
+func (a *app) Browser(w http.ResponseWriter, request provider.Request, file provider.StorageItem, message renderer.Message) (string, int, map[string]interface{}, error) {
 	var (
 		previous *provider.StorageItem
 		next     *provider.StorageItem
@@ -27,7 +27,7 @@ func (a *app) Browser(w http.ResponseWriter, request provider.Request, file prov
 		previous, next = getPreviousAndNext(file, files)
 	}
 
-	content := map[string]interface{}{
+	return "file", http.StatusOK, map[string]interface{}{
 		"Paths": breadcrumbs,
 		"File": provider.RenderItem{
 			ID:          sha.Sha1(file.Name),
@@ -37,7 +37,7 @@ func (a *app) Browser(w http.ResponseWriter, request provider.Request, file prov
 		"Parent":   path.Join(breadcrumbs...),
 		"Previous": previous,
 		"Next":     next,
-	}
-
-	a.rendererApp.File(w, request, content, message)
+		"Request":  request,
+		"Message":  message,
+	}, nil
 }

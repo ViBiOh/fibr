@@ -22,23 +22,18 @@ func (a App) Start(<-chan struct{}) {
 }
 
 // Browser mocked implementation
-func (a App) Browser(http.ResponseWriter, provider.Request, provider.StorageItem, renderer.Message) {
-	// mock implementation
-}
-
-// ServeStatic mocked implementation
-func (a App) ServeStatic(http.ResponseWriter, *http.Request) bool {
-	return false
+func (a App) Browser(http.ResponseWriter, provider.Request, provider.StorageItem, renderer.Message) (string, int, map[string]interface{}, error) {
+	return "", 0, nil, nil
 }
 
 // List mocked implementation
-func (a App) List(http.ResponseWriter, provider.Request, renderer.Message) {
-	// mock implementation
+func (a App) List(http.ResponseWriter, provider.Request, renderer.Message) (string, int, map[string]interface{}, error) {
+	return "", 0, nil, nil
 }
 
 // Get mocked implementation
-func (a App) Get(http.ResponseWriter, *http.Request, provider.Request) {
-	// mock implementation
+func (a App) Get(http.ResponseWriter, *http.Request, provider.Request) (string, int, map[string]interface{}, error) {
+	return "", 0, nil, nil
 }
 
 // Post mocked implementation

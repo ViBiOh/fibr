@@ -1,0 +1,30 @@
+{{ define "seo" }}
+  {{ $description := "FIle BRowser" }}
+
+  <title>{{ .Title }}</title>
+  <meta name="description" content="{{ $description }}">
+  <link rel="canonical" href="{{ publicURL "" }}{{ if .File }}{{ if not .File.IsDir }}?browser{{ end }}{{ end }}">
+
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{ publicURL "" }}">
+  <meta property="og:title" content="{{ .Title }}">
+  <meta property="og:description" content="{{ $description }}">
+
+  {{ if .Cover.Img }}
+    {{ if .File }}
+      {{ if (hasThumbnail .File) }}
+        <meta property="og:image" content="{{ .PublicURL }}?thumbnail&v={{ .Config.Version }}">
+      {{ else }}
+        <meta property="og:image" content="{{ .PublicURL }}/{{ urlquery (.Cover.Img.Name) }}?thumbnail&v={{ .Config.Version }}">
+      {{ end }}
+    {{ else }}
+      <meta property="og:image" content="{{ .PublicURL }}/{{ urlquery (.Cover.Img.Name) }}?thumbnail&v={{ .Config.Version }}">
+    {{ end }}
+    <meta property="og:image:height" content="{{ .Cover.ImgHeight }}">
+    <meta property="og:image:width" content="{{ .Cover.ImgWidth }}">
+  {{ else }}
+    <meta property="og:image" content="{{ publicURL "/favicon/android-chrome-512x512.png" }}?v={{ .Version }}">
+    <meta property="og:image:height" content="512">
+    <meta property="og:image:width" content="512">
+  {{ end }}
+{{ end }}

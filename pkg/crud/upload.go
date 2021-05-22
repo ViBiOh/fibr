@@ -61,30 +61,30 @@ func (a *app) saveUploadedFile(request provider.Request, part *multipart.Part) (
 // Upload saves form files to filesystem
 func (a *app) Upload(w http.ResponseWriter, r *http.Request, request provider.Request, values map[string]string, part *multipart.Part) {
 	if !request.CanEdit {
-		a.rendererApp.Error(w, request, provider.NewError(http.StatusForbidden, ErrNotAuthorized))
+		a.rendererApp.Error(w, provider.NewError(http.StatusForbidden, ErrNotAuthorized))
 		return
 	}
 
 	if part == nil {
-		a.rendererApp.Error(w, request, provider.NewError(http.StatusBadRequest, errors.New("no file provided for save")))
+		a.rendererApp.Error(w, provider.NewError(http.StatusBadRequest, errors.New("no file provided for save")))
 		return
 	}
 
 	shared, err := getFormBool(values["share"])
 	if err != nil {
-		a.rendererApp.Error(w, request, provider.NewError(http.StatusBadRequest, err))
+		a.rendererApp.Error(w, provider.NewError(http.StatusBadRequest, err))
 		return
 	}
 
 	duration, err := getFormDuration(values["duration"])
 	if err != nil {
-		a.rendererApp.Error(w, request, provider.NewError(http.StatusBadRequest, err))
+		a.rendererApp.Error(w, provider.NewError(http.StatusBadRequest, err))
 		return
 	}
 
 	filename, err := a.saveUploadedFile(request, part)
 	if err != nil {
-		a.rendererApp.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
+		a.rendererApp.Error(w, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
 
@@ -92,7 +92,7 @@ func (a *app) Upload(w http.ResponseWriter, r *http.Request, request provider.Re
 	if shared {
 		id, err := a.metadataApp.CreateShare(path.Join(request.Path, filename), false, "", false, duration)
 		if err != nil {
-			a.rendererApp.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
+			a.rendererApp.Error(w, provider.NewError(http.StatusInternalServerError, err))
 			return
 		}
 
@@ -114,5 +114,5 @@ func (a *app) Upload(w http.ResponseWriter, r *http.Request, request provider.Re
 		message = fmt.Sprintf("%s. Share ID is %s", message, shareID)
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("%s%s", a.publicURL, path.Join(request.GetURI(""), fmt.Sprintf("?%s", renderer.NewSuccessMessage(message)))), http.StatusFound)
+	a.rendererApp.Redirect(w, r, request.GetURI(""), renderer.NewSuccessMessage(message))
 }

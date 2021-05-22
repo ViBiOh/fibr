@@ -1,6 +1,7 @@
 package main
 
 import (
+	"embed"
 	"flag"
 	"os"
 
@@ -11,7 +12,6 @@ import (
 	"github.com/ViBiOh/fibr/pkg/fibr"
 	"github.com/ViBiOh/fibr/pkg/filesystem"
 	"github.com/ViBiOh/fibr/pkg/metadata"
-	"github.com/ViBiOh/fibr/pkg/renderer"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v4/pkg/alcotest"
 	"github.com/ViBiOh/httputils/v4/pkg/flags"
@@ -21,8 +21,12 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/owasp"
 	"github.com/ViBiOh/httputils/v4/pkg/prometheus"
 	"github.com/ViBiOh/httputils/v4/pkg/recoverer"
+	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 	"github.com/ViBiOh/httputils/v4/pkg/server"
 )
+
+//go:embed templates static
+var content embed.FS
 
 func newLoginApp(basicConfig basicMemory.Config) authMiddleware.App {
 	basicApp, err := basicMemory.New(basicConfig)
@@ -71,10 +75,13 @@ func main() {
 
 	prometheusRegister := prometheusApp.Registerer()
 
-	metadataApp := metadata.New(metadataConfig, storageApp)
 	thumbnailApp := thumbnail.New(thumbnailConfig, storageApp, prometheusRegister)
-	rendererApp := renderer.New(rendererConfig, thumbnailApp)
-	crudApp, err := crud.New(crudConfig, storageApp, rendererApp, metadataApp, thumbnailApp, prometheusRegister, rendererApp.PublicURL())
+
+	rendererApp, err := renderer.New(rendererConfig, content, fibr.FuncMap(thumbnailApp))
+	logger.Fatal(err)
+
+	metadataApp := metadata.New(metadataConfig, storageApp)
+	crudApp, err := crud.New(crudConfig, storageApp, rendererApp, metadataApp, thumbnailApp, prometheusRegister)
 	logger.Fatal(err)
 
 	var middlewareApp authMiddleware.App
@@ -82,14 +89,15 @@ func main() {
 		middlewareApp = newLoginApp(basicConfig)
 	}
 
-	fibrApp := fibr.New(crudApp, rendererApp, metadataApp, middlewareApp, rendererApp.PublicURL())
+	fibrApp := fibr.New(crudApp, rendererApp, metadataApp, middlewareApp)
+	handler := rendererApp.Handler(fibrApp.TemplateFunc)
 
 	go thumbnailApp.Start()
 	go metadataApp.Start(appServer.Done())
 	go crudApp.Start(appServer.Done())
 
 	go promServer.Start("prometheus", healthApp.End(), prometheusApp.Handler())
-	go appServer.Start("http", healthApp.End(), httputils.Handler(fibrApp.Handler(), healthApp, recoverer.Middleware, prometheusApp.Middleware, owasp.New(owaspConfig).Middleware))
+	go appServer.Start("http", healthApp.End(), httputils.Handler(handler, healthApp, recoverer.Middleware, prometheusApp.Middleware, owasp.New(owaspConfig).Middleware))
 
 	healthApp.WaitForTermination(appServer.Done())
 	server.GracefulWait(appServer.Done(), promServer.Done())

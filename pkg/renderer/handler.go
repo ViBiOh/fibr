@@ -1,7 +1,6 @@
 package renderer
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -90,25 +89,4 @@ func (a app) Sitemap(w http.ResponseWriter) {
 		httperror.InternalServerError(w, err)
 		return
 	}
-}
-
-// SVG render a svg in given coolor
-func (a app) SVG(w http.ResponseWriter, name, fill string) {
-	tpl := a.tpl.Lookup(fmt.Sprintf("svg-%s", name))
-	if tpl == nil {
-		httperror.NotFound(w)
-		return
-	}
-
-	w.Header().Set("Content-Type", "image/svg+xml")
-
-	if err := templates.WriteTemplate(tpl, w, fill, "text/xml"); err != nil {
-		httperror.InternalServerError(w, err)
-		return
-	}
-}
-
-// PublicURL returns public URL
-func (a app) PublicURL() string {
-	return a.config.PublicURL
 }
