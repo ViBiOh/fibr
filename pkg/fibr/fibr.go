@@ -13,14 +13,13 @@ import (
 	"github.com/ViBiOh/fibr/pkg/crud"
 	"github.com/ViBiOh/fibr/pkg/metadata"
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/fibr/pkg/renderer"
-	"github.com/ViBiOh/httputils/v4/pkg/httperror"
-	"github.com/ViBiOh/httputils/v4/pkg/query"
+	"github.com/ViBiOh/httputils/v4/pkg/model"
+	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
 // App of package
 type App interface {
-	Handler() http.Handler
+	TemplateFunc(http.ResponseWriter, *http.Request) (string, int, map[string]interface{}, error)
 }
 
 type app struct {
@@ -28,18 +27,15 @@ type app struct {
 	crudApp     crud.App
 	rendererApp renderer.App
 	metadataApp metadata.App
-
-	publicURL string
 }
 
 // New creates new App from Config
-func New(crudApp crud.App, rendererApp renderer.App, metadataApp metadata.App, loginApp authMiddleware.App, publicURL string) App {
+func New(crudApp crud.App, rendererApp renderer.App, metadataApp metadata.App, loginApp authMiddleware.App) App {
 	return &app{
 		crudApp:     crudApp,
 		rendererApp: rendererApp,
 		loginApp:    loginApp,
 		metadataApp: metadataApp,
-		publicURL:   publicURL,
 	}
 }
 
@@ -60,19 +56,19 @@ func (a app) parseShare(request *provider.Request, authorizationHeader string) e
 	return nil
 }
 
-func convertAuthenticationError(err error) *provider.Error {
+func convertAuthenticationError(err error) error {
 	if errors.Is(err, auth.ErrForbidden) {
-		return provider.NewError(http.StatusForbidden, errors.New("you're not authorized to speak to me"))
+		return model.WrapForbidden(errors.New("you're not authorized to speak to me"))
 	}
 
 	if errors.Is(err, ident.ErrMalformedAuth) {
-		return provider.NewError(http.StatusBadRequest, err)
+		return model.WrapInvalid(err)
 	}
 
-	return provider.NewError(http.StatusUnauthorized, err)
+	return model.WrapUnauthorized(err)
 }
 
-func (a app) parseRequest(r *http.Request) (provider.Request, *provider.Error) {
+func (a app) parseRequest(r *http.Request) (provider.Request, error) {
 	preferences := provider.Preferences{}
 	if cookie, err := r.Cookie("list_layout_paths"); err == nil {
 		if value := cookie.Value; len(value) > 0 {
@@ -88,13 +84,17 @@ func (a app) parseRequest(r *http.Request) (provider.Request, *provider.Error) {
 		Preferences: preferences,
 	}
 
+	if len(request.Display) == 0 {
+		request.Display = "grid"
+	}
+
 	if err := a.parseShare(&request, r.Header.Get("Authorization")); err != nil {
-		return request, provider.NewError(http.StatusUnauthorized, err)
+		return request, model.WrapUnauthorized(err)
 	}
 
 	if len(request.Share.ID) != 0 {
 		if request.Share.IsExpired(time.Now()) {
-			return request, provider.NewError(http.StatusNotFound, errors.New("link has expired"))
+			return request, model.WrapNotFound(errors.New("link has expired"))
 		}
 
 		return request, nil
@@ -117,48 +117,4 @@ func (a app) parseRequest(r *http.Request) (provider.Request, *provider.Error) {
 	}
 
 	return request, nil
-}
-
-func (a app) handleRequest(w http.ResponseWriter, r *http.Request, request provider.Request) {
-	switch r.Method {
-	case http.MethodGet:
-		a.crudApp.Get(w, r, request)
-	case http.MethodPost:
-		a.crudApp.Post(w, r, request)
-	case http.MethodPut:
-		a.crudApp.Create(w, r, request)
-	case http.MethodPatch:
-		a.crudApp.Rename(w, r, request)
-	case http.MethodDelete:
-		a.crudApp.Delete(w, r, request)
-	default:
-		httperror.NotFound(w)
-	}
-}
-
-// Handler for request. Should be use with net/http
-func (a app) Handler() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !isMethodAllowed(r) {
-			a.rendererApp.Error(w, provider.Request{}, provider.NewError(http.StatusMethodNotAllowed, errors.New("you lack of method for calling me")))
-			return
-		}
-
-		if a.crudApp.ServeStatic(w, r) {
-			return
-		}
-
-		if query.GetBool(r, "redirect") {
-			http.Redirect(w, r, fmt.Sprintf("%s%s", a.publicURL, r.URL.Path), http.StatusFound)
-			return
-		}
-
-		request, err := a.parseRequest(r)
-		if err != nil {
-			a.rendererApp.Error(w, request, err)
-			return
-		}
-
-		a.handleRequest(w, r, request)
-	})
 }

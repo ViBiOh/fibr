@@ -17,6 +17,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/crud/crudtest"
 	"github.com/ViBiOh/fibr/pkg/metadata/metadatatest"
 	"github.com/ViBiOh/fibr/pkg/provider"
+	httpModel "github.com/ViBiOh/httputils/v4/pkg/model"
 )
 
 var (
@@ -183,35 +184,35 @@ func TestConvertAuthenticationError(t *testing.T) {
 	var cases = []struct {
 		intention string
 		args      args
-		want      *provider.Error
+		want      error
 	}{
 		{
 			"forbidden",
 			args{
 				err: fmt.Errorf("forbidden access: %w", auth.ErrForbidden),
 			},
-			provider.NewError(http.StatusForbidden, errors.New("you're not authorized to speak to me")),
+			httpModel.ErrForbidden,
 		},
 		{
 			"malformed",
 			args{
 				err: fmt.Errorf("invalid access: %w", ident.ErrMalformedAuth),
 			},
-			provider.NewError(http.StatusBadRequest, errors.New("malformed auth")),
+			httpModel.ErrInvalid,
 		},
 		{
 			"unauthorized",
 			args{
 				err: fmt.Errorf("invalid: %w", ident.ErrInvalidCredentials),
 			},
-			provider.NewError(http.StatusUnauthorized, errors.New("try again")),
+			httpModel.ErrUnauthorized,
 		},
 	}
 
 	for _, tc := range cases {
 		t.Run(tc.intention, func(t *testing.T) {
-			if got := convertAuthenticationError(tc.args.err); got.Status != tc.want.Status {
-				t.Errorf("convertAuthenticationError() = %d, want %d", got.Status, tc.want.Status)
+			if got := convertAuthenticationError(tc.args.err); !errors.Is(got, tc.want) {
+				t.Errorf("convertAuthenticationError() = `%s`, want `%s`", got, tc.want)
 			}
 		})
 	}
@@ -239,7 +240,7 @@ func TestParseRequest(t *testing.T) {
 		instance  app
 		args      args
 		want      provider.Request
-		wantErr   *provider.Error
+		wantErr   error
 	}{
 		{
 			"share error",
@@ -252,10 +253,11 @@ func TestParseRequest(t *testing.T) {
 			},
 			provider.Request{
 				Path:     "/f5d4c3b2a1/",
+				Display:  "grid",
 				CanEdit:  false,
 				CanShare: false,
 			},
-			provider.NewError(http.StatusUnauthorized, errors.New("test")),
+			httpModel.ErrUnauthorized,
 		},
 		{
 			"share",
@@ -268,6 +270,7 @@ func TestParseRequest(t *testing.T) {
 			},
 			provider.Request{
 				Path:     "/",
+				Display:  "grid",
 				CanEdit:  false,
 				CanShare: false,
 				Share:    metadatatest.PasswordLessShare,
@@ -285,6 +288,7 @@ func TestParseRequest(t *testing.T) {
 			},
 			provider.Request{
 				Path:     "/",
+				Display:  "grid",
 				CanEdit:  true,
 				CanShare: false,
 			},
@@ -302,10 +306,11 @@ func TestParseRequest(t *testing.T) {
 			},
 			provider.Request{
 				Path:     invalidPath,
+				Display:  "grid",
 				CanEdit:  false,
 				CanShare: false,
 			},
-			provider.NewError(http.StatusUnauthorized, errors.New("test")),
+			httpModel.ErrUnauthorized,
 		},
 		{
 			"non admin user",
@@ -319,6 +324,7 @@ func TestParseRequest(t *testing.T) {
 			},
 			provider.Request{
 				Path:     "/guest",
+				Display:  "grid",
 				CanEdit:  false,
 				CanShare: false,
 			},
@@ -336,6 +342,7 @@ func TestParseRequest(t *testing.T) {
 			},
 			provider.Request{
 				Path:     adminPath,
+				Display:  "grid",
 				CanEdit:  true,
 				CanShare: true,
 			},
@@ -353,6 +360,7 @@ func TestParseRequest(t *testing.T) {
 			},
 			provider.Request{
 				Path:     adminPath,
+				Display:  "grid",
 				CanEdit:  true,
 				CanShare: false,
 			},
@@ -370,6 +378,7 @@ func TestParseRequest(t *testing.T) {
 			},
 			provider.Request{
 				Path:     adminPath,
+				Display:  "grid",
 				CanEdit:  true,
 				CanShare: false,
 				Preferences: provider.Preferences{
@@ -390,14 +399,14 @@ func TestParseRequest(t *testing.T) {
 				failed = true
 			} else if tc.wantErr == nil && gotErr != nil {
 				failed = true
-			} else if tc.wantErr != nil && tc.wantErr.Status != gotErr.Status {
+			} else if tc.wantErr != nil && !errors.Is(gotErr, tc.wantErr) {
 				failed = true
 			} else if !reflect.DeepEqual(got, tc.want) {
 				failed = true
 			}
 
 			if failed {
-				t.Errorf("parseRequest() = (%+v, %+v), want (%+v, %+v)", got, gotErr, tc.want, tc.wantErr)
+				t.Errorf("parseRequest() = (%+v, `%s`), want (%+v, `%s`)", got, gotErr, tc.want, tc.wantErr)
 			}
 		})
 	}

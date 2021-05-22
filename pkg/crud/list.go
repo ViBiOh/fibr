@@ -34,11 +34,10 @@ func (a *app) getCover(files []provider.StorageItem) map[string]interface{} {
 }
 
 // List render directory web view of given dirPath
-func (a *app) List(w http.ResponseWriter, request provider.Request, message renderer.Message) {
+func (a *app) List(w http.ResponseWriter, request provider.Request, message renderer.Message) (string, int, map[string]interface{}, error) {
 	files, err := a.storageApp.List(request.GetFilepath(""))
 	if err != nil {
-		a.rendererApp.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
-		return
+		return "", 0, nil, err
 	}
 
 	uri := request.GetURI("")
@@ -53,16 +52,18 @@ func (a *app) List(w http.ResponseWriter, request provider.Request, message rend
 	}
 
 	content := map[string]interface{}{
-		"Paths": getPathParts(uri),
-		"Files": items,
-		"Cover": a.getCover(files),
+		"Paths":   getPathParts(uri),
+		"Files":   items,
+		"Cover":   a.getCover(files),
+		"Request": request,
+		"Message": message,
 	}
 
 	if request.CanShare {
 		content["Shares"] = a.metadataApp.Dump()
 	}
 
-	a.rendererApp.Directory(w, request, content, message)
+	return "files", http.StatusOK, content, nil
 }
 
 // Download content of a directory into a streamed zip
@@ -82,7 +83,7 @@ func (a *app) Download(w http.ResponseWriter, request provider.Request) {
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s.zip", filename))
 
 	if err := a.zipFiles(request, zipWriter, ""); err != nil {
-		a.rendererApp.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
+		a.rendererApp.Error(w, err)
 	}
 }
 

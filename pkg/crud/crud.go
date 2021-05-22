@@ -1,11 +1,8 @@
 package crud
 
 import (
-	"embed"
 	"errors"
 	"flag"
-	"fmt"
-	"io/fs"
 	"mime/multipart"
 	"net/http"
 	"regexp"
@@ -34,18 +31,14 @@ var (
 	ErrAbsoluteFolder = errors.New("folder has to be absolute")
 )
 
-//go:embed static
-var filesystem embed.FS
-
 // App of package
 type App interface {
 	Start(done <-chan struct{})
 
-	Browser(http.ResponseWriter, provider.Request, provider.StorageItem, renderer.Message)
-	ServeStatic(http.ResponseWriter, *http.Request) bool
+	Browser(http.ResponseWriter, provider.Request, provider.StorageItem, renderer.Message) (string, int, map[string]interface{}, error)
+	List(http.ResponseWriter, provider.Request, renderer.Message) (string, int, map[string]interface{}, error)
+	Get(http.ResponseWriter, *http.Request, provider.Request) (string, int, map[string]interface{}, error)
 
-	List(http.ResponseWriter, provider.Request, renderer.Message)
-	Get(http.ResponseWriter, *http.Request, provider.Request)
 	Post(http.ResponseWriter, *http.Request, provider.Request)
 	Create(http.ResponseWriter, *http.Request, provider.Request)
 	Upload(http.ResponseWriter, *http.Request, provider.Request, map[string]string, *multipart.Part)
@@ -63,14 +56,14 @@ type Config struct {
 }
 
 type app struct {
-	prometheus   prometheus.Registerer
-	storageApp   provider.Storage
-	rendererApp  provider.Renderer
-	metadataApp  metadata.App
-	thumbnailApp thumbnail.App
+	prometheus     prometheus.Registerer
+	storageApp     provider.Storage
+	rendererApp    renderer.App
+	newRendererApp renderer.App
+	metadataApp    metadata.App
+	thumbnailApp   thumbnail.App
 
 	staticHandler   http.Handler
-	publicURL       string
 	sanitizeOnStart bool
 }
 
@@ -83,23 +76,16 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 }
 
 // New creates new App from Config
-func New(config Config, storage provider.Storage, renderer provider.Renderer, metadata metadata.App, thumbnail thumbnail.App, prometheus prometheus.Registerer, publicURL string) (App, error) {
+func New(config Config, storage provider.Storage, rendererApp renderer.App, metadata metadata.App, thumbnail thumbnail.App, prometheus prometheus.Registerer) (App, error) {
 	app := &app{
 		sanitizeOnStart: *config.sanitizeOnStart,
-		publicURL:       publicURL,
 
 		storageApp:   storage,
-		rendererApp:  renderer,
+		rendererApp:  rendererApp,
 		thumbnailApp: thumbnail,
 		metadataApp:  metadata,
 		prometheus:   prometheus,
 	}
-
-	staticFS, err := fs.Sub(filesystem, "static")
-	if err != nil {
-		return nil, fmt.Errorf("unable to get static/ filesystem: %s", err)
-	}
-	app.staticHandler = http.FileServer(http.FS(staticFS))
 
 	var ignorePattern *regexp.Regexp
 	ignore := strings.TrimSpace(*config.ignore)

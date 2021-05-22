@@ -24,13 +24,13 @@
     }
   </style>
 
-  {{ if .Content.File.IsVideo }}
-    <video id="content" controls src="{{ .Content.File.Name }}" type="{{ .Content.File.Mime }}"></video>
+  {{ if .File.IsVideo }}
+    <video id="content" controls src="{{ .File.Name }}" type="{{ .File.Mime }}"></video>
   {{ else }}
-    {{ if .Content.File.IsImage }}
-      <img id="content" src="{{ .Content.File.Name }}" alt="{{ .Content.File.Name }}" />
+    {{ if .File.IsImage }}
+      <img id="content" src="{{ .File.Name }}" alt="{{ .File.Name }}" />
     {{ else }}
-      <object id="content" data="{{ .Content.File.Name }}" type="{{ .Content.File.Mime }}"></object>
+      <object id="content" data="{{ .File.Name }}" type="{{ .File.Mime }}"></object>
     {{ end }}
   {{ end }}
 

@@ -1,15 +1,9 @@
 package provider
 
 import (
-	"encoding/base64"
-	"errors"
 	"fmt"
-	"mime"
-	"path"
+	"net/http"
 	"strings"
-	"time"
-
-	"golang.org/x/crypto/bcrypt"
 )
 
 var (
@@ -55,51 +49,31 @@ func (r Request) LayoutPath(path string) string {
 	return "grid"
 }
 
-// Share stores informations about shared paths
-type Share struct {
-	Creation time.Time     `json:"creation"`
-	ID       string        `json:"id"`
-	Path     string        `json:"path"`
-	RootName string        `json:"rootName"`
-	Password string        `json:"password"`
-	Duration time.Duration `json:"duration"`
-	Edit     bool          `json:"edit"`
-	File     bool          `json:"file"`
+func computeListLayoutPaths(request Request) string {
+	listLayoutPaths := request.Preferences.ListLayoutPath
+	path := strings.Trim(request.GetURI(""), "/")
+
+	switch request.Display {
+	case "list":
+		if index := FindIndex(listLayoutPaths, path); index == -1 {
+			listLayoutPaths = append(listLayoutPaths, path)
+		}
+	case "grid":
+		listLayoutPaths = RemoveIndex(listLayoutPaths, FindIndex(listLayoutPaths, path))
+	}
+
+	return strings.Join(listLayoutPaths, ",")
 }
 
-// CheckPassword verifies that request has correct password for share
-func (s Share) CheckPassword(authorizationHeader string) error {
-	if s.Password == "" {
-		return nil
-	}
-
-	if authorizationHeader == "" {
-		return errors.New("empty authorization header")
-	}
-
-	data, err := base64.StdEncoding.DecodeString(strings.TrimPrefix(authorizationHeader, "Basic "))
-	if err != nil {
-		return err
-	}
-
-	dataStr := string(data)
-
-	sepIndex := strings.Index(dataStr, ":")
-	if sepIndex < 0 {
-		return errors.New("invalid format for basic auth")
-	}
-
-	password := dataStr[sepIndex+1:]
-	if err := bcrypt.CompareHashAndPassword([]byte(s.Password), []byte(password)); err != nil {
-		return errors.New("invalid credentials")
-	}
-
-	return nil
-}
-
-// IsExpired check if given share is expired
-func (s Share) IsExpired(now time.Time) bool {
-	return s.Duration != 0 && s.Creation.Add(s.Duration).Before(now)
+// SetPrefsCookie set preferences cookie for given request
+func SetPrefsCookie(w http.ResponseWriter, request Request) {
+	http.SetCookie(w, &http.Cookie{
+		Name:     "list_layout_paths",
+		Value:    computeListLayoutPaths(request),
+		Path:     "/",
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+	})
 }
 
 // Config data
@@ -139,55 +113,4 @@ func NewError(status int, err error) *Error {
 // Error convert error to string
 func (e Error) Error() string {
 	return fmt.Sprintf("HTTP/%d: %s", e.Status, e.Err)
-}
-
-// StorageItem describe item on a storage provider
-type StorageItem struct {
-	Info     interface{}
-	Date     time.Time
-	Pathname string
-	Name     string
-
-	IsDir bool
-}
-
-// Extension gives extensions of item
-func (s StorageItem) Extension() string {
-	return strings.ToLower(path.Ext(s.Name))
-}
-
-// Mime gives Mime Type of item
-func (s StorageItem) Mime() string {
-	extension := s.Extension()
-	if mimeType := mime.TypeByExtension(extension); mimeType != "" {
-		return mimeType
-	}
-
-	if CodeExtensions[extension] {
-		return "text/plain; charset=utf-8"
-	}
-
-	return ""
-}
-
-// IsPdf determine if item if a pdf
-func (s StorageItem) IsPdf() bool {
-	return PdfExtensions[s.Extension()]
-}
-
-// IsImage determine if item if an image
-func (s StorageItem) IsImage() bool {
-	return ImageExtensions[s.Extension()]
-}
-
-// IsVideo determine if item if a video
-func (s StorageItem) IsVideo() bool {
-	return VideoExtensions[s.Extension()] != ""
-}
-
-// RenderItem is a storage item with an id
-type RenderItem struct {
-	ID  string
-	URI string
-	StorageItem
 }

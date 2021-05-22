@@ -6,58 +6,19 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/query"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
-var (
-	staticRootPath = []string{
-		"/robots.txt",
-		"/browserconfig.xml",
-		"/favicon.ico",
-	}
-)
-
-// ServeStatic check if filename match SEO or static filename and serve it
-func (a *app) ServeStatic(w http.ResponseWriter, r *http.Request) bool {
-	if r.Method != http.MethodGet {
-		return false
-	}
-
-	if r.URL.Path == "/sitemap.xml" {
-		a.rendererApp.Sitemap(w)
-		return true
-	}
-
-	if strings.HasPrefix(r.URL.Path, "/svg") {
-		a.rendererApp.SVG(w, strings.TrimPrefix(r.URL.Path, "/svg/"), r.URL.Query().Get("fill"))
-		return true
-	}
-
-	if strings.HasPrefix(r.URL.Path, "/favicon") {
-		a.staticHandler.ServeHTTP(w, r)
-		return true
-	}
-
-	for _, staticPath := range staticRootPath {
-		if r.URL.Path == staticPath {
-			a.staticHandler.ServeHTTP(w, r)
-			return true
-		}
-	}
-
-	return false
-}
-
-func (a *app) getWithMessage(w http.ResponseWriter, r *http.Request, request provider.Request, message renderer.Message) {
+func (a *app) getWithMessage(w http.ResponseWriter, r *http.Request, request provider.Request, message renderer.Message) (string, int, map[string]interface{}, error) {
 	info, err := a.storageApp.Info(request.GetFilepath(""))
 	if err != nil {
 		if provider.IsNotExist(err) {
-			a.rendererApp.Error(w, request, provider.NewError(http.StatusNotFound, err))
-		} else {
-			a.rendererApp.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
+			return "", 0, nil, model.WrapNotFound(err)
 		}
-		return
+
+		return "", 0, nil, model.WrapInternal(err)
 	}
 
 	if query.GetBool(r, "thumbnail") {
@@ -67,35 +28,38 @@ func (a *app) getWithMessage(w http.ResponseWriter, r *http.Request, request pro
 			a.thumbnailApp.Serve(w, r, info)
 		}
 
-		return
+		return "", 0, nil, nil
 	}
 
 	if !info.IsDir {
 		if query.GetBool(r, "browser") {
-			a.Browser(w, request, info, message)
-		} else if file, err := a.storageApp.ReaderFrom(info.Pathname); err != nil {
-			a.rendererApp.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
-		} else {
+			provider.SetPrefsCookie(w, request)
+			return a.Browser(w, request, info, message)
+		}
+
+		file, err := a.storageApp.ReaderFrom(info.Pathname)
+		if err == nil {
 			http.ServeContent(w, r, info.Name, info.Date, file)
 		}
 
-		return
+		return "", 0, nil, err
 	}
 
 	if query.GetBool(r, "download") {
 		a.Download(w, request)
-		return
+		return "", 0, nil, err
 	}
 
 	if !strings.HasSuffix(r.URL.Path, "/") {
-		http.Redirect(w, r, fmt.Sprintf("%s%s/", a.publicURL, r.URL.Path), http.StatusPermanentRedirect)
-		return
+		a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/", r.URL.Path), renderer.Message{})
+		return "", 0, nil, nil
 	}
 
-	a.List(w, request, message)
+	provider.SetPrefsCookie(w, request)
+	return a.List(w, request, message)
 }
 
 // Get output content
-func (a *app) Get(w http.ResponseWriter, r *http.Request, request provider.Request) {
-	a.getWithMessage(w, r, request, renderer.ParseMessage(r))
+func (a *app) Get(w http.ResponseWriter, r *http.Request, request provider.Request) (string, int, map[string]interface{}, error) {
+	return a.getWithMessage(w, r, request, renderer.ParseMessage(r))
 }

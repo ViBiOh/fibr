@@ -15,7 +15,7 @@
     {{ template "share-list" . }}
   {{ end }}
 
-  {{ range .Content.Files }}
+  {{ range .Files }}
     {{ if $root.Request.CanEdit }}
       {{ template "edit-modal" . }}
       {{ template "delete-modal" . }}
@@ -103,7 +103,7 @@
       max-height: 100%;
     }
 
-    {{- range .Content.Files -}}
+    {{- range .Files -}}
       {{ if $root.Request.CanEdit -}}
         #delete-modal-{{ .ID }}:target,
         #edit-modal-{{ .ID }}:target,
@@ -122,7 +122,7 @@
       z-index: 5;
     }
 
-    {{- range .Content.Files -}}
+    {{- range .Files -}}
       {{ if $root.Request.CanEdit -}}
         #delete-modal-{{ .ID }}:target ~ .content,
         #edit-modal-{{ .ID }}:target ~ .content,
@@ -140,7 +140,7 @@
       pointer-events: none;
     }
 
-    {{ if eq .Layout "list" }}
+    {{ if eq .Request.Display "list" }}
       #list-display {
         background-color: var(--primary);
       }
@@ -211,7 +211,7 @@
       }
     {{ end }}
 
-    {{ if eq .Layout "grid" }}
+    {{ if eq .Request.Display "grid" }}
       #grid-display {
         background-color: var(--primary);
       }
@@ -298,7 +298,7 @@
         <img class="icon" src="{{ .Config.PublicURL }}/svg/th?fill=silver" alt="Grid">
       </a>
 
-      <span class="padding-left">{{ len .Content.Files }}<span {{ if .Request.CanEdit }}class="hide-xs"{{ end }}> element{{ if gt (len .Content.Files) 1 }}s{{ end }}</span></span>
+      <span class="padding-left">{{ len .Files }}<span {{ if .Request.CanEdit }}class="hide-xs"{{ end }}> element{{ if gt (len .Files) 1 }}s{{ end }}</span></span>
       <span class="flex-grow"></span>
 
       {{ if .Request.CanEdit }}
@@ -316,7 +316,7 @@
         </a>
       {{ end }}
 
-      {{ if gt (len .Content.Files) 0 }}
+      {{ if gt (len .Files) 0 }}
         <a class="padding" href="?download" download>
           <img class="icon" src="{{ .Config.PublicURL }}/svg/download?fill=silver" alt="Download">
         </a>
@@ -324,22 +324,22 @@
     </div>
 
     <ul id="files" class="no-margin no-padding">
-      {{ range .Content.Files }}
-        {{ if and (eq $root.Layout "grid") (hasThumbnail .) }}
+      {{ range .Files }}
+        {{ if and (eq $root.Request.Display "grid") (hasThumbnail .) }}
           <li class="image relative">
         {{ else }}
           <li class="file">
         {{ end }}
           <a class="filelink center ellipsis" href="{{ .Name }}{{ if .IsDir }}/?d={{ $root.Request.Layout .Name }}{{ else }}?browser{{ end }}" title="{{ .Name }}">
-            {{ if and (eq $root.Layout "grid") (hasThumbnail .) }}
+            {{ if and (eq $root.Request.Display "grid") (hasThumbnail .) }}
               {{ template "async-image" asyncImage . $root.Config.Version }}
             {{ else }}
               {{ if .IsDir }}
-                <img class="icon {{ if eq $root.Layout "grid" }}icon-large{{ end }}" src="{{ $root.Config.PublicURL }}/svg/folder?fill=silver" alt="Folder">
+                <img class="icon {{ if eq $root.Request.Display "grid" }}icon-large{{ end }}" src="{{ $root.Config.PublicURL }}/svg/folder?fill=silver" alt="Folder">
               {{ else }}
-                <img class="icon {{ if eq $root.Layout "grid" }}icon-large{{ end }}" src="{{ $root.Config.PublicURL }}/svg/{{ iconFromExtension . }}?fill=silver" alt="File">
+                <img class="icon {{ if eq $root.Request.Display "grid" }}icon-large{{ end }}" src="{{ $root.Config.PublicURL }}/svg/{{ iconFromExtension . }}?fill=silver" alt="File">
               {{ end }}
-              <span class="filename ellipsis {{ if eq $root.Layout "list" }}padding-left{{ end }}">{{ .Name }}</span>
+              <span class="filename ellipsis {{ if eq $root.Request.Display "list" }}padding-left{{ end }}">{{ .Name }}</span>
             {{ end }}
 
             <a href="{{ .Name }}?download" class="button button-icon file-download" alt="Download" download>
@@ -361,7 +361,7 @@
               </a>
             {{ end }}
 
-            {{ if and (eq $root.Layout "grid") (hasThumbnail .) .IsVideo }}
+            {{ if and (eq $root.Request.Display "grid") (hasThumbnail .) .IsVideo }}
               <img class="icon icon-overlay" src="{{ $root.Config.PublicURL }}/svg/play?fill=rgba(192, 192, 192, 0.8)" alt="Play video">
             {{ end }}
           </a>

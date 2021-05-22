@@ -4,8 +4,8 @@
      * Go back from state.
      */
     function goBack() {
-      {{ if eq .Layout "browser" }}
-        window.location.href = '/{{ .Content.Parent }}';
+      {{ if eq .Request.Display "browser" }}
+        window.location.href = '/{{ .Parent }}';
       {{ else }}
         const previousHash = document.location.hash;
         document.location.hash = '';
@@ -20,8 +20,8 @@
      * Go to the previous item.
      */
     function goToPrevious() {
-      {{ if .Content.Previous }}
-        window.location.href = '{{ .Content.Previous.Name }}{{ if not .Content.Previous.IsDir }}?browser{{ end }}';
+      {{ if .Previous }}
+        window.location.href = '{{ .Previous.Name }}{{ if not .Previous.IsDir }}?browser{{ end }}';
       {{ end }}
     }
 
@@ -29,8 +29,8 @@
      * Go to the next item.
      */
     function goToNext() {
-      {{ if .Content.Next }}
-        window.location.href = '{{ .Content.Next.Name }}{{ if not .Content.Next.IsDir }}?browser{{ end }}';
+      {{ if .Next }}
+        window.location.href = '{{ .Next.Name }}{{ if not .Next.IsDir }}?browser{{ end }}';
       {{ end }}
     }
 

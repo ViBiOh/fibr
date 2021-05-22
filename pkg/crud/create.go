@@ -1,7 +1,6 @@
 package crud
 
 import (
-	"fmt"
 	"net/http"
 	"path"
 
@@ -12,28 +11,28 @@ import (
 // Create creates given path directory to filesystem
 func (a *app) Create(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !request.CanEdit {
-		a.rendererApp.Error(w, request, provider.NewError(http.StatusForbidden, ErrNotAuthorized))
+		a.rendererApp.Error(w, provider.NewError(http.StatusForbidden, ErrNotAuthorized))
 		return
 	}
 
 	name, httpErr := checkFormName(r, "name")
 	if httpErr != nil && httpErr.Err != ErrEmptyName {
-		a.rendererApp.Error(w, request, httpErr)
+		a.rendererApp.Error(w, httpErr)
 		return
 	}
 
 	name, err := provider.SanitizeName(name, false)
 	if err != nil {
-		a.rendererApp.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
+		a.rendererApp.Error(w, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
 
 	pathname := request.GetFilepath(name)
 
 	if err := a.storageApp.CreateDir(pathname); err != nil {
-		a.rendererApp.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
+		a.rendererApp.Error(w, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("%s%s", a.publicURL, path.Join(request.GetURI(name), fmt.Sprintf("?%s", renderer.NewSuccessMessage(fmt.Sprintf("Directory %s successfully created", path.Base(pathname)))))), http.StatusMovedPermanently)
+	a.rendererApp.Redirect(w, r, request.GetURI(name), renderer.NewSuccessMessage("Directory %s successfully created", path.Base(pathname)))
 }

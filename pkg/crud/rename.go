@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"path"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
@@ -32,25 +31,25 @@ func (a *app) doRename(oldPath, newPath string, oldItem provider.StorageItem) (p
 // Rename rename given path to a new one
 func (a *app) Rename(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !request.CanEdit {
-		a.rendererApp.Error(w, request, provider.NewError(http.StatusForbidden, ErrNotAuthorized))
+		a.rendererApp.Error(w, provider.NewError(http.StatusForbidden, ErrNotAuthorized))
 		return
 	}
 
 	oldName, httErr := checkFormName(r, "name")
 	if httErr != nil && httErr.Err != ErrEmptyName {
-		a.rendererApp.Error(w, request, httErr)
+		a.rendererApp.Error(w, httErr)
 		return
 	}
 
 	newFolder, err := getNewFolder(r, request)
 	if err != nil {
-		a.rendererApp.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
+		a.rendererApp.Error(w, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
 
 	newName, err := getNewName(r)
 	if err != nil {
-		a.rendererApp.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
+		a.rendererApp.Error(w, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
 
@@ -58,19 +57,19 @@ func (a *app) Rename(w http.ResponseWriter, r *http.Request, request provider.Re
 	newPath := provider.GetPathname(newFolder, newName, request.Share)
 
 	if _, err := a.storageApp.Info(newPath); err == nil {
-		a.rendererApp.Error(w, request, provider.NewError(http.StatusBadRequest, errors.New("new name already exist")))
+		a.rendererApp.Error(w, provider.NewError(http.StatusBadRequest, errors.New("new name already exist")))
 		return
 	} else if !provider.IsNotExist(err) {
-		a.rendererApp.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
+		a.rendererApp.Error(w, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
 
 	oldItem, err := a.storageApp.Info(oldPath)
 	if err != nil {
 		if !provider.IsNotExist(err) {
-			a.rendererApp.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
+			a.rendererApp.Error(w, provider.NewError(http.StatusInternalServerError, err))
 		} else {
-			a.rendererApp.Error(w, request, provider.NewError(http.StatusNotFound, err))
+			a.rendererApp.Error(w, provider.NewError(http.StatusNotFound, err))
 		}
 
 		return
@@ -78,7 +77,7 @@ func (a *app) Rename(w http.ResponseWriter, r *http.Request, request provider.Re
 
 	newItem, err := a.doRename(oldPath, newPath, oldItem)
 	if err != nil {
-		a.rendererApp.Error(w, request, provider.NewError(http.StatusInternalServerError, err))
+		a.rendererApp.Error(w, provider.NewError(http.StatusInternalServerError, err))
 		return
 	}
 
@@ -91,7 +90,7 @@ func (a *app) Rename(w http.ResponseWriter, r *http.Request, request provider.Re
 		message = fmt.Sprintf("%s successfully renamed to %s", oldItem.Name, newItem.Name)
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("%s%s", a.publicURL, path.Join(uri, fmt.Sprintf("?%s", renderer.NewSuccessMessage(message)))), http.StatusFound)
+	a.rendererApp.Redirect(w, r, uri, renderer.NewSuccessMessage(message))
 }
 
 func getNewFolder(r *http.Request, request provider.Request) (string, error) {
