@@ -15,7 +15,6 @@ var (
 // Page renderer to user
 type Page struct {
 	Content     map[string]interface{}
-	Error       *Error
 	Message     renderer.Message
 	PublicURL   string
 	Title       string
@@ -28,7 +27,6 @@ type Page struct {
 // PageBuilder for interactively create page
 type PageBuilder struct {
 	content map[string]interface{}
-	error   *Error
 	message renderer.Message
 	layout  string
 	config  Config
@@ -52,13 +50,6 @@ func (p *PageBuilder) Request(request Request) *PageBuilder {
 // Message set Message for page
 func (p *PageBuilder) Message(message renderer.Message) *PageBuilder {
 	p.message = message
-
-	return p
-}
-
-// Error set Error for page
-func (p *PageBuilder) Error(error *Error) *PageBuilder {
-	p.error = error
 
 	return p
 }
@@ -92,7 +83,6 @@ func (p *PageBuilder) Build() Page {
 		Config:  p.config,
 		Request: p.request,
 		Message: p.message,
-		Error:   p.error,
 		Layout:  layout,
 		Content: p.content,
 

@@ -1,7 +1,6 @@
 package provider
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 )
@@ -74,6 +73,8 @@ func SetPrefsCookie(w http.ResponseWriter, request Request) {
 		HttpOnly: true,
 		SameSite: http.SameSiteStrictMode,
 	})
+
+	w.Header().Set("content-language", "en")
 }
 
 // Config data
@@ -90,27 +91,4 @@ type Seo struct {
 	Img         string
 	ImgHeight   uint
 	ImgWidth    uint
-}
-
-// Error rendered to user
-type Error struct {
-	Err    error
-	Status int
-}
-
-// NewError create an http error
-func NewError(status int, err error) *Error {
-	if err == nil {
-		return nil
-	}
-
-	return &Error{
-		Status: status,
-		Err:    err,
-	}
-}
-
-// Error convert error to string
-func (e Error) Error() string {
-	return fmt.Sprintf("HTTP/%d: %s", e.Status, e.Err)
 }

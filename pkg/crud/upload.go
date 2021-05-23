@@ -11,6 +11,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
+	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
@@ -61,30 +62,30 @@ func (a *app) saveUploadedFile(request provider.Request, part *multipart.Part) (
 // Upload saves form files to filesystem
 func (a *app) Upload(w http.ResponseWriter, r *http.Request, request provider.Request, values map[string]string, part *multipart.Part) {
 	if !request.CanEdit {
-		a.rendererApp.Error(w, provider.NewError(http.StatusForbidden, ErrNotAuthorized))
+		a.rendererApp.Error(w, model.WrapForbidden(ErrNotAuthorized))
 		return
 	}
 
 	if part == nil {
-		a.rendererApp.Error(w, provider.NewError(http.StatusBadRequest, errors.New("no file provided for save")))
+		a.rendererApp.Error(w, model.WrapInvalid(errors.New("no file provided for save")))
 		return
 	}
 
 	shared, err := getFormBool(values["share"])
 	if err != nil {
-		a.rendererApp.Error(w, provider.NewError(http.StatusBadRequest, err))
+		a.rendererApp.Error(w, model.WrapInvalid(err))
 		return
 	}
 
 	duration, err := getFormDuration(values["duration"])
 	if err != nil {
-		a.rendererApp.Error(w, provider.NewError(http.StatusBadRequest, err))
+		a.rendererApp.Error(w, model.WrapInvalid(err))
 		return
 	}
 
 	filename, err := a.saveUploadedFile(request, part)
 	if err != nil {
-		a.rendererApp.Error(w, provider.NewError(http.StatusInternalServerError, err))
+		a.rendererApp.Error(w, model.WrapInternal(err))
 		return
 	}
 
@@ -92,7 +93,7 @@ func (a *app) Upload(w http.ResponseWriter, r *http.Request, request provider.Re
 	if shared {
 		id, err := a.metadataApp.CreateShare(path.Join(request.Path, filename), false, "", false, duration)
 		if err != nil {
-			a.rendererApp.Error(w, provider.NewError(http.StatusInternalServerError, err))
+			a.rendererApp.Error(w, model.WrapInternal(err))
 			return
 		}
 

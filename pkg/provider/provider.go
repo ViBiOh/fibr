@@ -2,9 +2,6 @@ package provider
 
 import (
 	"io"
-	"net/http"
-
-	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
 const (
@@ -36,15 +33,6 @@ type ReadSeekerCloser interface {
 	Read([]byte) (int, error)
 	Seek(int64, int) (int64, error)
 	Close() error
-}
-
-// Renderer interface for return rich content to user
-type Renderer interface {
-	Directory(http.ResponseWriter, Request, map[string]interface{}, renderer.Message)
-	File(http.ResponseWriter, Request, map[string]interface{}, renderer.Message)
-	Error(http.ResponseWriter, Request, *Error)
-	Sitemap(http.ResponseWriter)
-	SVG(http.ResponseWriter, string, string)
 }
 
 // Storage describe action on a storage provider
