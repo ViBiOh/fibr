@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/v4/pkg/model"
 )
 
 func parseMultipart(r *http.Request) (map[string]string, *multipart.Part, error) {
@@ -55,7 +56,7 @@ func (a *app) Post(w http.ResponseWriter, r *http.Request, request provider.Requ
 			case http.MethodDelete:
 				a.DeleteShare(w, r, request)
 			default:
-				a.rendererApp.Error(w, provider.NewError(http.StatusMethodNotAllowed, fmt.Errorf("unknown share method `%s` for %s", method, r.URL.Path)))
+				a.rendererApp.Error(w, model.WrapMethodNotAllowed(fmt.Errorf("unknown share method `%s` for %s", method, r.URL.Path)))
 			}
 		} else {
 			switch method {
@@ -66,7 +67,7 @@ func (a *app) Post(w http.ResponseWriter, r *http.Request, request provider.Requ
 			case http.MethodDelete:
 				a.Delete(w, r, request)
 			default:
-				a.rendererApp.Error(w, provider.NewError(http.StatusMethodNotAllowed, fmt.Errorf("unknown method `%s` for %s", method, r.URL.Path)))
+				a.rendererApp.Error(w, model.WrapMethodNotAllowed(fmt.Errorf("unknown method `%s` for %s", method, r.URL.Path)))
 			}
 		}
 
@@ -76,12 +77,12 @@ func (a *app) Post(w http.ResponseWriter, r *http.Request, request provider.Requ
 	if strings.HasPrefix(contentType, "multipart/form-data") {
 		values, file, err := parseMultipart(r)
 		if err != nil {
-			a.rendererApp.Error(w, provider.NewError(http.StatusInternalServerError, fmt.Errorf("unable to parse multipart request: %s", err)))
+			a.rendererApp.Error(w, model.WrapInternal(fmt.Errorf("unable to parse multipart request: %s", err)))
 			return
 		}
 
 		if values["method"] != http.MethodPost {
-			a.rendererApp.Error(w, provider.NewError(http.StatusMethodNotAllowed, fmt.Errorf("unknown method `%s` for multipart", values["method"])))
+			a.rendererApp.Error(w, model.WrapMethodNotAllowed(fmt.Errorf("unknown method `%s` for multipart", values["method"])))
 			return
 		}
 
@@ -89,5 +90,5 @@ func (a *app) Post(w http.ResponseWriter, r *http.Request, request provider.Requ
 		return
 	}
 
-	a.rendererApp.Error(w, provider.NewError(http.StatusMethodNotAllowed, fmt.Errorf("unknown content-type %s", contentType)))
+	a.rendererApp.Error(w, model.WrapMethodNotAllowed(fmt.Errorf("unknown content-type %s", contentType)))
 }

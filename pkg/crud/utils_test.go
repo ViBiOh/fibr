@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/v4/pkg/model"
 )
 
 var (
@@ -109,7 +110,7 @@ func TestCheckFormName(t *testing.T) {
 				formName: "filename",
 			},
 			"",
-			provider.NewError(http.StatusBadRequest, ErrEmptyName),
+			model.WrapInvalid(ErrEmptyName),
 		},
 		{
 			"root",
@@ -118,7 +119,7 @@ func TestCheckFormName(t *testing.T) {
 				formName: "filename",
 			},
 			"",
-			provider.NewError(http.StatusForbidden, ErrNotAuthorized),
+			model.WrapForbidden(ErrNotAuthorized),
 		},
 		{
 			"valid",
@@ -164,7 +165,7 @@ func TestCheckFolderName(t *testing.T) {
 		intention string
 		args      args
 		want      string
-		wantErr   *provider.Error
+		wantErr   error
 	}{
 		{
 			"empty value",
@@ -172,7 +173,7 @@ func TestCheckFolderName(t *testing.T) {
 				folderName: "",
 			},
 			"",
-			provider.NewError(http.StatusBadRequest, ErrEmptyFolder),
+			model.WrapInvalid(ErrEmptyFolder),
 		},
 		{
 			"no prefix",
@@ -180,7 +181,7 @@ func TestCheckFolderName(t *testing.T) {
 				folderName: "templates/",
 			},
 			"",
-			provider.NewError(http.StatusBadRequest, ErrAbsoluteFolder),
+			model.WrapInvalid(ErrAbsoluteFolder),
 		},
 		{
 			"share",
@@ -193,7 +194,7 @@ func TestCheckFolderName(t *testing.T) {
 				},
 			},
 			"",
-			provider.NewError(http.StatusForbidden, ErrNotAuthorized),
+			model.WrapForbidden(ErrNotAuthorized),
 		},
 		{
 			"valid share",

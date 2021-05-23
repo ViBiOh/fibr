@@ -25,7 +25,6 @@ func TestBuild(t *testing.T) {
 		config    Config
 		request   Request
 		message   renderer.Message
-		error     *Error
 		layout    string
 		content   map[string]interface{}
 		want      Page
@@ -35,7 +34,6 @@ func TestBuild(t *testing.T) {
 			Config{},
 			Request{},
 			renderer.Message{},
-			nil,
 			"",
 			nil,
 			Page{
@@ -47,7 +45,6 @@ func TestBuild(t *testing.T) {
 			config,
 			Request{},
 			renderer.Message{},
-			nil,
 			"list",
 			nil,
 			Page{
@@ -62,7 +59,7 @@ func TestBuild(t *testing.T) {
 
 	for _, testCase := range cases {
 		t.Run(testCase.intention, func(t *testing.T) {
-			result := (&PageBuilder{}).Config(testCase.config).Request(testCase.request).Message(testCase.message).Error(testCase.error).Layout(testCase.layout).Content(testCase.content).Build()
+			result := (&PageBuilder{}).Config(testCase.config).Request(testCase.request).Message(testCase.message).Layout(testCase.layout).Content(testCase.content).Build()
 
 			if !reflect.DeepEqual(result, testCase.want) {
 				t.Errorf("Build() = %#v, want %#v", result, testCase.want)

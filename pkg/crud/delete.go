@@ -1,38 +1,40 @@
 package crud
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
 // Delete given path from filesystem
 func (a *app) Delete(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !request.CanEdit {
-		a.rendererApp.Error(w, provider.NewError(http.StatusForbidden, ErrNotAuthorized))
+		a.rendererApp.Error(w, model.WrapForbidden(ErrNotAuthorized))
 		return
 	}
 
-	name, httpErr := checkFormName(r, "name")
-	if httpErr != nil && httpErr.Err != ErrEmptyName {
-		a.rendererApp.Error(w, httpErr)
+	name, err := checkFormName(r, "name")
+	if err != nil && !errors.Is(err, ErrEmptyName) {
+		a.rendererApp.Error(w, err)
 		return
 	}
 
 	info, err := a.storageApp.Info(request.GetFilepath(name))
 	if err != nil {
-		a.rendererApp.Error(w, provider.NewError(http.StatusNotFound, err))
+		a.rendererApp.Error(w, model.WrapNotFound(err))
 		return
 	}
 
 	if err := a.storageApp.Remove(info.Pathname); err != nil {
-		a.rendererApp.Error(w, provider.NewError(http.StatusInternalServerError, err))
+		a.rendererApp.Error(w, model.WrapInternal(err))
 		return
 	}
 
 	if err := a.metadataApp.DeleteSharePath(info.Pathname); err != nil {
-		a.rendererApp.Error(w, provider.NewError(http.StatusInternalServerError, err))
+		a.rendererApp.Error(w, model.WrapInternal(err))
 		return
 	}
 

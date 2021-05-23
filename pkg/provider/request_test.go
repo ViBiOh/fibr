@@ -4,8 +4,6 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"net/http"
-	"reflect"
 	"testing"
 
 	"golang.org/x/crypto/bcrypt"
@@ -228,61 +226,6 @@ func TestCheckPassword(t *testing.T) {
 
 			if failed {
 				t.Errorf("CheckPassword() = `%s`, want `%s`", err, testCase.want)
-			}
-		})
-	}
-}
-
-func TestNewError(t *testing.T) {
-	var cases = []struct {
-		intention string
-		status    int
-		err       error
-		want      *Error
-	}{
-		{
-			"empty",
-			0,
-			nil,
-			nil,
-		},
-		{
-			"given error",
-			500,
-			errors.New("invalid value"),
-			&Error{
-				Status: 500,
-				Err:    errors.New("invalid value"),
-			},
-		},
-	}
-
-	for _, testCase := range cases {
-		t.Run(testCase.intention, func(t *testing.T) {
-			if result := NewError(testCase.status, testCase.err); !reflect.DeepEqual(result, testCase.want) {
-				t.Errorf("NewError(%d, %#v) = %#v, want %#v", testCase.status, testCase.err, result, testCase.want)
-			}
-		})
-	}
-}
-
-func TestError(t *testing.T) {
-	var cases = []struct {
-		intention string
-		instance  *Error
-		want      string
-	}{
-		{
-			"simple",
-			NewError(http.StatusTeapot, errors.New("I'm a teapot")),
-			"HTTP/418: I'm a teapot",
-		},
-	}
-
-	for _, tc := range cases {
-		t.Run(tc.intention, func(t *testing.T) {
-			if got := tc.instance.Error(); got != tc.want {
-				t.Errorf("Error() = `%s`, want `%s`", got, tc.want)
 			}
 		})
 	}

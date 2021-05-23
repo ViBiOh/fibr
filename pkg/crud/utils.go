@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/v4/pkg/model"
 )
 
 func getPreviousAndNext(file provider.StorageItem, files []provider.StorageItem) (*provider.StorageItem, *provider.StorageItem) {
@@ -38,34 +39,34 @@ func getPreviousAndNext(file provider.StorageItem, files []provider.StorageItem)
 	return previous, nil
 }
 
-func checkFormName(r *http.Request, formName string) (string, *provider.Error) {
+func checkFormName(r *http.Request, formName string) (string, error) {
 	name := strings.TrimSpace(r.FormValue(formName))
 	if name == "" {
-		return "", provider.NewError(http.StatusBadRequest, ErrEmptyName)
+		return "", model.WrapInvalid(ErrEmptyName)
 	}
 
 	if name == "/" {
-		return "", provider.NewError(http.StatusForbidden, ErrNotAuthorized)
+		return "", model.WrapForbidden(ErrNotAuthorized)
 	}
 
 	return name, nil
 }
 
-func checkFolderName(formName string, request provider.Request) (string, *provider.Error) {
+func checkFolderName(formName string, request provider.Request) (string, error) {
 	name := strings.TrimSpace(formName)
 	if name == "" {
-		return "", provider.NewError(http.StatusBadRequest, ErrEmptyFolder)
+		return "", model.WrapInvalid(ErrEmptyFolder)
 	}
 
 	if !strings.HasPrefix(name, "/") {
-		return "", provider.NewError(http.StatusBadRequest, ErrAbsoluteFolder)
+		return "", model.WrapInvalid(ErrAbsoluteFolder)
 	}
 
 	if len(request.Share.ID) != 0 {
 		shareURIPrefix := fmt.Sprintf("/%s", request.Share.ID)
 
 		if !strings.HasPrefix(name, shareURIPrefix) {
-			return "", provider.NewError(http.StatusForbidden, ErrNotAuthorized)
+			return "", model.WrapForbidden(ErrNotAuthorized)
 		}
 
 		name = strings.TrimPrefix(name, shareURIPrefix)
