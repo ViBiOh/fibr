@@ -201,9 +201,9 @@
 
     @media print {
       body::before {
-        {{ $url := publicURL (url "/") }}
+        {{ $url := publicURL "/" }}
         {{ with .Request }}
-          {{ $url = publicURL (url (.URL "")) }}
+          {{ $url = publicURL (.URL "") }}
         {{ end }}
         content: 'Save ink, share link. {{ $url }}';
       }

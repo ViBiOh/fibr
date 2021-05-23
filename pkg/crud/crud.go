@@ -122,21 +122,19 @@ func (a *app) Start(done <-chan struct{}) {
 		a.prometheus.MustRegister(renameCount)
 	}
 
-	err := a.storageApp.Walk("", func(item provider.StorageItem, _ error) error {
+	err := a.storageApp.Walk("", func(item provider.StorageItem, err error) error {
 		name, err := provider.SanitizeName(item.Pathname, false)
 		if err != nil {
 			logger.Error("unable to sanitize name %s: %s", item.Pathname, err)
 			return nil
 		}
 
-		if name == item.Pathname {
-			return nil
-		}
-
-		if a.sanitizeOnStart {
-			a.rename(item, name, renameCount)
-		} else {
-			logger.Info("File with name `%s` should be renamed to `%s`", item.Pathname, name)
+		if name != item.Pathname {
+			if a.sanitizeOnStart {
+				a.rename(item, name, renameCount)
+			} else {
+				logger.Info("File with name `%s` should be renamed to `%s`", item.Pathname, name)
+			}
 		}
 
 		if thumbnail.CanHaveThumbnail(item) && !a.thumbnailApp.HasThumbnail(item) {

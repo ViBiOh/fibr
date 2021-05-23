@@ -19,8 +19,8 @@ func (a app) HasThumbnail(item provider.StorageItem) bool {
 		return false
 	}
 
-	_, err := a.storage.Info(getThumbnailPath(item))
-	return err == nil
+	info, err := a.storage.Info(getThumbnailPath(item))
+	return err == nil && !info.IsDir
 }
 
 func getThumbnailPath(item provider.StorageItem) string {

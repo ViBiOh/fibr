@@ -87,8 +87,8 @@ run:
 		-authProfiles "1:admin" \
 		-authUsers "1:`htpasswd -nBb admin admin`" \
 		-frameOptions "SAMEORIGIN" \
-		-thumbnailImageURL "http://localhost:9000" \
-		-thumbnailVideoURL "http://localhost:2080"
+		-thumbnailImageURL "https://imaginary.vibioh.fr" \
+		-thumbnailVideoURL "https://vith.vibioh.fr"
 
 .PHONY: run-imaginary
 run-imaginary:
