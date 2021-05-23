@@ -17,10 +17,11 @@ import (
 // FuncMap is the map of function available in templates
 func FuncMap(thumbnailApp thumbnail.App) template.FuncMap {
 	return template.FuncMap{
-		"asyncImage": func(file provider.RenderItem, version string) map[string]interface{} {
+		"asyncImage": func(file provider.RenderItem, version string, request provider.Request) map[string]interface{} {
 			return map[string]interface{}{
 				"File":    file,
 				"Version": version,
+				"Request": request,
 			}
 		},
 		"rebuildPaths": func(parts []string, index int) string {
