@@ -50,12 +50,12 @@ func GetPathname(folder, name string, share Share) string {
 	return path.Join(parts...)
 }
 
-// GetURI computes public URI for given params
-func GetURI(folder, name string, share Share) string {
-	parts := make([]string, 0)
+// URL computes public URI for given params
+func URL(folder, name string, share Share) string {
+	parts := []string{"/"}
 
 	if len(share.ID) != 0 {
-		parts = append(parts, "/", share.ID)
+		parts = append(parts, share.ID)
 	}
 
 	parts = append(parts, folder)

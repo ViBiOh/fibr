@@ -68,11 +68,12 @@ func (a *app) Rename(w http.ResponseWriter, r *http.Request, request provider.Re
 	oldItem, err := a.storageApp.Info(oldPath)
 	if err != nil {
 		if !provider.IsNotExist(err) {
-			a.rendererApp.Error(w, model.WrapInternal(err))
+			err = model.WrapInternal(err)
 		} else {
-			a.rendererApp.Error(w, model.WrapNotFound(err))
+			err = model.WrapNotFound(err)
 		}
 
+		a.rendererApp.Error(w, err)
 		return
 	}
 
@@ -83,15 +84,15 @@ func (a *app) Rename(w http.ResponseWriter, r *http.Request, request provider.Re
 	}
 
 	var message string
-	uri := request.GetURI("")
+	uri := request.URL("")
 
 	if newFolder != uri {
-		message = fmt.Sprintf("%s successfully moved to %s", oldItem.Name, provider.GetURI(newFolder, newName, request.Share))
+		message = fmt.Sprintf("%s successfully moved to %s", oldItem.Name, provider.URL(newFolder, newName, request.Share))
 	} else {
 		message = fmt.Sprintf("%s successfully renamed to %s", oldItem.Name, newItem.Name)
 	}
 
-	a.rendererApp.Redirect(w, r, uri, renderer.NewSuccessMessage(message))
+	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/", uri), renderer.NewSuccessMessage(message))
 }
 
 func getNewFolder(r *http.Request, request provider.Request) (string, error) {

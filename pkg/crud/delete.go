@@ -2,6 +2,7 @@ package crud
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -40,5 +41,5 @@ func (a *app) Delete(w http.ResponseWriter, r *http.Request, request provider.Re
 
 	go a.thumbnailApp.Remove(info)
 
-	a.rendererApp.Redirect(w, r, request.GetURI(""), renderer.NewSuccessMessage("%s successfully deleted", info.Name))
+	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/", request.URL("")), renderer.NewSuccessMessage("%s successfully deleted", info.Name))
 }

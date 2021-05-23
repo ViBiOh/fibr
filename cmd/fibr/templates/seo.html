@@ -1,24 +1,38 @@
 {{ define "seo" }}
+  {{ $title := "fibr" }}
   {{ $description := "FIle BRowser" }}
+  {{ $url := publicURL (url "/") }}
 
-  <title>{{ .Title }}</title>
+  {{ with .Request }}
+    {{ $title = .Title }}
+    {{ $description = .Description }}
+    {{ $url = publicURL (url (.URL "")) }}
+  {{ end }}
+
+  {{ if .File }}
+    {{ if not .File.IsDir }}
+      {{ $url = printf "%s%s" $url "?browser" }}
+    {{ end }}
+  {{ end }}
+
+  <title>{{ $title }}</title>
   <meta name="description" content="{{ $description }}">
-  <link rel="canonical" href="{{ publicURL "" }}{{ if .File }}{{ if not .File.IsDir }}?browser{{ end }}{{ end }}">
+  <link rel="canonical" href="{{ $url }}">
 
   <meta property="og:type" content="website">
-  <meta property="og:url" content="{{ publicURL "" }}">
-  <meta property="og:title" content="{{ .Title }}">
+  <meta property="og:url" content="{{ $url }}">
+  <meta property="og:title" content="{{ $title }}">
   <meta property="og:description" content="{{ $description }}">
 
   {{ if .Cover.Img }}
     {{ if .File }}
       {{ if (hasThumbnail .File) }}
-        <meta property="og:image" content="{{ .PublicURL }}?thumbnail&v={{ .Config.Version }}">
+        <meta property="og:image" content="{{ publicURL "/" }}?thumbnail&v={{ .Config.Version }}">
       {{ else }}
-        <meta property="og:image" content="{{ .PublicURL }}/{{ urlquery (.Cover.Img.Name) }}?thumbnail&v={{ .Config.Version }}">
+        <meta property="og:image" content="{{ publicURL "/" }}{{ urlquery (.Cover.Img.Name) }}?thumbnail&v={{ .Config.Version }}">
       {{ end }}
     {{ else }}
-      <meta property="og:image" content="{{ .PublicURL }}/{{ urlquery (.Cover.Img.Name) }}?thumbnail&v={{ .Config.Version }}">
+      <meta property="og:image" content="{{ publicURL "/" }}{{ urlquery (.Cover.Img.Name) }}?thumbnail&v={{ .Config.Version }}">
     {{ end }}
     <meta property="og:image:height" content="{{ .Cover.ImgHeight }}">
     <meta property="og:image:width" content="{{ .Cover.ImgWidth }}">

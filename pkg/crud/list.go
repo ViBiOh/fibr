@@ -40,7 +40,7 @@ func (a *app) List(w http.ResponseWriter, request provider.Request, message rend
 		return "", 0, nil, err
 	}
 
-	uri := request.GetURI("")
+	uri := request.URL("")
 
 	items := make([]provider.RenderItem, len(files))
 	for index, file := range files {
@@ -52,9 +52,10 @@ func (a *app) List(w http.ResponseWriter, request provider.Request, message rend
 	}
 
 	content := map[string]interface{}{
-		"Paths":   getPathParts(uri),
-		"Files":   items,
-		"Cover":   a.getCover(files),
+		"Paths": getPathParts(uri),
+		"Files": items,
+		"Cover": a.getCover(files),
+
 		"Request": request,
 		"Message": message,
 	}

@@ -2,6 +2,7 @@ package crud
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"path"
 	"strings"
@@ -72,7 +73,7 @@ func (a *app) CreateShare(w http.ResponseWriter, r *http.Request, request provid
 		return
 	}
 
-	a.rendererApp.Redirect(w, r, path.Dir(request.GetURI("")), renderer.NewSuccessMessage("Share successfully created with ID: %s", id)) // #share-list
+	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/", path.Dir(request.URL(""))), renderer.NewSuccessMessage("Share successfully created with ID: %s", id)) // #share-list
 }
 
 // DeleteShare delete a share from given ID
@@ -99,5 +100,5 @@ func (a *app) DeleteShare(w http.ResponseWriter, r *http.Request, request provid
 		return
 	}
 
-	a.rendererApp.Redirect(w, r, request.GetURI(""), renderer.NewSuccessMessage("Share with id %s successfully deleted", id)) // #share-list
+	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/", request.URL("")), renderer.NewSuccessMessage("Share with id %s successfully deleted", id)) // #share-list
 }

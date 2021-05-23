@@ -52,7 +52,7 @@ func main() {
 
 	crudConfig := crud.Flags(fs, "")
 	metadataConfig := metadata.Flags(fs, "")
-	rendererConfig := renderer.Flags(fs, "")
+	rendererConfig := renderer.Flags(fs, "", flags.NewOverride("PublicURL", "https://fibr.vibioh.fr"), flags.NewOverride("Title", "fibr"))
 
 	filesystemConfig := filesystem.Flags(fs, "fs")
 	thumbnailConfig := thumbnail.Flags(fs, "thumbnail")

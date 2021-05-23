@@ -56,14 +56,12 @@ type Config struct {
 }
 
 type app struct {
-	prometheus     prometheus.Registerer
-	storageApp     provider.Storage
-	rendererApp    renderer.App
-	newRendererApp renderer.App
-	metadataApp    metadata.App
-	thumbnailApp   thumbnail.App
+	prometheus   prometheus.Registerer
+	storageApp   provider.Storage
+	rendererApp  renderer.App
+	metadataApp  metadata.App
+	thumbnailApp thumbnail.App
 
-	staticHandler   http.Handler
 	sanitizeOnStart bool
 }
 

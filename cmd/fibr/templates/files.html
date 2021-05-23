@@ -292,10 +292,10 @@
   <div class="content">
     <div id="menu" class="flex flex-center">
       <a id="list-display" class="button button-icon" href="?d=list">
-        <img class="icon" src="{{ .Config.PublicURL }}/svg/list?fill=silver" alt="List">
+        <img class="icon" src="{{ url "/svg/list?fill=silver" }}" alt="List">
       </a>
       <a id="grid-display" class="button button-icon" href="?d=grid">
-        <img class="icon" src="{{ .Config.PublicURL }}/svg/th?fill=silver" alt="Grid">
+        <img class="icon" src="{{ url "/svg/th?fill=silver" }}" alt="Grid">
       </a>
 
       <span class="padding-left">{{ len .Files }}<span {{ if .Request.CanEdit }}class="hide-xs"{{ end }}> element{{ if gt (len .Files) 1 }}s{{ end }}</span></span>
@@ -303,22 +303,22 @@
 
       {{ if .Request.CanEdit }}
         <a href="#upload-modal" class="button button-icon">
-          <img class="icon" src="{{ .Config.PublicURL }}/svg/cloud-upload-alt?fill=silver" alt="Upload">
+          <img class="icon" src="{{ url "/svg/cloud-upload-alt?fill=silver" }}" alt="Upload">
         </a>
         <a href="#folder-modal" class="button button-icon">
-          <img class="icon" src="{{ .Config.PublicURL }}/svg/folder?fill=silver" alt="Create folder">
+          <img class="icon" src="{{ url "/svg/folder?fill=silver" }}" alt="Create folder">
         </a>
       {{ end }}
 
       {{ if .Request.CanShare }}
         <a href="#share-list" class="button button-icon">
-          <img class="icon" src="{{ .Config.PublicURL }}/svg/share-alt-square?fill=silver" alt="Share">
+          <img class="icon" src="{{ url "/svg/share-alt-square?fill=silver" }}" alt="Share">
         </a>
       {{ end }}
 
       {{ if gt (len .Files) 0 }}
         <a class="padding" href="?download" download>
-          <img class="icon" src="{{ .Config.PublicURL }}/svg/download?fill=silver" alt="Download">
+          <img class="icon" src="{{ url "/svg/download?fill=silver" }}" alt="Download">
         </a>
       {{ end }}
     </div>
@@ -335,34 +335,34 @@
               {{ template "async-image" asyncImage . $root.Config.Version }}
             {{ else }}
               {{ if .IsDir }}
-                <img class="icon {{ if eq $root.Request.Display "grid" }}icon-large{{ end }}" src="{{ $root.Config.PublicURL }}/svg/folder?fill=silver" alt="Folder">
+                <img class="icon {{ if eq $root.Request.Display "grid" }}icon-large{{ end }}" src="{{ url "/svg/folder?fill=silver" }}" alt="Folder">
               {{ else }}
-                <img class="icon {{ if eq $root.Request.Display "grid" }}icon-large{{ end }}" src="{{ $root.Config.PublicURL }}/svg/{{ iconFromExtension . }}?fill=silver" alt="File">
+                <img class="icon {{ if eq $root.Request.Display "grid" }}icon-large{{ end }}" src="{{ url "/svg/" }}{{ iconFromExtension . }}?fill=silver" alt="File">
               {{ end }}
               <span class="filename ellipsis {{ if eq $root.Request.Display "list" }}padding-left{{ end }}">{{ .Name }}</span>
             {{ end }}
 
             <a href="{{ .Name }}?download" class="button button-icon file-download" alt="Download" download>
-              <img class="icon" src="{{ $root.Config.PublicURL }}/svg/download?fill=silver" alt="Download">
+              <img class="icon" src="{{ url "/svg/download?fill=silver" }}" alt="Download">
             </a>
 
             {{ if $root.Request.CanEdit }}
               <a href="#delete-modal-{{ .ID }}" class="button button-icon file-delete" alt="Delete">
-                <img class="icon" src="{{ $root.Config.PublicURL }}/svg/times?fill=silver" alt="Delete">
+                <img class="icon" src="{{ url "/svg/times?fill=silver" }}" alt="Delete">
               </a>
               <a href="#edit-modal-{{ .ID }}" class="button button-icon file-edit" alt="Edit">
-                <img class="icon" src="{{ $root.Config.PublicURL }}/svg/pencil-alt?fill=silver" alt="Edit">
+                <img class="icon" src="{{ url "/svg/pencil-alt?fill=silver" }}" alt="Edit">
               </a>
             {{ end }}
 
             {{ if $root.Request.CanShare }}
               <a href="#share-form-{{ .ID }}" class="button button-icon file-share" alt="Share">
-                <img class="icon" src="{{ $root.Config.PublicURL }}/svg/share-alt-square?fill=silver" alt="Share {{ .Name }}">
+                <img class="icon" src="{{ url "/svg/share-alt-square?fill=silver" }}" alt="Share {{ .Name }}">
               </a>
             {{ end }}
 
             {{ if and (eq $root.Request.Display "grid") (hasThumbnail .) .IsVideo }}
-              <img class="icon icon-overlay" src="{{ $root.Config.PublicURL }}/svg/play?fill=rgba(192, 192, 192, 0.8)" alt="Play video">
+              <img class="icon icon-overlay" src="{{ url "/svg/play?fill=rgba(192, 192, 192, 0.8)" }}" alt="Play video">
             {{ end }}
           </a>
         </li>

@@ -30,14 +30,14 @@ func (r Request) GetFilepath(name string) string {
 	return GetPathname(r.Path, name, r.Share)
 }
 
-// GetURI of request
-func (r Request) GetURI(name string) string {
-	return GetURI(r.Path, name, r.Share)
+// URL of request
+func (r Request) URL(name string) string {
+	return URL(r.Path, name, r.Share)
 }
 
 // Layout returns layout of given name based on preferences
 func (r Request) Layout(name string) string {
-	return r.LayoutPath(strings.Trim(r.GetURI(name), "/"))
+	return r.LayoutPath(r.URL(name))
 }
 
 // LayoutPath returns layout of given path based on preferences
@@ -48,9 +48,47 @@ func (r Request) LayoutPath(path string) string {
 	return "grid"
 }
 
+// Title returns title of the page
+func (r Request) Title() string {
+	parts := []string{"fibr"}
+
+	if len(r.Share.ID) != 0 {
+		parts = append(parts, r.Share.RootName)
+	}
+
+	if len(r.Path) > 0 {
+		requestPath := strings.Trim(r.Path, "/")
+
+		if requestPath != "" {
+			parts = append(parts, requestPath)
+		}
+	}
+
+	return strings.Join(parts, " - ")
+}
+
+// Description returns description of the page
+func (r Request) Description() string {
+	parts := []string{"FIle BRowser"}
+
+	if len(r.Share.ID) != 0 {
+		parts = append(parts, r.Share.RootName)
+	}
+
+	if len(r.Path) > 0 {
+		requestPath := strings.Trim(r.Path, "/")
+
+		if requestPath != "" {
+			parts = append(parts, requestPath)
+		}
+	}
+
+	return strings.Join(parts, " - ")
+}
+
 func computeListLayoutPaths(request Request) string {
 	listLayoutPaths := request.Preferences.ListLayoutPath
-	path := strings.Trim(request.GetURI(""), "/")
+	path := request.URL("")
 
 	switch request.Display {
 	case "list":
@@ -75,20 +113,4 @@ func SetPrefsCookie(w http.ResponseWriter, request Request) {
 	})
 
 	w.Header().Set("content-language", "en")
-}
-
-// Config data
-type Config struct {
-	PublicURL string
-	Version   string
-	Seo       Seo
-}
-
-// Seo data
-type Seo struct {
-	Title       string
-	Description string
-	Img         string
-	ImgHeight   uint
-	ImgWidth    uint
 }
