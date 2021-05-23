@@ -7,6 +7,52 @@ import (
 	"testing"
 )
 
+func TestURL(t *testing.T) {
+	var cases = []struct {
+		intention string
+		request   Request
+		name      string
+		want      string
+	}{
+		{
+			"simple",
+			Request{
+				Path: "index",
+			},
+			"",
+			"/index",
+		},
+		{
+			"with given path",
+			Request{
+				Path: "index/templates",
+			},
+			"root.html",
+			"/index/templates/root.html",
+		},
+		{
+			"with share",
+			Request{
+				Path: "index",
+				Share: Share{
+					ID:   "abcd1234",
+					Path: "index",
+				},
+			},
+			"root.html",
+			"/abcd1234/index/root.html",
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.intention, func(t *testing.T) {
+			if result := tc.request.URL(tc.name); result != tc.want {
+				t.Errorf("URL() = `%s`, want `%s`", result, tc.want)
+			}
+		})
+	}
+}
+
 func TestSanitizeName(t *testing.T) {
 	var cases = []struct {
 		intention   string

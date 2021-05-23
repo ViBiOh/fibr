@@ -19,7 +19,7 @@
 
           <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
              / 
-            <a href="{{ $root.Config.PublicURL }}/{{ $fullPath }}/?d={{ $root.Request.LayoutPath $fullPath }}" itemprop="item">
+            <a href="{{ url $fullPath }}/?d={{ $root.Request.LayoutPath $fullPath }}" itemprop="item">
               <span itemprop="name">{{ $path }}</span>
             </a>
           </span>
@@ -37,14 +37,14 @@
       {{ if or .Previous .Next }}
         <nav class="flex">
           {{ if .Previous }}
-            <a class="button button-icon" href="{{ $root.Config.PublicURL }}/{{ .Previous.Name }}{{ if not .Previous.IsDir }}?browser{{ end }}">
-              <img class="icon" src="{{ .Config.PublicURL }}/svg/arrow-left?fill=silver" alt="Previous file">
+            <a class="button button-icon" href="{{ url ($root.Request.URL .Previous.Name) }}{{ if not .Previous.IsDir }}?browser{{ end }}">
+              <img class="icon" src="{{ url "/svg/arrow-left?fill=silver" }}" alt="Previous file">
             </a>
           {{ end }}
 
           {{ if .Next }}
-            <a class="button button-icon" href="{{ $root.Config.PublicURL }}/{{ .Next.Name }}{{ if not .Next.IsDir }}?browser{{ end }}">
-              <img class="icon" src="{{ .Config.PublicURL }}/svg/arrow-right?fill=silver" alt="Next file">
+            <a class="button button-icon" href="{{ url ($root.Request.URL .Next.Name) }}{{ if not .Next.IsDir }}?browser{{ end }}">
+              <img class="icon" src="{{ url "/svg/arrow-right?fill=silver" }}" alt="Next file">
             </a>
           {{ end }}
         </nav>

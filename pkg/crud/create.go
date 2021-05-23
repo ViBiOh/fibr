@@ -2,6 +2,7 @@ package crud
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"path"
 
@@ -36,5 +37,5 @@ func (a *app) Create(w http.ResponseWriter, r *http.Request, request provider.Re
 		return
 	}
 
-	a.rendererApp.Redirect(w, r, request.GetURI(name), renderer.NewSuccessMessage("Directory %s successfully created", path.Base(pathname)))
+	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/", request.URL(name)), renderer.NewSuccessMessage("Directory %s successfully created", path.Base(pathname)))
 }

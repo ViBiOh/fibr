@@ -201,7 +201,11 @@
 
     @media print {
       body::before {
-        content: 'Save ink, share link. {{ .PublicURL }}{{ if .Request.Share.ID }}/{{ .Request.Share.ID }}/{{ end }}';
+        {{ $url := publicURL (url "/") }}
+        {{ with .Request }}
+          {{ $url = publicURL (url (.URL "")) }}
+        {{ end }}
+        content: 'Save ink, share link. {{ $url }}';
       }
 
       body > * {

@@ -1,5 +1,5 @@
 {{ define "root_link" }}
-  <a href="{{ .Config.PublicURL }}/{{ if .Request.Share.ID }}{{ .Request.Share.ID }}/{{ end }}" itemprop="item">
+  <a href="{{ url "/" }}{{ if .Request.Share.ID }}{{ .Request.Share.ID }}/{{ end }}" itemprop="item">
     <span itemprop="name">{{ if .Request.Share.ID }}{{ .Request.Share.RootName }}{{ else }}fibr{{ end }}</span>
   </a>
 {{ end }}

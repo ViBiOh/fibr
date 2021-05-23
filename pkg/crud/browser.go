@@ -17,7 +17,7 @@ func (a *app) Browser(w http.ResponseWriter, request provider.Request, file prov
 		next     *provider.StorageItem
 	)
 
-	pathParts := getPathParts(request.GetURI(""))
+	pathParts := getPathParts(request.URL(""))
 	breadcrumbs := pathParts[:len(pathParts)-1]
 
 	files, err := a.storageApp.List(path.Dir(file.Pathname))
@@ -37,7 +37,8 @@ func (a *app) Browser(w http.ResponseWriter, request provider.Request, file prov
 		"Parent":   path.Join(breadcrumbs...),
 		"Previous": previous,
 		"Next":     next,
-		"Request":  request,
-		"Message":  message,
+
+		"Request": request,
+		"Message": message,
 	}, nil
 }

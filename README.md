@@ -169,6 +169,8 @@ Usage of fibr:
         [auth] Disable basic authentification {FIBR_NO_AUTH}
   -okStatus int
         [http] Healthy HTTP Status code {FIBR_OK_STATUS} (default 204)
+  -pathPrefix string
+        Root Path Prefix {FIBR_PATH_PREFIX}
   -port uint
         [server] Listen port {FIBR_PORT} (default 1080)
   -prometheusAddress string
@@ -190,7 +192,7 @@ Usage of fibr:
   -prometheusWriteTimeout string
         [prometheus] Write Timeout {FIBR_PROMETHEUS_WRITE_TIMEOUT} (default "10s")
   -publicURL string
-        [fibr] Public URL {FIBR_PUBLIC_URL} (default "https://fibr.vibioh.fr")
+        Public URL {FIBR_PUBLIC_URL} (default "https://fibr.vibioh.fr")
   -readTimeout string
         [server] Read Timeout {FIBR_READ_TIMEOUT} (default "2m")
   -sanitizeOnStart
@@ -201,12 +203,12 @@ Usage of fibr:
         [thumbnail] Imaginary URL {FIBR_THUMBNAIL_IMAGE_URL} (default "http://image:9000")
   -thumbnailVideoURL string
         [thumbnail] Video Thumbnail URL {FIBR_THUMBNAIL_VIDEO_URL} (default "http://video:1080")
+  -title string
+        Application title {FIBR_TITLE} (default "fibr")
   -url string
         [alcotest] URL to check {FIBR_URL}
   -userAgent string
         [alcotest] User-Agent for check {FIBR_USER_AGENT} (default "Alcotest")
-  -version string
-        [fibr] Version (used mainly as a cache-buster) {FIBR_VERSION}
   -writeTimeout string
         [server] Write Timeout {FIBR_WRITE_TIMEOUT} (default "2m")
 ```
