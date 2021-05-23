@@ -103,7 +103,7 @@
 
       const icon = document.createElement('img');
       icon.classList.add('icon');
-      icon.src = '/svg/share-alt-square?fill=silver';
+      icon.src = '{{ url "/svg/share-alt-square?fill=silver" }}';
       icon.alt = `Share ${file.name}`;
       item.appendChild(icon);
 
@@ -115,8 +115,10 @@
         'padding-left',
       );
 
+      const prefix = "{{ url "/" }}";
+
       const link = document.createElement('a');
-      link.href = `/${id}/`;
+      link.href = `${prefix}${id}/`;
       link.innerHTML = file.name;
       filename.appendChild(link);
 

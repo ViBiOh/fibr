@@ -95,11 +95,11 @@ run-imaginary:
 	docker run --rm \
 		--name "imaginary" \
 		-p "9000:9000/tcp" \
-		h2non/imaginary
+		"h2non/imaginary"
 
 .PHONY: run-vith
 run-vith:
 	docker run --rm \
 		--name "vith" \
 		-p "2080:1080/tcp" \
-		vibioh/vith
+		"vibioh/vith"
