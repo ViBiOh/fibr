@@ -25,7 +25,11 @@
   <meta property="og:description" content="{{ $description }}">
 
   {{ if .Cover.Img }}
-    <meta property="og:image" content="{{ publicURL (.Request.URL .Cover.Img.Name) }}?thumbnail&v={{ .Version }}">
+    {{ if .File }}
+      <meta property="og:image" content="{{ publicURL (.Request.URL "") }}?thumbnail&v={{ .Version }}">
+    {{ else }}
+      <meta property="og:image" content="{{ publicURL (.Request.URL .Cover.Img.Name) }}?thumbnail&v={{ .Version }}">
+    {{ end }}
     <meta property="og:image:height" content="{{ .Cover.ImgHeight }}">
     <meta property="og:image:width" content="{{ .Cover.ImgWidth }}">
   {{ else }}
