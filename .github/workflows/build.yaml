@@ -19,7 +19,6 @@ defaults:
 jobs:
   build:
     name: Golang
-    if: "! contains(toJSON(github.event.commits.*.message), '[skip ci]')"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -37,7 +36,6 @@ jobs:
 
   sonarcloud:
     name: SonarCloud
-    if: "! contains(toJSON(github.event.commits.*.message), '[skip ci]')"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -53,7 +51,6 @@ jobs:
 
   package:
     name: Docker
-    if: "! contains(toJSON(github.event.commits.*.message), '[skip ci]')"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
