@@ -62,6 +62,10 @@ func (a app) TemplateFunc(w http.ResponseWriter, r *http.Request) (string, int, 
 		return "", 0, nil, model.WrapMethodNotAllowed(errors.New("you lack of method for calling me"))
 	}
 
+	if r.URL.Path == "/sitemap.xml" {
+		return "sitemap", http.StatusOK, nil, nil
+	}
+
 	if query.GetBool(r, "redirect") {
 		a.rendererApp.Redirect(w, r, r.URL.Path, renderer.ParseMessage(r))
 		return "", 0, nil, nil
