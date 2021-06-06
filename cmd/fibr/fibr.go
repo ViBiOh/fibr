@@ -45,7 +45,7 @@ func main() {
 
 	alcotestConfig := alcotest.Flags(fs, "")
 	loggerConfig := logger.Flags(fs, "logger")
-	prometheusConfig := prometheus.Flags(fs, "prometheus")
+	prometheusConfig := prometheus.Flags(fs, "prometheus", flags.NewOverride("Gzip", false))
 	owaspConfig := owasp.Flags(fs, "", flags.NewOverride("FrameOptions", "SAMEORIGIN"), flags.NewOverride("Csp", "default-src 'self'; base-uri 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:"))
 
 	basicConfig := basicMemory.Flags(fs, "auth")
