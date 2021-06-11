@@ -53,7 +53,7 @@ spec:
               - bob
     resources:
       limits:
-        memory: 64Mi
+        memory: 256Mi
       requests:
         cpu: 400m
         memory: 64Mi
