@@ -96,6 +96,13 @@ func (a app) Serve(w http.ResponseWriter, r *http.Request, item provider.Storage
 	}
 
 	file, err := a.storage.ReaderFrom(getThumbnailPath(item))
+	if file != nil {
+		defer func() {
+			if err := file.Close(); err != nil {
+				logger.Error("unable to close file: %s", err)
+			}
+		}()
+	}
 	if err != nil {
 		httperror.InternalServerError(w, err)
 		return
@@ -130,6 +137,13 @@ func (a app) List(w http.ResponseWriter, _ *http.Request, item provider.StorageI
 		}
 
 		file, err := a.storage.ReaderFrom(getThumbnailPath(item))
+		if file != nil {
+			defer func() {
+				if err := file.Close(); err != nil {
+					logger.Error("unable to close file: %s", err)
+				}
+			}()
+		}
 		if err != nil {
 			logger.Error("unable to open %s: %s", item.Pathname, err)
 		}

@@ -132,8 +132,8 @@ func (a *app) refreshMetadatas() error {
 	file, err := a.storageApp.ReaderFrom(metadataFilename)
 	if file != nil {
 		defer func() {
-			if closeErr := file.Close(); closeErr != nil {
-				err = fmt.Errorf("%s: %w", err, closeErr)
+			if err := file.Close(); err != nil {
+				logger.Error("unable to close file: %s", err)
 			}
 		}()
 	}

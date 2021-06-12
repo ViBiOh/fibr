@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/query"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
@@ -38,6 +39,13 @@ func (a *app) getWithMessage(w http.ResponseWriter, r *http.Request, request pro
 		}
 
 		file, err := a.storageApp.ReaderFrom(info.Pathname)
+		if file != nil {
+			defer func() {
+				if err := file.Close(); err != nil {
+					logger.Error("unable to close file: %s", err)
+				}
+			}()
+		}
 		if err == nil {
 			http.ServeContent(w, r, info.Name, info.Date, file)
 		}
