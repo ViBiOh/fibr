@@ -31,14 +31,7 @@ func (a app) generate(item provider.StorageItem) error {
 		err  error
 	)
 
-	file, err = a.storage.ReaderFrom(item.Pathname)
-	if file != nil {
-		defer func() {
-			if err := file.Close(); err != nil {
-				logger.Error("unable to close storage file: %s", err)
-			}
-		}()
-	}
+	file, err = a.storage.ReaderFrom(item.Pathname) // file will be closed by `.Send`
 	if err != nil {
 		return err
 	}
