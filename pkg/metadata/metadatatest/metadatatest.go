@@ -20,7 +20,7 @@ var (
 		Path:     "/public",
 	}
 
-	passwordHash, _ = bcrypt.GenerateFromPassword([]byte("password"), 12)
+	passwordHash, _ = bcrypt.GenerateFromPassword([]byte("password"), provider.BcryptCost)
 
 	// PasswordShare instance
 	PasswordShare = provider.Share{
