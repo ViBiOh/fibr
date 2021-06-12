@@ -99,7 +99,7 @@ func (a app) Serve(w http.ResponseWriter, r *http.Request, item provider.Storage
 	if file != nil {
 		defer func() {
 			if err := file.Close(); err != nil {
-				logger.Error("unable to close file: %s", err)
+				logger.Error("unable to close thumbnail file: %s", err)
 			}
 		}()
 	}
@@ -136,32 +136,40 @@ func (a app) List(w http.ResponseWriter, _ *http.Request, item provider.StorageI
 			continue
 		}
 
-		file, err := a.storage.ReaderFrom(getThumbnailPath(item))
-		if file != nil {
-			defer func() {
-				if err := file.Close(); err != nil {
-					logger.Error("unable to close file: %s", err)
-				}
-			}()
-		}
-		if err != nil {
-			logger.Error("unable to open %s: %s", item.Pathname, err)
-		}
-
-		content, err := io.ReadAll(file)
-		if err != nil {
-			logger.Error("unable to read %s: %s", item.Pathname, err)
-		}
-
 		if commaNeeded {
 			provider.SafeWrite(w, ",")
 		} else {
 			commaNeeded = true
 		}
 
-		provider.SafeWrite(w, fmt.Sprintf(`"%s":`, sha.Sha1(item.Name)))
-		provider.SafeWrite(w, fmt.Sprintf(`"%s"`, base64.StdEncoding.EncodeToString(content)))
+		provider.SafeWrite(w, fmt.Sprintf(`"%s":"`, sha.Sha1(item.Name)))
+		a.encodeThumbnailContent(base64.NewEncoder(base64.StdEncoding, w), item)
+		provider.SafeWrite(w, `"`)
 	}
 
 	provider.SafeWrite(w, "}")
+}
+
+func (a app) encodeThumbnailContent(encoder io.WriteCloser, item provider.StorageItem) {
+	defer func() {
+		if err := encoder.Close(); err != nil {
+			logger.Error("unable to close encoder: %s", err)
+		}
+	}()
+
+	file, err := a.storage.ReaderFrom(getThumbnailPath(item))
+	if file != nil {
+		defer func() {
+			if err := file.Close(); err != nil {
+				logger.Error("unable to close thumbnail item: %s", err)
+			}
+		}()
+	}
+	if err != nil {
+		logger.Error("unable to open %s: %s", item.Pathname, err)
+	}
+
+	if _, err := io.Copy(encoder, file); err != nil {
+		logger.Error("unable to copy thumbnail: %s", err)
+	}
 }

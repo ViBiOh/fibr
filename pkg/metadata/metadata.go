@@ -133,7 +133,7 @@ func (a *app) refreshMetadatas() error {
 	if file != nil {
 		defer func() {
 			if err := file.Close(); err != nil {
-				logger.Error("unable to close file: %s", err)
+				logger.Error("unable to close metadata file: %s", err)
 			}
 		}()
 	}

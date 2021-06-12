@@ -171,6 +171,12 @@ func (a *app) CreateDir(name string) error {
 
 // Store file to storage
 func (a *app) Store(pathname string, content io.ReadCloser) error {
+	defer func() {
+		if err := content.Close(); err != nil {
+			logger.Error("unable to close content: %s", err)
+		}
+	}()
+
 	if err := checkPathname(pathname); err != nil {
 		return convertError(err)
 	}

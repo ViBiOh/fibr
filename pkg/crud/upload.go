@@ -33,7 +33,7 @@ func (a *app) saveUploadedFile(request provider.Request, part *multipart.Part) (
 	if hostFile != nil {
 		defer func() {
 			if err := hostFile.Close(); err != nil {
-				logger.Error("unable to close host file: %s", err)
+				logger.Error("unable to close uploaded file: %s", err)
 			}
 		}()
 	}

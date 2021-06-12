@@ -125,7 +125,7 @@ func (a *app) addFileToZip(zipWriter *zip.Writer, file provider.StorageItem, pat
 	if reader != nil {
 		defer func() {
 			if err := reader.Close(); err != nil {
-				logger.Error("unable to close file: %s", err)
+				logger.Error("unable to close zip file: %s", err)
 			}
 		}()
 	}

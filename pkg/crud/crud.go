@@ -123,6 +123,10 @@ func (a *app) Start(done <-chan struct{}) {
 	}
 
 	err := a.storageApp.Walk("", func(item provider.StorageItem, err error) error {
+		if err != nil {
+			return err
+		}
+
 		name, err := provider.SanitizeName(item.Pathname, false)
 		if err != nil {
 			logger.Error("unable to sanitize name %s: %s", item.Pathname, err)
