@@ -2,6 +2,7 @@ package crud
 
 import (
 	"archive/zip"
+	"bytes"
 	"fmt"
 	"io"
 	"net/http"
@@ -133,6 +134,9 @@ func (a *app) addFileToZip(zipWriter *zip.Writer, file provider.StorageItem, pat
 		return err
 	}
 
-	_, err = io.Copy(writer, reader)
+	buffer := provider.BufferPool.Get().(*bytes.Buffer)
+	defer provider.BufferPool.Put(buffer)
+
+	_, err = io.CopyBuffer(writer, reader, buffer.Bytes())
 	return err
 }

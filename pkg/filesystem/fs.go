@@ -1,6 +1,7 @@
 package filesystem
 
 import (
+	"bytes"
 	"errors"
 	"flag"
 	"fmt"
@@ -194,8 +195,10 @@ func (a *app) Store(pathname string, content io.ReadCloser) error {
 		return convertError(err)
 	}
 
-	copyBuffer := make([]byte, 32*1024)
-	if _, err = io.CopyBuffer(storageFile, content, copyBuffer); err != nil {
+	buffer := provider.BufferPool.Get().(*bytes.Buffer)
+	defer provider.BufferPool.Put(buffer)
+
+	if _, err = io.CopyBuffer(storageFile, content, buffer.Bytes()); err != nil {
 		return convertError(err)
 	}
 

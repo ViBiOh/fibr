@@ -1,11 +1,13 @@
 package provider
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"path"
 	"regexp"
 	"strings"
+	"sync"
 	"unicode"
 
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
@@ -31,6 +33,13 @@ var (
 	}
 	quotesChar   = regexp.MustCompile(`["'` + "`" + `](?m)`)
 	specialChars = regexp.MustCompile(`[^a-z0-9.\-_/](?m)`)
+
+	// BufferPool for io.CopyBuffer
+	BufferPool = sync.Pool{
+		New: func() interface{} {
+			return bytes.NewBuffer(make([]byte, 32*1024))
+		},
+	}
 )
 
 // GetPathname computes pathname for given params

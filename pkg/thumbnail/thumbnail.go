@@ -1,6 +1,7 @@
 package thumbnail
 
 import (
+	"bytes"
 	"encoding/base64"
 	"flag"
 	"fmt"
@@ -169,7 +170,10 @@ func (a app) encodeThumbnailContent(encoder io.WriteCloser, item provider.Storag
 		logger.Error("unable to open %s: %s", item.Pathname, err)
 	}
 
-	if _, err := io.Copy(encoder, file); err != nil {
+	buffer := provider.BufferPool.Get().(*bytes.Buffer)
+	defer provider.BufferPool.Put(buffer)
+
+	if _, err := io.CopyBuffer(encoder, file, buffer.Bytes()); err != nil {
 		logger.Error("unable to copy thumbnail: %s", err)
 	}
 }
