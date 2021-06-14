@@ -23,12 +23,7 @@ func (a *app) getWithMessage(w http.ResponseWriter, r *http.Request, request pro
 	}
 
 	if query.GetBool(r, "thumbnail") {
-		if info.IsDir {
-			a.thumbnailApp.List(w, r, info)
-		} else {
-			a.thumbnailApp.Serve(w, r, info)
-		}
-
+		a.serveThumbnail(w, r, info)
 		return "", 0, nil, nil
 	}
 
@@ -38,19 +33,7 @@ func (a *app) getWithMessage(w http.ResponseWriter, r *http.Request, request pro
 			return a.Browser(w, request, info, message)
 		}
 
-		file, err := a.storageApp.ReaderFrom(info.Pathname)
-		if file != nil {
-			defer func() {
-				if err := file.Close(); err != nil {
-					logger.Error("unable to close content file: %s", err)
-				}
-			}()
-		}
-		if err == nil {
-			http.ServeContent(w, r, info.Name, info.Date, file)
-		}
-
-		return "", 0, nil, err
+		return "", 0, nil, a.serveFile(w, r, info)
 	}
 
 	if query.GetBool(r, "download") {
@@ -65,6 +48,31 @@ func (a *app) getWithMessage(w http.ResponseWriter, r *http.Request, request pro
 
 	provider.SetPrefsCookie(w, request)
 	return a.List(w, request, message)
+}
+
+func (a *app) serveThumbnail(w http.ResponseWriter, r *http.Request, info provider.StorageItem) {
+	if info.IsDir {
+		a.thumbnailApp.List(w, r, info)
+	} else {
+		a.thumbnailApp.Serve(w, r, info)
+	}
+}
+
+func (a *app) serveFile(w http.ResponseWriter, r *http.Request, info provider.StorageItem) error {
+	file, err := a.storageApp.ReaderFrom(info.Pathname)
+	if file != nil {
+		defer func() {
+			if err := file.Close(); err != nil {
+				logger.Error("unable to close content file: %s", err)
+			}
+		}()
+	}
+	if err != nil {
+		return fmt.Errorf("unable to get reader for `%s`: %s", info.Pathname, err)
+	}
+
+	http.ServeContent(w, r, info.Name, info.Date, file)
+	return nil
 }
 
 // Get output content
