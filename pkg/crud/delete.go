@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
@@ -54,7 +53,7 @@ func deletePreferences(request provider.Request, oldPath string) provider.Reques
 	paths := make([]string, 0)
 
 	for _, layoutPath := range request.Preferences.ListLayoutPath {
-		if !strings.EqualFold(layoutPath, oldPath) {
+		if layoutPath != oldPath {
 			paths = append(paths, layoutPath)
 		}
 	}

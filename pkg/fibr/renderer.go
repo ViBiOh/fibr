@@ -67,7 +67,10 @@ func (a app) TemplateFunc(w http.ResponseWriter, r *http.Request) (string, int, 
 	}
 
 	if query.GetBool(r, "redirect") {
-		a.rendererApp.Redirect(w, r, r.URL.Path, renderer.ParseMessage(r))
+		params := r.URL.Query()
+		params.Del("redirect")
+
+		a.rendererApp.Redirect(w, r, fmt.Sprintf("%s?%s", r.URL.Path, params.Encode()), renderer.ParseMessage(r))
 		return "", 0, nil, nil
 	}
 

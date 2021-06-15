@@ -15,6 +15,14 @@ func TestURL(t *testing.T) {
 		want      string
 	}{
 		{
+			"empty",
+			Request{
+				Path: "",
+			},
+			"",
+			"/",
+		},
+		{
 			"simple",
 			Request{
 				Path: "index",

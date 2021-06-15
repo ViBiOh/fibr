@@ -42,7 +42,7 @@ func (a *app) getWithMessage(w http.ResponseWriter, r *http.Request, request pro
 	}
 
 	if !strings.HasSuffix(r.URL.Path, "/") {
-		a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/", r.URL.Path), renderer.Message{})
+		a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/?d=%s", r.URL.Path, request.Layout("")), renderer.Message{})
 		return "", 0, nil, nil
 	}
 

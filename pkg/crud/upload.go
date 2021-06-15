@@ -118,5 +118,5 @@ func (a *app) Upload(w http.ResponseWriter, r *http.Request, request provider.Re
 		message = fmt.Sprintf("%s. Share ID is %s", message, shareID)
 	}
 
-	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/", request.URL("")), renderer.NewSuccessMessage(message))
+	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/?d=%s", request.URL(""), request.Layout("")), renderer.NewSuccessMessage(message))
 }

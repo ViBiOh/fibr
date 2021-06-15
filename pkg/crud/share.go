@@ -73,7 +73,7 @@ func (a *app) CreateShare(w http.ResponseWriter, r *http.Request, request provid
 		return
 	}
 
-	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/", path.Dir(request.URL(""))), renderer.NewSuccessMessage("Share successfully created with ID: %s", id)) // #share-list
+	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/?d=%s#share-list", path.Dir(request.URL("")), request.Layout("")), renderer.NewSuccessMessage("Share successfully created with ID: %s", id))
 }
 
 // DeleteShare delete a share from given ID
@@ -100,5 +100,5 @@ func (a *app) DeleteShare(w http.ResponseWriter, r *http.Request, request provid
 		return
 	}
 
-	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/", request.URL("")), renderer.NewSuccessMessage("Share with id %s successfully deleted", id)) // #share-list
+	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/?d=%s#share-list", request.URL(""), request.Layout("")), renderer.NewSuccessMessage("Share with id %s successfully deleted", id))
 }

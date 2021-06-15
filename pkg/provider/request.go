@@ -109,7 +109,6 @@ func SetPrefsCookie(w http.ResponseWriter, request Request) {
 		Value:    computeListLayoutPaths(request),
 		Path:     "/",
 		HttpOnly: true,
-		Secure:   true,
 		SameSite: http.SameSiteStrictMode,
 	})
 

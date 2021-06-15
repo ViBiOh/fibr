@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
@@ -123,7 +122,7 @@ func updatePreferences(request provider.Request, oldPath, newPath string) {
 	paths := request.Preferences.ListLayoutPath
 
 	for index, layoutPath := range paths {
-		if strings.EqualFold(layoutPath, oldPath) {
+		if layoutPath != oldPath {
 			paths[index] = newPath
 		} else {
 			paths[index] = layoutPath
