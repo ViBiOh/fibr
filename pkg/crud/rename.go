@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
@@ -83,6 +84,11 @@ func (a *app) Rename(w http.ResponseWriter, r *http.Request, request provider.Re
 		return
 	}
 
+	if oldItem.IsDir {
+		updatePreferences(request, oldPath, newPath)
+		provider.SetPrefsCookie(w, request)
+	}
+
 	var message string
 	uri := request.URL("")
 
@@ -92,7 +98,7 @@ func (a *app) Rename(w http.ResponseWriter, r *http.Request, request provider.Re
 		message = fmt.Sprintf("%s successfully renamed to %s", oldItem.Name, newItem.Name)
 	}
 
-	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/", uri), renderer.NewSuccessMessage(message))
+	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/?d=%s", uri, request.Layout("")), renderer.NewSuccessMessage(message))
 }
 
 func getNewFolder(r *http.Request, request provider.Request) (string, error) {
@@ -111,4 +117,16 @@ func getNewName(r *http.Request) (string, error) {
 	}
 
 	return provider.SanitizeName(newName, true)
+}
+
+func updatePreferences(request provider.Request, oldPath, newPath string) {
+	paths := request.Preferences.ListLayoutPath
+
+	for index, layoutPath := range paths {
+		if strings.EqualFold(layoutPath, oldPath) {
+			paths[index] = newPath
+		} else {
+			paths[index] = layoutPath
+		}
+	}
 }

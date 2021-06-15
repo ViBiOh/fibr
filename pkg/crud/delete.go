@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
@@ -23,7 +24,8 @@ func (a *app) Delete(w http.ResponseWriter, r *http.Request, request provider.Re
 		return
 	}
 
-	info, err := a.storageApp.Info(request.GetFilepath(name))
+	oldPath := request.GetFilepath(name)
+	info, err := a.storageApp.Info(oldPath)
 	if err != nil {
 		a.rendererApp.Error(w, model.WrapNotFound(err))
 		return
@@ -39,7 +41,24 @@ func (a *app) Delete(w http.ResponseWriter, r *http.Request, request provider.Re
 		return
 	}
 
+	if info.IsDir {
+		provider.SetPrefsCookie(w, deletePreferences(request, oldPath))
+	}
+
 	go a.thumbnailApp.Remove(info)
 
-	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/", request.URL("")), renderer.NewSuccessMessage("%s successfully deleted", info.Name))
+	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/?d=%s", request.URL(""), request.Layout("")), renderer.NewSuccessMessage("%s successfully deleted", info.Name))
+}
+
+func deletePreferences(request provider.Request, oldPath string) provider.Request {
+	paths := make([]string, 0)
+
+	for _, layoutPath := range request.Preferences.ListLayoutPath {
+		if !strings.EqualFold(layoutPath, oldPath) {
+			paths = append(paths, layoutPath)
+		}
+	}
+
+	request.Preferences.ListLayoutPath = paths
+	return request
 }

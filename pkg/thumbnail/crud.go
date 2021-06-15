@@ -22,7 +22,12 @@ func (a app) Rename(old, new provider.StorageItem) {
 		return
 	}
 
-	if err := a.storage.Rename(getThumbnailPath(old), getThumbnailPath(new)); err != nil {
+	oldPath := getThumbnailPath(old)
+	if _, err := a.storage.Info(oldPath); provider.IsNotExist(err) {
+		return
+	}
+
+	if err := a.storage.Rename(oldPath, getThumbnailPath(new)); err != nil {
 		logger.Error("%s", err)
 	}
 }
