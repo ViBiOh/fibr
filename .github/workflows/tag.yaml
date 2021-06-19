@@ -1,0 +1,29 @@
+---
+name: Tag
+
+on:
+  push:
+    tags:
+      - '*'
+
+env:
+  SCRIPTS_NO_INTERACTIVE: 'true'
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  tag:
+    name: Tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Tag
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_USER }}
+          DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
+        run: |
+          curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap" | bash -s "docker_promote"
+          scripts/docker_promote "${{ secrets.DOCKER_USER }}/$(make name)" "$(make version)" "$(basename ${{ github.ref }})"
