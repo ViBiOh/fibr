@@ -34,10 +34,10 @@ dmitri.shuralyov.com/gpu/mtl v0.0.0-20190408044501-666a987793e9/go.mod h1:H6x//7
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/DATA-DOG/go-sqlmock v1.5.0/go.mod h1:f/Ixk793poVmq4qj/V1dPUg2JEAKC73Q5eFN3EC/SaM=
-github.com/ViBiOh/auth/v2 v2.8.7 h1:OwtOC7r64n1P8hYvdBGYHR2zQonO9BPdUTP0N7Hd8xg=
-github.com/ViBiOh/auth/v2 v2.8.7/go.mod h1:VLVA0m0mv26fGNQCOiKev9j3aM3U+SaKh0E7B9U52B8=
-github.com/ViBiOh/httputils/v4 v4.14.2 h1:uKrKsnzBpai4Y3j2cmmKX0TNzs4shf+uTMI+qqHL98g=
-github.com/ViBiOh/httputils/v4 v4.14.2/go.mod h1:jDIAVfCqDrHTMITjtQpn2glCLXfDeaIKrrkbLLa8tpQ=
+github.com/ViBiOh/auth/v2 v2.8.8 h1:uPf/7pzOWqPgX/+EZlFbr/5DKQ9KFmLyS2LdQiGXb2A=
+github.com/ViBiOh/auth/v2 v2.8.8/go.mod h1:EGglgJnMtYlg2A3gsJ0JPq/f4eKmgO0w/VnCEcysN2g=
+github.com/ViBiOh/httputils/v4 v4.14.3 h1:6Y0r0BEHWaJkNWM9Ltx15E2w8K9ImU8D7uhSKlHQt9g=
+github.com/ViBiOh/httputils/v4 v4.14.3/go.mod h1:jDIAVfCqDrHTMITjtQpn2glCLXfDeaIKrrkbLLa8tpQ=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf/go.mod h1:ybxpYRFXyAe+OPACYpWeL0wqObRcbAqCMya13uyzqw0=
