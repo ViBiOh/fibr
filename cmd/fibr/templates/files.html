@@ -103,16 +103,16 @@
       max-height: 100%;
     }
 
-    {{- range .Files -}}
-      {{ if $root.Request.CanEdit -}}
+    {{ range .Files }}
+      {{ if $root.Request.CanEdit }}
         #delete-modal-{{ .ID }}:target,
         #edit-modal-{{ .ID }}:target,
-      {{- end -}}
+      {{ end }}
 
-      {{ if $root.Request.CanShare -}}
+      {{ if $root.Request.CanShare }}
         #share-form-{{ .ID }}:target,
-      {{- end -}}
-    {{- end -}}
+      {{ end }}
+    {{ end }}
     #upload-modal:target,
     #upload-success:target,
     #folder-modal:target,
@@ -122,16 +122,16 @@
       z-index: 5;
     }
 
-    {{- range .Files -}}
-      {{ if $root.Request.CanEdit -}}
+    {{ range .Files }}
+      {{ if $root.Request.CanEdit }}
         #delete-modal-{{ .ID }}:target ~ .content,
         #edit-modal-{{ .ID }}:target ~ .content,
-      {{- end -}}
+      {{ end }}
 
-      {{ if $root.Request.CanShare -}}
+      {{ if $root.Request.CanShare }}
         #share-form-{{ .ID }}:target ~ .content,
-      {{- end -}}
-    {{- end -}}
+      {{ end }}
+    {{ end }}
     #upload-modal:target ~ .content,
     #upload-success:target ~ .content,
     #folder-modal:target ~ .content,

@@ -1,8 +1,8 @@
 {{ define "root_link" }}
-  {{- $rootURL := url "/" -}}
-  {{- if .Request.Share.ID -}}
-    {{- $rootURL = printf "%s%s/" $rootURL .Request.Share.ID -}}
-  {{- end -}}
+  {{ $rootURL := url "/" }}
+  {{ if .Request.Share.ID }}
+    {{ $rootURL = printf "%s%s/" $rootURL .Request.Share.ID }}
+  {{ end }}
 
   <a href="{{ url $rootURL }}?d={{ .Request.LayoutPath $rootURL }}" itemprop="item">
     <span itemprop="name">{{ if .Request.Share.ID }}{{ .Request.Share.RootName }}{{ else }}fibr{{ end }}</span>
