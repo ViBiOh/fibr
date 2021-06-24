@@ -78,6 +78,14 @@ func URL(folder, name string, share Share) string {
 
 // SanitizeName return sanitized name (remove diacritics)
 func SanitizeName(name string, removeSlash bool) (string, error) {
+	defer func() {
+		// temporary for investigating use case  that cause transform to panic
+		if r := recover(); r != nil {
+			logger.Error("unable to sanitize `%s`", name)
+			panic(r)
+		}
+	}()
+
 	withoutLigatures := strings.ToLower(name)
 	for key, value := range transliterations {
 		if strings.Contains(withoutLigatures, key) {
