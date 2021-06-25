@@ -43,9 +43,9 @@ app: init dev
 .PHONY: init
 init:
 	@curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap" | bash -s "git_hooks" "coverage" "release"
-	go get github.com/kisielk/errcheck
-	go get golang.org/x/lint/golint
-	go get golang.org/x/tools/cmd/goimports
+	go install github.com/kisielk/errcheck@latest
+	go install golang.org/x/lint/golint@latest
+	go install golang.org/x/tools/cmd/goimports@latest
 	go mod tidy
 
 ## format: Format code. e.g Prettier (js), format (golang)

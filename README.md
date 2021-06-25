@@ -88,7 +88,7 @@ In order to work, your user _must have_ `admin` profile sets with the `-authProf
 This is for local purpose with simple and hassle-free sharing in a private network.
 
 ```bash
-go get github.com/ViBiOh/fibr/cmd/fibr
+go install github.com/ViBiOh/fibr/cmd/fibr@latest
 fibr \
   -noAuth \
   -fsDirectory "$(pwd)" \
