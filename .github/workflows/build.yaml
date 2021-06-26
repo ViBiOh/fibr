@@ -10,7 +10,7 @@ on:
       - main
 
 env:
-  SCRIPTS_NO_INTERACTIVE: 'true'
+  SCRIPTS_NO_INTERACTIVE: "true"
 
 defaults:
   run:
@@ -26,7 +26,7 @@ jobs:
       - name: Setup Golang
         uses: actions/setup-go@v2
         with:
-          go-version: '^1.16'
+          go-version: "^1.16"
       - name: Build
         run: |
           make
@@ -58,10 +58,10 @@ jobs:
       - name: Setup Golang
         uses: actions/setup-go@v2
         with:
-          go-version: '^1.16'
+          go-version: "^1.16"
       - name: Build
         run: |
-          curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap" | bash -s "release"
+          curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap" | bash -s -- "-c" "release"
           curl --disable --silent --show-error --location --max-time 30 -o mime.types "https://svn.apache.org/viewvc/httpd/httpd/trunk/docs/conf/mime.types?view=co"
           DOCKER_IMAGE="${{ secrets.DOCKER_USER }}/$(make name)" IMAGE_VERSION="$(make version)" ./scripts/release build
       - name: Setup Docker
@@ -96,7 +96,7 @@ jobs:
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
           DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
         run: |
-          curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap" | bash -s "docker_promote"
+          curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap" | bash -s -- "-c" "docker_promote"
           scripts/docker_promote "${{ secrets.DOCKER_USER }}/$(make name)" "$(make version)"
       - name: Flux
         env:
@@ -122,6 +122,6 @@ jobs:
           DEPLOY_URL: ${{ secrets.DEPLOY_URL }}
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
         run: |
-          curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap" | bash -s "deploy" "env_replace"
+          curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap" | bash -s -- "-c" "deploy" "env_replace"
           VERSION="$(make version)" scripts/env_replace "docker-compose.yaml" DOCKER_USER DATA_DIR DATA_USER_ID BASIC_USERS VERSION | sed "s|\\\$|\$\$|g" > "docker-compose-env.yaml"
           scripts/deploy "$(make name)" "@docker-compose-env.yaml"
