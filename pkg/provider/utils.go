@@ -17,7 +17,6 @@ import (
 )
 
 var (
-	transformer      = transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
 	transliterations = map[string]string{
 		"Ð": "D",
 		"Ł": "l",
@@ -38,6 +37,12 @@ var (
 	BufferPool = sync.Pool{
 		New: func() interface{} {
 			return bytes.NewBuffer(make([]byte, 32*1024))
+		},
+	}
+
+	transformerPool = sync.Pool{
+		New: func() interface{} {
+			return transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
 		},
 	}
 )
@@ -78,20 +83,15 @@ func URL(folder, name string, share Share) string {
 
 // SanitizeName return sanitized name (remove diacritics)
 func SanitizeName(name string, removeSlash bool) (string, error) {
-	defer func() {
-		// temporary for investigating use case  that cause transform to panic
-		if r := recover(); r != nil {
-			logger.Error("unable to sanitize `%s`", name)
-			panic(r)
-		}
-	}()
-
 	withoutLigatures := strings.ToLower(name)
 	for key, value := range transliterations {
 		if strings.Contains(withoutLigatures, key) {
 			withoutLigatures = strings.ReplaceAll(withoutLigatures, key, value)
 		}
 	}
+
+	transformer := transformerPool.Get().(transform.Transformer)
+	defer transformerPool.Put(transformer)
 
 	withoutDiacritics, _, err := transform.String(transformer, withoutLigatures)
 	if err != nil {
