@@ -5,10 +5,10 @@ services:
     labels:
       traefik.http.routers.vith-http.rule: Host(`vith.vibioh.fr`)
       traefik.http.routers.vith-http.entrypoints: http
-      traefik.http.routers.vith-http.middlewares: redirect@file
+      traefik.http.routers.vith-http.middlewares: ratelimit@file, redirect@file
       traefik.http.routers.vith-https.rule: Host(`vith.vibioh.fr`)
       traefik.http.routers.vith-https.entrypoints: https
-      traefik.http.routers.vith-https.middlewares: compress@file, web-limit@file
+      traefik.http.routers.vith-https.middlewares: ratelimit@file, compress@file
       traefik.http.routers.vith-https.tls: 'true'
       traefik.http.routers.vith-https.tls.certresolver: default
       traefik.http.services.vith-service.loadbalancer.server.port: '1080'
@@ -16,20 +16,20 @@ services:
       VITH_LOGGER_JSON: 'true'
     restart: on-failure:5
     security_opt:
-    - no-new-privileges
+      - no-new-privileges
   image:
     image: h2non/imaginary
     labels:
       traefik.http.routers.imaginary-http.rule: Host(`imaginary.vibioh.fr`)
       traefik.http.routers.imaginary-http.entrypoints: http
-      traefik.http.routers.imaginary-http.middlewares: redirect@file
+      traefik.http.routers.imaginary-http.middlewares: ratelimit@file, redirect@file
       traefik.http.routers.imaginary-https.rule: Host(`imaginary.vibioh.fr`)
       traefik.http.routers.imaginary-https.entrypoints: https
-      traefik.http.routers.imaginary-https.middlewares: compress@file, web-limit@file
+      traefik.http.routers.imaginary-https.middlewares: ratelimit@file, compress@file
       traefik.http.routers.imaginary-https.tls: 'true'
       traefik.http.routers.imaginary-https.tls.certresolver: default
       traefik.http.services.imaginary-service.loadbalancer.server.port: '9000'
     restart: on-failure:5
     read_only: true
     security_opt:
-    - no-new-privileges
+      - no-new-privileges
