@@ -12,6 +12,9 @@ ENV FIBR_VERSION ${VERSION}
 ARG TARGETOS
 ARG TARGETARCH
 
+COPY passwd /etc/passwd
+USER 995
+
 COPY mime.types /etc/mime.types
 COPY ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY release/fibr_${TARGETOS}_${TARGETARCH} /fibr
