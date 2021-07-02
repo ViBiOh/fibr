@@ -58,8 +58,8 @@ spec:
         cpu: 400m
         memory: 64Mi
     securityContext:
-      runAsGroup: 1000
-      runAsUser: 1000
+      runAsGroup: 995
+      runAsUser: 995
       runAsNonRoot: true
       allowPrivilegeEscalation: false
     autoscaling:
