@@ -59,7 +59,7 @@ spec:
         memory: 64Mi
     securityContext:
       runAsGroup: 995
-      runAsUser: 995
+      runAsUser: 999
       runAsNonRoot: true
       allowPrivilegeEscalation: false
     autoscaling:
