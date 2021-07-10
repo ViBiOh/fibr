@@ -5,7 +5,6 @@ import (
 	"flag"
 	"os"
 
-	"github.com/NYTimes/gziphandler"
 	"github.com/ViBiOh/auth/v2/pkg/ident/basic"
 	authMiddleware "github.com/ViBiOh/auth/v2/pkg/middleware"
 	basicMemory "github.com/ViBiOh/auth/v2/pkg/store/memory"
@@ -98,7 +97,7 @@ func main() {
 	go crudApp.Start(appServer.Done())
 
 	go promServer.Start("prometheus", healthApp.End(), prometheusApp.Handler())
-	go appServer.Start("http", healthApp.End(), httputils.Handler(handler, healthApp, recoverer.Middleware, prometheusApp.Middleware, gziphandler.GzipHandler, owasp.New(owaspConfig).Middleware))
+	go appServer.Start("http", healthApp.End(), httputils.Handler(handler, healthApp, recoverer.Middleware, prometheusApp.Middleware, owasp.New(owaspConfig).Middleware))
 
 	healthApp.WaitForTermination(appServer.Done())
 	server.GracefulWait(appServer.Done(), promServer.Done())
