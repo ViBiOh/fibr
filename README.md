@@ -165,6 +165,8 @@ Usage of fibr:
         [logger] Key for timestamp in JSON {FIBR_LOGGER_TIME_KEY} (default "time")
   -metadata
         [metadata] Enable metadata storage {FIBR_METADATA} (default true)
+  -minify
+        Minify HTML {FIBR_MINIFY} (default true)
   -noAuth
         [auth] Disable basic authentification {FIBR_NO_AUTH}
   -okStatus int
