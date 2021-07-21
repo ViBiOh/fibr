@@ -14,15 +14,35 @@ import (
 	"github.com/ViBiOh/auth/v2/pkg/auth"
 	"github.com/ViBiOh/auth/v2/pkg/ident"
 	"github.com/ViBiOh/auth/v2/pkg/model"
-	"github.com/ViBiOh/fibr/pkg/crud/crudtest"
-	"github.com/ViBiOh/fibr/pkg/metadata/metadatatest"
+	"github.com/ViBiOh/fibr/pkg/mocks"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	httpModel "github.com/ViBiOh/httputils/v4/pkg/model"
+	"github.com/golang/mock/gomock"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var (
 	invalidPath = "/invalid"
 	adminPath   = "/admin"
+
+	passwordLessShare = provider.Share{
+		ID:       "a1b2c3d4f5",
+		Edit:     false,
+		RootName: "public",
+		File:     false,
+		Path:     "/public",
+	}
+
+	passwordHash, _ = bcrypt.GenerateFromPassword([]byte("password"), provider.BcryptCost)
+
+	passwordShare = provider.Share{
+		ID:       "f5d4c3b2a1",
+		Edit:     true,
+		RootName: "private",
+		File:     false,
+		Path:     "/private",
+		Password: string(passwordHash),
+	}
 )
 
 type authMiddlewareTest struct{}
@@ -62,10 +82,7 @@ func TestParseShare(t *testing.T) {
 	}{
 		{
 			"no share",
-			app{
-				crudApp:     crudtest.New(),
-				metadataApp: metadatatest.New(),
-			},
+			app{},
 			args{
 				request: &provider.Request{
 					Path:     "/",
@@ -83,11 +100,8 @@ func TestParseShare(t *testing.T) {
 			nil,
 		},
 		{
-			"passwordless share",
-			app{
-				crudApp:     crudtest.New(),
-				metadataApp: metadatatest.New().SetGetShare(metadatatest.PasswordLessShare),
-			},
+			"passwordless",
+			app{},
 			args{
 				request: &provider.Request{
 					Path:     "/a1b2c3d4f5/index.html",
@@ -101,16 +115,13 @@ func TestParseShare(t *testing.T) {
 				CanEdit:  false,
 				CanShare: false,
 				Display:  "grid",
-				Share:    metadatatest.PasswordLessShare,
+				Share:    passwordLessShare,
 			},
 			nil,
 		},
 		{
 			"empty password",
-			app{
-				crudApp:     crudtest.New(),
-				metadataApp: metadatatest.New().SetGetShare(metadatatest.PasswordShare),
-			},
+			app{},
 			args{
 				request: &provider.Request{
 					Path:     "/f5d4c3b2a1/index.html",
@@ -129,10 +140,7 @@ func TestParseShare(t *testing.T) {
 		},
 		{
 			"valid",
-			app{
-				crudApp:     crudtest.New(),
-				metadataApp: metadatatest.New().SetGetShare(metadatatest.PasswordShare),
-			},
+			app{},
 			args{
 				request: &provider.Request{
 					Path:     "/f5d4c3b2a1/index.html",
@@ -147,7 +155,7 @@ func TestParseShare(t *testing.T) {
 				CanEdit:  true,
 				CanShare: false,
 				Display:  "grid",
-				Share:    metadatatest.PasswordShare,
+				Share:    passwordShare,
 			},
 			nil,
 		},
@@ -155,6 +163,23 @@ func TestParseShare(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.intention, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			metadataMock := mocks.NewMetadata(ctrl)
+			tc.instance.metadataApp = metadataMock
+
+			switch tc.intention {
+			case "passwordless":
+				metadataMock.EXPECT().GetShare(gomock.Any()).Return(passwordLessShare)
+			case "empty password":
+				fallthrough
+			case "valid":
+				metadataMock.EXPECT().GetShare(gomock.Any()).Return(passwordShare)
+			default:
+				metadataMock.EXPECT().GetShare(gomock.Any()).Return(provider.Share{})
+			}
+
 			gotErr := tc.instance.parseShare(tc.args.request, tc.args.authorizationHeader)
 
 			failed := false
@@ -243,11 +268,8 @@ func TestParseRequest(t *testing.T) {
 		wantErr   error
 	}{
 		{
-			"share error",
-			app{
-				crudApp:     crudtest.New(),
-				metadataApp: metadatatest.New().SetEnabled(true).SetGetShare(metadatatest.PasswordShare),
-			},
+			"error",
+			app{},
 			args{
 				r: httptest.NewRequest(http.MethodGet, "/f5d4c3b2a1/", nil),
 			},
@@ -261,10 +283,7 @@ func TestParseRequest(t *testing.T) {
 		},
 		{
 			"share",
-			app{
-				crudApp:     crudtest.New(),
-				metadataApp: metadatatest.New().SetEnabled(true).SetGetShare(metadatatest.PasswordLessShare),
-			},
+			app{},
 			args{
 				r: httptest.NewRequest(http.MethodGet, "/a1b2c3d4f5/", nil),
 			},
@@ -273,16 +292,13 @@ func TestParseRequest(t *testing.T) {
 				Display:  "grid",
 				CanEdit:  false,
 				CanShare: false,
-				Share:    metadatatest.PasswordLessShare,
+				Share:    passwordLessShare,
 			},
 			nil,
 		},
 		{
 			"no auth",
-			app{
-				crudApp:     crudtest.New(),
-				metadataApp: metadatatest.New(),
-			},
+			app{},
 			args{
 				r: httptest.NewRequest(http.MethodGet, "/", nil),
 			},
@@ -297,9 +313,7 @@ func TestParseRequest(t *testing.T) {
 		{
 			"invalid auth",
 			app{
-				crudApp:     crudtest.New(),
-				metadataApp: metadatatest.New(),
-				loginApp:    authMiddlewareTest{},
+				loginApp: authMiddlewareTest{},
 			},
 			args{
 				r: httptest.NewRequest(http.MethodGet, invalidPath, nil),
@@ -315,9 +329,7 @@ func TestParseRequest(t *testing.T) {
 		{
 			"non admin user",
 			app{
-				crudApp:     crudtest.New(),
-				metadataApp: metadatatest.New(),
-				loginApp:    authMiddlewareTest{},
+				loginApp: authMiddlewareTest{},
 			},
 			args{
 				r: httptest.NewRequest(http.MethodGet, "/guest", nil),
@@ -333,9 +345,7 @@ func TestParseRequest(t *testing.T) {
 		{
 			"admin user",
 			app{
-				crudApp:     crudtest.New(),
-				metadataApp: metadatatest.New().SetEnabled(true),
-				loginApp:    authMiddlewareTest{},
+				loginApp: authMiddlewareTest{},
 			},
 			args{
 				r: httptest.NewRequest(http.MethodGet, adminPath, nil),
@@ -351,9 +361,7 @@ func TestParseRequest(t *testing.T) {
 		{
 			"empty cookie",
 			app{
-				crudApp:     crudtest.New(),
-				metadataApp: metadatatest.New(),
-				loginApp:    authMiddlewareTest{},
+				loginApp: authMiddlewareTest{},
 			},
 			args{
 				r: adminRequestWithEmptyCookie,
@@ -369,9 +377,7 @@ func TestParseRequest(t *testing.T) {
 		{
 			"cookie value",
 			app{
-				crudApp:     crudtest.New(),
-				metadataApp: metadatatest.New(),
-				loginApp:    authMiddlewareTest{},
+				loginApp: authMiddlewareTest{},
 			},
 			args{
 				r: adminRequestWithCookie,
@@ -391,6 +397,33 @@ func TestParseRequest(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.intention, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			crudMock := mocks.NewCrud(ctrl)
+			metadataMock := mocks.NewMetadata(ctrl)
+
+			tc.instance.crudApp = crudMock
+			tc.instance.metadataApp = metadataMock
+
+			switch tc.intention {
+			case "no auth":
+				metadataMock.EXPECT().GetShare(gomock.Any()).Return(provider.Share{})
+				metadataMock.EXPECT().Enabled().Return(false)
+			case "admin user":
+				metadataMock.EXPECT().Enabled().Return(true)
+				metadataMock.EXPECT().GetShare(gomock.Any()).Return(provider.Share{})
+			case "empty cookie", "cookie value":
+				metadataMock.EXPECT().Enabled().Return(false)
+				metadataMock.EXPECT().GetShare(gomock.Any()).Return(provider.Share{})
+			case "invalid auth", "non admin user":
+				metadataMock.EXPECT().GetShare(gomock.Any()).Return(provider.Share{})
+			case "error":
+				metadataMock.EXPECT().GetShare(gomock.Any()).Return(passwordShare)
+			case "share":
+				metadataMock.EXPECT().GetShare(gomock.Any()).Return(passwordLessShare)
+			}
+
 			got, gotErr := tc.instance.parseRequest(tc.args.r)
 
 			failed := false

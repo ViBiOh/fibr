@@ -4,6 +4,7 @@ scripts/
 # Golang
 bin/
 release/
+mocks
 coverage.*
 
 # Fibr

@@ -46,6 +46,7 @@ init:
 	go install github.com/kisielk/errcheck@latest
 	go install golang.org/x/lint/golint@latest
 	go install golang.org/x/tools/cmd/goimports@latest
+	go install github.com/golang/mock/mockgen@latest
 	go mod tidy
 
 ## format: Format code. e.g Prettier (js), format (golang)
@@ -61,9 +62,16 @@ style:
 	errcheck -ignoretests $(PACKAGES)
 	go vet $(PACKAGES)
 
+## mocks: Generate mocks
+.PHONY: mocks
+mocks:
+	find . -name "mock" -type d -exec rm {} \;
+	mockgen -destination pkg/mocks/crud.go -mock_names App=Crud -package mocks github.com/ViBiOh/fibr/pkg/crud App
+	mockgen -destination pkg/mocks/metadata.go -mock_names App=Metadata -package mocks github.com/ViBiOh/fibr/pkg/metadata App
+
 ## test: Shortcut to launch all the test tasks (unit, functional and integration).
 .PHONY: test
-test:
+test: mocks
 	scripts/coverage
 	$(MAKE) bench
 
