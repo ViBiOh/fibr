@@ -47,6 +47,7 @@ init:
 	go install golang.org/x/lint/golint@latest
 	go install golang.org/x/tools/cmd/goimports@latest
 	go install github.com/golang/mock/mockgen@v1.6.0
+	$(MAKE) mocks
 	go mod tidy
 
 ## format: Format code. e.g Prettier (js), format (golang)
@@ -71,7 +72,7 @@ mocks:
 
 ## test: Shortcut to launch all the test tasks (unit, functional and integration).
 .PHONY: test
-test: mocks
+test:
 	scripts/coverage
 	$(MAKE) bench
 
