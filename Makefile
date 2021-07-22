@@ -46,7 +46,7 @@ init:
 	go install github.com/kisielk/errcheck@latest
 	go install golang.org/x/lint/golint@latest
 	go install golang.org/x/tools/cmd/goimports@latest
-	go install github.com/golang/mock/mockgen@latest
+	go install github.com/golang/mock/mockgen@1.6.0
 	go mod tidy
 
 ## format: Format code. e.g Prettier (js), format (golang)
