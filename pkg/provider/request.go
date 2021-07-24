@@ -8,6 +8,9 @@ import (
 var (
 	// NoneShare is an undefined Share
 	NoneShare = Share{}
+
+	// DefaultDisplay format
+	DefaultDisplay = "grid"
 )
 
 // Preferences holds preferences of the user
@@ -45,7 +48,7 @@ func (r Request) LayoutPath(path string) string {
 	if FindIndex(r.Preferences.ListLayoutPath, path) != -1 {
 		return "list"
 	}
-	return "grid"
+	return DefaultDisplay
 }
 
 // Title returns title of the page
@@ -95,7 +98,7 @@ func computeListLayoutPaths(request Request) string {
 		if index := FindIndex(listLayoutPaths, path); index == -1 {
 			listLayoutPaths = append(listLayoutPaths, path)
 		}
-	case "grid":
+	case DefaultDisplay:
 		listLayoutPaths = RemoveIndex(listLayoutPaths, FindIndex(listLayoutPaths, path))
 	}
 

@@ -68,24 +68,35 @@ func convertAuthenticationError(err error) error {
 	return model.WrapUnauthorized(err)
 }
 
-func (a app) parseRequest(r *http.Request) (provider.Request, error) {
-	preferences := provider.Preferences{}
+func parsePreferences(r *http.Request) provider.Preferences {
+	var preferences provider.Preferences
+
 	if cookie, err := r.Cookie("list_layout_paths"); err == nil {
 		if value := cookie.Value; len(value) > 0 {
 			preferences.ListLayoutPath = strings.Split(value, ",")
 		}
 	}
 
+	return preferences
+}
+
+func parseDisplay(r *http.Request) string {
+	display := r.URL.Query().Get("d")
+
+	if len(display) != 0 {
+		return display
+	}
+
+	return provider.DefaultDisplay
+}
+
+func (a app) parseRequest(r *http.Request) (provider.Request, error) {
 	request := provider.Request{
 		Path:        r.URL.Path,
 		CanEdit:     false,
 		CanShare:    false,
-		Display:     r.URL.Query().Get("d"),
-		Preferences: preferences,
-	}
-
-	if len(request.Display) == 0 {
-		request.Display = "grid"
+		Display:     parseDisplay(r),
+		Preferences: parsePreferences(r),
 	}
 
 	if err := a.parseShare(&request, r.Header.Get("Authorization")); err != nil {

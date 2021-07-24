@@ -7,11 +7,11 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
-func lessString(first, second string) bool {
+func lowerString(first, second string) bool {
 	return strings.Compare(strings.ToLower(first), strings.ToLower(second)) < 0
 }
 
-func moreTime(first, second time.Time) bool {
+func greaterTime(first, second time.Time) bool {
 	return first.After(second)
 }
 
@@ -31,7 +31,7 @@ func (a ByHybridSort) Less(i, j int) bool {
 	second := a[j]
 
 	if first.IsDir && second.IsDir {
-		return lessString(first.Name, second.Name)
+		return lowerString(first.Name, second.Name)
 	}
 
 	if first.IsDir {
@@ -43,7 +43,7 @@ func (a ByHybridSort) Less(i, j int) bool {
 	}
 
 	if (first.IsImage() || first.IsVideo()) && (second.IsImage() || second.IsVideo()) {
-		return moreTime(first.Date, second.Date)
+		return greaterTime(first.Date, second.Date)
 	}
 
 	if first.IsImage() || first.IsVideo() {
@@ -54,5 +54,5 @@ func (a ByHybridSort) Less(i, j int) bool {
 		return true
 	}
 
-	return lessString(first.Name, second.Name)
+	return lowerString(first.Name, second.Name)
 }
