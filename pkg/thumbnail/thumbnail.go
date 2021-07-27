@@ -54,7 +54,7 @@ type app struct {
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		imageURL: flags.New(prefix, "thumbnail").Name("imageURL").Default("http://image:9000").Label("Imaginary URL").ToString(fs),
+		imageURL: flags.New(prefix, "thumbnail").Name("ImageURL").Default("http://image:9000").Label("Imaginary URL").ToString(fs),
 		videoURL: flags.New(prefix, "vith").Name("VideoURL").Default("http://video:1080").Label("Video Thumbnail URL").ToString(fs),
 	}
 }

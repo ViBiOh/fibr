@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 	"strings"
+	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
@@ -62,6 +63,11 @@ func (s Storage) ReaderFrom(pathname string) (provider.ReadSeekerCloser, error) 
 	}
 
 	return &buffer, nil
+}
+
+// UpdateDate fakes implementation
+func (s Storage) UpdateDate(pathname string, date time.Time) error {
+	return nil
 }
 
 // List fakes implementation

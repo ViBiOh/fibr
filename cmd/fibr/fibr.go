@@ -9,6 +9,7 @@ import (
 	authMiddleware "github.com/ViBiOh/auth/v2/pkg/middleware"
 	basicMemory "github.com/ViBiOh/auth/v2/pkg/store/memory"
 	"github.com/ViBiOh/fibr/pkg/crud"
+	"github.com/ViBiOh/fibr/pkg/exif"
 	"github.com/ViBiOh/fibr/pkg/fibr"
 	"github.com/ViBiOh/fibr/pkg/filesystem"
 	"github.com/ViBiOh/fibr/pkg/metadata"
@@ -56,6 +57,7 @@ func main() {
 
 	filesystemConfig := filesystem.Flags(fs, "fs")
 	thumbnailConfig := thumbnail.Flags(fs, "thumbnail")
+	exifConfig := exif.Flags(fs, "exif")
 
 	disableAuth := flags.New("", "auth").Name("NoAuth").Default(false).Label("Disable basic authentification").ToBool(fs)
 
@@ -76,12 +78,13 @@ func main() {
 	prometheusRegister := prometheusApp.Registerer()
 
 	thumbnailApp := thumbnail.New(thumbnailConfig, storageApp, prometheusRegister)
+	exifApp := exif.New(exifConfig, storageApp)
 
 	rendererApp, err := renderer.New(rendererConfig, content, fibr.FuncMap(thumbnailApp))
 	logger.Fatal(err)
 
 	metadataApp := metadata.New(metadataConfig, storageApp)
-	crudApp, err := crud.New(crudConfig, storageApp, rendererApp, metadataApp, thumbnailApp, prometheusRegister)
+	crudApp, err := crud.New(crudConfig, storageApp, rendererApp, metadataApp, thumbnailApp, exifApp, prometheusRegister)
 	logger.Fatal(err)
 
 	var middlewareApp authMiddleware.App

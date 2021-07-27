@@ -7,7 +7,6 @@ Web File Browser and Manager.
 - Thumbnail generation for image, PDF and video (with help of sidecars)
 - Works in pure HTML or with very little javascript for improved file upload
 - Can share directory with ou without password and with or without edit right.
-- Support multiple storage backend (basic filesystem implemented, but can be anything like Minio or S3)
 
 ![](docs/fibr.png)
 
@@ -139,6 +138,10 @@ Usage of fibr:
         [server] Certificate file {FIBR_CERT}
   -csp string
         [owasp] Content-Security-Policy {FIBR_CSP} (default "default-src 'self'; base-uri 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:")
+  -exifDateOnStart
+        [crud] Change file date from EXIF date on start {FIBR_EXIF_DATE_ON_START}
+  -exifExasURL string
+        [exif] Exif Tool URL (exas) {FIBR_EXIF_EXAS_URL} (default "http://exas:1080")
   -frameOptions string
         [owasp] X-Frame-Options {FIBR_FRAME_OPTIONS} (default "SAMEORIGIN")
   -fsDirectory string

@@ -97,7 +97,9 @@ run:
 		-authUsers "1:`htpasswd -nBb admin admin`" \
 		-frameOptions "SAMEORIGIN" \
 		-thumbnailImageURL "https://imaginary.vibioh.fr" \
-		-thumbnailVideoURL "https://vith.vibioh.fr"
+		-thumbnailVideoURL "https://vith.vibioh.fr" \
+		-exifExasURL "http://localhost:4000" \
+		-exifDateOnStart
 
 .PHONY: run-imaginary
 run-imaginary:
