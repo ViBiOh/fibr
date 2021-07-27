@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/flags"
@@ -137,6 +138,15 @@ func (a *app) ReaderFrom(pathname string) (provider.ReadSeekerCloser, error) {
 
 	output, err := a.getFile(pathname, os.O_RDONLY)
 	return output, convertError(err)
+}
+
+// UpdateDate update date from given value
+func (a *app) UpdateDate(pathname string, date time.Time) error {
+	if err := checkPathname(pathname); err != nil {
+		return convertError(err)
+	}
+
+	return convertError(os.Chtimes(a.getFullPath(pathname), date, date))
 }
 
 // Walk browses item recursively

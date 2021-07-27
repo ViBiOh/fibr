@@ -3,11 +3,14 @@ package crud
 import (
 	"errors"
 	"flag"
+	"fmt"
 	"mime/multipart"
 	"net/http"
 	"regexp"
 	"strings"
+	"time"
 
+	"github.com/ViBiOh/fibr/pkg/exif"
 	"github.com/ViBiOh/fibr/pkg/metadata"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
@@ -15,6 +18,10 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 	"github.com/prometheus/client_golang/prometheus"
+)
+
+const (
+	exifDate = "CreateDate"
 )
 
 var (
@@ -53,6 +60,7 @@ type App interface {
 type Config struct {
 	ignore          *string
 	sanitizeOnStart *bool
+	exifDateOnStart *bool
 }
 
 type app struct {
@@ -61,8 +69,10 @@ type app struct {
 	rendererApp  renderer.App
 	metadataApp  metadata.App
 	thumbnailApp thumbnail.App
+	exifApp      exif.App
 
 	sanitizeOnStart bool
+	exifDateOnStart bool
 }
 
 // Flags adds flags for configuring package
@@ -70,18 +80,21 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
 		ignore:          flags.New(prefix, "crud").Name("IgnorePattern").Default("").Label("Ignore pattern when listing files or directory").ToString(fs),
 		sanitizeOnStart: flags.New(prefix, "crud").Name("SanitizeOnStart").Default(false).Label("Sanitize name on start").ToBool(fs),
+		exifDateOnStart: flags.New(prefix, "crud").Name("ExifDateOnStart").Default(false).Label("Change file date from EXIF date on start").ToBool(fs),
 	}
 }
 
 // New creates new App from Config
-func New(config Config, storage provider.Storage, rendererApp renderer.App, metadata metadata.App, thumbnail thumbnail.App, prometheus prometheus.Registerer) (App, error) {
+func New(config Config, storage provider.Storage, rendererApp renderer.App, metadataApp metadata.App, thumbnailApp thumbnail.App, exifApp exif.App, prometheus prometheus.Registerer) (App, error) {
 	app := &app{
 		sanitizeOnStart: *config.sanitizeOnStart,
+		exifDateOnStart: *config.exifDateOnStart,
 
 		storageApp:   storage,
 		rendererApp:  rendererApp,
-		thumbnailApp: thumbnail,
-		metadataApp:  metadata,
+		thumbnailApp: thumbnailApp,
+		exifApp:      exifApp,
+		metadataApp:  metadataApp,
 		prometheus:   prometheus,
 	}
 
@@ -127,22 +140,16 @@ func (a *app) Start(done <-chan struct{}) {
 			return err
 		}
 
-		name, err := provider.SanitizeName(item.Pathname, false)
-		if err != nil {
-			logger.Error("unable to sanitize name %s: %s", item.Pathname, err)
-			return nil
-		}
-
-		if name != item.Pathname {
-			if a.sanitizeOnStart {
-				a.rename(item, name, renameCount)
-			} else {
-				logger.Info("File with name `%s` should be renamed to `%s`", item.Pathname, name)
-			}
-		}
+		item = a.sanitizeName(item, renameCount)
 
 		if thumbnail.CanHaveThumbnail(item) && !a.thumbnailApp.HasThumbnail(item) {
 			a.thumbnailApp.GenerateThumbnail(item)
+		}
+
+		if a.exifDateOnStart && exif.CanHaveExif(item) {
+			if err := a.dateFromExif(item); err != nil {
+				logger.Warn("unable to update date from exif for `%s`: %s", item.Pathname, err)
+			}
 		}
 
 		return nil
@@ -153,14 +160,59 @@ func (a *app) Start(done <-chan struct{}) {
 	}
 }
 
-func (a *app) rename(item provider.StorageItem, name string, guage *prometheus.GaugeVec) {
+func (a *app) sanitizeName(item provider.StorageItem, renameCount *prometheus.GaugeVec) provider.StorageItem {
+	name, err := provider.SanitizeName(item.Pathname, false)
+	if err != nil {
+		logger.Error("unable to sanitize name %s: %s", item.Pathname, err)
+		return item
+	}
+
+	if name == item.Pathname {
+		return item
+	}
+
+	if !a.sanitizeOnStart {
+		logger.Info("File with name `%s` should be renamed to `%s`", item.Pathname, name)
+		return item
+	}
+
+	return a.rename(item, name, renameCount)
+}
+
+func (a *app) rename(item provider.StorageItem, name string, guage *prometheus.GaugeVec) provider.StorageItem {
 	logger.Info("Renaming `%s` to `%s`", item.Pathname, name)
 
-	if renamedItem, err := a.doRename(item.Pathname, name, item); err != nil {
+	renamedItem, err := a.doRename(item.Pathname, name, item)
+	if err != nil {
 		guage.WithLabelValues("error").Add(1.0)
 		logger.Error("%s", err)
-	} else {
-		guage.WithLabelValues("success").Add(1.0)
-		item = renamedItem
+		return item
 	}
+
+	guage.WithLabelValues("success").Add(1.0)
+	return renamedItem
+}
+
+func (a *app) dateFromExif(item provider.StorageItem) error {
+	data, err := a.exifApp.Get(item)
+	if err != nil {
+		return fmt.Errorf("unable to get exif data: %s", err)
+	}
+
+	rawCreateDate, ok := data[exifDate]
+	if !ok {
+		return fmt.Errorf("no `%s` found", exifDate)
+	}
+
+	createDateStr, ok := rawCreateDate.(string)
+	if !ok {
+		return fmt.Errorf("key `%s` is not a string", exifDate)
+	}
+
+	createDate, err := time.Parse("2006:01:02 15:04:05", createDateStr)
+	if err != nil {
+		return fmt.Errorf("unable to parse `%s`: %s", exifDate, err)
+	}
+
+	return a.storageApp.UpdateDate(item.Pathname, createDate)
 }

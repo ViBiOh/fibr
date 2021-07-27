@@ -2,6 +2,7 @@ package provider
 
 import (
 	"io"
+	"time"
 )
 
 const (
@@ -47,4 +48,5 @@ type Storage interface {
 	Store(pathname string, content io.ReadCloser) error
 	Rename(oldName, newName string) error
 	Remove(pathname string) error
+	UpdateDate(pathname string, date time.Time) error
 }
