@@ -67,6 +67,10 @@ func New(config Config) (provider.Storage, error) {
 	}, nil
 }
 
+func (a app) Path(pathname string) string {
+	return path.Join(a.rootDirectory, pathname)
+}
+
 func (a *app) SetIgnoreFn(ignoreFn func(provider.StorageItem) bool) {
 	a.ignoreFn = ignoreFn
 }
@@ -77,7 +81,7 @@ func (a *app) Info(pathname string) (provider.StorageItem, error) {
 		return provider.StorageItem{}, convertError(err)
 	}
 
-	fullpath := a.getFullPath(pathname)
+	fullpath := a.Path(pathname)
 
 	info, err := os.Stat(fullpath)
 	if err != nil {
@@ -93,7 +97,7 @@ func (a *app) List(pathname string) ([]provider.StorageItem, error) {
 		return nil, convertError(err)
 	}
 
-	fullpath := a.getFullPath(pathname)
+	fullpath := a.Path(pathname)
 
 	files, err := os.ReadDir(fullpath)
 	if err != nil {
@@ -146,7 +150,7 @@ func (a *app) UpdateDate(pathname string, date time.Time) error {
 		return convertError(err)
 	}
 
-	return convertError(os.Chtimes(a.getFullPath(pathname), date, date))
+	return convertError(os.Chtimes(a.Path(pathname), date, date))
 }
 
 // Walk browses item recursively
@@ -177,7 +181,7 @@ func (a *app) CreateDir(name string) error {
 		return convertError(err)
 	}
 
-	return convertError(os.MkdirAll(a.getFullPath(name), 0700))
+	return convertError(os.MkdirAll(a.Path(name), 0700))
 }
 
 // Store file to storage
@@ -229,7 +233,7 @@ func (a *app) Rename(oldName, newName string) error {
 		return convertError(err)
 	}
 
-	return convertError(os.Rename(a.getFullPath(oldName), a.getFullPath(newName)))
+	return convertError(os.Rename(a.Path(oldName), a.Path(newName)))
 }
 
 // Remove file or directory from storage
@@ -238,5 +242,5 @@ func (a *app) Remove(pathname string) error {
 		return convertError(err)
 	}
 
-	return convertError(os.RemoveAll(a.getFullPath(pathname)))
+	return convertError(os.RemoveAll(a.Path(pathname)))
 }
