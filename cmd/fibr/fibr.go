@@ -9,6 +9,7 @@ import (
 	authMiddleware "github.com/ViBiOh/auth/v2/pkg/middleware"
 	basicMemory "github.com/ViBiOh/auth/v2/pkg/store/memory"
 	"github.com/ViBiOh/fibr/pkg/crud"
+	"github.com/ViBiOh/fibr/pkg/database"
 	"github.com/ViBiOh/fibr/pkg/exif"
 	"github.com/ViBiOh/fibr/pkg/fibr"
 	"github.com/ViBiOh/fibr/pkg/filesystem"
@@ -75,6 +76,14 @@ func main() {
 	storageApp, err := filesystem.New(filesystemConfig)
 	logger.Fatal(err)
 
+	databaseApp, err := database.New(storageApp)
+	logger.Fatal(err)
+	defer func() {
+		if err := databaseApp.Close(); err != nil {
+			logger.Error("unable to close database: %s", err)
+		}
+	}()
+
 	prometheusRegister := prometheusApp.Registerer()
 
 	thumbnailApp := thumbnail.New(thumbnailConfig, storageApp, prometheusRegister)
@@ -84,7 +93,7 @@ func main() {
 	logger.Fatal(err)
 
 	metadataApp := metadata.New(metadataConfig, storageApp)
-	crudApp, err := crud.New(crudConfig, storageApp, rendererApp, metadataApp, thumbnailApp, exifApp, prometheusRegister)
+	crudApp, err := crud.New(crudConfig, storageApp, rendererApp, metadataApp, thumbnailApp, exifApp, databaseApp, prometheusRegister)
 	logger.Fatal(err)
 
 	var middlewareApp authMiddleware.App

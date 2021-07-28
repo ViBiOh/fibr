@@ -1,6 +1,7 @@
 package crud
 
 import (
+	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
@@ -10,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ViBiOh/fibr/pkg/database"
 	"github.com/ViBiOh/fibr/pkg/exif"
 	"github.com/ViBiOh/fibr/pkg/metadata"
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -70,6 +72,7 @@ type app struct {
 	metadataApp  metadata.App
 	thumbnailApp thumbnail.App
 	exifApp      exif.App
+	databaseApp  database.App
 
 	sanitizeOnStart bool
 	exifDateOnStart bool
@@ -85,7 +88,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 }
 
 // New creates new App from Config
-func New(config Config, storage provider.Storage, rendererApp renderer.App, metadataApp metadata.App, thumbnailApp thumbnail.App, exifApp exif.App, prometheus prometheus.Registerer) (App, error) {
+func New(config Config, storage provider.Storage, rendererApp renderer.App, metadataApp metadata.App, thumbnailApp thumbnail.App, exifApp exif.App, databaseApp database.App, prometheus prometheus.Registerer) (App, error) {
 	app := &app{
 		sanitizeOnStart: *config.sanitizeOnStart,
 		exifDateOnStart: *config.exifDateOnStart,
@@ -94,6 +97,7 @@ func New(config Config, storage provider.Storage, rendererApp renderer.App, meta
 		rendererApp:  rendererApp,
 		thumbnailApp: thumbnailApp,
 		exifApp:      exifApp,
+		databaseApp:  databaseApp,
 		metadataApp:  metadataApp,
 		prometheus:   prometheus,
 	}
@@ -146,9 +150,17 @@ func (a *app) Start(done <-chan struct{}) {
 			a.thumbnailApp.GenerateThumbnail(item)
 		}
 
-		if a.exifDateOnStart && exif.CanHaveExif(item) {
-			if err := a.dateFromExif(item); err != nil {
-				logger.Warn("unable to update date from exif for `%s`: %s", item.Pathname, err)
+		if exif.CanHaveExif(item) {
+			if !a.databaseApp.HasEntry(item) {
+				if err := a.saveExif(item); err != nil {
+					logger.Error("unable to save exif for `%s`: %s", item.Pathname, err)
+				}
+			}
+
+			if a.exifDateOnStart && a.databaseApp.HasEntry(item) {
+				if err := a.dateFromExif(item); err != nil {
+					logger.Warn("unable to update date from exif for `%s`: %s", item.Pathname, err)
+				}
 			}
 		}
 
@@ -193,10 +205,28 @@ func (a *app) rename(item provider.StorageItem, name string, guage *prometheus.G
 	return renamedItem
 }
 
-func (a *app) dateFromExif(item provider.StorageItem) error {
+func (a *app) saveExif(item provider.StorageItem) error {
 	data, err := a.exifApp.Get(item)
 	if err != nil {
 		return fmt.Errorf("unable to get exif data: %s", err)
+	}
+
+	payload, err := json.Marshal(data)
+	if err != nil {
+		return fmt.Errorf("unable to marshal exif data: %s", err)
+	}
+
+	if err := a.databaseApp.Store([]byte(item.Pathname), payload); err != nil {
+		return fmt.Errorf("unable to store exif data: %s", err)
+	}
+
+	return nil
+}
+
+func (a *app) dateFromExif(item provider.StorageItem) error {
+	data, err := a.databaseApp.Get(item)
+	if err != nil {
+		return fmt.Errorf("unable to retrieve exif data: %s", err)
 	}
 
 	rawCreateDate, ok := data[exifDate]

@@ -3,7 +3,6 @@ package filesystem
 import (
 	"io"
 	"os"
-	"path"
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -21,16 +20,12 @@ func checkPathname(pathname string) error {
 	return nil
 }
 
-func (a app) getFullPath(pathname string) string {
-	return path.Join(a.rootDirectory, pathname)
-}
-
 func (a app) getRelativePath(pathname string) string {
 	return strings.TrimPrefix(pathname, a.rootDirectory)
 }
 
 func (a app) getFile(filename string, flags int) (*os.File, error) {
-	return os.OpenFile(a.getFullPath(filename), flags, getMode(filename))
+	return os.OpenFile(a.Path(filename), flags, getMode(filename))
 }
 
 func (a app) getWritableFile(filename string) (io.WriteCloser, error) {

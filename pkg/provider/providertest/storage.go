@@ -26,6 +26,11 @@ func (s stubReadCloserSeeker) Close() error {
 type Storage struct {
 }
 
+// Path fakes implementation
+func (s Storage) Path(_ string) string {
+	return ""
+}
+
 // SetIgnoreFn fakes implementation
 func (s Storage) SetIgnoreFn(func(provider.StorageItem) bool) {
 	// mock implementation
