@@ -27,7 +27,7 @@ spec:
       type: Recreate
     image:
       name: vibioh/fibr
-      tag: '202107292156' # {"$imagepolicy": "default:flux-fibr-web:tag"}
+      tag: '202107292204' # {"$imagepolicy": "default:flux-fibr-web:tag"}
     volumes:
       - name: data
         persistentVolumeClaim:
