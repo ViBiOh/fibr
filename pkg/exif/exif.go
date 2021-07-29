@@ -3,6 +3,7 @@ package exif
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"strings"
@@ -20,6 +21,22 @@ const (
 	exifDate = "CreateDate"
 
 	maxThumbnailSize = 1024 * 1024 * 150 // 150mo
+)
+
+var (
+	exifDates = []string{
+		"DateCreated",
+		"CreateDate",
+	}
+
+	datePatterns = []string{
+		"2006:01:02 15:04:05MST",
+		"2006:01:02 15:04:05-07:00",
+		"2006:01:02 15:04:05Z07:00",
+		"2006:01:02 15:04:05",
+		"01/02/2006 15:04:05",
+		"1/02/2006 15:04:05",
+	}
 )
 
 // App of package
@@ -122,51 +139,37 @@ func (a app) GetDate(item provider.StorageItem) (time.Time, error) {
 		return time.Time{}, nil
 	}
 
-	rawCreateDate, ok := data[exifDate]
-	if !ok {
-		return time.Time{}, nil
+	for _, exifDate := range exifDates {
+		rawCreateDate, ok := data[exifDate]
+		if !ok {
+			continue
+		}
+
+		createDateStr, ok := rawCreateDate.(string)
+		if !ok {
+			return time.Time{}, fmt.Errorf("key `%s` is not a string", exifDate)
+		}
+
+		createDate, err := parseDate(createDateStr)
+		if err != nil {
+			return time.Time{}, fmt.Errorf("unable to parse `%s`: %s", exifDate, err)
+		}
+
+		return createDate, nil
 	}
 
-	createDateStr, ok := rawCreateDate.(string)
-	if !ok {
-		return time.Time{}, fmt.Errorf("key `%s` is not a string", exifDate)
-	}
-
-	createDate, err := parseDate(createDateStr)
-	if err != nil {
-		return time.Time{}, fmt.Errorf("unable to parse `%s`: %s", exifDate, err)
-	}
-
-	return createDate, nil
+	return time.Time{}, nil
 }
 
 func parseDate(raw string) (time.Time, error) {
-	createDate, err := time.Parse("2006:01:02 15:04:05MST", raw)
-	if err == nil {
-		return createDate, nil
+	for _, pattern := range datePatterns {
+		createDate, err := time.Parse(pattern, raw)
+		if err == nil {
+			return createDate, nil
+		}
 	}
 
-	createDate, err = time.Parse("2006:01:02 15:04:05-07:00", raw)
-	if err == nil {
-		return createDate, nil
-	}
-
-	createDate, err = time.Parse("2006:01:02 15:04:05Z07:00", raw)
-	if err == nil {
-		return createDate, nil
-	}
-
-	createDate, err = time.Parse("2006:01:02 15:04:05", raw)
-	if err == nil {
-		return createDate, nil
-	}
-
-	createDate, err = time.Parse("01/02/2006 15:04:05", raw)
-	if err == nil {
-		return createDate, nil
-	}
-
-	return time.Time{}, err
+	return time.Time{}, errors.New("no matching pattern")
 }
 
 func (a app) Rename(old, new provider.StorageItem) {
