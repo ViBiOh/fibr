@@ -5,8 +5,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 )
 
-// Remove thumbnail of given item
-func (a app) Remove(item provider.StorageItem) {
+func (a app) Delete(item provider.StorageItem) {
 	if !a.Enabled() {
 		return
 	}
@@ -16,7 +15,6 @@ func (a app) Remove(item provider.StorageItem) {
 	}
 }
 
-// Rename thumbnails of given items
 func (a app) Rename(old, new provider.StorageItem) {
 	if !a.Enabled() {
 		return

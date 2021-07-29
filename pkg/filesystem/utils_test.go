@@ -171,6 +171,7 @@ func TestConvertToItem(t *testing.T) {
 				IsDir:    false,
 				Date:     readmeInfo.ModTime(),
 				Info:     readmeInfo,
+				Size:     readmeInfo.Size(),
 			},
 		},
 	}

@@ -46,6 +46,7 @@ func convertToItem(pathname string, info os.FileInfo) provider.StorageItem {
 		Pathname: pathname,
 		IsDir:    info.IsDir(),
 		Date:     info.ModTime(),
+		Size:     info.Size(),
 		Info:     info,
 	}
 }

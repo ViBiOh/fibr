@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"path"
 
+	"github.com/ViBiOh/fibr/pkg/exif"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
@@ -55,9 +56,24 @@ func (a *app) saveUploadedFile(request provider.Request, part *multipart.Part) (
 		return "", err
 	}
 
-	if thumbnail.CanHaveThumbnail(info) {
-		a.thumbnailApp.GenerateThumbnail(info)
-	}
+	go func() {
+		if thumbnail.CanHaveThumbnail(info) {
+			a.thumbnailApp.GenerateThumbnail(info)
+		}
+
+		if exif.CanHaveExif(info) {
+			createDate, err := a.exifApp.GetDate(info)
+			if err != nil {
+				logger.Error("unable to get exif date: %s", err)
+			}
+
+			if !createDate.IsZero() {
+				if err := a.storageApp.UpdateDate(info.Pathname, createDate); err != nil {
+					logger.Error("unable to set update date: %s", err)
+				}
+			}
+		}
+	}()
 
 	return filename, nil
 }

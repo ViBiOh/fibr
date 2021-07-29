@@ -44,7 +44,8 @@ func (a *app) Delete(w http.ResponseWriter, r *http.Request, request provider.Re
 		provider.SetPrefsCookie(w, deletePreferences(request, oldPath))
 	}
 
-	go a.thumbnailApp.Remove(info)
+	go a.thumbnailApp.Delete(info)
+	go a.exifApp.Delete(info)
 
 	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/?d=%s", request.URL(""), request.Layout("")), renderer.NewSuccessMessage("%s successfully deleted", info.Name))
 }

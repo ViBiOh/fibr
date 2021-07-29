@@ -25,6 +25,7 @@ func (a *app) doRename(oldPath, newPath string, oldItem provider.StorageItem) (p
 	}
 
 	go a.thumbnailApp.Rename(oldItem, newItem)
+	go a.exifApp.Rename(oldItem, newItem)
 
 	return newItem, nil
 }
