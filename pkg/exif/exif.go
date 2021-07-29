@@ -141,7 +141,7 @@ func (a app) GetDate(item provider.StorageItem) (time.Time, error) {
 }
 
 func parseDate(raw string) (time.Time, error) {
-	createDate, err := time.Parse("2006:01:02 15:04:05 MST", raw)
+	createDate, err := time.Parse("2006:01:02 15:04:05MST", raw)
 	if err == nil {
 		return createDate, nil
 	}

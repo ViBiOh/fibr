@@ -138,6 +138,12 @@ func (a *app) Start(done <-chan struct{}) {
 			return err
 		}
 
+		select {
+		case <-done:
+			return errors.New("server is shutting down")
+		default:
+		}
+
 		item = a.sanitizeName(item, renameCount)
 
 		if thumbnail.CanHaveThumbnail(item) && !a.thumbnailApp.HasThumbnail(item) {
