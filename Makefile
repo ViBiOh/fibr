@@ -98,7 +98,7 @@ run:
 		-frameOptions "SAMEORIGIN" \
 		-thumbnailImageURL "https://imaginary.vibioh.fr" \
 		-thumbnailVideoURL "https://vith.vibioh.fr" \
-		-exifExasURL "http://localhost:4000" \
+		-exifURL "http://localhost:4000" \
 		-exifDateOnStart
 
 .PHONY: run-imaginary

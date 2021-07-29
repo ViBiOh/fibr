@@ -32,9 +32,9 @@ Fibr creates a `.fibr` folder in _root folder_ for storing its metadata: shares'
 
 ### Files
 
-Fibr generates thumbnails of images, PDF and videos when these [mime-types are detected](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types) and sidecars are provided. Sidecars are [h2non/imaginary](https://github.com/h2non/imaginary) and [ViBiOh/vith](https://github.com/vibioh/vith).
+Fibr generates thumbnails of images, PDF and videos when these [mime-types are detected](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types) and sidecars are provided. Sidecars are [h2non/imaginary](https://github.com/h2non/imaginary), [ViBiOh/vith](https://github.com/vibioh/vith) and [ViBiOh/exas](https://github.com/vibioh/exas).
 
-You can refer to these projects for installing and configuring them and set `-thumbnailImageURL` and `-thumbnailVideoURL` options.
+You can refer to these projects for installing and configuring them and set `-thumbnailImageURL`, `-thumbnailVideoURL` and `-exifURL` options.
 
 ### Security
 
@@ -96,7 +96,7 @@ fibr \
 
 ### As a single Docker container, with admin/password user
 
-For long-living sharing with password and self-contained app in Docker, with no thumbnail generation.
+For long-living sharing with password and self-contained app in Docker, with no thumbnail generation or exif.
 
 ```bash
 docker run -d \
@@ -140,8 +140,8 @@ Usage of fibr:
         [owasp] Content-Security-Policy {FIBR_CSP} (default "default-src 'self'; base-uri 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:")
   -exifDateOnStart
         [crud] Change file date from EXIF date on start {FIBR_EXIF_DATE_ON_START}
-  -exifExasURL string
-        [exif] Exif Tool URL (exas) {FIBR_EXIF_EXAS_URL} (default "http://exas:1080")
+  -exifURL string
+        [exif] Exif Tool URL (exas) {FIBR_EXIF_URL}
   -frameOptions string
         [owasp] X-Frame-Options {FIBR_FRAME_OPTIONS} (default "SAMEORIGIN")
   -fsDirectory string

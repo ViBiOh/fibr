@@ -13,6 +13,7 @@ type StorageItem struct {
 	Date     time.Time
 	Pathname string
 	Name     string
+	Size     int64
 
 	IsDir bool
 }

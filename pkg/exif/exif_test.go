@@ -13,7 +13,7 @@ func TestFlags(t *testing.T) {
 	}{
 		{
 			"simple",
-			"Usage of simple:\n  -exasURL string\n    \t[exif] Exif Tool URL (exas) {SIMPLE_EXAS_URL} (default \"http://exas:1080\")\n",
+			"Usage of simple:\n  -uRL string\n    \t[exif] Exif Tool URL (exas) {SIMPLE_URL}\n",
 		},
 	}
 

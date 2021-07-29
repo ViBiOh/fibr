@@ -1,7 +1,6 @@
 package crud
 
 import (
-	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
@@ -9,7 +8,6 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
-	"time"
 
 	"github.com/ViBiOh/fibr/pkg/database"
 	"github.com/ViBiOh/fibr/pkg/exif"
@@ -20,10 +18,6 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 	"github.com/prometheus/client_golang/prometheus"
-)
-
-const (
-	exifDate = "CreateDate"
 )
 
 var (
@@ -151,13 +145,7 @@ func (a *app) Start(done <-chan struct{}) {
 		}
 
 		if exif.CanHaveExif(item) {
-			if !a.databaseApp.HasEntry(item) {
-				if err := a.saveExif(item); err != nil {
-					logger.Error("unable to save exif for `%s`: %s", item.Pathname, err)
-				}
-			}
-
-			if a.exifDateOnStart && a.databaseApp.HasEntry(item) {
+			if a.exifDateOnStart {
 				if err := a.dateFromExif(item); err != nil {
 					logger.Warn("unable to update date from exif for `%s`: %s", item.Pathname, err)
 				}
@@ -205,43 +193,14 @@ func (a *app) rename(item provider.StorageItem, name string, guage *prometheus.G
 	return renamedItem
 }
 
-func (a *app) saveExif(item provider.StorageItem) error {
-	data, err := a.exifApp.Get(item)
-	if err != nil {
-		return fmt.Errorf("unable to get exif data: %s", err)
-	}
-
-	payload, err := json.Marshal(data)
-	if err != nil {
-		return fmt.Errorf("unable to marshal exif data: %s", err)
-	}
-
-	if err := a.databaseApp.Store([]byte(item.Pathname), payload); err != nil {
-		return fmt.Errorf("unable to store exif data: %s", err)
-	}
-
-	return nil
-}
-
 func (a *app) dateFromExif(item provider.StorageItem) error {
-	data, err := a.databaseApp.Get(item)
+	createDate, err := a.exifApp.GetDate(item)
 	if err != nil {
-		return fmt.Errorf("unable to retrieve exif data: %s", err)
+		return fmt.Errorf("unable to get exif date: %s", err)
 	}
 
-	rawCreateDate, ok := data[exifDate]
-	if !ok {
-		return fmt.Errorf("no `%s` found", exifDate)
-	}
-
-	createDateStr, ok := rawCreateDate.(string)
-	if !ok {
-		return fmt.Errorf("key `%s` is not a string", exifDate)
-	}
-
-	createDate, err := time.Parse("2006:01:02 15:04:05", createDateStr)
-	if err != nil {
-		return fmt.Errorf("unable to parse `%s`: %s", exifDate, err)
+	if createDate.IsZero() {
+		return nil
 	}
 
 	return a.storageApp.UpdateDate(item.Pathname, createDate)

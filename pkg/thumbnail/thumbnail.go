@@ -28,8 +28,9 @@ const (
 // App of package
 type App interface {
 	Start()
-	Remove(provider.StorageItem)
+	Delete(provider.StorageItem)
 	Rename(provider.StorageItem, provider.StorageItem)
+
 	HasThumbnail(provider.StorageItem) bool
 	Serve(http.ResponseWriter, *http.Request, provider.StorageItem)
 	List(http.ResponseWriter, *http.Request, provider.StorageItem)
