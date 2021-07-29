@@ -151,6 +151,11 @@ func parseDate(raw string) (time.Time, error) {
 		return createDate, nil
 	}
 
+	createDate, err = time.Parse("2006:01:02 15:04:05Z07:00", raw)
+	if err == nil {
+		return createDate, nil
+	}
+
 	createDate, err = time.Parse("2006:01:02 15:04:05", raw)
 	if err == nil {
 		return createDate, nil
