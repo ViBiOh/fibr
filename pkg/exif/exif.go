@@ -30,7 +30,6 @@ var (
 	}
 
 	datePatterns = []string{
-		"2006-01-02T15:04:05Z07:00",
 		"2006:01:02 15:04:05MST",
 		"2006:01:02 15:04:05-07:00",
 		"2006:01:02 15:04:05Z07:00",
@@ -153,7 +152,7 @@ func (a app) GetDate(item provider.StorageItem) (time.Time, error) {
 
 		createDate, err := parseDate(createDateStr)
 		if err != nil {
-			return time.Time{}, fmt.Errorf("unable to parse `%s`: %s", exifDate, err)
+			return time.Time{}, fmt.Errorf("unable to parse `%s` with value `%s`: %s", exifDate, createDateStr, err)
 		}
 
 		return createDate, nil
