@@ -25,7 +25,7 @@ type app struct {
 
 // New creates new App
 func New(storageApp provider.Storage) (App, error) {
-	db, err := badger.Open(badger.DefaultOptions(storageApp.Path(path.Join(provider.MetadataDirectoryName, "LmZpYnI="))))
+	db, err := badger.Open(badger.DefaultOptions(storageApp.Path(path.Join(provider.MetadataDirectoryName, "LmZpYnI="))).WithMemTableSize(1024 * 1024 * 8).WithNumMemtables(1).WithNumLevelZeroTables(1).WithNumLevelZeroTablesStall(2))
 	if err != nil {
 		return nil, fmt.Errorf("unable to open database: %s", err)
 	}
