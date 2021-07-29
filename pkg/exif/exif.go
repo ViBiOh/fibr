@@ -132,12 +132,31 @@ func (a app) GetDate(item provider.StorageItem) (time.Time, error) {
 		return time.Time{}, fmt.Errorf("key `%s` is not a string", exifDate)
 	}
 
-	createDate, err := time.Parse("2006:01:02 15:04:05", createDateStr)
+	createDate, err := parseDate(createDateStr)
 	if err != nil {
 		return time.Time{}, fmt.Errorf("unable to parse `%s`: %s", exifDate, err)
 	}
 
 	return createDate, nil
+}
+
+func parseDate(raw string) (time.Time, error) {
+	createDate, err := time.Parse("2006:01:02 15:04:05 MST", raw)
+	if err == nil {
+		return createDate, nil
+	}
+
+	createDate, err = time.Parse("2006:01:02 15:04:05-07:00", raw)
+	if err == nil {
+		return createDate, nil
+	}
+
+	createDate, err = time.Parse("2006:01:02 15:04:05", raw)
+	if err == nil {
+		return createDate, nil
+	}
+
+	return time.Time{}, err
 }
 
 func (a app) Rename(old, new provider.StorageItem) {
