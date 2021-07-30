@@ -11,8 +11,8 @@ import (
 	"github.com/ViBiOh/auth/v2/pkg/ident"
 	authMiddleware "github.com/ViBiOh/auth/v2/pkg/middleware"
 	"github.com/ViBiOh/fibr/pkg/crud"
-	"github.com/ViBiOh/fibr/pkg/metadata"
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/fibr/pkg/share"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
@@ -26,21 +26,21 @@ type app struct {
 	loginApp    authMiddleware.App
 	crudApp     crud.App
 	rendererApp renderer.App
-	metadataApp metadata.App
+	shareApp    share.App
 }
 
 // New creates new App from Config
-func New(crudApp crud.App, rendererApp renderer.App, metadataApp metadata.App, loginApp authMiddleware.App) App {
+func New(crudApp crud.App, rendererApp renderer.App, shareApp share.App, loginApp authMiddleware.App) App {
 	return &app{
 		crudApp:     crudApp,
 		rendererApp: rendererApp,
 		loginApp:    loginApp,
-		metadataApp: metadataApp,
+		shareApp:    shareApp,
 	}
 }
 
 func (a app) parseShare(request *provider.Request, authorizationHeader string) error {
-	share := a.metadataApp.GetShare(request.Path)
+	share := a.shareApp.Get(request.Path)
 	if len(share.ID) == 0 {
 		return nil
 	}
@@ -113,7 +113,7 @@ func (a app) parseRequest(r *http.Request) (provider.Request, error) {
 
 	if a.loginApp == nil {
 		request.CanEdit = true
-		request.CanShare = a.metadataApp.Enabled()
+		request.CanShare = a.shareApp.Enabled()
 		return request, nil
 	}
 
@@ -124,7 +124,7 @@ func (a app) parseRequest(r *http.Request) (provider.Request, error) {
 
 	if a.loginApp.HasProfile(r.Context(), user, "admin") {
 		request.CanEdit = true
-		request.CanShare = a.metadataApp.Enabled()
+		request.CanShare = a.shareApp.Enabled()
 	}
 
 	return request, nil

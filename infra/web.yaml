@@ -23,8 +23,6 @@ spec:
     cleanupOnFail: true
   values:
     nameOverride: fibr
-    strategy:
-      type: Recreate
     image:
       name: vibioh/fibr
       tag: '202107301133' # {"$imagepolicy": "default:flux-fibr-web:tag"}

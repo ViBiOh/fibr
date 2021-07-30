@@ -44,7 +44,7 @@ type Config struct {
 }
 
 type app struct {
-	storage       provider.Storage
+	storageApp    provider.Storage
 	prometheus    prometheus.Registerer
 	pathnameInput chan provider.StorageItem
 
@@ -76,7 +76,7 @@ func New(config Config, storage provider.Storage, prometheusApp prometheus.Regis
 		imageURL: fmt.Sprintf("%s/crop?width=%d&height=%d&stripmeta=true&noprofile=true&quality=80&type=jpeg", imageURL, Width, Height),
 		videoURL: videoURL,
 
-		storage:    storage,
+		storageApp: storage,
 		prometheus: prometheusApp,
 
 		pathnameInput: make(chan provider.StorageItem, 10),
@@ -85,9 +85,8 @@ func New(config Config, storage provider.Storage, prometheusApp prometheus.Regis
 	return app
 }
 
-// Enabled checks if app is enabled
-func (a app) Enabled() bool {
-	return len(a.imageURL) != 0 && len(a.videoURL) != 0 && a.storage != nil
+func (a app) enabled() bool {
+	return len(a.imageURL) != 0 && len(a.videoURL) != 0
 }
 
 // Serve check if thumbnail is present and serve it
@@ -97,7 +96,7 @@ func (a app) Serve(w http.ResponseWriter, r *http.Request, item provider.Storage
 		return
 	}
 
-	file, err := a.storage.ReaderFrom(getThumbnailPath(item))
+	file, err := a.storageApp.ReaderFrom(getThumbnailPath(item))
 	if file != nil {
 		defer func() {
 			if err := file.Close(); err != nil {
@@ -115,12 +114,12 @@ func (a app) Serve(w http.ResponseWriter, r *http.Request, item provider.Storage
 
 // List return all thumbnail in a base64 form
 func (a app) List(w http.ResponseWriter, _ *http.Request, item provider.StorageItem) {
-	if !a.Enabled() {
+	if !a.enabled() {
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 
-	items, err := a.storage.List(item.Pathname)
+	items, err := a.storageApp.List(item.Pathname)
 	if err != nil {
 		httperror.InternalServerError(w, err)
 		return
@@ -159,7 +158,7 @@ func (a app) encodeThumbnailContent(encoder io.WriteCloser, item provider.Storag
 		}
 	}()
 
-	file, err := a.storage.ReaderFrom(getThumbnailPath(item))
+	file, err := a.storageApp.ReaderFrom(getThumbnailPath(item))
 	if file != nil {
 		defer func() {
 			if err := file.Close(); err != nil {

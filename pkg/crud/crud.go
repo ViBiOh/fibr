@@ -9,10 +9,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/ViBiOh/fibr/pkg/database"
 	"github.com/ViBiOh/fibr/pkg/exif"
-	"github.com/ViBiOh/fibr/pkg/metadata"
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/fibr/pkg/share"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v4/pkg/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
@@ -63,10 +62,9 @@ type app struct {
 	prometheus   prometheus.Registerer
 	storageApp   provider.Storage
 	rendererApp  renderer.App
-	metadataApp  metadata.App
+	shareApp     share.App
 	thumbnailApp thumbnail.App
 	exifApp      exif.App
-	databaseApp  database.App
 
 	sanitizeOnStart bool
 	exifDateOnStart bool
@@ -82,7 +80,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 }
 
 // New creates new App from Config
-func New(config Config, storage provider.Storage, rendererApp renderer.App, metadataApp metadata.App, thumbnailApp thumbnail.App, exifApp exif.App, databaseApp database.App, prometheus prometheus.Registerer) (App, error) {
+func New(config Config, storage provider.Storage, rendererApp renderer.App, shareApp share.App, thumbnailApp thumbnail.App, exifApp exif.App, prometheus prometheus.Registerer) (App, error) {
 	app := &app{
 		sanitizeOnStart: *config.sanitizeOnStart,
 		exifDateOnStart: *config.exifDateOnStart,
@@ -91,8 +89,7 @@ func New(config Config, storage provider.Storage, rendererApp renderer.App, meta
 		rendererApp:  rendererApp,
 		thumbnailApp: thumbnailApp,
 		exifApp:      exifApp,
-		databaseApp:  databaseApp,
-		metadataApp:  metadataApp,
+		shareApp:     shareApp,
 		prometheus:   prometheus,
 	}
 

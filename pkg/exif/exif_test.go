@@ -34,3 +34,34 @@ func TestFlags(t *testing.T) {
 		})
 	}
 }
+
+func TestEnabled(t *testing.T) {
+	var cases = []struct {
+		intention string
+		instance  app
+		want      bool
+	}{
+		{
+			"disabled",
+			app{
+				exifURL: "",
+			},
+			false,
+		},
+		{
+			"enabled",
+			app{
+				exifURL: "http://exas",
+			},
+			true,
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.intention, func(t *testing.T) {
+			if got := tc.instance.enabled(); got != tc.want {
+				t.Errorf("Enabled() = %t, want %t", got, tc.want)
+			}
+		})
+	}
+}

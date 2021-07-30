@@ -70,9 +70,9 @@ func TestHasThumbnail(t *testing.T) {
 		{
 			"not found",
 			app{
-				storage:  providertest.Storage{},
-				imageURL: publicPath,
-				videoURL: publicPath,
+				storageApp: providertest.Storage{},
+				imageURL:   publicPath,
+				videoURL:   publicPath,
 			},
 			provider.StorageItem{
 				Pathname: "path/to/error",
@@ -83,9 +83,9 @@ func TestHasThumbnail(t *testing.T) {
 		{
 			"found",
 			app{
-				storage:  providertest.Storage{},
-				imageURL: publicPath,
-				videoURL: publicPath,
+				storageApp: providertest.Storage{},
+				imageURL:   publicPath,
+				videoURL:   publicPath,
 			},
 			provider.StorageItem{
 				Pathname: "path/to/valid",

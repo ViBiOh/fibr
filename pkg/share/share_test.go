@@ -1,4 +1,4 @@
-package metadata
+package share
 
 import (
 	"reflect"
@@ -8,7 +8,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
-func TestPurgeExpiredMetadatas(t *testing.T) {
+func TestPurgeExpiredShares(t *testing.T) {
 	var cases = []struct {
 		intention string
 		instance  *app
@@ -20,7 +20,7 @@ func TestPurgeExpiredMetadatas(t *testing.T) {
 				clock: &Clock{
 					now: time.Date(2021, 05, 01, 14, 00, 00, 0, time.UTC),
 				},
-				metadatas: make(map[string]provider.Share),
+				shares: make(map[string]provider.Share),
 			},
 			make(map[string]provider.Share),
 		},
@@ -30,7 +30,7 @@ func TestPurgeExpiredMetadatas(t *testing.T) {
 				clock: &Clock{
 					now: time.Date(2021, 05, 01, 14, 00, 00, 0, time.UTC),
 				},
-				metadatas: map[string]provider.Share{
+				shares: map[string]provider.Share{
 					"1": {
 						ID:       "1",
 						Creation: time.Date(2021, 05, 01, 12, 00, 00, 0, time.UTC),
@@ -70,11 +70,11 @@ func TestPurgeExpiredMetadatas(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.intention, func(t *testing.T) {
-			tc.instance.purgeExpiredMetadatas()
-			got := tc.instance.metadatas
+			tc.instance.purgeExpiredShares()
+			got := tc.instance.shares
 
 			if !reflect.DeepEqual(got, tc.want) {
-				t.Errorf("purgeExpiredMetadatas() = %+v, want %+v", got, tc.want)
+				t.Errorf("purgeExpiredShares() = %+v, want %+v", got, tc.want)
 			}
 		})
 	}

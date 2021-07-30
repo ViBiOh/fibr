@@ -68,7 +68,7 @@ style:
 mocks:
 	find . -name "mock" -type d -exec rm {} \;
 	mockgen -destination pkg/mocks/crud.go -mock_names App=Crud -package mocks github.com/ViBiOh/fibr/pkg/crud App
-	mockgen -destination pkg/mocks/metadata.go -mock_names App=Metadata -package mocks github.com/ViBiOh/fibr/pkg/metadata App
+	mockgen -destination pkg/mocks/share.go -mock_names App=Share -package mocks github.com/ViBiOh/fibr/pkg/share App
 
 ## test: Shortcut to launch all the test tasks (unit, functional and integration).
 .PHONY: test

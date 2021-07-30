@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	// MetadataDirectoryName directory when metadata are stored
+	// MetadataDirectoryName directory where metadata are stored
 	MetadataDirectoryName = ".fibr"
 )
 

@@ -1,4 +1,4 @@
-package metadata
+package share
 
 import (
 	"crypto/rand"
@@ -29,15 +29,15 @@ func (a *app) generateShareID() (string, error) {
 		}
 		id := sha.Sha1(uuid)[:8]
 
-		if _, ok := a.metadatas[id]; !ok {
+		if _, ok := a.shares[id]; !ok {
 			return id, nil
 		}
 	}
 }
 
-func (a *app) CreateShare(filepath string, edit bool, password string, isDir bool, duration time.Duration) (string, error) {
+func (a *app) Create(filepath string, edit bool, password string, isDir bool, duration time.Duration) (string, error) {
 	if !a.Enabled() {
-		return "", fmt.Errorf("metadatas are disabled")
+		return "", fmt.Errorf("share is disabled")
 	}
 
 	a.mutex.Lock()
@@ -48,7 +48,7 @@ func (a *app) CreateShare(filepath string, edit bool, password string, isDir boo
 		return "", err
 	}
 
-	a.metadatas[id] = provider.Share{
+	a.shares[id] = provider.Share{
 		ID:       id,
 		Path:     filepath,
 		RootName: path.Base(filepath),
@@ -59,23 +59,23 @@ func (a *app) CreateShare(filepath string, edit bool, password string, isDir boo
 		Duration: duration,
 	}
 
-	return id, a.saveMetadatas()
+	return id, a.saveShares()
 }
 
-func (a *app) DeleteShare(id string) error {
+func (a *app) Delete(id string) error {
 	if !a.Enabled() {
-		return fmt.Errorf("metadatas are disabled")
+		return fmt.Errorf("share is disabled")
 	}
 
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
-	delete(a.metadatas, id)
+	delete(a.shares, id)
 
-	return a.saveMetadatas()
+	return a.saveShares()
 }
 
-func (a *app) RenameSharePath(oldPath, newPath string) error {
+func (a *app) RenamePath(oldPath, newPath string) error {
 	if !a.Enabled() {
 		return nil
 	}
@@ -83,17 +83,17 @@ func (a *app) RenameSharePath(oldPath, newPath string) error {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
-	for id, share := range a.metadatas {
+	for id, share := range a.shares {
 		if strings.HasPrefix(share.Path, oldPath) {
 			share.Path = strings.Replace(share.Path, oldPath, newPath, 1)
-			a.metadatas[id] = share
+			a.shares[id] = share
 		}
 	}
 
-	return a.saveMetadatas()
+	return a.saveShares()
 }
 
-func (a *app) DeleteSharePath(path string) error {
+func (a *app) DeletePath(path string) error {
 	if !a.Enabled() {
 		return nil
 	}
@@ -101,11 +101,11 @@ func (a *app) DeleteSharePath(path string) error {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
-	for id, share := range a.metadatas {
+	for id, share := range a.shares {
 		if strings.HasPrefix(share.Path, path) {
-			delete(a.metadatas, id)
+			delete(a.shares, id)
 		}
 	}
 
-	return a.saveMetadatas()
+	return a.saveShares()
 }

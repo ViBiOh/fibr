@@ -19,11 +19,11 @@ func CanHaveThumbnail(item provider.StorageItem) bool {
 
 // HasThumbnail determine if thumbnail exist for given pathname
 func (a app) HasThumbnail(item provider.StorageItem) bool {
-	if !a.Enabled() {
+	if !a.enabled() {
 		return false
 	}
 
-	info, err := a.storage.Info(getThumbnailPath(item))
+	info, err := a.storageApp.Info(getThumbnailPath(item))
 	return err == nil && !info.IsDir
 }
 

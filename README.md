@@ -28,7 +28,7 @@ Fibr browses files of given `-data` option folder, called "root folder". For sec
 
 It aims to be consistent accross all existing filesystem (block storage, object storage, etc.) and thus enforces filenames in lowercase, with no space or special character. At start, it walks every files and reports names that breaks its policy. It doesn't modify existing files unless you set `-sanitizeOnStart` option.
 
-Fibr creates a `.fibr` folder in _root folder_ for storing its metadata: shares' configuration and thumbnails. If you want to stop using _fibr_ or start with a fresh installation (e.g. regenerating thumbnails), you can delete this folder.
+Fibr creates a `.fibr` folder in _root folder_ for storing its metadata: shares' configuration, thumbnails and exif. If you want to stop using _fibr_ or start with a fresh installation (e.g. regenerating thumbnails), you can delete this folder.
 
 ### Files
 
@@ -166,8 +166,6 @@ Usage of fibr:
         [logger] Key for message in JSON {FIBR_LOGGER_MESSAGE_KEY} (default "message")
   -loggerTimeKey string
         [logger] Key for timestamp in JSON {FIBR_LOGGER_TIME_KEY} (default "time")
-  -metadata
-        [metadata] Enable metadata storage {FIBR_METADATA} (default true)
   -minify
         Minify HTML {FIBR_MINIFY} (default true)
   -noAuth

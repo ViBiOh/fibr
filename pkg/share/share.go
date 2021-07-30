@@ -1,4 +1,4 @@
-package metadata
+package share
 
 import (
 	"context"
@@ -18,28 +18,28 @@ import (
 )
 
 var (
-	metadataFilename = path.Join(provider.MetadataDirectoryName, ".json")
+	shareFilename = path.Join(provider.MetadataDirectoryName, ".json")
 )
 
 // App of package
 type App interface {
 	Enabled() bool
-	GetShare(string) provider.Share
-	CreateShare(string, bool, string, bool, time.Duration) (string, error)
-	RenameSharePath(string, string) error
-	DeleteShare(string) error
-	DeleteSharePath(string) error
-	Dump() map[string]provider.Share
+	Get(string) provider.Share
+	Create(string, bool, string, bool, time.Duration) (string, error)
+	RenamePath(string, string) error
+	Delete(string) error
+	DeletePath(string) error
+	List() map[string]provider.Share
 	Start(<-chan struct{})
 }
 
 // Config of package
 type Config struct {
-	metadata *bool
+	share *bool
 }
 
 type app struct {
-	metadatas  map[string]provider.Share
+	shares     map[string]provider.Share
 	clock      *Clock
 	storageApp provider.Storage
 	mutex      sync.RWMutex
@@ -48,29 +48,29 @@ type app struct {
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) Config {
 	return Config{
-		metadata: flags.New(prefix, "metadata").Name("Metadata").Default(flags.Default("Metadata", true, overrides)).Label("Enable metadata storage").ToBool(fs),
+		share: flags.New(prefix, "share").Name("Share").Default(flags.Default("Share", true, overrides)).Label("Enable sharing feature").ToBool(fs),
 	}
 }
 
 // New creates new App from Config
 func New(config Config, storageApp provider.Storage) App {
-	if !*config.metadata {
+	if !*config.share {
 		return &app{}
 	}
 
 	return &app{
-		metadatas:  make(map[string]provider.Share),
+		shares:     make(map[string]provider.Share),
 		storageApp: storageApp,
 	}
 }
 
 // GetShare returns share configuration if request path match
 func (a *app) Enabled() bool {
-	return a.metadatas != nil
+	return a.shares != nil
 }
 
 // GetShare returns share configuration if request path match
-func (a *app) GetShare(requestPath string) provider.Share {
+func (a *app) Get(requestPath string) provider.Share {
 	if !a.Enabled() {
 		return provider.NoneShare
 	}
@@ -80,7 +80,7 @@ func (a *app) GetShare(requestPath string) provider.Share {
 	a.mutex.RLock()
 	defer a.mutex.RUnlock()
 
-	for key, share := range a.metadatas {
+	for key, share := range a.shares {
 		if strings.HasPrefix(cleanPath, key) {
 			return share
 		}
@@ -89,7 +89,7 @@ func (a *app) GetShare(requestPath string) provider.Share {
 	return provider.NoneShare
 }
 
-func (a *app) Dump() map[string]provider.Share {
+func (a *app) List() map[string]provider.Share {
 	if !a.Enabled() {
 		return nil
 	}
@@ -97,7 +97,7 @@ func (a *app) Dump() map[string]provider.Share {
 	a.mutex.RLock()
 	defer a.mutex.RUnlock()
 
-	return a.metadatas
+	return a.shares
 }
 
 func (a *app) Start(done <-chan struct{}) {
@@ -106,17 +106,17 @@ func (a *app) Start(done <-chan struct{}) {
 	}
 
 	if err := a.refreshMetadatas(); err != nil {
-		logger.Error("unable to refresh metadatas: %s", err)
+		logger.Error("unable to refresh shares: %s", err)
 		return
 	}
 
 	cron.New().Each(time.Hour).OnError(func(err error) {
-		logger.Error("unable to purge metadatas: %s", err)
-	}).OnSignal(syscall.SIGUSR1).Now().Start(a.cleanMetadatas, done)
+		logger.Error("unable to purge shares: %s", err)
+	}).OnSignal(syscall.SIGUSR1).Now().Start(a.cleanShares, done)
 }
 
 func (a *app) refreshMetadatas() error {
-	_, err := a.storageApp.Info(metadataFilename)
+	_, err := a.storageApp.Info(shareFilename)
 	if err != nil && !provider.IsNotExist(err) {
 		return err
 	}
@@ -129,11 +129,11 @@ func (a *app) refreshMetadatas() error {
 		return nil
 	}
 
-	file, err := a.storageApp.ReaderFrom(metadataFilename)
+	file, err := a.storageApp.ReaderFrom(shareFilename)
 	if file != nil {
 		defer func() {
 			if err := file.Close(); err != nil {
-				logger.Error("unable to close metadata file: %s", err)
+				logger.Error("unable to close share file: %s", err)
 			}
 		}()
 	}
@@ -144,21 +144,20 @@ func (a *app) refreshMetadatas() error {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
-	decoder := json.NewDecoder(file)
-	if err = decoder.Decode(&a.metadatas); err != nil {
-		return fmt.Errorf("unable to decode metadatas: %s", err)
+	if err = json.NewDecoder(file).Decode(&a.shares); err != nil {
+		return fmt.Errorf("unable to decode: %s", err)
 	}
 
 	return nil
 }
 
-func (a *app) purgeExpiredMetadatas() bool {
+func (a *app) purgeExpiredShares() bool {
 	now := a.clock.Now()
 	changed := false
 
-	for key, share := range a.metadatas {
+	for key, share := range a.shares {
 		if share.IsExpired(now) {
-			delete(a.metadatas, key)
+			delete(a.shares, key)
 			changed = true
 		}
 	}
@@ -166,23 +165,23 @@ func (a *app) purgeExpiredMetadatas() bool {
 	return changed
 }
 
-func (a *app) cleanMetadatas(_ context.Context) error {
+func (a *app) cleanShares(_ context.Context) error {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
-	if !a.purgeExpiredMetadatas() {
+	if !a.purgeExpiredShares() {
 		return nil
 	}
 
-	if err := a.saveMetadatas(); err != nil {
-		return fmt.Errorf("unable to save metadatas: %s", err)
+	if err := a.saveShares(); err != nil {
+		return fmt.Errorf("unable to save: %s", err)
 	}
 
 	return nil
 }
 
-func (a *app) saveMetadatas() (err error) {
-	file, err := a.storageApp.WriterTo(metadataFilename)
+func (a *app) saveShares() (err error) {
+	file, err := a.storageApp.WriterTo(shareFilename)
 	if file != nil {
 		defer func() {
 			if closeErr := file.Close(); closeErr != nil {
@@ -197,8 +196,8 @@ func (a *app) saveMetadatas() (err error) {
 	encoder := json.NewEncoder(file)
 	encoder.SetIndent("", "  ")
 
-	if err := encoder.Encode(a.metadatas); err != nil {
-		return fmt.Errorf("unable to json encode metadatas: %s", err)
+	if err := encoder.Encode(a.shares); err != nil {
+		return fmt.Errorf("unable to encode: %s", err)
 	}
 
 	return nil

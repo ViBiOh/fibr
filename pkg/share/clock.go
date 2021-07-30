@@ -1,4 +1,4 @@
-package metadata
+package share
 
 import "time"
 

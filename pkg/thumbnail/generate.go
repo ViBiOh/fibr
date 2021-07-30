@@ -31,7 +31,7 @@ func (a app) generate(item provider.StorageItem) error {
 		err  error
 	)
 
-	file, err = a.storage.ReaderFrom(item.Pathname) // file will be closed by `.Send`
+	file, err = a.storageApp.ReaderFrom(item.Pathname) // file will be closed by `.Send`
 	if err != nil {
 		return err
 	}
@@ -57,11 +57,11 @@ func (a app) generate(item provider.StorageItem) error {
 	}
 
 	thumbnailPath := getThumbnailPath(item)
-	if err := a.storage.CreateDir(path.Dir(thumbnailPath)); err != nil {
+	if err := a.storageApp.CreateDir(path.Dir(thumbnailPath)); err != nil {
 		return err
 	}
 
-	if err := a.storage.Store(thumbnailPath, resp.Body); err != nil {
+	if err := a.storageApp.Store(thumbnailPath, resp.Body); err != nil {
 		return err
 	}
 
@@ -70,7 +70,7 @@ func (a app) generate(item provider.StorageItem) error {
 
 // GenerateThumbnail generate thumbnail image for given path
 func (a app) GenerateThumbnail(item provider.StorageItem) {
-	if !a.Enabled() {
+	if !a.enabled() {
 		return
 	}
 
@@ -78,11 +78,11 @@ func (a app) GenerateThumbnail(item provider.StorageItem) {
 }
 
 func (a app) Start() {
-	if !a.Enabled() {
+	if !a.enabled() {
 		return
 	}
 
-	if _, err := a.storage.Info(provider.MetadataDirectoryName); err != nil {
+	if _, err := a.storageApp.Info(provider.MetadataDirectoryName); err != nil {
 		logger.Warn("no thumbnail generation because %s has error: %s", provider.MetadataDirectoryName, err)
 		return
 	}

@@ -9,7 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ViBiOh/fibr/pkg/database"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/httpjson"
@@ -18,9 +17,7 @@ import (
 )
 
 const (
-	exifDate = "CreateDate"
-
-	maxThumbnailSize = 1024 * 1024 * 150 // 150mo
+	maxExifSize = 150 << 20 // 150mo
 )
 
 var (
@@ -54,8 +51,7 @@ type Config struct {
 }
 
 type app struct {
-	storageApp  provider.Storage
-	databaseApp database.App
+	storageApp provider.Storage
 
 	exifURL string
 }
@@ -68,36 +64,58 @@ func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) Config 
 }
 
 // New creates new App from Config
-func New(config Config, storageApp provider.Storage, databaseApp database.App) App {
+func New(config Config, storageApp provider.Storage) App {
 	return app{
-		exifURL:     strings.TrimSpace(*config.exifURL),
-		storageApp:  storageApp,
-		databaseApp: databaseApp,
+		exifURL:    strings.TrimSpace(*config.exifURL),
+		storageApp: storageApp,
 	}
 }
 
-// Enabled checks if app is enabled
-func (a app) Enabled() bool {
+func (a app) enabled() bool {
 	return len(a.exifURL) != 0
 }
 
 // CanHaveExif determine if exif can be extracted for given pathname
 func CanHaveExif(item provider.StorageItem) bool {
-	return (item.IsImage() || item.IsVideo() || item.IsPdf()) && item.Size < maxThumbnailSize
+	return (item.IsImage() || item.IsVideo() || item.IsPdf()) && item.Size < maxExifSize
 }
 
 func (a app) Get(item provider.StorageItem) (map[string]interface{}, error) {
-	if !a.Enabled() {
+	if !a.enabled() {
 		return nil, nil
 	}
 
-	if a.databaseApp.HasEntry([]byte(item.Pathname)) {
-		return a.databaseApp.Get([]byte(item.Pathname))
+	if item.IsDir {
+		return nil, nil
 	}
 
+	var data map[string]interface{}
+
+	reader, err := a.storageApp.ReaderFrom(getExifPath(item))
+	if err == nil {
+		if err := json.NewDecoder(reader).Decode(&data); err != nil {
+			return nil, fmt.Errorf("unable to decode: %s", err)
+		}
+
+		return data, nil
+	}
+
+	if !provider.IsNotExist(err) {
+		return nil, fmt.Errorf("unable to read: %s", err)
+	}
+
+	exif, err := a.fetchExif(item)
+	if err != nil {
+		return nil, fmt.Errorf("unable to fetch: %s", err)
+	}
+
+	return exif, nil
+}
+
+func (a app) fetchExif(item provider.StorageItem) (map[string]interface{}, error) {
 	file, err := a.storageApp.ReaderFrom(item.Pathname) // file will be closed by `.Send`
 	if err != nil {
-		return nil, fmt.Errorf("unable to get reader for `%s`: %s", item.Pathname, err)
+		return nil, fmt.Errorf("unable to get reader: %s", err)
 	}
 
 	resp, err := request.New().Post(a.exifURL).Send(context.Background(), file)
@@ -116,16 +134,20 @@ func (a app) Get(item provider.StorageItem) (map[string]interface{}, error) {
 
 	data := exifs[0]
 
-	go func() {
-		payload, err := json.Marshal(data)
-		if err != nil {
-			logger.Error("unable to marshal exif data: %s", err)
-		}
+	writer, err := a.storageApp.WriterTo(getExifPath(item))
+	if err != nil {
+		return nil, fmt.Errorf("unable to get writer: %s", err)
+	}
 
-		if err := a.databaseApp.Store([]byte(item.Pathname), payload); err != nil {
-			logger.Error("unable to store exif in database: %s", err)
+	defer func() {
+		if err := writer.Close(); err != nil {
+			logger.Error("unable to close exif file: %s", err)
 		}
 	}()
+
+	if err := json.NewEncoder(writer).Encode(data); err != nil {
+		return nil, fmt.Errorf("unable to encode: %s", err)
+	}
 
 	return data, nil
 }
@@ -133,7 +155,7 @@ func (a app) Get(item provider.StorageItem) (map[string]interface{}, error) {
 func (a app) GetDate(item provider.StorageItem) (time.Time, error) {
 	data, err := a.Get(item)
 	if err != nil {
-		return time.Time{}, fmt.Errorf("unable to retrieve exif data: %s", err)
+		return time.Time{}, fmt.Errorf("unable to retrieve: %s", err)
 	}
 
 	if data == nil {
@@ -174,13 +196,26 @@ func parseDate(raw string) (time.Time, error) {
 }
 
 func (a app) Rename(old, new provider.StorageItem) {
-	if err := a.databaseApp.Rename([]byte(old.Pathname), []byte(new.Pathname)); err != nil {
+	if !a.enabled() {
+		return
+	}
+
+	oldPath := getExifPath(old)
+	if _, err := a.storageApp.Info(oldPath); provider.IsNotExist(err) {
+		return
+	}
+
+	if err := a.storageApp.Rename(oldPath, getExifPath(new)); err != nil {
 		logger.Error("unable to rename exif: %s", err)
 	}
 }
 
 func (a app) Delete(item provider.StorageItem) {
-	if err := a.databaseApp.Delete([]byte(item.Pathname)); err != nil {
+	if !a.enabled() {
+		return
+	}
+
+	if err := a.storageApp.Remove(getExifPath(item)); err != nil {
 		logger.Error("unable to delete exif: %s", err)
 	}
 }

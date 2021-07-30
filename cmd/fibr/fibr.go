@@ -9,11 +9,10 @@ import (
 	authMiddleware "github.com/ViBiOh/auth/v2/pkg/middleware"
 	basicMemory "github.com/ViBiOh/auth/v2/pkg/store/memory"
 	"github.com/ViBiOh/fibr/pkg/crud"
-	"github.com/ViBiOh/fibr/pkg/database"
 	"github.com/ViBiOh/fibr/pkg/exif"
 	"github.com/ViBiOh/fibr/pkg/fibr"
 	"github.com/ViBiOh/fibr/pkg/filesystem"
-	"github.com/ViBiOh/fibr/pkg/metadata"
+	"github.com/ViBiOh/fibr/pkg/share"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v4/pkg/alcotest"
 	"github.com/ViBiOh/httputils/v4/pkg/flags"
@@ -53,7 +52,7 @@ func main() {
 	basicConfig := basicMemory.Flags(fs, "auth")
 
 	crudConfig := crud.Flags(fs, "")
-	metadataConfig := metadata.Flags(fs, "")
+	shareConfig := share.Flags(fs, "")
 	rendererConfig := renderer.Flags(fs, "", flags.NewOverride("PublicURL", "https://fibr.vibioh.fr"), flags.NewOverride("Title", "fibr"))
 
 	filesystemConfig := filesystem.Flags(fs, "fs")
@@ -76,24 +75,16 @@ func main() {
 	storageApp, err := filesystem.New(filesystemConfig)
 	logger.Fatal(err)
 
-	databaseApp, err := database.New(storageApp)
-	logger.Fatal(err)
-	defer func() {
-		if err := databaseApp.Close(); err != nil {
-			logger.Error("unable to close database: %s", err)
-		}
-	}()
-
 	prometheusRegister := prometheusApp.Registerer()
 
 	thumbnailApp := thumbnail.New(thumbnailConfig, storageApp, prometheusRegister)
-	exifApp := exif.New(exifConfig, storageApp, databaseApp)
+	exifApp := exif.New(exifConfig, storageApp)
 
 	rendererApp, err := renderer.New(rendererConfig, content, fibr.FuncMap(thumbnailApp))
 	logger.Fatal(err)
 
-	metadataApp := metadata.New(metadataConfig, storageApp)
-	crudApp, err := crud.New(crudConfig, storageApp, rendererApp, metadataApp, thumbnailApp, exifApp, databaseApp, prometheusRegister)
+	shareApp := share.New(shareConfig, storageApp)
+	crudApp, err := crud.New(crudConfig, storageApp, rendererApp, shareApp, thumbnailApp, exifApp, prometheusRegister)
 	logger.Fatal(err)
 
 	var middlewareApp authMiddleware.App
@@ -101,11 +92,11 @@ func main() {
 		middlewareApp = newLoginApp(basicConfig)
 	}
 
-	fibrApp := fibr.New(crudApp, rendererApp, metadataApp, middlewareApp)
+	fibrApp := fibr.New(crudApp, rendererApp, shareApp, middlewareApp)
 	handler := rendererApp.Handler(fibrApp.TemplateFunc)
 
 	go thumbnailApp.Start()
-	go metadataApp.Start(appServer.Done())
+	go shareApp.Start(appServer.Done())
 	go crudApp.Start(appServer.Done())
 
 	go promServer.Start("prometheus", healthApp.End(), prometheusApp.Handler())

@@ -6,26 +6,26 @@ import (
 )
 
 func (a app) Delete(item provider.StorageItem) {
-	if !a.Enabled() {
+	if !a.enabled() {
 		return
 	}
 
-	if err := a.storage.Remove(getThumbnailPath(item)); err != nil {
-		logger.Error("%s", err)
+	if err := a.storageApp.Remove(getThumbnailPath(item)); err != nil {
+		logger.Error("unable to delete thumbnail: %s", err)
 	}
 }
 
 func (a app) Rename(old, new provider.StorageItem) {
-	if !a.Enabled() {
+	if !a.enabled() {
 		return
 	}
 
 	oldPath := getThumbnailPath(old)
-	if _, err := a.storage.Info(oldPath); provider.IsNotExist(err) {
+	if _, err := a.storageApp.Info(oldPath); provider.IsNotExist(err) {
 		return
 	}
 
-	if err := a.storage.Rename(oldPath, getThumbnailPath(new)); err != nil {
-		logger.Error("%s", err)
+	if err := a.storageApp.Rename(oldPath, getThumbnailPath(new)); err != nil {
+		logger.Error("unable to rename thumbnail: %s", err)
 	}
 }

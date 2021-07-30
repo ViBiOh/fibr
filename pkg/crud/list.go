@@ -62,7 +62,7 @@ func (a *app) List(w http.ResponseWriter, request provider.Request, message rend
 	}
 
 	if request.CanShare {
-		content["Shares"] = a.metadataApp.Dump()
+		content["Shares"] = a.shareApp.List()
 	}
 
 	return "files", http.StatusOK, content, nil

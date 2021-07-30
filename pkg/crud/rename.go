@@ -20,8 +20,8 @@ func (a *app) doRename(oldPath, newPath string, oldItem provider.StorageItem) (p
 		return provider.StorageItem{}, err
 	}
 
-	if err := a.metadataApp.RenameSharePath(oldPath, newPath); err != nil {
-		return newItem, fmt.Errorf("error while updating metadatas: %s", err)
+	if err := a.shareApp.RenamePath(oldPath, newPath); err != nil {
+		return newItem, fmt.Errorf("unable to update share: %s", err)
 	}
 
 	go a.thumbnailApp.Rename(oldItem, newItem)

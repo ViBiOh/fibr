@@ -166,18 +166,18 @@ func TestParseShare(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			metadataMock := mocks.NewMetadata(ctrl)
-			tc.instance.metadataApp = metadataMock
+			shareMock := mocks.NewShare(ctrl)
+			tc.instance.shareApp = shareMock
 
 			switch tc.intention {
 			case "passwordless":
-				metadataMock.EXPECT().GetShare(gomock.Any()).Return(passwordLessShare)
+				shareMock.EXPECT().Get(gomock.Any()).Return(passwordLessShare)
 			case "empty password":
 				fallthrough
 			case "valid":
-				metadataMock.EXPECT().GetShare(gomock.Any()).Return(passwordShare)
+				shareMock.EXPECT().Get(gomock.Any()).Return(passwordShare)
 			default:
-				metadataMock.EXPECT().GetShare(gomock.Any()).Return(provider.Share{})
+				shareMock.EXPECT().Get(gomock.Any()).Return(provider.Share{})
 			}
 
 			gotErr := tc.instance.parseShare(tc.args.request, tc.args.authorizationHeader)
@@ -401,27 +401,27 @@ func TestParseRequest(t *testing.T) {
 			defer ctrl.Finish()
 
 			crudMock := mocks.NewCrud(ctrl)
-			metadataMock := mocks.NewMetadata(ctrl)
+			shareMock := mocks.NewShare(ctrl)
 
 			tc.instance.crudApp = crudMock
-			tc.instance.metadataApp = metadataMock
+			tc.instance.shareApp = shareMock
 
 			switch tc.intention {
 			case "no auth":
-				metadataMock.EXPECT().GetShare(gomock.Any()).Return(provider.Share{})
-				metadataMock.EXPECT().Enabled().Return(false)
+				shareMock.EXPECT().Get(gomock.Any()).Return(provider.Share{})
+				shareMock.EXPECT().Enabled().Return(false)
 			case "admin user":
-				metadataMock.EXPECT().Enabled().Return(true)
-				metadataMock.EXPECT().GetShare(gomock.Any()).Return(provider.Share{})
+				shareMock.EXPECT().Enabled().Return(true)
+				shareMock.EXPECT().Get(gomock.Any()).Return(provider.Share{})
 			case "empty cookie", "cookie value":
-				metadataMock.EXPECT().Enabled().Return(false)
-				metadataMock.EXPECT().GetShare(gomock.Any()).Return(provider.Share{})
+				shareMock.EXPECT().Enabled().Return(false)
+				shareMock.EXPECT().Get(gomock.Any()).Return(provider.Share{})
 			case "invalid auth", "non admin user":
-				metadataMock.EXPECT().GetShare(gomock.Any()).Return(provider.Share{})
+				shareMock.EXPECT().Get(gomock.Any()).Return(provider.Share{})
 			case "error":
-				metadataMock.EXPECT().GetShare(gomock.Any()).Return(passwordShare)
+				shareMock.EXPECT().Get(gomock.Any()).Return(passwordShare)
 			case "share":
-				metadataMock.EXPECT().GetShare(gomock.Any()).Return(passwordLessShare)
+				shareMock.EXPECT().Get(gomock.Any()).Return(passwordLessShare)
 			}
 
 			got, gotErr := tc.instance.parseRequest(tc.args.r)

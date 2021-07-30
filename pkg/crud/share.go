@@ -15,8 +15,8 @@ import (
 
 // CreateShare create a share for given URL
 func (a *app) CreateShare(w http.ResponseWriter, r *http.Request, request provider.Request) {
-	if !a.metadataApp.Enabled() {
-		a.rendererApp.Error(w, model.WrapInternal(errors.New("metadatas are disabled")))
+	if !a.shareApp.Enabled() {
+		a.rendererApp.Error(w, model.WrapInternal(errors.New("share is disabled")))
 		return
 	}
 
@@ -60,7 +60,7 @@ func (a *app) CreateShare(w http.ResponseWriter, r *http.Request, request provid
 		return
 	}
 
-	id, err := a.metadataApp.CreateShare(request.Path, edit, password, info.IsDir, duration)
+	id, err := a.shareApp.Create(request.Path, edit, password, info.IsDir, duration)
 	if err != nil {
 		a.rendererApp.Error(w, model.WrapInternal(err))
 		return
@@ -78,8 +78,8 @@ func (a *app) CreateShare(w http.ResponseWriter, r *http.Request, request provid
 
 // DeleteShare delete a share from given ID
 func (a *app) DeleteShare(w http.ResponseWriter, r *http.Request, request provider.Request) {
-	if !a.metadataApp.Enabled() {
-		a.rendererApp.Error(w, model.WrapInternal(errors.New("metadatas are disabled")))
+	if !a.shareApp.Enabled() {
+		a.rendererApp.Error(w, model.WrapInternal(errors.New("share is disabled")))
 		return
 	}
 
@@ -90,7 +90,7 @@ func (a *app) DeleteShare(w http.ResponseWriter, r *http.Request, request provid
 
 	id := r.FormValue("id")
 
-	if err := a.metadataApp.DeleteShare(id); err != nil {
+	if err := a.shareApp.Delete(id); err != nil {
 		a.rendererApp.Error(w, model.WrapInternal(err))
 		return
 	}
