@@ -83,7 +83,7 @@ func (a app) Enabled() bool {
 
 // CanHaveExif determine if exif can be extracted for given pathname
 func CanHaveExif(item provider.StorageItem) bool {
-	return (item.IsImage() || item.IsPdf()) && item.Size < maxThumbnailSize
+	return (item.IsImage() || item.IsVideo() || item.IsPdf()) && item.Size < maxThumbnailSize
 }
 
 func (a app) Get(item provider.StorageItem) (map[string]interface{}, error) {
