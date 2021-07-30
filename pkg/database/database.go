@@ -9,6 +9,10 @@ import (
 	badger "github.com/dgraph-io/badger/v3"
 )
 
+const (
+	baseSize = 1024 * 1024 * 8
+)
+
 // App of package
 type App interface {
 	Get([]byte) (map[string]interface{}, error)
@@ -25,7 +29,8 @@ type app struct {
 
 // New creates new App
 func New(storageApp provider.Storage) (App, error) {
-	db, err := badger.Open(badger.DefaultOptions(storageApp.Path(path.Join(provider.MetadataDirectoryName, "LmZpYnI="))).WithMemTableSize(1024 * 1024 * 8).WithNumMemtables(1).WithNumLevelZeroTables(1).WithNumLevelZeroTablesStall(2))
+	db, err := badger.Open(
+		badger.DefaultOptions(storageApp.Path(path.Join(provider.MetadataDirectoryName, "LmZpYnI="))).WithMemTableSize(baseSize).WithNumMemtables(1).WithNumLevelZeroTables(1).WithNumLevelZeroTablesStall(2).WithBaseTableSize(baseSize / 4).WithBaseLevelSize(baseSize).WithValueLogFileSize(baseSize))
 	if err != nil {
 		return nil, fmt.Errorf("unable to open database: %s", err)
 	}
