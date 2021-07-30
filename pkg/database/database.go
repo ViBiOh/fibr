@@ -93,10 +93,12 @@ func (a app) Rename(old, new []byte) error {
 	})
 }
 func (a app) HasEntry(key []byte) bool {
-	return a.db.View(func(txn *badger.Txn) error {
+	err := a.db.View(func(txn *badger.Txn) error {
 		_, err := txn.Get([]byte(key))
 		return err
-	}) != badger.ErrKeyNotFound
+	})
+
+	return err == nil || err != badger.ErrKeyNotFound
 }
 
 func (a app) Delete(key []byte) error {
