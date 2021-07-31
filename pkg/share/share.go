@@ -105,7 +105,7 @@ func (a *app) Start(done <-chan struct{}) {
 		return
 	}
 
-	if err := a.refreshMetadatas(); err != nil {
+	if err := a.refresh(); err != nil {
 		logger.Error("unable to refresh shares: %s", err)
 		return
 	}
@@ -115,7 +115,7 @@ func (a *app) Start(done <-chan struct{}) {
 	}).OnSignal(syscall.SIGUSR1).Now().Start(a.cleanShares, done)
 }
 
-func (a *app) refreshMetadatas() error {
+func (a *app) refresh() error {
 	_, err := a.storageApp.Info(shareFilename)
 	if err != nil && !provider.IsNotExist(err) {
 		return err
