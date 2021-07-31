@@ -117,12 +117,11 @@ func (a app) parseRequest(r *http.Request) (provider.Request, error) {
 		return request, nil
 	}
 
-	_, user, err := a.loginApp.IsAuthenticated(r, "")
-	if err != nil {
+	if _, _, err := a.loginApp.IsAuthenticated(r); err != nil {
 		return request, convertAuthenticationError(err)
 	}
 
-	if a.loginApp.HasProfile(r.Context(), user, "admin") {
+	if a.loginApp.IsAuthorized(r.Context(), "admin") {
 		request.CanEdit = true
 		request.CanShare = a.shareApp.Enabled()
 	}

@@ -1,7 +1,6 @@
 package fibr
 
 import (
-	"context"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -13,7 +12,7 @@ import (
 
 	"github.com/ViBiOh/auth/v2/pkg/auth"
 	"github.com/ViBiOh/auth/v2/pkg/ident"
-	"github.com/ViBiOh/auth/v2/pkg/model"
+	authModel "github.com/ViBiOh/auth/v2/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/mocks"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	httpModel "github.com/ViBiOh/httputils/v4/pkg/model"
@@ -44,28 +43,6 @@ var (
 		Password: string(passwordHash),
 	}
 )
-
-type authMiddlewareTest struct{}
-
-func (amt authMiddlewareTest) Middleware(http.Handler) http.Handler {
-	return nil
-}
-
-func (amt authMiddlewareTest) IsAuthenticated(r *http.Request, _ string) (ident.Provider, model.User, error) {
-	if r.URL.Path == invalidPath {
-		return nil, model.NoneUser, errors.New("authentication failed")
-	}
-
-	if r.URL.Path == adminPath {
-		return nil, model.User{ID: 8000}, nil
-	}
-
-	return nil, model.NoneUser, nil
-}
-
-func (amt authMiddlewareTest) HasProfile(_ context.Context, user model.User, _ string) bool {
-	return user.ID == 8000
-}
 
 func TestParseShare(t *testing.T) {
 	type args struct {
@@ -312,9 +289,7 @@ func TestParseRequest(t *testing.T) {
 		},
 		{
 			"invalid auth",
-			app{
-				loginApp: authMiddlewareTest{},
-			},
+			app{},
 			args{
 				r: httptest.NewRequest(http.MethodGet, invalidPath, nil),
 			},
@@ -328,9 +303,7 @@ func TestParseRequest(t *testing.T) {
 		},
 		{
 			"non admin user",
-			app{
-				loginApp: authMiddlewareTest{},
-			},
+			app{},
 			args{
 				r: httptest.NewRequest(http.MethodGet, "/guest", nil),
 			},
@@ -344,9 +317,7 @@ func TestParseRequest(t *testing.T) {
 		},
 		{
 			"admin user",
-			app{
-				loginApp: authMiddlewareTest{},
-			},
+			app{},
 			args{
 				r: httptest.NewRequest(http.MethodGet, adminPath, nil),
 			},
@@ -360,9 +331,7 @@ func TestParseRequest(t *testing.T) {
 		},
 		{
 			"empty cookie",
-			app{
-				loginApp: authMiddlewareTest{},
-			},
+			app{},
 			args{
 				r: adminRequestWithEmptyCookie,
 			},
@@ -376,9 +345,7 @@ func TestParseRequest(t *testing.T) {
 		},
 		{
 			"cookie value",
-			app{
-				loginApp: authMiddlewareTest{},
-			},
+			app{},
 			args{
 				r: adminRequestWithCookie,
 			},
@@ -402,6 +369,7 @@ func TestParseRequest(t *testing.T) {
 
 			crudMock := mocks.NewCrud(ctrl)
 			shareMock := mocks.NewShare(ctrl)
+			loginMock := mocks.NewAuthMiddleware(ctrl)
 
 			tc.instance.crudApp = crudMock
 			tc.instance.shareApp = shareMock
@@ -422,6 +390,20 @@ func TestParseRequest(t *testing.T) {
 				shareMock.EXPECT().Get(gomock.Any()).Return(passwordShare)
 			case "share":
 				shareMock.EXPECT().Get(gomock.Any()).Return(passwordLessShare)
+			}
+
+			switch tc.intention {
+			case "invalid auth":
+				tc.instance.loginApp = loginMock
+				loginMock.EXPECT().IsAuthenticated(gomock.Any()).Return(nil, authModel.User{}, errors.New("invalid auth"))
+			case "non admin user":
+				tc.instance.loginApp = loginMock
+				loginMock.EXPECT().IsAuthenticated(gomock.Any()).Return(nil, authModel.User{}, nil)
+				loginMock.EXPECT().IsAuthorized(gomock.Any(), gomock.Any()).Return(false)
+			case "admin user":
+				tc.instance.loginApp = loginMock
+				loginMock.EXPECT().IsAuthenticated(gomock.Any()).Return(nil, authModel.User{}, nil)
+				loginMock.EXPECT().IsAuthorized(gomock.Any(), gomock.Any()).Return(true)
 			}
 
 			got, gotErr := tc.instance.parseRequest(tc.args.r)

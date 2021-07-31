@@ -206,5 +206,9 @@ func (a *app) dateFromExif(item provider.StorageItem) error {
 		return nil
 	}
 
+	if item.Date.Equal(createDate) {
+		return nil
+	}
+
 	return a.storageApp.UpdateDate(item.Pathname, createDate)
 }
