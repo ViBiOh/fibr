@@ -21,6 +21,8 @@ const (
 )
 
 var (
+	exifSuffixes = []string{"", "geocode"}
+
 	exifDates = []string{
 		"DateCreated",
 		"CreateDate",
@@ -39,6 +41,7 @@ var (
 
 // App of package
 type App interface {
+	Start(<-chan struct{})
 	Get(provider.StorageItem) (map[string]interface{}, error)
 	GetDate(provider.StorageItem) (time.Time, error)
 	Rename(provider.StorageItem, provider.StorageItem)
@@ -47,19 +50,23 @@ type App interface {
 
 // Config of package
 type Config struct {
-	exifURL *string
+	exifURL    *string
+	geocodeURL *string
 }
 
 type app struct {
-	storageApp provider.Storage
+	storageApp   provider.Storage
+	geocodeQueue chan provider.StorageItem
 
-	exifURL string
+	exifURL    string
+	geocodeURL string
 }
 
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) Config {
 	return Config{
-		exifURL: flags.New(prefix, "exif").Name("URL").Default(flags.Default("URL", "", overrides)).Label("Exif Tool URL (exas)").ToString(fs),
+		exifURL:    flags.New(prefix, "exif").Name("URL").Default(flags.Default("URL", "", overrides)).Label("Exif Tool URL (exas)").ToString(fs),
+		geocodeURL: flags.New(prefix, "exif").Name("GeocodeURL").Default(flags.Default("URL", "https://nominatim.openstreetmap.org", overrides)).Label("Nominatim Geocode Service URL").ToString(fs),
 	}
 }
 
@@ -67,12 +74,24 @@ func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) Config 
 func New(config Config, storageApp provider.Storage) App {
 	return app{
 		exifURL:    strings.TrimSpace(*config.exifURL),
+		geocodeURL: strings.TrimSpace(*config.geocodeURL),
+
 		storageApp: storageApp,
+
+		geocodeQueue: make(chan provider.StorageItem, 100),
 	}
 }
 
 func (a app) enabled() bool {
 	return len(a.exifURL) != 0
+}
+
+func (a app) Start(done <-chan struct{}) {
+	if !a.enabled() {
+		return
+	}
+
+	go a.computeGeocode(done)
 }
 
 // CanHaveExif determine if exif can be extracted for given pathname
@@ -91,7 +110,7 @@ func (a app) Get(item provider.StorageItem) (map[string]interface{}, error) {
 
 	var data map[string]interface{}
 
-	reader, err := a.storageApp.ReaderFrom(getExifPath(item))
+	reader, err := a.storageApp.ReaderFrom(getExifPath(item, ""))
 	if err == nil {
 		if err := json.NewDecoder(reader).Decode(&data); err != nil {
 			return nil, fmt.Errorf("unable to decode: %s", err)
@@ -134,7 +153,7 @@ func (a app) fetchExif(item provider.StorageItem) (map[string]interface{}, error
 
 	data := exifs[0]
 
-	writer, err := a.storageApp.WriterTo(getExifPath(item))
+	writer, err := a.storageApp.WriterTo(getExifPath(item, ""))
 	if err != nil {
 		return nil, fmt.Errorf("unable to get writer: %s", err)
 	}
@@ -148,6 +167,8 @@ func (a app) fetchExif(item provider.StorageItem) (map[string]interface{}, error
 	if err := json.NewEncoder(writer).Encode(data); err != nil {
 		return nil, fmt.Errorf("unable to encode: %s", err)
 	}
+
+	go a.ReverseGeocode(item)
 
 	return data, nil
 }
@@ -200,13 +221,15 @@ func (a app) Rename(old, new provider.StorageItem) {
 		return
 	}
 
-	oldPath := getExifPath(old)
-	if _, err := a.storageApp.Info(oldPath); provider.IsNotExist(err) {
-		return
-	}
+	for _, suffix := range exifSuffixes {
+		oldPath := getExifPath(old, suffix)
+		if _, err := a.storageApp.Info(oldPath); provider.IsNotExist(err) {
+			return
+		}
 
-	if err := a.storageApp.Rename(oldPath, getExifPath(new)); err != nil {
-		logger.Error("unable to rename exif: %s", err)
+		if err := a.storageApp.Rename(oldPath, getExifPath(new, suffix)); err != nil {
+			logger.Error("unable to rename exif: %s", err)
+		}
 	}
 }
 
@@ -215,7 +238,9 @@ func (a app) Delete(item provider.StorageItem) {
 		return
 	}
 
-	if err := a.storageApp.Remove(getExifPath(item)); err != nil {
-		logger.Error("unable to delete exif: %s", err)
+	for _, suffix := range exifSuffixes {
+		if err := a.storageApp.Remove(getExifPath(item, suffix)); err != nil {
+			logger.Error("unable to delete exif: %s", err)
+		}
 	}
 }

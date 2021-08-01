@@ -8,11 +8,17 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
-func getExifPath(item provider.StorageItem) string {
+func getExifPath(item provider.StorageItem, suffix string) string {
 	fullPath := path.Join(provider.MetadataDirectoryName, item.Pathname)
 	if item.IsDir {
 		return fullPath
 	}
 
-	return fmt.Sprintf("%s.json", strings.TrimSuffix(fullPath, path.Ext(fullPath)))
+	name := strings.TrimSuffix(fullPath, path.Ext(fullPath))
+
+	if len(suffix) == 0 {
+		return fmt.Sprintf("%s.json", name)
+	}
+
+	return fmt.Sprintf("%s_%s.json", name, suffix)
 }

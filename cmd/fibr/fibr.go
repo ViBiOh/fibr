@@ -98,6 +98,7 @@ func main() {
 	go thumbnailApp.Start()
 	go shareApp.Start(appServer.Done())
 	go crudApp.Start(appServer.Done())
+	go exifApp.Start(appServer.Done())
 
 	go promServer.Start("prometheus", healthApp.End(), prometheusApp.Handler())
 	go appServer.Start("http", healthApp.End(), httputils.Handler(handler, healthApp, recoverer.Middleware, prometheusApp.Middleware, owasp.New(owaspConfig).Middleware))

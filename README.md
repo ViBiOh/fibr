@@ -140,6 +140,8 @@ Usage of fibr:
         [owasp] Content-Security-Policy {FIBR_CSP} (default "default-src 'self'; base-uri 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:")
   -exifDateOnStart
         [crud] Change file date from EXIF date on start {FIBR_EXIF_DATE_ON_START}
+  -exifGeocodeURL string
+        [exif] Nominatim Geocode Service URL {FIBR_EXIF_GEOCODE_URL} (default "https://nominatim.openstreetmap.org")
   -exifURL string
         [exif] Exif Tool URL (exas) {FIBR_EXIF_URL}
   -frameOptions string
@@ -202,6 +204,8 @@ Usage of fibr:
         [server] Read Timeout {FIBR_READ_TIMEOUT} (default "2m")
   -sanitizeOnStart
         [crud] Sanitize name on start {FIBR_SANITIZE_ON_START}
+  -share
+        [share] Enable sharing feature {FIBR_SHARE} (default true)
   -shutdownTimeout string
         [server] Shutdown Timeout {FIBR_SHUTDOWN_TIMEOUT} (default "10s")
   -thumbnailImageURL string
