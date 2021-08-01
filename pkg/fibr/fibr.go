@@ -10,6 +10,7 @@ import (
 	"github.com/ViBiOh/auth/v2/pkg/auth"
 	"github.com/ViBiOh/auth/v2/pkg/ident"
 	authMiddleware "github.com/ViBiOh/auth/v2/pkg/middleware"
+	authModel "github.com/ViBiOh/auth/v2/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/crud"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/share"
@@ -117,11 +118,12 @@ func (a app) parseRequest(r *http.Request) (provider.Request, error) {
 		return request, nil
 	}
 
-	if _, _, err := a.loginApp.IsAuthenticated(r); err != nil {
+	_, user, err := a.loginApp.IsAuthenticated(r)
+	if err != nil {
 		return request, convertAuthenticationError(err)
 	}
 
-	if a.loginApp.IsAuthorized(r.Context(), "admin") {
+	if a.loginApp.IsAuthorized(authModel.StoreUser(r.Context(), user), "admin") {
 		request.CanEdit = true
 		request.CanShare = a.shareApp.Enabled()
 	}
