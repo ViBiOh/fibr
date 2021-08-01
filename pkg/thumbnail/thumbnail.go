@@ -34,7 +34,7 @@ type App interface {
 	HasThumbnail(provider.StorageItem) bool
 	Serve(http.ResponseWriter, *http.Request, provider.StorageItem)
 	List(http.ResponseWriter, *http.Request, provider.StorageItem)
-	GenerateThumbnail(provider.StorageItem)
+	GenerateFor(provider.StorageItem)
 }
 
 // Config of package
@@ -45,8 +45,9 @@ type Config struct {
 
 type app struct {
 	storageApp    provider.Storage
-	prometheus    prometheus.Registerer
 	pathnameInput chan provider.StorageItem
+
+	thumbnailCounter *prometheus.GaugeVec
 
 	imageURL string
 	videoURL string
@@ -61,7 +62,19 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 }
 
 // New creates new App from Config
-func New(config Config, storage provider.Storage, prometheusApp prometheus.Registerer) App {
+func New(config Config, storage provider.Storage, prometheusRegisterer prometheus.Registerer) App {
+	thumbnailCounter := prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: "fibr",
+		Subsystem: "thumbnail",
+		Name:      "item",
+	}, []string{"state"})
+
+	if prometheusRegisterer != nil {
+		if err := prometheusRegisterer.Register(thumbnailCounter); err != nil {
+			logger.Error("unable to register thumbnail gauge: %s", err)
+		}
+	}
+
 	imageURL := strings.TrimSpace(*config.imageURL)
 	if len(imageURL) == 0 {
 		return &app{}
@@ -73,12 +86,9 @@ func New(config Config, storage provider.Storage, prometheusApp prometheus.Regis
 	}
 
 	app := &app{
-		imageURL: fmt.Sprintf("%s/crop?width=%d&height=%d&stripmeta=true&noprofile=true&quality=80&type=jpeg", imageURL, Width, Height),
-		videoURL: videoURL,
-
-		storageApp: storage,
-		prometheus: prometheusApp,
-
+		imageURL:      fmt.Sprintf("%s/crop?width=%d&height=%d&stripmeta=true&noprofile=true&quality=80&type=jpeg", imageURL, Width, Height),
+		videoURL:      videoURL,
+		storageApp:    storage,
 		pathnameInput: make(chan provider.StorageItem, 10),
 	}
 

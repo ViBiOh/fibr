@@ -6,6 +6,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"net/http"
 	"strings"
 	"time"
 
@@ -22,6 +23,13 @@ const (
 )
 
 var (
+	exasClient = http.Client{
+		Timeout: 2 * time.Minute,
+		CheckRedirect: func(*http.Request, []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+	}
+
 	exifSuffixes = []string{"", "geocode"}
 
 	exifDates = []string{
@@ -74,13 +82,13 @@ type app struct {
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) Config {
 	return Config{
-		exifURL:    flags.New(prefix, "exif").Name("URL").Default(flags.Default("URL", "", overrides)).Label("Exif Tool URL (exas)").ToString(fs),
+		exifURL:    flags.New(prefix, "exif").Name("URL").Default(flags.Default("URL", "http://exas:1080", overrides)).Label("Exif Tool URL (exas)").ToString(fs),
 		geocodeURL: flags.New(prefix, "exif").Name("GeocodeURL").Default(flags.Default("URL", "", overrides)).Label(fmt.Sprintf("Nominatim Geocode Service URL. This can leak GPS metadatas to a third-party (e.g. \"%s\")", publicNominatimURL)).ToString(fs),
 	}
 }
 
 // New creates new App from Config
-func New(config Config, storageApp provider.Storage, prometheuRegisterer prometheus.Registerer) App {
+func New(config Config, storageApp provider.Storage, prometheusRegisterer prometheus.Registerer) App {
 	exifCounter := prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: "fibr",
 		Subsystem: "exif",
@@ -97,14 +105,14 @@ func New(config Config, storageApp provider.Storage, prometheuRegisterer prometh
 		Name:      "item",
 	}, []string{"state"})
 
-	if prometheuRegisterer != nil {
-		if err := prometheuRegisterer.Register(exifCounter); err != nil {
+	if prometheusRegisterer != nil {
+		if err := prometheusRegisterer.Register(exifCounter); err != nil {
 			logger.Error("unable to register exif gauge: %s", err)
 		}
-		if err := prometheuRegisterer.Register(dateCounter); err != nil {
+		if err := prometheusRegisterer.Register(dateCounter); err != nil {
 			logger.Error("unable to register date gauge: %s", err)
 		}
-		if err := prometheuRegisterer.Register(geocodeCounter); err != nil {
+		if err := prometheusRegisterer.Register(geocodeCounter); err != nil {
 			logger.Error("unable to register geocode gauge: %s", err)
 		}
 	}
@@ -212,7 +220,7 @@ func (a app) fetchAndStoreExif(item provider.StorageItem) (map[string]interface{
 
 	a.exifCounter.WithLabelValues("requested").Inc()
 
-	resp, err := request.New().Post(a.exifURL).Send(context.Background(), file)
+	resp, err := request.New().WithClient(exasClient).Post(a.exifURL).Send(context.Background(), file)
 	if err != nil {
 		return nil, err
 	}

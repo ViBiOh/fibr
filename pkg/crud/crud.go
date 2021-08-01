@@ -149,7 +149,7 @@ func (a *app) Start(done <-chan struct{}) {
 		item = a.sanitizeName(item, sanitizeCounter)
 
 		if thumbnail.CanHaveThumbnail(item) && !a.thumbnailApp.HasThumbnail(item) {
-			a.thumbnailApp.GenerateThumbnail(item)
+			a.thumbnailApp.GenerateFor(item)
 		}
 
 		if exif.CanHaveExif(item) {

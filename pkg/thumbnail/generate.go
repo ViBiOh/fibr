@@ -11,7 +11,6 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
-	"github.com/prometheus/client_golang/prometheus"
 )
 
 const (
@@ -51,6 +50,8 @@ func (a app) generate(item provider.StorageItem) error {
 		file = resp.Body
 	}
 
+	a.thumbnailCounter.WithLabelValues("requested").Inc()
+
 	resp, err = req.Post(a.imageURL).Send(ctx, file)
 	if err != nil {
 		return err
@@ -65,11 +66,13 @@ func (a app) generate(item provider.StorageItem) error {
 		return err
 	}
 
+	a.thumbnailCounter.WithLabelValues("saved").Inc()
+
 	return nil
 }
 
-// GenerateThumbnail generate thumbnail image for given path
-func (a app) GenerateThumbnail(item provider.StorageItem) {
+// GenerateFor generate thumbnail image for given path
+func (a app) GenerateFor(item provider.StorageItem) {
 	if !a.enabled() {
 		return
 	}
@@ -78,7 +81,12 @@ func (a app) GenerateThumbnail(item provider.StorageItem) {
 		return
 	}
 
+	if a.HasThumbnail(item) {
+		return
+	}
+
 	a.pathnameInput <- item
+	a.thumbnailCounter.WithLabelValues("queued").Inc()
 }
 
 func (a app) Start() {
@@ -93,22 +101,13 @@ func (a app) Start() {
 
 	waitTimeout := time.Millisecond * 300
 
-	thumbnailCount := prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Namespace: "fibr",
-		Subsystem: "thumbnail_generations",
-		Name:      "total",
-	}, []string{"status"})
-	if a.prometheus != nil {
-		a.prometheus.MustRegister(thumbnailCount)
-	}
-
 	for item := range a.pathnameInput {
+		a.thumbnailCounter.WithLabelValues("queued").Dec()
+
 		if err := a.generate(item); err != nil {
 			logger.Error("unable to generate thumbnail for %s: %s", item.Pathname, err)
-			thumbnailCount.WithLabelValues("error").Add(1.0)
 		} else {
 			logger.Info("Thumbnail generated for %s", item.Pathname)
-			thumbnailCount.WithLabelValues("success").Add(1.0)
 		}
 
 		// Do not stress API

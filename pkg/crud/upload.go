@@ -58,7 +58,7 @@ func (a *app) saveUploadedFile(request provider.Request, part *multipart.Part) (
 
 	go func() {
 		if thumbnail.CanHaveThumbnail(info) {
-			a.thumbnailApp.GenerateThumbnail(info)
+			a.thumbnailApp.GenerateFor(info)
 		}
 
 		if exif.CanHaveExif(info) {

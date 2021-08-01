@@ -80,6 +80,12 @@ htpasswd -nBb login password
 
 In order to work, your user _must have_ `admin` profile sets with the `-authProfiles` option.
 
+### Metadatas
+
+With help of different sidercars, Fibr can generate image, video and PDF thumbnails. These sidecars can be self hosted with ease. It can also extract and enrich content displayed by looking at [EXIF Data](https://en.wikipedia.org/wiki/Exif), also with the help of a little sidecar. This behaviour are opt-out (if you remove the `url` of the service, Fibr will do nothing).
+
+For the last mile, Fibr can try to reverse geocoding the GPS data found in EXIF, using [Open Street Map](https://wiki.openstreetmap.org/wiki/Nominatim). Hosting this kind of service is complicated and calling a third-party party with such sensible datas is an opt-in decision.
+
 ## Getting started
 
 ### As a binary, without authentification
@@ -143,7 +149,7 @@ Usage of fibr:
   -exifGeocodeURL string
         [exif] Nominatim Geocode Service URL. This can leak GPS metadatas to a third-party (e.g. "https://nominatim.openstreetmap.org") {FIBR_EXIF_GEOCODE_URL}
   -exifURL string
-        [exif] Exif Tool URL (exas) {FIBR_EXIF_URL}
+        [exif] Exif Tool URL (exas) {FIBR_EXIF_URL} (default "http://exas:1080")
   -frameOptions string
         [owasp] X-Frame-Options {FIBR_FRAME_OPTIONS} (default "SAMEORIGIN")
   -fsDirectory string
