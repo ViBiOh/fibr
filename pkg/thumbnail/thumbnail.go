@@ -86,10 +86,11 @@ func New(config Config, storage provider.Storage, prometheusRegisterer prometheu
 	}
 
 	app := &app{
-		imageURL:      fmt.Sprintf("%s/crop?width=%d&height=%d&stripmeta=true&noprofile=true&quality=80&type=jpeg", imageURL, Width, Height),
-		videoURL:      videoURL,
-		storageApp:    storage,
-		pathnameInput: make(chan provider.StorageItem, 10),
+		imageURL:         fmt.Sprintf("%s/crop?width=%d&height=%d&stripmeta=true&noprofile=true&quality=80&type=jpeg", imageURL, Width, Height),
+		videoURL:         videoURL,
+		storageApp:       storage,
+		thumbnailCounter: thumbnailCounter,
+		pathnameInput:    make(chan provider.StorageItem, 10),
 	}
 
 	return app
