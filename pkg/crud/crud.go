@@ -120,13 +120,16 @@ func New(config Config, storage provider.Storage, rendererApp renderer.App, shar
 }
 
 func (a *app) Start(done <-chan struct{}) {
-	renameCount := prometheus.NewGaugeVec(prometheus.GaugeOpts{
+	sanitizeCounter := prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: "fibr",
-		Subsystem: "renames",
+		Subsystem: "sanitize",
 		Name:      "total",
 	}, []string{"status"})
+
 	if a.prometheus != nil {
-		a.prometheus.MustRegister(renameCount)
+		if err := a.prometheus.Register(sanitizeCounter); err != nil {
+			logger.Error("unable to register sanitize count metric: %s", err)
+		}
 	}
 
 	logger.Info("fibr start routine started")
@@ -143,7 +146,7 @@ func (a *app) Start(done <-chan struct{}) {
 		default:
 		}
 
-		item = a.sanitizeName(item, renameCount)
+		item = a.sanitizeName(item, sanitizeCounter)
 
 		if thumbnail.CanHaveThumbnail(item) && !a.thumbnailApp.HasThumbnail(item) {
 			a.thumbnailApp.GenerateThumbnail(item)
@@ -171,7 +174,7 @@ func (a *app) Start(done <-chan struct{}) {
 	}
 }
 
-func (a *app) sanitizeName(item provider.StorageItem, renameCount *prometheus.GaugeVec) provider.StorageItem {
+func (a *app) sanitizeName(item provider.StorageItem, gauge *prometheus.GaugeVec) provider.StorageItem {
 	name, err := provider.SanitizeName(item.Pathname, false)
 	if err != nil {
 		logger.Error("unable to sanitize name %s: %s", item.Pathname, err)
@@ -187,19 +190,19 @@ func (a *app) sanitizeName(item provider.StorageItem, renameCount *prometheus.Ga
 		return item
 	}
 
-	return a.rename(item, name, renameCount)
+	return a.rename(item, name, gauge)
 }
 
-func (a *app) rename(item provider.StorageItem, name string, guage *prometheus.GaugeVec) provider.StorageItem {
+func (a *app) rename(item provider.StorageItem, name string, gauge *prometheus.GaugeVec) provider.StorageItem {
 	logger.Info("Renaming `%s` to `%s`", item.Pathname, name)
 
 	renamedItem, err := a.doRename(item.Pathname, name, item)
 	if err != nil {
-		guage.WithLabelValues("error").Add(1.0)
+		gauge.WithLabelValues("error").Inc()
 		logger.Error("%s", err)
 		return item
 	}
 
-	guage.WithLabelValues("success").Add(1.0)
+	gauge.WithLabelValues("success").Inc()
 	return renamedItem
 }

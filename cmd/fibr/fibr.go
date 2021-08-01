@@ -78,7 +78,7 @@ func main() {
 	prometheusRegister := prometheusApp.Registerer()
 
 	thumbnailApp := thumbnail.New(thumbnailConfig, storageApp, prometheusRegister)
-	exifApp := exif.New(exifConfig, storageApp)
+	exifApp := exif.New(exifConfig, storageApp, prometheusRegister)
 
 	rendererApp, err := renderer.New(rendererConfig, content, fibr.FuncMap(thumbnailApp))
 	logger.Fatal(err)

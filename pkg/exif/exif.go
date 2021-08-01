@@ -14,6 +14,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/httpjson"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 const (
@@ -61,6 +62,7 @@ type app struct {
 	storageApp   provider.Storage
 	geocodeDone  chan struct{}
 	geocodeQueue chan provider.StorageItem
+	gauge        *prometheus.GaugeVec
 
 	exifURL    string
 	geocodeURL string
@@ -75,13 +77,26 @@ func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) Config 
 }
 
 // New creates new App from Config
-func New(config Config, storageApp provider.Storage) App {
+func New(config Config, storageApp provider.Storage, prometheuRegisterer prometheus.Registerer) App {
+	gauge := prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: "fibr",
+		Subsystem: "exif",
+		Name:      "state",
+	}, []string{"item"})
+
+	if prometheuRegisterer != nil {
+		if err := prometheuRegisterer.Register(gauge); err != nil {
+			logger.Error("unable to register prometheus gauge: %s", err)
+		}
+	}
+
 	return app{
 		exifURL:    strings.TrimSpace(*config.exifURL),
 		geocodeURL: strings.TrimSpace(*config.geocodeURL),
 
 		storageApp: storageApp,
 
+		gauge:        gauge,
 		geocodeDone:  make(chan struct{}),
 		geocodeQueue: make(chan provider.StorageItem, 10),
 	}
@@ -174,6 +189,8 @@ func (a app) fetchAndStoreExif(item provider.StorageItem) (map[string]interface{
 		return nil, fmt.Errorf("unable to get reader: %s", err)
 	}
 
+	a.gauge.WithLabelValues("exif").Inc()
+
 	resp, err := request.New().Post(a.exifURL).Send(context.Background(), file)
 	if err != nil {
 		return nil, err
@@ -245,6 +262,8 @@ func (a app) UpdateDate(item provider.StorageItem) {
 		if item.Date.Equal(createDate) {
 			return
 		}
+
+		a.gauge.WithLabelValues("date").Inc()
 
 		if err := a.storageApp.UpdateDate(item.Pathname, createDate); err != nil {
 			logger.Error("unable to update date for `%s`: %s", item.Pathname, err)

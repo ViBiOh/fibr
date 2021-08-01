@@ -47,6 +47,7 @@ func (a app) ExtractGeocodeFor(item provider.StorageItem) {
 	default:
 	}
 
+	a.gauge.WithLabelValues("queued").Inc()
 	a.geocodeQueue <- item
 }
 
@@ -60,6 +61,8 @@ func (a app) computeGeocode() {
 	}
 
 	for item := range a.geocodeQueue {
+		a.gauge.WithLabelValues("queued").Dec()
+
 		if tick != nil {
 			<-tick
 		}
@@ -210,6 +213,8 @@ func (a app) getReverseGeocode(ctx context.Context, lat, lon string) (map[string
 	params.Set("zoom", "18")
 
 	reverseURL := fmt.Sprintf("%s/reverse?%s", a.geocodeURL, params.Encode())
+
+	a.gauge.WithLabelValues("geocode").Inc()
 
 	resp, err := request.New().Header("User-Agent", "fibr").Get(reverseURL).Send(ctx, nil)
 	if err != nil {
