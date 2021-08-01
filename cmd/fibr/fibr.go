@@ -96,9 +96,9 @@ func main() {
 	handler := rendererApp.Handler(fibrApp.TemplateFunc)
 
 	go thumbnailApp.Start()
-	go shareApp.Start(appServer.Done())
-	go crudApp.Start(appServer.Done())
-	go exifApp.Start(appServer.Done())
+	go shareApp.Start(healthApp.Done())
+	go crudApp.Start(healthApp.Done())
+	go exifApp.Start(healthApp.Done())
 
 	go promServer.Start("prometheus", healthApp.End(), prometheusApp.Handler())
 	go appServer.Start("http", healthApp.End(), httputils.Handler(handler, healthApp, recoverer.Middleware, prometheusApp.Middleware, owasp.New(owaspConfig).Middleware))

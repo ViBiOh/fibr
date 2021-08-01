@@ -62,7 +62,10 @@ type app struct {
 	storageApp   provider.Storage
 	geocodeDone  chan struct{}
 	geocodeQueue chan provider.StorageItem
-	gauge        *prometheus.GaugeVec
+
+	exifCounter    *prometheus.GaugeVec
+	dateCounter    *prometheus.GaugeVec
+	geocodeCounter *prometheus.GaugeVec
 
 	exifURL    string
 	geocodeURL string
@@ -78,15 +81,31 @@ func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) Config 
 
 // New creates new App from Config
 func New(config Config, storageApp provider.Storage, prometheuRegisterer prometheus.Registerer) App {
-	gauge := prometheus.NewGaugeVec(prometheus.GaugeOpts{
+	exifCounter := prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: "fibr",
 		Subsystem: "exif",
-		Name:      "state",
-	}, []string{"item"})
+		Name:      "item",
+	}, []string{"state"})
+	dateCounter := prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: "fibr",
+		Subsystem: "geocode",
+		Name:      "date",
+	}, []string{"state"})
+	geocodeCounter := prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: "fibr",
+		Subsystem: "geocode",
+		Name:      "item",
+	}, []string{"state"})
 
 	if prometheuRegisterer != nil {
-		if err := prometheuRegisterer.Register(gauge); err != nil {
-			logger.Error("unable to register prometheus gauge: %s", err)
+		if err := prometheuRegisterer.Register(exifCounter); err != nil {
+			logger.Error("unable to register exif gauge: %s", err)
+		}
+		if err := prometheuRegisterer.Register(dateCounter); err != nil {
+			logger.Error("unable to register date gauge: %s", err)
+		}
+		if err := prometheuRegisterer.Register(geocodeCounter); err != nil {
+			logger.Error("unable to register geocode gauge: %s", err)
 		}
 	}
 
@@ -96,9 +115,11 @@ func New(config Config, storageApp provider.Storage, prometheuRegisterer prometh
 
 		storageApp: storageApp,
 
-		gauge:        gauge,
-		geocodeDone:  make(chan struct{}),
-		geocodeQueue: make(chan provider.StorageItem, 10),
+		exifCounter:    exifCounter,
+		dateCounter:    dateCounter,
+		geocodeCounter: geocodeCounter,
+		geocodeDone:    make(chan struct{}),
+		geocodeQueue:   make(chan provider.StorageItem, 10),
 	}
 }
 
@@ -189,7 +210,7 @@ func (a app) fetchAndStoreExif(item provider.StorageItem) (map[string]interface{
 		return nil, fmt.Errorf("unable to get reader: %s", err)
 	}
 
-	a.gauge.WithLabelValues("exif").Inc()
+	a.exifCounter.WithLabelValues("requested").Inc()
 
 	resp, err := request.New().Post(a.exifURL).Send(context.Background(), file)
 	if err != nil {
@@ -221,7 +242,7 @@ func (a app) fetchAndStoreExif(item provider.StorageItem) (map[string]interface{
 		return nil, fmt.Errorf("unable to encode: %s", err)
 	}
 
-	a.ExtractGeocodeFor(item)
+	a.exifCounter.WithLabelValues("saved").Inc()
 
 	return data, nil
 }
@@ -251,19 +272,22 @@ func (a app) UpdateDate(item provider.StorageItem) {
 
 		createDate, err := parseDate(createDateStr)
 		if err != nil {
+			a.dateCounter.WithLabelValues("error").Inc()
 			logger.Error("unable to parse `%s` with value `%s` for `%s`: %s", exifDate, createDateStr, item.Pathname, err)
 			return
 		}
 
 		if createDate.IsZero() {
+			a.dateCounter.WithLabelValues("zero").Inc()
 			return
 		}
 
 		if item.Date.Equal(createDate) {
+			a.dateCounter.WithLabelValues("equal").Inc()
 			return
 		}
 
-		a.gauge.WithLabelValues("date").Inc()
+		a.dateCounter.WithLabelValues("updated").Inc()
 
 		if err := a.storageApp.UpdateDate(item.Pathname, createDate); err != nil {
 			logger.Error("unable to update date for `%s`: %s", item.Pathname, err)

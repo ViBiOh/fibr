@@ -100,6 +100,7 @@ run:
 		-thumbnailImageURL "https://imaginary.vibioh.fr" \
 		-thumbnailVideoURL "https://vith.vibioh.fr" \
 		-exifURL "http://localhost:4000" \
+		-exifGeocodeURL "https://nominatim.openstreetmap.org" \
 		-exifDateOnStart
 
 .PHONY: run-imaginary

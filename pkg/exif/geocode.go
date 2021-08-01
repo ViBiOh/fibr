@@ -47,8 +47,8 @@ func (a app) ExtractGeocodeFor(item provider.StorageItem) {
 	default:
 	}
 
-	a.gauge.WithLabelValues("queued").Inc()
 	a.geocodeQueue <- item
+	a.geocodeCounter.WithLabelValues("queued").Inc()
 }
 
 func (a app) computeGeocode() {
@@ -61,7 +61,7 @@ func (a app) computeGeocode() {
 	}
 
 	for item := range a.geocodeQueue {
-		a.gauge.WithLabelValues("queued").Dec()
+		a.geocodeCounter.WithLabelValues("queued").Dec()
 
 		if tick != nil {
 			<-tick
@@ -78,6 +78,8 @@ func (a app) extractAndSaveGeocoding(item provider.StorageItem) error {
 	if err != nil {
 		return fmt.Errorf("unable to get gps coordinate: %s", err)
 	}
+
+	a.geocodeCounter.WithLabelValues("error").Inc()
 
 	var geocode map[string]interface{}
 
@@ -102,6 +104,8 @@ func (a app) extractAndSaveGeocoding(item provider.StorageItem) error {
 	if err := json.NewEncoder(writer).Encode(geocode); err != nil {
 		return fmt.Errorf("unable to encode geocode: %s", err)
 	}
+
+	a.geocodeCounter.WithLabelValues("saved").Inc()
 
 	return nil
 }
@@ -214,7 +218,7 @@ func (a app) getReverseGeocode(ctx context.Context, lat, lon string) (map[string
 
 	reverseURL := fmt.Sprintf("%s/reverse?%s", a.geocodeURL, params.Encode())
 
-	a.gauge.WithLabelValues("geocode").Inc()
+	a.geocodeCounter.WithLabelValues("requested").Inc()
 
 	resp, err := request.New().Header("User-Agent", "fibr").Get(reverseURL).Send(ctx, nil)
 	if err != nil {
