@@ -62,16 +62,7 @@ func (a *app) saveUploadedFile(request provider.Request, part *multipart.Part) (
 		}
 
 		if exif.CanHaveExif(info) {
-			createDate, err := a.exifApp.GetDate(info)
-			if err != nil {
-				logger.Error("unable to get exif date: %s", err)
-			}
-
-			if !createDate.IsZero() {
-				if err := a.storageApp.UpdateDate(info.Pathname, createDate); err != nil {
-					logger.Error("unable to set update date: %s", err)
-				}
-			}
+			a.exifApp.UpdateDate(info)
 		}
 	}()
 

@@ -141,7 +141,7 @@ Usage of fibr:
   -exifDateOnStart
         [crud] Change file date from EXIF date on start {FIBR_EXIF_DATE_ON_START}
   -exifGeocodeURL string
-        [exif] Nominatim Geocode Service URL {FIBR_EXIF_GEOCODE_URL} (default "https://nominatim.openstreetmap.org")
+        [exif] Nominatim Geocode Service URL. This can leak GPS metadatas to a third-party (e.g. "https://nominatim.openstreetmap.org") {FIBR_EXIF_GEOCODE_URL}
   -exifURL string
         [exif] Exif Tool URL (exas) {FIBR_EXIF_URL}
   -frameOptions string

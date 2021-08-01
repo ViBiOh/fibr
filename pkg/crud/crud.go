@@ -3,7 +3,6 @@ package crud
 import (
 	"errors"
 	"flag"
-	"fmt"
 	"mime/multipart"
 	"net/http"
 	"regexp"
@@ -130,6 +129,9 @@ func (a *app) Start(done <-chan struct{}) {
 		a.prometheus.MustRegister(renameCount)
 	}
 
+	logger.Info("fibr start routine started")
+	defer logger.Info("fibr start routine ended")
+
 	err := a.storageApp.Walk("", func(item provider.StorageItem, err error) error {
 		if err != nil {
 			return err
@@ -148,10 +150,16 @@ func (a *app) Start(done <-chan struct{}) {
 		}
 
 		if exif.CanHaveExif(item) {
+			if !a.exifApp.HasExif(item) {
+				a.exifApp.ExtractFor(item)
+			}
+
 			if a.exifDateOnStart {
-				if err := a.dateFromExif(item); err != nil {
-					logger.Warn("unable to update date from exif for `%s`: %s", item.Pathname, err)
-				}
+				a.exifApp.UpdateDate(item)
+			}
+
+			if !a.exifApp.HasGeocode(item) {
+				a.exifApp.ExtractGeocodeFor(item)
 			}
 		}
 
@@ -194,21 +202,4 @@ func (a *app) rename(item provider.StorageItem, name string, guage *prometheus.G
 
 	guage.WithLabelValues("success").Add(1.0)
 	return renamedItem
-}
-
-func (a *app) dateFromExif(item provider.StorageItem) error {
-	createDate, err := a.exifApp.GetDate(item)
-	if err != nil {
-		return fmt.Errorf("unable to get exif date: %s", err)
-	}
-
-	if createDate.IsZero() {
-		return nil
-	}
-
-	if item.Date.Equal(createDate) {
-		return nil
-	}
-
-	return a.storageApp.UpdateDate(item.Pathname, createDate)
 }

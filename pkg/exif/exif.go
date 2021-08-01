@@ -42,8 +42,11 @@ var (
 // App of package
 type App interface {
 	Start(<-chan struct{})
-	Get(provider.StorageItem) (map[string]interface{}, error)
-	GetDate(provider.StorageItem) (time.Time, error)
+	HasExif(provider.StorageItem) bool
+	HasGeocode(provider.StorageItem) bool
+	ExtractFor(provider.StorageItem)
+	ExtractGeocodeFor(provider.StorageItem)
+	UpdateDate(provider.StorageItem)
 	Rename(provider.StorageItem, provider.StorageItem)
 	Delete(provider.StorageItem)
 }
@@ -56,6 +59,7 @@ type Config struct {
 
 type app struct {
 	storageApp   provider.Storage
+	geocodeDone  chan struct{}
 	geocodeQueue chan provider.StorageItem
 
 	exifURL    string
@@ -66,7 +70,7 @@ type app struct {
 func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) Config {
 	return Config{
 		exifURL:    flags.New(prefix, "exif").Name("URL").Default(flags.Default("URL", "", overrides)).Label("Exif Tool URL (exas)").ToString(fs),
-		geocodeURL: flags.New(prefix, "exif").Name("GeocodeURL").Default(flags.Default("URL", "https://nominatim.openstreetmap.org", overrides)).Label("Nominatim Geocode Service URL").ToString(fs),
+		geocodeURL: flags.New(prefix, "exif").Name("GeocodeURL").Default(flags.Default("URL", "", overrides)).Label(fmt.Sprintf("Nominatim Geocode Service URL. This can leak GPS metadatas to a third-party (e.g. \"%s\")", publicNominatimURL)).ToString(fs),
 	}
 }
 
@@ -78,7 +82,8 @@ func New(config Config, storageApp provider.Storage) App {
 
 		storageApp: storageApp,
 
-		geocodeQueue: make(chan provider.StorageItem, 100),
+		geocodeDone:  make(chan struct{}),
+		geocodeQueue: make(chan provider.StorageItem, 10),
 	}
 }
 
@@ -87,11 +92,16 @@ func (a app) enabled() bool {
 }
 
 func (a app) Start(done <-chan struct{}) {
+	defer close(a.geocodeDone)
+	defer close(a.geocodeQueue)
+
 	if !a.enabled() {
 		return
 	}
 
-	go a.computeGeocode(done)
+	go a.computeGeocode()
+
+	<-done
 }
 
 // CanHaveExif determine if exif can be extracted for given pathname
@@ -99,15 +109,42 @@ func CanHaveExif(item provider.StorageItem) bool {
 	return (item.IsImage() || item.IsVideo() || item.IsPdf()) && item.Size < maxExifSize
 }
 
-func (a app) Get(item provider.StorageItem) (map[string]interface{}, error) {
+func (a app) HasExif(item provider.StorageItem) bool {
+	return a.hasMetadata(item, "")
+}
+
+func (a app) HasGeocode(item provider.StorageItem) bool {
+	return a.hasMetadata(item, "geocode")
+}
+
+func (a app) hasMetadata(item provider.StorageItem, suffix string) bool {
 	if !a.enabled() {
-		return nil, nil
+		return false
 	}
 
 	if item.IsDir {
-		return nil, nil
+		return false
 	}
 
+	_, err := a.storageApp.Info(getExifPath(item, suffix))
+	return err == nil
+}
+
+func (a app) ExtractFor(item provider.StorageItem) {
+	if !a.enabled() {
+		return
+	}
+
+	if item.IsDir {
+		return
+	}
+
+	if _, err := a.fetchAndStoreExif(item); err != nil {
+		logger.Error("unable to fetch and store for `%s`: %s", item.Pathname, err)
+	}
+}
+
+func (a app) get(item provider.StorageItem) (map[string]interface{}, error) {
 	var data map[string]interface{}
 
 	reader, err := a.storageApp.ReaderFrom(getExifPath(item, ""))
@@ -123,7 +160,7 @@ func (a app) Get(item provider.StorageItem) (map[string]interface{}, error) {
 		return nil, fmt.Errorf("unable to read: %s", err)
 	}
 
-	exif, err := a.fetchExif(item)
+	exif, err := a.fetchAndStoreExif(item)
 	if err != nil {
 		return nil, fmt.Errorf("unable to fetch: %s", err)
 	}
@@ -131,7 +168,7 @@ func (a app) Get(item provider.StorageItem) (map[string]interface{}, error) {
 	return exif, nil
 }
 
-func (a app) fetchExif(item provider.StorageItem) (map[string]interface{}, error) {
+func (a app) fetchAndStoreExif(item provider.StorageItem) (map[string]interface{}, error) {
 	file, err := a.storageApp.ReaderFrom(item.Pathname) // file will be closed by `.Send`
 	if err != nil {
 		return nil, fmt.Errorf("unable to get reader: %s", err)
@@ -168,19 +205,20 @@ func (a app) fetchExif(item provider.StorageItem) (map[string]interface{}, error
 		return nil, fmt.Errorf("unable to encode: %s", err)
 	}
 
-	go a.ReverseGeocode(item)
+	a.ExtractGeocodeFor(item)
 
 	return data, nil
 }
 
-func (a app) GetDate(item provider.StorageItem) (time.Time, error) {
-	data, err := a.Get(item)
+func (a app) UpdateDate(item provider.StorageItem) {
+	data, err := a.get(item)
 	if err != nil {
-		return time.Time{}, fmt.Errorf("unable to retrieve: %s", err)
+		logger.Error("unable to retrieve exif for `%s`: %s", item.Pathname, err)
+		return
 	}
 
 	if data == nil {
-		return time.Time{}, nil
+		return
 	}
 
 	for _, exifDate := range exifDates {
@@ -191,18 +229,30 @@ func (a app) GetDate(item provider.StorageItem) (time.Time, error) {
 
 		createDateStr, ok := rawCreateDate.(string)
 		if !ok {
-			return time.Time{}, fmt.Errorf("key `%s` is not a string", exifDate)
+			logger.Error("key `%s` is not a string for `%s`", exifDate, item.Pathname)
+			return
 		}
 
 		createDate, err := parseDate(createDateStr)
 		if err != nil {
-			return time.Time{}, fmt.Errorf("unable to parse `%s` with value `%s`: %s", exifDate, createDateStr, err)
+			logger.Error("unable to parse `%s` with value `%s` for `%s`: %s", exifDate, createDateStr, item.Pathname, err)
+			return
 		}
 
-		return createDate, nil
-	}
+		if createDate.IsZero() {
+			return
+		}
 
-	return time.Time{}, nil
+		if item.Date.Equal(createDate) {
+			return
+		}
+
+		if err := a.storageApp.UpdateDate(item.Pathname, createDate); err != nil {
+			logger.Error("unable to update date for `%s`: %s", item.Pathname, err)
+		}
+
+		return
+	}
 }
 
 func parseDate(raw string) (time.Time, error) {

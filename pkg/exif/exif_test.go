@@ -13,7 +13,7 @@ func TestFlags(t *testing.T) {
 	}{
 		{
 			"simple",
-			"Usage of simple:\n  -geocodeURL string\n    \t[exif] Nominatim Geocode Service URL {SIMPLE_GEOCODE_URL} (default \"https://nominatim.openstreetmap.org\")\n  -uRL string\n    \t[exif] Exif Tool URL (exas) {SIMPLE_URL}\n",
+			"Usage of simple:\n  -geocodeURL string\n    \t[exif] Nominatim Geocode Service URL. This can leak GPS metadatas to a third-party (e.g. \"https://nominatim.openstreetmap.org\") {SIMPLE_GEOCODE_URL}\n  -uRL string\n    \t[exif] Exif Tool URL (exas) {SIMPLE_URL}\n",
 		},
 	}
 

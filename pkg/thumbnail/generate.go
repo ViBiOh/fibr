@@ -74,6 +74,10 @@ func (a app) GenerateThumbnail(item provider.StorageItem) {
 		return
 	}
 
+	if item.IsDir {
+		return
+	}
+
 	a.pathnameInput <- item
 }
 
