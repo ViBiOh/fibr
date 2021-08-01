@@ -40,6 +40,10 @@ func (a app) ExtractGeocodeFor(item provider.StorageItem) {
 		return
 	}
 
+	if a.HasGeocode(item) {
+		return
+	}
+
 	select {
 	case <-a.geocodeDone:
 		logger.Warn("Service is going to shutdown, not adding more geocode to the queue `%s`", item.Pathname)
@@ -51,7 +55,7 @@ func (a app) ExtractGeocodeFor(item provider.StorageItem) {
 	a.geocodeCounter.WithLabelValues("queued").Inc()
 }
 
-func (a app) computeGeocode() {
+func (a app) fetchGeocodes() {
 	var tick <-chan time.Time
 
 	if strings.HasPrefix(a.geocodeURL, publicNominatimURL) {
@@ -78,8 +82,6 @@ func (a app) extractAndSaveGeocoding(item provider.StorageItem) error {
 	if err != nil {
 		return fmt.Errorf("unable to get gps coordinate: %s", err)
 	}
-
-	a.geocodeCounter.WithLabelValues("error").Inc()
 
 	var geocode map[string]interface{}
 

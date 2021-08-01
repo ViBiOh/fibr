@@ -88,8 +88,8 @@ func New(config Config, storageApp provider.Storage, prometheuRegisterer prometh
 	}, []string{"state"})
 	dateCounter := prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: "fibr",
-		Subsystem: "geocode",
-		Name:      "date",
+		Subsystem: "date",
+		Name:      "item",
 	}, []string{"state"})
 	geocodeCounter := prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: "fibr",
@@ -135,7 +135,7 @@ func (a app) Start(done <-chan struct{}) {
 		return
 	}
 
-	go a.computeGeocode()
+	go a.fetchGeocodes()
 
 	<-done
 }
@@ -272,7 +272,6 @@ func (a app) UpdateDate(item provider.StorageItem) {
 
 		createDate, err := parseDate(createDateStr)
 		if err != nil {
-			a.dateCounter.WithLabelValues("error").Inc()
 			logger.Error("unable to parse `%s` with value `%s` for `%s`: %s", exifDate, createDateStr, item.Pathname, err)
 			return
 		}
