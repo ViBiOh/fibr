@@ -88,6 +88,10 @@ func (a app) geocodeNextItem() {
 			logger.Error("unable to get gps coordinate for `%s`: %s", item.Pathname, err)
 		}
 
+		if len(lat) == 0 || len(lon) == 0 {
+			return
+		}
+
 		geocode, err := a.getReverseGeocode(context.Background(), lat, lon)
 		if err != nil {
 			logger.Error("unable to reverse geocode for `%s`: %s", item.Pathname, err)
