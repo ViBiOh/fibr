@@ -76,13 +76,13 @@ func (a app) extractAndSaveGeocoding(item provider.StorageItem) error {
 		return fmt.Errorf("unable to get gps coordinate: %s", err)
 	}
 
-	if len(lat) == 0 || len(lon) == 0 {
-		return nil
-	}
+	var geocode map[string]interface{}
 
-	geocode, err := a.getReverseGeocode(context.Background(), lat, lon)
-	if err != nil {
-		return fmt.Errorf("unable to reverse geocode: %s", err)
+	if len(lat) != 0 && len(lon) != 0 {
+		geocode, err = a.getReverseGeocode(context.Background(), lat, lon)
+		if err != nil {
+			return fmt.Errorf("unable to reverse geocode: %s", err)
+		}
 	}
 
 	writer, err := a.storageApp.WriterTo(getExifPath(item, "geocode"))

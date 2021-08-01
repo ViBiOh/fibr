@@ -184,12 +184,6 @@ func (a app) fetchAndStoreExif(item provider.StorageItem) (map[string]interface{
 		return nil, fmt.Errorf("unable to read exas response: %s", err)
 	}
 
-	if len(exifs) == 0 {
-		return nil, nil
-	}
-
-	data := exifs[0]
-
 	writer, err := a.storageApp.WriterTo(getExifPath(item, ""))
 	if err != nil {
 		return nil, fmt.Errorf("unable to get writer: %s", err)
@@ -200,6 +194,11 @@ func (a app) fetchAndStoreExif(item provider.StorageItem) (map[string]interface{
 			logger.Error("unable to close exif file: %s", err)
 		}
 	}()
+
+	var data map[string]interface{}
+	if len(exifs) > 0 {
+		data = exifs[0]
+	}
 
 	if err := json.NewEncoder(writer).Encode(data); err != nil {
 		return nil, fmt.Errorf("unable to encode: %s", err)
