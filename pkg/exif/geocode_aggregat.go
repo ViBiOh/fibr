@@ -101,20 +101,24 @@ func (a aggregate) valueOf(key string) string {
 	return strings.Join(names, ", ")
 }
 
-func (a app) GeolocationFor(item provider.StorageItem) (string, error) {
+func (a app) GeolocationFor(dir provider.StorageItem) (string, error) {
 	if !a.enabled() {
 		return "", nil
 	}
 
-	if !item.IsDir {
+	if !dir.IsDir {
 		return "", nil
 	}
 
 	directoryAggregate := newAggregate()
 
-	err := a.storageApp.Walk(item.Pathname, func(item provider.StorageItem, err error) error {
+	err := a.storageApp.Walk(dir.Pathname, func(item provider.StorageItem, err error) error {
 		if err != nil {
 			return err
+		}
+
+		if item.Pathname == dir.Pathname {
+			return nil
 		}
 
 		if item.IsDir {
