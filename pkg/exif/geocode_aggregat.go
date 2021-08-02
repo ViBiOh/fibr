@@ -13,27 +13,21 @@ var (
 	aggregateRatio = 0.4
 )
 
+type geocode struct {
+	Address map[string]string `json:"address"`
+}
+
 type aggregate map[string]map[string]int64
 
 func newAggregate() aggregate {
 	return make(map[string]map[string]int64)
 }
 
-func (a *aggregate) ingest(geocoding map[string]interface{}) {
-	rawAddress, ok := geocoding["address"]
-	if !ok {
-		return
-	}
-
-	address, ok := rawAddress.(map[string]string)
-	if !ok {
-		return
-	}
-
-	a.inc("country", address["country"])
-	a.inc("state", address["state"])
-	a.inc("city", address["city"])
-	a.inc("neighbourhood", address["neighbourhood"])
+func (a *aggregate) ingest(geocoding geocode) {
+	a.inc("country", geocoding.Address["country"])
+	a.inc("state", geocoding.Address["state"])
+	a.inc("city", geocoding.Address["city"])
+	a.inc("neighbourhood", geocoding.Address["neighbourhood"])
 }
 
 func (a aggregate) inc(key, value string) {
@@ -146,16 +140,16 @@ func (a app) GeolocationFor(dir provider.StorageItem) (string, error) {
 	return directoryAggregate.value(), nil
 }
 
-func (a app) getGeocode(item provider.StorageItem) (map[string]interface{}, error) {
-	var data map[string]interface{}
+func (a app) getGeocode(item provider.StorageItem) (geocode, error) {
+	var data geocode
 
 	reader, err := a.storageApp.ReaderFrom(getExifPath(item, "geocode"))
 	if err != nil {
-		return nil, fmt.Errorf("unable to read: %s", err)
+		return geocode{}, fmt.Errorf("unable to read: %s", err)
 	}
 
 	if err := json.NewDecoder(reader).Decode(&data); err != nil {
-		return nil, fmt.Errorf("unable to decode: %s", err)
+		return geocode{}, fmt.Errorf("unable to decode: %s", err)
 	}
 
 	return data, nil
