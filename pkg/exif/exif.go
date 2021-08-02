@@ -56,6 +56,7 @@ type App interface {
 	ExtractFor(provider.StorageItem)
 	ExtractGeocodeFor(provider.StorageItem)
 	UpdateDate(provider.StorageItem)
+	GeolocationFor(provider.StorageItem) (string, error)
 	Rename(provider.StorageItem, provider.StorageItem)
 	Delete(provider.StorageItem)
 }

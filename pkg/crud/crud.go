@@ -166,6 +166,15 @@ func (a *app) Start(done <-chan struct{}) {
 			}
 		}
 
+		if item.IsDir {
+			geolocation, err := a.exifApp.GeolocationFor(item)
+			if err != nil {
+				logger.Error("unable to get geolocation for `%s`: %s", item.Pathname, err)
+			} else if len(geolocation) > 0 {
+				logger.Info("geolocation of `%s`: %s", item.Pathname, geolocation)
+			}
+		}
+
 		return nil
 	})
 
