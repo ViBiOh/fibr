@@ -11,6 +11,8 @@ import (
 
 var (
 	aggregateRatio = 0.4
+
+	levels = []string{"city", "state", "country"}
 )
 
 type geocode struct {
@@ -24,10 +26,9 @@ func newAggregate() aggregate {
 }
 
 func (a *aggregate) ingest(geocoding geocode) {
-	a.inc("country", geocoding.Address["country"])
-	a.inc("state", geocoding.Address["state"])
-	a.inc("city", geocoding.Address["city"])
-	a.inc("neighbourhood", geocoding.Address["neighbourhood"])
+	for _, level := range levels {
+		a.inc(level, geocoding.Address[level])
+	}
 }
 
 func (a aggregate) inc(key, value string) {
@@ -53,20 +54,10 @@ func (a aggregate) value() string {
 		return ""
 	}
 
-	if neighbourhood := a.valueOf("neighbourhood"); len(neighbourhood) > 0 {
-		return neighbourhood
-	}
-
-	if city := a.valueOf("city"); len(city) > 0 {
-		return city
-	}
-
-	if state := a.valueOf("state"); len(state) > 0 {
-		return state
-	}
-
-	if country := a.valueOf("country"); len(country) > 0 {
-		return country
+	for _, level := range levels {
+		if val := a.valueOf(level); len(val) > 0 {
+			return val
+		}
 	}
 
 	return "Worldwide"
