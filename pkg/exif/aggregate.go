@@ -170,7 +170,7 @@ func (a app) computeAndSaveAggregate(dir provider.StorageItem) error {
 }
 
 func aggregateDate(min, max, current time.Time) (time.Time, time.Time) {
-	if current.Before(min) {
+	if min.IsZero() || current.Before(min) {
 		min = current
 	}
 
