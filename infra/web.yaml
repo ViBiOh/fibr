@@ -38,7 +38,6 @@ spec:
       FIBR_IGNORE_PATTERN: '.st(folder|ignore)'
       FIBR_LOGGER_JSON: 'true'
       FIBR_SANITIZE_ON_START: 'true'
-      FIBR_EXIF_DATE_ON_START: 'true'
       FIBR_THUMBNAIL_VIDEO_URL: https://vith.vibioh.fr
       FIBR_THUMBNAIL_IMAGE_URL: https://imaginary.vibioh.fr
       FIBR_EXIF_URL: http://exas
