@@ -53,7 +53,7 @@ func (a app) loadMetadata(item provider.StorageItem, suffix string, content inte
 		return nil
 	}
 
-	if err := json.NewDecoder(reader).Decode(&content); err != nil {
+	if err := json.NewDecoder(reader).Decode(content); err != nil {
 		return fmt.Errorf("unable to decode: %s", err)
 	}
 

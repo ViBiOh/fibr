@@ -218,6 +218,10 @@ func (a app) get(item provider.StorageItem) (map[string]interface{}, error) {
 		return nil, fmt.Errorf("unable to read: %s", err)
 	}
 
+	if len(data) != 0 {
+		return data, nil
+	}
+
 	exif, err := a.fetchAndStoreExif(item)
 	if err != nil {
 		return nil, fmt.Errorf("unable to fetch: %s", err)
