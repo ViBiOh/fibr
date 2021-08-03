@@ -3,8 +3,9 @@ package thumbnail
 import (
 	"testing"
 
+	"github.com/ViBiOh/fibr/pkg/mocks"
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/fibr/pkg/provider/providertest"
+	"github.com/golang/mock/gomock"
 )
 
 var (
@@ -45,10 +46,10 @@ func TestCanHaveThumbnail(t *testing.T) {
 		},
 	}
 
-	for _, testCase := range cases {
-		t.Run(testCase.intention, func(t *testing.T) {
-			if result := CanHaveThumbnail(testCase.input); result != testCase.want {
-				t.Errorf("CanHaveThumbnail() = %t, want %t", result, testCase.want)
+	for _, tc := range cases {
+		t.Run(tc.intention, func(t *testing.T) {
+			if result := CanHaveThumbnail(tc.input); result != tc.want {
+				t.Errorf("CanHaveThumbnail() = %t, want %t", result, tc.want)
 			}
 		})
 	}
@@ -70,9 +71,8 @@ func TestHasThumbnail(t *testing.T) {
 		{
 			"not found",
 			app{
-				storageApp: providertest.Storage{},
-				imageURL:   publicPath,
-				videoURL:   publicPath,
+				imageURL: publicPath,
+				videoURL: publicPath,
 			},
 			provider.StorageItem{
 				Pathname: "path/to/error",
@@ -83,9 +83,8 @@ func TestHasThumbnail(t *testing.T) {
 		{
 			"found",
 			app{
-				storageApp: providertest.Storage{},
-				imageURL:   publicPath,
-				videoURL:   publicPath,
+				imageURL: publicPath,
+				videoURL: publicPath,
 			},
 			provider.StorageItem{
 				Pathname: "path/to/valid",
@@ -94,10 +93,21 @@ func TestHasThumbnail(t *testing.T) {
 		},
 	}
 
-	for _, testCase := range cases {
-		t.Run(testCase.intention, func(t *testing.T) {
-			if result := testCase.instance.HasThumbnail(testCase.input); result != testCase.want {
-				t.Errorf("HasThumbnail() = %t, want %t", result, testCase.want)
+	for _, tc := range cases {
+		t.Run(tc.intention, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			storageMock := mocks.NewStorage(ctrl)
+
+			tc.instance.storageApp = storageMock
+
+			if tc.intention == "found" {
+				storageMock.EXPECT().Info(gomock.Any()).Return(provider.StorageItem{}, nil)
+			}
+
+			if result := tc.instance.HasThumbnail(tc.input); result != tc.want {
+				t.Errorf("HasThumbnail() = %t, want %t", result, tc.want)
 			}
 		})
 	}
@@ -126,10 +136,10 @@ func TestGetThumbnailPath(t *testing.T) {
 		},
 	}
 
-	for _, testCase := range cases {
-		t.Run(testCase.intention, func(t *testing.T) {
-			if result := getThumbnailPath(testCase.input); result != testCase.want {
-				t.Errorf("getThumbnailPath() = %s, want %s", result, testCase.want)
+	for _, tc := range cases {
+		t.Run(tc.intention, func(t *testing.T) {
+			if result := getThumbnailPath(tc.input); result != tc.want {
+				t.Errorf("getThumbnailPath() = %s, want %s", result, tc.want)
 			}
 		})
 	}

@@ -62,7 +62,7 @@ func (a *app) saveUploadedFile(request provider.Request, part *multipart.Part) (
 		}
 
 		if exif.CanHaveExif(info) {
-			a.exifApp.UpdateDate(info)
+			a.exifApp.UpdateDateFor(info)
 			a.exifApp.ExtractGeocodeFor(info)
 		}
 	}()

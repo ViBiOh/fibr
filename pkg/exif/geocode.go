@@ -45,7 +45,7 @@ func (a app) ExtractGeocodeFor(item provider.StorageItem) {
 	}
 
 	select {
-	case <-a.geocodeDone:
+	case <-a.done:
 		logger.Warn("Service is going to shutdown, not adding more geocode to the queue `%s`", item.Pathname)
 		return
 	default:
@@ -92,19 +92,8 @@ func (a app) extractAndSaveGeocoding(item provider.StorageItem) error {
 		}
 	}
 
-	writer, err := a.storageApp.WriterTo(getExifPath(item, "geocode"))
-	if err != nil {
-		return fmt.Errorf("unable to get geocode writer: %s", err)
-	}
-
-	defer func() {
-		if err := writer.Close(); err != nil {
-			logger.Error("unable to close geocode file: %s", err)
-		}
-	}()
-
-	if err := json.NewEncoder(writer).Encode(geocode); err != nil {
-		return fmt.Errorf("unable to encode geocode: %s", err)
+	if err := a.saveMetadata(item, "geocode", geocode); err != nil {
+		return fmt.Errorf("unable to save geocode: %s", err)
 	}
 
 	a.geocodeCounter.WithLabelValues("saved").Inc()

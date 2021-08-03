@@ -7,6 +7,7 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	"path"
 	"strings"
 	"time"
 
@@ -30,7 +31,7 @@ var (
 		},
 	}
 
-	exifSuffixes = []string{"", "geocode"}
+	exifSuffixes = []string{"", "geocode", "aggregate"}
 
 	exifDates = []string{
 		"DateCreated",
@@ -53,10 +54,11 @@ type App interface {
 	Start(<-chan struct{})
 	HasExif(provider.StorageItem) bool
 	HasGeocode(provider.StorageItem) bool
+	HasAggregat(provider.StorageItem) bool
 	ExtractFor(provider.StorageItem)
 	ExtractGeocodeFor(provider.StorageItem)
-	UpdateDate(provider.StorageItem)
-	GeolocationFor(provider.StorageItem) (string, error)
+	UpdateDateFor(provider.StorageItem)
+	AggregateFor(provider.StorageItem)
 	Rename(provider.StorageItem, provider.StorageItem)
 	Delete(provider.StorageItem)
 }
@@ -68,13 +70,16 @@ type Config struct {
 }
 
 type app struct {
-	storageApp   provider.Storage
-	geocodeDone  chan struct{}
-	geocodeQueue chan provider.StorageItem
+	storageApp provider.Storage
 
-	exifCounter    *prometheus.GaugeVec
-	dateCounter    *prometheus.GaugeVec
-	geocodeCounter *prometheus.GaugeVec
+	done           chan struct{}
+	geocodeQueue   chan provider.StorageItem
+	aggregateQueue chan provider.StorageItem
+
+	exifCounter      *prometheus.GaugeVec
+	dateCounter      *prometheus.GaugeVec
+	geocodeCounter   *prometheus.GaugeVec
+	aggregateCounter *prometheus.GaugeVec
 
 	exifURL    string
 	geocodeURL string
@@ -105,6 +110,11 @@ func New(config Config, storageApp provider.Storage, prometheusRegisterer promet
 		Subsystem: "geocode",
 		Name:      "item",
 	}, []string{"state"})
+	aggregateCounter := prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: "fibr",
+		Subsystem: "aggregate",
+		Name:      "item",
+	}, []string{"state"})
 
 	if prometheusRegisterer != nil {
 		if err := prometheusRegisterer.Register(exifCounter); err != nil {
@@ -116,6 +126,9 @@ func New(config Config, storageApp provider.Storage, prometheusRegisterer promet
 		if err := prometheusRegisterer.Register(geocodeCounter); err != nil {
 			logger.Error("unable to register geocode gauge: %s", err)
 		}
+		if err := prometheusRegisterer.Register(aggregateCounter); err != nil {
+			logger.Error("unable to register aggregate gauge: %s", err)
+		}
 	}
 
 	return app{
@@ -124,11 +137,14 @@ func New(config Config, storageApp provider.Storage, prometheusRegisterer promet
 
 		storageApp: storageApp,
 
-		exifCounter:    exifCounter,
-		dateCounter:    dateCounter,
-		geocodeCounter: geocodeCounter,
-		geocodeDone:    make(chan struct{}),
+		exifCounter:      exifCounter,
+		dateCounter:      dateCounter,
+		geocodeCounter:   geocodeCounter,
+		aggregateCounter: aggregateCounter,
+
+		done:           make(chan struct{}),
 		geocodeQueue:   make(chan provider.StorageItem, 10),
+		aggregateQueue: make(chan provider.StorageItem, 10),
 	}
 }
 
@@ -137,14 +153,16 @@ func (a app) enabled() bool {
 }
 
 func (a app) Start(done <-chan struct{}) {
-	defer close(a.geocodeDone)
+	defer close(a.done)
 	defer close(a.geocodeQueue)
+	defer close(a.aggregateQueue)
 
 	if !a.enabled() {
 		return
 	}
 
 	go a.fetchGeocodes()
+	go a.computeAggregate()
 
 	<-done
 }
@@ -160,6 +178,10 @@ func (a app) HasExif(item provider.StorageItem) bool {
 
 func (a app) HasGeocode(item provider.StorageItem) bool {
 	return a.hasMetadata(item, "geocode")
+}
+
+func (a app) HasAggregat(item provider.StorageItem) bool {
+	return a.hasMetadata(item, "aggregate")
 }
 
 func (a app) hasMetadata(item provider.StorageItem, suffix string) bool {
@@ -231,24 +253,13 @@ func (a app) fetchAndStoreExif(item provider.StorageItem) (map[string]interface{
 		return nil, fmt.Errorf("unable to read exas response: %s", err)
 	}
 
-	writer, err := a.storageApp.WriterTo(getExifPath(item, ""))
-	if err != nil {
-		return nil, fmt.Errorf("unable to get writer: %s", err)
-	}
-
-	defer func() {
-		if err := writer.Close(); err != nil {
-			logger.Error("unable to close exif file: %s", err)
-		}
-	}()
-
 	var data map[string]interface{}
 	if len(exifs) > 0 {
 		data = exifs[0]
 	}
 
-	if err := json.NewEncoder(writer).Encode(data); err != nil {
-		return nil, fmt.Errorf("unable to encode: %s", err)
+	if err := a.saveMetadata(item, "", data); err != nil {
+		return nil, fmt.Errorf("unable to save exif: %s", err)
 	}
 
 	a.exifCounter.WithLabelValues("saved").Inc()
@@ -256,15 +267,35 @@ func (a app) fetchAndStoreExif(item provider.StorageItem) (map[string]interface{
 	return data, nil
 }
 
-func (a app) UpdateDate(item provider.StorageItem) {
-	data, err := a.get(item)
+func (a app) UpdateDateFor(item provider.StorageItem) {
+	createDate, err := a.getDate(item)
 	if err != nil {
-		logger.Error("unable to retrieve exif for `%s`: %s", item.Pathname, err)
+		logger.Error("unable to get date for `%s`: %s", item.Pathname, err)
+	}
+
+	a.updateAggregateFor(item)
+
+	if createDate.IsZero() {
+		a.dateCounter.WithLabelValues("zero").Inc()
 		return
 	}
 
-	if data == nil {
+	if item.Date.Equal(createDate) {
+		a.dateCounter.WithLabelValues("equal").Inc()
 		return
+	}
+
+	a.dateCounter.WithLabelValues("updated").Inc()
+
+	if err := a.storageApp.UpdateDate(item.Pathname, createDate); err != nil {
+		logger.Error("unable to update date for `%s`: %s", item.Pathname, err)
+	}
+}
+
+func (a app) getDate(item provider.StorageItem) (time.Time, error) {
+	data, err := a.get(item)
+	if err != nil {
+		return time.Time{}, fmt.Errorf("unable to retrieve exif for `%s`: %s", item.Pathname, err)
 	}
 
 	for _, exifDate := range exifDates {
@@ -275,34 +306,16 @@ func (a app) UpdateDate(item provider.StorageItem) {
 
 		createDateStr, ok := rawCreateDate.(string)
 		if !ok {
-			logger.Error("key `%s` is not a string for `%s`", exifDate, item.Pathname)
-			return
+			return time.Time{}, fmt.Errorf("key `%s` is not a string for `%s`", exifDate, item.Pathname)
 		}
 
 		createDate, err := parseDate(createDateStr)
-		if err != nil {
-			logger.Error("unable to parse `%s` with value `%s` for `%s`: %s", exifDate, createDateStr, item.Pathname, err)
-			return
+		if err == nil {
+			return createDate, nil
 		}
-
-		if createDate.IsZero() {
-			a.dateCounter.WithLabelValues("zero").Inc()
-			return
-		}
-
-		if item.Date.Equal(createDate) {
-			a.dateCounter.WithLabelValues("equal").Inc()
-			return
-		}
-
-		a.dateCounter.WithLabelValues("updated").Inc()
-
-		if err := a.storageApp.UpdateDate(item.Pathname, createDate); err != nil {
-			logger.Error("unable to update date for `%s`: %s", item.Pathname, err)
-		}
-
-		return
 	}
+
+	return time.Time{}, nil
 }
 
 func parseDate(raw string) (time.Time, error) {
@@ -331,6 +344,9 @@ func (a app) Rename(old, new provider.StorageItem) {
 			logger.Error("unable to rename exif: %s", err)
 		}
 	}
+
+	a.updateAggregateFor(old)
+	a.updateAggregateFor(new)
 }
 
 func (a app) Delete(item provider.StorageItem) {
@@ -342,5 +358,20 @@ func (a app) Delete(item provider.StorageItem) {
 		if err := a.storageApp.Remove(getExifPath(item, suffix)); err != nil {
 			logger.Error("unable to delete exif: %s", err)
 		}
+	}
+
+	a.updateAggregateFor(item)
+}
+
+func (a app) updateAggregateFor(item provider.StorageItem) {
+	if item.IsDir {
+		return
+	}
+
+	dir, err := a.storageApp.Info(path.Dir(item.Pathname))
+	if err != nil {
+		logger.Error("unable to get directory of `%s`: %s", item.Pathname, err)
+	} else {
+		a.AggregateFor(dir)
 	}
 }
