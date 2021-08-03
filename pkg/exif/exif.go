@@ -268,8 +268,6 @@ func (a app) UpdateDateFor(item provider.StorageItem) {
 		logger.Error("unable to get date for `%s`: %s", item.Pathname, err)
 	}
 
-	a.updateAggregateFor(item)
-
 	if createDate.IsZero() {
 		a.dateCounter.WithLabelValues("zero").Inc()
 		return
