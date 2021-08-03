@@ -88,6 +88,24 @@ func (a locationAggregate) valueOf(key string) string {
 	return strings.Join(names, ", ")
 }
 
+func (a app) GetAggregateFor(item provider.StorageItem) (provider.Aggregate, error) {
+	if !a.enabled() {
+		return provider.Aggregate{}, nil
+	}
+
+	if !item.IsDir {
+		return provider.Aggregate{}, nil
+	}
+
+	var aggregate provider.Aggregate
+
+	if err := a.loadMetadata(item, "aggregate", &aggregate); err != nil {
+		return aggregate, fmt.Errorf("unable to load metadata: %s", err)
+	}
+
+	return aggregate, nil
+}
+
 func (a app) AggregateFor(item provider.StorageItem) {
 	if !a.enabled() {
 		return
@@ -157,10 +175,10 @@ func (a app) computeAndSaveAggregate(dir provider.StorageItem) error {
 		return fmt.Errorf("unable to aggregate: %s", err)
 	}
 
-	err = a.saveMetadata(dir, "aggregate", map[string]interface{}{
-		"location": directoryAggregate.value(),
-		"minDate":  minDate,
-		"maxDate":  maxDate,
+	err = a.saveMetadata(dir, "aggregate", provider.Aggregate{
+		Location: directoryAggregate.value(),
+		Start:    minDate,
+		End:      maxDate,
 	})
 	if err == nil {
 		a.aggregateCounter.WithLabelValues("saved").Dec()
@@ -174,7 +192,7 @@ func aggregateDate(min, max, current time.Time) (time.Time, time.Time) {
 		min = current
 	}
 
-	if current.After(max) {
+	if max.IsZero() || current.After(max) {
 		max = current
 	}
 

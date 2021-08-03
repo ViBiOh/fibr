@@ -45,10 +45,16 @@ func (a *app) List(w http.ResponseWriter, request provider.Request, message rend
 
 	items := make([]provider.RenderItem, len(files))
 	for index, file := range files {
+		aggregate, err := a.exifApp.GetAggregateFor(file)
+		if err != nil {
+			logger.Error("unable to read aggregate for `%s`: %s", file.Pathname, err)
+		}
+
 		items[index] = provider.RenderItem{
 			ID:          sha.Sha1(file.Name),
 			URI:         uri,
 			StorageItem: file,
+			Aggregate:   aggregate,
 		}
 	}
 

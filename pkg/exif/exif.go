@@ -2,7 +2,6 @@ package exif
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
@@ -59,6 +58,7 @@ type App interface {
 	ExtractGeocodeFor(provider.StorageItem)
 	UpdateDateFor(provider.StorageItem)
 	AggregateFor(provider.StorageItem)
+	GetAggregateFor(provider.StorageItem) (provider.Aggregate, error)
 	Rename(provider.StorageItem, provider.StorageItem)
 	Delete(provider.StorageItem)
 }
@@ -214,16 +214,7 @@ func (a app) ExtractFor(item provider.StorageItem) {
 func (a app) get(item provider.StorageItem) (map[string]interface{}, error) {
 	var data map[string]interface{}
 
-	reader, err := a.storageApp.ReaderFrom(getExifPath(item, ""))
-	if err == nil {
-		if err := json.NewDecoder(reader).Decode(&data); err != nil {
-			return nil, fmt.Errorf("unable to decode: %s", err)
-		}
-
-		return data, nil
-	}
-
-	if !provider.IsNotExist(err) {
+	if err := a.loadMetadata(item, "", &data); err != nil {
 		return nil, fmt.Errorf("unable to read: %s", err)
 	}
 

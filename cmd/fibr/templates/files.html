@@ -169,6 +169,11 @@
         text-align: left;
       }
 
+      .exif {
+        display: inline-block;
+        font-size: 1rem;
+      }
+
       .file-download,
       .file-edit,
       .file-delete,
@@ -246,8 +251,14 @@
 
       .filename {
         display: block;
-        margin-top: 1rem;
+        margin-top: 0.5rem;
         text-align: center;
+      }
+
+      .exif {
+        display: inline-block;
+        font-size: 1rem;
+        margin-top: 0.5rem;
       }
 
       .file-download,
@@ -279,7 +290,6 @@
         right: 0.5rem;
         top: 4.5rem;
       }
-
       #files > *:hover .file-edit,
       #files > *:hover .file-download,
       #files > *:hover .file-share,
@@ -340,6 +350,40 @@
                 <img class="icon {{ if eq $root.Request.Display "grid" }}icon-large{{ end }}" src="{{ url "/svg/" }}{{ iconFromExtension . }}?fill=silver" alt="File">
               {{ end }}
               <span class="filename ellipsis {{ if eq $root.Request.Display "list" }}padding-left{{ end }}">{{ .Name }}</span>
+
+              {{ if .IsDir }}
+                {{ if or .Aggregate.Location (not .Aggregate.Start.IsZero) }}
+                  <em class="exif ellipsis {{ if eq $root.Request.Display "list" }}padding-left{{ end }}">
+                    {{- if eq $root.Request.Display "list" -}}
+                      (
+                    {{- end -}}
+
+                    {{- if .Aggregate.Location }}
+                      {{- .Aggregate.Location }}
+                    {{- end }}
+
+                    {{- if not .Aggregate.Start.IsZero }}
+                      {{- if and .Aggregate.Location }}
+                        {{- if eq $root.Request.Display "grid" }}
+                          <br>
+                        {{- else }}
+                          |
+                        {{ end -}}
+                      {{- end }}
+
+                      {{- .Aggregate.Start.Format "2006-01-02" }}
+
+                      {{- if not (.Aggregate.Start.Equal .Aggregate.End) }}
+                        - {{ .Aggregate.End.Format "2006-01-02" }}
+                      {{- end }}
+                    {{- end }}
+
+                    {{- if eq $root.Request.Display "list" -}}
+                      )
+                    {{- end -}}
+                  </em>
+                {{ end }}
+              {{ end }}
             {{ end }}
 
             <a href="{{ .Name }}?download" class="button button-icon file-download" alt="Download" download>

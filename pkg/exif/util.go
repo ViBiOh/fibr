@@ -43,3 +43,19 @@ func (a app) saveMetadata(item provider.StorageItem, suffix string, data interfa
 
 	return nil
 }
+
+func (a app) loadMetadata(item provider.StorageItem, suffix string, content interface{}) error {
+	reader, err := a.storageApp.ReaderFrom(getExifPath(item, suffix))
+	if err != nil {
+		if !provider.IsNotExist(err) {
+			return fmt.Errorf("unable to read: %s", err)
+		}
+		return nil
+	}
+
+	if err := json.NewDecoder(reader).Decode(&content); err != nil {
+		return fmt.Errorf("unable to decode: %s", err)
+	}
+
+	return nil
+}

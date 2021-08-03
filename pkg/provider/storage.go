@@ -57,4 +57,5 @@ type RenderItem struct {
 	ID  string
 	URI string
 	StorageItem
+	Aggregate
 }
