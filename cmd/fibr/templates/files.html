@@ -376,7 +376,7 @@
 
                       {{- $startDate }}
 
-                      {{- if not ($startDate $endDate) }}
+                      {{- if ne $startDate $endDate }}
                         - {{ $endDate }}
                       {{- end }}
                     {{- end }}
