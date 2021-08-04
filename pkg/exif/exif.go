@@ -219,8 +219,22 @@ func (a app) Rename(old, new provider.StorageItem) {
 		}
 	}
 
-	a.updateAggregateFor(old)
-	a.updateAggregateFor(new)
+	if !old.IsDir {
+		oldDir, err := a.getDirOf(old)
+		if err != nil {
+			logger.Error("unable to get directory for `%s`: %s", old.Pathname, err)
+		}
+
+		newDir, err := a.getDirOf(new)
+		if err != nil {
+			logger.Error("unable to get directory for `%s`: %s", old.Pathname, err)
+		}
+
+		if oldDir.Pathname != newDir.Pathname {
+			a.AggregateFor(oldDir)
+			a.AggregateFor(newDir)
+		}
+	}
 }
 
 func (a app) Delete(item provider.StorageItem) {
@@ -234,5 +248,7 @@ func (a app) Delete(item provider.StorageItem) {
 		}
 	}
 
-	a.updateAggregateFor(item)
+	if !item.IsDir {
+		a.AggregateFor(item)
+	}
 }

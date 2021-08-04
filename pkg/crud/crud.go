@@ -52,9 +52,10 @@ type App interface {
 
 // Config of package
 type Config struct {
-	ignore          *string
-	sanitizeOnStart *bool
-	exifDateOnStart *bool
+	ignore               *string
+	sanitizeOnStart      *bool
+	exifDateOnStart      *bool
+	aggregateExifOnStart *bool
 }
 
 type app struct {
@@ -65,24 +66,27 @@ type app struct {
 	thumbnailApp thumbnail.App
 	exifApp      exif.App
 
-	sanitizeOnStart bool
-	exifDateOnStart bool
+	sanitizeOnStart      bool
+	exifDateOnStart      bool
+	aggregateExifOnStart bool
 }
 
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		ignore:          flags.New(prefix, "crud").Name("IgnorePattern").Default("").Label("Ignore pattern when listing files or directory").ToString(fs),
-		sanitizeOnStart: flags.New(prefix, "crud").Name("SanitizeOnStart").Default(false).Label("Sanitize name on start").ToBool(fs),
-		exifDateOnStart: flags.New(prefix, "crud").Name("ExifDateOnStart").Default(false).Label("Change file date from EXIF date on start").ToBool(fs),
+		ignore:               flags.New(prefix, "crud").Name("IgnorePattern").Default("").Label("Ignore pattern when listing files or directory").ToString(fs),
+		sanitizeOnStart:      flags.New(prefix, "crud").Name("SanitizeOnStart").Default(false).Label("Sanitize name on start").ToBool(fs),
+		exifDateOnStart:      flags.New(prefix, "crud").Name("ExifDateOnStart").Default(false).Label("Change file date from EXIF date on start").ToBool(fs),
+		aggregateExifOnStart: flags.New(prefix, "crud").Name("AggregateExifOnStart").Default(false).Label("Aggregate EXIF data per folder on start").ToBool(fs),
 	}
 }
 
 // New creates new App from Config
 func New(config Config, storage provider.Storage, rendererApp renderer.App, shareApp share.App, thumbnailApp thumbnail.App, exifApp exif.App, prometheus prometheus.Registerer) (App, error) {
 	app := &app{
-		sanitizeOnStart: *config.sanitizeOnStart,
-		exifDateOnStart: *config.exifDateOnStart,
+		sanitizeOnStart:      *config.sanitizeOnStart,
+		exifDateOnStart:      *config.exifDateOnStart,
+		aggregateExifOnStart: *config.aggregateExifOnStart,
 
 		storageApp:   storage,
 		rendererApp:  rendererApp,
@@ -132,9 +136,6 @@ func (a *app) Start(done <-chan struct{}) {
 		}
 	}
 
-	logger.Info("fibr start routine started")
-	defer logger.Info("fibr start routine ended")
-
 	err := a.storageApp.Walk("", func(item provider.StorageItem, err error) error {
 		if err != nil {
 			return err
@@ -147,24 +148,8 @@ func (a *app) Start(done <-chan struct{}) {
 		}
 
 		item = a.sanitizeName(item, sanitizeCounter)
-
-		if thumbnail.CanHaveThumbnail(item) && !a.thumbnailApp.HasThumbnail(item) {
-			a.thumbnailApp.GenerateFor(item)
-		}
-
-		if exif.CanHaveExif(item) {
-			if !a.exifApp.HasExif(item) {
-				a.exifApp.ExtractFor(item)
-			}
-
-			if a.exifDateOnStart {
-				a.exifApp.UpdateDateFor(item)
-			}
-
-			if !a.exifApp.HasGeocode(item) {
-				a.exifApp.ExtractGeocodeFor(item)
-			}
-		}
+		a.thumbnailStart(item)
+		a.exifStart(item)
 
 		return nil
 	})
@@ -205,4 +190,30 @@ func (a *app) rename(item provider.StorageItem, name string, gauge *prometheus.G
 
 	gauge.WithLabelValues("success").Inc()
 	return renamedItem
+}
+
+func (a *app) thumbnailStart(item provider.StorageItem) {
+	if thumbnail.CanHaveThumbnail(item) && !a.thumbnailApp.HasThumbnail(item) {
+		a.thumbnailApp.GenerateFor(item)
+	}
+}
+
+func (a *app) exifStart(item provider.StorageItem) {
+	if exif.CanHaveExif(item) {
+		if !a.exifApp.HasExif(item) {
+			a.exifApp.ExtractFor(item)
+		}
+
+		if !a.exifApp.HasGeocode(item) {
+			a.exifApp.ExtractGeocodeFor(item)
+		}
+
+		if a.exifDateOnStart {
+			a.exifApp.UpdateDateFor(item)
+		}
+	}
+
+	if item.IsDir && a.aggregateExifOnStart {
+		a.exifApp.AggregateFor(item)
+	}
 }

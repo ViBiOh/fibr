@@ -39,7 +39,13 @@ func (a app) AggregateFor(item provider.StorageItem) {
 	}
 
 	if !item.IsDir {
-		return
+		file, err := a.getDirOf(item)
+		if err != nil {
+			logger.Error("unable to get directory for `%s`: %s", item.Pathname, err)
+			return
+		}
+
+		item = file
 	}
 
 	for {
@@ -129,15 +135,6 @@ func aggregateDate(min, max, current time.Time) (time.Time, time.Time) {
 	return min, max
 }
 
-func (a app) updateAggregateFor(item provider.StorageItem) {
-	if item.IsDir {
-		return
-	}
-
-	dir, err := a.storageApp.Info(path.Dir(item.Pathname))
-	if err != nil {
-		logger.Error("unable to get directory of `%s`: %s", item.Pathname, err)
-	} else {
-		a.AggregateFor(dir)
-	}
+func (a app) getDirOf(item provider.StorageItem) (provider.StorageItem, error) {
+	return a.storageApp.Info(path.Dir(item.Pathname))
 }
