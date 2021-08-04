@@ -158,6 +158,7 @@
       }
 
       .filelink {
+        align-items: center;
         display: inline-flex;
         height: 2.5rem;
         width: 45rem;
@@ -229,7 +230,7 @@
       }
 
       #files > * {
-        align-items: flex-start;
+        align-items: center;
         background-color: var(--grey);
         display: flex;
         min-height: 12rem;
@@ -237,7 +238,6 @@
       }
 
       .file {
-        margin-top: 0.5rem;
         padding: 0.5rem;
       }
 
@@ -257,11 +257,9 @@
       }
 
       .exif {
-        bottom: 0.5rem;
-        font-size: 1rem;
-        left: 50%;
         position: absolute;
-        transform: translateX(-50%);
+        bottom: 0.5rem;
+        right:  0.5rem;
       }
 
       .file-download,
@@ -356,38 +354,52 @@
 
               {{ if .IsDir }}
                 {{ if or .Aggregate.Location (not .Aggregate.Start.IsZero) }}
-                  <em class="exif ellipsis {{ if eq $root.Request.Display "list" }}padding-left{{ end }}">
-                    {{- if eq $root.Request.Display "list" -}}
+                  {{- $startDate := .Aggregate.Start.Format "Jan 2006" -}}
+                  {{- $endDate := .Aggregate.End.Format "Jan 2006" -}}
+
+                  {{- if eq $root.Request.Display "grid" -}}
+                    <img
+                      class="icon exif"
+                      src="{{ url "/svg/info" }}?fill=silver"
+                      alt="Exif"
+                      title="
+                        {{- if .Aggregate.Location }}
+                          {{- .Aggregate.Location }}
+                        {{- end }}
+
+                        {{- if not .Aggregate.Start.IsZero }}
+                          {{- if and .Aggregate.Location }}
+{{ end }}
+                          {{- $startDate }}
+                        {{- end }}
+
+                        {{- if ne $startDate $endDate }} - {{ $endDate }}
+                        {{- end -}}
+                      "
+                    >
+                  {{ else }}
+                    <em class="exif ellipsis {{ if eq $root.Request.Display "list" }}padding-left{{ end }}">
                       (
-                    {{- end -}}
 
-                    {{- if .Aggregate.Location }}
-                      {{- .Aggregate.Location }}
-                    {{- end }}
+                      {{- if .Aggregate.Location }}
+                        {{- .Aggregate.Location }}
+                      {{- end }}
 
-                    {{- if not .Aggregate.Start.IsZero }}
-                      {{- if and .Aggregate.Location }}
-                        {{- if eq $root.Request.Display "grid" }}
-                          <br>
-                        {{- else }}
+                      {{- if not .Aggregate.Start.IsZero }}
+                        {{- if and .Aggregate.Location }}
                           |
-                        {{ end -}}
-                      {{- end }}
-                    
-                      {{- $startDate := .Aggregate.Start.Format "Jan 2006" -}}
-                      {{- $endDate := .Aggregate.End.Format "Jan 2006" -}}
+                        {{ end }}
 
-                      {{- $startDate }}
+                        {{- $startDate }}
 
-                      {{- if ne $startDate $endDate }}
-                        - {{ $endDate }}
-                      {{- end }}
-                    {{- end }}
+                        {{- if ne $startDate $endDate }}
+                          - {{ $endDate }}
+                        {{- end }}
+                      {{- end -}}
 
-                    {{- if eq $root.Request.Display "list" -}}
                       )
-                    {{- end -}}
-                  </em>
+                    </em>
+                  {{ end}}
                 {{ end }}
               {{ end }}
             {{ end }}
