@@ -20,6 +20,10 @@ import (
 
 const (
 	maxExifSize = 150 << 20 // 150mo
+
+	exifMetadataFilename      = ""
+	geocodeMetadataFilename   = "geocode"
+	aggregateMetadataFilename = "aggregate"
 )
 
 var (
@@ -30,7 +34,11 @@ var (
 		},
 	}
 
-	exifSuffixes = []string{"", "geocode", "aggregate"}
+	metadataFilenames = []string{
+		exifMetadataFilename,
+		geocodeMetadataFilename,
+		aggregateMetadataFilename,
+	}
 
 	exifDates = []string{
 		"DateCreated",
@@ -95,41 +103,7 @@ func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) Config 
 
 // New creates new App from Config
 func New(config Config, storageApp provider.Storage, prometheusRegisterer prometheus.Registerer) App {
-	exifCounter := prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Namespace: "fibr",
-		Subsystem: "exif",
-		Name:      "item",
-	}, []string{"state"})
-	dateCounter := prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Namespace: "fibr",
-		Subsystem: "date",
-		Name:      "item",
-	}, []string{"state"})
-	geocodeCounter := prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Namespace: "fibr",
-		Subsystem: "geocode",
-		Name:      "item",
-	}, []string{"state"})
-	aggregateCounter := prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Namespace: "fibr",
-		Subsystem: "aggregate",
-		Name:      "item",
-	}, []string{"state"})
-
-	if prometheusRegisterer != nil {
-		if err := prometheusRegisterer.Register(exifCounter); err != nil {
-			logger.Error("unable to register exif gauge: %s", err)
-		}
-		if err := prometheusRegisterer.Register(dateCounter); err != nil {
-			logger.Error("unable to register date gauge: %s", err)
-		}
-		if err := prometheusRegisterer.Register(geocodeCounter); err != nil {
-			logger.Error("unable to register geocode gauge: %s", err)
-		}
-		if err := prometheusRegisterer.Register(aggregateCounter); err != nil {
-			logger.Error("unable to register aggregate gauge: %s", err)
-		}
-	}
+	counters := createMetrics(prometheusRegisterer)
 
 	return app{
 		exifURL:    strings.TrimSpace(*config.exifURL),
@@ -137,10 +111,10 @@ func New(config Config, storageApp provider.Storage, prometheusRegisterer promet
 
 		storageApp: storageApp,
 
-		exifCounter:      exifCounter,
-		dateCounter:      dateCounter,
-		geocodeCounter:   geocodeCounter,
-		aggregateCounter: aggregateCounter,
+		exifCounter:      counters["exif"],
+		dateCounter:      counters["date"],
+		geocodeCounter:   counters["geocode"],
+		aggregateCounter: counters["aggregate"],
 
 		done:           make(chan struct{}),
 		geocodeQueue:   make(chan provider.StorageItem, 10),
@@ -161,40 +135,10 @@ func (a app) Start(done <-chan struct{}) {
 		return
 	}
 
-	go a.fetchGeocodes()
-	go a.computeAggregate()
+	go a.processGeocodeQueue()
+	go a.processAggregateQueue()
 
 	<-done
-}
-
-// CanHaveExif determine if exif can be extracted for given pathname
-func CanHaveExif(item provider.StorageItem) bool {
-	return (item.IsImage() || item.IsVideo() || item.IsPdf()) && item.Size < maxExifSize
-}
-
-func (a app) HasExif(item provider.StorageItem) bool {
-	return a.hasMetadata(item, "")
-}
-
-func (a app) HasGeocode(item provider.StorageItem) bool {
-	return a.hasMetadata(item, "geocode")
-}
-
-func (a app) HasAggregat(item provider.StorageItem) bool {
-	return a.hasMetadata(item, "aggregate")
-}
-
-func (a app) hasMetadata(item provider.StorageItem, suffix string) bool {
-	if !a.enabled() {
-		return false
-	}
-
-	if item.IsDir {
-		return false
-	}
-
-	_, err := a.storageApp.Info(getExifPath(item, suffix))
-	return err == nil
 }
 
 func (a app) ExtractFor(item provider.StorageItem) {
@@ -212,17 +156,16 @@ func (a app) ExtractFor(item provider.StorageItem) {
 }
 
 func (a app) get(item provider.StorageItem) (map[string]interface{}, error) {
-	var data map[string]interface{}
-
-	if err := a.loadMetadata(item, "", &data); err != nil {
-		return nil, fmt.Errorf("unable to read: %s", err)
+	exif, err := a.loadExif(item)
+	if err != nil {
+		return nil, fmt.Errorf("unable to load exif: %s", err)
 	}
 
-	if len(data) != 0 {
-		return data, nil
+	if len(exif) != 0 {
+		return exif, nil
 	}
 
-	exif, err := a.fetchAndStoreExif(item)
+	exif, err = a.fetchAndStoreExif(item)
 	if err != nil {
 		return nil, fmt.Errorf("unable to fetch: %s", err)
 	}
@@ -327,7 +270,7 @@ func (a app) Rename(old, new provider.StorageItem) {
 		return
 	}
 
-	for _, suffix := range exifSuffixes {
+	for _, suffix := range metadataFilenames {
 		oldPath := getExifPath(old, suffix)
 		if _, err := a.storageApp.Info(oldPath); provider.IsNotExist(err) {
 			return
@@ -347,7 +290,7 @@ func (a app) Delete(item provider.StorageItem) {
 		return
 	}
 
-	for _, suffix := range exifSuffixes {
+	for _, suffix := range metadataFilenames {
 		if err := a.storageApp.Remove(getExifPath(item, suffix)); err != nil {
 			logger.Error("unable to delete exif: %s", err)
 		}

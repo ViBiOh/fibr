@@ -2,7 +2,6 @@ package exif
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/url"
 	"regexp"
@@ -20,12 +19,19 @@ const (
 	gpsLatitude  = "GPSLatitude"
 	gpsLongitude = "GPSLongitude"
 
-	publicNominatimURL = "https://nominatim.openstreetmap.org"
+	publicNominatimURL      = "https://nominatim.openstreetmap.org"
+	publicNominatimInterval = time.Second * 2 // nominatim is at 1req/sec, so we take an extra step
 )
 
 var (
 	gpsRegex = regexp.MustCompile(`(?im)([0-9]+)\s*deg\s*([0-9]+)'\s*([0-9]+(?:\.[0-9]+)?)"\s*([N|S|W|E])`)
 )
+
+type geocode struct {
+	Address   map[string]string `json:"address"`
+	Latitude  string            `json:"lat"`
+	Longitude string            `json:"lon"`
+}
 
 func (a app) ExtractGeocodeFor(item provider.StorageItem) {
 	if !a.enabled() {
@@ -44,22 +50,24 @@ func (a app) ExtractGeocodeFor(item provider.StorageItem) {
 		return
 	}
 
-	select {
-	case <-a.done:
-		logger.Warn("Service is going to shutdown, not adding more geocode to the queue `%s`", item.Pathname)
-		return
-	default:
+	for {
+		select {
+		case <-a.done:
+			logger.Warn("Service is going to shutdown, not adding more geocode to the queue `%s`", item.Pathname)
+			return
+		case a.geocodeQueue <- item:
+			a.geocodeCounter.WithLabelValues("queued").Inc()
+			return
+		default:
+			time.Sleep(publicNominatimInterval * 2)
+		}
 	}
-
-	a.geocodeQueue <- item
-	a.geocodeCounter.WithLabelValues("queued").Inc()
 }
 
-func (a app) fetchGeocodes() {
+func (a app) processGeocodeQueue() {
 	var tick <-chan time.Time
-
 	if strings.HasPrefix(a.geocodeURL, publicNominatimURL) {
-		ticker := time.NewTicker(time.Second * 2) // nominatim is at 1req/sec, so we take an extra step
+		ticker := time.NewTicker(publicNominatimInterval)
 		defer ticker.Stop()
 		tick = ticker.C
 	}
@@ -84,7 +92,6 @@ func (a app) extractAndSaveGeocoding(item provider.StorageItem) error {
 	}
 
 	var geocode map[string]interface{}
-
 	if len(lat) != 0 && len(lon) != 0 {
 		geocode, err = a.getReverseGeocode(context.Background(), lat, lon)
 		if err != nil {
@@ -92,7 +99,7 @@ func (a app) extractAndSaveGeocoding(item provider.StorageItem) error {
 		}
 	}
 
-	if err := a.saveMetadata(item, "geocode", geocode); err != nil {
+	if err := a.saveMetadata(item, geocodeMetadataFilename, geocode); err != nil {
 		return fmt.Errorf("unable to save geocode: %s", err)
 	}
 
@@ -102,31 +109,20 @@ func (a app) extractAndSaveGeocoding(item provider.StorageItem) error {
 }
 
 func (a app) getLatitudeAndLongitude(item provider.StorageItem) (string, string, error) {
-	var data map[string]interface{}
-
-	reader, err := a.storageApp.ReaderFrom(getExifPath(item, "geocode"))
-	if err == nil {
-		if err := json.NewDecoder(reader).Decode(&data); err != nil {
-			return "", "", fmt.Errorf("unable to decode: %s", err)
-		}
-
-		return data["lat"].(string), data["lon"].(string), nil
-	}
-
-	if !provider.IsNotExist(err) {
-		return "", "", fmt.Errorf("unable to read: %s", err)
-	}
-
-	data, err = a.get(item)
+	geocode, err := a.loadGeocode(item)
 	if err != nil {
-		return "", "", fmt.Errorf("unable to retrieve: %s", err)
+		return "", "", fmt.Errorf("unable to load geocode: %s", err)
+	}
+	if len(geocode.Latitude) != 0 {
+		return geocode.Latitude, geocode.Longitude, nil
 	}
 
-	if data == nil {
-		return "", "", nil
+	exif, err := a.loadExif(item)
+	if err != nil {
+		return "", "", fmt.Errorf("unable to load exif: %s", err)
 	}
 
-	return extractCoordinates(data)
+	return extractCoordinates(exif)
 }
 
 func extractCoordinates(data map[string]interface{}) (string, string, error) {
@@ -211,7 +207,7 @@ func (a app) getReverseGeocode(ctx context.Context, lat, lon string) (map[string
 
 	a.geocodeCounter.WithLabelValues("requested").Inc()
 
-	resp, err := request.New().Header("User-Agent", "fibr").Get(reverseURL).Send(ctx, nil)
+	resp, err := request.New().Header("User-Agent", "fibr, reverse geocoding from exif data").Get(reverseURL).Send(ctx, nil)
 	if err != nil {
 		return nil, fmt.Errorf("unable to reverse geocode from API: %s", err)
 	}
