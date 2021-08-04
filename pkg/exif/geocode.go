@@ -56,7 +56,7 @@ func (a app) ExtractGeocodeFor(item provider.StorageItem) {
 			logger.Warn("Service is going to shutdown, not adding more geocode to the queue `%s`", item.Pathname)
 			return
 		case a.geocodeQueue <- item:
-			a.geocodeCounter.WithLabelValues("queued").Inc()
+			a.increaseMetric("geocode", "queued")
 			return
 		default:
 			time.Sleep(publicNominatimInterval * 2)
@@ -73,7 +73,7 @@ func (a app) processGeocodeQueue() {
 	}
 
 	for item := range a.geocodeQueue {
-		a.geocodeCounter.WithLabelValues("queued").Dec()
+		a.decreaseMetric("geocode", "queued")
 
 		if tick != nil {
 			<-tick
@@ -103,7 +103,7 @@ func (a app) extractAndSaveGeocoding(item provider.StorageItem) error {
 		return fmt.Errorf("unable to save geocode: %s", err)
 	}
 
-	a.geocodeCounter.WithLabelValues("saved").Inc()
+	a.increaseMetric("geocode", "saved")
 
 	return nil
 }
@@ -205,7 +205,7 @@ func (a app) getReverseGeocode(ctx context.Context, lat, lon string) (geocode, e
 
 	reverseURL := fmt.Sprintf("%s/reverse?%s", a.geocodeURL, params.Encode())
 
-	a.geocodeCounter.WithLabelValues("requested").Inc()
+	a.increaseMetric("geocode", "requested")
 
 	resp, err := request.New().Header("User-Agent", "fibr, reverse geocoding from exif data").Get(reverseURL).Send(ctx, nil)
 	if err != nil {

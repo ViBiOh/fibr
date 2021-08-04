@@ -16,16 +16,16 @@ func (a app) UpdateDateFor(item provider.StorageItem) {
 	}
 
 	if createDate.IsZero() {
-		a.dateCounter.WithLabelValues("zero").Inc()
+		a.increaseMetric("date", "zero")
 		return
 	}
 
 	if item.Date.Equal(createDate) {
-		a.dateCounter.WithLabelValues("equal").Inc()
+		a.increaseMetric("date", "equal")
 		return
 	}
 
-	a.dateCounter.WithLabelValues("updated").Inc()
+	a.increaseMetric("date", "updated")
 
 	if err := a.storageApp.UpdateDate(item.Pathname, createDate); err != nil {
 		logger.Error("unable to update date for `%s`: %s", item.Pathname, err)

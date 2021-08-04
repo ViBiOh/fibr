@@ -54,7 +54,7 @@ func (a app) AggregateFor(item provider.StorageItem) {
 			logger.Warn("Service is going to shutdown, not adding more aggregate to the queue `%s`", item.Pathname)
 			return
 		case a.aggregateQueue <- item:
-			a.aggregateCounter.WithLabelValues("queued").Inc()
+			a.increaseMetric("aggregate", "queued")
 			return
 		default:
 			time.Sleep(time.Second)
@@ -64,7 +64,7 @@ func (a app) AggregateFor(item provider.StorageItem) {
 
 func (a app) processAggregateQueue() {
 	for item := range a.aggregateQueue {
-		a.aggregateCounter.WithLabelValues("queued").Dec()
+		a.decreaseMetric("aggregate", "queued")
 
 		if err := a.computeAndSaveAggregate(item); err != nil {
 			logger.Error("unable to compute aggregate for `%s`: %s", item.Pathname, err)
@@ -117,7 +117,7 @@ func (a app) computeAndSaveAggregate(dir provider.StorageItem) error {
 		End:      maxDate,
 	})
 	if err == nil {
-		a.aggregateCounter.WithLabelValues("saved").Dec()
+		a.increaseMetric("aggregate", "saved")
 	}
 
 	return err

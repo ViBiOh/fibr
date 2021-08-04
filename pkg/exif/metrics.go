@@ -20,7 +20,7 @@ func createMetric(prometheusRegisterer prometheus.Registerer, name string) *prom
 }
 
 func createMetrics(prometheusRegisterer prometheus.Registerer) map[string]*prometheus.GaugeVec {
-	if prometheusRegisterer != nil {
+	if prometheusRegisterer == nil {
 		return nil
 	}
 
@@ -29,5 +29,17 @@ func createMetrics(prometheusRegisterer prometheus.Registerer) map[string]*prome
 		"date":      createMetric(prometheusRegisterer, "date"),
 		"geocode":   createMetric(prometheusRegisterer, "geocode"),
 		"aggregate": createMetric(prometheusRegisterer, "aggregate"),
+	}
+}
+
+func (a app) increaseMetric(name, label string) {
+	if gauge, ok := a.metrics[name]; ok {
+		gauge.WithLabelValues(label).Inc()
+	}
+}
+
+func (a app) decreaseMetric(name, label string) {
+	if gauge, ok := a.metrics[name]; ok {
+		gauge.WithLabelValues(label).Inc()
 	}
 }

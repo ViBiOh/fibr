@@ -82,10 +82,7 @@ type app struct {
 	geocodeQueue   chan provider.StorageItem
 	aggregateQueue chan provider.StorageItem
 
-	exifCounter      *prometheus.GaugeVec
-	dateCounter      *prometheus.GaugeVec
-	geocodeCounter   *prometheus.GaugeVec
-	aggregateCounter *prometheus.GaugeVec
+	metrics map[string]*prometheus.GaugeVec
 
 	exifURL    string
 	geocodeURL string
@@ -101,19 +98,13 @@ func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) Config 
 
 // New creates new App from Config
 func New(config Config, storageApp provider.Storage, prometheusRegisterer prometheus.Registerer) App {
-	counters := createMetrics(prometheusRegisterer)
-
 	return app{
 		exifURL:    strings.TrimSpace(*config.exifURL),
 		geocodeURL: strings.TrimSpace(*config.geocodeURL),
 
 		storageApp: storageApp,
 
-		exifCounter:      counters["exif"],
-		dateCounter:      counters["date"],
-		geocodeCounter:   counters["geocode"],
-		aggregateCounter: counters["aggregate"],
-
+		metrics:        createMetrics(prometheusRegisterer),
 		done:           make(chan struct{}),
 		geocodeQueue:   make(chan provider.StorageItem, 10),
 		aggregateQueue: make(chan provider.StorageItem, 10),
@@ -177,7 +168,7 @@ func (a app) fetchAndStoreExif(item provider.StorageItem) (map[string]interface{
 		return nil, fmt.Errorf("unable to get reader: %s", err)
 	}
 
-	a.exifCounter.WithLabelValues("requested").Inc()
+	a.increaseMetric("exif", "requested")
 
 	resp, err := request.New().WithClient(exasClient).Post(a.exifURL).Send(context.Background(), file)
 	if err != nil {
@@ -198,7 +189,7 @@ func (a app) fetchAndStoreExif(item provider.StorageItem) (map[string]interface{
 		return nil, fmt.Errorf("unable to save exif: %s", err)
 	}
 
-	a.exifCounter.WithLabelValues("saved").Inc()
+	a.increaseMetric("exif", "saved")
 
 	return data, nil
 }
