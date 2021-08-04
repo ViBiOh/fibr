@@ -229,7 +229,7 @@
       }
 
       #files > * {
-        align-items: center;
+        align-items: flex-start;
         background-color: var(--grey);
         display: flex;
         min-height: 12rem;
@@ -237,6 +237,7 @@
       }
 
       .file {
+        margin-top: 0.5rem;
         padding: 0.5rem;
       }
 
@@ -256,9 +257,11 @@
       }
 
       .exif {
-        display: inline-block;
+        bottom: 0.5rem;
         font-size: 1rem;
-        margin-top: 0.5rem;
+        left: 50%;
+        position: absolute;
+        transform: translateX(-50%);
       }
 
       .file-download,
