@@ -370,11 +370,14 @@
                           |
                         {{ end -}}
                       {{- end }}
+                    
+                      {{- $startDate := .Aggregate.Start.Format "Feb 2006" -}}
+                      {{- $endDate := .Aggregate.End.Format "Feb 2006" -}}
 
-                      {{- .Aggregate.Start.Format "2006-01-02" }}
+                      {{- $startDate }}
 
-                      {{- if not (.Aggregate.Start.Equal .Aggregate.End) }}
-                        - {{ .Aggregate.End.Format "2006-01-02" }}
+                      {{- if not ($startDate $endDate) }}
+                        - {{ $endDate }}
                       {{- end }}
                     {{- end }}
 
