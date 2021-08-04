@@ -2,11 +2,9 @@ package exif
 
 import (
 	"context"
-	"errors"
 	"flag"
 	"fmt"
 	"net/http"
-	"path"
 	"strings"
 	"time"
 
@@ -196,73 +194,13 @@ func (a app) fetchAndStoreExif(item provider.StorageItem) (map[string]interface{
 		data = exifs[0]
 	}
 
-	if err := a.saveMetadata(item, "", data); err != nil {
+	if err := a.saveMetadata(item, exifMetadataFilename, data); err != nil {
 		return nil, fmt.Errorf("unable to save exif: %s", err)
 	}
 
 	a.exifCounter.WithLabelValues("saved").Inc()
 
 	return data, nil
-}
-
-func (a app) UpdateDateFor(item provider.StorageItem) {
-	createDate, err := a.getDate(item)
-	if err != nil {
-		logger.Error("unable to get date for `%s`: %s", item.Pathname, err)
-	}
-
-	if createDate.IsZero() {
-		a.dateCounter.WithLabelValues("zero").Inc()
-		return
-	}
-
-	if item.Date.Equal(createDate) {
-		a.dateCounter.WithLabelValues("equal").Inc()
-		return
-	}
-
-	a.dateCounter.WithLabelValues("updated").Inc()
-
-	if err := a.storageApp.UpdateDate(item.Pathname, createDate); err != nil {
-		logger.Error("unable to update date for `%s`: %s", item.Pathname, err)
-	}
-}
-
-func (a app) getDate(item provider.StorageItem) (time.Time, error) {
-	data, err := a.get(item)
-	if err != nil {
-		return time.Time{}, fmt.Errorf("unable to retrieve exif for `%s`: %s", item.Pathname, err)
-	}
-
-	for _, exifDate := range exifDates {
-		rawCreateDate, ok := data[exifDate]
-		if !ok {
-			continue
-		}
-
-		createDateStr, ok := rawCreateDate.(string)
-		if !ok {
-			return time.Time{}, fmt.Errorf("key `%s` is not a string for `%s`", exifDate, item.Pathname)
-		}
-
-		createDate, err := parseDate(createDateStr)
-		if err == nil {
-			return createDate, nil
-		}
-	}
-
-	return time.Time{}, nil
-}
-
-func parseDate(raw string) (time.Time, error) {
-	for _, pattern := range datePatterns {
-		createDate, err := time.Parse(pattern, raw)
-		if err == nil {
-			return createDate, nil
-		}
-	}
-
-	return time.Time{}, errors.New("no matching pattern")
 }
 
 func (a app) Rename(old, new provider.StorageItem) {
@@ -297,17 +235,4 @@ func (a app) Delete(item provider.StorageItem) {
 	}
 
 	a.updateAggregateFor(item)
-}
-
-func (a app) updateAggregateFor(item provider.StorageItem) {
-	if item.IsDir {
-		return
-	}
-
-	dir, err := a.storageApp.Info(path.Dir(item.Pathname))
-	if err != nil {
-		logger.Error("unable to get directory of `%s`: %s", item.Pathname, err)
-	} else {
-		a.AggregateFor(dir)
-	}
 }

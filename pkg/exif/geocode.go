@@ -91,7 +91,7 @@ func (a app) extractAndSaveGeocoding(item provider.StorageItem) error {
 		return fmt.Errorf("unable to get gps coordinate: %s", err)
 	}
 
-	var geocode map[string]interface{}
+	var geocode geocode
 	if len(lat) != 0 && len(lon) != 0 {
 		geocode, err = a.getReverseGeocode(context.Background(), lat, lon)
 		if err != nil {
@@ -196,7 +196,7 @@ func convertDegreeMinuteSecondToDecimal(location string) (string, error) {
 	return fmt.Sprintf("%.6f", dd), nil
 }
 
-func (a app) getReverseGeocode(ctx context.Context, lat, lon string) (map[string]interface{}, error) {
+func (a app) getReverseGeocode(ctx context.Context, lat, lon string) (geocode, error) {
 	params := url.Values{}
 	params.Set("lat", lat)
 	params.Set("lon", lon)
@@ -209,12 +209,12 @@ func (a app) getReverseGeocode(ctx context.Context, lat, lon string) (map[string
 
 	resp, err := request.New().Header("User-Agent", "fibr, reverse geocoding from exif data").Get(reverseURL).Send(ctx, nil)
 	if err != nil {
-		return nil, fmt.Errorf("unable to reverse geocode from API: %s", err)
+		return geocode{}, fmt.Errorf("unable to reverse geocode from API: %s", err)
 	}
 
-	var data map[string]interface{}
+	var data geocode
 	if err := httpjson.Read(resp, &data); err != nil {
-		return nil, fmt.Errorf("unable to decode reverse geocoding: %s", err)
+		return data, fmt.Errorf("unable to decode reverse geocoding: %s", err)
 	}
 
 	return data, nil

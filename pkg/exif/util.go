@@ -47,10 +47,6 @@ func (a app) hasMetadata(item provider.StorageItem, suffix string) bool {
 		return false
 	}
 
-	if item.IsDir {
-		return false
-	}
-
 	_, err := a.storageApp.Info(getExifPath(item, suffix))
 	return err == nil
 }
@@ -66,8 +62,8 @@ func (a app) loadGeocode(item provider.StorageItem) (geocode, error) {
 }
 
 func (a app) loadAggregate(item provider.StorageItem) (provider.Aggregate, error) {
-	var aggregate provider.Aggregate
-	return aggregate, a.loadMetadata(item, aggregateMetadataFilename, &aggregate)
+	var data provider.Aggregate
+	return data, a.loadMetadata(item, aggregateMetadataFilename, &data)
 }
 
 func (a app) loadMetadata(item provider.StorageItem, suffix string, content interface{}) error {

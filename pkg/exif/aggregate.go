@@ -2,6 +2,7 @@ package exif
 
 import (
 	"fmt"
+	"path"
 	"path/filepath"
 	"time"
 
@@ -126,4 +127,17 @@ func aggregateDate(min, max, current time.Time) (time.Time, time.Time) {
 	}
 
 	return min, max
+}
+
+func (a app) updateAggregateFor(item provider.StorageItem) {
+	if item.IsDir {
+		return
+	}
+
+	dir, err := a.storageApp.Info(path.Dir(item.Pathname))
+	if err != nil {
+		logger.Error("unable to get directory of `%s`: %s", item.Pathname, err)
+	} else {
+		a.AggregateFor(dir)
+	}
 }
