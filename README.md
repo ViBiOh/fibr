@@ -136,6 +136,8 @@ You'll find a Kubernetes exemple in the [`infra/`](infra/) folder, using my [`ap
 Usage of fibr:
   -address string
         [server] Listen address {FIBR_ADDRESS}
+  -aggregateExifOnStart
+        [crud] Aggregate EXIF data per folder on start {FIBR_AGGREGATE_EXIF_ON_START}
   -authProfiles string
         [auth] Users profiles in the form 'id:profile1|profile2,id2:profile1' {FIBR_AUTH_PROFILES}
   -authUsers string

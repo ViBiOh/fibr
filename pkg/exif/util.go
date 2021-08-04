@@ -83,7 +83,20 @@ func (a app) loadMetadata(item provider.StorageItem, suffix string, content inte
 }
 
 func (a app) saveMetadata(item provider.StorageItem, suffix string, data interface{}) error {
-	writer, err := a.storageApp.WriterTo(getExifPath(item, suffix))
+	filename := getExifPath(item, suffix)
+	dirname := path.Dir(filename)
+
+	if _, err := a.storageApp.Info(dirname); err != nil {
+		if !provider.IsNotExist(err) {
+			return fmt.Errorf("unable to check directory existence: %s", err)
+		}
+
+		if err = a.storageApp.CreateDir(dirname); err != nil {
+			return fmt.Errorf("unable to create directory: %s", err)
+		}
+	}
+
+	writer, err := a.storageApp.WriterTo(filename)
 	if err != nil {
 		return fmt.Errorf("unable to get writer: %s", err)
 	}

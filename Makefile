@@ -102,7 +102,8 @@ run:
 		-thumbnailVideoURL "https://vith.vibioh.fr" \
 		-exifURL "http://localhost:4000" \
 		-exifGeocodeURL "https://nominatim.openstreetmap.org" \
-		-exifDateOnStart
+		-exifDateOnStart \
+		-aggregateExifOnStart
 
 .PHONY: run-imaginary
 run-imaginary:
