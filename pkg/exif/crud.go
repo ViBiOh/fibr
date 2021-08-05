@@ -20,25 +20,35 @@ func (a app) rename(old, new provider.StorageItem) error {
 	}
 
 	if !old.IsDir {
-		oldDir, err := a.getDirOf(old)
-		if err != nil {
-			return fmt.Errorf("unable to get old directory: %s", err)
+		if err := a.aggregateOnRename(old, new); err != nil {
+			return fmt.Errorf("unable to aggregate on rename: %s", err)
 		}
+	}
 
-		newDir, err := a.getDirOf(new)
-		if err != nil {
-			return fmt.Errorf("unable to get new directory: %s", err)
-		}
+	return nil
+}
 
-		if oldDir.Pathname != newDir.Pathname {
-			if err := a.aggregate(oldDir); err != nil {
-				return fmt.Errorf("unable to aggregate old directory: %s", err)
-			}
+func (a app) aggregateOnRename(old, new provider.StorageItem) error {
+	oldDir, err := a.getDirOf(old)
+	if err != nil {
+		return fmt.Errorf("unable to get old directory: %s", err)
+	}
 
-			if err := a.aggregate(newDir); err != nil {
-				return fmt.Errorf("unable to aggregate new directory: %s", err)
-			}
-		}
+	newDir, err := a.getDirOf(new)
+	if err != nil {
+		return fmt.Errorf("unable to get new directory: %s", err)
+	}
+
+	if oldDir.Pathname == newDir.Pathname {
+		return nil
+	}
+
+	if err := a.aggregate(oldDir); err != nil {
+		return fmt.Errorf("unable to aggregate old directory: %s", err)
+	}
+
+	if err := a.aggregate(newDir); err != nil {
+		return fmt.Errorf("unable to aggregate new directory: %s", err)
 	}
 
 	return nil
@@ -67,42 +77,12 @@ func (a app) EventConsumer(e provider.Event) {
 
 	switch e.Type {
 	case provider.StartEvent:
-		if CanHaveExif(e.Item) {
-			if !a.HasExif(e.Item) {
-				if _, err := a.get(e.Item); err != nil {
-					logger.Error("unable to get exif for `%s`: %s", e.Item.Pathname, err)
-				}
-			}
-
-			if !a.HasGeocode(e.Item) {
-				a.geocode(e.Item)
-			}
-
-			if a.dateOnStart {
-				if err := a.updateDate(e.Item); err != nil {
-					logger.Error("unable to update date for `%s`: %s", e.Item.Pathname, err)
-				}
-			}
-		}
-
-		if e.Item.IsDir && a.aggregateOnStart {
-			if err := a.aggregate(e.Item); err != nil {
-				logger.Error("unable to aggregate exif for `%s`: %s", e.Item.Pathname, err)
-			}
+		if err := a.handleStartEvent(e.Item); err != nil {
+			logger.Error("unable to start exif for `%s`: %s", e.Item.Pathname, err)
 		}
 	case provider.UploadEvent:
-		if !CanHaveExif(e.Item) {
-			return
-		}
-
-		if err := a.updateDate(e.Item); err != nil {
-			logger.Error("unable to update date for `%s`: %s", e.Item.Pathname, err)
-		}
-
-		a.geocode(e.Item)
-
-		if err := a.aggregate(e.Item); err != nil {
-			logger.Error("unable to aggregate exif for `%s`: %s", e.Item.Pathname, err)
+		if err := a.handleUploadEvent(e.Item); err != nil {
+			logger.Error("unable to upload exif for `%s`: %s", e.Item.Pathname, err)
 		}
 	case provider.RenameEvent:
 		if err := a.rename(e.Item, e.New); err != nil {
@@ -113,4 +93,50 @@ func (a app) EventConsumer(e provider.Event) {
 			logger.Error("unable to delete exif for `%s`: %s", e.Item.Pathname, err)
 		}
 	}
+}
+
+func (a app) handleStartEvent(item provider.StorageItem) error {
+	if CanHaveExif(item) {
+		if !a.HasExif(item) {
+			if _, err := a.get(item); err != nil {
+				return fmt.Errorf("unable to get exif : %s", err)
+			}
+		}
+
+		if !a.HasGeocode(item) {
+			a.geocode(item)
+		}
+
+		if a.dateOnStart {
+			if err := a.updateDate(item); err != nil {
+				return fmt.Errorf("unable to update date : %s", err)
+			}
+		}
+	}
+
+	if item.IsDir && a.aggregateOnStart {
+		if err := a.aggregate(item); err != nil {
+			return fmt.Errorf("unable to aggregate exif : %s", err)
+		}
+	}
+
+	return nil
+}
+
+func (a app) handleUploadEvent(item provider.StorageItem) error {
+	if !CanHaveExif(item) {
+		return nil
+	}
+
+	if err := a.updateDate(item); err != nil {
+		return fmt.Errorf("unable to update date: %s", err)
+	}
+
+	a.geocode(item)
+
+	if err := a.aggregate(item); err != nil {
+		return fmt.Errorf("unable to aggregate exif: %s", err)
+	}
+
+	return nil
 }

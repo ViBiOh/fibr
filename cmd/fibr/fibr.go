@@ -77,7 +77,7 @@ func main() {
 	logger.Fatal(err)
 
 	prometheusRegister := prometheusApp.Registerer()
-	eventBus := provider.NewEventBus(20)
+	eventBus := provider.NewEventBus(10)
 
 	thumbnailApp := thumbnail.New(thumbnailConfig, storageApp, prometheusRegister)
 	exifApp := exif.New(exifConfig, storageApp, prometheusRegister)
@@ -86,7 +86,7 @@ func main() {
 	logger.Fatal(err)
 
 	shareApp := share.New(shareConfig, storageApp)
-	crudApp, err := crud.New(crudConfig, storageApp, rendererApp, shareApp, thumbnailApp, exifApp, prometheusRegister, eventBus.Push)
+	crudApp, err := crud.New(crudConfig, storageApp, rendererApp, shareApp, thumbnailApp, exifApp, eventBus.Push)
 	logger.Fatal(err)
 
 	var middlewareApp authMiddleware.App

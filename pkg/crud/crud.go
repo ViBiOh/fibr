@@ -15,7 +15,6 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
-	"github.com/prometheus/client_golang/prometheus"
 )
 
 var (
@@ -57,7 +56,6 @@ type Config struct {
 }
 
 type app struct {
-	prometheus   prometheus.Registerer
 	storageApp   provider.Storage
 	rendererApp  renderer.App
 	shareApp     share.App
@@ -78,7 +76,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 }
 
 // New creates new App from Config
-func New(config Config, storage provider.Storage, rendererApp renderer.App, shareApp share.App, thumbnailApp thumbnail.App, exifApp exif.App, prometheus prometheus.Registerer, eventProducer provider.EventProducer) (App, error) {
+func New(config Config, storage provider.Storage, rendererApp renderer.App, shareApp share.App, thumbnailApp thumbnail.App, exifApp exif.App, eventProducer provider.EventProducer) (App, error) {
 	app := &app{
 		sanitizeOnStart: *config.sanitizeOnStart,
 
@@ -89,7 +87,6 @@ func New(config Config, storage provider.Storage, rendererApp renderer.App, shar
 		thumbnailApp: thumbnailApp,
 		exifApp:      exifApp,
 		shareApp:     shareApp,
-		prometheus:   prometheus,
 	}
 
 	var ignorePattern *regexp.Regexp
@@ -120,18 +117,6 @@ func New(config Config, storage provider.Storage, rendererApp renderer.App, shar
 }
 
 func (a *app) Start(done <-chan struct{}) {
-	sanitizeCounter := prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Namespace: "fibr",
-		Subsystem: "sanitize",
-		Name:      "total",
-	}, []string{"status"})
-
-	if a.prometheus != nil {
-		if err := a.prometheus.Register(sanitizeCounter); err != nil {
-			logger.Error("unable to register sanitize count metric: %s", err)
-		}
-	}
-
 	err := a.storageApp.Walk("", func(item provider.StorageItem, err error) error {
 		if err != nil {
 			return err
@@ -143,7 +128,7 @@ func (a *app) Start(done <-chan struct{}) {
 		default:
 		}
 
-		item = a.sanitizeName(item, sanitizeCounter)
+		item = a.sanitizeName(item)
 		a.notify(provider.NewStartEvent(item))
 
 		return nil
@@ -154,7 +139,7 @@ func (a *app) Start(done <-chan struct{}) {
 	}
 }
 
-func (a *app) sanitizeName(item provider.StorageItem, gauge *prometheus.GaugeVec) provider.StorageItem {
+func (a *app) sanitizeName(item provider.StorageItem) provider.StorageItem {
 	name, err := provider.SanitizeName(item.Pathname, false)
 	if err != nil {
 		logger.Error("unable to sanitize name %s: %s", item.Pathname, err)
@@ -170,19 +155,17 @@ func (a *app) sanitizeName(item provider.StorageItem, gauge *prometheus.GaugeVec
 		return item
 	}
 
-	return a.rename(item, name, gauge)
+	return a.rename(item, name)
 }
 
-func (a *app) rename(item provider.StorageItem, name string, gauge *prometheus.GaugeVec) provider.StorageItem {
+func (a *app) rename(item provider.StorageItem, name string) provider.StorageItem {
 	logger.Info("Renaming `%s` to `%s`", item.Pathname, name)
 
 	renamedItem, err := a.doRename(item.Pathname, name, item)
 	if err != nil {
-		gauge.WithLabelValues("error").Inc()
 		logger.Error("%s", err)
 		return item
 	}
 
-	gauge.WithLabelValues("success").Inc()
 	return renamedItem
 }
