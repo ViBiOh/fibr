@@ -12,6 +12,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/exif"
 	"github.com/ViBiOh/fibr/pkg/fibr"
 	"github.com/ViBiOh/fibr/pkg/filesystem"
+	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/share"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v4/pkg/alcotest"
@@ -76,6 +77,7 @@ func main() {
 	logger.Fatal(err)
 
 	prometheusRegister := prometheusApp.Registerer()
+	eventBus := provider.NewEventBus(20)
 
 	thumbnailApp := thumbnail.New(thumbnailConfig, storageApp, prometheusRegister)
 	exifApp := exif.New(exifConfig, storageApp, prometheusRegister)
@@ -84,7 +86,7 @@ func main() {
 	logger.Fatal(err)
 
 	shareApp := share.New(shareConfig, storageApp)
-	crudApp, err := crud.New(crudConfig, storageApp, rendererApp, shareApp, thumbnailApp, exifApp, prometheusRegister)
+	crudApp, err := crud.New(crudConfig, storageApp, rendererApp, shareApp, thumbnailApp, exifApp, prometheusRegister, eventBus.Push)
 	logger.Fatal(err)
 
 	var middlewareApp authMiddleware.App
@@ -95,10 +97,10 @@ func main() {
 	fibrApp := fibr.New(crudApp, rendererApp, shareApp, middlewareApp)
 	handler := rendererApp.Handler(fibrApp.TemplateFunc)
 
-	go thumbnailApp.Start()
 	go shareApp.Start(healthApp.Done())
 	go crudApp.Start(healthApp.Done())
 	go exifApp.Start(healthApp.Done())
+	go eventBus.Start(healthApp.Done(), thumbnailApp.EventConsumer, exifApp.EventConsumer)
 
 	go promServer.Start("prometheus", healthApp.End(), prometheusApp.Handler())
 	go appServer.Start("http", healthApp.End(), httputils.Handler(handler, healthApp, recoverer.Middleware, prometheusApp.Middleware, owasp.New(owaspConfig).Middleware))

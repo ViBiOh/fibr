@@ -38,10 +38,6 @@ func (a app) HasGeocode(item provider.StorageItem) bool {
 	return a.hasMetadata(item, geocodeMetadataFilename)
 }
 
-func (a app) HasAggregat(item provider.StorageItem) bool {
-	return a.hasMetadata(item, aggregateMetadataFilename)
-}
-
 func (a app) hasMetadata(item provider.StorageItem, suffix string) bool {
 	if !a.enabled() {
 		return false

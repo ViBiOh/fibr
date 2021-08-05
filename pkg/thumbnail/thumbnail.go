@@ -27,14 +27,10 @@ const (
 
 // App of package
 type App interface {
-	Start()
-	Delete(provider.StorageItem)
-	Rename(provider.StorageItem, provider.StorageItem)
-
 	HasThumbnail(provider.StorageItem) bool
 	Serve(http.ResponseWriter, *http.Request, provider.StorageItem)
 	List(http.ResponseWriter, *http.Request, provider.StorageItem)
-	GenerateFor(provider.StorageItem)
+	EventConsumer(provider.Event)
 }
 
 // Config of package

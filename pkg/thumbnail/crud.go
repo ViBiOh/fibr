@@ -5,21 +5,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 )
 
-func (a app) Delete(item provider.StorageItem) {
-	if !a.enabled() {
-		return
-	}
-
-	if err := a.storageApp.Remove(getThumbnailPath(item)); err != nil {
-		logger.Error("unable to delete thumbnail: %s", err)
-	}
-}
-
-func (a app) Rename(old, new provider.StorageItem) {
-	if !a.enabled() {
-		return
-	}
-
+func (a app) rename(old, new provider.StorageItem) {
 	oldPath := getThumbnailPath(old)
 	if _, err := a.storageApp.Info(oldPath); provider.IsNotExist(err) {
 		return
@@ -27,5 +13,32 @@ func (a app) Rename(old, new provider.StorageItem) {
 
 	if err := a.storageApp.Rename(oldPath, getThumbnailPath(new)); err != nil {
 		logger.Error("unable to rename thumbnail: %s", err)
+	}
+}
+
+func (a app) delete(item provider.StorageItem) {
+	if err := a.storageApp.Remove(getThumbnailPath(item)); err != nil {
+		logger.Error("unable to delete thumbnail: %s", err)
+	}
+}
+
+func (a app) EventConsumer(e provider.Event) {
+	if !a.enabled() {
+		return
+	}
+
+	switch e.Type {
+	case provider.StartEvent:
+		fallthrough
+	case provider.UploadEvent:
+		if CanHaveThumbnail(e.Item) && !a.HasThumbnail(e.Item) {
+			if err := a.generate(e.Item); err != nil {
+				logger.Error("unable to generate thumbnail for `%s`: %s", e.Item.Pathname, err)
+			}
+		}
+	case provider.RenameEvent:
+		a.rename(e.Item, e.New)
+	case provider.DeleteEvent:
+		a.delete(e.Item)
 	}
 }

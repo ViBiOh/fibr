@@ -103,7 +103,7 @@ run:
 		-exifURL "http://localhost:4000" \
 		-exifGeocodeURL "https://nominatim.openstreetmap.org" \
 		-exifDateOnStart \
-		-aggregateExifOnStart
+		-exifAggregateOnStart
 
 .PHONY: run-imaginary
 run-imaginary:

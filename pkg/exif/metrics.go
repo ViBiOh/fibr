@@ -19,17 +19,18 @@ func createMetric(prometheusRegisterer prometheus.Registerer, name string) *prom
 	return counter
 }
 
-func createMetrics(prometheusRegisterer prometheus.Registerer) map[string]*prometheus.GaugeVec {
+func createMetrics(prometheusRegisterer prometheus.Registerer, names ...string) map[string]*prometheus.GaugeVec {
 	if prometheusRegisterer == nil {
 		return nil
 	}
 
-	return map[string]*prometheus.GaugeVec{
-		"exif":      createMetric(prometheusRegisterer, "exif"),
-		"date":      createMetric(prometheusRegisterer, "date"),
-		"geocode":   createMetric(prometheusRegisterer, "geocode"),
-		"aggregate": createMetric(prometheusRegisterer, "aggregate"),
+	metrics := make(map[string]*prometheus.GaugeVec)
+
+	for _, name := range names {
+		metrics[name] = createMetric(prometheusRegisterer, name)
 	}
+
+	return metrics
 }
 
 func (a app) increaseMetric(name, label string) {

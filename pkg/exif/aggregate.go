@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/v4/pkg/logger"
 )
 
 var (
@@ -33,43 +32,21 @@ func (a app) GetAggregateFor(item provider.StorageItem) (provider.Aggregate, err
 	return aggregate, nil
 }
 
-func (a app) AggregateFor(item provider.StorageItem) {
-	if !a.enabled() {
-		return
-	}
-
+func (a app) aggregate(item provider.StorageItem) error {
 	if !item.IsDir {
 		file, err := a.getDirOf(item)
 		if err != nil {
-			logger.Error("unable to get directory for `%s`: %s", item.Pathname, err)
-			return
+			return fmt.Errorf("unable to get directory: %s", err)
 		}
 
 		item = file
 	}
 
-	for {
-		select {
-		case <-a.done:
-			logger.Warn("Service is going to shutdown, not adding more aggregate to the queue `%s`", item.Pathname)
-			return
-		case a.aggregateQueue <- item:
-			a.increaseMetric("aggregate", "queued")
-			return
-		default:
-			time.Sleep(time.Second)
-		}
+	if err := a.computeAndSaveAggregate(item); err != nil {
+		return fmt.Errorf("unable to compute aggregate: %s", err)
 	}
-}
 
-func (a app) processAggregateQueue() {
-	for item := range a.aggregateQueue {
-		a.decreaseMetric("aggregate", "queued")
-
-		if err := a.computeAndSaveAggregate(item); err != nil {
-			logger.Error("unable to compute aggregate for `%s`: %s", item.Pathname, err)
-		}
-	}
+	return nil
 }
 
 func (a app) computeAndSaveAggregate(dir provider.StorageItem) error {

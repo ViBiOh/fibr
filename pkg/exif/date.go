@@ -6,30 +6,27 @@ import (
 	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/v4/pkg/logger"
 )
 
-func (a app) UpdateDateFor(item provider.StorageItem) {
+func (a app) updateDate(item provider.StorageItem) error {
 	createDate, err := a.getDate(item)
 	if err != nil {
-		logger.Error("unable to get date for `%s`: %s", item.Pathname, err)
+		return fmt.Errorf("unable to get date: %s", err)
 	}
 
 	if createDate.IsZero() {
-		a.increaseMetric("date", "zero")
-		return
+		return nil
 	}
 
 	if item.Date.Equal(createDate) {
-		a.increaseMetric("date", "equal")
-		return
+		return nil
 	}
-
-	a.increaseMetric("date", "updated")
 
 	if err := a.storageApp.UpdateDate(item.Pathname, createDate); err != nil {
-		logger.Error("unable to update date for `%s`: %s", item.Pathname, err)
+		return fmt.Errorf("unable to update date: %s", err)
 	}
+
+	return nil
 }
 
 func (a app) getDate(item provider.StorageItem) (time.Time, error) {

@@ -11,7 +11,6 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/httpjson"
-	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -59,20 +58,16 @@ type App interface {
 	Start(<-chan struct{})
 	HasExif(provider.StorageItem) bool
 	HasGeocode(provider.StorageItem) bool
-	HasAggregat(provider.StorageItem) bool
-	ExtractFor(provider.StorageItem)
-	ExtractGeocodeFor(provider.StorageItem)
-	UpdateDateFor(provider.StorageItem)
-	AggregateFor(provider.StorageItem)
 	GetAggregateFor(provider.StorageItem) (provider.Aggregate, error)
-	Rename(provider.StorageItem, provider.StorageItem)
-	Delete(provider.StorageItem)
+	EventConsumer(provider.Event)
 }
 
 // Config of package
 type Config struct {
-	exifURL    *string
-	geocodeURL *string
+	exifURL          *string
+	geocodeURL       *string
+	dateOnStart      *bool
+	aggregateOnStart *bool
 }
 
 type app struct {
@@ -84,30 +79,35 @@ type app struct {
 
 	metrics map[string]*prometheus.GaugeVec
 
-	exifURL    string
-	geocodeURL string
+	exifURL          string
+	geocodeURL       string
+	dateOnStart      bool
+	aggregateOnStart bool
 }
 
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) Config {
 	return Config{
-		exifURL:    flags.New(prefix, "exif").Name("URL").Default(flags.Default("URL", "http://exas:1080", overrides)).Label("Exif Tool URL (exas)").ToString(fs),
-		geocodeURL: flags.New(prefix, "exif").Name("GeocodeURL").Default(flags.Default("URL", "", overrides)).Label(fmt.Sprintf("Nominatim Geocode Service URL. This can leak GPS metadatas to a third-party (e.g. \"%s\")", publicNominatimURL)).ToString(fs),
+		exifURL:          flags.New(prefix, "exif").Name("URL").Default(flags.Default("URL", "http://exas:1080", overrides)).Label("Exif Tool URL (exas)").ToString(fs),
+		geocodeURL:       flags.New(prefix, "exif").Name("GeocodeURL").Default(flags.Default("GeocodeURL", "", overrides)).Label(fmt.Sprintf("Nominatim Geocode Service URL. This can leak GPS metadatas to a third-party (e.g. \"%s\")", publicNominatimURL)).ToString(fs),
+		dateOnStart:      flags.New(prefix, "exif").Name("DateOnStart").Default(false).Label("Change file date from EXIF date on start").ToBool(fs),
+		aggregateOnStart: flags.New(prefix, "exif").Name("AggregateOnStart").Default(false).Label("Aggregate EXIF data per folder on start").ToBool(fs),
 	}
 }
 
 // New creates new App from Config
 func New(config Config, storageApp provider.Storage, prometheusRegisterer prometheus.Registerer) App {
 	return app{
-		exifURL:    strings.TrimSpace(*config.exifURL),
-		geocodeURL: strings.TrimSpace(*config.geocodeURL),
+		exifURL:          strings.TrimSpace(*config.exifURL),
+		geocodeURL:       strings.TrimSpace(*config.geocodeURL),
+		dateOnStart:      *config.dateOnStart,
+		aggregateOnStart: *config.aggregateOnStart,
 
 		storageApp: storageApp,
 
-		metrics:        createMetrics(prometheusRegisterer),
-		done:           make(chan struct{}),
-		geocodeQueue:   make(chan provider.StorageItem, 10),
-		aggregateQueue: make(chan provider.StorageItem, 10),
+		metrics:      createMetrics(prometheusRegisterer, "exif", "geocode", "aggregate"),
+		done:         make(chan struct{}),
+		geocodeQueue: make(chan provider.StorageItem, 10),
 	}
 }
 
@@ -116,32 +116,16 @@ func (a app) enabled() bool {
 }
 
 func (a app) Start(done <-chan struct{}) {
-	defer close(a.done)
 	defer close(a.geocodeQueue)
-	defer close(a.aggregateQueue)
+	defer close(a.done)
 
 	if !a.enabled() {
 		return
 	}
 
 	go a.processGeocodeQueue()
-	go a.processAggregateQueue()
 
 	<-done
-}
-
-func (a app) ExtractFor(item provider.StorageItem) {
-	if !a.enabled() {
-		return
-	}
-
-	if item.IsDir {
-		return
-	}
-
-	if _, err := a.fetchAndStoreExif(item); err != nil {
-		logger.Error("unable to fetch and store for `%s`: %s", item.Pathname, err)
-	}
 }
 
 func (a app) get(item provider.StorageItem) (map[string]interface{}, error) {
@@ -192,54 +176,4 @@ func (a app) fetchAndStoreExif(item provider.StorageItem) (map[string]interface{
 	a.increaseMetric("exif", "saved")
 
 	return data, nil
-}
-
-func (a app) Rename(old, new provider.StorageItem) {
-	if !a.enabled() {
-		return
-	}
-
-	for _, suffix := range metadataFilenames {
-		oldPath := getExifPath(old, suffix)
-		if _, err := a.storageApp.Info(oldPath); provider.IsNotExist(err) {
-			return
-		}
-
-		if err := a.storageApp.Rename(oldPath, getExifPath(new, suffix)); err != nil {
-			logger.Error("unable to rename exif: %s", err)
-		}
-	}
-
-	if !old.IsDir {
-		oldDir, err := a.getDirOf(old)
-		if err != nil {
-			logger.Error("unable to get directory for `%s`: %s", old.Pathname, err)
-		}
-
-		newDir, err := a.getDirOf(new)
-		if err != nil {
-			logger.Error("unable to get directory for `%s`: %s", old.Pathname, err)
-		}
-
-		if oldDir.Pathname != newDir.Pathname {
-			a.AggregateFor(oldDir)
-			a.AggregateFor(newDir)
-		}
-	}
-}
-
-func (a app) Delete(item provider.StorageItem) {
-	if !a.enabled() {
-		return
-	}
-
-	for _, suffix := range metadataFilenames {
-		if err := a.storageApp.Remove(getExifPath(item, suffix)); err != nil {
-			logger.Error("unable to delete exif: %s", err)
-		}
-	}
-
-	if !item.IsDir {
-		a.AggregateFor(item)
-	}
 }

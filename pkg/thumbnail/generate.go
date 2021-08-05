@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 )
 
@@ -69,48 +68,4 @@ func (a app) generate(item provider.StorageItem) error {
 	a.thumbnailCounter.WithLabelValues("saved").Inc()
 
 	return nil
-}
-
-// GenerateFor generate thumbnail image for given path
-func (a app) GenerateFor(item provider.StorageItem) {
-	if !a.enabled() {
-		return
-	}
-
-	if item.IsDir {
-		return
-	}
-
-	if a.HasThumbnail(item) {
-		return
-	}
-
-	a.pathnameInput <- item
-	a.thumbnailCounter.WithLabelValues("queued").Inc()
-}
-
-func (a app) Start() {
-	if !a.enabled() {
-		return
-	}
-
-	if _, err := a.storageApp.Info(provider.MetadataDirectoryName); err != nil {
-		logger.Warn("no thumbnail generation because %s has error: %s", provider.MetadataDirectoryName, err)
-		return
-	}
-
-	waitTimeout := time.Millisecond * 300
-
-	for item := range a.pathnameInput {
-		a.thumbnailCounter.WithLabelValues("queued").Dec()
-
-		if err := a.generate(item); err != nil {
-			logger.Error("unable to generate thumbnail for %s: %s", item.Pathname, err)
-		} else {
-			logger.Info("Thumbnail generated for %s", item.Pathname)
-		}
-
-		// Do not stress API
-		time.Sleep(waitTimeout)
-	}
 }

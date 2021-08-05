@@ -9,9 +9,7 @@ import (
 	"net/http"
 	"path"
 
-	"github.com/ViBiOh/fibr/pkg/exif"
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
@@ -56,17 +54,7 @@ func (a *app) saveUploadedFile(request provider.Request, part *multipart.Part) (
 		return "", err
 	}
 
-	go func() {
-		if thumbnail.CanHaveThumbnail(info) {
-			a.thumbnailApp.GenerateFor(info)
-		}
-
-		if exif.CanHaveExif(info) {
-			a.exifApp.UpdateDateFor(info)
-			a.exifApp.ExtractGeocodeFor(info)
-			a.exifApp.AggregateFor(info)
-		}
-	}()
+	go a.notify(provider.NewUploadEvent(info))
 
 	return filename, nil
 }

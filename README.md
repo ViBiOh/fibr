@@ -136,8 +136,6 @@ You'll find a Kubernetes exemple in the [`infra/`](infra/) folder, using my [`ap
 Usage of fibr:
   -address string
         [server] Listen address {FIBR_ADDRESS}
-  -aggregateExifOnStart
-        [crud] Aggregate EXIF data per folder on start {FIBR_AGGREGATE_EXIF_ON_START}
   -authProfiles string
         [auth] Users profiles in the form 'id:profile1|profile2,id2:profile1' {FIBR_AUTH_PROFILES}
   -authUsers string
@@ -146,8 +144,10 @@ Usage of fibr:
         [server] Certificate file {FIBR_CERT}
   -csp string
         [owasp] Content-Security-Policy {FIBR_CSP} (default "default-src 'self'; base-uri 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:")
+  -exifAggregateOnStart
+        [exif] Aggregate EXIF data per folder on start {FIBR_EXIF_AGGREGATE_ON_START}
   -exifDateOnStart
-        [crud] Change file date from EXIF date on start {FIBR_EXIF_DATE_ON_START}
+        [exif] Change file date from EXIF date on start {FIBR_EXIF_DATE_ON_START}
   -exifGeocodeURL string
         [exif] Nominatim Geocode Service URL. This can leak GPS metadatas to a third-party (e.g. "https://nominatim.openstreetmap.org") {FIBR_EXIF_GEOCODE_URL}
   -exifURL string

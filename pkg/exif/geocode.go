@@ -33,11 +33,7 @@ type geocode struct {
 	Longitude string            `json:"lon"`
 }
 
-func (a app) ExtractGeocodeFor(item provider.StorageItem) {
-	if !a.enabled() {
-		return
-	}
-
+func (a app) geocode(item provider.StorageItem) {
 	if len(a.geocodeURL) == 0 {
 		return
 	}
@@ -50,17 +46,12 @@ func (a app) ExtractGeocodeFor(item provider.StorageItem) {
 		return
 	}
 
-	for {
-		select {
-		case <-a.done:
-			logger.Warn("Service is going to shutdown, not adding more geocode to the queue `%s`", item.Pathname)
-			return
-		case a.geocodeQueue <- item:
-			a.increaseMetric("geocode", "queued")
-			return
-		default:
-			time.Sleep(publicNominatimInterval * 2)
-		}
+	select {
+	case <-a.done:
+		logger.Warn("Service is going to shutdown, not adding more geocode to the queue `%s`", item.Pathname)
+		return
+	case a.geocodeQueue <- item:
+		a.increaseMetric("geocode", "queued")
 	}
 }
 

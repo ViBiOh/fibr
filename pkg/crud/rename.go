@@ -24,8 +24,7 @@ func (a *app) doRename(oldPath, newPath string, oldItem provider.StorageItem) (p
 		return newItem, fmt.Errorf("unable to update share: %s", err)
 	}
 
-	go a.thumbnailApp.Rename(oldItem, newItem)
-	go a.exifApp.Rename(oldItem, newItem)
+	go a.notify(provider.NewRenameEvent(oldItem, newItem))
 
 	return newItem, nil
 }
