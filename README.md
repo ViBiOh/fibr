@@ -82,7 +82,7 @@ In order to work, your user _must have_ `admin` profile sets with the `-authProf
 
 ### Metadatas
 
-With help of different sidercars, Fibr can generate image, video and PDF thumbnails. These sidecars can be self hosted with ease. It can also extract and enrich content displayed by looking at [EXIF Data](https://en.wikipedia.org/wiki/Exif), also with the help of a little sidecar. This behaviour are opt-out (if you remove the `url` of the service, Fibr will do nothing).
+With help of different sidecars, Fibr can generate image, video and PDF thumbnails. These sidecars can be self hosted with ease. It can also extract and enrich content displayed by looking at [EXIF Data](https://en.wikipedia.org/wiki/Exif), also with the help of a little sidecar. This behaviour are opt-out (if you remove the `url` of the service, Fibr will do nothing).
 
 For the last mile, Fibr can try to reverse geocoding the GPS data found in EXIF, using [Open Street Map](https://wiki.openstreetmap.org/wiki/Nominatim). Hosting this kind of service is complicated and calling a third-party party with such sensible datas is an opt-in decision.
 
@@ -102,7 +102,7 @@ fibr \
 
 ### As a single Docker container, with admin/password user
 
-For long-living sharing with password and self-contained app in Docker, with no thumbnail generation or exif.
+For long-living sharing with password and self-contained app in Docker, with no thumbnail generation or exif, configured with environment variables.
 
 ```bash
 docker run -d \
@@ -125,12 +125,16 @@ You'll find a Kubernetes exemple in the [`infra/`](infra/) folder, using my [`ap
 
 ## Endpoints
 
-- `GET /health`: healthcheck of server, respond [`okStatus (default 204)`](#usage) or `503` during [`graceDuration`](#usage) when SIGTERM is received
+- `GET /health`: healthcheck of server, respond [`okStatus (default 204)`](#usage) or `503` during [`graceDuration`](#usage) when `SIGTERM` is received
 - `GET /ready`: same response than `/health` but it also checks external dependencies availability
 - `GET /version`: value of `VERSION` environment variable
-- `GET /metrics`: Prometheus metrics values, on a dedicated port
+- `GET /metrics`: Prometheus metrics, on a dedicated port [`prometheusPort (default 9090)`](#usage)
 
 ## Usage
+
+Fibr can be configured by passing CLI args described below or their equivalent as environment variable. If both the CLI and environment variable are defined, the CLI value is used.
+
+Be careful when using the CLI, if someone list the processes on the system, they will appear in plain-text. I recommend passing secrets by environment variables: it's less easily visible.
 
 ```bash
 Usage of fibr:
@@ -239,11 +243,3 @@ Fibr doesn't handle multiple instances running at the same time on the same `roo
 Shares' metadatas are stored in a file, loaded at the start of the application. If an _instance A_ adds a share, _instance B_ can't see it. If they are both behind the same load-balancer, it can leads to an erratic behavior.
 
 Fibr has also an internal cron that purge expired shares and write the new metadatas to the file. If _instance A_ adds a share and _instance B_ runs the cron, the share added in _instance A_ is lost. It's a known limitation I need to work on, without adding an external tool like Redis and without being I/O intensive on filesystem.
-
-## Change in metadatas format
-
-In recent version, metadatas file structure has changed from an array to the map. You can convert it with the following snippet (make a copy before, updating a JSON in place with `jq` can be risky).
-
-```bash
-cat <<<"$(jq 'map({ (.id): . }) | add' .json)" > .json
-```

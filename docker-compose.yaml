@@ -1,4 +1,6 @@
+---
 version: '2.1'
+
 services:
   video:
     image: vibioh/vith
@@ -17,6 +19,7 @@ services:
     restart: on-failure:5
     security_opt:
       - no-new-privileges
+
   image:
     image: h2non/imaginary
     labels:
