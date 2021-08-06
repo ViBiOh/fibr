@@ -116,5 +116,5 @@ func SetPrefsCookie(w http.ResponseWriter, request Request) {
 		SameSite: http.SameSiteStrictMode,
 	})
 
-	w.Header().Set("content-language", "en")
+	w.Header().Add("content-language", "en")
 }

@@ -89,13 +89,13 @@ func TestCheckFormName(t *testing.T) {
 		"filename": {"/"},
 	}
 	rootRequest := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(rootValues.Encode()))
-	rootRequest.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	rootRequest.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
 	validValues := url.Values{
 		"filename": {"/README.md"},
 	}
 	validRequest := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(validValues.Encode()))
-	validRequest.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	validRequest.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
 	var cases = []struct {
 		intention string

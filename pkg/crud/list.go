@@ -88,7 +88,7 @@ func (a *app) Download(w http.ResponseWriter, request provider.Request) {
 		filename = path.Base(path.Join(request.Share.RootName, request.Path))
 	}
 
-	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s.zip", filename))
+	w.Header().Add("Content-Disposition", fmt.Sprintf("attachment; filename=%s.zip", filename))
 
 	if err := a.zipFiles(request, zipWriter, ""); err != nil {
 		a.rendererApp.Error(w, err)

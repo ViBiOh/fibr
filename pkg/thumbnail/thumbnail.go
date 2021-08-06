@@ -132,8 +132,8 @@ func (a app) List(w http.ResponseWriter, _ *http.Request, item provider.StorageI
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Add("Content-Type", "application/json; charset=utf-8")
+	w.Header().Add("Cache-Control", "no-cache")
 	w.WriteHeader(http.StatusOK)
 
 	commaNeeded := false
