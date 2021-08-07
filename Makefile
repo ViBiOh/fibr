@@ -66,7 +66,7 @@ style:
 ## mocks: Generate mocks
 .PHONY: mocks
 mocks:
-	find . -name "mock" -type d -exec rm {} \;
+	find . -name "mocks" -type d -exec rm {} \;
 	mockgen -destination pkg/mocks/crud.go -mock_names Crud=Crud -package mocks github.com/ViBiOh/fibr/pkg/provider Crud
 	mockgen -destination pkg/mocks/auth.go -mock_names Auth=Auth -package mocks github.com/ViBiOh/fibr/pkg/provider Auth
 	mockgen -destination pkg/mocks/share.go -mock_names App=Share -package mocks github.com/ViBiOh/fibr/pkg/share App
