@@ -7,7 +7,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 )
 
-func (a app) rename(old, new provider.StorageItem) error {
+func (a App) rename(old, new provider.StorageItem) error {
 	for _, suffix := range metadataFilenames {
 		oldPath := getExifPath(old, suffix)
 		if _, err := a.storageApp.Info(oldPath); provider.IsNotExist(err) {
@@ -28,7 +28,7 @@ func (a app) rename(old, new provider.StorageItem) error {
 	return nil
 }
 
-func (a app) aggregateOnRename(old, new provider.StorageItem) error {
+func (a App) aggregateOnRename(old, new provider.StorageItem) error {
 	oldDir, err := a.getDirOf(old)
 	if err != nil {
 		return fmt.Errorf("unable to get old directory: %s", err)
@@ -54,7 +54,7 @@ func (a app) aggregateOnRename(old, new provider.StorageItem) error {
 	return nil
 }
 
-func (a app) delete(item provider.StorageItem) error {
+func (a App) delete(item provider.StorageItem) error {
 	for _, suffix := range metadataFilenames {
 		if err := a.storageApp.Remove(getExifPath(item, suffix)); err != nil {
 			return fmt.Errorf("unable to delete: %s", err)
@@ -70,7 +70,8 @@ func (a app) delete(item provider.StorageItem) error {
 	return nil
 }
 
-func (a app) EventConsumer(e provider.Event) {
+// EventConsumer handle event pushed to the event bus
+func (a App) EventConsumer(e provider.Event) {
 	if !a.enabled() {
 		return
 	}
@@ -95,15 +96,15 @@ func (a app) EventConsumer(e provider.Event) {
 	}
 }
 
-func (a app) handleStartEvent(item provider.StorageItem) error {
+func (a App) handleStartEvent(item provider.StorageItem) error {
 	if CanHaveExif(item) {
-		if !a.HasExif(item) {
+		if !a.hasExif(item) {
 			if _, err := a.get(item); err != nil {
 				return fmt.Errorf("unable to get exif : %s", err)
 			}
 		}
 
-		if !a.HasGeocode(item) {
+		if !a.hasGeocode(item) {
 			a.geocode(item)
 		}
 
@@ -123,7 +124,7 @@ func (a app) handleStartEvent(item provider.StorageItem) error {
 	return nil
 }
 
-func (a app) handleUploadEvent(item provider.StorageItem) error {
+func (a App) handleUploadEvent(item provider.StorageItem) error {
 	if !CanHaveExif(item) {
 		return nil
 	}

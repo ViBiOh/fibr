@@ -16,7 +16,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
-func (a *app) getCover(files []provider.StorageItem) map[string]interface{} {
+func (a *App) getCover(files []provider.StorageItem) map[string]interface{} {
 	for _, file := range files {
 		if file.IsVideo() {
 			continue
@@ -35,7 +35,7 @@ func (a *app) getCover(files []provider.StorageItem) map[string]interface{} {
 }
 
 // List render directory web view of given dirPath
-func (a *app) List(w http.ResponseWriter, request provider.Request, message renderer.Message) (string, int, map[string]interface{}, error) {
+func (a *App) List(w http.ResponseWriter, request provider.Request, message renderer.Message) (string, int, map[string]interface{}, error) {
 	files, err := a.storageApp.List(request.GetFilepath(""))
 	if err != nil {
 		return "", 0, nil, err
@@ -75,7 +75,7 @@ func (a *app) List(w http.ResponseWriter, request provider.Request, message rend
 }
 
 // Download content of a directory into a streamed zip
-func (a *app) Download(w http.ResponseWriter, request provider.Request) {
+func (a *App) Download(w http.ResponseWriter, request provider.Request) {
 	zipWriter := zip.NewWriter(w)
 	defer func() {
 		if err := zipWriter.Close(); err != nil {
@@ -95,7 +95,7 @@ func (a *app) Download(w http.ResponseWriter, request provider.Request) {
 	}
 }
 
-func (a *app) zipFiles(request provider.Request, zipWriter *zip.Writer, pathname string) error {
+func (a *App) zipFiles(request provider.Request, zipWriter *zip.Writer, pathname string) error {
 	files, err := a.storageApp.List(request.GetFilepath(pathname))
 	if err != nil {
 		return err
@@ -114,7 +114,7 @@ func (a *app) zipFiles(request provider.Request, zipWriter *zip.Writer, pathname
 	return nil
 }
 
-func (a *app) addFileToZip(zipWriter *zip.Writer, file provider.StorageItem, pathname string) error {
+func (a *App) addFileToZip(zipWriter *zip.Writer, file provider.StorageItem, pathname string) error {
 	header, err := zip.FileInfoHeader(file.Info.(os.FileInfo))
 	if err != nil {
 		return err

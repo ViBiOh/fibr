@@ -24,7 +24,7 @@ const (
 )
 
 var (
-	exasClient = http.Client{
+	exasClient = &http.Client{
 		Timeout: 2 * time.Minute,
 		CheckRedirect: func(*http.Request, []*http.Request) error {
 			return http.ErrUseLastResponse
@@ -54,23 +54,7 @@ var (
 )
 
 // App of package
-type App interface {
-	Start(<-chan struct{})
-	HasExif(provider.StorageItem) bool
-	HasGeocode(provider.StorageItem) bool
-	GetAggregateFor(provider.StorageItem) (provider.Aggregate, error)
-	EventConsumer(provider.Event)
-}
-
-// Config of package
-type Config struct {
-	exifURL          *string
-	geocodeURL       *string
-	dateOnStart      *bool
-	aggregateOnStart *bool
-}
-
-type app struct {
+type App struct {
 	storageApp provider.Storage
 
 	done           chan struct{}
@@ -85,6 +69,14 @@ type app struct {
 	aggregateOnStart bool
 }
 
+// Config of package
+type Config struct {
+	exifURL          *string
+	geocodeURL       *string
+	dateOnStart      *bool
+	aggregateOnStart *bool
+}
+
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) Config {
 	return Config{
@@ -97,7 +89,7 @@ func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) Config 
 
 // New creates new App from Config
 func New(config Config, storageApp provider.Storage, prometheusRegisterer prometheus.Registerer) App {
-	return app{
+	return App{
 		exifURL:          strings.TrimSpace(*config.exifURL),
 		geocodeURL:       strings.TrimSpace(*config.geocodeURL),
 		dateOnStart:      *config.dateOnStart,
@@ -111,11 +103,12 @@ func New(config Config, storageApp provider.Storage, prometheusRegisterer promet
 	}
 }
 
-func (a app) enabled() bool {
+func (a App) enabled() bool {
 	return len(a.exifURL) != 0
 }
 
-func (a app) Start(done <-chan struct{}) {
+// Start worker
+func (a App) Start(done <-chan struct{}) {
 	defer close(a.geocodeQueue)
 	defer close(a.done)
 
@@ -128,7 +121,7 @@ func (a app) Start(done <-chan struct{}) {
 	<-done
 }
 
-func (a app) get(item provider.StorageItem) (map[string]interface{}, error) {
+func (a App) get(item provider.StorageItem) (map[string]interface{}, error) {
 	exif, err := a.loadExif(item)
 	if err != nil {
 		return nil, fmt.Errorf("unable to load exif: %s", err)
@@ -146,7 +139,7 @@ func (a app) get(item provider.StorageItem) (map[string]interface{}, error) {
 	return exif, nil
 }
 
-func (a app) fetchAndStoreExif(item provider.StorageItem) (map[string]interface{}, error) {
+func (a App) fetchAndStoreExif(item provider.StorageItem) (map[string]interface{}, error) {
 	file, err := a.storageApp.ReaderFrom(item.Pathname) // file will be closed by `.Send`
 	if err != nil {
 		return nil, fmt.Errorf("unable to get reader: %s", err)

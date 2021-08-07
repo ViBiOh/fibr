@@ -5,7 +5,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 )
 
-func (a app) rename(old, new provider.StorageItem) {
+func (a App) rename(old, new provider.StorageItem) {
 	oldPath := getThumbnailPath(old)
 	if _, err := a.storageApp.Info(oldPath); provider.IsNotExist(err) {
 		return
@@ -16,13 +16,14 @@ func (a app) rename(old, new provider.StorageItem) {
 	}
 }
 
-func (a app) delete(item provider.StorageItem) {
+func (a App) delete(item provider.StorageItem) {
 	if err := a.storageApp.Remove(getThumbnailPath(item)); err != nil {
 		logger.Error("unable to delete thumbnail: %s", err)
 	}
 }
 
-func (a app) EventConsumer(e provider.Event) {
+// EventConsumer handle event pushed to the event bus
+func (a App) EventConsumer(e provider.Event) {
 	if !a.enabled() {
 		return
 	}

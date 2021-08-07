@@ -10,7 +10,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
-func (a *app) doRename(oldPath, newPath string, oldItem provider.StorageItem) (provider.StorageItem, error) {
+func (a *App) doRename(oldPath, newPath string, oldItem provider.StorageItem) (provider.StorageItem, error) {
 	if err := a.storageApp.Rename(oldPath, newPath); err != nil {
 		return provider.StorageItem{}, err
 	}
@@ -30,7 +30,7 @@ func (a *app) doRename(oldPath, newPath string, oldItem provider.StorageItem) (p
 }
 
 // Rename rename given path to a new one
-func (a *app) Rename(w http.ResponseWriter, r *http.Request, request provider.Request) {
+func (a *App) Rename(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !request.CanEdit {
 		a.rendererApp.Error(w, model.WrapForbidden(ErrNotAuthorized))
 		return

@@ -3,14 +3,11 @@ package crud
 import (
 	"errors"
 	"flag"
-	"mime/multipart"
-	"net/http"
 	"regexp"
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/exif"
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/fibr/pkg/share"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v4/pkg/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
@@ -32,39 +29,22 @@ var (
 )
 
 // App of package
-type App interface {
-	Start(done <-chan struct{})
-
-	Browser(http.ResponseWriter, provider.Request, provider.StorageItem, renderer.Message) (string, int, map[string]interface{}, error)
-	List(http.ResponseWriter, provider.Request, renderer.Message) (string, int, map[string]interface{}, error)
-	Get(http.ResponseWriter, *http.Request, provider.Request) (string, int, map[string]interface{}, error)
-
-	Post(http.ResponseWriter, *http.Request, provider.Request)
-	Create(http.ResponseWriter, *http.Request, provider.Request)
-	Upload(http.ResponseWriter, *http.Request, provider.Request, map[string]string, *multipart.Part)
-	Rename(http.ResponseWriter, *http.Request, provider.Request)
-	Delete(http.ResponseWriter, *http.Request, provider.Request)
-
-	CreateShare(http.ResponseWriter, *http.Request, provider.Request)
-	DeleteShare(http.ResponseWriter, *http.Request, provider.Request)
-}
-
-// Config of package
-type Config struct {
-	ignore          *string
-	sanitizeOnStart *bool
-}
-
-type app struct {
+type App struct {
 	storageApp   provider.Storage
 	rendererApp  renderer.App
-	shareApp     share.App
+	shareApp     provider.ShareManager
 	thumbnailApp thumbnail.App
 	exifApp      exif.App
 
 	pushEvent provider.EventProducer
 
 	sanitizeOnStart bool
+}
+
+// Config of package
+type Config struct {
+	ignore          *string
+	sanitizeOnStart *bool
 }
 
 // Flags adds flags for configuring package
@@ -76,8 +56,8 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 }
 
 // New creates new App from Config
-func New(config Config, storage provider.Storage, rendererApp renderer.App, shareApp share.App, thumbnailApp thumbnail.App, exifApp exif.App, eventProducer provider.EventProducer) (App, error) {
-	app := &app{
+func New(config Config, storage provider.Storage, rendererApp renderer.App, shareApp provider.ShareManager, thumbnailApp thumbnail.App, exifApp exif.App, eventProducer provider.EventProducer) (App, error) {
+	app := App{
 		sanitizeOnStart: *config.sanitizeOnStart,
 
 		pushEvent: eventProducer,
@@ -94,7 +74,7 @@ func New(config Config, storage provider.Storage, rendererApp renderer.App, shar
 	if len(ignore) != 0 {
 		pattern, err := regexp.Compile(ignore)
 		if err != nil {
-			return nil, err
+			return App{}, err
 		}
 
 		ignorePattern = pattern
@@ -116,7 +96,8 @@ func New(config Config, storage provider.Storage, rendererApp renderer.App, shar
 	return app, nil
 }
 
-func (a *app) Start(done <-chan struct{}) {
+// Start crud operations
+func (a *App) Start(done <-chan struct{}) {
 	err := a.storageApp.Walk("", func(item provider.StorageItem, err error) error {
 		if err != nil {
 			return err
@@ -139,7 +120,7 @@ func (a *app) Start(done <-chan struct{}) {
 	}
 }
 
-func (a *app) sanitizeName(item provider.StorageItem) provider.StorageItem {
+func (a *App) sanitizeName(item provider.StorageItem) provider.StorageItem {
 	name, err := provider.SanitizeName(item.Pathname, false)
 	if err != nil {
 		logger.Error("unable to sanitize name %s: %s", item.Pathname, err)
@@ -158,7 +139,7 @@ func (a *app) sanitizeName(item provider.StorageItem) provider.StorageItem {
 	return a.rename(item, name)
 }
 
-func (a *app) rename(item provider.StorageItem, name string) provider.StorageItem {
+func (a *App) rename(item provider.StorageItem, name string) provider.StorageItem {
 	logger.Info("Renaming `%s` to `%s`", item.Pathname, name)
 
 	renamedItem, err := a.doRename(item.Pathname, name, item)

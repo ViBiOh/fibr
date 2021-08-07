@@ -16,14 +16,14 @@ const (
 	defaultTimeout = time.Minute * 2
 )
 
-var thumbnailClient = http.Client{
+var thumbnailClient = &http.Client{
 	Timeout: 2 * time.Minute,
 	CheckRedirect: func(*http.Request, []*http.Request) error {
 		return http.ErrUseLastResponse
 	},
 }
 
-func (a app) generate(item provider.StorageItem) error {
+func (a App) generate(item provider.StorageItem) error {
 	var (
 		file io.ReadCloser
 		err  error

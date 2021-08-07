@@ -67,10 +67,10 @@ style:
 .PHONY: mocks
 mocks:
 	find . -name "mock" -type d -exec rm {} \;
-	mockgen -destination pkg/mocks/crud.go -mock_names App=Crud -package mocks github.com/ViBiOh/fibr/pkg/crud App
+	mockgen -destination pkg/mocks/crud.go -mock_names Crud=Crud -package mocks github.com/ViBiOh/fibr/pkg/provider Crud
+	mockgen -destination pkg/mocks/auth.go -mock_names Auth=Auth -package mocks github.com/ViBiOh/fibr/pkg/provider Auth
 	mockgen -destination pkg/mocks/share.go -mock_names App=Share -package mocks github.com/ViBiOh/fibr/pkg/share App
 	mockgen -destination pkg/mocks/storage.go -mock_names Storage=Storage -package mocks github.com/ViBiOh/fibr/pkg/provider Storage
-	mockgen -destination pkg/mocks/auth_middleware.go -mock_names App=AuthMiddleware -package mocks github.com/ViBiOh/auth/v2/pkg/middleware App
 
 ## test: Shortcut to launch all the test tasks (unit, functional and integration).
 .PHONY: test

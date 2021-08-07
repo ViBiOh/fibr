@@ -21,7 +21,7 @@ func uuid() (string, error) {
 	return fmt.Sprintf("%x-%x-%x-%x-%x", raw[0:4], raw[4:6], raw[6:8], raw[8:10], raw[10:]), nil
 }
 
-func (a *app) generateShareID() (string, error) {
+func (a *App) generateShareID() (string, error) {
 	for {
 		uuid, err := uuid()
 		if err != nil {
@@ -35,7 +35,8 @@ func (a *app) generateShareID() (string, error) {
 	}
 }
 
-func (a *app) Create(filepath string, edit bool, password string, isDir bool, duration time.Duration) (string, error) {
+// Create a share
+func (a *App) Create(filepath string, edit bool, password string, isDir bool, duration time.Duration) (string, error) {
 	if !a.Enabled() {
 		return "", fmt.Errorf("share is disabled")
 	}
@@ -62,7 +63,8 @@ func (a *app) Create(filepath string, edit bool, password string, isDir bool, du
 	return id, a.saveShares()
 }
 
-func (a *app) Delete(id string) error {
+// Delete a share
+func (a *App) Delete(id string) error {
 	if !a.Enabled() {
 		return fmt.Errorf("share is disabled")
 	}
@@ -75,7 +77,8 @@ func (a *app) Delete(id string) error {
 	return a.saveShares()
 }
 
-func (a *app) RenamePath(oldPath, newPath string) error {
+// RenamePath of a potential share
+func (a *App) RenamePath(oldPath, newPath string) error {
 	if !a.Enabled() {
 		return nil
 	}
@@ -93,7 +96,8 @@ func (a *app) RenamePath(oldPath, newPath string) error {
 	return a.saveShares()
 }
 
-func (a *app) DeletePath(path string) error {
+// DeletePath of a potential share
+func (a *App) DeletePath(path string) error {
 	if !a.Enabled() {
 		return nil
 	}

@@ -18,7 +18,7 @@ func CanHaveThumbnail(item provider.StorageItem) bool {
 }
 
 // HasThumbnail determine if thumbnail exist for given pathname
-func (a app) HasThumbnail(item provider.StorageItem) bool {
+func (a App) HasThumbnail(item provider.StorageItem) bool {
 	if !a.enabled() {
 		return false
 	}

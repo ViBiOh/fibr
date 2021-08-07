@@ -8,7 +8,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
-func (a app) updateDate(item provider.StorageItem) error {
+func (a App) updateDate(item provider.StorageItem) error {
 	createDate, err := a.getDate(item)
 	if err != nil {
 		return fmt.Errorf("unable to get date: %s", err)
@@ -29,7 +29,7 @@ func (a app) updateDate(item provider.StorageItem) error {
 	return nil
 }
 
-func (a app) getDate(item provider.StorageItem) (time.Time, error) {
+func (a App) getDate(item provider.StorageItem) (time.Time, error) {
 	data, err := a.get(item)
 	if err != nil {
 		return time.Time{}, fmt.Errorf("unable to get exif: %s", err)

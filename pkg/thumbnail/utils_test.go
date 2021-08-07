@@ -58,19 +58,19 @@ func TestCanHaveThumbnail(t *testing.T) {
 func TestHasThumbnail(t *testing.T) {
 	var cases = []struct {
 		intention string
-		instance  app
+		instance  App
 		input     provider.StorageItem
 		want      bool
 	}{
 		{
 			"not enabled",
-			app{},
+			App{},
 			provider.StorageItem{},
 			false,
 		},
 		{
 			"not found",
-			app{
+			App{
 				imageURL: publicPath,
 				videoURL: publicPath,
 			},
@@ -82,7 +82,7 @@ func TestHasThumbnail(t *testing.T) {
 		},
 		{
 			"found",
-			app{
+			App{
 				imageURL: publicPath,
 				videoURL: publicPath,
 			},

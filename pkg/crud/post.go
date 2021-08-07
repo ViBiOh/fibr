@@ -43,7 +43,7 @@ func parseMultipart(r *http.Request) (map[string]string, *multipart.Part, error)
 }
 
 // Post handle post from form
-func (a *app) Post(w http.ResponseWriter, r *http.Request, request provider.Request) {
+func (a *App) Post(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	contentType := r.Header.Get("Content-Type")
 
 	if contentType == "application/x-www-form-urlencoded" {
@@ -52,9 +52,9 @@ func (a *app) Post(w http.ResponseWriter, r *http.Request, request provider.Requ
 		if r.FormValue("type") == "share" {
 			switch method {
 			case http.MethodPost:
-				a.CreateShare(w, r, request)
+				a.createShare(w, r, request)
 			case http.MethodDelete:
-				a.DeleteShare(w, r, request)
+				a.deleteShare(w, r, request)
 			default:
 				a.rendererApp.Error(w, model.WrapMethodNotAllowed(fmt.Errorf("unknown share method `%s` for %s", method, r.URL.Path)))
 			}

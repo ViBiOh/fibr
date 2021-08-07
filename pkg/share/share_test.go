@@ -11,12 +11,12 @@ import (
 func TestPurgeExpiredShares(t *testing.T) {
 	var cases = []struct {
 		intention string
-		instance  *app
+		instance  *App
 		want      map[string]provider.Share
 	}{
 		{
 			"empty",
-			&app{
+			&App{
 				clock: &Clock{
 					now: time.Date(2021, 05, 01, 14, 00, 00, 0, time.UTC),
 				},
@@ -26,7 +26,7 @@ func TestPurgeExpiredShares(t *testing.T) {
 		},
 		{
 			"purge at boundaries",
-			&app{
+			&App{
 				clock: &Clock{
 					now: time.Date(2021, 05, 01, 14, 00, 00, 0, time.UTC),
 				},

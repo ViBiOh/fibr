@@ -9,30 +9,23 @@ import (
 
 	"github.com/ViBiOh/auth/v2/pkg/auth"
 	"github.com/ViBiOh/auth/v2/pkg/ident"
-	authMiddleware "github.com/ViBiOh/auth/v2/pkg/middleware"
 	authModel "github.com/ViBiOh/auth/v2/pkg/model"
-	"github.com/ViBiOh/fibr/pkg/crud"
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/fibr/pkg/share"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
 // App of package
-type App interface {
-	TemplateFunc(http.ResponseWriter, *http.Request) (string, int, map[string]interface{}, error)
-}
-
-type app struct {
-	loginApp    authMiddleware.App
-	crudApp     crud.App
+type App struct {
+	loginApp    provider.Auth
+	crudApp     provider.Crud
 	rendererApp renderer.App
-	shareApp    share.App
+	shareApp    provider.ShareManager
 }
 
 // New creates new App from Config
-func New(crudApp crud.App, rendererApp renderer.App, shareApp share.App, loginApp authMiddleware.App) App {
-	return &app{
+func New(crudApp provider.Crud, rendererApp renderer.App, shareApp provider.ShareManager, loginApp provider.Auth) App {
+	return App{
 		crudApp:     crudApp,
 		rendererApp: rendererApp,
 		loginApp:    loginApp,
@@ -40,7 +33,7 @@ func New(crudApp crud.App, rendererApp renderer.App, shareApp share.App, loginAp
 	}
 }
 
-func (a app) parseShare(request *provider.Request, authorizationHeader string) error {
+func (a App) parseShare(request *provider.Request, authorizationHeader string) error {
 	share := a.shareApp.Get(request.Path)
 	if len(share.ID) == 0 {
 		return nil
@@ -91,7 +84,7 @@ func parseDisplay(r *http.Request) string {
 	return provider.DefaultDisplay
 }
 
-func (a app) parseRequest(r *http.Request) (provider.Request, error) {
+func (a App) parseRequest(r *http.Request) (provider.Request, error) {
 	request := provider.Request{
 		Path:        r.URL.Path,
 		CanEdit:     false,

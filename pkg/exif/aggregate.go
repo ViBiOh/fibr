@@ -15,7 +15,8 @@ var (
 	levels = []string{"city", "state", "country"}
 )
 
-func (a app) GetAggregateFor(item provider.StorageItem) (provider.Aggregate, error) {
+// GetAggregateFor return aggregated value for a given directory
+func (a App) GetAggregateFor(item provider.StorageItem) (provider.Aggregate, error) {
 	if !a.enabled() {
 		return provider.Aggregate{}, nil
 	}
@@ -32,7 +33,7 @@ func (a app) GetAggregateFor(item provider.StorageItem) (provider.Aggregate, err
 	return aggregate, nil
 }
 
-func (a app) aggregate(item provider.StorageItem) error {
+func (a App) aggregate(item provider.StorageItem) error {
 	if !item.IsDir {
 		file, err := a.getDirOf(item)
 		if err != nil {
@@ -49,7 +50,7 @@ func (a app) aggregate(item provider.StorageItem) error {
 	return nil
 }
 
-func (a app) computeAndSaveAggregate(dir provider.StorageItem) error {
+func (a App) computeAndSaveAggregate(dir provider.StorageItem) error {
 	directoryAggregate := newAggregate()
 	var minDate, maxDate time.Time
 
@@ -66,13 +67,13 @@ func (a app) computeAndSaveAggregate(dir provider.StorageItem) error {
 			return filepath.SkipDir
 		}
 
-		if a.HasExif(item) {
+		if a.hasExif(item) {
 			if itemDate, err := a.getDate(item); err == nil {
 				minDate, maxDate = aggregateDate(minDate, maxDate, itemDate)
 			}
 		}
 
-		if a.HasGeocode(item) {
+		if a.hasGeocode(item) {
 			data, err := a.loadGeocode(item)
 			if err != nil {
 				return fmt.Errorf("unable to get geocode: %s", err)
@@ -112,6 +113,6 @@ func aggregateDate(min, max, current time.Time) (time.Time, time.Time) {
 	return min, max
 }
 
-func (a app) getDirOf(item provider.StorageItem) (provider.StorageItem, error) {
+func (a App) getDirOf(item provider.StorageItem) (provider.StorageItem, error) {
 	return a.storageApp.Info(path.Dir(item.Pathname))
 }

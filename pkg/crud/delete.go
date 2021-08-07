@@ -11,7 +11,7 @@ import (
 )
 
 // Delete given path from filesystem
-func (a *app) Delete(w http.ResponseWriter, r *http.Request, request provider.Request) {
+func (a *App) Delete(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !request.CanEdit {
 		a.rendererApp.Error(w, model.WrapForbidden(ErrNotAuthorized))
 		return

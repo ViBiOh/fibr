@@ -57,7 +57,8 @@ func FuncMap(thumbnailApp thumbnail.App) template.FuncMap {
 	}
 }
 
-func (a app) TemplateFunc(w http.ResponseWriter, r *http.Request) (string, int, map[string]interface{}, error) {
+// TemplateFunc for rendering GUI
+func (a App) TemplateFunc(w http.ResponseWriter, r *http.Request) (string, int, map[string]interface{}, error) {
 	if !isMethodAllowed(r) {
 		return "", 0, nil, model.WrapMethodNotAllowed(errors.New("you lack of method for calling me"))
 	}

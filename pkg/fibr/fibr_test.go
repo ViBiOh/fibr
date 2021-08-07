@@ -52,14 +52,14 @@ func TestParseShare(t *testing.T) {
 
 	var cases = []struct {
 		intention string
-		instance  app
+		instance  App
 		args      args
 		want      *provider.Request
 		wantErr   error
 	}{
 		{
 			"no share",
-			app{},
+			App{},
 			args{
 				request: &provider.Request{
 					Path:     "/",
@@ -78,7 +78,7 @@ func TestParseShare(t *testing.T) {
 		},
 		{
 			"passwordless",
-			app{},
+			App{},
 			args{
 				request: &provider.Request{
 					Path:     "/a1b2c3d4f5/index.html",
@@ -98,7 +98,7 @@ func TestParseShare(t *testing.T) {
 		},
 		{
 			"empty password",
-			app{},
+			App{},
 			args{
 				request: &provider.Request{
 					Path:     "/f5d4c3b2a1/index.html",
@@ -117,7 +117,7 @@ func TestParseShare(t *testing.T) {
 		},
 		{
 			"valid",
-			app{},
+			App{},
 			args{
 				request: &provider.Request{
 					Path:     "/f5d4c3b2a1/index.html",
@@ -239,14 +239,14 @@ func TestParseRequest(t *testing.T) {
 
 	var cases = []struct {
 		intention string
-		instance  app
+		instance  App
 		args      args
 		want      provider.Request
 		wantErr   error
 	}{
 		{
 			"error",
-			app{},
+			App{},
 			args{
 				r: httptest.NewRequest(http.MethodGet, "/f5d4c3b2a1/", nil),
 			},
@@ -260,7 +260,7 @@ func TestParseRequest(t *testing.T) {
 		},
 		{
 			"share",
-			app{},
+			App{},
 			args{
 				r: httptest.NewRequest(http.MethodGet, "/a1b2c3d4f5/", nil),
 			},
@@ -275,7 +275,7 @@ func TestParseRequest(t *testing.T) {
 		},
 		{
 			"no auth",
-			app{},
+			App{},
 			args{
 				r: httptest.NewRequest(http.MethodGet, "/", nil),
 			},
@@ -289,7 +289,7 @@ func TestParseRequest(t *testing.T) {
 		},
 		{
 			"invalid auth",
-			app{},
+			App{},
 			args{
 				r: httptest.NewRequest(http.MethodGet, invalidPath, nil),
 			},
@@ -303,7 +303,7 @@ func TestParseRequest(t *testing.T) {
 		},
 		{
 			"non admin user",
-			app{},
+			App{},
 			args{
 				r: httptest.NewRequest(http.MethodGet, "/guest", nil),
 			},
@@ -317,7 +317,7 @@ func TestParseRequest(t *testing.T) {
 		},
 		{
 			"admin user",
-			app{},
+			App{},
 			args{
 				r: httptest.NewRequest(http.MethodGet, adminPath, nil),
 			},
@@ -331,7 +331,7 @@ func TestParseRequest(t *testing.T) {
 		},
 		{
 			"empty cookie",
-			app{},
+			App{},
 			args{
 				r: adminRequestWithEmptyCookie,
 			},
@@ -345,7 +345,7 @@ func TestParseRequest(t *testing.T) {
 		},
 		{
 			"cookie value",
-			app{},
+			App{},
 			args{
 				r: adminRequestWithCookie,
 			},
@@ -369,7 +369,7 @@ func TestParseRequest(t *testing.T) {
 
 			crudMock := mocks.NewCrud(ctrl)
 			shareMock := mocks.NewShare(ctrl)
-			loginMock := mocks.NewAuthMiddleware(ctrl)
+			loginMock := mocks.NewAuth(ctrl)
 
 			tc.instance.crudApp = crudMock
 			tc.instance.shareApp = shareMock

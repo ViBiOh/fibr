@@ -26,20 +26,7 @@ const (
 )
 
 // App of package
-type App interface {
-	HasThumbnail(provider.StorageItem) bool
-	Serve(http.ResponseWriter, *http.Request, provider.StorageItem)
-	List(http.ResponseWriter, *http.Request, provider.StorageItem)
-	EventConsumer(provider.Event)
-}
-
-// Config of package
-type Config struct {
-	imageURL *string
-	videoURL *string
-}
-
-type app struct {
+type App struct {
 	storageApp    provider.Storage
 	pathnameInput chan provider.StorageItem
 
@@ -47,6 +34,12 @@ type app struct {
 
 	imageURL string
 	videoURL string
+}
+
+// Config of package
+type Config struct {
+	imageURL *string
+	videoURL *string
 }
 
 // Flags adds flags for configuring package
@@ -73,31 +66,29 @@ func New(config Config, storage provider.Storage, prometheusRegisterer prometheu
 
 	imageURL := strings.TrimSpace(*config.imageURL)
 	if len(imageURL) == 0 {
-		return &app{}
+		return App{}
 	}
 
 	videoURL := strings.TrimSpace(*config.videoURL)
 	if len(videoURL) == 0 {
-		return &app{}
+		return App{}
 	}
 
-	app := &app{
+	return App{
 		imageURL:         fmt.Sprintf("%s/crop?width=%d&height=%d&stripmeta=true&noprofile=true&quality=80&type=jpeg", imageURL, Width, Height),
 		videoURL:         videoURL,
 		storageApp:       storage,
 		thumbnailCounter: thumbnailCounter,
 		pathnameInput:    make(chan provider.StorageItem, 10),
 	}
-
-	return app
 }
 
-func (a app) enabled() bool {
+func (a App) enabled() bool {
 	return len(a.imageURL) != 0 && len(a.videoURL) != 0
 }
 
 // Serve check if thumbnail is present and serve it
-func (a app) Serve(w http.ResponseWriter, r *http.Request, item provider.StorageItem) {
+func (a App) Serve(w http.ResponseWriter, r *http.Request, item provider.StorageItem) {
 	if !CanHaveThumbnail(item) || !a.HasThumbnail(item) {
 		w.WriteHeader(http.StatusNoContent)
 		return
@@ -120,7 +111,7 @@ func (a app) Serve(w http.ResponseWriter, r *http.Request, item provider.Storage
 }
 
 // List return all thumbnail in a base64 form
-func (a app) List(w http.ResponseWriter, _ *http.Request, item provider.StorageItem) {
+func (a App) List(w http.ResponseWriter, _ *http.Request, item provider.StorageItem) {
 	if !a.enabled() {
 		w.WriteHeader(http.StatusNoContent)
 		return
@@ -158,7 +149,7 @@ func (a app) List(w http.ResponseWriter, _ *http.Request, item provider.StorageI
 	provider.SafeWrite(w, "}")
 }
 
-func (a app) encodeThumbnailContent(encoder io.WriteCloser, item provider.StorageItem) {
+func (a App) encodeThumbnailContent(encoder io.WriteCloser, item provider.StorageItem) {
 	defer func() {
 		if err := encoder.Close(); err != nil {
 			logger.Error("unable to close encoder: %s", err)

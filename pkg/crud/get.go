@@ -12,7 +12,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
-func (a *app) getWithMessage(w http.ResponseWriter, r *http.Request, request provider.Request, message renderer.Message) (string, int, map[string]interface{}, error) {
+func (a *App) getWithMessage(w http.ResponseWriter, r *http.Request, request provider.Request, message renderer.Message) (string, int, map[string]interface{}, error) {
 	info, err := a.storageApp.Info(request.GetFilepath(""))
 	if err != nil {
 		if provider.IsNotExist(err) {
@@ -50,7 +50,7 @@ func (a *app) getWithMessage(w http.ResponseWriter, r *http.Request, request pro
 	return a.List(w, request, message)
 }
 
-func (a *app) serveThumbnail(w http.ResponseWriter, r *http.Request, info provider.StorageItem) {
+func (a *App) serveThumbnail(w http.ResponseWriter, r *http.Request, info provider.StorageItem) {
 	if info.IsDir {
 		a.thumbnailApp.List(w, r, info)
 	} else {
@@ -58,7 +58,7 @@ func (a *app) serveThumbnail(w http.ResponseWriter, r *http.Request, info provid
 	}
 }
 
-func (a *app) serveFile(w http.ResponseWriter, r *http.Request, info provider.StorageItem) error {
+func (a *App) serveFile(w http.ResponseWriter, r *http.Request, info provider.StorageItem) error {
 	file, err := a.storageApp.ReaderFrom(info.Pathname)
 	if file != nil {
 		defer func() {
@@ -76,6 +76,6 @@ func (a *app) serveFile(w http.ResponseWriter, r *http.Request, info provider.St
 }
 
 // Get output content
-func (a *app) Get(w http.ResponseWriter, r *http.Request, request provider.Request) (string, int, map[string]interface{}, error) {
+func (a *App) Get(w http.ResponseWriter, r *http.Request, request provider.Request) (string, int, map[string]interface{}, error) {
 	return a.getWithMessage(w, r, request, renderer.ParseMessage(r))
 }

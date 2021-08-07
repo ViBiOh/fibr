@@ -5,7 +5,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 )
 
-func (a *app) notify(event provider.Event) {
+func (a *App) notify(event provider.Event) {
 	if a.pushEvent == nil {
 		return
 	}

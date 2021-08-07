@@ -38,19 +38,19 @@ func TestFlags(t *testing.T) {
 func TestEnabled(t *testing.T) {
 	var cases = []struct {
 		intention string
-		instance  app
+		instance  App
 		want      bool
 	}{
 		{
 			"disabled",
-			app{
+			App{
 				exifURL: "",
 			},
 			false,
 		},
 		{
 			"enabled",
-			app{
+			App{
 				exifURL: "http://exas",
 			},
 			true,

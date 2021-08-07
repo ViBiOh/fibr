@@ -33,13 +33,13 @@ func createMetrics(prometheusRegisterer prometheus.Registerer, names ...string) 
 	return metrics
 }
 
-func (a app) increaseMetric(name, label string) {
+func (a App) increaseMetric(name, label string) {
 	if gauge, ok := a.metrics[name]; ok {
 		gauge.WithLabelValues(label).Inc()
 	}
 }
 
-func (a app) decreaseMetric(name, label string) {
+func (a App) decreaseMetric(name, label string) {
 	if gauge, ok := a.metrics[name]; ok {
 		gauge.WithLabelValues(label).Inc()
 	}

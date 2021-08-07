@@ -33,7 +33,7 @@ type geocode struct {
 	Longitude string            `json:"lon"`
 }
 
-func (a app) geocode(item provider.StorageItem) {
+func (a App) geocode(item provider.StorageItem) {
 	if len(a.geocodeURL) == 0 {
 		return
 	}
@@ -42,7 +42,7 @@ func (a app) geocode(item provider.StorageItem) {
 		return
 	}
 
-	if a.HasGeocode(item) {
+	if a.hasGeocode(item) {
 		return
 	}
 
@@ -55,7 +55,7 @@ func (a app) geocode(item provider.StorageItem) {
 	}
 }
 
-func (a app) processGeocodeQueue() {
+func (a App) processGeocodeQueue() {
 	var tick <-chan time.Time
 	if strings.HasPrefix(a.geocodeURL, publicNominatimURL) {
 		ticker := time.NewTicker(publicNominatimInterval)
@@ -76,7 +76,7 @@ func (a app) processGeocodeQueue() {
 	}
 }
 
-func (a app) extractAndSaveGeocoding(item provider.StorageItem) error {
+func (a App) extractAndSaveGeocoding(item provider.StorageItem) error {
 	lat, lon, err := a.getLatitudeAndLongitude(item)
 	if err != nil {
 		return fmt.Errorf("unable to get gps coordinate: %s", err)
@@ -99,7 +99,7 @@ func (a app) extractAndSaveGeocoding(item provider.StorageItem) error {
 	return nil
 }
 
-func (a app) getLatitudeAndLongitude(item provider.StorageItem) (string, string, error) {
+func (a App) getLatitudeAndLongitude(item provider.StorageItem) (string, string, error) {
 	geocode, err := a.loadGeocode(item)
 	if err != nil {
 		return "", "", fmt.Errorf("unable to load geocode: %s", err)
@@ -187,7 +187,7 @@ func convertDegreeMinuteSecondToDecimal(location string) (string, error) {
 	return fmt.Sprintf("%.6f", dd), nil
 }
 
-func (a app) getReverseGeocode(ctx context.Context, lat, lon string) (geocode, error) {
+func (a App) getReverseGeocode(ctx context.Context, lat, lon string) (geocode, error) {
 	params := url.Values{}
 	params.Set("lat", lat)
 	params.Set("lon", lon)

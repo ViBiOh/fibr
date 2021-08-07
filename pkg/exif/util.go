@@ -30,15 +30,15 @@ func getExifPath(item provider.StorageItem, suffix string) string {
 	return fmt.Sprintf("%s_%s.json", name, suffix)
 }
 
-func (a app) HasExif(item provider.StorageItem) bool {
+func (a App) hasExif(item provider.StorageItem) bool {
 	return a.hasMetadata(item, exifMetadataFilename)
 }
 
-func (a app) HasGeocode(item provider.StorageItem) bool {
+func (a App) hasGeocode(item provider.StorageItem) bool {
 	return a.hasMetadata(item, geocodeMetadataFilename)
 }
 
-func (a app) hasMetadata(item provider.StorageItem, suffix string) bool {
+func (a App) hasMetadata(item provider.StorageItem, suffix string) bool {
 	if !a.enabled() {
 		return false
 	}
@@ -47,22 +47,22 @@ func (a app) hasMetadata(item provider.StorageItem, suffix string) bool {
 	return err == nil
 }
 
-func (a app) loadExif(item provider.StorageItem) (map[string]interface{}, error) {
+func (a App) loadExif(item provider.StorageItem) (map[string]interface{}, error) {
 	var data map[string]interface{}
 	return data, a.loadMetadata(item, exifMetadataFilename, &data)
 }
 
-func (a app) loadGeocode(item provider.StorageItem) (geocode, error) {
+func (a App) loadGeocode(item provider.StorageItem) (geocode, error) {
 	var data geocode
 	return data, a.loadMetadata(item, geocodeMetadataFilename, &data)
 }
 
-func (a app) loadAggregate(item provider.StorageItem) (provider.Aggregate, error) {
+func (a App) loadAggregate(item provider.StorageItem) (provider.Aggregate, error) {
 	var data provider.Aggregate
 	return data, a.loadMetadata(item, aggregateMetadataFilename, &data)
 }
 
-func (a app) loadMetadata(item provider.StorageItem, suffix string, content interface{}) error {
+func (a App) loadMetadata(item provider.StorageItem, suffix string, content interface{}) error {
 	reader, err := a.storageApp.ReaderFrom(getExifPath(item, suffix))
 	if err != nil {
 		if !provider.IsNotExist(err) {
@@ -78,7 +78,7 @@ func (a app) loadMetadata(item provider.StorageItem, suffix string, content inte
 	return nil
 }
 
-func (a app) saveMetadata(item provider.StorageItem, suffix string, data interface{}) error {
+func (a App) saveMetadata(item provider.StorageItem, suffix string, data interface{}) error {
 	filename := getExifPath(item, suffix)
 	dirname := path.Dir(filename)
 

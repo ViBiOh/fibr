@@ -30,7 +30,7 @@ import (
 //go:embed templates static
 var content embed.FS
 
-func newLoginApp(basicConfig basicMemory.Config) authMiddleware.App {
+func newLoginApp(basicConfig basicMemory.Config) provider.Auth {
 	basicApp, err := basicMemory.New(basicConfig)
 	logger.Fatal(err)
 
@@ -86,15 +86,15 @@ func main() {
 	logger.Fatal(err)
 
 	shareApp := share.New(shareConfig, storageApp)
-	crudApp, err := crud.New(crudConfig, storageApp, rendererApp, shareApp, thumbnailApp, exifApp, eventBus.Push)
+	crudApp, err := crud.New(crudConfig, storageApp, rendererApp, &shareApp, thumbnailApp, exifApp, eventBus.Push)
 	logger.Fatal(err)
 
-	var middlewareApp authMiddleware.App
+	var middlewareApp provider.Auth
 	if !*disableAuth {
 		middlewareApp = newLoginApp(basicConfig)
 	}
 
-	fibrApp := fibr.New(crudApp, rendererApp, shareApp, middlewareApp)
+	fibrApp := fibr.New(&crudApp, rendererApp, &shareApp, middlewareApp)
 	handler := rendererApp.Handler(fibrApp.TemplateFunc)
 
 	go shareApp.Start(healthApp.Done())

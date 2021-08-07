@@ -13,8 +13,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// CreateShare create a share for given URL
-func (a *app) CreateShare(w http.ResponseWriter, r *http.Request, request provider.Request) {
+func (a *App) createShare(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !a.shareApp.Enabled() {
 		a.rendererApp.Error(w, model.WrapInternal(errors.New("share is disabled")))
 		return
@@ -76,8 +75,7 @@ func (a *app) CreateShare(w http.ResponseWriter, r *http.Request, request provid
 	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/?d=%s#share-list", path.Dir(request.URL("")), request.Layout("")), renderer.NewSuccessMessage("Share successfully created with ID: %s", id))
 }
 
-// DeleteShare delete a share from given ID
-func (a *app) DeleteShare(w http.ResponseWriter, r *http.Request, request provider.Request) {
+func (a *App) deleteShare(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !a.shareApp.Enabled() {
 		a.rendererApp.Error(w, model.WrapInternal(errors.New("share is disabled")))
 		return

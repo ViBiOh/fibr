@@ -22,27 +22,16 @@ var (
 )
 
 // App of package
-type App interface {
-	Enabled() bool
-	Get(string) provider.Share
-	Create(string, bool, string, bool, time.Duration) (string, error)
-	RenamePath(string, string) error
-	Delete(string) error
-	DeletePath(string) error
-	List() map[string]provider.Share
-	Start(<-chan struct{})
+type App struct {
+	shares     map[string]provider.Share
+	clock      *Clock
+	storageApp provider.Storage
+	mutex      sync.RWMutex
 }
 
 // Config of package
 type Config struct {
 	share *bool
-}
-
-type app struct {
-	shares     map[string]provider.Share
-	clock      *Clock
-	storageApp provider.Storage
-	mutex      sync.RWMutex
 }
 
 // Flags adds flags for configuring package
@@ -55,22 +44,22 @@ func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) Config 
 // New creates new App from Config
 func New(config Config, storageApp provider.Storage) App {
 	if !*config.share {
-		return &app{}
+		return App{}
 	}
 
-	return &app{
+	return App{
 		shares:     make(map[string]provider.Share),
 		storageApp: storageApp,
 	}
 }
 
-// GetShare returns share configuration if request path match
-func (a *app) Enabled() bool {
+// Enabled checks if requirements are met
+func (a *App) Enabled() bool {
 	return a.shares != nil
 }
 
-// GetShare returns share configuration if request path match
-func (a *app) Get(requestPath string) provider.Share {
+// Get returns a share based on path
+func (a *App) Get(requestPath string) provider.Share {
 	if !a.Enabled() {
 		return provider.NoneShare
 	}
@@ -89,7 +78,8 @@ func (a *app) Get(requestPath string) provider.Share {
 	return provider.NoneShare
 }
 
-func (a *app) List() map[string]provider.Share {
+// List shares
+func (a *App) List() map[string]provider.Share {
 	if !a.Enabled() {
 		return nil
 	}
@@ -100,7 +90,8 @@ func (a *app) List() map[string]provider.Share {
 	return a.shares
 }
 
-func (a *app) Start(done <-chan struct{}) {
+// Start worker
+func (a *App) Start(done <-chan struct{}) {
 	if !a.Enabled() {
 		return
 	}
@@ -115,7 +106,7 @@ func (a *app) Start(done <-chan struct{}) {
 	}).OnSignal(syscall.SIGUSR1).Now().Start(a.cleanShares, done)
 }
 
-func (a *app) refresh() error {
+func (a *App) refresh() error {
 	_, err := a.storageApp.Info(shareFilename)
 	if err != nil && !provider.IsNotExist(err) {
 		return err
@@ -151,7 +142,7 @@ func (a *app) refresh() error {
 	return nil
 }
 
-func (a *app) purgeExpiredShares() bool {
+func (a *App) purgeExpiredShares() bool {
 	now := a.clock.Now()
 	changed := false
 
@@ -165,7 +156,7 @@ func (a *app) purgeExpiredShares() bool {
 	return changed
 }
 
-func (a *app) cleanShares(_ context.Context) error {
+func (a *App) cleanShares(_ context.Context) error {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
@@ -180,7 +171,7 @@ func (a *app) cleanShares(_ context.Context) error {
 	return nil
 }
 
-func (a *app) saveShares() (err error) {
+func (a *App) saveShares() (err error) {
 	file, err := a.storageApp.WriterTo(shareFilename)
 	if file != nil {
 		defer func() {
