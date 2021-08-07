@@ -40,7 +40,7 @@ func (a *App) createShare(w http.ResponseWriter, r *http.Request, request provid
 
 	password := ""
 	if passwordValue := strings.TrimSpace(r.FormValue("password")); passwordValue != "" {
-		hash, err := bcrypt.GenerateFromPassword([]byte(passwordValue), provider.BcryptCost)
+		hash, err := bcrypt.GenerateFromPassword([]byte(passwordValue), a.bcryptCost)
 		if err != nil {
 			a.rendererApp.Error(w, model.WrapInternal(err))
 			return

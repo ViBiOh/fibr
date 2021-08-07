@@ -5,6 +5,7 @@ import (
 	"flag"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/ViBiOh/fibr/pkg/exif"
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -12,6 +13,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var (
@@ -38,6 +40,7 @@ type App struct {
 
 	pushEvent provider.EventProducer
 
+	bcryptCost      int
 	sanitizeOnStart bool
 }
 
@@ -92,6 +95,15 @@ func New(config Config, storage provider.Storage, rendererApp renderer.App, shar
 
 		return false
 	})
+
+	bcryptCost, err := findBcryptBestCost(time.Second / 4)
+	if err != nil {
+		logger.Error("unable to find best bcrypt cost: %s", err)
+		bcryptCost = bcrypt.DefaultCost
+	}
+	logger.Info("Best bcrypt cost is %d", bcryptCost)
+
+	app.bcryptCost = bcryptCost
 
 	return app, nil
 }

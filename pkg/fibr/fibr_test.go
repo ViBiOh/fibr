@@ -32,7 +32,7 @@ var (
 		Path:     "/public",
 	}
 
-	passwordHash, _ = bcrypt.GenerateFromPassword([]byte("password"), provider.BcryptCost)
+	passwordHash, _ = bcrypt.GenerateFromPassword([]byte("password"), 10)
 
 	passwordShare = provider.Share{
 		ID:       "f5d4c3b2a1",
