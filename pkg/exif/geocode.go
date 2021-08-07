@@ -189,10 +189,10 @@ func convertDegreeMinuteSecondToDecimal(location string) (string, error) {
 
 func (a App) getReverseGeocode(ctx context.Context, lat, lon string) (geocode, error) {
 	params := url.Values{}
-	params.Set("lat", lat)
-	params.Set("lon", lon)
-	params.Set("format", "json")
-	params.Set("zoom", "18")
+	params.Add("lat", lat)
+	params.Add("lon", lon)
+	params.Add("format", "json")
+	params.Add("zoom", "18")
 
 	reverseURL := fmt.Sprintf("%s/reverse?%s", a.geocodeURL, params.Encode())
 
