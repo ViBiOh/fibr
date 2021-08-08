@@ -1,6 +1,9 @@
 package provider
 
-import "errors"
+import (
+	"bytes"
+	"errors"
+)
 
 // EventType is the enumeration of event that can happen
 type EventType uint
@@ -24,11 +27,29 @@ const (
 	StartEvent
 )
 
+var (
+	// EventTypeValues string values
+	EventTypeValues = []string{"upload", "create", "rename", "delete", "start"}
+)
+
+// String return string values
+func (et EventType) String() string {
+	return EventTypeValues[et]
+}
+
+// MarshalJSON marshals the enum as a quoted json string
+func (et EventType) MarshalJSON() ([]byte, error) {
+	buffer := bytes.NewBufferString(`"`)
+	buffer.WriteString(et.String())
+	buffer.WriteString(`"`)
+	return buffer.Bytes(), nil
+}
+
 // Event describes an event on fibr
 type Event struct {
-	Type EventType
-	Item StorageItem
-	New  StorageItem
+	Type EventType   `json:"type"`
+	Item StorageItem `json:"item"`
+	New  StorageItem `json:"new,omitempty"`
 }
 
 // NewUploadEvent creates a new upload event
