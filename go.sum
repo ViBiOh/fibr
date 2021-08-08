@@ -1,7 +1,7 @@
 cloud.google.com/go v0.34.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 github.com/DATA-DOG/go-sqlmock v1.5.0/go.mod h1:f/Ixk793poVmq4qj/V1dPUg2JEAKC73Q5eFN3EC/SaM=
-github.com/ViBiOh/auth/v2 v2.11.0 h1:wsbbeYY95nvkm7L2jJetT8t6fvbQujItLODd9sgHw5Y=
-github.com/ViBiOh/auth/v2 v2.11.0/go.mod h1:jok0N7SGswjksROJYhrzUT/ltmqrv5BJg/Mxn9mFX1Q=
+github.com/ViBiOh/auth/v2 v2.11.1 h1:lFgsuLmpD2TGiUWSAfqImZjpPJVVfWdGuNzYjxejzYY=
+github.com/ViBiOh/auth/v2 v2.11.1/go.mod h1:9Ql9IMlCGn0TYBW8xG46Cs+ehCjdb6ThT6tk47Bzgwo=
 github.com/ViBiOh/httputils/v4 v4.19.3 h1:FcndtU3EjBeC/NGvXZM3S91gD85NHjNdsEfNfBVpPJg=
 github.com/ViBiOh/httputils/v4 v4.19.3/go.mod h1:pQXN2ZC7AHYWI9wegjAmYczpJMRpX2BYtIDXnqnTC90=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
