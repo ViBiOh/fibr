@@ -61,7 +61,7 @@ func (a *App) Start(_ <-chan struct{}) {
 	}
 
 	if err := a.loadWebhooks(); err != nil {
-		logger.Error("unable to refresh shares: %s", err)
+		logger.Error("unable to refresh webhooks: %s", err)
 		return
 	}
 }
@@ -107,6 +107,9 @@ func (a *App) EventConsumer(e provider.Event) {
 func (a *App) loadWebhooks() (err error) {
 	file, err := a.storageApp.ReaderFrom(webhookFilename)
 	if err != nil {
+		if provider.IsNotExist(err) {
+			return a.saveWebhooks()
+		}
 		return err
 	}
 

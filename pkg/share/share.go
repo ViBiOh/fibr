@@ -108,7 +108,11 @@ func (a *App) Start(done <-chan struct{}) {
 
 func (a *App) refresh() error {
 	_, err := a.storageApp.Info(shareFilename)
-	if err != nil && !provider.IsNotExist(err) {
+	if err != nil {
+		if provider.IsNotExist(err) {
+			return a.saveShares()
+		}
+
 		return err
 	}
 
