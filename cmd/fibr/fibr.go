@@ -15,6 +15,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/share"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
+	"github.com/ViBiOh/fibr/pkg/webhook"
 	"github.com/ViBiOh/httputils/v4/pkg/alcotest"
 	"github.com/ViBiOh/httputils/v4/pkg/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/health"
@@ -54,6 +55,7 @@ func main() {
 
 	crudConfig := crud.Flags(fs, "")
 	shareConfig := share.Flags(fs, "")
+	webhookConfig := webhook.Flags(fs, "")
 	rendererConfig := renderer.Flags(fs, "", flags.NewOverride("PublicURL", "https://fibr.vibioh.fr"), flags.NewOverride("Title", "fibr"))
 
 	filesystemConfig := filesystem.Flags(fs, "fs")
@@ -86,7 +88,8 @@ func main() {
 	logger.Fatal(err)
 
 	shareApp := share.New(shareConfig, storageApp)
-	crudApp, err := crud.New(crudConfig, storageApp, rendererApp, &shareApp, thumbnailApp, exifApp, eventBus.Push)
+	webhookApp := webhook.New(webhookConfig, storageApp)
+	crudApp, err := crud.New(crudConfig, storageApp, rendererApp, shareApp, thumbnailApp, exifApp, eventBus.Push)
 	logger.Fatal(err)
 
 	var middlewareApp provider.Auth
@@ -94,13 +97,14 @@ func main() {
 		middlewareApp = newLoginApp(basicConfig)
 	}
 
-	fibrApp := fibr.New(&crudApp, rendererApp, &shareApp, middlewareApp)
+	fibrApp := fibr.New(&crudApp, rendererApp, shareApp, middlewareApp)
 	handler := rendererApp.Handler(fibrApp.TemplateFunc)
 
+	go webhookApp.Start(healthApp.Done())
 	go shareApp.Start(healthApp.Done())
 	go crudApp.Start(healthApp.Done())
 	go exifApp.Start(healthApp.Done())
-	go eventBus.Start(healthApp.Done(), thumbnailApp.EventConsumer, exifApp.EventConsumer)
+	go eventBus.Start(healthApp.Done(), shareApp.EventConsumer, thumbnailApp.EventConsumer, webhookApp.EventConsumer, exifApp.EventConsumer)
 
 	go promServer.Start("prometheus", healthApp.End(), prometheusApp.Handler())
 	go appServer.Start("http", healthApp.End(), httputils.Handler(handler, healthApp, recoverer.Middleware, prometheusApp.Middleware, owasp.New(owaspConfig).Middleware))

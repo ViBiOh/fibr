@@ -42,12 +42,12 @@ func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) Config 
 }
 
 // New creates new App from Config
-func New(config Config, storageApp provider.Storage) App {
+func New(config Config, storageApp provider.Storage) *App {
 	if !*config.share {
-		return App{}
+		return &App{}
 	}
 
-	return App{
+	return &App{
 		shares:     make(map[string]provider.Share),
 		storageApp: storageApp,
 	}
@@ -55,7 +55,7 @@ func New(config Config, storageApp provider.Storage) App {
 
 // Enabled checks if requirements are met
 func (a *App) Enabled() bool {
-	return a.shares != nil
+	return a.storageApp != nil
 }
 
 // Get returns a share based on path
@@ -121,16 +121,15 @@ func (a *App) refresh() error {
 	}
 
 	file, err := a.storageApp.ReaderFrom(shareFilename)
-	if file != nil {
-		defer func() {
-			if err := file.Close(); err != nil {
-				logger.Error("unable to close share file: %s", err)
-			}
-		}()
-	}
 	if err != nil {
 		return err
 	}
+
+	defer func() {
+		if err := file.Close(); err != nil {
+			logger.Error("unable to close share file: %s", err)
+		}
+	}()
 
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
@@ -173,16 +172,15 @@ func (a *App) cleanShares(_ context.Context) error {
 
 func (a *App) saveShares() (err error) {
 	file, err := a.storageApp.WriterTo(shareFilename)
-	if file != nil {
-		defer func() {
-			if closeErr := file.Close(); closeErr != nil {
-				err = fmt.Errorf("%s: %w", err, closeErr)
-			}
-		}()
-	}
 	if err != nil {
 		return err
 	}
+
+	defer func() {
+		if closeErr := file.Close(); closeErr != nil {
+			err = fmt.Errorf("%s: %w", err, closeErr)
+		}
+	}()
 
 	encoder := json.NewEncoder(file)
 	encoder.SetIndent("", "  ")

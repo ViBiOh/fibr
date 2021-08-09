@@ -20,10 +20,6 @@ func (a *App) doRename(oldPath, newPath string, oldItem provider.StorageItem) (p
 		return provider.StorageItem{}, err
 	}
 
-	if err := a.shareApp.RenamePath(oldPath, newPath); err != nil {
-		return newItem, fmt.Errorf("unable to update share: %s", err)
-	}
-
 	go a.notify(provider.NewRenameEvent(oldItem, newItem))
 
 	return newItem, nil

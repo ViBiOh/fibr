@@ -30,17 +30,15 @@ func (a *App) saveUploadedFile(request provider.Request, part *multipart.Part) (
 	}
 
 	hostFile, err := a.storageApp.WriterTo(filePath)
-	if hostFile != nil {
-		defer func() {
-			if err := hostFile.Close(); err != nil {
-				logger.Error("unable to close uploaded file: %s", err)
-			}
-		}()
-	}
-
 	if err != nil {
 		return "", err
 	}
+
+	defer func() {
+		if err := hostFile.Close(); err != nil {
+			logger.Error("unable to close uploaded file: %s", err)
+		}
+	}()
 
 	buffer := provider.BufferPool.Get().(*bytes.Buffer)
 	defer provider.BufferPool.Put(buffer)

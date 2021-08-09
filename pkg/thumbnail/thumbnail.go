@@ -95,17 +95,16 @@ func (a App) Serve(w http.ResponseWriter, r *http.Request, item provider.Storage
 	}
 
 	file, err := a.storageApp.ReaderFrom(getThumbnailPath(item))
-	if file != nil {
-		defer func() {
-			if err := file.Close(); err != nil {
-				logger.Error("unable to close thumbnail file: %s", err)
-			}
-		}()
-	}
 	if err != nil {
 		httperror.InternalServerError(w, err)
 		return
 	}
+
+	defer func() {
+		if err := file.Close(); err != nil {
+			logger.Error("unable to close thumbnail file: %s", err)
+		}
+	}()
 
 	http.ServeContent(w, r, item.Name, item.Date, file)
 }
@@ -157,16 +156,15 @@ func (a App) encodeThumbnailContent(encoder io.WriteCloser, item provider.Storag
 	}()
 
 	file, err := a.storageApp.ReaderFrom(getThumbnailPath(item))
-	if file != nil {
-		defer func() {
-			if err := file.Close(); err != nil {
-				logger.Error("unable to close thumbnail item: %s", err)
-			}
-		}()
-	}
 	if err != nil {
 		logger.Error("unable to open %s: %s", item.Pathname, err)
 	}
+
+	defer func() {
+		if err := file.Close(); err != nil {
+			logger.Error("unable to close thumbnail item: %s", err)
+		}
+	}()
 
 	buffer := provider.BufferPool.Get().(*bytes.Buffer)
 	defer provider.BufferPool.Put(buffer)

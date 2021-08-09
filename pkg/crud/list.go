@@ -114,13 +114,13 @@ func (a *App) zipFiles(request provider.Request, zipWriter *zip.Writer, pathname
 	return nil
 }
 
-func (a *App) addFileToZip(zipWriter *zip.Writer, file provider.StorageItem, pathname string) error {
-	header, err := zip.FileInfoHeader(file.Info.(os.FileInfo))
+func (a *App) addFileToZip(zipWriter *zip.Writer, item provider.StorageItem, pathname string) error {
+	header, err := zip.FileInfoHeader(item.Info.(os.FileInfo))
 	if err != nil {
 		return err
 	}
 
-	header.Name = path.Join(pathname, file.Name)
+	header.Name = path.Join(pathname, item.Name)
 	header.Method = zip.Deflate
 
 	writer, err := zipWriter.CreateHeader(header)
@@ -128,21 +128,20 @@ func (a *App) addFileToZip(zipWriter *zip.Writer, file provider.StorageItem, pat
 		return err
 	}
 
-	reader, err := a.storageApp.ReaderFrom(file.Pathname)
-	if reader != nil {
-		defer func() {
-			if err := reader.Close(); err != nil {
-				logger.Error("unable to close zip file: %s", err)
-			}
-		}()
-	}
+	file, err := a.storageApp.ReaderFrom(item.Pathname)
 	if err != nil {
 		return err
 	}
 
+	defer func() {
+		if err := file.Close(); err != nil {
+			logger.Error("unable to close zip file: %s", err)
+		}
+	}()
+
 	buffer := provider.BufferPool.Get().(*bytes.Buffer)
 	defer provider.BufferPool.Put(buffer)
 
-	_, err = io.CopyBuffer(writer, reader, buffer.Bytes())
+	_, err = io.CopyBuffer(writer, file, buffer.Bytes())
 	return err
 }

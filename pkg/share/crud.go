@@ -4,7 +4,6 @@ import (
 	"crypto/rand"
 	"fmt"
 	"path"
-	"strings"
 	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -73,43 +72,6 @@ func (a *App) Delete(id string) error {
 	defer a.mutex.Unlock()
 
 	delete(a.shares, id)
-
-	return a.saveShares()
-}
-
-// RenamePath of a potential share
-func (a *App) RenamePath(oldPath, newPath string) error {
-	if !a.Enabled() {
-		return nil
-	}
-
-	a.mutex.Lock()
-	defer a.mutex.Unlock()
-
-	for id, share := range a.shares {
-		if strings.HasPrefix(share.Path, oldPath) {
-			share.Path = strings.Replace(share.Path, oldPath, newPath, 1)
-			a.shares[id] = share
-		}
-	}
-
-	return a.saveShares()
-}
-
-// DeletePath of a potential share
-func (a *App) DeletePath(path string) error {
-	if !a.Enabled() {
-		return nil
-	}
-
-	a.mutex.Lock()
-	defer a.mutex.Unlock()
-
-	for id, share := range a.shares {
-		if strings.HasPrefix(share.Path, path) {
-			delete(a.shares, id)
-		}
-	}
 
 	return a.saveShares()
 }

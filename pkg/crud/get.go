@@ -60,16 +60,15 @@ func (a *App) serveThumbnail(w http.ResponseWriter, r *http.Request, info provid
 
 func (a *App) serveFile(w http.ResponseWriter, r *http.Request, info provider.StorageItem) error {
 	file, err := a.storageApp.ReaderFrom(info.Pathname)
-	if file != nil {
-		defer func() {
-			if err := file.Close(); err != nil {
-				logger.Error("unable to close content file: %s", err)
-			}
-		}()
-	}
 	if err != nil {
 		return fmt.Errorf("unable to get reader for `%s`: %s", info.Pathname, err)
 	}
+
+	defer func() {
+		if err := file.Close(); err != nil {
+			logger.Error("unable to close content file: %s", err)
+		}
+	}()
 
 	http.ServeContent(w, r, info.Name, info.Date, file)
 	return nil

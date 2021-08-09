@@ -35,11 +35,6 @@ func (a *App) Delete(w http.ResponseWriter, r *http.Request, request provider.Re
 		return
 	}
 
-	if err := a.shareApp.DeletePath(info.Pathname); err != nil {
-		a.rendererApp.Error(w, model.WrapInternal(err))
-		return
-	}
-
 	if info.IsDir {
 		provider.SetPrefsCookie(w, deletePreferences(request, oldPath))
 	}

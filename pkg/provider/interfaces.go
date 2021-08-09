@@ -37,8 +37,6 @@ type ShareManager interface {
 	Enabled() bool
 	Get(string) Share
 	Create(string, bool, string, bool, time.Duration) (string, error)
-	RenamePath(string, string) error
 	Delete(string) error
-	DeletePath(string) error
 	List() map[string]Share
 }
