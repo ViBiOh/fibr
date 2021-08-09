@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"path"
+	"path/filepath"
 	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -57,7 +57,7 @@ func (a App) generate(item provider.StorageItem) error {
 	}
 
 	thumbnailPath := getThumbnailPath(item)
-	if err := a.storageApp.CreateDir(path.Dir(thumbnailPath)); err != nil {
+	if err := a.storageApp.CreateDir(filepath.Dir(thumbnailPath)); err != nil {
 		return err
 	}
 

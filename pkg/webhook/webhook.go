@@ -5,14 +5,11 @@ import (
 	"flag"
 	"fmt"
 	"path"
-	"strings"
 	"sync"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
-	"github.com/ViBiOh/httputils/v4/pkg/request"
-	"golang.org/x/net/context"
 )
 
 var (
@@ -63,44 +60,6 @@ func (a *App) Start(_ <-chan struct{}) {
 	if err := a.loadWebhooks(); err != nil {
 		logger.Error("unable to refresh webhooks: %s", err)
 		return
-	}
-}
-
-// EventConsumer handle event pushed to the event bus
-func (a *App) EventConsumer(e provider.Event) {
-	if !a.Enabled() {
-		return
-	}
-
-	a.mutex.RLock()
-	defer a.mutex.RUnlock()
-
-	pathname := e.Item.Pathname
-	newPathname := e.New.Pathname
-	if !e.Item.IsDir {
-		pathname = path.Dir(pathname)
-		newPathname = path.Dir(newPathname)
-	}
-
-	for _, webhook := range a.webhooks {
-		if !strings.EqualFold(webhook.Pathname, pathname) && !strings.EqualFold(webhook.Pathname, newPathname) {
-			continue
-		}
-
-		req := request.New().Post(webhook.URL).ContentJSON()
-		for key, val := range webhook.Headers {
-			req.Header(key, val)
-		}
-
-		resp, err := req.JSON(context.Background(), e)
-		if err != nil {
-			logger.Error("error while sending webhook: %s", err)
-			continue
-		}
-
-		if err := resp.Body.Close(); err != nil {
-			logger.Error("unable to close response body: %s", err)
-		}
 	}
 }
 

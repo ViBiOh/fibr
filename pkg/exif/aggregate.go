@@ -2,7 +2,6 @@ package exif
 
 import (
 	"fmt"
-	"path"
 	"path/filepath"
 	"time"
 
@@ -114,5 +113,5 @@ func aggregateDate(min, max, current time.Time) (time.Time, time.Time) {
 }
 
 func (a App) getDirOf(item provider.StorageItem) (provider.StorageItem, error) {
-	return a.storageApp.Info(path.Dir(item.Pathname))
+	return a.storageApp.Info(item.Dir())
 }

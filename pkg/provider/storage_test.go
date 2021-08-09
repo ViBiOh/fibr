@@ -156,3 +156,35 @@ func TestIsVideo(t *testing.T) {
 		})
 	}
 }
+
+func TestDir(t *testing.T) {
+	var cases = []struct {
+		intention string
+		instance  StorageItem
+		want      string
+	}{
+		{
+			"simple",
+			StorageItem{
+				Pathname: "/parent/test.mov",
+			},
+			"/parent",
+		},
+		{
+			"directory",
+			StorageItem{
+				Pathname: "/parent",
+				IsDir:    true,
+			},
+			"/parent",
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.intention, func(t *testing.T) {
+			if got := tc.instance.Dir(); got != tc.want {
+				t.Errorf("Dir() = `%s`, want `%s`", got, tc.want)
+			}
+		})
+	}
+}

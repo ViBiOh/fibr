@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -80,7 +81,7 @@ func (a App) loadMetadata(item provider.StorageItem, suffix string, content inte
 
 func (a App) saveMetadata(item provider.StorageItem, suffix string, data interface{}) error {
 	filename := getExifPath(item, suffix)
-	dirname := path.Dir(filename)
+	dirname := filepath.Dir(filename)
 
 	if _, err := a.storageApp.Info(dirname); err != nil {
 		if !provider.IsNotExist(err) {

@@ -3,6 +3,7 @@ package provider
 import (
 	"mime"
 	"path"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -50,6 +51,15 @@ func (s StorageItem) IsImage() bool {
 // IsVideo determine if item if a video
 func (s StorageItem) IsVideo() bool {
 	return VideoExtensions[s.Extension()] != ""
+}
+
+// Dir return the nearest directory (self of parent)
+func (s StorageItem) Dir() string {
+	if s.IsDir {
+		return s.Pathname
+	}
+
+	return filepath.Dir(s.Pathname)
 }
 
 // RenderItem is a storage item with an id

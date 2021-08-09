@@ -7,69 +7,6 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 )
 
-func (a App) rename(old, new provider.StorageItem) error {
-	for _, suffix := range metadataFilenames {
-		oldPath := getExifPath(old, suffix)
-		if _, err := a.storageApp.Info(oldPath); provider.IsNotExist(err) {
-			return nil
-		}
-
-		if err := a.storageApp.Rename(oldPath, getExifPath(new, suffix)); err != nil {
-			return fmt.Errorf("unable to rename exif: %s", err)
-		}
-	}
-
-	if !old.IsDir {
-		if err := a.aggregateOnRename(old, new); err != nil {
-			return fmt.Errorf("unable to aggregate on rename: %s", err)
-		}
-	}
-
-	return nil
-}
-
-func (a App) aggregateOnRename(old, new provider.StorageItem) error {
-	oldDir, err := a.getDirOf(old)
-	if err != nil {
-		return fmt.Errorf("unable to get old directory: %s", err)
-	}
-
-	newDir, err := a.getDirOf(new)
-	if err != nil {
-		return fmt.Errorf("unable to get new directory: %s", err)
-	}
-
-	if oldDir.Pathname == newDir.Pathname {
-		return nil
-	}
-
-	if err := a.aggregate(oldDir); err != nil {
-		return fmt.Errorf("unable to aggregate old directory: %s", err)
-	}
-
-	if err := a.aggregate(newDir); err != nil {
-		return fmt.Errorf("unable to aggregate new directory: %s", err)
-	}
-
-	return nil
-}
-
-func (a App) delete(item provider.StorageItem) error {
-	for _, suffix := range metadataFilenames {
-		if err := a.storageApp.Remove(getExifPath(item, suffix)); err != nil {
-			return fmt.Errorf("unable to delete: %s", err)
-		}
-	}
-
-	if !item.IsDir {
-		if err := a.aggregate(item); err != nil {
-			return fmt.Errorf("unable to aggregate directory: %s", err)
-		}
-	}
-
-	return nil
-}
-
 // EventConsumer handle event pushed to the event bus
 func (a App) EventConsumer(e provider.Event) {
 	if !a.enabled() {
@@ -137,6 +74,69 @@ func (a App) handleUploadEvent(item provider.StorageItem) error {
 
 	if err := a.aggregate(item); err != nil {
 		return fmt.Errorf("unable to aggregate exif: %s", err)
+	}
+
+	return nil
+}
+
+func (a App) rename(old, new provider.StorageItem) error {
+	for _, suffix := range metadataFilenames {
+		oldPath := getExifPath(old, suffix)
+		if _, err := a.storageApp.Info(oldPath); provider.IsNotExist(err) {
+			return nil
+		}
+
+		if err := a.storageApp.Rename(oldPath, getExifPath(new, suffix)); err != nil {
+			return fmt.Errorf("unable to rename exif: %s", err)
+		}
+	}
+
+	if !old.IsDir {
+		if err := a.aggregateOnRename(old, new); err != nil {
+			return fmt.Errorf("unable to aggregate on rename: %s", err)
+		}
+	}
+
+	return nil
+}
+
+func (a App) aggregateOnRename(old, new provider.StorageItem) error {
+	oldDir, err := a.getDirOf(old)
+	if err != nil {
+		return fmt.Errorf("unable to get old directory: %s", err)
+	}
+
+	newDir, err := a.getDirOf(new)
+	if err != nil {
+		return fmt.Errorf("unable to get new directory: %s", err)
+	}
+
+	if oldDir.Pathname == newDir.Pathname {
+		return nil
+	}
+
+	if err := a.aggregate(oldDir); err != nil {
+		return fmt.Errorf("unable to aggregate old directory: %s", err)
+	}
+
+	if err := a.aggregate(newDir); err != nil {
+		return fmt.Errorf("unable to aggregate new directory: %s", err)
+	}
+
+	return nil
+}
+
+func (a App) delete(item provider.StorageItem) error {
+	for _, suffix := range metadataFilenames {
+		if err := a.storageApp.Remove(getExifPath(item, suffix)); err != nil {
+			return fmt.Errorf("unable to delete: %s", err)
+		}
+	}
+
+	if !item.IsDir {
+		if err := a.aggregate(item); err != nil {
+			return fmt.Errorf("unable to aggregate directory: %s", err)
+		}
 	}
 
 	return nil

@@ -25,6 +25,8 @@ const (
 	DeleteEvent
 	// StartEvent occurs when fibr start
 	StartEvent
+	// AccessEvent occurs when content is accessed
+	AccessEvent
 )
 
 var (
