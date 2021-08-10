@@ -23,11 +23,11 @@ func (a App) EventConsumer(e provider.Event) {
 			logger.Error("unable to upload exif for `%s`: %s", e.Item.Pathname, err)
 		}
 	case provider.RenameEvent:
-		if err := a.rename(e.Item, e.New); err != nil {
+		if err := a.rename(e.Item, *e.New); err != nil {
 			logger.Error("unable to rename exif for `%s`: %s", e.Item.Pathname, err)
 		}
 	case provider.DeleteEvent:
-		if err := a.rename(e.Item, e.New); err != nil {
+		if err := a.delete(e.Item); err != nil {
 			logger.Error("unable to delete exif for `%s`: %s", e.Item.Pathname, err)
 		}
 	}

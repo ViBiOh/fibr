@@ -26,6 +26,7 @@ type Request struct {
 	Share       Share
 	CanEdit     bool
 	CanShare    bool
+	CanWebhook  bool
 }
 
 // GetFilepath of request

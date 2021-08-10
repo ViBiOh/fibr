@@ -308,10 +308,11 @@ func TestParseRequest(t *testing.T) {
 				r: httptest.NewRequest(http.MethodGet, "/guest", nil),
 			},
 			provider.Request{
-				Path:     "/guest",
-				Display:  provider.DefaultDisplay,
-				CanEdit:  false,
-				CanShare: false,
+				Path:       "/guest",
+				Display:    provider.DefaultDisplay,
+				CanEdit:    false,
+				CanShare:   false,
+				CanWebhook: false,
 			},
 			nil,
 		},
@@ -322,10 +323,11 @@ func TestParseRequest(t *testing.T) {
 				r: httptest.NewRequest(http.MethodGet, adminPath, nil),
 			},
 			provider.Request{
-				Path:     adminPath,
-				Display:  provider.DefaultDisplay,
-				CanEdit:  true,
-				CanShare: true,
+				Path:       adminPath,
+				Display:    provider.DefaultDisplay,
+				CanEdit:    true,
+				CanShare:   true,
+				CanWebhook: true,
 			},
 			nil,
 		},
@@ -336,10 +338,11 @@ func TestParseRequest(t *testing.T) {
 				r: adminRequestWithEmptyCookie,
 			},
 			provider.Request{
-				Path:     adminPath,
-				Display:  provider.DefaultDisplay,
-				CanEdit:  true,
-				CanShare: false,
+				Path:       adminPath,
+				Display:    provider.DefaultDisplay,
+				CanEdit:    true,
+				CanShare:   false,
+				CanWebhook: false,
 			},
 			nil,
 		},
@@ -350,10 +353,11 @@ func TestParseRequest(t *testing.T) {
 				r: adminRequestWithCookie,
 			},
 			provider.Request{
-				Path:     adminPath,
-				Display:  provider.DefaultDisplay,
-				CanEdit:  true,
-				CanShare: false,
+				Path:       adminPath,
+				Display:    provider.DefaultDisplay,
+				CanEdit:    true,
+				CanShare:   false,
+				CanWebhook: false,
 				Preferences: provider.Preferences{
 					ListLayoutPath: []string{"assets", "documents/monthly"},
 				},
@@ -369,19 +373,24 @@ func TestParseRequest(t *testing.T) {
 
 			crudMock := mocks.NewCrud(ctrl)
 			shareMock := mocks.NewShare(ctrl)
+			webhookMock := mocks.NewWebhook(ctrl)
 			loginMock := mocks.NewAuth(ctrl)
 
 			tc.instance.crudApp = crudMock
 			tc.instance.shareApp = shareMock
+			tc.instance.webhookApp = webhookMock
 
 			switch tc.intention {
 			case "no auth":
-				shareMock.EXPECT().Get(gomock.Any()).Return(provider.Share{})
+				webhookMock.EXPECT().Enabled().Return(false)
 				shareMock.EXPECT().Enabled().Return(false)
+				shareMock.EXPECT().Get(gomock.Any()).Return(provider.Share{})
 			case "admin user":
+				webhookMock.EXPECT().Enabled().Return(true)
 				shareMock.EXPECT().Enabled().Return(true)
 				shareMock.EXPECT().Get(gomock.Any()).Return(provider.Share{})
 			case "empty cookie", "cookie value":
+				webhookMock.EXPECT().Enabled().Return(false)
 				shareMock.EXPECT().Enabled().Return(false)
 				shareMock.EXPECT().Get(gomock.Any()).Return(provider.Share{})
 			case "invalid auth", "non admin user":

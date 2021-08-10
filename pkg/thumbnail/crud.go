@@ -38,7 +38,7 @@ func (a App) EventConsumer(e provider.Event) {
 			}
 		}
 	case provider.RenameEvent:
-		a.rename(e.Item, e.New)
+		a.rename(e.Item, *e.New)
 	case provider.DeleteEvent:
 		a.delete(e.Item)
 	}

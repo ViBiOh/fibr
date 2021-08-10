@@ -40,3 +40,11 @@ type ShareManager interface {
 	Delete(string) error
 	List() map[string]Share
 }
+
+// WebhookManager description
+type WebhookManager interface {
+	Enabled() bool
+	Create(string, bool, string, map[string]string) (string, error)
+	Delete(string) error
+	List() map[string]Webhook
+}

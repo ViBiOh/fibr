@@ -58,6 +58,15 @@ func (a *App) Post(w http.ResponseWriter, r *http.Request, request provider.Requ
 			default:
 				a.rendererApp.Error(w, model.WrapMethodNotAllowed(fmt.Errorf("unknown share method `%s` for %s", method, r.URL.Path)))
 			}
+		} else if r.FormValue("type") == "webhook" {
+			switch method {
+			case http.MethodPost:
+				a.createWebhook(w, r, request)
+			case http.MethodDelete:
+				a.deleteWebhook(w, r, request)
+			default:
+				a.rendererApp.Error(w, model.WrapMethodNotAllowed(fmt.Errorf("unknown webhook method `%s` for %s", method, r.URL.Path)))
+			}
 		} else {
 			switch method {
 			case http.MethodPatch:

@@ -15,7 +15,7 @@ func (a *App) EventConsumer(e provider.Event) {
 
 	switch e.Type {
 	case provider.RenameEvent:
-		if err := a.renameItem(e.Item, e.New); err != nil {
+		if err := a.renameItem(e.Item, *e.New); err != nil {
 			logger.Error("unable to rename share: %s", err)
 		}
 	case provider.DeleteEvent:

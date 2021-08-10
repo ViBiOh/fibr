@@ -1,10 +1,8 @@
-package share
+package webhook
 
 import (
 	"crypto/rand"
 	"fmt"
-	"path"
-	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/sha"
@@ -28,14 +26,14 @@ func (a *App) generateID() (string, error) {
 		}
 		id := sha.Sha1(uuid)[:8]
 
-		if _, ok := a.shares[id]; !ok {
+		if _, ok := a.webhooks[id]; !ok {
 			return id, nil
 		}
 	}
 }
 
-// List shares
-func (a *App) List() map[string]provider.Share {
+// List webhooks
+func (a *App) List() map[string]provider.Webhook {
 	if !a.Enabled() {
 		return nil
 	}
@@ -43,13 +41,13 @@ func (a *App) List() map[string]provider.Share {
 	a.mutex.RLock()
 	defer a.mutex.RUnlock()
 
-	return a.shares
+	return a.webhooks
 }
 
-// Create a share
-func (a *App) Create(filepath string, edit bool, password string, isDir bool, duration time.Duration) (string, error) {
+// Create a webhook
+func (a *App) Create(pathname string, recursive bool, url string, headers map[string]string) (string, error) {
 	if !a.Enabled() {
-		return "", fmt.Errorf("share is disabled")
+		return "", fmt.Errorf("webhook is disabled")
 	}
 
 	a.mutex.Lock()
@@ -60,30 +58,27 @@ func (a *App) Create(filepath string, edit bool, password string, isDir bool, du
 		return "", err
 	}
 
-	a.shares[id] = provider.Share{
-		ID:       id,
-		Path:     filepath,
-		RootName: path.Base(filepath),
-		Edit:     edit,
-		Password: password,
-		File:     !isDir,
-		Creation: a.clock.Now(),
-		Duration: duration,
+	a.webhooks[id] = provider.Webhook{
+		ID:        id,
+		Pathname:  pathname,
+		Recursive: recursive,
+		URL:       url,
+		Headers:   headers,
 	}
 
-	return id, a.saveShares()
+	return id, a.saveWebhooks()
 }
 
-// Delete a share
+// Delete a webhook
 func (a *App) Delete(id string) error {
 	if !a.Enabled() {
-		return fmt.Errorf("share is disabled")
+		return fmt.Errorf("webhook is disabled")
 	}
 
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
-	delete(a.shares, id)
+	delete(a.webhooks, id)
 
-	return a.saveShares()
+	return a.saveWebhooks()
 }

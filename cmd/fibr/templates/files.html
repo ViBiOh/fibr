@@ -15,6 +15,11 @@
     {{ template "share-list" . }}
   {{ end }}
 
+  {{ if .Request.CanWebhook }}
+    {{ template "webhook-directory" . }}
+    {{ template "webhook-list" . }}
+  {{ end }}
+
   {{ range .Files }}
     {{ if $root.Request.CanEdit }}
       {{ template "edit-modal" . }}
@@ -112,12 +117,18 @@
       {{ if $root.Request.CanShare }}
         #share-form-{{ .ID }}:target,
       {{ end }}
+
+      {{ if $root.Request.CanWebhook }}
+        #webhook-form-{{ .ID }}:target,
+      {{ end }}
     {{ end }}
     #upload-modal:target,
     #upload-success:target,
     #folder-modal:target,
     #share-form:target,
-    #share-list:target {
+    #share-list:target,
+    #webhook-form:target,
+    #webhook-list:target {
       display: flex;
       z-index: 5;
     }
@@ -131,12 +142,18 @@
       {{ if $root.Request.CanShare }}
         #share-form-{{ .ID }}:target ~ .content,
       {{ end }}
+
+      {{ if $root.Request.CanWebhook }}
+        #webhook-form-{{ .ID }}:target ~ .content,
+      {{ end }}
     {{ end }}
     #upload-modal:target ~ .content,
     #upload-success:target ~ .content,
     #folder-modal:target ~ .content,
     #share-form:target ~ .content,
-    #share-list:target ~ .content {
+    #share-list:target ~ .content,
+    #webhook-form:target ~ .content,
+    #webhook-list:target ~ .content {
       pointer-events: none;
     }
 
@@ -326,6 +343,12 @@
       {{ if .Request.CanShare }}
         <a href="#share-list" class="button button-icon">
           <img class="icon" src="{{ url "/svg/share-alt-square?fill=silver" }}" alt="Share">
+        </a>
+      {{ end }}
+
+      {{ if .Request.CanWebhook }}
+        <a href="#webhook-list" class="button button-icon">
+          <img class="icon" src="{{ url "/svg/webhook?fill=silver" }}" alt="Webhook">
         </a>
       {{ end }}
 

@@ -78,18 +78,6 @@ func (a *App) Get(requestPath string) provider.Share {
 	return provider.NoneShare
 }
 
-// List shares
-func (a *App) List() map[string]provider.Share {
-	if !a.Enabled() {
-		return nil
-	}
-
-	a.mutex.RLock()
-	defer a.mutex.RUnlock()
-
-	return a.shares
-}
-
 // Start worker
 func (a *App) Start(done <-chan struct{}) {
 	if !a.Enabled() {

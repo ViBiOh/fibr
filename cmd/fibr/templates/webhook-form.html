@@ -1,0 +1,28 @@
+{{ define "webhook-directory" }}
+  <div id="webhook-form" class="modal">
+    <div class="modal-content">
+      <h2 class="header">Webhook on this directory</h2>
+
+      <form method="post" action="#">
+        {{ template "webhook-form" . }}
+      </form>
+    </div>
+  </div>
+{{ end }}
+
+{{ define "webhook-form" }}
+  <input type="hidden" name="type" value="webhook" />
+  <input type="hidden" name="method" value="POST" />
+
+  <p class="padding no-margin center">
+    <input id="recursive" type="checkbox" name="recursive" value="true" />
+    <label for="recursive">Recursive on children folders</label>
+  </p>
+
+  <p class="padding no-margin">
+    <label for="url" class="block">URL</label>
+    <input id="url" class="full" type="text" name="url" value="" placeholder="http://website.com/fibr" />
+  </p>
+
+  {{ template "form_buttons" "Connect" }}
+{{ end }}

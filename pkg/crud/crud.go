@@ -34,6 +34,7 @@ var (
 type App struct {
 	storageApp provider.Storage
 	shareApp   provider.ShareManager
+	webhookApp provider.WebhookManager
 	pushEvent  provider.EventProducer
 
 	rendererApp  renderer.App
@@ -59,7 +60,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 }
 
 // New creates new App from Config
-func New(config Config, storage provider.Storage, rendererApp renderer.App, shareApp provider.ShareManager, thumbnailApp thumbnail.App, exifApp exif.App, eventProducer provider.EventProducer) (App, error) {
+func New(config Config, storage provider.Storage, rendererApp renderer.App, shareApp provider.ShareManager, webhookApp provider.WebhookManager, thumbnailApp thumbnail.App, exifApp exif.App, eventProducer provider.EventProducer) (App, error) {
 	app := App{
 		sanitizeOnStart: *config.sanitizeOnStart,
 
@@ -70,6 +71,7 @@ func New(config Config, storage provider.Storage, rendererApp renderer.App, shar
 		thumbnailApp: thumbnailApp,
 		exifApp:      exifApp,
 		shareApp:     shareApp,
+		webhookApp:   webhookApp,
 	}
 
 	var ignorePattern *regexp.Regexp

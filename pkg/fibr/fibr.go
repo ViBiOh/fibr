@@ -20,16 +20,18 @@ type App struct {
 	loginApp    provider.Auth
 	crudApp     provider.Crud
 	shareApp    provider.ShareManager
+	webhookApp  provider.WebhookManager
 	rendererApp renderer.App
 }
 
 // New creates new App from Config
-func New(crudApp provider.Crud, rendererApp renderer.App, shareApp provider.ShareManager, loginApp provider.Auth) App {
+func New(crudApp provider.Crud, rendererApp renderer.App, shareApp provider.ShareManager, webhookApp provider.WebhookManager, loginApp provider.Auth) App {
 	return App{
 		crudApp:     crudApp,
 		rendererApp: rendererApp,
-		loginApp:    loginApp,
 		shareApp:    shareApp,
+		webhookApp:  webhookApp,
+		loginApp:    loginApp,
 	}
 }
 
@@ -108,6 +110,7 @@ func (a App) parseRequest(r *http.Request) (provider.Request, error) {
 	if a.loginApp == nil {
 		request.CanEdit = true
 		request.CanShare = a.shareApp.Enabled()
+		request.CanWebhook = a.webhookApp.Enabled()
 		return request, nil
 	}
 
@@ -119,6 +122,7 @@ func (a App) parseRequest(r *http.Request) (provider.Request, error) {
 	if a.loginApp.IsAuthorized(authModel.StoreUser(r.Context(), user), "admin") {
 		request.CanEdit = true
 		request.CanShare = a.shareApp.Enabled()
+		request.CanWebhook = a.webhookApp.Enabled()
 	}
 
 	return request, nil

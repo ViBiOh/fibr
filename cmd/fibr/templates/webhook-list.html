@@ -1,0 +1,102 @@
+{{ define "webhook-list" }}
+  <style>
+    #webhooks {
+      border-spacing: 0;
+      display: block;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    #webhooks th,
+    #webhooks td {
+      padding: 1rem;
+    }
+
+    .webhook-content:hover {
+      background-color: var(--grey);
+    }
+
+    .url {
+      max-width: 30rem;
+      text-align: left;
+    }
+
+    @media screen and (max-width: 485px) {
+      .url {
+        max-width: 20rem;
+      }
+    }
+
+    @media screen and (max-width: 430px) {
+      .url {
+        max-width: 16rem;
+      }
+    }
+
+    @media screen and (max-width: 375px) {
+      .url {
+        max-width: 12rem;
+      }
+    }
+
+    @media screen and (max-width: 320px) {
+      .url {
+        max-width: 8rem;
+      }
+    }
+  </style>
+
+  <div id="webhook-list" class="modal">
+    <div class="modal-content">
+      <h2 class="header">Webhooks</h2>
+
+      {{ if len .Webhooks }}
+        <table id="webhooks" class="full padding">
+          <caption>List of existing webhooks</caption>
+
+          <thead>
+            <tr>
+              <th scope="col">Path</th>
+              <th scope="col">URL</th>
+              <td></td>
+            </tr>
+          </thead>
+
+          {{ $root := . }}
+
+          <tbody>
+            {{ range $key, $value := .Webhooks }}
+              <tr class="webhook-content">
+                <th scope="row" class="ellipsis path">
+                  <code>{{ or $value.Pathname "/" }}</code>
+                </th>
+                <th scope="row" class="ellipsis url">
+                  <code>{{ $value.URL }}</code>
+                </th>
+                <td >
+                  <form method="post">
+                    <input type="hidden" name="type" value="webhook" />
+                    <input type="hidden" name="method" value="DELETE" />
+                    <input type="hidden" name="id" value="{{ $value.ID }}" />
+                    <button type="submit" onclick="return confirm('Are you sure you want to delete webhook for {{ $value.Pathname }}?')" class="button button-icon" alt="Delete">
+                      <img class="icon" src="{{ url "/svg/times?fill=silver" }}" alt="Delete">
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            {{ end }}
+          </tbody>
+        </table>
+      {{ else }}
+        <p class="padding no-margin center">
+          <em>No webhook yet.</em>
+        </p>
+      {{ end }}
+
+      <p class="padding no-margin center">
+        <a href="#" class="button white">Cancel</a>
+        <a href="#webhook-form" class="button bg-primary">Add</a>
+      </p>
+    </div>
+  </div>
+{{ end }}

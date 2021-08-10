@@ -71,6 +71,10 @@ func (a *App) List(w http.ResponseWriter, request provider.Request, message rend
 		content["Shares"] = a.shareApp.List()
 	}
 
+	if request.CanWebhook {
+		content["Webhooks"] = a.webhookApp.List()
+	}
+
 	return "files", http.StatusOK, content, nil
 }
 

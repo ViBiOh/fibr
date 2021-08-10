@@ -89,7 +89,7 @@ func main() {
 
 	shareApp := share.New(shareConfig, storageApp)
 	webhookApp := webhook.New(webhookConfig, storageApp)
-	crudApp, err := crud.New(crudConfig, storageApp, rendererApp, shareApp, thumbnailApp, exifApp, eventBus.Push)
+	crudApp, err := crud.New(crudConfig, storageApp, rendererApp, shareApp, webhookApp, thumbnailApp, exifApp, eventBus.Push)
 	logger.Fatal(err)
 
 	var middlewareApp provider.Auth
@@ -97,7 +97,7 @@ func main() {
 		middlewareApp = newLoginApp(basicConfig)
 	}
 
-	fibrApp := fibr.New(&crudApp, rendererApp, shareApp, middlewareApp)
+	fibrApp := fibr.New(&crudApp, rendererApp, shareApp, webhookApp, middlewareApp)
 	handler := rendererApp.Handler(fibrApp.TemplateFunc)
 
 	go webhookApp.Start(healthApp.Done())

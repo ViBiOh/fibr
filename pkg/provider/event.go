@@ -31,7 +31,7 @@ const (
 
 var (
 	// EventTypeValues string values
-	EventTypeValues = []string{"upload", "create", "rename", "delete", "start"}
+	EventTypeValues = []string{"upload", "create", "rename", "delete", "start", "access"}
 )
 
 // String return string values
@@ -49,9 +49,9 @@ func (et EventType) MarshalJSON() ([]byte, error) {
 
 // Event describes an event on fibr
 type Event struct {
-	Item StorageItem `json:"item"`
-	New  StorageItem `json:"new,omitempty"`
-	Type EventType   `json:"type"`
+	Item StorageItem  `json:"item"`
+	New  *StorageItem `json:"new,omitempty"`
+	Type EventType    `json:"type"`
 }
 
 // NewUploadEvent creates a new upload event
@@ -67,7 +67,7 @@ func NewRenameEvent(old, new StorageItem) Event {
 	return Event{
 		Type: RenameEvent,
 		Item: old,
-		New:  new,
+		New:  &new,
 	}
 }
 
@@ -102,7 +102,7 @@ type EventBus struct {
 }
 
 // NewEventBus create an event exchange channel
-func NewEventBus(size int) EventBus {
+func NewEventBus(size uint) EventBus {
 	return EventBus{
 		done: make(chan struct{}),
 		bus:  make(chan Event, size),
