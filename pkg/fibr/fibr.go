@@ -19,8 +19,8 @@ import (
 type App struct {
 	loginApp    provider.Auth
 	crudApp     provider.Crud
-	rendererApp renderer.App
 	shareApp    provider.ShareManager
+	rendererApp renderer.App
 }
 
 // New creates new App from Config

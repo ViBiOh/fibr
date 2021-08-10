@@ -32,13 +32,13 @@ var (
 
 // App of package
 type App struct {
-	storageApp   provider.Storage
+	storageApp provider.Storage
+	shareApp   provider.ShareManager
+	pushEvent  provider.EventProducer
+
 	rendererApp  renderer.App
-	shareApp     provider.ShareManager
 	thumbnailApp thumbnail.App
 	exifApp      exif.App
-
-	pushEvent provider.EventProducer
 
 	bcryptCost      int
 	sanitizeOnStart bool

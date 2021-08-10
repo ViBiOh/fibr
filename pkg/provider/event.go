@@ -49,9 +49,9 @@ func (et EventType) MarshalJSON() ([]byte, error) {
 
 // Event describes an event on fibr
 type Event struct {
-	Type EventType   `json:"type"`
 	Item StorageItem `json:"item"`
 	New  StorageItem `json:"new,omitempty"`
+	Type EventType   `json:"type"`
 }
 
 // NewUploadEvent creates a new upload event
@@ -83,6 +83,14 @@ func NewDeleteEvent(item StorageItem) Event {
 func NewStartEvent(item StorageItem) Event {
 	return Event{
 		Type: StartEvent,
+		Item: item,
+	}
+}
+
+// NewAccessEvent creates a new access event
+func NewAccessEvent(item StorageItem) Event {
+	return Event{
+		Type: AccessEvent,
 		Item: item,
 	}
 }

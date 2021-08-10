@@ -10,13 +10,12 @@ import (
 
 // StorageItem describe item on a storage provider
 type StorageItem struct {
-	Info     interface{}
-	Date     time.Time
-	Pathname string
-	Name     string
-	Size     int64
-
-	IsDir bool
+	Date     time.Time   `json:"date"`
+	Info     interface{} `json:"-"`
+	Name     string      `json:"name"`
+	Pathname string      `json:"pathname"`
+	IsDir    bool        `json:"isDir"`
+	Size     int64       `json:"size"`
 }
 
 // Extension gives extensions of item
@@ -64,8 +63,8 @@ func (s StorageItem) Dir() string {
 
 // RenderItem is a storage item with an id
 type RenderItem struct {
+	Aggregate
 	ID  string
 	URI string
 	StorageItem
-	Aggregate
 }

@@ -18,8 +18,8 @@ var (
 
 // App of package
 type App struct {
-	webhooks   []provider.Webhook
 	storageApp provider.Storage
+	webhooks   []provider.Webhook
 	mutex      sync.RWMutex
 }
 

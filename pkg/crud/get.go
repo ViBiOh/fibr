@@ -27,6 +27,13 @@ func (a *App) getWithMessage(w http.ResponseWriter, r *http.Request, request pro
 		return "", 0, nil, nil
 	}
 
+	if !strings.HasSuffix(r.URL.Path, "/") {
+		a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/?d=%s", r.URL.Path, request.Layout("")), renderer.Message{})
+		return "", 0, nil, nil
+	}
+
+	go a.notify(provider.NewAccessEvent(info))
+
 	if !info.IsDir {
 		if query.GetBool(r, "browser") {
 			provider.SetPrefsCookie(w, request)
@@ -39,11 +46,6 @@ func (a *App) getWithMessage(w http.ResponseWriter, r *http.Request, request pro
 	if query.GetBool(r, "download") {
 		a.Download(w, request)
 		return "", 0, nil, err
-	}
-
-	if !strings.HasSuffix(r.URL.Path, "/") {
-		a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/?d=%s", r.URL.Path, request.Layout("")), renderer.Message{})
-		return "", 0, nil, nil
 	}
 
 	provider.SetPrefsCookie(w, request)
