@@ -10,7 +10,6 @@ import (
 	"path"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
@@ -35,8 +34,18 @@ func (a *App) saveUploadedFile(request provider.Request, part *multipart.Part) (
 	}
 
 	defer func() {
-		if err := hostFile.Close(); err != nil {
-			logger.Error("unable to close uploaded file: %s", err)
+		if err == nil {
+			return
+		}
+
+		if removeErr := a.storageApp.Remove(filePath); removeErr != nil {
+			err = fmt.Errorf("%s, unable to remove errored file: %s", err, removeErr)
+		}
+	}()
+
+	defer func() {
+		if closeErr := hostFile.Close(); closeErr != nil {
+			err = fmt.Errorf("%s, unable to close uploaded file: %s", err, closeErr)
 		}
 	}()
 
@@ -44,7 +53,7 @@ func (a *App) saveUploadedFile(request provider.Request, part *multipart.Part) (
 	defer provider.BufferPool.Put(buffer)
 
 	if _, err = io.CopyBuffer(hostFile, part, buffer.Bytes()); err != nil {
-		return "", err
+		return "", fmt.Errorf("error while copying file: %s", err)
 	}
 
 	info, err := a.storageApp.Info(filePath)
