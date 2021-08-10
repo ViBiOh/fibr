@@ -49,8 +49,8 @@ func (et EventType) MarshalJSON() ([]byte, error) {
 
 // Event describes an event on fibr
 type Event struct {
-	Item StorageItem  `json:"item"`
 	New  *StorageItem `json:"new,omitempty"`
+	Item StorageItem  `json:"item"`
 	Type EventType    `json:"type"`
 }
 

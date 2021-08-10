@@ -161,17 +161,17 @@ func convertDegreeMinuteSecondToDecimal(location string) (string, error) {
 
 	match := matches[0]
 
-	degrees, err := strconv.ParseFloat(match[1], 16)
+	degrees, err := strconv.ParseFloat(match[1], 32)
 	if err != nil {
 		return "", fmt.Errorf("unable to parse GPS degrees: %s", err)
 	}
 
-	minutes, err := strconv.ParseFloat(match[2], 16)
+	minutes, err := strconv.ParseFloat(match[2], 32)
 	if err != nil {
 		return "", fmt.Errorf("unable to parse GPS minutes: %s", err)
 	}
 
-	seconds, err := strconv.ParseFloat(match[3], 16)
+	seconds, err := strconv.ParseFloat(match[3], 32)
 	if err != nil {
 		return "", fmt.Errorf("unable to parse GPS seconds: %s", err)
 	}

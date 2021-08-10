@@ -20,11 +20,7 @@ func (a locationAggregate) inc(key, value string) {
 	}
 
 	if level, ok := a[key]; ok {
-		if _, ok := level[value]; ok {
-			level[value]++
-		} else {
-			level[value] = 1
-		}
+		level[value]++
 	} else {
 		a[key] = map[string]int64{
 			value: 1,

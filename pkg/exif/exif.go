@@ -57,9 +57,8 @@ var (
 type App struct {
 	storageApp provider.Storage
 
-	done           chan struct{}
-	geocodeQueue   chan provider.StorageItem
-	aggregateQueue chan provider.StorageItem
+	done         chan struct{}
+	geocodeQueue chan provider.StorageItem
 
 	metrics map[string]*prometheus.GaugeVec
 

@@ -49,35 +49,13 @@ func (a *App) Post(w http.ResponseWriter, r *http.Request, request provider.Requ
 	if contentType == "application/x-www-form-urlencoded" {
 		method := r.FormValue("method")
 
-		if r.FormValue("type") == "share" {
-			switch method {
-			case http.MethodPost:
-				a.createShare(w, r, request)
-			case http.MethodDelete:
-				a.deleteShare(w, r, request)
-			default:
-				a.rendererApp.Error(w, model.WrapMethodNotAllowed(fmt.Errorf("unknown share method `%s` for %s", method, r.URL.Path)))
-			}
-		} else if r.FormValue("type") == "webhook" {
-			switch method {
-			case http.MethodPost:
-				a.createWebhook(w, r, request)
-			case http.MethodDelete:
-				a.deleteWebhook(w, r, request)
-			default:
-				a.rendererApp.Error(w, model.WrapMethodNotAllowed(fmt.Errorf("unknown webhook method `%s` for %s", method, r.URL.Path)))
-			}
-		} else {
-			switch method {
-			case http.MethodPatch:
-				a.Rename(w, r, request)
-			case http.MethodPut:
-				a.Create(w, r, request)
-			case http.MethodDelete:
-				a.Delete(w, r, request)
-			default:
-				a.rendererApp.Error(w, model.WrapMethodNotAllowed(fmt.Errorf("unknown method `%s` for %s", method, r.URL.Path)))
-			}
+		switch r.FormValue("type") {
+		case "share":
+			a.handlePostShare(w, r, request, method)
+		case "webhook":
+			a.handlePostWebhook(w, r, request, method)
+		default:
+			a.handlePost(w, r, request, method)
 		}
 
 		return
@@ -100,4 +78,39 @@ func (a *App) Post(w http.ResponseWriter, r *http.Request, request provider.Requ
 	}
 
 	a.rendererApp.Error(w, model.WrapMethodNotAllowed(fmt.Errorf("unknown content-type %s", contentType)))
+}
+
+func (a *App) handlePostShare(w http.ResponseWriter, r *http.Request, request provider.Request, method string) {
+	switch method {
+	case http.MethodPost:
+		a.createShare(w, r, request)
+	case http.MethodDelete:
+		a.deleteShare(w, r, request)
+	default:
+		a.rendererApp.Error(w, model.WrapMethodNotAllowed(fmt.Errorf("unknown share method `%s` for %s", method, r.URL.Path)))
+	}
+}
+
+func (a *App) handlePostWebhook(w http.ResponseWriter, r *http.Request, request provider.Request, method string) {
+	switch method {
+	case http.MethodPost:
+		a.createWebhook(w, r, request)
+	case http.MethodDelete:
+		a.deleteWebhook(w, r, request)
+	default:
+		a.rendererApp.Error(w, model.WrapMethodNotAllowed(fmt.Errorf("unknown webhook method `%s` for %s", method, r.URL.Path)))
+	}
+}
+
+func (a *App) handlePost(w http.ResponseWriter, r *http.Request, request provider.Request, method string) {
+	switch method {
+	case http.MethodPatch:
+		a.Rename(w, r, request)
+	case http.MethodPut:
+		a.Create(w, r, request)
+	case http.MethodDelete:
+		a.Delete(w, r, request)
+	default:
+		a.rendererApp.Error(w, model.WrapMethodNotAllowed(fmt.Errorf("unknown method `%s` for %s", method, r.URL.Path)))
+	}
 }
