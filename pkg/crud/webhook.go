@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"path"
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -48,6 +47,11 @@ func (a *App) createWebhook(w http.ResponseWriter, r *http.Request, request prov
 		return
 	}
 
+	if !info.IsDir {
+		a.rendererApp.Error(w, model.WrapInvalid(errors.New("webhook are only available on directories")))
+		return
+	}
+
 	id, err := a.webhookApp.Create(info.Pathname, recursive, target.String(), nil)
 	if err != nil {
 		a.rendererApp.Error(w, model.WrapInternal(err))
@@ -61,7 +65,7 @@ func (a *App) createWebhook(w http.ResponseWriter, r *http.Request, request prov
 		return
 	}
 
-	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/?d=%s#webhook-list", path.Dir(request.URL("")), request.Layout("")), renderer.NewSuccessMessage("Webhook successfully created with ID: %s", id))
+	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/?d=%s#webhook-list", request.URL(""), request.Layout("")), renderer.NewSuccessMessage("Webhook successfully created with ID: %s", id))
 }
 
 func (a *App) deleteWebhook(w http.ResponseWriter, r *http.Request, request provider.Request) {

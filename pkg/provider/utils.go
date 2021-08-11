@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"path"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"sync"
@@ -49,27 +50,19 @@ var (
 
 // GetPathname computes pathname for given params
 func GetPathname(folder, name string, share Share) string {
-	parts := make([]string, 0)
-
-	if len(share.ID) != 0 {
-		parts = append(parts, share.Path)
-	}
-
-	parts = append(parts, folder)
-
-	if len(name) > 0 {
-		parts = append(parts, name)
-	}
-
-	return path.Join(parts...)
+	return filepath.Join(buildPath(folder, name, share.Path)...)
 }
 
 // URL computes public URI for given params
 func URL(folder, name string, share Share) string {
+	return path.Join(buildPath(folder, name, share.ID)...)
+}
+
+func buildPath(folder, name, share string) []string {
 	parts := []string{"/"}
 
-	if len(share.ID) != 0 {
-		parts = append(parts, share.ID)
+	if len(share) > 0 {
+		parts = append(parts, share)
 	}
 
 	parts = append(parts, folder)
@@ -78,7 +71,7 @@ func URL(folder, name string, share Share) string {
 		parts = append(parts, name)
 	}
 
-	return path.Join(parts...)
+	return parts
 }
 
 // SanitizeName return sanitized name (remove diacritics)

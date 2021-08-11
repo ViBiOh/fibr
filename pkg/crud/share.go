@@ -72,7 +72,12 @@ func (a *App) createShare(w http.ResponseWriter, r *http.Request, request provid
 		return
 	}
 
-	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/?d=%s#share-list", path.Dir(request.URL("")), request.Layout("")), renderer.NewSuccessMessage("Share successfully created with ID: %s", id))
+	redirection := request.URL("")
+	if !info.IsDir {
+		redirection = path.Dir(redirection)
+	}
+
+	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/?d=%s#share-list", redirection, request.LayoutPath(redirection)), renderer.NewSuccessMessage("Share successfully created with ID: %s", id))
 }
 
 func (a *App) deleteShare(w http.ResponseWriter, r *http.Request, request provider.Request) {

@@ -17,7 +17,7 @@ func TestGetFilepath(t *testing.T) {
 				Path: "index",
 			},
 			"",
-			"index",
+			"/index",
 		},
 		{
 			"with given path",
@@ -25,7 +25,7 @@ func TestGetFilepath(t *testing.T) {
 				Path: "index",
 			},
 			"root.html",
-			"index/root.html",
+			"/index/root.html",
 		},
 		{
 			"with share",
