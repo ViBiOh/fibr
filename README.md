@@ -56,6 +56,36 @@ It can be read-only or with edit right. With edit-right, user can do anything as
 
 This is the main reason I've started to develop this app.
 
+### Webhook
+
+You can register webhook listeners on folders and receive an HTTP notification when one of these event occurs:
+
+- `create` occurs when a directory is created
+- `upload` occurs when an item is uploaded
+- `rename` occurs when an item is renamed
+- `delete` occurs when an item is deleted
+- `start` occurs when fibr start and do something on an item
+- `access` occurs when content is accessed (directory browsing or just one file)
+
+The request sends is a POST with 15s timeout with the given payload structure:
+
+```json
+{
+  "item": {
+    "date": "2021-08-10T19:31:28.952325533Z",
+    "name": "payload.json",
+    "pathname": "/path/to/payload.json",
+    "isDir": false,
+    "size": 177
+  },
+  "type": "upload"
+}
+```
+
+It will contains an extra key `new` with the same structure of `item` in case of a `rename` event.
+
+The webhook can be recursive (all children folders will be notified too) and for now, no event type selection is possible: the webhook will receive all kinds of events.
+
 ### SEO
 
 Fibr provides [OpenGraph metadatas](https://ogp.me) to have nice preview of link when shared. These metadatas don't leak any password-protected datas.
