@@ -44,7 +44,7 @@ type ShareManager interface {
 // WebhookManager description
 type WebhookManager interface {
 	Enabled() bool
-	Create(string, bool, string, map[string]string) (string, error)
+	Create(string, bool, string, []EventType, map[string]string) (string, error)
 	Delete(string) error
 	List() map[string]Webhook
 }

@@ -10,11 +10,23 @@ type Webhook struct {
 	ID        string            `json:"id"`
 	Pathname  string            `json:"pathname"`
 	URL       string            `json:"url"`
+	Types     []EventType       `json:"types"`
 	Recursive bool              `json:"recursive"`
 }
 
 // Match determine if storage item match webhook
-func (w Webhook) Match(item StorageItem) bool {
+func (w Webhook) hasType(eventType EventType) bool {
+	for _, t := range w.Types {
+		if t == eventType {
+			return true
+		}
+	}
+
+	return false
+}
+
+// Match determine if storage item match webhook
+func (w Webhook) matchItem(item StorageItem) bool {
 	if len(item.Name) == 0 {
 		return false
 	}
@@ -24,4 +36,13 @@ func (w Webhook) Match(item StorageItem) bool {
 	}
 
 	return item.Dir() == w.Pathname
+}
+
+// Match determine if storage item match webhook
+func (w Webhook) Match(e Event) bool {
+	if !w.hasType(e.Type) {
+		return false
+	}
+
+	return w.matchItem(e.Item) || (e.New != nil && w.matchItem(*e.New))
 }

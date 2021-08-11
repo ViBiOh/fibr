@@ -24,17 +24,33 @@ func (a *App) createWebhook(w http.ResponseWriter, r *http.Request, request prov
 	}
 
 	var err error
+	err = r.ParseForm()
+	if err != nil {
+		a.rendererApp.Error(w, model.WrapInvalid(fmt.Errorf("unable to parse form: %s", err)))
+		return
+	}
 
-	recursive, err := getFormBool(r.FormValue("recursive"))
+	recursive, err := getFormBool(r.Form.Get("recursive"))
 	if err != nil {
 		a.rendererApp.Error(w, model.WrapInvalid(err))
 		return
 	}
 
-	target, err := url.Parse(strings.TrimSpace(r.FormValue("url")))
+	target, err := url.Parse(strings.TrimSpace(r.Form.Get("url")))
 	if err != nil {
 		a.rendererApp.Error(w, model.WrapInvalid(fmt.Errorf("unable to parse url: %s", err)))
 		return
+	}
+
+	rawEventTypes := r.Form["types"]
+	eventTypes := make([]provider.EventType, len(rawEventTypes))
+	for i, rawEventType := range rawEventTypes {
+		eType, err := provider.ParseEventType(rawEventType)
+		if err != nil {
+			a.rendererApp.Error(w, model.WrapInvalid(err))
+			return
+		}
+		eventTypes[i] = eType
 	}
 
 	info, err := a.storageApp.Info(request.Path)
@@ -52,7 +68,7 @@ func (a *App) createWebhook(w http.ResponseWriter, r *http.Request, request prov
 		return
 	}
 
-	id, err := a.webhookApp.Create(info.Pathname, recursive, target.String(), nil)
+	id, err := a.webhookApp.Create(info.Pathname, recursive, target.String(), eventTypes, nil)
 	if err != nil {
 		a.rendererApp.Error(w, model.WrapInternal(err))
 		return

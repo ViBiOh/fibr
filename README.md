@@ -84,7 +84,7 @@ The request sends is a POST with 15s timeout with the given payload structure:
 
 It will contains an extra key `new` with the same structure of `item` in case of a `rename` event.
 
-The webhook can be recursive (all children folders will be notified too) and for now, no event type selection is possible: the webhook will receive all kinds of events.
+The webhook can be recursive (all children folders will be notified too) for event choosen.
 
 ### SEO
 

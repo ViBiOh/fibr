@@ -24,5 +24,17 @@
     <input id="url" class="full" type="text" name="url" value="" placeholder="http://website.com/fibr" />
   </p>
 
+  <p class="padding no-margin">
+    <label for="types" class="block">Types</label>
+    <select id="types" name="types" class="full" multiple>
+      <option value="upload">upload</option>
+      <option value="create">create</option>
+      <option value="rename">rename</option>
+      <option value="delete">delete</option>
+      <option value="start">start</option>
+      <option value="access">access</option>
+    </select>
+  </p>
+
   {{ template "form_buttons" "Connect" }}
 {{ end }}

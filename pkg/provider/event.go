@@ -2,7 +2,10 @@ package provider
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
+	"fmt"
+	"strings"
 )
 
 // EventType is the enumeration of event that can happen
@@ -30,13 +33,23 @@ const (
 )
 
 var (
-	// EventTypeValues string values
-	EventTypeValues = []string{"upload", "create", "rename", "delete", "start", "access"}
+	eventTypeValues = []string{"upload", "create", "rename", "delete", "start", "access"}
 )
+
+// ParseEventType parse raw string into an EventType
+func ParseEventType(value string) (EventType, error) {
+	for i, eType := range eventTypeValues {
+		if strings.EqualFold(eType, value) {
+			return EventType(i), nil
+		}
+	}
+
+	return 0, fmt.Errorf("invalid value `%s` for event type", value)
+}
 
 // String return string values
 func (et EventType) String() string {
-	return EventTypeValues[et]
+	return eventTypeValues[et]
 }
 
 // MarshalJSON marshals the enum as a quoted json string
@@ -45,6 +58,23 @@ func (et EventType) MarshalJSON() ([]byte, error) {
 	buffer.WriteString(et.String())
 	buffer.WriteString(`"`)
 	return buffer.Bytes(), nil
+}
+
+// UnmarshalJSON unmarshal JSOn
+func (et *EventType) UnmarshalJSON(b []byte) error {
+	var strValue string
+	err := json.Unmarshal(b, &strValue)
+	if err != nil {
+		return fmt.Errorf("unable to unmarshal event type: %s", err)
+	}
+
+	value, err := ParseEventType(strValue)
+	if err != nil {
+		return fmt.Errorf("unable to parse event type: %s", err)
+	}
+
+	*et = value
+	return nil
 }
 
 // Event describes an event on fibr
