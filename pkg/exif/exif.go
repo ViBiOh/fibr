@@ -60,7 +60,7 @@ type App struct {
 	done         chan struct{}
 	geocodeQueue chan provider.StorageItem
 
-	metrics map[string]*prometheus.GaugeVec
+	metrics map[string]*prometheus.CounterVec
 
 	exifURL          string
 	geocodeURL       string
@@ -87,7 +87,12 @@ func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) Config 
 }
 
 // New creates new App from Config
-func New(config Config, storageApp provider.Storage, prometheusRegisterer prometheus.Registerer) App {
+func New(config Config, storageApp provider.Storage, prometheusRegisterer prometheus.Registerer) (App, error) {
+	metrics, err := createMetrics(prometheusRegisterer, "exif", "geocode", "aggregate")
+	if err != nil {
+		return App{}, err
+	}
+
 	return App{
 		exifURL:          strings.TrimSpace(*config.exifURL),
 		geocodeURL:       strings.TrimSpace(*config.geocodeURL),
@@ -96,10 +101,10 @@ func New(config Config, storageApp provider.Storage, prometheusRegisterer promet
 
 		storageApp: storageApp,
 
-		metrics:      createMetrics(prometheusRegisterer, "exif", "geocode", "aggregate"),
+		metrics:      metrics,
 		done:         make(chan struct{}),
 		geocodeQueue: make(chan provider.StorageItem, 10),
-	}
+	}, nil
 }
 
 func (a App) enabled() bool {
@@ -164,8 +169,6 @@ func (a App) fetchAndStoreExif(item provider.StorageItem) (map[string]interface{
 	if err := a.saveMetadata(item, exifMetadataFilename, data); err != nil {
 		return nil, fmt.Errorf("unable to save exif: %s", err)
 	}
-
-	a.increaseMetric("exif", "saved")
 
 	return data, nil
 }

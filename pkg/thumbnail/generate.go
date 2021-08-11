@@ -49,7 +49,7 @@ func (a App) generate(item provider.StorageItem) error {
 		file = resp.Body
 	}
 
-	a.thumbnailCounter.WithLabelValues("requested").Inc()
+	a.increaseMetric("requested")
 
 	resp, err = req.Post(a.imageURL).Send(ctx, file)
 	if err != nil {
@@ -65,7 +65,7 @@ func (a App) generate(item provider.StorageItem) error {
 		return err
 	}
 
-	a.thumbnailCounter.WithLabelValues("saved").Inc()
+	a.increaseMetric("saved")
 
 	return nil
 }

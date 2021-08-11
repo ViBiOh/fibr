@@ -15,6 +15,15 @@ type Webhook struct {
 }
 
 // Match determine if storage item match webhook
+func (w Webhook) Match(e Event) bool {
+	if !w.hasType(e.Type) {
+		return false
+	}
+
+	return w.matchItem(e.Item) || (e.New != nil && w.matchItem(*e.New))
+}
+
+// Match determine if storage item match webhook
 func (w Webhook) hasType(eventType EventType) bool {
 	for _, t := range w.Types {
 		if t == eventType {
@@ -36,13 +45,4 @@ func (w Webhook) matchItem(item StorageItem) bool {
 	}
 
 	return item.Dir() == w.Pathname
-}
-
-// Match determine if storage item match webhook
-func (w Webhook) Match(e Event) bool {
-	if !w.hasType(e.Type) {
-		return false
-	}
-
-	return w.matchItem(e.Item) || (e.New != nil && w.matchItem(*e.New))
 }

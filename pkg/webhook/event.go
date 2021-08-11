@@ -2,6 +2,7 @@ package webhook
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
@@ -28,8 +29,12 @@ func (a *App) EventConsumer(e provider.Event) {
 		}
 
 		resp, err := req.JSON(context.Background(), e)
+		if resp != nil {
+			a.increaseMetric(strconv.Itoa(resp.StatusCode))
+		}
 		if err != nil {
 			logger.Error("error while sending webhook: %s", err)
+
 			continue
 		}
 

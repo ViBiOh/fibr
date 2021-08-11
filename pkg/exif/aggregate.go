@@ -88,16 +88,11 @@ func (a App) computeAndSaveAggregate(dir provider.StorageItem) error {
 		return fmt.Errorf("unable to aggregate: %s", err)
 	}
 
-	err = a.saveMetadata(dir, aggregateMetadataFilename, provider.Aggregate{
+	return a.saveMetadata(dir, aggregateMetadataFilename, provider.Aggregate{
 		Location: directoryAggregate.value(),
 		Start:    minDate,
 		End:      maxDate,
 	})
-	if err == nil {
-		a.increaseMetric("aggregate", "saved")
-	}
-
-	return err
 }
 
 func aggregateDate(min, max, current time.Time) (time.Time, time.Time) {

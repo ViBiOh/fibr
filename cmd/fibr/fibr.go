@@ -78,11 +78,15 @@ func main() {
 	storageApp, err := filesystem.New(filesystemConfig)
 	logger.Fatal(err)
 
-	prometheusRegister := prometheusApp.Registerer()
-	eventBus := provider.NewEventBus(10)
+	prometheusRegisterer := prometheusApp.Registerer()
+	eventBus, err := provider.NewEventBus(10, prometheusRegisterer)
+	logger.Fatal(err)
 
-	thumbnailApp := thumbnail.New(thumbnailConfig, storageApp, prometheusRegister)
-	exifApp := exif.New(exifConfig, storageApp, prometheusRegister)
+	thumbnailApp, err := thumbnail.New(thumbnailConfig, storageApp, prometheusRegisterer)
+	logger.Fatal(err)
+
+	exifApp, err := exif.New(exifConfig, storageApp, prometheusRegisterer)
+	logger.Fatal(err)
 
 	rendererApp, err := renderer.New(rendererConfig, content, fibr.FuncMap(thumbnailApp))
 	logger.Fatal(err)

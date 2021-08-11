@@ -10,6 +10,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 var (
@@ -20,6 +21,7 @@ var (
 type App struct {
 	storageApp provider.Storage
 	webhooks   map[string]provider.Webhook
+	counter    *prometheus.CounterVec
 	mutex      sync.RWMutex
 }
 

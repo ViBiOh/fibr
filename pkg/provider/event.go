@@ -6,6 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 // EventType is the enumeration of event that can happen
@@ -127,24 +129,53 @@ func NewAccessEvent(item StorageItem) Event {
 
 // EventBus describes a channel for exchanging Event
 type EventBus struct {
-	bus  chan Event
-	done chan struct{}
+	counter *prometheus.CounterVec
+	bus     chan Event
+	done    chan struct{}
 }
 
 // NewEventBus create an event exchange channel
-func NewEventBus(size uint) EventBus {
-	return EventBus{
-		done: make(chan struct{}),
-		bus:  make(chan Event, size),
+func NewEventBus(size uint, prometheusRegisterer prometheus.Registerer) (EventBus, error) {
+	var counter *prometheus.CounterVec
+
+	if prometheusRegisterer != nil {
+		counter = prometheus.NewCounterVec(prometheus.CounterOpts{
+			Namespace: "fibr",
+			Subsystem: "event",
+			Name:      "item",
+		}, []string{"type", "state"})
+
+		if err := prometheusRegisterer.Register(counter); err != nil {
+			return EventBus{}, fmt.Errorf("unable to register event metric: %s", err)
+		}
 	}
+
+	return EventBus{
+		done:    make(chan struct{}),
+		bus:     make(chan Event, size),
+		counter: counter,
+	}, nil
+}
+
+func (e EventBus) increaseMetric(event Event, state string) {
+	if e.counter == nil {
+		return
+	}
+
+	e.counter.With(prometheus.Labels{
+		"type":  event.Type.String(),
+		"state": state,
+	}).Inc()
 }
 
 // Push an event in the bus
 func (e EventBus) Push(event Event) error {
 	select {
 	case <-e.done:
+		e.increaseMetric(event, "refused")
 		return errors.New("event bus is closed")
 	case e.bus <- event:
+		e.increaseMetric(event, "push")
 		return nil
 	}
 }
@@ -159,6 +190,7 @@ func (e EventBus) Start(done <-chan struct{}, consumers ...EventConsumer) {
 			for _, consumer := range consumers {
 				consumer(event)
 			}
+			e.increaseMetric(event, "done")
 		}
 	}()
 

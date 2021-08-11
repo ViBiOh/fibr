@@ -64,8 +64,6 @@ func (a App) processGeocodeQueue() {
 	}
 
 	for item := range a.geocodeQueue {
-		a.decreaseMetric("geocode", "queued")
-
 		if tick != nil {
 			<-tick
 		}
@@ -73,6 +71,8 @@ func (a App) processGeocodeQueue() {
 		if err := a.extractAndSaveGeocoding(item); err != nil {
 			logger.Error("unable to extract geocoding for `%s`: %s", item.Pathname, err)
 		}
+
+		a.increaseMetric("geocode", "processed")
 	}
 }
 
@@ -93,8 +93,6 @@ func (a App) extractAndSaveGeocoding(item provider.StorageItem) error {
 	if err := a.saveMetadata(item, geocodeMetadataFilename, geocode); err != nil {
 		return fmt.Errorf("unable to save geocode: %s", err)
 	}
-
-	a.increaseMetric("geocode", "saved")
 
 	return nil
 }

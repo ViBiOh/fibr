@@ -108,5 +108,7 @@ func (a App) saveMetadata(item provider.StorageItem, suffix string, data interfa
 		return fmt.Errorf("unable to encode: %s", err)
 	}
 
+	a.increaseMetric(suffix, "saved")
+
 	return nil
 }

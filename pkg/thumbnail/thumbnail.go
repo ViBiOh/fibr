@@ -30,7 +30,7 @@ type App struct {
 	storageApp    provider.Storage
 	pathnameInput chan provider.StorageItem
 
-	thumbnailCounter *prometheus.GaugeVec
+	counter *prometheus.CounterVec
 
 	imageURL string
 	videoURL string
@@ -51,36 +51,29 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 }
 
 // New creates new App from Config
-func New(config Config, storage provider.Storage, prometheusRegisterer prometheus.Registerer) App {
-	thumbnailCounter := prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Namespace: "fibr",
-		Subsystem: "thumbnail",
-		Name:      "item",
-	}, []string{"state"})
-
-	if prometheusRegisterer != nil {
-		if err := prometheusRegisterer.Register(thumbnailCounter); err != nil {
-			logger.Error("unable to register thumbnail gauge: %s", err)
-		}
-	}
-
+func New(config Config, storage provider.Storage, prometheusRegisterer prometheus.Registerer) (App, error) {
 	imageURL := strings.TrimSpace(*config.imageURL)
 	if len(imageURL) == 0 {
-		return App{}
+		return App{}, nil
 	}
 
 	videoURL := strings.TrimSpace(*config.videoURL)
 	if len(videoURL) == 0 {
-		return App{}
+		return App{}, nil
+	}
+
+	counter, err := createMetric(prometheusRegisterer)
+	if err != nil {
+		return App{}, err
 	}
 
 	return App{
-		imageURL:         fmt.Sprintf("%s/crop?width=%d&height=%d&stripmeta=true&noprofile=true&quality=80&type=jpeg", imageURL, Width, Height),
-		videoURL:         videoURL,
-		storageApp:       storage,
-		thumbnailCounter: thumbnailCounter,
-		pathnameInput:    make(chan provider.StorageItem, 10),
-	}
+		imageURL:      fmt.Sprintf("%s/crop?width=%d&height=%d&stripmeta=true&noprofile=true&quality=80&type=jpeg", imageURL, Width, Height),
+		videoURL:      videoURL,
+		storageApp:    storage,
+		counter:       counter,
+		pathnameInput: make(chan provider.StorageItem, 10),
+	}, nil
 }
 
 func (a App) enabled() bool {
