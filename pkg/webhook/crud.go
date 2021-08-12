@@ -26,7 +26,7 @@ func (a *App) generateID() (string, error) {
 		}
 		id := sha.Sha1(uuid)[:8]
 
-		if _, ok := a.webhooks[id]; !ok {
+		if _, ok := a.webhooks.Load(id); !ok {
 			return id, nil
 		}
 	}
@@ -38,10 +38,13 @@ func (a *App) List() map[string]provider.Webhook {
 		return nil
 	}
 
-	a.mutex.RLock()
-	defer a.mutex.RUnlock()
+	webhooks := make(map[string]provider.Webhook)
+	a.webhooks.Range(func(key, value interface{}) bool {
+		webhooks[key.(string)] = value.(provider.Webhook)
+		return true
+	})
 
-	return a.webhooks
+	return webhooks
 }
 
 // Create a webhook
@@ -50,21 +53,18 @@ func (a *App) Create(pathname string, recursive bool, url string, types []provid
 		return "", fmt.Errorf("webhook is disabled")
 	}
 
-	a.mutex.Lock()
-	defer a.mutex.Unlock()
-
 	id, err := a.generateID()
 	if err != nil {
 		return "", err
 	}
 
-	a.webhooks[id] = provider.Webhook{
+	a.webhooks.Store(id, provider.Webhook{
 		ID:        id,
 		Pathname:  pathname,
 		Recursive: recursive,
 		URL:       url,
 		Types:     types,
-	}
+	})
 
 	return id, a.saveWebhooks()
 }
@@ -75,10 +75,7 @@ func (a *App) Delete(id string) error {
 		return fmt.Errorf("webhook is disabled")
 	}
 
-	a.mutex.Lock()
-	defer a.mutex.Unlock()
-
-	delete(a.webhooks, id)
+	a.webhooks.Delete(id)
 
 	return a.saveWebhooks()
 }
