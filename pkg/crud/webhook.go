@@ -68,7 +68,7 @@ func (a *App) createWebhook(w http.ResponseWriter, r *http.Request, request prov
 		return
 	}
 
-	id, err := a.webhookApp.Create(info.Pathname, recursive, target.String(), eventTypes, nil)
+	id, err := a.webhookApp.Create(info.Pathname, recursive, target.String(), eventTypes)
 	if err != nil {
 		a.rendererApp.Error(w, model.WrapInternal(err))
 		return

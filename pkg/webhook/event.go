@@ -31,9 +31,6 @@ func (a *App) EventConsumer(e provider.Event) {
 		}
 
 		req := request.New().Post(webhook.URL)
-		for key, val := range webhook.Headers {
-			req.Header(key, val)
-		}
 
 		var resp *http.Response
 		var err error

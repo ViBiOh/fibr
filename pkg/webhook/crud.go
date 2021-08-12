@@ -45,7 +45,7 @@ func (a *App) List() map[string]provider.Webhook {
 }
 
 // Create a webhook
-func (a *App) Create(pathname string, recursive bool, url string, types []provider.EventType, headers map[string]string) (string, error) {
+func (a *App) Create(pathname string, recursive bool, url string, types []provider.EventType) (string, error) {
 	if !a.Enabled() {
 		return "", fmt.Errorf("webhook is disabled")
 	}
@@ -64,7 +64,6 @@ func (a *App) Create(pathname string, recursive bool, url string, types []provid
 		Recursive: recursive,
 		URL:       url,
 		Types:     types,
-		Headers:   headers,
 	}
 
 	return id, a.saveWebhooks()

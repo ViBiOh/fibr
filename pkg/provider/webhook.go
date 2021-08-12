@@ -6,12 +6,11 @@ import (
 
 // Webhook stores informations about webhook
 type Webhook struct {
-	Headers   map[string]string `json:"headers,omitempty"`
-	ID        string            `json:"id"`
-	Pathname  string            `json:"pathname"`
-	URL       string            `json:"url"`
-	Types     []EventType       `json:"types"`
-	Recursive bool              `json:"recursive"`
+	ID        string      `json:"id"`
+	Pathname  string      `json:"pathname"`
+	URL       string      `json:"url"`
+	Types     []EventType `json:"types"`
+	Recursive bool        `json:"recursive"`
 }
 
 // Match determine if storage item match webhook

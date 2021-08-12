@@ -35,18 +35,18 @@ func (m *Webhook) EXPECT() *WebhookMockRecorder {
 }
 
 // Create mocks base method.
-func (m *Webhook) Create(arg0 string, arg1 bool, arg2 string, arg3 []provider.EventType, arg4 map[string]string) (string, error) {
+func (m *Webhook) Create(arg0 string, arg1 bool, arg2 string, arg3 []provider.EventType) (string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", arg0, arg1, arg2, arg3, arg4)
+	ret := m.ctrl.Call(m, "Create", arg0, arg1, arg2, arg3)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Create indicates an expected call of Create.
-func (mr *WebhookMockRecorder) Create(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
+func (mr *WebhookMockRecorder) Create(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*Webhook)(nil).Create), arg0, arg1, arg2, arg3, arg4)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*Webhook)(nil).Create), arg0, arg1, arg2, arg3)
 }
 
 // Delete mocks base method.
