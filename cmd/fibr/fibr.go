@@ -55,7 +55,7 @@ func main() {
 
 	crudConfig := crud.Flags(fs, "")
 	shareConfig := share.Flags(fs, "")
-	webhookConfig := webhook.Flags(fs, "")
+	webhookConfig := webhook.Flags(fs, "webhook")
 	rendererConfig := renderer.Flags(fs, "", flags.NewOverride("PublicURL", "https://fibr.vibioh.fr"), flags.NewOverride("Title", "fibr"))
 
 	filesystemConfig := filesystem.Flags(fs, "fs")

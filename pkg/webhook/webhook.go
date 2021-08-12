@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"path"
+	"strings"
 	"sync"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -23,17 +24,20 @@ type App struct {
 	webhooks   map[string]provider.Webhook
 	counter    *prometheus.CounterVec
 	mutex      sync.RWMutex
+	hmacSecret []byte
 }
 
 // Config of package
 type Config struct {
-	enabled *bool
+	enabled    *bool
+	hmacSecret *string
 }
 
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) Config {
 	return Config{
-		enabled: flags.New(prefix, "webhook").Name("Webhook").Default(flags.Default("Webhook", true, overrides)).Label("Enable webhook feature").ToBool(fs),
+		enabled:    flags.New(prefix, "webhook").Name("Enabled").Default(flags.Default("Enabled", true, overrides)).Label("Enable webhook feature").ToBool(fs),
+		hmacSecret: flags.New(prefix, "webhook").Name("Secret").Default(flags.Default("Secret", "", overrides)).Label("Secret for HMAC Signature").ToString(fs),
 	}
 }
 
@@ -46,6 +50,7 @@ func New(config Config, storageApp provider.Storage) *App {
 	return &App{
 		storageApp: storageApp,
 		webhooks:   make(map[string]provider.Webhook),
+		hmacSecret: []byte(strings.TrimSpace(*config.hmacSecret)),
 	}
 }
 

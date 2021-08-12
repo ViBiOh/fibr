@@ -260,8 +260,10 @@ Usage of fibr:
         [alcotest] URL to check {FIBR_URL}
   -userAgent string
         [alcotest] User-Agent for check {FIBR_USER_AGENT} (default "Alcotest")
-  -webhook
-        [webhook] Enable webhook feature {FIBR_WEBHOOK} (default true)
+  -webhookEnabled
+        [webhook] Enable webhook feature {FIBR_WEBHOOK_ENABLED} (default true)
+  -webhookSecret string
+        [webhook] Secret for HMAC Signature {FIBR_WEBHOOK_SECRET}
   -writeTimeout string
         [server] Write Timeout {FIBR_WRITE_TIMEOUT} (default "2m")
 ```

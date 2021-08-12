@@ -104,7 +104,8 @@ run:
 		-exifURL "http://localhost:4000" \
 		-exifGeocodeURL "https://nominatim.openstreetmap.org" \
 		-exifDateOnStart \
-		-exifAggregateOnStart
+		-exifAggregateOnStart \
+		-webhookSecret "secret"
 
 .PHONY: run-imaginary
 run-imaginary:
