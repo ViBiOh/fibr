@@ -22,11 +22,12 @@ func (a *App) EventConsumer(e provider.Event) {
 		return
 	}
 
-	a.webhooks.Range(func(key, value interface{}) bool {
-		webhook := value.(provider.Webhook)
+	a.mutex.RLock()
+	defer a.mutex.RUnlock()
 
+	for _, webhook := range a.webhooks {
 		if !webhook.Match(e) {
-			return true
+			continue
 		}
 
 		req := request.New().Post(webhook.URL)
@@ -45,15 +46,14 @@ func (a *App) EventConsumer(e provider.Event) {
 		}
 		if err != nil {
 			logger.Error("error while sending webhook: %s", err)
-			return true
+
+			continue
 		}
 
 		if err := resp.Body.Close(); err != nil {
 			logger.Error("unable to close response body: %s", err)
 		}
-
-		return true
-	})
+	}
 }
 
 func (a *App) sendWithHmac(ctx context.Context, req *request.Request, event provider.Event) (*http.Response, error) {

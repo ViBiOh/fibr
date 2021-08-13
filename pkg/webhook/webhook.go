@@ -21,8 +21,9 @@ var (
 // App of package
 type App struct {
 	storageApp provider.Storage
-	webhooks   sync.Map
+	webhooks   map[string]provider.Webhook
 	counter    *prometheus.CounterVec
+	mutex      sync.RWMutex
 	hmacSecret []byte
 }
 
@@ -48,6 +49,7 @@ func New(config Config, storageApp provider.Storage) *App {
 
 	return &App{
 		storageApp: storageApp,
+		webhooks:   make(map[string]provider.Webhook),
 		hmacSecret: []byte(strings.TrimSpace(*config.hmacSecret)),
 	}
 }
@@ -62,6 +64,9 @@ func (a *App) Start(_ <-chan struct{}) {
 	if !a.Enabled() {
 		return
 	}
+
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
 
 	if err := a.loadWebhooks(); err != nil {
 		logger.Error("unable to refresh webhooks: %s", err)
@@ -84,14 +89,8 @@ func (a *App) loadWebhooks() (err error) {
 		}
 	}()
 
-	var webhooks map[string]provider.Webhook
-	if err = json.NewDecoder(file).Decode(&webhooks); err != nil {
+	if err = json.NewDecoder(file).Decode(&a.webhooks); err != nil {
 		return fmt.Errorf("unable to decode: %s", err)
-	}
-
-	a.webhooks = sync.Map{}
-	for key, value := range webhooks {
-		a.webhooks.Store(key, value)
 	}
 
 	return nil
@@ -112,7 +111,7 @@ func (a *App) saveWebhooks() (err error) {
 	encoder := json.NewEncoder(file)
 	encoder.SetIndent("", "  ")
 
-	if err := encoder.Encode(a.List()); err != nil {
+	if err := encoder.Encode(a.webhooks); err != nil {
 		return fmt.Errorf("unable to encode: %s", err)
 	}
 
