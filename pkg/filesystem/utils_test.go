@@ -170,8 +170,8 @@ func TestConvertToItem(t *testing.T) {
 				Pathname: "/README.md",
 				IsDir:    false,
 				Date:     readmeInfo.ModTime(),
-				Info:     readmeInfo,
 				Size:     readmeInfo.Size(),
+				Mode:     readmeInfo.Mode(),
 			},
 		},
 	}

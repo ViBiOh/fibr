@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 	"path"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -14,6 +13,10 @@ import (
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
+)
+
+const (
+	uint32max = (1 << 32) - 1
 )
 
 func (a *App) getCover(files []provider.StorageItem) map[string]interface{} {
@@ -119,13 +122,20 @@ func (a *App) zipFiles(request provider.Request, zipWriter *zip.Writer, pathname
 }
 
 func (a *App) addFileToZip(zipWriter *zip.Writer, item provider.StorageItem, pathname string) error {
-	header, err := zip.FileInfoHeader(item.Info.(os.FileInfo))
-	if err != nil {
-		return err
+	header := &zip.FileHeader{
+		Name:               path.Join(pathname, item.Name),
+		UncompressedSize64: uint64(item.Size),
+		UncompressedSize:   uint32(item.Size),
+		Modified:           item.Date,
+		Method:             zip.Deflate,
 	}
+	header.SetMode(item.Mode)
 
-	header.Name = path.Join(pathname, item.Name)
-	header.Method = zip.Deflate
+	if header.UncompressedSize64 > uint32max {
+		header.UncompressedSize = uint32max
+	} else {
+		header.UncompressedSize = uint32(header.UncompressedSize64)
+	}
 
 	writer, err := zipWriter.CreateHeader(header)
 	if err != nil {

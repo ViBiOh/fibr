@@ -88,11 +88,13 @@ func main() {
 	exifApp, err := exif.New(exifConfig, storageApp, prometheusRegisterer)
 	logger.Fatal(err)
 
+	webhookApp, err := webhook.New(webhookConfig, storageApp, prometheusRegisterer)
+	logger.Fatal(err)
+
 	rendererApp, err := renderer.New(rendererConfig, content, fibr.FuncMap(thumbnailApp))
 	logger.Fatal(err)
 
 	shareApp := share.New(shareConfig, storageApp)
-	webhookApp := webhook.New(webhookConfig, storageApp)
 	crudApp, err := crud.New(crudConfig, storageApp, rendererApp, shareApp, webhookApp, thumbnailApp, exifApp, eventBus.Push)
 	logger.Fatal(err)
 

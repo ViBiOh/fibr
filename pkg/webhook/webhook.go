@@ -23,8 +23,8 @@ type App struct {
 	storageApp provider.Storage
 	webhooks   map[string]provider.Webhook
 	counter    *prometheus.CounterVec
-	mutex      sync.RWMutex
 	hmacSecret []byte
+	mutex      sync.RWMutex
 }
 
 // Config of package
@@ -42,16 +42,22 @@ func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) Config 
 }
 
 // New creates new App from Config
-func New(config Config, storageApp provider.Storage) *App {
+func New(config Config, storageApp provider.Storage, prometheusRegisterer prometheus.Registerer) (*App, error) {
 	if !*config.enabled {
-		return &App{}
+		return &App{}, nil
+	}
+
+	counter, err := createMetric(prometheusRegisterer)
+	if err != nil {
+		return nil, fmt.Errorf("unable to create metric: %s", err)
 	}
 
 	return &App{
 		storageApp: storageApp,
 		webhooks:   make(map[string]provider.Webhook),
+		counter:    counter,
 		hmacSecret: []byte(strings.TrimSpace(*config.hmacSecret)),
-	}
+	}, nil
 }
 
 // Enabled checks if requirements are met

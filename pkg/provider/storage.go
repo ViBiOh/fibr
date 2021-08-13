@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"io/fs"
 	"mime"
 	"path"
 	"path/filepath"
@@ -11,10 +12,10 @@ import (
 // StorageItem describe item on a storage provider
 type StorageItem struct {
 	Date     time.Time   `json:"date"`
-	Info     interface{} `json:"-"`
 	Name     string      `json:"name"`
 	Pathname string      `json:"pathname"`
 	IsDir    bool        `json:"isDir"`
+	Mode     fs.FileMode `json:"mode"`
 	Size     int64       `json:"size"`
 }
 
