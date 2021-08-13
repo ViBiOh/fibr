@@ -63,9 +63,7 @@ func (a *App) sendWithHmac(ctx context.Context, req *request.Request, event prov
 	if err != nil {
 		return nil, fmt.Errorf("unable to marshal: %s", err)
 	}
-
 	hasher.Write(payload)
-	req.Header("X-Fibr-Signature", hex.EncodeToString(hasher.Sum(nil)))
-	req.ContentJSON()
-	return req.Send(ctx, bytes.NewReader(payload))
+
+	return req.Header("X-Fibr-Signature", hex.EncodeToString(hasher.Sum(nil))).ContentJSON().Send(ctx, bytes.NewReader(payload))
 }
