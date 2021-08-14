@@ -80,20 +80,6 @@ func (mr *StorageMockRecorder) List(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*Storage)(nil).List), arg0)
 }
 
-// Path mocks base method.
-func (m *Storage) Path(arg0 string) string {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Path", arg0)
-	ret0, _ := ret[0].(string)
-	return ret0
-}
-
-// Path indicates an expected call of Path.
-func (mr *StorageMockRecorder) Path(arg0 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Path", reflect.TypeOf((*Storage)(nil).Path), arg0)
-}
-
 // ReaderFrom mocks base method.
 func (m *Storage) ReaderFrom(arg0 string) (provider.ReadSeekerCloser, error) {
 	m.ctrl.T.Helper()
@@ -137,18 +123,6 @@ func (mr *StorageMockRecorder) Rename(arg0, arg1 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Rename", reflect.TypeOf((*Storage)(nil).Rename), arg0, arg1)
 }
 
-// SetIgnoreFn mocks base method.
-func (m *Storage) SetIgnoreFn(arg0 func(provider.StorageItem) bool) {
-	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "SetIgnoreFn", arg0)
-}
-
-// SetIgnoreFn indicates an expected call of SetIgnoreFn.
-func (mr *StorageMockRecorder) SetIgnoreFn(arg0 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetIgnoreFn", reflect.TypeOf((*Storage)(nil).SetIgnoreFn), arg0)
-}
-
 // Store mocks base method.
 func (m *Storage) Store(arg0 string, arg1 io.ReadCloser) error {
 	m.ctrl.T.Helper()
@@ -189,6 +163,18 @@ func (m *Storage) Walk(arg0 string, arg1 func(provider.StorageItem, error) error
 func (mr *StorageMockRecorder) Walk(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Walk", reflect.TypeOf((*Storage)(nil).Walk), arg0, arg1)
+}
+
+// WithIgnoreFn mocks base method.
+func (m *Storage) WithIgnoreFn(arg0 func(provider.StorageItem) bool) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "WithIgnoreFn", arg0)
+}
+
+// WithIgnoreFn indicates an expected call of WithIgnoreFn.
+func (mr *StorageMockRecorder) WithIgnoreFn(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WithIgnoreFn", reflect.TypeOf((*Storage)(nil).WithIgnoreFn), arg0)
 }
 
 // WriterTo mocks base method.

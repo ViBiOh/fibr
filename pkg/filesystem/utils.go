@@ -20,15 +20,15 @@ func checkPathname(pathname string) error {
 	return nil
 }
 
-func (a app) getRelativePath(pathname string) string {
+func (a *App) getRelativePath(pathname string) string {
 	return strings.TrimPrefix(pathname, a.rootDirectory)
 }
 
-func (a app) getFile(filename string, flags int) (*os.File, error) {
-	return os.OpenFile(a.Path(filename), flags, getMode(filename))
+func (a *App) getFile(filename string, flags int) (*os.File, error) {
+	return os.OpenFile(a.path(filename), flags, getMode(filename))
 }
 
-func (a app) getWritableFile(filename string) (io.WriteCloser, error) {
+func (a *App) getWritableFile(filename string) (io.WriteCloser, error) {
 	return a.getFile(filename, writeFlags)
 }
 

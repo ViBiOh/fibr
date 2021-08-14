@@ -11,7 +11,7 @@ import (
 )
 
 // Browser render file web view
-func (a *App) Browser(w http.ResponseWriter, request provider.Request, file provider.StorageItem, message renderer.Message) (string, int, map[string]interface{}, error) {
+func (a App) Browser(w http.ResponseWriter, request provider.Request, file provider.StorageItem, message renderer.Message) (string, int, map[string]interface{}, error) {
 	var (
 		previous *provider.StorageItem
 		next     *provider.StorageItem

@@ -28,7 +28,8 @@ type Config struct {
 	directory *string
 }
 
-type app struct {
+// App of the package
+type App struct {
 	ignoreFn func(provider.StorageItem) bool
 
 	rootDirectory string
@@ -43,45 +44,46 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 }
 
 // New creates new App from Config
-func New(config Config) (provider.Storage, error) {
+func New(config Config) (App, error) {
 	rootDirectory := strings.TrimSuffix(strings.TrimSpace(*config.directory), "/")
 
 	if len(rootDirectory) == 0 {
-		return nil, errors.New("no directory provided")
+		return App{}, errors.New("no directory provided")
 	}
 
 	info, err := os.Stat(rootDirectory)
 	if err != nil {
-		return nil, convertError(err)
+		return App{}, convertError(err)
 	}
 
 	if !info.IsDir() {
-		return nil, fmt.Errorf("path %s is not a directory", rootDirectory)
+		return App{}, fmt.Errorf("path %s is not a directory", rootDirectory)
 	}
 
 	logger.Info("Serving file from %s", rootDirectory)
 
-	return &app{
+	return App{
 		rootDirectory: rootDirectory,
 		rootDirname:   info.Name(),
 	}, nil
 }
 
-func (a app) Path(pathname string) string {
+func (a *App) path(pathname string) string {
 	return path.Join(a.rootDirectory, pathname)
 }
 
-func (a *app) SetIgnoreFn(ignoreFn func(provider.StorageItem) bool) {
+// WithIgnoreFn create a new App with given ignoreFn
+func (a *App) WithIgnoreFn(ignoreFn func(provider.StorageItem) bool) {
 	a.ignoreFn = ignoreFn
 }
 
 // Info provide metadata about given pathname
-func (a *app) Info(pathname string) (provider.StorageItem, error) {
+func (a *App) Info(pathname string) (provider.StorageItem, error) {
 	if err := checkPathname(pathname); err != nil {
 		return provider.StorageItem{}, convertError(err)
 	}
 
-	fullpath := a.Path(pathname)
+	fullpath := a.path(pathname)
 
 	info, err := os.Stat(fullpath)
 	if err != nil {
@@ -92,12 +94,12 @@ func (a *app) Info(pathname string) (provider.StorageItem, error) {
 }
 
 // List items in the storage
-func (a *app) List(pathname string) ([]provider.StorageItem, error) {
+func (a *App) List(pathname string) ([]provider.StorageItem, error) {
 	if err := checkPathname(pathname); err != nil {
 		return nil, convertError(err)
 	}
 
-	fullpath := a.Path(pathname)
+	fullpath := a.path(pathname)
 
 	files, err := os.ReadDir(fullpath)
 	if err != nil {
@@ -125,7 +127,7 @@ func (a *app) List(pathname string) ([]provider.StorageItem, error) {
 }
 
 // WriterTo opens writer for given pathname
-func (a *app) WriterTo(pathname string) (io.WriteCloser, error) {
+func (a *App) WriterTo(pathname string) (io.WriteCloser, error) {
 	if err := checkPathname(pathname); err != nil {
 		return nil, convertError(err)
 	}
@@ -135,7 +137,7 @@ func (a *app) WriterTo(pathname string) (io.WriteCloser, error) {
 }
 
 // ReaderFrom reads content from given pathname
-func (a *app) ReaderFrom(pathname string) (provider.ReadSeekerCloser, error) {
+func (a *App) ReaderFrom(pathname string) (provider.ReadSeekerCloser, error) {
 	if err := checkPathname(pathname); err != nil {
 		return nil, convertError(err)
 	}
@@ -145,16 +147,16 @@ func (a *app) ReaderFrom(pathname string) (provider.ReadSeekerCloser, error) {
 }
 
 // UpdateDate update date from given value
-func (a *app) UpdateDate(pathname string, date time.Time) error {
+func (a *App) UpdateDate(pathname string, date time.Time) error {
 	if err := checkPathname(pathname); err != nil {
 		return convertError(err)
 	}
 
-	return convertError(os.Chtimes(a.Path(pathname), date, date))
+	return convertError(os.Chtimes(a.path(pathname), date, date))
 }
 
 // Walk browses item recursively
-func (a *app) Walk(pathname string, walkFn func(provider.StorageItem, error) error) error {
+func (a *App) Walk(pathname string, walkFn func(provider.StorageItem, error) error) error {
 	pathname = path.Join(a.rootDirectory, pathname)
 
 	return convertError(filepath.Walk(pathname, func(path string, info os.FileInfo, err error) error {
@@ -175,17 +177,17 @@ func (a *app) Walk(pathname string, walkFn func(provider.StorageItem, error) err
 	}))
 }
 
-// Create container in storage
-func (a *app) CreateDir(name string) error {
+// CreateDir container in storage
+func (a *App) CreateDir(name string) error {
 	if err := checkPathname(name); err != nil {
 		return convertError(err)
 	}
 
-	return convertError(os.MkdirAll(a.Path(name), 0700))
+	return convertError(os.MkdirAll(a.path(name), 0700))
 }
 
 // Store file to storage
-func (a *app) Store(pathname string, content io.ReadCloser) error {
+func (a *App) Store(pathname string, content io.ReadCloser) error {
 	defer func() {
 		if err := content.Close(); err != nil {
 			logger.Error("unable to close content: %s", err)
@@ -220,7 +222,7 @@ func (a *app) Store(pathname string, content io.ReadCloser) error {
 }
 
 // Rename file or directory from storage
-func (a *app) Rename(oldName, newName string) error {
+func (a *App) Rename(oldName, newName string) error {
 	if err := checkPathname(oldName); err != nil {
 		return convertError(err)
 	}
@@ -233,14 +235,14 @@ func (a *app) Rename(oldName, newName string) error {
 		return convertError(err)
 	}
 
-	return convertError(os.Rename(a.Path(oldName), a.Path(newName)))
+	return convertError(os.Rename(a.path(oldName), a.path(newName)))
 }
 
 // Remove file or directory from storage
-func (a *app) Remove(pathname string) error {
+func (a *App) Remove(pathname string) error {
 	if err := checkPathname(pathname); err != nil {
 		return convertError(err)
 	}
 
-	return convertError(os.RemoveAll(a.Path(pathname)))
+	return convertError(os.RemoveAll(a.path(pathname)))
 }

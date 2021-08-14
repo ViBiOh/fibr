@@ -12,7 +12,7 @@ import (
 )
 
 // Create creates given path directory to filesystem
-func (a *App) Create(w http.ResponseWriter, r *http.Request, request provider.Request) {
+func (a App) Create(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !request.CanEdit {
 		a.rendererApp.Error(w, model.WrapForbidden(ErrNotAuthorized))
 		return

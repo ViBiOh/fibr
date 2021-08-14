@@ -51,13 +51,13 @@ func TestGetFullPath(t *testing.T) {
 
 	var cases = []struct {
 		intention string
-		instance  app
+		instance  App
 		args      args
 		want      string
 	}{
 		{
 			"simple",
-			app{
+			App{
 				rootDirectory: "/home/users",
 			},
 			args{
@@ -69,7 +69,7 @@ func TestGetFullPath(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.intention, func(t *testing.T) {
-			if got := tc.instance.Path(tc.args.pathname); got != tc.want {
+			if got := tc.instance.path(tc.args.pathname); got != tc.want {
 				t.Errorf("getFullPath() = `%s`, want `%s`", got, tc.want)
 			}
 		})
@@ -83,13 +83,13 @@ func TestGetRelativePath(t *testing.T) {
 
 	var cases = []struct {
 		intention string
-		instance  app
+		instance  App
 		args      args
 		want      string
 	}{
 		{
 			"simple",
-			app{
+			App{
 				rootDirectory: "/home/users",
 			},
 			args{

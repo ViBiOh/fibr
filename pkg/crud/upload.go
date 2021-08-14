@@ -14,7 +14,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
-func (a *App) saveUploadedFile(request provider.Request, part *multipart.Part) (filename string, err error) {
+func (a App) saveUploadedFile(request provider.Request, part *multipart.Part) (filename string, err error) {
 	var filePath string
 
 	if len(request.Share.ID) != 0 && request.Share.File {
@@ -67,7 +67,7 @@ func (a *App) saveUploadedFile(request provider.Request, part *multipart.Part) (
 }
 
 // Upload saves form files to filesystem
-func (a *App) Upload(w http.ResponseWriter, r *http.Request, request provider.Request, values map[string]string, part *multipart.Part) {
+func (a App) Upload(w http.ResponseWriter, r *http.Request, request provider.Request, values map[string]string, part *multipart.Part) {
 	if !request.CanEdit {
 		a.rendererApp.Error(w, model.WrapForbidden(ErrNotAuthorized))
 		return

@@ -12,7 +12,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
-func (a *App) createWebhook(w http.ResponseWriter, r *http.Request, request provider.Request) {
+func (a App) createWebhook(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !a.webhookApp.Enabled() {
 		a.rendererApp.Error(w, model.WrapInternal(errors.New("webhook is disabled")))
 		return
@@ -84,7 +84,7 @@ func (a *App) createWebhook(w http.ResponseWriter, r *http.Request, request prov
 	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/?d=%s#webhook-list", request.URL(""), request.Layout("")), renderer.NewSuccessMessage("Webhook successfully created with ID: %s", id))
 }
 
-func (a *App) deleteWebhook(w http.ResponseWriter, r *http.Request, request provider.Request) {
+func (a App) deleteWebhook(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !a.webhookApp.Enabled() {
 		a.rendererApp.Error(w, model.WrapInternal(errors.New("webhook is disabled")))
 		return

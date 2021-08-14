@@ -43,7 +43,7 @@ func parseMultipart(r *http.Request) (map[string]string, *multipart.Part, error)
 }
 
 // Post handle post from form
-func (a *App) Post(w http.ResponseWriter, r *http.Request, request provider.Request) {
+func (a App) Post(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	contentType := r.Header.Get("Content-Type")
 
 	if contentType == "application/x-www-form-urlencoded" {
@@ -80,7 +80,7 @@ func (a *App) Post(w http.ResponseWriter, r *http.Request, request provider.Requ
 	a.rendererApp.Error(w, model.WrapMethodNotAllowed(fmt.Errorf("unknown content-type %s", contentType)))
 }
 
-func (a *App) handlePostShare(w http.ResponseWriter, r *http.Request, request provider.Request, method string) {
+func (a App) handlePostShare(w http.ResponseWriter, r *http.Request, request provider.Request, method string) {
 	switch method {
 	case http.MethodPost:
 		a.createShare(w, r, request)
@@ -91,7 +91,7 @@ func (a *App) handlePostShare(w http.ResponseWriter, r *http.Request, request pr
 	}
 }
 
-func (a *App) handlePostWebhook(w http.ResponseWriter, r *http.Request, request provider.Request, method string) {
+func (a App) handlePostWebhook(w http.ResponseWriter, r *http.Request, request provider.Request, method string) {
 	switch method {
 	case http.MethodPost:
 		a.createWebhook(w, r, request)
@@ -102,7 +102,7 @@ func (a *App) handlePostWebhook(w http.ResponseWriter, r *http.Request, request 
 	}
 }
 
-func (a *App) handlePost(w http.ResponseWriter, r *http.Request, request provider.Request, method string) {
+func (a App) handlePost(w http.ResponseWriter, r *http.Request, request provider.Request, method string) {
 	switch method {
 	case http.MethodPatch:
 		a.Rename(w, r, request)

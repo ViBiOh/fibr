@@ -86,7 +86,7 @@ func New(config Config, storage provider.Storage, rendererApp renderer.App, shar
 		logger.Info("Ignoring files with pattern `%s`", ignore)
 	}
 
-	storage.SetIgnoreFn(func(item provider.StorageItem) bool {
+	storage.WithIgnoreFn(func(item provider.StorageItem) bool {
 		if item.IsDir && item.Name == provider.MetadataDirectoryName {
 			return true
 		}
@@ -111,7 +111,7 @@ func New(config Config, storage provider.Storage, rendererApp renderer.App, shar
 }
 
 // Start crud operations
-func (a *App) Start(done <-chan struct{}) {
+func (a App) Start(done <-chan struct{}) {
 	err := a.storageApp.Walk("", func(item provider.StorageItem, err error) error {
 		if err != nil {
 			return err
@@ -134,7 +134,7 @@ func (a *App) Start(done <-chan struct{}) {
 	}
 }
 
-func (a *App) sanitizeName(item provider.StorageItem) provider.StorageItem {
+func (a App) sanitizeName(item provider.StorageItem) provider.StorageItem {
 	name, err := provider.SanitizeName(item.Pathname, false)
 	if err != nil {
 		logger.Error("unable to sanitize name %s: %s", item.Pathname, err)
@@ -153,7 +153,7 @@ func (a *App) sanitizeName(item provider.StorageItem) provider.StorageItem {
 	return a.rename(item, name)
 }
 
-func (a *App) rename(item provider.StorageItem, name string) provider.StorageItem {
+func (a App) rename(item provider.StorageItem, name string) provider.StorageItem {
 	logger.Info("Renaming `%s` to `%s`", item.Pathname, name)
 
 	renamedItem, err := a.doRename(item.Pathname, name, item)
