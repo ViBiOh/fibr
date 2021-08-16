@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/v4/pkg/clock"
 	"github.com/ViBiOh/httputils/v4/pkg/cron"
 	"github.com/ViBiOh/httputils/v4/pkg/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
@@ -24,7 +25,7 @@ var (
 // App of package
 type App struct {
 	shares     map[string]provider.Share
-	clock      *Clock
+	clock      *clock.Clock
 	storageApp provider.Storage
 	mutex      sync.RWMutex
 }

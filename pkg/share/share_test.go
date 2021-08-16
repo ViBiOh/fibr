@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/v4/pkg/clock"
 )
 
 func TestPurgeExpiredShares(t *testing.T) {
@@ -17,9 +18,7 @@ func TestPurgeExpiredShares(t *testing.T) {
 		{
 			"empty",
 			&App{
-				clock: &Clock{
-					now: time.Date(2021, 05, 01, 14, 00, 00, 0, time.UTC),
-				},
+				clock:  clock.New(time.Date(2021, 05, 01, 14, 00, 00, 0, time.UTC)),
 				shares: make(map[string]provider.Share),
 			},
 			make(map[string]provider.Share),
@@ -27,9 +26,7 @@ func TestPurgeExpiredShares(t *testing.T) {
 		{
 			"purge at boundaries",
 			&App{
-				clock: &Clock{
-					now: time.Date(2021, 05, 01, 14, 00, 00, 0, time.UTC),
-				},
+				clock: clock.New(time.Date(2021, 05, 01, 14, 00, 00, 0, time.UTC)),
 				shares: map[string]provider.Share{
 					"1": {
 						ID:       "1",
