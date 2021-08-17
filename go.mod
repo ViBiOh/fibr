@@ -1,6 +1,6 @@
 module github.com/ViBiOh/fibr
 
-go 1.16
+go 1.17
 
 require (
 	github.com/ViBiOh/auth/v2 v2.11.3
