@@ -46,13 +46,6 @@ func TestMime(t *testing.T) {
 			},
 			"text/plain; charset=utf-8",
 		},
-		{
-			"golang",
-			StorageItem{
-				Name: "main.go",
-			},
-			"text/plain; charset=utf-8",
-		},
 	}
 
 	for _, testCase := range cases {
