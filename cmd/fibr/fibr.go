@@ -62,7 +62,7 @@ func main() {
 	thumbnailConfig := thumbnail.Flags(fs, "thumbnail")
 	exifConfig := exif.Flags(fs, "exif")
 
-	disableAuth := flags.New("", "auth").Name("NoAuth").Default(false).Label("Disable basic authentification").ToBool(fs)
+	disableAuth := flags.New("", "auth", "NoAuth").Default(false, nil).Label("Disable basic authentification").ToBool(fs)
 
 	logger.Fatal(fs.Parse(os.Args[1:]))
 

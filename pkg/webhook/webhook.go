@@ -36,8 +36,8 @@ type Config struct {
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) Config {
 	return Config{
-		enabled:    flags.New(prefix, "webhook").Name("Enabled").Default(flags.Default("Enabled", true, overrides)).Label("Enable webhook feature").ToBool(fs),
-		hmacSecret: flags.New(prefix, "webhook").Name("Secret").Default(flags.Default("Secret", "", overrides)).Label("Secret for HMAC Signature").ToString(fs),
+		enabled:    flags.New(prefix, "webhook", "Enabled").Default(true, overrides).Label("Enable webhook feature").ToBool(fs),
+		hmacSecret: flags.New(prefix, "webhook", "Secret").Default("", overrides).Label("Secret for HMAC Signature").ToString(fs),
 	}
 }
 

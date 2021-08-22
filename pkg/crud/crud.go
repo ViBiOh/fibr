@@ -54,8 +54,8 @@ type Config struct {
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		ignore:          flags.New(prefix, "crud").Name("IgnorePattern").Default("").Label("Ignore pattern when listing files or directory").ToString(fs),
-		sanitizeOnStart: flags.New(prefix, "crud").Name("SanitizeOnStart").Default(false).Label("Sanitize name on start").ToBool(fs),
+		ignore:          flags.New(prefix, "crud", "IgnorePattern").Default("", nil).Label("Ignore pattern when listing files or directory").ToString(fs),
+		sanitizeOnStart: flags.New(prefix, "crud", "SanitizeOnStart").Default(false, nil).Label("Sanitize name on start").ToBool(fs),
 	}
 }
 
