@@ -2,8 +2,9 @@ cloud.google.com/go v0.34.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMT
 github.com/DATA-DOG/go-sqlmock v1.5.0/go.mod h1:f/Ixk793poVmq4qj/V1dPUg2JEAKC73Q5eFN3EC/SaM=
 github.com/ViBiOh/auth/v2 v2.11.3 h1:XQzr1pCcCziPr8lqO0ImSQl7SEWBDpayr6cA6cRCouY=
 github.com/ViBiOh/auth/v2 v2.11.3/go.mod h1:nudQP6eyFimsfGrf4iB+1x32LEV0YUrZqBejfUCeqpE=
-github.com/ViBiOh/httputils/v4 v4.20.1 h1:EN4fQCF6cqeaWs9jwX3JV9+PU+D9NZVDrkPxpKUjkD8=
 github.com/ViBiOh/httputils/v4 v4.20.1/go.mod h1:xaIqVmMbcnucWfNPXCP5dPffPZNSkwfhHJOK+xIzU00=
+github.com/ViBiOh/httputils/v4 v4.21.2 h1:Ac5+E5E2Q8r0PzuB6k01NG8eovt0Ulj5Vwk2pRGvOZE=
+github.com/ViBiOh/httputils/v4 v4.21.2/go.mod h1:EHlIJgVJJATWyXZXzd+J4+Jl0Yz6Q790WydE+Y/3FFo=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf/go.mod h1:ybxpYRFXyAe+OPACYpWeL0wqObRcbAqCMya13uyzqw0=
