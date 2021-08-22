@@ -39,7 +39,7 @@ type App struct {
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		directory: flags.New(prefix, "filesystem").Name("Directory").Default("/data").Label("Path to served directory").ToString(fs),
+		directory: flags.New(prefix, "filesystem", "Directory").Default("/data", nil).Label("Path to served directory").ToString(fs),
 	}
 }
 

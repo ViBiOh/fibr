@@ -79,10 +79,10 @@ type Config struct {
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) Config {
 	return Config{
-		exifURL:          flags.New(prefix, "exif").Name("URL").Default(flags.Default("URL", "http://exas:1080", overrides)).Label("Exif Tool URL (exas)").ToString(fs),
-		geocodeURL:       flags.New(prefix, "exif").Name("GeocodeURL").Default(flags.Default("GeocodeURL", "", overrides)).Label(fmt.Sprintf("Nominatim Geocode Service URL. This can leak GPS metadatas to a third-party (e.g. \"%s\")", publicNominatimURL)).ToString(fs),
-		dateOnStart:      flags.New(prefix, "exif").Name("DateOnStart").Default(false).Label("Change file date from EXIF date on start").ToBool(fs),
-		aggregateOnStart: flags.New(prefix, "exif").Name("AggregateOnStart").Default(false).Label("Aggregate EXIF data per folder on start").ToBool(fs),
+		exifURL:          flags.New(prefix, "exif", "URL").Default("http://exas:1080", overrides).Label("Exif Tool URL (exas)").ToString(fs),
+		geocodeURL:       flags.New(prefix, "exif", "GeocodeURL").Default("", overrides).Label(fmt.Sprintf("Nominatim Geocode Service URL. This can leak GPS metadatas to a third-party (e.g. \"%s\")", publicNominatimURL)).ToString(fs),
+		dateOnStart:      flags.New(prefix, "exif", "DateOnStart").Default(false, nil).Label("Change file date from EXIF date on start").ToBool(fs),
+		aggregateOnStart: flags.New(prefix, "exif", "AggregateOnStart").Default(false, nil).Label("Aggregate EXIF data per folder on start").ToBool(fs),
 	}
 }
 

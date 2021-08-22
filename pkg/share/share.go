@@ -38,7 +38,7 @@ type Config struct {
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) Config {
 	return Config{
-		share: flags.New(prefix, "share").Name("Share").Default(flags.Default("Share", true, overrides)).Label("Enable sharing feature").ToBool(fs),
+		share: flags.New(prefix, "share", "Share").Default(true, overrides).Label("Enable sharing feature").ToBool(fs),
 	}
 }
 
