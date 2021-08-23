@@ -149,9 +149,21 @@ func (a App) fetchAndStoreExif(item provider.StorageItem) (map[string]interface{
 		return nil, fmt.Errorf("unable to get reader: %s", err)
 	}
 
+	info, err := a.storageApp.Info(item.Pathname)
+	if err != nil {
+		return nil, fmt.Errorf("unable to get info: %s", err)
+	}
+
+	r, err := request.New().WithClient(exasClient).Post(a.exifURL).Build(context.Background(), file)
+	if err != nil {
+		return nil, fmt.Errorf("unable to create request: %s", err)
+	}
+
+	r.ContentLength = info.Size
+
 	a.increaseMetric("exif", "requested")
 
-	resp, err := request.New().WithClient(exasClient).Post(a.exifURL).Send(context.Background(), file)
+	resp, err := request.DoWithClient(exasClient, r)
 	if err != nil {
 		return nil, err
 	}

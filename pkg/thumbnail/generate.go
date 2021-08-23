@@ -41,7 +41,19 @@ func (a App) generate(item provider.StorageItem) error {
 	var resp *http.Response
 
 	if item.IsVideo() {
-		resp, err = req.Post(fmt.Sprintf("%s/", a.videoURL)).Send(ctx, file)
+		info, err := a.storageApp.Info(item.Pathname)
+		if err != nil {
+			return fmt.Errorf("unable to get video info: %s", err)
+		}
+
+		r, err := req.Post(fmt.Sprintf("%s/", a.videoURL)).Build(ctx, file)
+		if err != nil {
+			return fmt.Errorf("unable to create video request: %s", err)
+		}
+
+		r.ContentLength = info.Size
+
+		resp, err = request.DoWithClient(thumbnailClient, r)
 		if err != nil {
 			return err
 		}
