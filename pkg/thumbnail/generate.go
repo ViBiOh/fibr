@@ -1,7 +1,6 @@
 package thumbnail
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -10,7 +9,6 @@ import (
 	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 )
 
@@ -88,29 +86,5 @@ func (a App) requestVith(ctx context.Context, item provider.StorageItem) (*http.
 		return request.New().Get(fmt.Sprintf("%s%s", a.videoURL, item.Pathname)).Send(ctx, nil)
 	}
 
-	file, err := a.storageApp.ReaderFrom(item.Pathname) // will be closed by `.PipedWriter`
-	if err != nil {
-		return nil, fmt.Errorf("unable to get reader: %s", err)
-	}
-
-	reader, writer := io.Pipe()
-	go func() {
-		buffer := provider.BufferPool.Get().(*bytes.Buffer)
-		defer provider.BufferPool.Put(buffer)
-
-		if _, err := io.CopyBuffer(writer, file, buffer.Bytes()); err != nil {
-			logger.Error("unable to copy file: %s", err)
-		}
-
-		_ = writer.CloseWithError(file.Close())
-	}()
-
-	r, err := request.New().Post(a.videoURL).Build(ctx, reader)
-	if err != nil {
-		return nil, fmt.Errorf("unable to create request: %s", err)
-	}
-
-	r.ContentLength = item.Size
-
-	return request.DoWithClient(thumbnailClient, r)
+	return provider.SendLargeFile(ctx, a.storageApp, item, thumbnailClient, a.videoURL)
 }

@@ -1,11 +1,9 @@
 package exif
 
 import (
-	"bytes"
 	"context"
 	"flag"
 	"fmt"
-	"io"
 	"net/http"
 	"strings"
 	"time"
@@ -13,7 +11,6 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/httpjson"
-	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -182,29 +179,5 @@ func (a App) requestExas(ctx context.Context, item provider.StorageItem) (*http.
 		return request.New().Get(fmt.Sprintf("%s%s", a.exifURL, item.Pathname)).Send(ctx, nil)
 	}
 
-	file, err := a.storageApp.ReaderFrom(item.Pathname) // will be closed by `.PipedWriter`
-	if err != nil {
-		return nil, fmt.Errorf("unable to get reader: %s", err)
-	}
-
-	reader, writer := io.Pipe()
-	go func() {
-		buffer := provider.BufferPool.Get().(*bytes.Buffer)
-		defer provider.BufferPool.Put(buffer)
-
-		if _, err := io.CopyBuffer(writer, file, buffer.Bytes()); err != nil {
-			logger.Error("unable to copy file: %s", err)
-		}
-
-		_ = writer.CloseWithError(file.Close())
-	}()
-
-	r, err := request.New().Post(a.exifURL).Build(ctx, reader)
-	if err != nil {
-		return nil, fmt.Errorf("unable to create request: %s", err)
-	}
-
-	r.ContentLength = item.Size
-
-	return request.DoWithClient(exasClient, r)
+	return provider.SendLargeFile(ctx, a.storageApp, item, exasClient, a.exifURL)
 }

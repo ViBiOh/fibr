@@ -2,8 +2,10 @@ package provider
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io"
+	"net/http"
 	"path"
 	"path/filepath"
 	"regexp"
@@ -12,6 +14,7 @@ import (
 	"unicode"
 
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
+	"github.com/ViBiOh/httputils/v4/pkg/request"
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
@@ -142,4 +145,33 @@ func RemoveIndex(arr []string, index int) []string {
 	}
 
 	return append(arr[:index], arr[index+1:]...)
+}
+
+// SendLargeFile in a request with buffered copy
+func SendLargeFile(ctx context.Context, storageApp Storage, item StorageItem, client *http.Client, url string) (*http.Response, error) {
+	file, err := storageApp.ReaderFrom(item.Pathname) // will be closed by `.PipedWriter`
+	if err != nil {
+		return nil, fmt.Errorf("unable to get reader: %s", err)
+	}
+
+	reader, writer := io.Pipe()
+	go func() {
+		buffer := BufferPool.Get().(*bytes.Buffer)
+		defer BufferPool.Put(buffer)
+
+		if _, err := io.CopyBuffer(writer, file, buffer.Bytes()); err != nil {
+			logger.Error("unable to copy file: %s", err)
+		}
+
+		_ = writer.CloseWithError(file.Close())
+	}()
+
+	r, err := request.New().Post(url).Build(ctx, reader)
+	if err != nil {
+		return nil, fmt.Errorf("unable to create request: %s", err)
+	}
+
+	r.ContentLength = item.Size
+
+	return request.DoWithClient(client, r)
 }
