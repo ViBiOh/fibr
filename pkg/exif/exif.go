@@ -1,9 +1,11 @@
 package exif
 
 import (
+	"bytes"
 	"context"
 	"flag"
 	"fmt"
+	"io"
 	"net/http"
 	"strings"
 	"time"
@@ -11,6 +13,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/httpjson"
+	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -146,17 +149,29 @@ func (a App) get(item provider.StorageItem) (map[string]interface{}, error) {
 }
 
 func (a App) fetchAndStoreExif(item provider.StorageItem) (map[string]interface{}, error) {
-	file, err := a.storageApp.ReaderFrom(item.Pathname) // file will be closed by `.Send`
-	if err != nil {
-		return nil, fmt.Errorf("unable to get reader: %s", err)
-	}
-
 	info, err := a.storageApp.Info(item.Pathname)
 	if err != nil {
 		return nil, fmt.Errorf("unable to get info: %s", err)
 	}
 
-	r, err := request.New().WithClient(exasClient).Post(a.exifURL).Build(context.Background(), file)
+	file, err := a.storageApp.ReaderFrom(item.Pathname) // file will be closed by `PipedWriter`
+	if err != nil {
+		return nil, fmt.Errorf("unable to get reader: %s", err)
+	}
+
+	reader, writer := io.Pipe()
+	go func() {
+		buffer := provider.BufferPool.Get().(*bytes.Buffer)
+		defer provider.BufferPool.Put(buffer)
+
+		if _, err := io.CopyBuffer(writer, file, buffer.Bytes()); err != nil {
+			logger.Error("unable to copy video: %s", err)
+		}
+
+		_ = writer.CloseWithError(file.Close())
+	}()
+
+	r, err := request.New().WithClient(exasClient).Post(a.exifURL).Build(context.Background(), reader)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create request: %s", err)
 	}

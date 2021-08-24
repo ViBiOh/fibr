@@ -1,6 +1,7 @@
 package thumbnail
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -9,6 +10,7 @@ import (
 	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 )
 
@@ -29,7 +31,12 @@ func (a App) generate(item provider.StorageItem) error {
 		err  error
 	)
 
-	file, err = a.storageApp.ReaderFrom(item.Pathname) // file will be closed by `.Send`
+	info, err := a.storageApp.Info(item.Pathname)
+	if err != nil {
+		return fmt.Errorf("unable to get file info: %s", err)
+	}
+
+	file, err = a.storageApp.ReaderFrom(item.Pathname) // file will be closed by `.Send or PipedWriter`
 	if err != nil {
 		return err
 	}
@@ -41,12 +48,19 @@ func (a App) generate(item provider.StorageItem) error {
 	var resp *http.Response
 
 	if item.IsVideo() {
-		info, err := a.storageApp.Info(item.Pathname)
-		if err != nil {
-			return fmt.Errorf("unable to get video info: %s", err)
-		}
+		reader, writer := io.Pipe()
+		go func() {
+			buffer := provider.BufferPool.Get().(*bytes.Buffer)
+			defer provider.BufferPool.Put(buffer)
 
-		r, err := req.Post(fmt.Sprintf("%s/", a.videoURL)).Build(ctx, file)
+			if _, err := io.CopyBuffer(writer, file, buffer.Bytes()); err != nil {
+				logger.Error("unable to copy video: %s", err)
+			}
+
+			_ = writer.CloseWithError(file.Close())
+		}()
+
+		r, err := req.Post(fmt.Sprintf("%s/", a.videoURL)).Build(ctx, reader)
 		if err != nil {
 			return fmt.Errorf("unable to create video request: %s", err)
 		}
@@ -63,7 +77,16 @@ func (a App) generate(item provider.StorageItem) error {
 
 	a.increaseMetric("requested")
 
-	resp, err = req.Post(a.imageURL).Send(ctx, file)
+	r, err := req.Post(a.imageURL).Build(ctx, file)
+	if err != nil {
+		return fmt.Errorf("unable to create request: %s", err)
+	}
+
+	if !item.IsVideo() {
+		r.ContentLength = info.Size
+	}
+
+	resp, err = request.DoWithClient(thumbnailClient, r)
 	if err != nil {
 		return err
 	}
