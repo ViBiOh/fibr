@@ -9,12 +9,22 @@ services:
       FIBR_AUTH_USERS: '${BASIC_USERS}'
       FIBR_IGNORE_PATTERN: '.st(folder|ignore)'
       FIBR_LOGGER_JSON: 'true'
+      FIBR_EXIF_DIRECT_ACCESS: 'true'
+      FIBR_THUMBNAIL_DIRECT_ACCESS: 'true'
+      FIBR_EXIF_MAX_SIZE: '0'
+      FIBR_THUMBNAIL_MAX_SIZE: '0'
     volumes:
       - ${DATA_DIR}:/data
     depends_on:
       - image
       - video
+      - exas
     user: '${DATA_USER_ID}'
+    restart: on-failure:5
+    read_only: true
+
+  image:
+    image: h2non/imaginary
     restart: on-failure:5
     read_only: true
 
@@ -22,16 +32,18 @@ services:
     image: vibioh/vith
     environment:
       VITH_LOGGER_JSON: 'true'
+      VITH_WORK_DIR: '/data'
+    volumes:
+      - ${DATA_DIR}:/data
+    user: '${DATA_USER_ID}'
     restart: on-failure:5
-
-  image:
-    image: h2non/imaginary
-    restart: on-failure:5
-    read_only: true
 
   exas:
     image: vibioh/exas
     environment:
       EXAS_LOGGER_JSON: 'true'
+      EXAS_WORK_DIR: '/data'
+    volumes:
+      - ${DATA_DIR}:/data
+    user: '${DATA_USER_ID}'
     restart: on-failure:5
-    read_only: true

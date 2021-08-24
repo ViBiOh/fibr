@@ -40,7 +40,7 @@ func (a App) generate(item provider.StorageItem) error {
 	if item.IsVideo() {
 		resp, err = a.requestVith(ctx, item)
 		if err != nil {
-			return err
+			return fmt.Errorf("unable to request video thumbnailer: %s", err)
 		}
 
 		file = resp.Body
@@ -85,12 +85,12 @@ func (a App) generate(item provider.StorageItem) error {
 
 func (a App) requestVith(ctx context.Context, item provider.StorageItem) (*http.Response, error) {
 	if a.directAccess {
-		return request.New().Get(item.Pathname).Send(ctx, nil)
+		return request.New().Get(fmt.Sprintf("%s%s", a.videoURL, item.Pathname)).Send(ctx, nil)
 	}
 
 	file, err := a.storageApp.ReaderFrom(item.Pathname) // will be closed by `.PipedWriter`
 	if err != nil {
-		return nil, fmt.Errorf("unable to get reader from storage: %s", err)
+		return nil, fmt.Errorf("unable to get reader: %s", err)
 	}
 
 	reader, writer := io.Pipe()
@@ -99,15 +99,15 @@ func (a App) requestVith(ctx context.Context, item provider.StorageItem) (*http.
 		defer provider.BufferPool.Put(buffer)
 
 		if _, err := io.CopyBuffer(writer, file, buffer.Bytes()); err != nil {
-			logger.Error("unable to copy video file: %s", err)
+			logger.Error("unable to copy file: %s", err)
 		}
 
 		_ = writer.CloseWithError(file.Close())
 	}()
 
-	r, err := request.New().WithClient(thumbnailClient).Post(fmt.Sprintf("%s/", a.videoURL)).Build(ctx, reader)
+	r, err := request.New().Post(a.videoURL).Build(ctx, reader)
 	if err != nil {
-		return nil, fmt.Errorf("unable to create video request: %s", err)
+		return nil, fmt.Errorf("unable to create request: %s", err)
 	}
 
 	r.ContentLength = item.Size

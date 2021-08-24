@@ -66,8 +66,9 @@ type App struct {
 	exifURL          string
 	geocodeURL       string
 	maxSize          int64
-	dateOnStart      bool
 	aggregateOnStart bool
+	dateOnStart      bool
+	directAccess     bool
 }
 
 // Config of package
@@ -75,13 +76,15 @@ type Config struct {
 	exifURL          *string
 	geocodeURL       *string
 	maxSize          *int
-	dateOnStart      *bool
 	aggregateOnStart *bool
+	dateOnStart      *bool
+	directAccess     *bool
 }
 
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) Config {
 	return Config{
+		directAccess:     flags.New(prefix, "exif", "DirectAccess").Default(false, nil).Label("Use Exas with direct access to filesystem (no large file upload to it, send a GET request)").ToBool(fs),
 		exifURL:          flags.New(prefix, "exif", "URL").Default("http://exas:1080", overrides).Label("Exif Tool URL (exas)").ToString(fs),
 		geocodeURL:       flags.New(prefix, "exif", "GeocodeURL").Default("", overrides).Label(fmt.Sprintf("Nominatim Geocode Service URL. This can leak GPS metadatas to a third-party (e.g. \"%s\")", publicNominatimURL)).ToString(fs),
 		dateOnStart:      flags.New(prefix, "exif", "DateOnStart").Default(false, nil).Label("Change file date from EXIF date on start").ToBool(fs),
@@ -102,6 +105,7 @@ func New(config Config, storageApp provider.Storage, prometheusRegisterer promet
 		geocodeURL:       strings.TrimSpace(*config.geocodeURL),
 		dateOnStart:      *config.dateOnStart,
 		aggregateOnStart: *config.aggregateOnStart,
+		directAccess:     *config.directAccess,
 		maxSize:          int64(*config.maxSize),
 
 		storageApp: storageApp,
@@ -149,35 +153,11 @@ func (a App) get(item provider.StorageItem) (map[string]interface{}, error) {
 }
 
 func (a App) fetchAndStoreExif(item provider.StorageItem) (map[string]interface{}, error) {
-	file, err := a.storageApp.ReaderFrom(item.Pathname) // file will be closed by `PipedWriter`
-	if err != nil {
-		return nil, fmt.Errorf("unable to get reader: %s", err)
-	}
-
-	reader, writer := io.Pipe()
-	go func() {
-		buffer := provider.BufferPool.Get().(*bytes.Buffer)
-		defer provider.BufferPool.Put(buffer)
-
-		if _, err := io.CopyBuffer(writer, file, buffer.Bytes()); err != nil {
-			logger.Error("unable to copy video: %s", err)
-		}
-
-		_ = writer.CloseWithError(file.Close())
-	}()
-
-	r, err := request.New().WithClient(exasClient).Post(a.exifURL).Build(context.Background(), reader)
-	if err != nil {
-		return nil, fmt.Errorf("unable to create request: %s", err)
-	}
-
-	r.ContentLength = item.Size
-
 	a.increaseMetric("exif", "requested")
 
-	resp, err := request.DoWithClient(exasClient, r)
+	resp, err := a.requestExas(context.Background(), item)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("unable to request exif: %s", err)
 	}
 
 	var exifs []map[string]interface{}
@@ -195,4 +175,36 @@ func (a App) fetchAndStoreExif(item provider.StorageItem) (map[string]interface{
 	}
 
 	return data, nil
+}
+
+func (a App) requestExas(ctx context.Context, item provider.StorageItem) (*http.Response, error) {
+	if a.directAccess {
+		return request.New().Get(fmt.Sprintf("%s%s", a.exifURL, item.Pathname)).Send(ctx, nil)
+	}
+
+	file, err := a.storageApp.ReaderFrom(item.Pathname) // will be closed by `.PipedWriter`
+	if err != nil {
+		return nil, fmt.Errorf("unable to get reader: %s", err)
+	}
+
+	reader, writer := io.Pipe()
+	go func() {
+		buffer := provider.BufferPool.Get().(*bytes.Buffer)
+		defer provider.BufferPool.Put(buffer)
+
+		if _, err := io.CopyBuffer(writer, file, buffer.Bytes()); err != nil {
+			logger.Error("unable to copy file: %s", err)
+		}
+
+		_ = writer.CloseWithError(file.Close())
+	}()
+
+	r, err := request.New().Post(a.exifURL).Build(ctx, reader)
+	if err != nil {
+		return nil, fmt.Errorf("unable to create request: %s", err)
+	}
+
+	r.ContentLength = item.Size
+
+	return request.DoWithClient(exasClient, r)
 }
