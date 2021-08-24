@@ -16,6 +16,10 @@ services:
       traefik.http.services.vith-service.loadbalancer.server.port: '1080'
     environment:
       VITH_LOGGER_JSON: 'true'
+      VITH_WORK_DIR: '/data'
+    volumes:
+      - ${DATA_DIR}:/data
+    user: '${DATA_USER_ID}'
     restart: on-failure:5
     security_opt:
       - no-new-privileges

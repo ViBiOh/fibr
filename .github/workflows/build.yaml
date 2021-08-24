@@ -115,7 +115,6 @@ jobs:
         uses: actions/checkout@v2
       - name: Deploy
         env:
-          BASIC_USERS: ${{ secrets.BASIC_USERS }}
           DATA_DIR: ${{ secrets.DATA_DIR }}
           DATA_USER_ID: ${{ secrets.DATA_USER_ID }}
           DEPLOY_CREDENTIALS: ${{ secrets.DEPLOY_CREDENTIALS }}
@@ -123,5 +122,5 @@ jobs:
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
         run: |
           curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap" | bash -s -- "-c" "deploy" "env_replace"
-          VERSION="$(make version)" scripts/env_replace "docker-compose.yaml" DOCKER_USER DATA_DIR DATA_USER_ID BASIC_USERS VERSION | sed "s|\\\$|\$\$|g" > "docker-compose-env.yaml"
+          VERSION="$(make version)" scripts/env_replace "docker-compose.yaml" DOCKER_USER DATA_DIR DATA_USER_ID VERSION | sed "s|\\\$|\$\$|g" > "docker-compose-env.yaml"
           scripts/deploy "$(make name)" "@docker-compose-env.yaml"
