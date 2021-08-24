@@ -15,16 +15,19 @@ var (
 func TestCanHaveThumbnail(t *testing.T) {
 	var cases = []struct {
 		intention string
+		instance  App
 		input     provider.StorageItem
 		want      bool
 	}{
 		{
 			"empty",
+			App{},
 			provider.StorageItem{},
 			false,
 		},
 		{
 			"image",
+			App{},
 			provider.StorageItem{
 				Name: "test.png",
 			},
@@ -32,6 +35,7 @@ func TestCanHaveThumbnail(t *testing.T) {
 		},
 		{
 			"pdf",
+			App{},
 			provider.StorageItem{
 				Name: "test.pdf",
 			},
@@ -39,6 +43,7 @@ func TestCanHaveThumbnail(t *testing.T) {
 		},
 		{
 			"video",
+			App{},
 			provider.StorageItem{
 				Name: "test.avi",
 			},
@@ -48,7 +53,7 @@ func TestCanHaveThumbnail(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.intention, func(t *testing.T) {
-			if result := CanHaveThumbnail(tc.input); result != tc.want {
+			if result := tc.instance.CanHaveThumbnail(tc.input); result != tc.want {
 				t.Errorf("CanHaveThumbnail() = %t, want %t", result, tc.want)
 			}
 		})

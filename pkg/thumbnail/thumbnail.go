@@ -34,12 +34,14 @@ type App struct {
 
 	imageURL string
 	videoURL string
+	maxSize  int64
 }
 
 // Config of package
 type Config struct {
 	imageURL *string
 	videoURL *string
+	maxSize  *int
 }
 
 // Flags adds flags for configuring package
@@ -47,6 +49,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
 		imageURL: flags.New(prefix, "thumbnail", "ImageURL").Default("http://image:9000", nil).Label("Imaginary URL").ToString(fs),
 		videoURL: flags.New(prefix, "vith", "VideoURL").Default("http://video:1080", nil).Label("Video Thumbnail URL").ToString(fs),
+		maxSize:  flags.New(prefix, "thumbnail", "MaxSize").Default(1024*1024*200, nil).Label("Max file size (in bytes) for generating thumbnail (0 to no limit)").ToInt(fs),
 	}
 }
 
@@ -70,6 +73,7 @@ func New(config Config, storage provider.Storage, prometheusRegisterer prometheu
 	return App{
 		imageURL:      fmt.Sprintf("%s/crop?width=%d&height=%d&stripmeta=true&noprofile=true&quality=80&type=jpeg", imageURL, Width, Height),
 		videoURL:      videoURL,
+		maxSize:       int64(*config.maxSize),
 		storageApp:    storage,
 		counter:       counter,
 		pathnameInput: make(chan provider.StorageItem, 10),
@@ -82,7 +86,7 @@ func (a App) enabled() bool {
 
 // Serve check if thumbnail is present and serve it
 func (a App) Serve(w http.ResponseWriter, r *http.Request, item provider.StorageItem) {
-	if !CanHaveThumbnail(item) || !a.HasThumbnail(item) {
+	if !a.CanHaveThumbnail(item) || !a.HasThumbnail(item) {
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}

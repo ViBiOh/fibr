@@ -8,13 +8,9 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
-const (
-	maxThumbnailSize = 1024 * 1024 * 150 // 150mo
-)
-
 // CanHaveThumbnail determine if thumbnail can be generated for given pathname
-func CanHaveThumbnail(item provider.StorageItem) bool {
-	return (item.IsImage() || item.IsPdf() || item.IsVideo()) && item.Size < maxThumbnailSize
+func (a App) CanHaveThumbnail(item provider.StorageItem) bool {
+	return (item.IsImage() || item.IsPdf() || item.IsVideo()) && (a.maxSize == 0 || item.Size < a.maxSize)
 }
 
 // HasThumbnail determine if thumbnail exist for given pathname

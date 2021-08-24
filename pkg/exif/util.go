@@ -12,8 +12,8 @@ import (
 )
 
 // CanHaveExif determine if exif can be extracted for given pathname
-func CanHaveExif(item provider.StorageItem) bool {
-	return (item.IsImage() || item.IsVideo() || item.IsPdf()) && item.Size < maxExifSize
+func (a App) CanHaveExif(item provider.StorageItem) bool {
+	return (item.IsImage() || item.IsVideo() || item.IsPdf()) && (a.maxSize == 0 || item.Size < a.maxSize)
 }
 
 func getExifPath(item provider.StorageItem, suffix string) string {

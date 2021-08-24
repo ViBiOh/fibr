@@ -184,6 +184,8 @@ Usage of fibr:
         [exif] Change file date from EXIF date on start {FIBR_EXIF_DATE_ON_START}
   -exifGeocodeURL string
         [exif] Nominatim Geocode Service URL. This can leak GPS metadatas to a third-party (e.g. "https://nominatim.openstreetmap.org") {FIBR_EXIF_GEOCODE_URL}
+  -exifMaxSize int
+        [exif] Max file size (in bytes) for extracting exif (0 to no limit) {FIBR_EXIF_MAX_SIZE} (default 209715200)
   -exifURL string
         [exif] Exif Tool URL (exas) {FIBR_EXIF_URL} (default "http://exas:1080")
   -frameOptions string
@@ -252,6 +254,8 @@ Usage of fibr:
         [server] Shutdown Timeout {FIBR_SHUTDOWN_TIMEOUT} (default "10s")
   -thumbnailImageURL string
         [thumbnail] Imaginary URL {FIBR_THUMBNAIL_IMAGE_URL} (default "http://image:9000")
+  -thumbnailMaxSize int
+        [thumbnail] Max file size (in bytes) for generating thumbnail (0 to no limit) {FIBR_THUMBNAIL_MAX_SIZE} (default 209715200)
   -thumbnailVideoURL string
         [thumbnail] Video Thumbnail URL {FIBR_THUMBNAIL_VIDEO_URL} (default "http://video:1080")
   -title string

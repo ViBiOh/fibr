@@ -16,8 +16,6 @@ import (
 )
 
 const (
-	maxExifSize = 150 << 20 // 150mo
-
 	exifMetadataFilename      = ""
 	geocodeMetadataFilename   = "geocode"
 	aggregateMetadataFilename = "aggregate"
@@ -64,6 +62,7 @@ type App struct {
 
 	exifURL          string
 	geocodeURL       string
+	maxSize          int64
 	dateOnStart      bool
 	aggregateOnStart bool
 }
@@ -72,6 +71,7 @@ type App struct {
 type Config struct {
 	exifURL          *string
 	geocodeURL       *string
+	maxSize          *int
 	dateOnStart      *bool
 	aggregateOnStart *bool
 }
@@ -83,6 +83,7 @@ func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) Config 
 		geocodeURL:       flags.New(prefix, "exif", "GeocodeURL").Default("", overrides).Label(fmt.Sprintf("Nominatim Geocode Service URL. This can leak GPS metadatas to a third-party (e.g. \"%s\")", publicNominatimURL)).ToString(fs),
 		dateOnStart:      flags.New(prefix, "exif", "DateOnStart").Default(false, nil).Label("Change file date from EXIF date on start").ToBool(fs),
 		aggregateOnStart: flags.New(prefix, "exif", "AggregateOnStart").Default(false, nil).Label("Aggregate EXIF data per folder on start").ToBool(fs),
+		maxSize:          flags.New(prefix, "exif", "MaxSize").Default(1024*1024*200, nil).Label("Max file size (in bytes) for extracting exif (0 to no limit)").ToInt(fs),
 	}
 }
 
@@ -98,6 +99,7 @@ func New(config Config, storageApp provider.Storage, prometheusRegisterer promet
 		geocodeURL:       strings.TrimSpace(*config.geocodeURL),
 		dateOnStart:      *config.dateOnStart,
 		aggregateOnStart: *config.aggregateOnStart,
+		maxSize:          int64(*config.maxSize),
 
 		storageApp: storageApp,
 

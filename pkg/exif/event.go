@@ -34,7 +34,7 @@ func (a App) EventConsumer(e provider.Event) {
 }
 
 func (a App) handleStartEvent(item provider.StorageItem) error {
-	if CanHaveExif(item) {
+	if a.CanHaveExif(item) {
 		if !a.hasExif(item) {
 			if _, err := a.get(item); err != nil {
 				return fmt.Errorf("unable to get exif : %s", err)
@@ -62,7 +62,7 @@ func (a App) handleStartEvent(item provider.StorageItem) error {
 }
 
 func (a App) handleUploadEvent(item provider.StorageItem) error {
-	if !CanHaveExif(item) {
+	if !a.CanHaveExif(item) {
 		return nil
 	}
 
