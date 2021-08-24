@@ -31,16 +31,6 @@ func (a App) generate(item provider.StorageItem) error {
 		err  error
 	)
 
-	info, err := a.storageApp.Info(item.Pathname)
-	if err != nil {
-		return fmt.Errorf("unable to get file info: %s", err)
-	}
-
-	file, err = a.storageApp.ReaderFrom(item.Pathname) // file will be closed by `.Send or PipedWriter`
-	if err != nil {
-		return err
-	}
-
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
 	defer cancel()
 
@@ -48,26 +38,7 @@ func (a App) generate(item provider.StorageItem) error {
 	var resp *http.Response
 
 	if item.IsVideo() {
-		reader, writer := io.Pipe()
-		go func() {
-			buffer := provider.BufferPool.Get().(*bytes.Buffer)
-			defer provider.BufferPool.Put(buffer)
-
-			if _, err := io.CopyBuffer(writer, file, buffer.Bytes()); err != nil {
-				logger.Error("unable to copy video: %s", err)
-			}
-
-			_ = writer.CloseWithError(file.Close())
-		}()
-
-		r, err := req.Post(fmt.Sprintf("%s/", a.videoURL)).Build(ctx, reader)
-		if err != nil {
-			return fmt.Errorf("unable to create video request: %s", err)
-		}
-
-		r.ContentLength = info.Size
-
-		resp, err = request.DoWithClient(thumbnailClient, r)
+		resp, err = a.requestVith(ctx, item)
 		if err != nil {
 			return err
 		}
@@ -77,13 +48,20 @@ func (a App) generate(item provider.StorageItem) error {
 
 	a.increaseMetric("requested")
 
+	if file == nil {
+		file, err = a.storageApp.ReaderFrom(item.Pathname) // will be closed by `.Send`
+		if err != nil {
+			return err
+		}
+	}
+
 	r, err := req.Post(a.imageURL).Build(ctx, file)
 	if err != nil {
 		return fmt.Errorf("unable to create request: %s", err)
 	}
 
 	if !item.IsVideo() {
-		r.ContentLength = info.Size
+		r.ContentLength = item.Size
 	}
 
 	resp, err = request.DoWithClient(thumbnailClient, r)
@@ -103,4 +81,36 @@ func (a App) generate(item provider.StorageItem) error {
 	a.increaseMetric("saved")
 
 	return nil
+}
+
+func (a App) requestVith(ctx context.Context, item provider.StorageItem) (*http.Response, error) {
+	if a.directAccess {
+		return request.New().Get(item.Pathname).Send(ctx, nil)
+	}
+
+	file, err := a.storageApp.ReaderFrom(item.Pathname) // will be closed by `.PipedWriter`
+	if err != nil {
+		return nil, fmt.Errorf("unable to get reader from storage: %s", err)
+	}
+
+	reader, writer := io.Pipe()
+	go func() {
+		buffer := provider.BufferPool.Get().(*bytes.Buffer)
+		defer provider.BufferPool.Put(buffer)
+
+		if _, err := io.CopyBuffer(writer, file, buffer.Bytes()); err != nil {
+			logger.Error("unable to copy video file: %s", err)
+		}
+
+		_ = writer.CloseWithError(file.Close())
+	}()
+
+	r, err := request.New().WithClient(thumbnailClient).Post(fmt.Sprintf("%s/", a.videoURL)).Build(ctx, reader)
+	if err != nil {
+		return nil, fmt.Errorf("unable to create video request: %s", err)
+	}
+
+	r.ContentLength = item.Size
+
+	return request.DoWithClient(thumbnailClient, r)
 }

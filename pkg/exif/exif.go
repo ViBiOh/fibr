@@ -149,11 +149,6 @@ func (a App) get(item provider.StorageItem) (map[string]interface{}, error) {
 }
 
 func (a App) fetchAndStoreExif(item provider.StorageItem) (map[string]interface{}, error) {
-	info, err := a.storageApp.Info(item.Pathname)
-	if err != nil {
-		return nil, fmt.Errorf("unable to get info: %s", err)
-	}
-
 	file, err := a.storageApp.ReaderFrom(item.Pathname) // file will be closed by `PipedWriter`
 	if err != nil {
 		return nil, fmt.Errorf("unable to get reader: %s", err)
@@ -176,7 +171,7 @@ func (a App) fetchAndStoreExif(item provider.StorageItem) (map[string]interface{
 		return nil, fmt.Errorf("unable to create request: %s", err)
 	}
 
-	r.ContentLength = info.Size
+	r.ContentLength = item.Size
 
 	a.increaseMetric("exif", "requested")
 

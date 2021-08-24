@@ -252,6 +252,8 @@ Usage of fibr:
         [share] Enable sharing feature {FIBR_SHARE} (default true)
   -shutdownTimeout string
         [server] Shutdown Timeout {FIBR_SHUTDOWN_TIMEOUT} (default "10s")
+  -thumbnailDirectAccess
+        [thumbnail] Use Vith with direct access to filesystem (no large file upload to it, send a GET request) {FIBR_THUMBNAIL_DIRECT_ACCESS}
   -thumbnailImageURL string
         [thumbnail] Imaginary URL {FIBR_THUMBNAIL_IMAGE_URL} (default "http://image:9000")
   -thumbnailMaxSize int

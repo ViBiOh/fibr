@@ -32,24 +32,27 @@ type App struct {
 
 	counter *prometheus.CounterVec
 
-	imageURL string
-	videoURL string
-	maxSize  int64
+	imageURL     string
+	videoURL     string
+	maxSize      int64
+	directAccess bool
 }
 
 // Config of package
 type Config struct {
-	imageURL *string
-	videoURL *string
-	maxSize  *int
+	imageURL     *string
+	videoURL     *string
+	maxSize      *int
+	directAccess *bool
 }
 
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		imageURL: flags.New(prefix, "thumbnail", "ImageURL").Default("http://image:9000", nil).Label("Imaginary URL").ToString(fs),
-		videoURL: flags.New(prefix, "vith", "VideoURL").Default("http://video:1080", nil).Label("Video Thumbnail URL").ToString(fs),
-		maxSize:  flags.New(prefix, "thumbnail", "MaxSize").Default(1024*1024*200, nil).Label("Max file size (in bytes) for generating thumbnail (0 to no limit)").ToInt(fs),
+		directAccess: flags.New(prefix, "vith", "DirectAccess").Default(false, nil).Label("Use Vith with direct access to filesystem (no large file upload to it, send a GET request)").ToBool(fs),
+		imageURL:     flags.New(prefix, "thumbnail", "ImageURL").Default("http://image:9000", nil).Label("Imaginary URL").ToString(fs),
+		maxSize:      flags.New(prefix, "thumbnail", "MaxSize").Default(1024*1024*200, nil).Label("Max file size (in bytes) for generating thumbnail (0 to no limit)").ToInt(fs),
+		videoURL:     flags.New(prefix, "vith", "VideoURL").Default("http://video:1080", nil).Label("Video Thumbnail URL").ToString(fs),
 	}
 }
 
@@ -74,6 +77,7 @@ func New(config Config, storage provider.Storage, prometheusRegisterer prometheu
 		imageURL:      fmt.Sprintf("%s/crop?width=%d&height=%d&stripmeta=true&noprofile=true&quality=80&type=jpeg", imageURL, Width, Height),
 		videoURL:      videoURL,
 		maxSize:       int64(*config.maxSize),
+		directAccess:  *config.directAccess,
 		storageApp:    storage,
 		counter:       counter,
 		pathnameInput: make(chan provider.StorageItem, 10),
