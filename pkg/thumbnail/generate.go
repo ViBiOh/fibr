@@ -69,10 +69,15 @@ func (a App) generate(item provider.StorageItem) error {
 
 	thumbnailPath := getThumbnailPath(item)
 	if err := a.storageApp.CreateDir(filepath.Dir(thumbnailPath)); err != nil {
-		return err
+		return fmt.Errorf("unable to create directory: %s", err)
 	}
 
-	if err := a.storageApp.Store(thumbnailPath, resp.Body); err != nil {
+	writer, err := a.storageApp.WriterTo(thumbnailPath)
+	if err != nil {
+		return fmt.Errorf("unable to get writer: %s", err)
+	}
+
+	if _, err := io.Copy(writer, resp.Body); err != nil {
 		return err
 	}
 

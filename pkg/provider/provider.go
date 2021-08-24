@@ -45,7 +45,6 @@ type Storage interface {
 	ReaderFrom(pathname string) (ReadSeekerCloser, error)
 	Walk(pathname string, walkFn func(StorageItem, error) error) error
 	CreateDir(pathname string) error
-	Store(pathname string, content io.ReadCloser) error
 	Rename(oldName, newName string) error
 	Remove(pathname string) error
 	UpdateDate(pathname string, date time.Time) error

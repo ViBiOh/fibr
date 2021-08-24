@@ -40,7 +40,7 @@ var (
 	// BufferPool for io.CopyBuffer
 	BufferPool = sync.Pool{
 		New: func() interface{} {
-			return bytes.NewBuffer(make([]byte, 32*1024))
+			return bytes.NewBuffer(make([]byte, 4*1024))
 		},
 	}
 

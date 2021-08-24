@@ -1,7 +1,6 @@
 package filesystem
 
 import (
-	"bytes"
 	"errors"
 	"flag"
 	"fmt"
@@ -184,41 +183,6 @@ func (a *App) CreateDir(name string) error {
 	}
 
 	return convertError(os.MkdirAll(a.path(name), 0700))
-}
-
-// Store file to storage
-func (a *App) Store(pathname string, content io.ReadCloser) error {
-	defer func() {
-		if err := content.Close(); err != nil {
-			logger.Error("unable to close content: %s", err)
-		}
-	}()
-
-	if err := checkPathname(pathname); err != nil {
-		return convertError(err)
-	}
-
-	storageFile, err := a.getWritableFile(pathname)
-	if storageFile != nil {
-		defer func() {
-			if err := storageFile.Close(); err != nil {
-				logger.Error("unable to close stored file: %s", err)
-			}
-		}()
-	}
-
-	if err != nil {
-		return convertError(err)
-	}
-
-	buffer := provider.BufferPool.Get().(*bytes.Buffer)
-	defer provider.BufferPool.Put(buffer)
-
-	if _, err = io.CopyBuffer(storageFile, content, buffer.Bytes()); err != nil {
-		return convertError(err)
-	}
-
-	return nil
 }
 
 // Rename file or directory from storage
