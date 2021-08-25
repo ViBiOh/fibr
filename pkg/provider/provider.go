@@ -29,11 +29,11 @@ var (
 	WordExtensions = map[string]bool{".doc": true, ".docx": true, ".docm": true}
 )
 
-// ReadSeekerCloser is a combination of io.Reader, io.Seeker and io.Closer
-type ReadSeekerCloser interface {
-	Read([]byte) (int, error)
-	Seek(int64, int) (int64, error)
-	Close() error
+// ReadSeekCloser is a combination of io.Reader, io.Seeker and io.Closer
+type ReadSeekCloser interface {
+	io.Reader
+	io.Seeker
+	io.Closer
 }
 
 // Storage describe action on a storage provider
@@ -42,7 +42,7 @@ type Storage interface {
 	Info(pathname string) (StorageItem, error)
 	List(pathname string) ([]StorageItem, error)
 	WriterTo(pathname string) (io.WriteCloser, error)
-	ReaderFrom(pathname string) (ReadSeekerCloser, error)
+	ReaderFrom(pathname string) (ReadSeekCloser, error)
 	Walk(pathname string, walkFn func(StorageItem, error) error) error
 	CreateDir(pathname string) error
 	Rename(oldName, newName string) error
