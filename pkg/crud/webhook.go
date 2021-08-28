@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
@@ -36,7 +35,7 @@ func (a App) createWebhook(w http.ResponseWriter, r *http.Request, request provi
 		return
 	}
 
-	target, err := url.Parse(strings.TrimSpace(r.Form.Get("url")))
+	target, err := url.Parse(r.Form.Get("url"))
 	if err != nil {
 		a.rendererApp.Error(w, model.WrapInvalid(fmt.Errorf("unable to parse url: %s", err)))
 		return

@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -53,25 +52,27 @@ var (
 
 // App of package
 type App struct {
-	storageApp provider.Storage
-
+	storageApp   provider.Storage
 	done         chan struct{}
 	geocodeQueue chan provider.StorageItem
+	metrics      map[string]*prometheus.CounterVec
 
-	metrics map[string]*prometheus.CounterVec
+	geocodeURL  string
+	exifRequest request.Request
 
-	exifURL          string
-	geocodeURL       string
-	maxSize          int64
 	aggregateOnStart bool
 	dateOnStart      bool
 	directAccess     bool
+	maxSize          int64
 }
 
 // Config of package
 type Config struct {
-	exifURL          *string
-	geocodeURL       *string
+	exifURL    *string
+	exifUser   *string
+	exifPass   *string
+	geocodeURL *string
+
 	maxSize          *int
 	aggregateOnStart *bool
 	dateOnStart      *bool
@@ -81,12 +82,17 @@ type Config struct {
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) Config {
 	return Config{
-		directAccess:     flags.New(prefix, "exif", "DirectAccess").Default(false, nil).Label("Use Exas with direct access to filesystem (no large file upload to it, send a GET request)").ToBool(fs),
-		exifURL:          flags.New(prefix, "exif", "URL").Default("http://exas:1080", overrides).Label("Exif Tool URL (exas)").ToString(fs),
-		geocodeURL:       flags.New(prefix, "exif", "GeocodeURL").Default("", overrides).Label(fmt.Sprintf("Nominatim Geocode Service URL. This can leak GPS metadatas to a third-party (e.g. \"%s\")", publicNominatimURL)).ToString(fs),
+		exifURL:  flags.New(prefix, "exif", "URL").Default("http://exas:1080", overrides).Label("Exif Tool URL (exas)").ToString(fs),
+		exifUser: flags.New(prefix, "exif", "User").Default("", overrides).Label("Exif Tool URL Basic User").ToString(fs),
+		exifPass: flags.New(prefix, "exif", "Password").Default("", overrides).Label("Exif Tool URL Basic Password").ToString(fs),
+
+		geocodeURL: flags.New(prefix, "exif", "GeocodeURL").Default("", overrides).Label(fmt.Sprintf("Nominatim Geocode Service URL. This can leak GPS metadatas to a third-party (e.g. \"%s\")", publicNominatimURL)).ToString(fs),
+
+		directAccess: flags.New(prefix, "exif", "DirectAccess").Default(false, nil).Label("Use Exas with direct access to filesystem (no large file upload to it, send a GET request)").ToBool(fs),
+		maxSize:      flags.New(prefix, "exif", "MaxSize").Default(1024*1024*200, nil).Label("Max file size (in bytes) for extracting exif (0 to no limit)").ToInt(fs),
+
 		dateOnStart:      flags.New(prefix, "exif", "DateOnStart").Default(false, nil).Label("Change file date from EXIF date on start").ToBool(fs),
 		aggregateOnStart: flags.New(prefix, "exif", "AggregateOnStart").Default(false, nil).Label("Aggregate EXIF data per folder on start").ToBool(fs),
-		maxSize:          flags.New(prefix, "exif", "MaxSize").Default(1024*1024*200, nil).Label("Max file size (in bytes) for extracting exif (0 to no limit)").ToInt(fs),
 	}
 }
 
@@ -98,8 +104,8 @@ func New(config Config, storageApp provider.Storage, prometheusRegisterer promet
 	}
 
 	return App{
-		exifURL:          strings.TrimSpace(*config.exifURL),
-		geocodeURL:       strings.TrimSpace(*config.geocodeURL),
+		exifRequest:      request.New().URL(*config.exifURL).BasicAuth(*config.exifUser, *config.exifPass),
+		geocodeURL:       *config.geocodeURL,
 		dateOnStart:      *config.dateOnStart,
 		aggregateOnStart: *config.aggregateOnStart,
 		directAccess:     *config.directAccess,
@@ -114,7 +120,7 @@ func New(config Config, storageApp provider.Storage, prometheusRegisterer promet
 }
 
 func (a App) enabled() bool {
-	return len(a.exifURL) != 0
+	return !a.exifRequest.IsZero()
 }
 
 // Start worker
@@ -176,8 +182,8 @@ func (a App) fetchAndStoreExif(item provider.StorageItem) (map[string]interface{
 
 func (a App) requestExas(ctx context.Context, item provider.StorageItem) (*http.Response, error) {
 	if a.directAccess {
-		return request.New().Get(fmt.Sprintf("%s%s", a.exifURL, item.Pathname)).Send(ctx, nil)
+		return a.exifRequest.Path(item.Pathname).Send(ctx, nil)
 	}
 
-	return provider.SendLargeFile(ctx, a.storageApp, item, exasClient, a.exifURL)
+	return provider.SendLargeFile(ctx, a.storageApp, item, a.exifRequest)
 }

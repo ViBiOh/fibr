@@ -4,7 +4,6 @@ import (
 	"errors"
 	"flag"
 	"regexp"
-	"strings"
 	"time"
 
 	"github.com/ViBiOh/fibr/pkg/exif"
@@ -38,8 +37,8 @@ type App struct {
 	pushEvent  provider.EventProducer
 
 	rendererApp  renderer.App
-	thumbnailApp thumbnail.App
 	exifApp      exif.App
+	thumbnailApp thumbnail.App
 
 	bcryptCost      int
 	sanitizeOnStart bool
@@ -75,7 +74,7 @@ func New(config Config, storage provider.Storage, rendererApp renderer.App, shar
 	}
 
 	var ignorePattern *regexp.Regexp
-	ignore := strings.TrimSpace(*config.ignore)
+	ignore := *config.ignore
 	if len(ignore) != 0 {
 		pattern, err := regexp.Compile(ignore)
 		if err != nil {

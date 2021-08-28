@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/fibr/pkg/sha"
+	"github.com/ViBiOh/httputils/v4/pkg/sha"
 )
 
 func uuid() (string, error) {
@@ -26,7 +26,7 @@ func (a *App) generateID() (string, error) {
 		if err != nil {
 			return "", err
 		}
-		id := sha.Sha1(uuid)[:8]
+		id := sha.New(uuid)[:8]
 
 		if _, ok := a.shares[id]; !ok {
 			return id, nil

@@ -4,6 +4,8 @@ import (
 	"flag"
 	"strings"
 	"testing"
+
+	"github.com/ViBiOh/httputils/v4/pkg/request"
 )
 
 func TestFlags(t *testing.T) {
@@ -13,7 +15,7 @@ func TestFlags(t *testing.T) {
 	}{
 		{
 			"simple",
-			"Usage of simple:\n  -aggregateOnStart\n    \t[exif] Aggregate EXIF data per folder on start {SIMPLE_AGGREGATE_ON_START}\n  -dateOnStart\n    \t[exif] Change file date from EXIF date on start {SIMPLE_DATE_ON_START}\n  -directAccess\n    \t[exif] Use Exas with direct access to filesystem (no large file upload to it, send a GET request) {SIMPLE_DIRECT_ACCESS}\n  -geocodeURL string\n    \t[exif] Nominatim Geocode Service URL. This can leak GPS metadatas to a third-party (e.g. \"https://nominatim.openstreetmap.org\") {SIMPLE_GEOCODE_URL}\n  -maxSize int\n    \t[exif] Max file size (in bytes) for extracting exif (0 to no limit) {SIMPLE_MAX_SIZE} (default 209715200)\n  -uRL string\n    \t[exif] Exif Tool URL (exas) {SIMPLE_URL} (default \"http://exas:1080\")\n",
+			"Usage of simple:\n  -aggregateOnStart\n    \t[exif] Aggregate EXIF data per folder on start {SIMPLE_AGGREGATE_ON_START}\n  -dateOnStart\n    \t[exif] Change file date from EXIF date on start {SIMPLE_DATE_ON_START}\n  -directAccess\n    \t[exif] Use Exas with direct access to filesystem (no large file upload to it, send a GET request) {SIMPLE_DIRECT_ACCESS}\n  -geocodeURL string\n    \t[exif] Nominatim Geocode Service URL. This can leak GPS metadatas to a third-party (e.g. \"https://nominatim.openstreetmap.org\") {SIMPLE_GEOCODE_URL}\n  -maxSize int\n    \t[exif] Max file size (in bytes) for extracting exif (0 to no limit) {SIMPLE_MAX_SIZE} (default 209715200)\n  -password string\n    \t[exif] Exif Tool URL Basic Password {SIMPLE_PASSWORD}\n  -uRL string\n    \t[exif] Exif Tool URL (exas) {SIMPLE_URL} (default \"http://exas:1080\")\n  -user string\n    \t[exif] Exif Tool URL Basic User {SIMPLE_USER}\n",
 		},
 	}
 
@@ -43,15 +45,13 @@ func TestEnabled(t *testing.T) {
 	}{
 		{
 			"disabled",
-			App{
-				exifURL: "",
-			},
+			App{},
 			false,
 		},
 		{
 			"enabled",
 			App{
-				exifURL: "http://exas",
+				exifRequest: request.New().URL("http://localhost"),
 			},
 			true,
 		},

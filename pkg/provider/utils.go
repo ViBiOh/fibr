@@ -11,6 +11,7 @@ import (
 	"regexp"
 	"strings"
 	"sync"
+	"time"
 	"unicode"
 
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
@@ -47,6 +48,13 @@ var (
 	transformerPool = sync.Pool{
 		New: func() interface{} {
 			return transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
+		},
+	}
+
+	slowClient = &http.Client{
+		Timeout: 2 * time.Minute,
+		CheckRedirect: func(*http.Request, []*http.Request) error {
+			return http.ErrUseLastResponse
 		},
 	}
 )
@@ -148,7 +156,7 @@ func RemoveIndex(arr []string, index int) []string {
 }
 
 // SendLargeFile in a request with buffered copy
-func SendLargeFile(ctx context.Context, storageApp Storage, item StorageItem, client *http.Client, url string) (*http.Response, error) {
+func SendLargeFile(ctx context.Context, storageApp Storage, item StorageItem, req request.Request) (*http.Response, error) {
 	file, err := storageApp.ReaderFrom(item.Pathname) // will be closed by `.PipedWriter`
 	if err != nil {
 		return nil, fmt.Errorf("unable to get reader: %s", err)
@@ -166,12 +174,12 @@ func SendLargeFile(ctx context.Context, storageApp Storage, item StorageItem, cl
 		_ = writer.CloseWithError(file.Close())
 	}()
 
-	r, err := request.New().Post(url).Build(ctx, reader)
+	r, err := req.Build(ctx, reader)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create request: %s", err)
 	}
 
 	r.ContentLength = item.Size
 
-	return request.DoWithClient(client, r)
+	return request.DoWithClient(slowClient, r)
 }

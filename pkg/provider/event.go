@@ -162,10 +162,7 @@ func (e EventBus) increaseMetric(event Event, state string) {
 		return
 	}
 
-	e.counter.With(prometheus.Labels{
-		"type":  event.Type.String(),
-		"state": state,
-	}).Inc()
+	e.counter.WithLabelValues(event.Type.String(), state).Inc()
 }
 
 // Push an event in the bus

@@ -5,9 +5,9 @@ import (
 	"path"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/fibr/pkg/sha"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
+	"github.com/ViBiOh/httputils/v4/pkg/sha"
 )
 
 // Browser render file web view
@@ -30,7 +30,7 @@ func (a App) Browser(w http.ResponseWriter, request provider.Request, item provi
 	return "file", http.StatusOK, map[string]interface{}{
 		"Paths": breadcrumbs,
 		"File": provider.RenderItem{
-			ID:          sha.Sha1(item.Name),
+			ID:          sha.New(item.Name),
 			StorageItem: item,
 		},
 		"Cover":     a.getCover(files),

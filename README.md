@@ -188,8 +188,12 @@ Usage of fibr:
         [exif] Nominatim Geocode Service URL. This can leak GPS metadatas to a third-party (e.g. "https://nominatim.openstreetmap.org") {FIBR_EXIF_GEOCODE_URL}
   -exifMaxSize int
         [exif] Max file size (in bytes) for extracting exif (0 to no limit) {FIBR_EXIF_MAX_SIZE} (default 209715200)
+  -exifPassword string
+        [exif] Exif Tool URL Basic Password {FIBR_EXIF_PASSWORD}
   -exifURL string
         [exif] Exif Tool URL (exas) {FIBR_EXIF_URL} (default "http://exas:1080")
+  -exifUser string
+        [exif] Exif Tool URL Basic User {FIBR_EXIF_USER}
   -frameOptions string
         [owasp] X-Frame-Options {FIBR_FRAME_OPTIONS} (default "SAMEORIGIN")
   -fsDirectory string
@@ -255,15 +259,23 @@ Usage of fibr:
   -shutdownTimeout string
         [server] Shutdown Timeout {FIBR_SHUTDOWN_TIMEOUT} (default "10s")
   -thumbnailDirectAccess
-        [thumbnail] Use Vith with direct access to filesystem (no large file upload to it, send a GET request) {FIBR_THUMBNAIL_DIRECT_ACCESS}
+        [thumbnail] Use Vith with direct access to filesystem (no large file upload to it, send a GET request, Basic Auth recommended) {FIBR_THUMBNAIL_DIRECT_ACCESS}
+  -thumbnailImagePassword string
+        [thumbnail] Imaginary Basic Auth Password {FIBR_THUMBNAIL_IMAGE_PASSWORD}
   -thumbnailImageURL string
         [thumbnail] Imaginary URL {FIBR_THUMBNAIL_IMAGE_URL} (default "http://image:9000")
+  -thumbnailImageUser string
+        [thumbnail] Imaginary Basic Auth User {FIBR_THUMBNAIL_IMAGE_USER}
   -thumbnailMaxSize int
         [thumbnail] Maximum file size (in bytes) for generating thumbnail (0 to no limit) {FIBR_THUMBNAIL_MAX_SIZE} (default 209715200)
   -thumbnailMinBitrate uint
         [thumbnail] Minimal video bitrate (in bits per second) to generate a streamable version (in HLS), if DirectAccess enabled {FIBR_THUMBNAIL_MIN_BITRATE} (default 80000000)
+  -thumbnailVideoPassword string
+        [thumbnail] Video Thumbnail Basic Auth Password {FIBR_THUMBNAIL_VIDEO_PASSWORD}
   -thumbnailVideoURL string
         [thumbnail] Video Thumbnail URL {FIBR_THUMBNAIL_VIDEO_URL} (default "http://video:1080")
+  -thumbnailVideoUser string
+        [thumbnail] Video Thumbnail Basic Auth User {FIBR_THUMBNAIL_VIDEO_USER}
   -title string
         Application title {FIBR_TITLE} (default "fibr")
   -url string

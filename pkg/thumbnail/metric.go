@@ -15,7 +15,7 @@ func createMetric(prometheusRegisterer prometheus.Registerer) (*prometheus.Count
 		Namespace: "fibr",
 		Subsystem: "thumbnail",
 		Name:      "item",
-	}, []string{"state"})
+	}, []string{"type", "state"})
 
 	if err := prometheusRegisterer.Register(counter); err != nil {
 		return nil, fmt.Errorf("unable to register metric: %s", err)
@@ -24,12 +24,10 @@ func createMetric(prometheusRegisterer prometheus.Registerer) (*prometheus.Count
 	return counter, nil
 }
 
-func (a App) increaseMetric(state string) {
+func (a App) increaseMetric(kind, state string) {
 	if a.counter == nil {
 		return
 	}
 
-	a.counter.With(prometheus.Labels{
-		"state": state,
-	}).Inc()
+	a.counter.WithLabelValues(kind, state).Inc()
 }

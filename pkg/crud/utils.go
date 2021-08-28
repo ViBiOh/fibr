@@ -40,7 +40,7 @@ func getPreviousAndNext(file provider.StorageItem, files []provider.StorageItem)
 }
 
 func checkFormName(r *http.Request, formName string) (string, error) {
-	name := strings.TrimSpace(r.FormValue(formName))
+	name := r.FormValue(formName)
 	if name == "" {
 		return "", model.WrapInvalid(ErrEmptyName)
 	}
@@ -53,7 +53,7 @@ func checkFormName(r *http.Request, formName string) (string, error) {
 }
 
 func checkFolderName(formName string, request provider.Request) (string, error) {
-	name := strings.TrimSpace(formName)
+	name := formName
 	if name == "" {
 		return "", model.WrapInvalid(ErrEmptyFolder)
 	}
@@ -76,7 +76,7 @@ func checkFolderName(formName string, request provider.Request) (string, error) 
 }
 
 func getPathParts(uri string) []string {
-	cleanURI := strings.TrimSpace(strings.Trim(uri, "/"))
+	cleanURI := strings.Trim(uri, "/")
 	if cleanURI == "" {
 		return nil
 	}
@@ -85,7 +85,7 @@ func getPathParts(uri string) []string {
 }
 
 func getFormBool(val string) (bool, error) {
-	value := strings.TrimSpace(val)
+	value := val
 	if len(value) == 0 {
 		return false, nil
 	}
@@ -94,7 +94,7 @@ func getFormBool(val string) (bool, error) {
 }
 
 func getFormDuration(val string) (time.Duration, error) {
-	value := strings.TrimSpace(val)
+	value := val
 	if len(value) == 0 {
 		return 0, nil
 	}

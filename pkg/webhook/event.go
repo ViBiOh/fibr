@@ -23,7 +23,7 @@ func (a *App) EventConsumer(e provider.Event) {
 			continue
 		}
 
-		req := request.New().Post(webhook.URL).Header("User-Agent", "fibr webhook")
+		req := request.New().Post(webhook.URL).Header("User-Agent", "fibr-webhook")
 
 		if len(a.hmacSecret) != 0 {
 			req = req.WithSignatureAuthorization("fibr", a.hmacSecret)

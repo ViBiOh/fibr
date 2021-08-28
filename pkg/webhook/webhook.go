@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"path"
-	"strings"
 	"sync"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -56,7 +55,7 @@ func New(config Config, storageApp provider.Storage, prometheusRegisterer promet
 		storageApp: storageApp,
 		webhooks:   make(map[string]provider.Webhook),
 		counter:    counter,
-		hmacSecret: []byte(strings.TrimSpace(*config.hmacSecret)),
+		hmacSecret: []byte(*config.hmacSecret),
 	}, nil
 }
 

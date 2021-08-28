@@ -29,7 +29,5 @@ func (a *App) increaseMetric(code string) {
 		return
 	}
 
-	a.counter.With(prometheus.Labels{
-		"code": code,
-	}).Inc()
+	a.counter.WithLabelValues(code).Inc()
 }

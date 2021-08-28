@@ -11,7 +11,6 @@ import (
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
-	"github.com/ViBiOh/httputils/v4/pkg/request"
 )
 
 // HasStream checks if given item has a streamable version
@@ -25,7 +24,9 @@ func (a App) shouldGenerateStream(ctx context.Context, item provider.StorageItem
 		return false, nil
 	}
 
-	resp, err := request.New().WithClient(thumbnailClient).Method(http.MethodHead).URL(fmt.Sprintf("%s%s", a.videoURL, item.Pathname)).Send(ctx, nil)
+	a.increaseMetric("video", "headers")
+
+	resp, err := a.videoRequest.Method(http.MethodHead).Path(item.Pathname).Send(ctx, nil)
 	if err != nil {
 		return false, fmt.Errorf("unable to retrieve metadata: %s", err)
 	}
@@ -53,7 +54,9 @@ func (a App) shouldGenerateStream(ctx context.Context, item provider.StorageItem
 }
 
 func (a App) generateStream(ctx context.Context, item provider.StorageItem) error {
-	resp, err := request.New().WithClient(thumbnailClient).Put(fmt.Sprintf("%s%s?output=%s", a.videoURL, item.Pathname, url.QueryEscape(path.Dir(getStreamPath(item))))).Send(ctx, nil)
+	a.increaseMetric("video", "stream")
+
+	resp, err := a.videoRequest.Method(http.MethodPut).Path(fmt.Sprintf("%s?output=%s", item.Pathname, url.QueryEscape(path.Dir(getStreamPath(item))))).Send(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("unable to send request: %s", err)
 	}
@@ -71,7 +74,9 @@ func (a App) generateStream(ctx context.Context, item provider.StorageItem) erro
 }
 
 func (a App) deleteStream(ctx context.Context, item provider.StorageItem) error {
-	resp, err := request.New().WithClient(thumbnailClient).Delete(fmt.Sprintf("%s%s", a.videoURL, getStreamPath(item))).Send(ctx, nil)
+	a.increaseMetric("video", "delete")
+
+	resp, err := a.videoRequest.Method(http.MethodDelete).Path(getStreamPath(item)).Send(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("unable to send request: %s", err)
 	}

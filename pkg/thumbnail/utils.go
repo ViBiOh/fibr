@@ -1,7 +1,6 @@
 package thumbnail
 
 import (
-	"errors"
 	"fmt"
 	"path"
 	"strings"
@@ -16,10 +15,6 @@ func (a App) CanHaveThumbnail(item provider.StorageItem) bool {
 
 // HasThumbnail determine if thumbnail exist for given pathname
 func (a App) HasThumbnail(item provider.StorageItem) bool {
-	if !a.enabled() {
-		return false
-	}
-
 	if item.IsDir {
 		return false
 	}
@@ -30,10 +25,6 @@ func (a App) HasThumbnail(item provider.StorageItem) bool {
 
 // GetChunk retrieve the storage item in the metdata
 func (a App) GetChunk(filename string) (provider.StorageItem, error) {
-	if !a.enabled() {
-		return provider.StorageItem{}, errors.New("thumbnail is disabled")
-	}
-
 	return a.storageApp.Info(path.Join(provider.MetadataDirectoryName, filename))
 }
 

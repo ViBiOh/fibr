@@ -38,7 +38,7 @@ func (a App) delete(item provider.StorageItem) {
 
 // EventConsumer handle event pushed to the event bus
 func (a App) EventConsumer(e provider.Event) {
-	if !a.enabled() {
+	if !a.videoEnabled() && !a.imageEnabled() {
 		return
 	}
 
@@ -46,10 +46,16 @@ func (a App) EventConsumer(e provider.Event) {
 	case provider.StartEvent:
 		fallthrough
 	case provider.UploadEvent:
-		if a.CanHaveThumbnail(e.Item) && !a.HasThumbnail(e.Item) {
-			if err := a.generate(e.Item); err != nil {
-				logger.Error("unable to generate thumbnail for `%s`: %s", e.Item.Pathname, err)
-			}
+		if !a.CanHaveThumbnail(e.Item) || a.HasThumbnail(e.Item) {
+			return
+		}
+
+		if (e.Item.IsVideo() && !a.videoEnabled()) || (e.Item.IsImage() && !a.imageEnabled()) {
+			return
+		}
+
+		if err := a.generate(e.Item); err != nil {
+			logger.Error("unable to generate thumbnail for `%s`: %s", e.Item.Pathname, err)
 		}
 
 		if e.Item.IsVideo() && !a.HasStream(e.Item) {

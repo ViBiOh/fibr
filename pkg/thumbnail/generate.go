@@ -32,7 +32,6 @@ func (a App) generate(item provider.StorageItem) error {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
 	defer cancel()
 
-	req := request.New().WithClient(thumbnailClient)
 	var resp *http.Response
 
 	if item.IsVideo() {
@@ -44,8 +43,6 @@ func (a App) generate(item provider.StorageItem) error {
 		file = resp.Body
 	}
 
-	a.increaseMetric("requested")
-
 	if file == nil {
 		file, err = a.storageApp.ReaderFrom(item.Pathname) // will be closed by `.Send`
 		if err != nil {
@@ -53,7 +50,9 @@ func (a App) generate(item provider.StorageItem) error {
 		}
 	}
 
-	r, err := req.Post(a.imageURL).Build(ctx, file)
+	a.increaseMetric("image", "requested")
+
+	r, err := a.imageRequest.Build(ctx, file)
 	if err != nil {
 		return fmt.Errorf("unable to create request: %s", err)
 	}
@@ -81,15 +80,17 @@ func (a App) generate(item provider.StorageItem) error {
 		return err
 	}
 
-	a.increaseMetric("saved")
+	a.increaseMetric("image", "saved")
 
 	return nil
 }
 
 func (a App) requestVith(ctx context.Context, item provider.StorageItem) (*http.Response, error) {
+	a.increaseMetric("video", "requested")
+
 	if a.directAccess {
-		return request.New().WithClient(thumbnailClient).Get(fmt.Sprintf("%s%s", a.videoURL, item.Pathname)).Send(ctx, nil)
+		return a.videoRequest.Path(item.Pathname).Send(ctx, nil)
 	}
 
-	return provider.SendLargeFile(ctx, a.storageApp, item, thumbnailClient, a.videoURL)
+	return provider.SendLargeFile(ctx, a.storageApp, item, a.videoRequest)
 }

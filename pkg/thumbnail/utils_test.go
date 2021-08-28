@@ -68,17 +68,8 @@ func TestHasThumbnail(t *testing.T) {
 		want      bool
 	}{
 		{
-			"not enabled",
-			App{},
-			provider.StorageItem{},
-			false,
-		},
-		{
 			"not found",
-			App{
-				imageURL: publicPath,
-				videoURL: publicPath,
-			},
+			App{},
 			provider.StorageItem{
 				Pathname: "path/to/error",
 				IsDir:    true,
@@ -87,10 +78,7 @@ func TestHasThumbnail(t *testing.T) {
 		},
 		{
 			"found",
-			App{
-				imageURL: publicPath,
-				videoURL: publicPath,
-			},
+			App{},
 			provider.StorageItem{
 				Pathname: "path/to/valid",
 			},

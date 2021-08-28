@@ -9,10 +9,10 @@ import (
 	"path"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/fibr/pkg/sha"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
+	"github.com/ViBiOh/httputils/v4/pkg/sha"
 )
 
 const (
@@ -54,7 +54,7 @@ func (a App) List(w http.ResponseWriter, request provider.Request, message rende
 		}
 
 		items[index] = provider.RenderItem{
-			ID:          sha.Sha1(file.Name),
+			ID:          sha.New(file.Name),
 			URI:         uri,
 			StorageItem: file,
 			Aggregate:   aggregate,

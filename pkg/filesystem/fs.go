@@ -44,7 +44,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 
 // New creates new App from Config
 func New(config Config) (App, error) {
-	rootDirectory := strings.TrimSuffix(strings.TrimSpace(*config.directory), "/")
+	rootDirectory := strings.TrimSuffix(*config.directory, "/")
 
 	if len(rootDirectory) == 0 {
 		return App{}, errors.New("no directory provided")

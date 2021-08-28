@@ -14,6 +14,7 @@ services:
       traefik.http.routers.vith-https.tls: 'true'
       traefik.http.routers.vith-https.tls.certresolver: default
       traefik.http.services.vith-service.loadbalancer.server.port: '1080'
+      traefik.http.middlewares.vith-auth.basicauth.users: '${VITH_BASIC_AUTH}'
     environment:
       VITH_LOGGER_JSON: 'true'
     restart: on-failure:5

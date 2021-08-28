@@ -7,13 +7,13 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/fibr/pkg/sha"
 	"github.com/ViBiOh/httputils/v4/pkg/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/httperror"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
+	"github.com/ViBiOh/httputils/v4/pkg/request"
+	"github.com/ViBiOh/httputils/v4/pkg/sha"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -32,8 +32,9 @@ type App struct {
 
 	counter *prometheus.CounterVec
 
-	imageURL     string
-	videoURL     string
+	imageRequest request.Request
+	videoRequest request.Request
+
 	maxSize      int64
 	minBitrate   uint64
 	directAccess bool
@@ -41,55 +42,64 @@ type App struct {
 
 // Config of package
 type Config struct {
-	imageURL     *string
-	videoURL     *string
+	imageURL  *string
+	imageUser *string
+	imagePass *string
+	videoURL  *string
+	videoUser *string
+	videoPass *string
+
 	maxSize      *int
-	minBitrate   *uint
+	minBitrate   *uint64
 	directAccess *bool
 }
 
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		directAccess: flags.New(prefix, "vith", "DirectAccess").Default(false, nil).Label("Use Vith with direct access to filesystem (no large file upload to it, send a GET request)").ToBool(fs),
-		imageURL:     flags.New(prefix, "thumbnail", "ImageURL").Default("http://image:9000", nil).Label("Imaginary URL").ToString(fs),
+		imageURL:  flags.New(prefix, "thumbnail", "ImageURL").Default("http://image:9000", nil).Label("Imaginary URL").ToString(fs),
+		imageUser: flags.New(prefix, "thumbnail", "ImageUser").Default("", nil).Label("Imaginary Basic Auth User").ToString(fs),
+		imagePass: flags.New(prefix, "thumbnail", "ImagePassword").Default("", nil).Label("Imaginary Basic Auth Password").ToString(fs),
+
 		maxSize:      flags.New(prefix, "thumbnail", "MaxSize").Default(1024*1024*200, nil).Label("Maximum file size (in bytes) for generating thumbnail (0 to no limit)").ToInt(fs),
-		minBitrate:   flags.New(prefix, "vith", "MinBitrate").Default(80*1000*1000, nil).Label("Minimal video bitrate (in bits per second) to generate a streamable version (in HLS), if DirectAccess enabled").ToUint(fs),
-		videoURL:     flags.New(prefix, "vith", "VideoURL").Default("http://video:1080", nil).Label("Video Thumbnail URL").ToString(fs),
+		minBitrate:   flags.New(prefix, "vith", "MinBitrate").Default(80*1000*1000, nil).Label("Minimal video bitrate (in bits per second) to generate a streamable version (in HLS), if DirectAccess enabled").ToUint64(fs),
+		directAccess: flags.New(prefix, "vith", "DirectAccess").Default(false, nil).Label("Use Vith with direct access to filesystem (no large file upload to it, send a GET request, Basic Auth recommended)").ToBool(fs),
+
+		videoURL:  flags.New(prefix, "vith", "VideoURL").Default("http://video:1080", nil).Label("Video Thumbnail URL").ToString(fs),
+		videoUser: flags.New(prefix, "vith", "VideoUser").Default("", nil).Label("Video Thumbnail Basic Auth User").ToString(fs),
+		videoPass: flags.New(prefix, "vith", "VideoPassword").Default("", nil).Label("Video Thumbnail Basic Auth Password").ToString(fs),
 	}
 }
 
 // New creates new App from Config
 func New(config Config, storage provider.Storage, prometheusRegisterer prometheus.Registerer) (App, error) {
-	imageURL := strings.TrimSpace(*config.imageURL)
-	if len(imageURL) == 0 {
-		return App{}, nil
-	}
-
-	videoURL := strings.TrimSpace(*config.videoURL)
-	if len(videoURL) == 0 {
-		return App{}, nil
-	}
-
 	counter, err := createMetric(prometheusRegisterer)
 	if err != nil {
 		return App{}, err
 	}
 
+	imageURL := fmt.Sprintf("%s/crop?width=%d&height=%d&stripmeta=true&noprofile=true&quality=80&type=jpeg", *config.imageURL, Width, Height)
+
 	return App{
-		imageURL:      fmt.Sprintf("%s/crop?width=%d&height=%d&stripmeta=true&noprofile=true&quality=80&type=jpeg", imageURL, Width, Height),
-		videoURL:      videoURL,
-		maxSize:       int64(*config.maxSize),
-		minBitrate:    uint64(*config.minBitrate),
-		directAccess:  *config.directAccess,
+		imageRequest: request.New().WithClient(thumbnailClient).Post(imageURL).BasicAuth(*config.imageUser, *config.imagePass),
+		videoRequest: request.New().WithClient(thumbnailClient).URL(*config.videoURL).BasicAuth(*config.videoUser, *config.videoPass),
+
+		maxSize:      int64(*config.maxSize),
+		minBitrate:   *config.minBitrate,
+		directAccess: *config.directAccess,
+
 		storageApp:    storage,
 		counter:       counter,
 		pathnameInput: make(chan provider.StorageItem, 10),
 	}, nil
 }
 
-func (a App) enabled() bool {
-	return len(a.imageURL) != 0 && len(a.videoURL) != 0
+func (a App) imageEnabled() bool {
+	return !a.imageRequest.IsZero()
+}
+
+func (a App) videoEnabled() bool {
+	return !a.videoRequest.IsZero()
 }
 
 // Stream check if stream is present and serve it
@@ -138,11 +148,6 @@ func (a App) Serve(w http.ResponseWriter, r *http.Request, item provider.Storage
 
 // List return all thumbnail in a base64 form
 func (a App) List(w http.ResponseWriter, _ *http.Request, item provider.StorageItem) {
-	if !a.enabled() {
-		w.WriteHeader(http.StatusNoContent)
-		return
-	}
-
 	items, err := a.storageApp.List(item.Pathname)
 	if err != nil {
 		httperror.InternalServerError(w, err)
@@ -167,7 +172,7 @@ func (a App) List(w http.ResponseWriter, _ *http.Request, item provider.StorageI
 			commaNeeded = true
 		}
 
-		provider.SafeWrite(w, fmt.Sprintf(`"%s":"`, sha.Sha1(item.Name)))
+		provider.SafeWrite(w, fmt.Sprintf(`"%s":"`, sha.New(item.Name)))
 		a.encodeThumbnailContent(base64.NewEncoder(base64.StdEncoding, w), item)
 		provider.SafeWrite(w, `"`)
 	}
