@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
+	"path"
 	"strconv"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -51,7 +53,7 @@ func (a App) shouldGenerateStream(ctx context.Context, item provider.StorageItem
 }
 
 func (a App) generateStream(ctx context.Context, item provider.StorageItem) error {
-	resp, err := request.New().Put(fmt.Sprintf("%s%s", a.videoURL, item.Pathname)).Send(ctx, nil)
+	resp, err := request.New().Put(fmt.Sprintf("%s%s?output=%s", a.videoURL, item.Pathname, url.QueryEscape(path.Dir(getStreamPath(item))))).Send(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("unable to send generate request: %d", err)
 	}
