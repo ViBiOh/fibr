@@ -88,7 +88,7 @@ func (a App) generate(item provider.StorageItem) error {
 
 func (a App) requestVith(ctx context.Context, item provider.StorageItem) (*http.Response, error) {
 	if a.directAccess {
-		return request.New().Get(fmt.Sprintf("%s%s", a.videoURL, item.Pathname)).Send(ctx, nil)
+		return request.New().WithClient(thumbnailClient).Get(fmt.Sprintf("%s%s", a.videoURL, item.Pathname)).Send(ctx, nil)
 	}
 
 	return provider.SendLargeFile(ctx, a.storageApp, item, thumbnailClient, a.videoURL)
