@@ -27,7 +27,7 @@ func (a App) shouldGenerateStream(ctx context.Context, item provider.StorageItem
 
 	resp, err := request.New().WithClient(thumbnailClient).Method(http.MethodHead).URL(fmt.Sprintf("%s%s", a.videoURL, item.Pathname)).Send(ctx, nil)
 	if err != nil {
-		return false, fmt.Errorf("unable to retrieve metadata: %d", err)
+		return false, fmt.Errorf("unable to retrieve metadata: %s", err)
 	}
 
 	defer func() {
@@ -55,12 +55,30 @@ func (a App) shouldGenerateStream(ctx context.Context, item provider.StorageItem
 func (a App) generateStream(ctx context.Context, item provider.StorageItem) error {
 	resp, err := request.New().WithClient(thumbnailClient).Put(fmt.Sprintf("%s%s?output=%s", a.videoURL, item.Pathname, url.QueryEscape(path.Dir(getStreamPath(item))))).Send(ctx, nil)
 	if err != nil {
-		return fmt.Errorf("unable to send generate request: %d", err)
+		return fmt.Errorf("unable to send request: %s", err)
 	}
 
 	defer func() {
 		if err := resp.Body.Close(); err != nil {
-			logger.Error("unable to close body: %s", err)
+			logger.Error("unable to close generate stream body: %s", err)
+		}
+	}()
+	if _, err := io.Copy(io.Discard, resp.Body); err != nil {
+		return fmt.Errorf("unable to discard body: %s", err)
+	}
+
+	return nil
+}
+
+func (a App) deleteStream(ctx context.Context, item provider.StorageItem) error {
+	resp, err := request.New().WithClient(thumbnailClient).Delete(fmt.Sprintf("%s%s", a.videoURL, getStreamPath(item))).Send(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("unable to send request: %s", err)
+	}
+
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			logger.Error("unable to close delete stream body: %s", err)
 		}
 	}()
 	if _, err := io.Copy(io.Discard, resp.Body); err != nil {

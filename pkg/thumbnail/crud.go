@@ -16,11 +16,23 @@ func (a App) rename(old, new provider.StorageItem) {
 	if err := a.storageApp.Rename(oldPath, getThumbnailPath(new)); err != nil {
 		logger.Error("unable to rename thumbnail: %s", err)
 	}
+
+	if old.IsVideo() && a.HasStream(old) {
+		if err := a.deleteStream(context.Background(), old); err != nil {
+			logger.Error("unable to delete stream: %s", err)
+		}
+	}
 }
 
 func (a App) delete(item provider.StorageItem) {
 	if err := a.storageApp.Remove(getThumbnailPath(item)); err != nil {
 		logger.Error("unable to delete thumbnail: %s", err)
+	}
+
+	if item.IsVideo() && a.HasStream(item) {
+		if err := a.deleteStream(context.Background(), item); err != nil {
+			logger.Error("unable to delete stream: %s", err)
+		}
 	}
 }
 
@@ -40,7 +52,7 @@ func (a App) EventConsumer(e provider.Event) {
 			}
 		}
 
-		if e.Item.IsVideo() {
+		if e.Item.IsVideo() && !a.HasStream(e.Item) {
 			needStream, err := a.shouldGenerateStream(context.Background(), e.Item)
 			if err != nil {
 				logger.Error("unable to determine if stream generation is possible: %s", err)
