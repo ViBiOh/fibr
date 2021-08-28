@@ -89,8 +89,8 @@ func (a App) requestVith(ctx context.Context, item provider.StorageItem) (*http.
 	a.increaseMetric("video", "requested")
 
 	if a.directAccess {
-		return a.videoRequest.Path(item.Pathname).Send(ctx, nil)
+		return a.videoRequest.Method(http.MethodGet).Path(item.Pathname).Send(ctx, nil)
 	}
 
-	return provider.SendLargeFile(ctx, a.storageApp, item, a.videoRequest)
+	return provider.SendLargeFile(ctx, a.storageApp, item, a.videoRequest.Method(http.MethodPost))
 }

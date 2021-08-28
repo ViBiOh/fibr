@@ -182,8 +182,8 @@ func (a App) fetchAndStoreExif(item provider.StorageItem) (map[string]interface{
 
 func (a App) requestExas(ctx context.Context, item provider.StorageItem) (*http.Response, error) {
 	if a.directAccess {
-		return a.exifRequest.Path(item.Pathname).Send(ctx, nil)
+		return a.exifRequest.Method(http.MethodGet).Path(item.Pathname).Send(ctx, nil)
 	}
 
-	return provider.SendLargeFile(ctx, a.storageApp, item, a.exifRequest)
+	return provider.SendLargeFile(ctx, a.storageApp, item, a.exifRequest.Method(http.MethodPost))
 }
