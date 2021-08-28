@@ -35,6 +35,7 @@ type App struct {
 	imageURL     string
 	videoURL     string
 	maxSize      int64
+	minBitrate   uint64
 	directAccess bool
 }
 
@@ -43,6 +44,7 @@ type Config struct {
 	imageURL     *string
 	videoURL     *string
 	maxSize      *int
+	minBitrate   *uint
 	directAccess *bool
 }
 
@@ -51,7 +53,8 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
 		directAccess: flags.New(prefix, "vith", "DirectAccess").Default(false, nil).Label("Use Vith with direct access to filesystem (no large file upload to it, send a GET request)").ToBool(fs),
 		imageURL:     flags.New(prefix, "thumbnail", "ImageURL").Default("http://image:9000", nil).Label("Imaginary URL").ToString(fs),
-		maxSize:      flags.New(prefix, "thumbnail", "MaxSize").Default(1024*1024*200, nil).Label("Max file size (in bytes) for generating thumbnail (0 to no limit)").ToInt(fs),
+		maxSize:      flags.New(prefix, "thumbnail", "MaxSize").Default(1024*1024*200, nil).Label("Maximum file size (in bytes) for generating thumbnail (0 to no limit)").ToInt(fs),
+		minBitrate:   flags.New(prefix, "vith", "MinBitrate").Default(80*1000*1000, nil).Label("Minimal video bitrate (in bits per second) to generate a streamable version (in HLS), if DirectAccess enabled").ToUint(fs),
 		videoURL:     flags.New(prefix, "vith", "VideoURL").Default("http://video:1080", nil).Label("Video Thumbnail URL").ToString(fs),
 	}
 }
@@ -77,6 +80,7 @@ func New(config Config, storage provider.Storage, prometheusRegisterer prometheu
 		imageURL:      fmt.Sprintf("%s/crop?width=%d&height=%d&stripmeta=true&noprofile=true&quality=80&type=jpeg", imageURL, Width, Height),
 		videoURL:      videoURL,
 		maxSize:       int64(*config.maxSize),
+		minBitrate:    uint64(*config.minBitrate),
 		directAccess:  *config.directAccess,
 		storageApp:    storage,
 		counter:       counter,
@@ -86,6 +90,28 @@ func New(config Config, storage provider.Storage, prometheusRegisterer prometheu
 
 func (a App) enabled() bool {
 	return len(a.imageURL) != 0 && len(a.videoURL) != 0
+}
+
+// Stream check if stream is present and serve it
+func (a App) Stream(w http.ResponseWriter, r *http.Request, item provider.StorageItem) {
+	if !a.HasStream(item) {
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
+
+	file, err := a.storageApp.ReaderFrom(getStreamPath(item))
+	if err != nil {
+		httperror.InternalServerError(w, err)
+		return
+	}
+
+	defer func() {
+		if err := file.Close(); err != nil {
+			logger.Error("unable to close stream file: %s", err)
+		}
+	}()
+
+	http.ServeContent(w, r, item.Name, item.Date, file)
 }
 
 // Serve check if thumbnail is present and serve it

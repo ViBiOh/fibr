@@ -3,6 +3,7 @@ package crud
 import (
 	"fmt"
 	"net/http"
+	"path/filepath"
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -13,7 +14,13 @@ import (
 )
 
 func (a App) getWithMessage(w http.ResponseWriter, r *http.Request, request provider.Request, message renderer.Message) (string, int, map[string]interface{}, error) {
-	info, err := a.storageApp.Info(request.GetFilepath(""))
+	filename := request.GetFilepath("")
+	item, err := a.storageApp.Info(filename)
+
+	if err != nil && provider.IsNotExist(err) && provider.StreamExtensions[filepath.Ext(filename)] {
+		item, err = a.thumbnailApp.GetChunk(filename)
+	}
+
 	if err != nil {
 		if provider.IsNotExist(err) {
 			return "", 0, nil, model.WrapNotFound(err)
@@ -23,24 +30,29 @@ func (a App) getWithMessage(w http.ResponseWriter, r *http.Request, request prov
 	}
 
 	if query.GetBool(r, "thumbnail") {
-		a.serveThumbnail(w, r, info)
+		a.serveThumbnail(w, r, item)
 		return "", 0, nil, nil
 	}
 
-	if info.IsDir && !strings.HasSuffix(r.URL.Path, "/") {
+	if query.GetBool(r, "stream") {
+		a.thumbnailApp.Stream(w, r, item)
+		return "", 0, nil, nil
+	}
+
+	if item.IsDir && !strings.HasSuffix(r.URL.Path, "/") {
 		a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/?d=%s", r.URL.Path, request.Layout("")), renderer.Message{})
 		return "", 0, nil, nil
 	}
 
-	go a.notify(provider.NewAccessEvent(info))
+	go a.notify(provider.NewAccessEvent(item))
 
-	if !info.IsDir {
+	if !item.IsDir {
 		if query.GetBool(r, "browser") {
 			provider.SetPrefsCookie(w, request)
-			return a.Browser(w, request, info, message)
+			return a.Browser(w, request, item, message)
 		}
 
-		return "", 0, nil, a.serveFile(w, r, info)
+		return "", 0, nil, a.serveFile(w, r, item)
 	}
 
 	if query.GetBool(r, "download") {

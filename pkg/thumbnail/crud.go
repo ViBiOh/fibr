@@ -1,6 +1,8 @@
 package thumbnail
 
 import (
+	"context"
+
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 )
@@ -37,6 +39,18 @@ func (a App) EventConsumer(e provider.Event) {
 				logger.Error("unable to generate thumbnail for `%s`: %s", e.Item.Pathname, err)
 			}
 		}
+
+		if e.Item.IsVideo() {
+			needStream, err := a.shouldGenerateStream(context.Background(), e.Item)
+			if err != nil {
+				logger.Error("unable to determine if stream generation is possible: %s", err)
+			} else if needStream {
+				if err := a.generateStream(context.Background(), e.Item); err != nil {
+					logger.Error("unable to generate stream: %s", err)
+				}
+			}
+		}
+
 	case provider.RenameEvent:
 		a.rename(e.Item, *e.New)
 	case provider.DeleteEvent:

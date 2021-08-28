@@ -1,6 +1,7 @@
 package thumbnail
 
 import (
+	"errors"
 	"fmt"
 	"path"
 	"strings"
@@ -27,11 +28,28 @@ func (a App) HasThumbnail(item provider.StorageItem) bool {
 	return err == nil
 }
 
+// GetChunk retrieve the storage item in the metdata
+func (a App) GetChunk(filename string) (provider.StorageItem, error) {
+	if !a.enabled() {
+		return provider.StorageItem{}, errors.New("thumbnail is disabled")
+	}
+
+	return a.storageApp.Info(path.Join(provider.MetadataDirectoryName, filename))
+}
+
 func getThumbnailPath(item provider.StorageItem) string {
+	return getThumbnailExtension(item, "jpg")
+}
+
+func getStreamPath(item provider.StorageItem) string {
+	return getThumbnailExtension(item, "m3u8")
+}
+
+func getThumbnailExtension(item provider.StorageItem, extension string) string {
 	fullPath := path.Join(provider.MetadataDirectoryName, item.Pathname)
 	if item.IsDir {
 		return fullPath
 	}
 
-	return fmt.Sprintf("%s.jpg", strings.TrimSuffix(fullPath, path.Ext(fullPath)))
+	return fmt.Sprintf("%s.%s", strings.TrimSuffix(fullPath, path.Ext(fullPath)), extension)
 }

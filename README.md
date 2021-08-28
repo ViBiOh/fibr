@@ -259,7 +259,9 @@ Usage of fibr:
   -thumbnailImageURL string
         [thumbnail] Imaginary URL {FIBR_THUMBNAIL_IMAGE_URL} (default "http://image:9000")
   -thumbnailMaxSize int
-        [thumbnail] Max file size (in bytes) for generating thumbnail (0 to no limit) {FIBR_THUMBNAIL_MAX_SIZE} (default 209715200)
+        [thumbnail] Maximum file size (in bytes) for generating thumbnail (0 to no limit) {FIBR_THUMBNAIL_MAX_SIZE} (default 209715200)
+  -thumbnailMinBitrate uint
+        [thumbnail] Minimal video bitrate (in bits per second) to generate a streamable version (in HLS), if DirectAccess enabled {FIBR_THUMBNAIL_MIN_BITRATE} (default 80000000)
   -thumbnailVideoURL string
         [thumbnail] Video Thumbnail URL {FIBR_THUMBNAIL_VIDEO_URL} (default "http://video:1080")
   -title string

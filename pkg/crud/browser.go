@@ -11,7 +11,7 @@ import (
 )
 
 // Browser render file web view
-func (a App) Browser(w http.ResponseWriter, request provider.Request, file provider.StorageItem, message renderer.Message) (string, int, map[string]interface{}, error) {
+func (a App) Browser(w http.ResponseWriter, request provider.Request, item provider.StorageItem, message renderer.Message) (string, int, map[string]interface{}, error) {
 	var (
 		previous *provider.StorageItem
 		next     *provider.StorageItem
@@ -20,23 +20,24 @@ func (a App) Browser(w http.ResponseWriter, request provider.Request, file provi
 	pathParts := getPathParts(request.URL(""))
 	breadcrumbs := pathParts[:len(pathParts)-1]
 
-	files, err := a.storageApp.List(file.Dir())
+	files, err := a.storageApp.List(item.Dir())
 	if err != nil {
 		logger.Error("unable to list neighbors files: %s", err)
 	} else {
-		previous, next = getPreviousAndNext(file, files)
+		previous, next = getPreviousAndNext(item, files)
 	}
 
 	return "file", http.StatusOK, map[string]interface{}{
 		"Paths": breadcrumbs,
 		"File": provider.RenderItem{
-			ID:          sha.Sha1(file.Name),
-			StorageItem: file,
+			ID:          sha.Sha1(item.Name),
+			StorageItem: item,
 		},
-		"Cover":    a.getCover(files),
-		"Parent":   path.Join(breadcrumbs...),
-		"Previous": previous,
-		"Next":     next,
+		"Cover":     a.getCover(files),
+		"HasStream": item.IsVideo() && a.thumbnailApp.HasStream(item),
+		"Parent":    path.Join(breadcrumbs...),
+		"Previous":  previous,
+		"Next":      next,
 
 		"Request": request,
 		"Message": message,

@@ -25,7 +25,12 @@
   </style>
 
   {{ if .File.IsVideo }}
-    <video id="content" controls src="{{ .File.Name }}" type="{{ .File.Mime }}"></video>
+    <video id="content" controls>
+      {{ if .HasStream }}
+        <source src="{{ .File.Name }}?stream" type="application/x-mpegURL"></source>
+      {{ end }}
+      <source src="{{ .File.Name }}" type="{{ .File.Mime }}"></source>
+    </video>
   {{ else }}
     {{ if .File.IsImage }}
       <img id="content" src="{{ .File.Name }}" alt="{{ .File.Name }}" />
