@@ -49,7 +49,7 @@ type Config struct {
 	videoUser *string
 	videoPass *string
 
-	maxSize      *int
+	maxSize      *int64
 	minBitrate   *uint64
 	directAccess *bool
 }
@@ -61,7 +61,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 		imageUser: flags.New(prefix, "thumbnail", "ImageUser").Default("", nil).Label("Imaginary Basic Auth User").ToString(fs),
 		imagePass: flags.New(prefix, "thumbnail", "ImagePassword").Default("", nil).Label("Imaginary Basic Auth Password").ToString(fs),
 
-		maxSize:      flags.New(prefix, "thumbnail", "MaxSize").Default(1024*1024*200, nil).Label("Maximum file size (in bytes) for generating thumbnail (0 to no limit)").ToInt(fs),
+		maxSize:      flags.New(prefix, "thumbnail", "MaxSize").Default(1024*1024*200, nil).Label("Maximum file size (in bytes) for generating thumbnail (0 to no limit)").ToInt64(fs),
 		minBitrate:   flags.New(prefix, "vith", "MinBitrate").Default(80*1000*1000, nil).Label("Minimal video bitrate (in bits per second) to generate a streamable version (in HLS), if DirectAccess enabled").ToUint64(fs),
 		directAccess: flags.New(prefix, "vith", "DirectAccess").Default(false, nil).Label("Use Vith with direct access to filesystem (no large file upload to it, send a GET request, Basic Auth recommended)").ToBool(fs),
 
@@ -84,7 +84,7 @@ func New(config Config, storage provider.Storage, prometheusRegisterer prometheu
 		imageRequest: request.New().WithClient(thumbnailClient).Post(imageURL).BasicAuth(*config.imageUser, *config.imagePass),
 		videoRequest: request.New().WithClient(thumbnailClient).URL(*config.videoURL).BasicAuth(*config.videoUser, *config.videoPass),
 
-		maxSize:      int64(*config.maxSize),
+		maxSize:      *config.maxSize,
 		minBitrate:   *config.minBitrate,
 		directAccess: *config.directAccess,
 

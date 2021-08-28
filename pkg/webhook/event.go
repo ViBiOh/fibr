@@ -35,12 +35,10 @@ func (a *App) EventConsumer(e provider.Event) {
 		}
 		if err != nil {
 			logger.Error("error while sending webhook: %s", err)
-
-			continue
 		}
 
-		if err := resp.Body.Close(); err != nil {
-			logger.Error("unable to close response body: %s", err)
+		if err := request.DiscardBody(resp.Body); err != nil {
+			logger.Error("unable to discard body: %s", err)
 		}
 	}
 }
