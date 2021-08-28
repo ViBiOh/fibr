@@ -120,6 +120,7 @@ jobs:
           DEPLOY_CREDENTIALS: ${{ secrets.DEPLOY_CREDENTIALS }}
           DEPLOY_URL: ${{ secrets.DEPLOY_URL }}
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
+          VITH_BASIC_AUTH: ${{ secrets.VITH_BASIC_AUTH }}
         run: |
           curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap" | bash -s -- "-c" "deploy" "env_replace"
           VERSION="$(make version)" scripts/env_replace "docker-compose.yaml" DOCKER_USER DATA_DIR DATA_USER_ID VITH_BASIC_AUTH VERSION | sed "s|\\\$|\$\$|g" > "docker-compose-env.yaml"
