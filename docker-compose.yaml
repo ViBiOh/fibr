@@ -2,25 +2,6 @@
 version: '2.1'
 
 services:
-  video:
-    image: vibioh/vith
-    labels:
-      traefik.http.routers.vith-http.rule: Host(`vith.vibioh.fr`)
-      traefik.http.routers.vith-http.entrypoints: http
-      traefik.http.routers.vith-http.middlewares: ratelimit@file, redirect@file
-      traefik.http.routers.vith-https.rule: Host(`vith.vibioh.fr`)
-      traefik.http.routers.vith-https.entrypoints: https
-      traefik.http.routers.vith-https.middlewares: ratelimit@file, vith-auth, compress@file
-      traefik.http.routers.vith-https.tls: 'true'
-      traefik.http.routers.vith-https.tls.certresolver: default
-      traefik.http.services.vith-service.loadbalancer.server.port: '1080'
-      traefik.http.middlewares.vith-auth.basicauth.users: '${VITH_BASIC_AUTH}'
-    environment:
-      VITH_LOGGER_JSON: 'true'
-    restart: on-failure:5
-    security_opt:
-      - no-new-privileges
-
   image:
     image: h2non/imaginary
     labels:
