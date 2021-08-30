@@ -18,8 +18,8 @@ func (a App) rename(old, new provider.StorageItem) {
 	}
 
 	if old.IsVideo() && a.HasStream(old) {
-		if err := a.deleteStream(context.Background(), old); err != nil {
-			logger.Error("unable to delete stream: %s", err)
+		if err := a.renameStream(context.Background(), old, new); err != nil {
+			logger.Error("unable to rename stream: %s", err)
 		}
 	}
 }

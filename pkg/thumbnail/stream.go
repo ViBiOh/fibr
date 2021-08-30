@@ -65,6 +65,21 @@ func (a App) generateStream(ctx context.Context, item provider.StorageItem) erro
 	return nil
 }
 
+func (a App) renameStream(ctx context.Context, old, new provider.StorageItem) error {
+	a.increaseMetric("video", "rename")
+
+	resp, err := a.videoRequest.Method(http.MethodPut).Path(fmt.Sprintf("%s?to=%s", getStreamPath(old), url.QueryEscape(getStreamPath(new)))).Send(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("unable to send request: %s", err)
+	}
+
+	if err := request.DiscardBody(resp.Body); err != nil {
+		return fmt.Errorf("unable to discard body: %s", err)
+	}
+
+	return nil
+}
+
 func (a App) deleteStream(ctx context.Context, item provider.StorageItem) error {
 	a.increaseMetric("video", "delete")
 
