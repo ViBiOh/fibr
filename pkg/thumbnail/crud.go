@@ -46,7 +46,7 @@ func (a App) EventConsumer(e provider.Event) {
 	case provider.StartEvent:
 		fallthrough
 	case provider.UploadEvent:
-		if !a.CanHaveThumbnail(e.Item) || a.HasThumbnail(e.Item) {
+		if !a.CanHaveThumbnail(e.Item) {
 			return
 		}
 
@@ -54,8 +54,10 @@ func (a App) EventConsumer(e provider.Event) {
 			return
 		}
 
-		if err := a.generate(e.Item); err != nil {
-			logger.Error("unable to generate thumbnail for `%s`: %s", e.Item.Pathname, err)
+		if !a.HasThumbnail(e.Item) {
+			if err := a.generate(e.Item); err != nil {
+				logger.Error("unable to generate thumbnail for `%s`: %s", e.Item.Pathname, err)
+			}
 		}
 
 		if e.Item.IsVideo() && !a.HasStream(e.Item) {
