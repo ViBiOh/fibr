@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 )
 
@@ -43,6 +44,8 @@ func (a App) shouldGenerateStream(ctx context.Context, item provider.StorageItem
 	if err := request.DiscardBody(resp.Body); err != nil {
 		return false, fmt.Errorf("unable to discard body: %s", err)
 	}
+
+	logger.WithField("item", item.Pathname).Debug("Bitrate is %s", bitrate)
 
 	return bitrate >= a.minBitrate, nil
 }
