@@ -68,7 +68,7 @@ func (a App) generateStream(ctx context.Context, item provider.StorageItem) erro
 func (a App) renameStream(ctx context.Context, old, new provider.StorageItem) error {
 	a.increaseMetric("video", "rename")
 
-	resp, err := a.videoRequest.Method(http.MethodPut).Path(fmt.Sprintf("%s?to=%s", getStreamPath(old), url.QueryEscape(getStreamPath(new)))).Send(ctx, nil)
+	resp, err := a.videoRequest.Method(http.MethodPatch).Path(fmt.Sprintf("%s?to=%s", getStreamPath(old), url.QueryEscape(getStreamPath(new)))).Send(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("unable to send request: %s", err)
 	}
