@@ -111,6 +111,9 @@ func New(config Config, storage provider.Storage, rendererApp renderer.App, shar
 
 // Start crud operations
 func (a App) Start(done <-chan struct{}) {
+	var filesCount, directoriesCount, filesSize uint64
+	start := time.Now()
+
 	err := a.storageApp.Walk("", func(item provider.StorageItem, err error) error {
 		if err != nil {
 			return err
@@ -122,11 +125,20 @@ func (a App) Start(done <-chan struct{}) {
 		default:
 		}
 
+		if item.IsDir {
+			directoriesCount++
+		} else {
+			filesCount++
+			filesSize += uint64(item.Size)
+		}
+
 		item = a.sanitizeName(item)
 		a.notify(provider.NewStartEvent(item))
 
 		return nil
 	})
+
+	logger.Info("%d files in %d directories, for a size of %.02f MB, walked in %s", filesCount, directoriesCount, float64(filesSize)/1024/1024, time.Since(start))
 
 	if err != nil {
 		logger.Error("%s", err)
