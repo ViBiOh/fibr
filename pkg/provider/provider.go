@@ -40,7 +40,7 @@ type ReadSeekCloser interface {
 
 // Storage describe action on a storage provider
 type Storage interface {
-	WithIgnoreFn(ignoreFn func(StorageItem) bool)
+	WithIgnoreFn(ignoreFn func(StorageItem) bool) Storage
 	Info(pathname string) (StorageItem, error)
 	List(pathname string) ([]StorageItem, error)
 	WriterTo(pathname string) (io.WriteCloser, error)

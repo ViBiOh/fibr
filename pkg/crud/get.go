@@ -14,6 +14,10 @@ import (
 )
 
 func (a App) getWithMessage(w http.ResponseWriter, r *http.Request, request provider.Request, message renderer.Message) (string, int, map[string]interface{}, error) {
+	if query.GetBool(r, "stats") {
+		return a.Stats(w, request, message)
+	}
+
 	filename := request.GetFilepath("")
 	item, err := a.storageApp.Info(filename)
 

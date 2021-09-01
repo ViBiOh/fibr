@@ -31,10 +31,11 @@ var (
 
 // App of package
 type App struct {
-	storageApp provider.Storage
-	shareApp   provider.ShareManager
-	webhookApp provider.WebhookManager
-	pushEvent  provider.EventProducer
+	rawStorageApp provider.Storage
+	storageApp    provider.Storage
+	shareApp      provider.ShareManager
+	webhookApp    provider.WebhookManager
+	pushEvent     provider.EventProducer
 
 	rendererApp  renderer.App
 	exifApp      exif.App
@@ -65,12 +66,12 @@ func New(config Config, storage provider.Storage, rendererApp renderer.App, shar
 
 		pushEvent: eventProducer,
 
-		storageApp:   storage,
-		rendererApp:  rendererApp,
-		thumbnailApp: thumbnailApp,
-		exifApp:      exifApp,
-		shareApp:     shareApp,
-		webhookApp:   webhookApp,
+		rawStorageApp: storage,
+		rendererApp:   rendererApp,
+		thumbnailApp:  thumbnailApp,
+		exifApp:       exifApp,
+		shareApp:      shareApp,
+		webhookApp:    webhookApp,
 	}
 
 	var ignorePattern *regexp.Regexp
@@ -85,7 +86,7 @@ func New(config Config, storage provider.Storage, rendererApp renderer.App, shar
 		logger.Info("Ignoring files with pattern `%s`", ignore)
 	}
 
-	storage.WithIgnoreFn(func(item provider.StorageItem) bool {
+	app.storageApp = storage.WithIgnoreFn(func(item provider.StorageItem) bool {
 		if item.IsDir && item.Name == provider.MetadataDirectoryName {
 			return true
 		}
@@ -111,9 +112,6 @@ func New(config Config, storage provider.Storage, rendererApp renderer.App, shar
 
 // Start crud operations
 func (a App) Start(done <-chan struct{}) {
-	var filesCount, directoriesCount, filesSize uint64
-	start := time.Now()
-
 	err := a.storageApp.Walk("", func(item provider.StorageItem, err error) error {
 		if err != nil {
 			return err
@@ -125,20 +123,11 @@ func (a App) Start(done <-chan struct{}) {
 		default:
 		}
 
-		if item.IsDir {
-			directoriesCount++
-		} else {
-			filesCount++
-			filesSize += uint64(item.Size)
-		}
-
 		item = a.sanitizeName(item)
 		a.notify(provider.NewStartEvent(item))
 
 		return nil
 	})
-
-	logger.Info("%d files in %d directories, for a size of %.02f MB, walked in %s", filesCount, directoriesCount, float64(filesSize)/1024/1024, time.Since(start))
 
 	if err != nil {
 		logger.Error("%s", err)

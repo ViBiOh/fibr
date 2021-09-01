@@ -1,0 +1,28 @@
+{{ define "stats" }}
+  {{ template "header" . }}
+  {{ template "layout" . }}
+
+  <style type="text/css">
+    .stats {
+      margin: 0 auto;
+      width: 30rem;
+    }
+
+    .key {
+      display: inline-block;
+      width: 15rem;
+    }
+  </style>
+
+  <h2 class="center">Stats</h2>
+
+  <section class="stats">
+    {{ range .Stats }}
+      <p class="padding no-margin">
+        <strong class="key">{{ .Key }}</strong>: {{ .Value }}
+      </p>
+    {{ end }}
+  </section>
+
+  {{ template "footer" . }}
+{{ end }}

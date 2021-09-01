@@ -152,9 +152,11 @@ func (mr *StorageMockRecorder) Walk(arg0, arg1 interface{}) *gomock.Call {
 }
 
 // WithIgnoreFn mocks base method.
-func (m *Storage) WithIgnoreFn(arg0 func(provider.StorageItem) bool) {
+func (m *Storage) WithIgnoreFn(arg0 func(provider.StorageItem) bool) provider.Storage {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "WithIgnoreFn", arg0)
+	ret := m.ctrl.Call(m, "WithIgnoreFn", arg0)
+	ret0, _ := ret[0].(provider.Storage)
+	return ret0
 }
 
 // WithIgnoreFn indicates an expected call of WithIgnoreFn.
