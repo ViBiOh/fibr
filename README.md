@@ -18,7 +18,7 @@ Thanks to [FontAwesome](https://fontawesome.com) for providing awesome svg.
 
 ## Concepts
 
-Fibr aims to provide simple browsing of your filesystem. It's a single static binary with embed html templates. No Javascript framework. HTTP and HTML have all we need.
+Fibr aims to provide simple browsing of your filesystem. It's a single static binary with embedded html templates. No Javascript framework. HTTP and HTML have all we need.
 
 Fibr aims to be compatible with the most platforms available, on a best-effort basis. Fibr itself is already compatible with `x86_64`, `arm`, `arm64` architectures. But sidecars, which depends on system library, are not all ready yet.
 
@@ -30,15 +30,22 @@ It aims to be consistent accross all existing filesystem (block storage, object 
 
 Fibr creates a `.fibr` folder in _root folder_ for storing its metadata: shares' configuration, thumbnails and exif. If you want to stop using _fibr_ or start with a fresh installation (e.g. regenerating thumbnails), you can delete this folder.
 
-### Files
+### Sidecars
 
 Fibr generates thumbnails of images, PDF and videos when these [mime-types are detected](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types) and sidecars are provided. Sidecars are [h2non/imaginary](https://github.com/h2non/imaginary), [ViBiOh/vith](https://github.com/vibioh/vith) and [ViBiOh/exas](https://github.com/vibioh/exas).
 
 You can refer to these projects for installing and configuring them and set `-thumbnailImageURL`, `-thumbnailVideoURL` and `-exifURL` options.
 
+#### HTTP Live Streaming
+
+Fibr has a special treatment for videos, that can be very large sometimes. With the help of the `vith` sidecar, it can convert a video to its [HLS version](https://en.wikipedia.org/wiki/HTTP_Live_Streaming). It keeps the original video as is, and stores streamable version in the metadatas directory. It's a basic conversion into the appropriate format: no resolution, frame-per-second or any quality specifications are changed. Conversion is done where this two requirements are met altogether:
+
+- `vith` is configured with direct access to the filesystem (see [`vith`documentation about configuring `WorkDir`](https://github.com/vibioh/vith#usage) and [`fibr` configuration](#usage) for enabling it). Direct access disable large file transfer in the network.
+- the video bitrate is above [`thumbnailMinBitrate (default 80000000)`](#usage)
+
 ### Security
 
-Authentication is made with [Basic Auth](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication), compatible with all browsers and CLI tools such as `curl`. I _strongly recommend configuring HTTPS_ in order to avoid exposing your credentials in plain text.
+Authentication is made with [Basic Auth](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication), compatible with all browsers and CLI tools such as `curl`. I **strongly recommend configuring HTTPS** in order to avoid exposing your credentials in plain text.
 
 You can set `-cert` and `-key` options, it uses [Golang's standard net/http#ServeTLS](https://golang.org/pkg/net/http/#ServeTLS) under the hood.
 
@@ -48,9 +55,11 @@ You can also configure a reverse proxy with Let's Encrypt to manage encryption, 
 
 You can share folders or just one file: it generates a short link that gain access to shared object and is considered as "root folder" with no parent escalation.
 
-It can be password-protected: user _has to_ enter password to see content (login is not used, you can leave it blank).
+It can be password-protected: user **has to** enter password to see content (login is not used, you can leave it blank).
 
 It can be read-only or with edit right. With edit-right, user can do anything as you, uploading, deleting, renaming, except generating new shares.
+
+It can be created with expiration duration.
 
 > It's really useful for sharing files with friends. You don't need account at Google, Dropbox, iCloud or a mobile-app: a link and everyone can see and share content!
 
@@ -67,7 +76,7 @@ You can register webhook listeners on folders and receive an HTTP notification w
 - `start` occurs when fibr start and do something on an item
 - `access` occurs when content is accessed (directory browsing or just one file)
 
-The request sends is a POST with 15s timeout with the given payload structure:
+The request sent is a POST with 15s timeout with the given payload structure:
 
 ```json
 {
@@ -85,6 +94,12 @@ The request sends is a POST with 15s timeout with the given payload structure:
 It will contains an extra key `new` with the same structure of `item` in case of a `rename` event.
 
 The webhook can be recursive (all children folders will be notified too) for event choosen.
+
+#### Security
+
+Webhooks can be sent with an [HTTP Signature](https://tools.ietf.org/id/draft-cavage-http-signatures-12.html) if you configure the [`webhookSecret`](#usage). It adds an `Authorization` header to the sent request that serves as an authentification mechanism for the receiver: if the signature is not valid, you should not trust the caller.
+
+I've implemented a [very simple function](https://github.com/ViBiOh/httputils/blob/main/pkg/request/signature.go#L34) you can add to your receiver for checking it.
 
 ### SEO
 
@@ -108,13 +123,13 @@ You can easily encrypt your `login:password` value with [`htpasswd`](https://htt
 htpasswd -nBb login password
 ```
 
-In order to work, your user _must have_ `admin` profile sets with the `-authProfiles` option.
+In order to work, your user **must have** `admin` profile sets with the `-authProfiles` option.
 
 ### Metadatas
 
 With help of different sidecars, Fibr can generate image, video and PDF thumbnails. These sidecars can be self hosted with ease. It can also extract and enrich content displayed by looking at [EXIF Data](https://en.wikipedia.org/wiki/Exif), also with the help of a little sidecar. This behaviour are opt-out (if you remove the `url` of the service, Fibr will do nothing).
 
-For the last mile, Fibr can try to reverse geocoding the GPS data found in EXIF, using [Open Street Map](https://wiki.openstreetmap.org/wiki/Nominatim). Hosting this kind of service is complicated and calling a third-party party with such sensible datas is an opt-in decision.
+For the last mile, Fibr can try to reverse geocoding the GPS data found in EXIF, using [Open Street Map](https://wiki.openstreetmap.org/wiki/Nominatim). Self-hosting this kind of service can be complicated and calling a third-party party with such sensible datas is an opt-in decision.
 
 ## Getting started
 
@@ -127,6 +142,9 @@ go install github.com/ViBiOh/fibr/cmd/fibr@latest
 fibr \
   -noAuth \
   -fsDirectory "$(pwd)" \
+  -thumbnailImageURL "" \
+  -thumbnailVideoURL "" \
+  -exifURL "" \
   -publicURL "http://localhost:1080"
 ```
 
@@ -142,6 +160,9 @@ docker run -d \
   -e FIBR_PUBLIC_URL="http://localhost:1080" \
   -e FIBR_AUTH_PROFILES="1:admin" \
   -e FIBR_AUTH_USERS="1:$(htpasswd -nBb login password)" \
+  -e FIBR_THUMBNAIL_IMAGE_URL="" \
+  -e FIBR_THUMBNAIL_VIDEO_URL="" \
+  -e FIBR_EXIF_URL="" \
   vibioh/fibr
 ```
 
