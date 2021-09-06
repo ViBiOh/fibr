@@ -137,7 +137,7 @@ func (a App) WriterTo(pathname string) (io.WriteCloser, error) {
 }
 
 // ReaderFrom reads content from given pathname
-func (a App) ReaderFrom(pathname string) (provider.ReadSeekCloser, error) {
+func (a App) ReaderFrom(pathname string) (provider.StorageReader, error) {
 	if err := checkPathname(pathname); err != nil {
 		return nil, convertError(err)
 	}
