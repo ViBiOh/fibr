@@ -1,6 +1,7 @@
 package crud
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -48,7 +49,10 @@ func (a App) saveUploadedFile(request provider.Request, part *multipart.Part) (f
 		}
 	}()
 
-	if _, err = io.Copy(hostFile, part); err != nil {
+	buffer := provider.BufferPool.Get().(*bytes.Buffer)
+	defer provider.BufferPool.Put(buffer)
+
+	if _, err = io.CopyBuffer(hostFile, part, buffer.Bytes()); err != nil {
 		return "", fmt.Errorf("error while copying file: %s", err)
 	}
 

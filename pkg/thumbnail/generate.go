@@ -1,6 +1,7 @@
 package thumbnail
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -76,7 +77,10 @@ func (a App) generate(item provider.StorageItem) error {
 		return fmt.Errorf("unable to get writer: %s", err)
 	}
 
-	if _, err := io.Copy(writer, resp.Body); err != nil {
+	buffer := provider.BufferPool.Get().(*bytes.Buffer)
+	defer provider.BufferPool.Put(buffer)
+
+	if _, err := io.CopyBuffer(writer, resp.Body, buffer.Bytes()); err != nil {
 		return err
 	}
 
