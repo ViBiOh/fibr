@@ -172,7 +172,9 @@ func (a App) List(w http.ResponseWriter, _ *http.Request, item provider.StorageI
 			commaNeeded = true
 		}
 
-		provider.SafeWrite(w, fmt.Sprintf(`"%s":"`, sha.New(item.Name)))
+		provider.SafeWrite(w, `"`)
+		provider.SafeWrite(w, sha.New(item.Name))
+		provider.SafeWrite(w, `":"`)
 		a.encodeThumbnailContent(base64.NewEncoder(base64.StdEncoding, w), item)
 		provider.SafeWrite(w, `"`)
 	}

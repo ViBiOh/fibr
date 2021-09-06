@@ -129,7 +129,12 @@ func (a App) addFileToZip(zipWriter *zip.Writer, item provider.StorageItem, path
 		Modified:           item.Date,
 		Method:             zip.Deflate,
 	}
-	header.SetMode(item.Mode)
+
+	if item.IsDir {
+		header.SetMode(0700)
+	} else {
+		header.SetMode(0600)
+	}
 
 	if header.UncompressedSize64 > uint32max {
 		header.UncompressedSize = uint32max

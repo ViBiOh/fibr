@@ -5,6 +5,7 @@ scripts/
 bin/
 release/
 coverage.*
+.env
 
 # Fibr
 .fibr/*

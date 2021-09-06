@@ -36,7 +36,6 @@ type StorageReader interface {
 	io.Reader
 	io.Seeker
 	io.Closer
-	io.ReaderFrom
 }
 
 // Storage describe action on a storage provider

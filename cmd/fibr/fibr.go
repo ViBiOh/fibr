@@ -75,27 +75,29 @@ func main() {
 	prometheusApp := prometheus.New(prometheusConfig)
 	healthApp := health.New(healthConfig)
 
-	storageApp, err := filesystem.New(filesystemConfig)
+	fsApp, err := filesystem.New(filesystemConfig)
 	logger.Fatal(err)
+
+	var storageProvider provider.Storage = fsApp
 
 	prometheusRegisterer := prometheusApp.Registerer()
 	eventBus, err := provider.NewEventBus(10, prometheusRegisterer)
 	logger.Fatal(err)
 
-	thumbnailApp, err := thumbnail.New(thumbnailConfig, &storageApp, prometheusRegisterer)
+	thumbnailApp, err := thumbnail.New(thumbnailConfig, storageProvider, prometheusRegisterer)
 	logger.Fatal(err)
 
-	exifApp, err := exif.New(exifConfig, &storageApp, prometheusRegisterer)
+	exifApp, err := exif.New(exifConfig, storageProvider, prometheusRegisterer)
 	logger.Fatal(err)
 
-	webhookApp, err := webhook.New(webhookConfig, &storageApp, prometheusRegisterer)
+	webhookApp, err := webhook.New(webhookConfig, storageProvider, prometheusRegisterer)
 	logger.Fatal(err)
 
 	rendererApp, err := renderer.New(rendererConfig, content, fibr.FuncMap(thumbnailApp))
 	logger.Fatal(err)
 
-	shareApp := share.New(shareConfig, &storageApp)
-	crudApp, err := crud.New(crudConfig, &storageApp, rendererApp, shareApp, webhookApp, thumbnailApp, exifApp, eventBus.Push)
+	shareApp := share.New(shareConfig, storageProvider)
+	crudApp, err := crud.New(crudConfig, storageProvider, rendererApp, shareApp, webhookApp, thumbnailApp, exifApp, eventBus.Push)
 	logger.Fatal(err)
 
 	var middlewareApp provider.Auth

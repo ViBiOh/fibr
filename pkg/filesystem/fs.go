@@ -121,7 +121,7 @@ func (a App) List(pathname string) ([]provider.StorageItem, error) {
 		items = append(items, item)
 	}
 
-	sort.Sort(ByHybridSort(items))
+	sort.Sort(provider.ByHybridSort(items))
 
 	return items, nil
 }

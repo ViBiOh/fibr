@@ -1,7 +1,6 @@
 package provider
 
 import (
-	"io/fs"
 	"mime"
 	"path"
 	"path/filepath"
@@ -11,12 +10,11 @@ import (
 
 // StorageItem describe item on a storage provider
 type StorageItem struct {
-	Date     time.Time   `json:"date"`
-	Name     string      `json:"name"`
-	Pathname string      `json:"pathname"`
-	IsDir    bool        `json:"isDir"`
-	Mode     fs.FileMode `json:"mode"`
-	Size     int64       `json:"size"`
+	Date     time.Time `json:"date"`
+	Name     string    `json:"name"`
+	Pathname string    `json:"pathname"`
+	IsDir    bool      `json:"isDir"`
+	Size     int64     `json:"size"`
 }
 
 // Extension gives extensions of item
@@ -60,6 +58,56 @@ func (s StorageItem) Dir() string {
 	}
 
 	return filepath.Dir(s.Pathname)
+}
+
+func lowerString(first, second string) bool {
+	return strings.Compare(strings.ToLower(first), strings.ToLower(second)) < 0
+}
+
+func greaterTime(first, second time.Time) bool {
+	return first.After(second)
+}
+
+// ByHybridSort implements Sorter by type, name then modification time
+type ByHybridSort []StorageItem
+
+func (a ByHybridSort) Len() int {
+	return len(a)
+}
+
+func (a ByHybridSort) Swap(i, j int) {
+	a[i], a[j] = a[j], a[i]
+}
+
+func (a ByHybridSort) Less(i, j int) bool {
+	first := a[i]
+	second := a[j]
+
+	if first.IsDir && second.IsDir {
+		return lowerString(first.Name, second.Name)
+	}
+
+	if first.IsDir {
+		return true
+	}
+
+	if second.IsDir {
+		return false
+	}
+
+	if (first.IsImage() || first.IsVideo()) && (second.IsImage() || second.IsVideo()) {
+		return greaterTime(first.Date, second.Date)
+	}
+
+	if first.IsImage() || first.IsVideo() {
+		return false
+	}
+
+	if second.IsImage() || first.IsVideo() {
+		return true
+	}
+
+	return lowerString(first.Name, second.Name)
 }
 
 // RenderItem is a storage item with an id
