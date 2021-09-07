@@ -76,17 +76,18 @@ func (a App) WithIgnoreFn(ignoreFn func(provider.StorageItem) bool) provider.Sto
 
 // Info provide metadata about given pathname
 func (a App) Info(pathname string) (provider.StorageItem, error) {
-	if len(getPath(pathname)) == 0 {
+	realPathname := getPath(pathname)
+	if len(realPathname) == 0 {
 		return provider.StorageItem{
-			Name:     "root",
-			Pathname: "",
+			Name:     "/",
+			Pathname: "/",
 			IsDir:    true,
 		}, nil
 	}
 
-	info, err := a.client.StatObject(context.Background(), a.bucket, getPath(pathname), minio.GetObjectOptions{})
+	info, err := a.client.StatObject(context.Background(), a.bucket, realPathname, minio.GetObjectOptions{})
 	if err != nil {
-		return provider.StorageItem{}, fmt.Errorf("unable to retrieve object: %s", err)
+		return provider.StorageItem{}, convertError(err)
 	}
 
 	return convertToItem(pathname, info), nil
@@ -118,13 +119,11 @@ func (a App) WriterTo(pathname string) (io.WriteCloser, error) {
 	reader, writer := io.Pipe()
 
 	if _, err := a.client.PutObject(context.Background(), a.bucket, getPath(pathname), reader, -1, minio.PutObjectOptions{}); err != nil {
-		err = fmt.Errorf("unable to put object: %s", err)
-
 		if closeErr := writer.Close(); closeErr != nil {
 			err = fmt.Errorf("%s: %w", err, closeErr)
 		}
 
-		return nil, err
+		return nil, convertError(err)
 	}
 
 	return writer, nil
@@ -134,7 +133,7 @@ func (a App) WriterTo(pathname string) (io.WriteCloser, error) {
 func (a App) ReaderFrom(pathname string) (provider.StorageReader, error) {
 	object, err := a.client.GetObject(context.Background(), a.bucket, getPath(pathname), minio.GetObjectOptions{})
 	if err != nil {
-		return nil, fmt.Errorf("unable to get object: %s", err)
+		return nil, convertError(err)
 	}
 
 	return object, nil

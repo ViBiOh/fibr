@@ -3,6 +3,7 @@ package provider
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -57,6 +58,8 @@ var (
 			return http.ErrUseLastResponse
 		},
 	}
+
+	errNotExists = errors.New("not exists")
 )
 
 // GetPathname computes pathname for given params
@@ -123,7 +126,7 @@ func SafeWrite(w io.Writer, content string) {
 
 // ErrNotExist create a NotExist error
 func ErrNotExist(err error) error {
-	return fmt.Errorf("path not found: %w", err)
+	return fmt.Errorf("%s: %w", err, errNotExists)
 }
 
 // IsNotExist checks if error match a not found
@@ -132,7 +135,7 @@ func IsNotExist(err error) bool {
 		return false
 	}
 
-	return strings.HasPrefix(err.Error(), "path not found")
+	return errors.Is(err, errNotExists)
 }
 
 // FindIndex finds index of given value into array, or -1 if not found

@@ -13,10 +13,22 @@ func getPath(pathname string) string {
 
 func convertToItem(pathname string, info minio.ObjectInfo) provider.StorageItem {
 	return provider.StorageItem{
-		Name:     strings.TrimSuffix(info.Key, "/"),
+		Name:     info.Key,
 		Pathname: pathname,
 		IsDir:    strings.HasSuffix(info.Key, "/"),
 		Date:     info.LastModified,
 		Size:     info.Size,
 	}
+}
+
+func convertError(err error) error {
+	if err == nil {
+		return err
+	}
+
+	if strings.Contains(err.Error(), "The specified key does not exist") {
+		return provider.ErrNotExist(err)
+	}
+
+	return err
 }
