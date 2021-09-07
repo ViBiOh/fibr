@@ -7,6 +7,7 @@ import (
 	"io"
 	"path"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -80,7 +81,7 @@ func (a App) WithIgnoreFn(ignoreFn func(provider.StorageItem) bool) provider.Sto
 func (a App) Info(pathname string) (provider.StorageItem, error) {
 	realPathname := getPath(pathname)
 
-	if realPathname == "/" {
+	if realPathname == "" {
 		return provider.StorageItem{
 			Name:     "/",
 			Pathname: "/",
@@ -90,19 +91,16 @@ func (a App) Info(pathname string) (provider.StorageItem, error) {
 
 	info, err := a.client.StatObject(context.Background(), a.bucket, realPathname, minio.GetObjectOptions{})
 	if err != nil {
-		return provider.StorageItem{}, convertError(err)
+		return provider.StorageItem{}, convertError(fmt.Errorf("unable to stat object: %s", err))
 	}
 
-	return convertToItem(realPathname, info), nil
+	return convertToItem(info), nil
 }
 
 // List items in the storage
 func (a App) List(pathname string) ([]provider.StorageItem, error) {
 	realPathname := getPath(pathname)
-
-	if realPathname == "/" {
-		realPathname = ""
-	}
+	baseRealPathname := path.Base(realPathname)
 
 	objectsCh := a.client.ListObjects(context.Background(), a.bucket, minio.ListObjectsOptions{
 		Prefix: realPathname,
@@ -110,8 +108,8 @@ func (a App) List(pathname string) ([]provider.StorageItem, error) {
 
 	var items []provider.StorageItem
 	for object := range objectsCh {
-		item := convertToItem(realPathname, object)
-		if item.IsDir && item.Name == path.Base(realPathname) {
+		item := convertToItem(object)
+		if item.IsDir && item.Name == baseRealPathname {
 			continue
 		}
 
@@ -148,7 +146,7 @@ func (a App) WriterTo(pathname string) (io.WriteCloser, error) {
 func (a App) ReaderFrom(pathname string) (provider.StorageReader, error) {
 	object, err := a.client.GetObject(context.Background(), a.bucket, getPath(pathname), minio.GetObjectOptions{})
 	if err != nil {
-		return nil, convertError(err)
+		return nil, convertError(fmt.Errorf("unable to get object: %s", err))
 	}
 
 	return object, nil
@@ -169,7 +167,7 @@ func (a App) Walk(pathname string, walkFn func(provider.StorageItem, error) erro
 	})
 
 	for object := range objectsCh {
-		item := convertToItem(pathname, object)
+		item := convertToItem(object)
 		if a.ignoreFn != nil && a.ignoreFn(item) {
 			continue
 		}
@@ -184,19 +182,55 @@ func (a App) Walk(pathname string, walkFn func(provider.StorageItem, error) erro
 
 // CreateDir container in storage
 func (a App) CreateDir(name string) error {
-	// TODO
+	_, err := a.client.PutObject(context.Background(), a.bucket, provider.Dirname(getPath(name)), strings.NewReader(""), 0, minio.PutObjectOptions{})
+	if err != nil {
+		return convertError(fmt.Errorf("unable to create directory: %s", err))
+	}
 
 	return nil
 }
 
 // Rename file or directory from storage
 func (a App) Rename(oldName, newName string) error {
-	// TODO
+	oldRoot := getPath(oldName)
+	newRoot := getPath(newName)
 
-	return nil
+	return a.Walk(oldRoot, func(item provider.StorageItem, err error) error {
+		if err != nil {
+			return err
+		}
+
+		_, err = a.client.CopyObject(context.Background(), minio.CopyDestOptions{
+			Bucket: a.bucket,
+			Object: strings.Replace(item.Pathname, oldRoot, newRoot, -1),
+		}, minio.CopySrcOptions{
+			Bucket: a.bucket,
+			Object: item.Pathname,
+		})
+
+		if err != nil {
+			return convertError(err)
+		}
+
+		if err := a.client.RemoveObject(context.Background(), a.bucket, item.Pathname, minio.RemoveObjectOptions{}); err != nil {
+			return convertError(fmt.Errorf("unable to delete object: %s", err))
+		}
+
+		return nil
+	})
 }
 
 // Remove file or directory from storage
 func (a App) Remove(pathname string) error {
-	return convertError(a.client.RemoveObject(context.Background(), a.bucket, getPath(pathname), minio.RemoveObjectOptions{}))
+	return a.Walk(pathname, func(item provider.StorageItem, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if err := a.client.RemoveObject(context.Background(), a.bucket, item.Pathname, minio.RemoveObjectOptions{}); err != nil {
+			return convertError(fmt.Errorf("unable to delete object: %s", err))
+		}
+
+		return nil
+	})
 }

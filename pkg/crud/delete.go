@@ -23,8 +23,8 @@ func (a App) Delete(w http.ResponseWriter, r *http.Request, request provider.Req
 		return
 	}
 
-	oldPath := request.GetFilepath(name)
-	info, err := a.storageApp.Info(oldPath)
+	pathname := request.GetFilepath(name)
+	info, err := a.storageApp.Info(pathname)
 	if err != nil {
 		a.rendererApp.Error(w, model.WrapNotFound(err))
 		return
@@ -36,7 +36,7 @@ func (a App) Delete(w http.ResponseWriter, r *http.Request, request provider.Req
 	}
 
 	if info.IsDir {
-		provider.SetPrefsCookie(w, deletePreferences(request, oldPath))
+		provider.SetPrefsCookie(w, deletePreferences(request, pathname))
 	}
 
 	go a.notify(provider.NewDeleteEvent(info))

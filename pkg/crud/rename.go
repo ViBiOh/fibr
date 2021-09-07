@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
@@ -48,6 +49,10 @@ func (a App) Rename(w http.ResponseWriter, r *http.Request, request provider.Req
 	if err != nil {
 		a.rendererApp.Error(w, model.WrapInternal(err))
 		return
+	}
+
+	if strings.HasSuffix(oldName, "/") {
+		newName = provider.Dirname(newName)
 	}
 
 	oldPath := request.GetFilepath(oldName)

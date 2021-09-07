@@ -33,8 +33,8 @@ type Request struct {
 func (r Request) GetFilepath(name string) string {
 	pathname := GetPathname(r.Path, name, r.Share)
 
-	if len(name) == 0 && strings.HasSuffix(r.Path, "/") {
-		pathname += "/"
+	if len(name) == 0 && strings.HasSuffix(r.Path, "/") && !r.Share.File {
+		return Dirname(pathname)
 	}
 
 	return pathname

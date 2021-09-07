@@ -13,6 +13,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/fibr"
 	"github.com/ViBiOh/fibr/pkg/filesystem"
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/fibr/pkg/s3"
 	"github.com/ViBiOh/fibr/pkg/share"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/fibr/pkg/webhook"
@@ -59,6 +60,7 @@ func main() {
 	rendererConfig := renderer.Flags(fs, "", flags.NewOverride("PublicURL", "https://fibr.vibioh.fr"), flags.NewOverride("Title", "fibr"))
 
 	filesystemConfig := filesystem.Flags(fs, "fs")
+	s3Config := s3.Flags(fs, "s3")
 	thumbnailConfig := thumbnail.Flags(fs, "thumbnail")
 	exifConfig := exif.Flags(fs, "exif")
 
@@ -75,10 +77,21 @@ func main() {
 	prometheusApp := prometheus.New(prometheusConfig)
 	healthApp := health.New(healthConfig)
 
-	fsApp, err := filesystem.New(filesystemConfig)
+	s3App, err := s3.New(s3Config)
 	logger.Fatal(err)
 
-	var storageProvider provider.Storage = fsApp
+	var storageProvider provider.Storage
+
+	if s3App.Enabled() {
+		logger.Info("Serving content from s3")
+		storageProvider = s3App
+	} else {
+		fsApp, err := filesystem.New(filesystemConfig)
+		logger.Fatal(err)
+
+		logger.Info("Serving content from filesystem")
+		storageProvider = fsApp
+	}
 
 	prometheusRegisterer := prometheusApp.Registerer()
 	eventBus, err := provider.NewEventBus(10, prometheusRegisterer)

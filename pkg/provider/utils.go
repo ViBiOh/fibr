@@ -62,9 +62,23 @@ var (
 	errNotExists = errors.New("not exists")
 )
 
+// Dirname ensures given name is a dirname, with a trailing slash
+func Dirname(name string) string {
+	if !strings.HasSuffix(name, "/") {
+		return name + "/"
+	}
+	return name
+}
+
 // GetPathname computes pathname for given params
 func GetPathname(folder, name string, share Share) string {
-	return filepath.Join(buildPath(folder, name, share.Path)...)
+	pathname := filepath.Join(buildPath(folder, name, share.Path)...)
+
+	if strings.HasSuffix(name, "/") {
+		return Dirname(pathname)
+	}
+
+	return pathname
 }
 
 // URL computes public URI for given params

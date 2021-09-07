@@ -12,7 +12,7 @@ func getPath(pathname string) string {
 	return strings.TrimPrefix(pathname, "/")
 }
 
-func convertToItem(pathname string, info minio.ObjectInfo) provider.StorageItem {
+func convertToItem(info minio.ObjectInfo) provider.StorageItem {
 	return provider.StorageItem{
 		Name:     path.Base(info.Key),
 		Pathname: info.Key,

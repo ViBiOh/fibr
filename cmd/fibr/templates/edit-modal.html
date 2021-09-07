@@ -6,7 +6,7 @@
       <form method="post" action="#">
         <input type="hidden" name="type" value="item" />
         <input type="hidden" name="method" value="PATCH" />
-        <input type="hidden" name="name" value="{{ .Name }}" />
+        <input type="hidden" name="name" value="{{ .Name }}{{ if .IsDir }}/{{ end }}" />
 
         <p class="padding no-margin">
           <label for="folder-{{ .ID }}" class="block">Folder</label>
