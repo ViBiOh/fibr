@@ -7,6 +7,7 @@ Web File Browser and Manager.
 - Thumbnail generation for image, PDF and video (with help of sidecars)
 - Works in pure HTML or with very little javascript for improved file upload
 - Can share directory with ou without password and with or without edit right.
+- Support for basic filesystem and storage object (in beta)
 
 ![](docs/fibr.png)
 
@@ -24,7 +25,7 @@ Fibr aims to be compatible with the most platforms available, on a best-effort b
 
 ### Folder
 
-Fibr browses files of given `-data` option folder, called "root folder". For security reason, it's not possible to browse parent.
+Fibr browses files of given `-data` option folder (or S3 configuration), called "root folder". For security reason, it's not possible to browse parent.
 
 It aims to be consistent accross all existing filesystem (block storage, object storage, etc.) and thus enforces filenames in lowercase, with no space or special character. At start, it walks every files and reports names that breaks its policy. It doesn't modify existing files unless you set `-sanitizeOnStart` option.
 
@@ -273,6 +274,16 @@ Usage of fibr:
         Public URL {FIBR_PUBLIC_URL} (default "https://fibr.vibioh.fr")
   -readTimeout string
         [server] Read Timeout {FIBR_READ_TIMEOUT} (default "2m")
+  -s3AccessKey string
+        [s3] Storage Object Access Key {FIBR_S3_ACCESS_KEY}
+  -s3Bucket string
+        [s3] Storage Object Bucket {FIBR_S3_BUCKET}
+  -s3Endpoint string
+        [s3] Storage Object endpoint {FIBR_S3_ENDPOINT}
+  -s3SSL
+        [s3] Use SSL {FIBR_S3_SSL} (default true)
+  -s3SecretAccess string
+        [s3] Storage Object Secret Access {FIBR_S3_SECRET_ACCESS}
   -sanitizeOnStart
         [crud] Sanitize name on start {FIBR_SANITIZE_ON_START}
   -share
