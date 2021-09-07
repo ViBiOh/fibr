@@ -20,6 +20,22 @@ func TestGetFilepath(t *testing.T) {
 			"/index",
 		},
 		{
+			"directory",
+			Request{
+				Path: "www/",
+			},
+			"",
+			"/www/",
+		},
+		{
+			"directory file",
+			Request{
+				Path: "www/",
+			},
+			"index.html",
+			"/www/index.html",
+		},
+		{
 			"with given path",
 			Request{
 				Path: "index",

@@ -31,7 +31,13 @@ type Request struct {
 
 // GetFilepath of request
 func (r Request) GetFilepath(name string) string {
-	return GetPathname(r.Path, name, r.Share)
+	pathname := GetPathname(r.Path, name, r.Share)
+
+	if len(name) == 0 && strings.HasSuffix(r.Path, "/") {
+		pathname += "/"
+	}
+
+	return pathname
 }
 
 // URL of request

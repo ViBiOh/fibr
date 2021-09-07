@@ -1,6 +1,7 @@
 package s3
 
 import (
+	"path"
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -13,8 +14,8 @@ func getPath(pathname string) string {
 
 func convertToItem(pathname string, info minio.ObjectInfo) provider.StorageItem {
 	return provider.StorageItem{
-		Name:     info.Key,
-		Pathname: pathname,
+		Name:     path.Base(info.Key),
+		Pathname: info.Key,
 		IsDir:    strings.HasSuffix(info.Key, "/"),
 		Date:     info.LastModified,
 		Size:     info.Size,

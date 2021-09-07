@@ -5,11 +5,13 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"path"
 	"sort"
 	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/flags"
+	"github.com/ViBiOh/httputils/v4/pkg/logger"
 
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
@@ -77,7 +79,8 @@ func (a App) WithIgnoreFn(ignoreFn func(provider.StorageItem) bool) provider.Sto
 // Info provide metadata about given pathname
 func (a App) Info(pathname string) (provider.StorageItem, error) {
 	realPathname := getPath(pathname)
-	if len(realPathname) == 0 {
+
+	if realPathname == "/" {
 		return provider.StorageItem{
 			Name:     "/",
 			Pathname: "/",
@@ -90,18 +93,28 @@ func (a App) Info(pathname string) (provider.StorageItem, error) {
 		return provider.StorageItem{}, convertError(err)
 	}
 
-	return convertToItem(pathname, info), nil
+	return convertToItem(realPathname, info), nil
 }
 
 // List items in the storage
 func (a App) List(pathname string) ([]provider.StorageItem, error) {
+	realPathname := getPath(pathname)
+
+	if realPathname == "/" {
+		realPathname = ""
+	}
+
 	objectsCh := a.client.ListObjects(context.Background(), a.bucket, minio.ListObjectsOptions{
-		Prefix: getPath(pathname),
+		Prefix: realPathname,
 	})
 
 	var items []provider.StorageItem
 	for object := range objectsCh {
-		item := convertToItem(pathname, object)
+		item := convertToItem(realPathname, object)
+		if item.IsDir && item.Name == path.Base(realPathname) {
+			continue
+		}
+
 		if a.ignoreFn != nil && a.ignoreFn(item) {
 			continue
 		}
@@ -118,13 +131,15 @@ func (a App) List(pathname string) ([]provider.StorageItem, error) {
 func (a App) WriterTo(pathname string) (io.WriteCloser, error) {
 	reader, writer := io.Pipe()
 
-	if _, err := a.client.PutObject(context.Background(), a.bucket, getPath(pathname), reader, -1, minio.PutObjectOptions{}); err != nil {
-		if closeErr := writer.Close(); closeErr != nil {
-			err = fmt.Errorf("%s: %w", err, closeErr)
-		}
+	go func() {
+		if _, err := a.client.PutObject(context.Background(), a.bucket, getPath(pathname), reader, -1, minio.PutObjectOptions{}); err != nil {
+			if closeErr := writer.Close(); closeErr != nil {
+				err = fmt.Errorf("%s: %w", err, closeErr)
+			}
 
-		return nil, convertError(err)
-	}
+			logger.Error("unable to put object: %s", err)
+		}
+	}()
 
 	return writer, nil
 }
@@ -183,7 +198,5 @@ func (a App) Rename(oldName, newName string) error {
 
 // Remove file or directory from storage
 func (a App) Remove(pathname string) error {
-	// TODO
-
-	return nil
+	return convertError(a.client.RemoveObject(context.Background(), a.bucket, getPath(pathname), minio.RemoveObjectOptions{}))
 }

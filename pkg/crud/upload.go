@@ -8,8 +8,10 @@ import (
 	"mime/multipart"
 	"net/http"
 	"path"
+	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
@@ -56,12 +58,17 @@ func (a App) saveUploadedFile(request provider.Request, part *multipart.Part) (f
 		return "", fmt.Errorf("error while copying file: %s", err)
 	}
 
-	info, err := a.storageApp.Info(filePath)
-	if err != nil {
-		return "", err
-	}
+	go func() {
+		// Waiting 5 seconds before sending hooks
+		time.Sleep(time.Second * 5)
 
-	go a.notify(provider.NewUploadEvent(info))
+		info, err := a.storageApp.Info(filePath)
+		if err != nil {
+			logger.Error("unable to get info for upload event: %s", err)
+		}
+
+		a.notify(provider.NewUploadEvent(info))
+	}()
 
 	return filename, nil
 }
