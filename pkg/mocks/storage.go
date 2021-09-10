@@ -81,10 +81,10 @@ func (mr *StorageMockRecorder) List(arg0 interface{}) *gomock.Call {
 }
 
 // ReaderFrom mocks base method.
-func (m *Storage) ReaderFrom(arg0 string) (provider.StorageReader, error) {
+func (m *Storage) ReaderFrom(arg0 string) (io.ReadSeekCloser, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ReaderFrom", arg0)
-	ret0, _ := ret[0].(provider.StorageReader)
+	ret0, _ := ret[0].(io.ReadSeekCloser)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

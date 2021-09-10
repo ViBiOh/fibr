@@ -143,7 +143,7 @@ func (a App) WriterTo(pathname string) (io.WriteCloser, error) {
 }
 
 // ReaderFrom reads content from given pathname
-func (a App) ReaderFrom(pathname string) (provider.StorageReader, error) {
+func (a App) ReaderFrom(pathname string) (io.ReadSeekCloser, error) {
 	object, err := a.client.GetObject(context.Background(), a.bucket, getPath(pathname), minio.GetObjectOptions{})
 	if err != nil {
 		return nil, convertError(fmt.Errorf("unable to get object: %s", err))
