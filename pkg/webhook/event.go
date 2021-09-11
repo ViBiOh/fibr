@@ -33,14 +33,11 @@ func (a *App) EventConsumer(e provider.Event) {
 		if resp != nil {
 			a.increaseMetric(strconv.Itoa(resp.StatusCode))
 		}
+
 		if err != nil {
 			logger.Error("error while sending webhook: %s", err)
-		}
-
-		if resp != nil {
-			if err := request.DiscardBody(resp.Body); err != nil {
-				logger.Error("unable to discard body: %s", err)
-			}
+		} else if err := request.DiscardBody(resp.Body); err != nil {
+			logger.Error("unable to discard body: %s", err)
 		}
 	}
 }
