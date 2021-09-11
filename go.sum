@@ -1,8 +1,8 @@
 cloud.google.com/go v0.34.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
-github.com/ViBiOh/auth/v2 v2.11.8 h1:c7EJTzQP5bgJ8oFwAgI1Og3/sHUq27OwPhl9pI6LHe4=
-github.com/ViBiOh/auth/v2 v2.11.8/go.mod h1:zoG47NC7ge+7NmPSNoobkKV1zX4pWIy+skaMoqMWw5I=
-github.com/ViBiOh/httputils/v4 v4.22.4 h1:p6RLYRqkT+5+bZWvwANHxuwzZjTRmpFrEs/aAYLT3cI=
-github.com/ViBiOh/httputils/v4 v4.22.4/go.mod h1:K5vS+PfYOTF8T374GVHLeokWZa/7X7qfW9+0qsOlIg4=
+github.com/ViBiOh/auth/v2 v2.11.10 h1:W5lqVIyOTntvuIOqIfN+fQ7ygVK3VD0J9VXgWuhvNKI=
+github.com/ViBiOh/auth/v2 v2.11.10/go.mod h1:s+fGT0Ur355EJrrkcjVKfgTkoHTBx726XXbQlEaKsHE=
+github.com/ViBiOh/httputils/v4 v4.23.1 h1:HgfV/Ncs1KZmvJtL2kerUJr8HYEHMOs1p2lG4qZ0tsI=
+github.com/ViBiOh/httputils/v4 v4.23.1/go.mod h1:a0+C9EL6ycmf9UvJLW6YE2VlW/QfY8RS+5zYtm+W2vo=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf/go.mod h1:ybxpYRFXyAe+OPACYpWeL0wqObRcbAqCMya13uyzqw0=
