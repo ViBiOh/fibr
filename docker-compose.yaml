@@ -10,10 +10,11 @@ services:
       traefik.http.routers.imaginary-http.middlewares: ratelimit@file, redirect@file
       traefik.http.routers.imaginary-https.rule: Host(`imaginary.vibioh.fr`)
       traefik.http.routers.imaginary-https.entrypoints: https
-      traefik.http.routers.imaginary-https.middlewares: ratelimit@file, compress@file
+      traefik.http.routers.imaginary-https.middlewares: ratelimit@file, imaginary-auth, compress@file
       traefik.http.routers.imaginary-https.tls: 'true'
       traefik.http.routers.imaginary-https.tls.certresolver: default
       traefik.http.services.imaginary-service.loadbalancer.server.port: '9000'
+      traefik.http.middlewares.imaginary-auth.basicauth.users: '${IMAGINARY_AUTH}'
     restart: on-failure:5
     read_only: true
     security_opt:
