@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/flags"
@@ -78,10 +79,13 @@ func New(config Config, storage provider.Storage, prometheusRegisterer prometheu
 		return App{}, err
 	}
 
-	imagePath := fmt.Sprintf("/crop?width=%d&height=%d&stripmeta=true&noprofile=true&quality=80&type=jpeg", Width, Height)
+	imageReq := request.New().WithClient(thumbnailClient).Post(*config.imageURL).BasicAuth(strings.TrimSpace(*config.imageUser), *config.imagePass)
+	if !imageReq.IsZero() {
+		imageReq = imageReq.Path(fmt.Sprintf("/crop?width=%d&height=%d&stripmeta=true&noprofile=true&quality=80&type=jpeg", Width, Height))
+	}
 
 	return App{
-		imageRequest: request.New().WithClient(thumbnailClient).Post(*config.imageURL).Path(imagePath).BasicAuth(*config.imageUser, *config.imagePass),
+		imageRequest: imageReq,
 		videoRequest: request.New().WithClient(thumbnailClient).URL(*config.videoURL).BasicAuth(*config.videoUser, *config.videoPass),
 
 		maxSize:      *config.maxSize,

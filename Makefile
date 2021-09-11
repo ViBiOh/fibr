@@ -98,13 +98,9 @@ run:
 		-publicURL "http://localhost:1080" \
 		-authProfiles "1:admin" \
 		-authUsers "1:`htpasswd -nBb admin admin`" \
-		-frameOptions "SAMEORIGIN" \
-		-thumbnailImageURL "https://imaginary.vibioh.fr" \
-		-thumbnailVideoURL "https://vith.vibioh.fr" \
-		-exifURL "http://localhost:4000" \
-		-exifGeocodeURL "https://nominatim.openstreetmap.org" \
-		-exifDateOnStart \
-		-exifAggregateOnStart \
+		-thumbnailImageURL "" \
+		-thumbnailVideoURL "" \
+		-exifURL "" \
 		-webhookSecret "secret"
 
 .PHONY: run-imaginary

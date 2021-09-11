@@ -1,10 +1,12 @@
 package share
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"path"
 	"strings"
 	"sync"
@@ -19,7 +21,8 @@ import (
 )
 
 var (
-	shareFilename = path.Join(provider.MetadataDirectoryName, ".json")
+	oldShareFilename = path.Join(provider.MetadataDirectoryName, ".json")
+	shareFilename    = path.Join(provider.MetadataDirectoryName, "shares.json")
 )
 
 // App of package
@@ -85,6 +88,10 @@ func (a *App) Start(done <-chan struct{}) {
 		return
 	}
 
+	if err := a.migrate(); err != nil {
+		logger.Error("unable to migrate shares file: %s", err)
+	}
+
 	if err := a.refresh(); err != nil {
 		logger.Error("unable to refresh shares: %s", err)
 		return
@@ -95,27 +102,66 @@ func (a *App) Start(done <-chan struct{}) {
 	}).OnSignal(syscall.SIGUSR1).Now().Start(a.cleanShares, done)
 }
 
-func (a *App) refresh() error {
-	_, err := a.storageApp.Info(shareFilename)
+func (a *App) migrate() error {
+	_, err := a.storageApp.Info(oldShareFilename)
 	if err != nil {
 		if provider.IsNotExist(err) {
-			return a.saveShares()
+			return nil
 		}
 
 		return err
 	}
 
-	if provider.IsNotExist(err) {
+	logger.Info("Migrating old share file to new one")
+
+	oldFile, err := a.storageApp.ReaderFrom(oldShareFilename)
+	if err != nil {
+		return fmt.Errorf("unable to read from old file: %s", err)
+	}
+
+	defer func() {
+		if err := oldFile.Close(); err != nil {
+			logger.Error("unable to close old share file: %s", err)
+		}
+	}()
+
+	newFile, err := a.storageApp.WriterTo(shareFilename)
+	if err != nil {
+		return fmt.Errorf("unable to write to new file: %s", err)
+	}
+
+	defer func() {
+		if err := newFile.Close(); err != nil {
+			logger.Error("unable to close new share file: %s", err)
+		}
+	}()
+
+	buffer := provider.BufferPool.Get().(*bytes.Buffer)
+	defer provider.BufferPool.Put(buffer)
+
+	if _, err := io.CopyBuffer(newFile, oldFile, buffer.Bytes()); err != nil {
+		return fmt.Errorf("unable to copy files: %s", err)
+	}
+
+	if err := a.storageApp.Remove(oldShareFilename); err != nil {
+		return fmt.Errorf("unable to remove old file: %s", err)
+	}
+
+	return nil
+}
+
+func (a *App) refresh() error {
+	file, err := a.storageApp.ReaderFrom(shareFilename)
+	if err != nil {
+		if !provider.IsNotExist(err) {
+			return err
+		}
+
 		if err := a.storageApp.CreateDir(provider.MetadataDirectoryName); err != nil {
 			return err
 		}
 
-		return nil
-	}
-
-	file, err := a.storageApp.ReaderFrom(shareFilename)
-	if err != nil {
-		return err
+		return a.saveShares()
 	}
 
 	defer func() {

@@ -70,9 +70,6 @@ func (a *App) Start(_ <-chan struct{}) {
 		return
 	}
 
-	a.mutex.Lock()
-	defer a.mutex.Unlock()
-
 	if err := a.loadWebhooks(); err != nil {
 		logger.Error("unable to refresh webhooks: %s", err)
 		return
@@ -82,10 +79,15 @@ func (a *App) Start(_ <-chan struct{}) {
 func (a *App) loadWebhooks() (err error) {
 	file, err := a.storageApp.ReaderFrom(webhookFilename)
 	if err != nil {
-		if provider.IsNotExist(err) {
-			return a.saveWebhooks()
+		if !provider.IsNotExist(err) {
+			return err
 		}
-		return err
+
+		if err := a.storageApp.CreateDir(provider.MetadataDirectoryName); err != nil {
+			return err
+		}
+
+		return a.saveWebhooks()
 	}
 
 	defer func() {
@@ -93,6 +95,9 @@ func (a *App) loadWebhooks() (err error) {
 			logger.Error("unable to close webhook file: %s", err)
 		}
 	}()
+
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
 
 	if err = json.NewDecoder(file).Decode(&a.webhooks); err != nil {
 		return fmt.Errorf("unable to decode: %s", err)
