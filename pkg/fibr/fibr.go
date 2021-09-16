@@ -11,6 +11,7 @@ import (
 	"github.com/ViBiOh/auth/v2/pkg/ident"
 	authModel "github.com/ViBiOh/auth/v2/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
@@ -96,6 +97,7 @@ func (a App) parseRequest(r *http.Request) (provider.Request, error) {
 	}
 
 	if err := a.parseShare(&request, r.Header.Get("Authorization")); err != nil {
+		logRequest(r)
 		return request, model.WrapUnauthorized(err)
 	}
 
@@ -116,6 +118,7 @@ func (a App) parseRequest(r *http.Request) (provider.Request, error) {
 
 	_, user, err := a.loginApp.IsAuthenticated(r)
 	if err != nil {
+		logRequest(r)
 		return request, convertAuthenticationError(err)
 	}
 
@@ -126,4 +129,16 @@ func (a App) parseRequest(r *http.Request) (provider.Request, error) {
 	}
 
 	return request, nil
+}
+
+func logRequest(r *http.Request) {
+	ip := r.Header.Get("X-Forwarded-For")
+	if len(ip) == 0 {
+		ip = r.Header.Get("X-Real-Ip")
+	}
+	if len(ip) == 0 {
+		ip = r.RemoteAddr
+	}
+
+	logger.Warn("Unauthenticated request: %s %s from %s", r.Method, r.URL.String(), ip)
 }
