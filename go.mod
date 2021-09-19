@@ -4,11 +4,11 @@ go 1.17
 
 require (
 	github.com/ViBiOh/auth/v2 v2.11.10
-	github.com/ViBiOh/httputils/v4 v4.23.1
+	github.com/ViBiOh/httputils/v4 v4.24.1
 	github.com/golang/mock v1.6.0
 	github.com/minio/minio-go/v7 v7.0.14
 	github.com/prometheus/client_golang v1.11.0
-	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a
+	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97
 	golang.org/x/text v0.3.7
 )
 
@@ -31,10 +31,10 @@ require (
 	github.com/prometheus/procfs v0.6.0 // indirect
 	github.com/rs/xid v1.2.1 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
-	github.com/tdewolff/minify/v2 v2.9.21 // indirect
-	github.com/tdewolff/parse/v2 v2.5.19 // indirect
+	github.com/tdewolff/minify/v2 v2.9.22 // indirect
+	github.com/tdewolff/parse/v2 v2.5.21 // indirect
 	golang.org/x/net v0.0.0-20210405180319-a5a99cb37ef4 // indirect
-	golang.org/x/sys v0.0.0-20210603081109-ebe580a85c40 // indirect
+	golang.org/x/sys v0.0.0-20210630005230-0f9fa26af87c // indirect
 	google.golang.org/protobuf v1.26.0 // indirect
 	gopkg.in/ini.v1 v1.57.0 // indirect
 )
