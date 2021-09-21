@@ -32,6 +32,7 @@ var (
 )
 
 // Storage describe action on a storage provider
+//go:generate mockgen -destination ../mocks/storage.go -mock_names Storage=Storage -package mocks github.com/ViBiOh/fibr/pkg/provider Storage
 type Storage interface {
 	WithIgnoreFn(ignoreFn func(StorageItem) bool) Storage
 	Info(pathname string) (StorageItem, error)
