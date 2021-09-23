@@ -31,7 +31,7 @@ func (a App) Stats(w http.ResponseWriter, request provider.Request, message rend
 			{Key: "Directories", Value: stats["Directories"]},
 			{Key: "Files", Value: stats["Files"]},
 			{Key: "Size", Value: bytesHuman(stats["Size"])},
-			{Key: "Metadatas", Value: fmt.Sprintf("%s (%.1f%% of Size)", bytesHuman(stats["Metadatas"]), float64(stats["Metadatas"])/float64(stats["Size"]))},
+			{Key: "Metadatas", Value: fmt.Sprintf("%s (%.1f%% of Size)", bytesHuman(stats["Metadatas"]), float64(stats["Metadatas"]*100)/float64(stats["Size"]))},
 		},
 	}, nil
 }
