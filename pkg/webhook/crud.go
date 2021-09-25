@@ -1,26 +1,16 @@
 package webhook
 
 import (
-	"crypto/rand"
 	"fmt"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/sha"
+	"github.com/ViBiOh/httputils/v4/pkg/uuid"
 )
-
-func uuid() (string, error) {
-	raw := make([]byte, 16)
-	_, _ = rand.Read(raw)
-
-	raw[8] = raw[8]&^0xc0 | 0x80
-	raw[6] = raw[6]&^0xf0 | 0x40
-
-	return fmt.Sprintf("%x-%x-%x-%x-%x", raw[0:4], raw[4:6], raw[6:8], raw[8:10], raw[10:]), nil
-}
 
 func (a *App) generateID() (string, error) {
 	for {
-		uuid, err := uuid()
+		uuid, err := uuid.New()
 		if err != nil {
 			return "", err
 		}
