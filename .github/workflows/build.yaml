@@ -104,24 +104,3 @@ jobs:
           FLUX_WEBHOOK_URL: ${{ secrets.FLUX_WEBHOOK_URL }}
         run: |
           curl --disable --silent --show-error --location --max-time 30 --header "X-Signature: sha1=$(printf "{}" | openssl dgst -sha1 -r -hmac "${FLUX_TOKEN}"| awk '{print $1}')" --data "{}" "${FLUX_WEBHOOK_URL}"
-
-  deploy:
-    name: Deploy
-    runs-on: ubuntu-latest
-    needs: publish
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Deploy
-        env:
-          DATA_DIR: ${{ secrets.DATA_DIR }}
-          DATA_USER_ID: ${{ secrets.DATA_USER_ID }}
-          DEPLOY_CREDENTIALS: ${{ secrets.DEPLOY_CREDENTIALS }}
-          DEPLOY_URL: ${{ secrets.DEPLOY_URL }}
-          DOCKER_USER: ${{ secrets.DOCKER_USER }}
-          IMAGINARY_AUTH: ${{ secrets.IMAGINARY_AUTH }}
-        run: |
-          curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap" | bash -s -- "-c" "deploy" "env_replace"
-          VERSION="$(make version)" scripts/env_replace "docker-compose.yaml" DOCKER_USER DATA_DIR DATA_USER_ID VERSION IMAGINARY_AUTH | sed "s|\\\$|\$\$|g" > "docker-compose-env.yaml"
-          scripts/deploy "$(make name)" "@docker-compose-env.yaml"
