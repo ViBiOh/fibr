@@ -17,7 +17,9 @@ Web File Browser and Manager.
 
 Thanks to [FontAwesome](https://fontawesome.com) for providing awesome svg.
 
-I do it mostly for myself, but if you want to support me, you can [!["Buy Me A Tea"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/vibioh)
+I do it mostly for myself, but if you want to support me, you can star this project to give more visibility or sponsor my work (it pays server hosting, tooling, etc.).
+
+[!["Buy Me A Tea"](https://img.buymeacoffee.com/button-api/?text=Buy%20me%20a%20tea&emoji=🍵&slug=vibioh&button_colour=5F7FFF&font_colour=ffffff&font_family=Lato&outline_colour=000000&coffee_colour=FFDD00)](https://www.buymeacoffee.com/vibioh)
 
 ## Concepts
 
