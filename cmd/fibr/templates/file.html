@@ -2,7 +2,7 @@
   {{ template "header" . }}
   {{ template "layout" . }}
 
-  <style>
+  <style type="text/css" nonce="{{ .nonce }}">
     body {
       background-color: var(--white);
       display: grid;

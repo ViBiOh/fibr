@@ -1,5 +1,5 @@
 {{ define "upload-modal" }}
-  <script>
+  <script type="text/javascript" nonce="{{ .nonce }}">
     /**
      * Drag'n drop.
      */
@@ -332,7 +332,7 @@
     });
   </script>
 
-  <style>
+  <style type="text/css" nonce="{{ .nonce }}">
     #upload-list {
       margin: 1rem auto;
       overflow-y: auto;

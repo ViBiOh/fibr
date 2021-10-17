@@ -203,7 +203,7 @@ Usage of fibr:
   -cert string
         [server] Certificate file {FIBR_CERT}
   -csp string
-        [owasp] Content-Security-Policy {FIBR_CSP} (default "default-src 'self'; base-uri 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:")
+        [owasp] Content-Security-Policy {FIBR_CSP} (default "default-src 'self'; base-uri 'self'; script-src 'nonce'; style-src 'nonce'; img-src 'self' data:")
   -exifAggregateOnStart
         [exif] Aggregate EXIF data per folder on start {FIBR_EXIF_AGGREGATE_ON_START}
   -exifDateOnStart
