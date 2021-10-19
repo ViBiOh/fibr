@@ -106,7 +106,7 @@ func (a App) List(pathname string) ([]provider.StorageItem, error) {
 		return nil, convertError(err)
 	}
 
-	items := make([]provider.StorageItem, 0)
+	var items []provider.StorageItem
 	for _, file := range files {
 		fileInfo, err := file.Info()
 		if err != nil {

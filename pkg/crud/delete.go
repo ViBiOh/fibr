@@ -45,7 +45,7 @@ func (a App) Delete(w http.ResponseWriter, r *http.Request, request provider.Req
 }
 
 func deletePreferences(request provider.Request, oldPath string) provider.Request {
-	paths := make([]string, 0)
+	var paths []string
 
 	for _, layoutPath := range request.Preferences.ListLayoutPath {
 		if layoutPath != oldPath {
