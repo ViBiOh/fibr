@@ -1,4 +1,4 @@
-SHELL = /bin/bash
+SHELL = /usr/bin/env bash -o nounset -o pipefail -o errexit -c
 
 ifneq ("$(wildcard .env)","")
 	include .env
