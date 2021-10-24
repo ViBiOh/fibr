@@ -14,26 +14,26 @@ import (
 // Create creates given path directory to filesystem
 func (a App) Create(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !request.CanEdit {
-		a.rendererApp.Error(w, model.WrapForbidden(ErrNotAuthorized))
+		a.rendererApp.Error(w, r, model.WrapForbidden(ErrNotAuthorized))
 		return
 	}
 
 	name, err := checkFormName(r, "name")
 	if err != nil && !errors.Is(err, ErrEmptyName) {
-		a.rendererApp.Error(w, err)
+		a.rendererApp.Error(w, r, err)
 		return
 	}
 
 	name, err = provider.SanitizeName(name, false)
 	if err != nil {
-		a.rendererApp.Error(w, model.WrapInternal(err))
+		a.rendererApp.Error(w, r, model.WrapInternal(err))
 		return
 	}
 
 	pathname := request.GetFilepath(name)
 
 	if err := a.storageApp.CreateDir(pathname); err != nil {
-		a.rendererApp.Error(w, model.WrapInternal(err))
+		a.rendererApp.Error(w, r, model.WrapInternal(err))
 		return
 	}
 

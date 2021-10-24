@@ -60,7 +60,7 @@ func (a App) getWithMessage(w http.ResponseWriter, r *http.Request, request prov
 	}
 
 	if query.GetBool(r, "download") {
-		a.Download(w, request)
+		a.Download(w, r, request)
 		return "", 0, nil, err
 	}
 

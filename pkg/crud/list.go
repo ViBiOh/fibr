@@ -82,7 +82,7 @@ func (a App) List(w http.ResponseWriter, request provider.Request, message rende
 }
 
 // Download content of a directory into a streamed zip
-func (a App) Download(w http.ResponseWriter, request provider.Request) {
+func (a App) Download(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	zipWriter := zip.NewWriter(w)
 	defer func() {
 		if err := zipWriter.Close(); err != nil {
@@ -98,7 +98,7 @@ func (a App) Download(w http.ResponseWriter, request provider.Request) {
 	w.Header().Add("Content-Disposition", fmt.Sprintf("attachment; filename=%s.zip", filename))
 
 	if err := a.zipFiles(request, zipWriter, ""); err != nil {
-		a.rendererApp.Error(w, err)
+		a.rendererApp.Error(w, r, err)
 	}
 }
 

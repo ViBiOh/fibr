@@ -13,25 +13,25 @@ import (
 // Delete given path from filesystem
 func (a App) Delete(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !request.CanEdit {
-		a.rendererApp.Error(w, model.WrapForbidden(ErrNotAuthorized))
+		a.rendererApp.Error(w, r, model.WrapForbidden(ErrNotAuthorized))
 		return
 	}
 
 	name, err := checkFormName(r, "name")
 	if err != nil && !errors.Is(err, ErrEmptyName) {
-		a.rendererApp.Error(w, err)
+		a.rendererApp.Error(w, r, err)
 		return
 	}
 
 	pathname := request.GetFilepath(name)
 	info, err := a.storageApp.Info(pathname)
 	if err != nil {
-		a.rendererApp.Error(w, model.WrapNotFound(err))
+		a.rendererApp.Error(w, r, model.WrapNotFound(err))
 		return
 	}
 
 	if err := a.storageApp.Remove(info.Pathname); err != nil {
-		a.rendererApp.Error(w, model.WrapInternal(err))
+		a.rendererApp.Error(w, r, model.WrapInternal(err))
 		return
 	}
 
