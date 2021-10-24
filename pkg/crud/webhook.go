@@ -13,31 +13,31 @@ import (
 
 func (a App) createWebhook(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !a.webhookApp.Enabled() {
-		a.rendererApp.Error(w, model.WrapInternal(errors.New("webhook is disabled")))
+		a.rendererApp.Error(w, r, model.WrapInternal(errors.New("webhook is disabled")))
 		return
 	}
 
 	if !request.CanWebhook {
-		a.rendererApp.Error(w, model.WrapForbidden(ErrNotAuthorized))
+		a.rendererApp.Error(w, r, model.WrapForbidden(ErrNotAuthorized))
 		return
 	}
 
 	var err error
 	err = r.ParseForm()
 	if err != nil {
-		a.rendererApp.Error(w, model.WrapInvalid(fmt.Errorf("unable to parse form: %s", err)))
+		a.rendererApp.Error(w, r, model.WrapInvalid(fmt.Errorf("unable to parse form: %s", err)))
 		return
 	}
 
 	recursive, err := getFormBool(r.Form.Get("recursive"))
 	if err != nil {
-		a.rendererApp.Error(w, model.WrapInvalid(err))
+		a.rendererApp.Error(w, r, model.WrapInvalid(err))
 		return
 	}
 
 	target, err := url.Parse(r.Form.Get("url"))
 	if err != nil {
-		a.rendererApp.Error(w, model.WrapInvalid(fmt.Errorf("unable to parse url: %s", err)))
+		a.rendererApp.Error(w, r, model.WrapInvalid(fmt.Errorf("unable to parse url: %s", err)))
 		return
 	}
 
@@ -46,7 +46,7 @@ func (a App) createWebhook(w http.ResponseWriter, r *http.Request, request provi
 	for i, rawEventType := range rawEventTypes {
 		eType, err := provider.ParseEventType(rawEventType)
 		if err != nil {
-			a.rendererApp.Error(w, model.WrapInvalid(err))
+			a.rendererApp.Error(w, r, model.WrapInvalid(err))
 			return
 		}
 		eventTypes[i] = eType
@@ -55,21 +55,21 @@ func (a App) createWebhook(w http.ResponseWriter, r *http.Request, request provi
 	info, err := a.storageApp.Info(request.Path)
 	if err != nil {
 		if provider.IsNotExist(err) {
-			a.rendererApp.Error(w, model.WrapNotFound(err))
+			a.rendererApp.Error(w, r, model.WrapNotFound(err))
 		} else {
-			a.rendererApp.Error(w, model.WrapInternal(err))
+			a.rendererApp.Error(w, r, model.WrapInternal(err))
 		}
 		return
 	}
 
 	if !info.IsDir {
-		a.rendererApp.Error(w, model.WrapInvalid(errors.New("webhook are only available on directories")))
+		a.rendererApp.Error(w, r, model.WrapInvalid(errors.New("webhook are only available on directories")))
 		return
 	}
 
 	id, err := a.webhookApp.Create(info.Pathname, recursive, target.String(), eventTypes)
 	if err != nil {
-		a.rendererApp.Error(w, model.WrapInternal(err))
+		a.rendererApp.Error(w, r, model.WrapInternal(err))
 		return
 	}
 
@@ -85,19 +85,19 @@ func (a App) createWebhook(w http.ResponseWriter, r *http.Request, request provi
 
 func (a App) deleteWebhook(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !a.webhookApp.Enabled() {
-		a.rendererApp.Error(w, model.WrapInternal(errors.New("webhook is disabled")))
+		a.rendererApp.Error(w, r, model.WrapInternal(errors.New("webhook is disabled")))
 		return
 	}
 
 	if !request.CanWebhook {
-		a.rendererApp.Error(w, model.WrapForbidden(ErrNotAuthorized))
+		a.rendererApp.Error(w, r, model.WrapForbidden(ErrNotAuthorized))
 		return
 	}
 
 	id := r.FormValue("id")
 
 	if err := a.webhookApp.Delete(id); err != nil {
-		a.rendererApp.Error(w, model.WrapInternal(err))
+		a.rendererApp.Error(w, r, model.WrapInternal(err))
 		return
 	}
 
