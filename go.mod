@@ -6,7 +6,7 @@ require (
 	github.com/ViBiOh/auth/v2 v2.11.16
 	github.com/ViBiOh/httputils/v4 v4.27.1
 	github.com/golang/mock v1.6.0
-	github.com/minio/minio-go/v7 v7.0.14
+	github.com/minio/minio-go/v7 v7.0.15
 	github.com/prometheus/client_golang v1.11.0
 	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97
 	golang.org/x/text v0.3.7
@@ -19,6 +19,7 @@ require (
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/uuid v1.1.2 // indirect
 	github.com/json-iterator/go v1.1.11 // indirect
+	github.com/klauspost/compress v1.13.5 // indirect
 	github.com/klauspost/cpuid v1.3.1 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/minio/md5-simd v1.1.0 // indirect
