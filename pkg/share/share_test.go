@@ -10,7 +10,7 @@ import (
 )
 
 func TestPurgeExpiredShares(t *testing.T) {
-	var cases = []struct {
+	cases := []struct {
 		intention string
 		instance  *App
 		want      map[string]provider.Share
@@ -18,7 +18,7 @@ func TestPurgeExpiredShares(t *testing.T) {
 		{
 			"empty",
 			&App{
-				clock:  clock.New(time.Date(2021, 05, 01, 14, 00, 00, 0, time.UTC)),
+				clock:  clock.New(time.Date(2021, 0o5, 0o1, 14, 0o0, 0o0, 0, time.UTC)),
 				shares: make(map[string]provider.Share),
 			},
 			make(map[string]provider.Share),
@@ -26,26 +26,26 @@ func TestPurgeExpiredShares(t *testing.T) {
 		{
 			"purge at boundaries",
 			&App{
-				clock: clock.New(time.Date(2021, 05, 01, 14, 00, 00, 0, time.UTC)),
+				clock: clock.New(time.Date(2021, 0o5, 0o1, 14, 0o0, 0o0, 0, time.UTC)),
 				shares: map[string]provider.Share{
 					"1": {
 						ID:       "1",
-						Creation: time.Date(2021, 05, 01, 12, 00, 00, 0, time.UTC),
+						Creation: time.Date(2021, 0o5, 0o1, 12, 0o0, 0o0, 0, time.UTC),
 						Duration: time.Hour,
 					},
 					"2": {
 						ID:       "2",
-						Creation: time.Date(2021, 05, 01, 12, 00, 00, 0, time.UTC),
+						Creation: time.Date(2021, 0o5, 0o1, 12, 0o0, 0o0, 0, time.UTC),
 						Duration: time.Hour * 24,
 					},
 					"22": {
 						ID:       "22",
-						Creation: time.Date(2021, 05, 01, 12, 00, 00, 0, time.UTC),
+						Creation: time.Date(2021, 0o5, 0o1, 12, 0o0, 0o0, 0, time.UTC),
 						Duration: 0,
 					},
 					"3": {
 						ID:       "3",
-						Creation: time.Date(2021, 05, 01, 12, 00, 00, 0, time.UTC),
+						Creation: time.Date(2021, 0o5, 0o1, 12, 0o0, 0o0, 0, time.UTC),
 						Duration: time.Hour,
 					},
 				},
@@ -53,12 +53,12 @@ func TestPurgeExpiredShares(t *testing.T) {
 			map[string]provider.Share{
 				"2": {
 					ID:       "2",
-					Creation: time.Date(2021, 05, 01, 12, 00, 00, 0, time.UTC),
+					Creation: time.Date(2021, 0o5, 0o1, 12, 0o0, 0o0, 0, time.UTC),
 					Duration: time.Hour * 24,
 				},
 				"22": {
 					ID:       "22",
-					Creation: time.Date(2021, 05, 01, 12, 00, 00, 0, time.UTC),
+					Creation: time.Date(2021, 0o5, 0o1, 12, 0o0, 0o0, 0, time.UTC),
 					Duration: 0,
 				},
 			},

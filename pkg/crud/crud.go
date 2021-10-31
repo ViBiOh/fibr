@@ -128,7 +128,6 @@ func (a App) Start(done <-chan struct{}) {
 
 		return nil
 	})
-
 	if err != nil {
 		logger.Error("%s", err)
 	}

@@ -53,7 +53,6 @@ func (a App) computeStats(pathname string) (map[string]uint64, error) {
 
 		return nil
 	})
-
 	if err != nil {
 		return nil, fmt.Errorf("unable to browse files: %s", err)
 	}

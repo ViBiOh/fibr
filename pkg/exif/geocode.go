@@ -23,9 +23,7 @@ const (
 	publicNominatimInterval = time.Second * 2 // nominatim is at 1req/sec, so we take an extra step
 )
 
-var (
-	gpsRegex = regexp.MustCompile(`(?im)([0-9]+)\s*deg\s*([0-9]+)'\s*([0-9]+(?:\.[0-9]+)?)"\s*([N|S|W|E])`)
-)
+var gpsRegex = regexp.MustCompile(`(?im)([0-9]+)\s*deg\s*([0-9]+)'\s*([0-9]+(?:\.[0-9]+)?)"\s*([N|S|W|E])`)
 
 type geocode struct {
 	Address   map[string]string `json:"address"`

@@ -17,10 +17,8 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 )
 
-var (
-	// ErrRelativePath occurs when path is relative (contains ".."")
-	ErrRelativePath = errors.New("pathname contains relatives paths")
-)
+// ErrRelativePath occurs when path is relative (contains ".."")
+var ErrRelativePath = errors.New("pathname contains relatives paths")
 
 // Config of package
 type Config struct {
@@ -182,7 +180,7 @@ func (a App) CreateDir(name string) error {
 		return convertError(err)
 	}
 
-	return convertError(os.MkdirAll(a.path(name), 0700))
+	return convertError(os.MkdirAll(a.path(name), 0o700))
 }
 
 // Rename file or directory from storage

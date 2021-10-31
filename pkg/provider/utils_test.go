@@ -8,7 +8,7 @@ import (
 )
 
 func TestURL(t *testing.T) {
-	var cases = []struct {
+	cases := []struct {
 		intention string
 		request   Request
 		name      string
@@ -62,7 +62,7 @@ func TestURL(t *testing.T) {
 }
 
 func TestSanitizeName(t *testing.T) {
-	var cases = []struct {
+	cases := []struct {
 		intention   string
 		name        string
 		removeSlash bool
@@ -135,7 +135,7 @@ func TestSafeWrite(t *testing.T) {
 		content string
 	}
 
-	var cases = []struct {
+	cases := []struct {
 		intention string
 		args      args
 	}{
@@ -156,7 +156,7 @@ func TestSafeWrite(t *testing.T) {
 }
 
 func TestIsNotExist(t *testing.T) {
-	var cases = []struct {
+	cases := []struct {
 		intention string
 		input     error
 		want      bool
@@ -193,7 +193,7 @@ func TestFindIndex(t *testing.T) {
 		value string
 	}
 
-	var cases = []struct {
+	cases := []struct {
 		intention string
 		args      args
 		want      int
@@ -236,7 +236,7 @@ func TestRemoveIndex(t *testing.T) {
 		index int
 	}
 
-	var cases = []struct {
+	cases := []struct {
 		intention string
 		args      args
 		want      []string

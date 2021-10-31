@@ -8,12 +8,10 @@ import (
 	"github.com/golang/mock/gomock"
 )
 
-var (
-	publicPath = "http://localhost"
-)
+var publicPath = "http://localhost"
 
 func TestCanHaveThumbnail(t *testing.T) {
-	var cases = []struct {
+	cases := []struct {
 		intention string
 		instance  App
 		input     provider.StorageItem
@@ -61,7 +59,7 @@ func TestCanHaveThumbnail(t *testing.T) {
 }
 
 func TestHasThumbnail(t *testing.T) {
-	var cases = []struct {
+	cases := []struct {
 		intention string
 		instance  App
 		input     provider.StorageItem
@@ -107,7 +105,7 @@ func TestHasThumbnail(t *testing.T) {
 }
 
 func TestGetThumbnailPath(t *testing.T) {
-	var cases = []struct {
+	cases := []struct {
 		intention string
 		input     provider.StorageItem
 		want      string

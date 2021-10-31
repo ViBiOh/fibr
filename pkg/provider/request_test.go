@@ -5,7 +5,7 @@ import (
 )
 
 func TestGetFilepath(t *testing.T) {
-	var cases = []struct {
+	cases := []struct {
 		intention string
 		request   Request
 		input     string
@@ -71,7 +71,7 @@ func TestLayoutPath(t *testing.T) {
 		path string
 	}
 
-	var cases = []struct {
+	cases := []struct {
 		intention string
 		instance  Request
 		args      args
@@ -109,7 +109,7 @@ func TestLayoutPath(t *testing.T) {
 }
 
 func TestTitle(t *testing.T) {
-	var cases = []struct {
+	cases := []struct {
 		intention string
 		instance  Request
 		want      string
@@ -149,7 +149,7 @@ func TestTitle(t *testing.T) {
 }
 
 func TestDescription(t *testing.T) {
-	var cases = []struct {
+	cases := []struct {
 		intention string
 		instance  Request
 		want      string

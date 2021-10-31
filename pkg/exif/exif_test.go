@@ -9,7 +9,7 @@ import (
 )
 
 func TestFlags(t *testing.T) {
-	var cases = []struct {
+	cases := []struct {
 		intention string
 		want      string
 	}{
@@ -38,7 +38,7 @@ func TestFlags(t *testing.T) {
 }
 
 func TestEnabled(t *testing.T) {
-	var cases = []struct {
+	cases := []struct {
 		intention string
 		instance  App
 		want      bool

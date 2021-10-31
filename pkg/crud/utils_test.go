@@ -24,7 +24,7 @@ func TestGetPreviousAndNext(t *testing.T) {
 		files []provider.StorageItem
 	}
 
-	var cases = []struct {
+	cases := []struct {
 		intention    string
 		args         args
 		wantPrevious *provider.StorageItem
@@ -97,7 +97,7 @@ func TestCheckFormName(t *testing.T) {
 	validRequest := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(validValues.Encode()))
 	validRequest.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
-	var cases = []struct {
+	cases := []struct {
 		intention string
 		args      args
 		want      string
@@ -161,7 +161,7 @@ func TestCheckFolderName(t *testing.T) {
 		request    provider.Request
 	}
 
-	var cases = []struct {
+	cases := []struct {
 		intention string
 		args      args
 		want      string
@@ -247,7 +247,7 @@ func TestGetPathParts(t *testing.T) {
 		uri string
 	}
 
-	var cases = []struct {
+	cases := []struct {
 		intention string
 		args      args
 		want      []string

@@ -50,7 +50,7 @@ func TestParseShare(t *testing.T) {
 		authorizationHeader string
 	}
 
-	var cases = []struct {
+	cases := []struct {
 		intention string
 		instance  App
 		args      args
@@ -183,7 +183,7 @@ func TestConvertAuthenticationError(t *testing.T) {
 		err error
 	}
 
-	var cases = []struct {
+	cases := []struct {
 		intention string
 		args      args
 		want      error
@@ -237,7 +237,7 @@ func TestParseRequest(t *testing.T) {
 		r *http.Request
 	}
 
-	var cases = []struct {
+	cases := []struct {
 		intention string
 		instance  App
 		args      args

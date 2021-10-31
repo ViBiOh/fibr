@@ -14,7 +14,7 @@ func TestCheckPathname(t *testing.T) {
 		pathname string
 	}
 
-	var cases = []struct {
+	cases := []struct {
 		intention string
 		args      args
 		want      error
@@ -49,7 +49,7 @@ func TestGetFullPath(t *testing.T) {
 		pathname string
 	}
 
-	var cases = []struct {
+	cases := []struct {
 		intention string
 		instance  App
 		args      args
@@ -81,7 +81,7 @@ func TestGetRelativePath(t *testing.T) {
 		pathname string
 	}
 
-	var cases = []struct {
+	cases := []struct {
 		intention string
 		instance  App
 		args      args
@@ -113,7 +113,7 @@ func TestGetMode(t *testing.T) {
 		name string
 	}
 
-	var cases = []struct {
+	cases := []struct {
 		intention string
 		args      args
 		want      os.FileMode
@@ -123,14 +123,14 @@ func TestGetMode(t *testing.T) {
 			args{
 				name: "/photos/",
 			},
-			0700,
+			0o700,
 		},
 		{
 			"file",
 			args{
 				name: "/photo.png",
 			},
-			0600,
+			0o600,
 		},
 	}
 
@@ -154,7 +154,7 @@ func TestConvertToItem(t *testing.T) {
 		t.Error(err)
 	}
 
-	var cases = []struct {
+	cases := []struct {
 		intention string
 		args      args
 		want      provider.StorageItem
@@ -189,7 +189,7 @@ func TestConvertError(t *testing.T) {
 		err error
 	}
 
-	var cases = []struct {
+	cases := []struct {
 		intention string
 		args      args
 		want      error

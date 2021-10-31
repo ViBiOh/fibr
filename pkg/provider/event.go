@@ -34,9 +34,7 @@ const (
 	AccessEvent
 )
 
-var (
-	eventTypeValues = []string{"upload", "create", "rename", "delete", "start", "access"}
-)
+var eventTypeValues = []string{"upload", "create", "rename", "delete", "start", "access"}
 
 // ParseEventType parse raw string into an EventType
 func ParseEventType(value string) (EventType, error) {

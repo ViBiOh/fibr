@@ -11,7 +11,7 @@ func TestConvertDegreeMinuteSecondToDecimal(t *testing.T) {
 		location string
 	}
 
-	var cases = []struct {
+	cases := []struct {
 		intention string
 		args      args
 		want      string

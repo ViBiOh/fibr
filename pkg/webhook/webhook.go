@@ -13,9 +13,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-var (
-	webhookFilename = path.Join(provider.MetadataDirectoryName, "webhooks.json")
-)
+var webhookFilename = path.Join(provider.MetadataDirectoryName, "webhooks.json")
 
 // App of package
 type App struct {

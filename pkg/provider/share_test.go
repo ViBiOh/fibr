@@ -15,7 +15,7 @@ func TestCheckPassword(t *testing.T) {
 		t.Errorf("unable to create bcrypted password: %s", err)
 	}
 
-	var cases = []struct {
+	cases := []struct {
 		intention string
 		share     Share
 		header    string

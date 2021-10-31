@@ -34,10 +34,10 @@ func (a App) getWritableFile(filename string) (io.WriteCloser, error) {
 
 func getMode(name string) os.FileMode {
 	if strings.HasSuffix(name, "/") {
-		return 0700
+		return 0o700
 	}
 
-	return 0600
+	return 0o600
 }
 
 func convertToItem(pathname string, info os.FileInfo) provider.StorageItem {

@@ -3,7 +3,7 @@ package provider
 import "testing"
 
 func TestExtension(t *testing.T) {
-	var cases = []struct {
+	cases := []struct {
 		intention string
 		input     StorageItem
 		want      string
@@ -27,7 +27,7 @@ func TestExtension(t *testing.T) {
 }
 
 func TestMime(t *testing.T) {
-	var cases = []struct {
+	cases := []struct {
 		intention string
 		input     StorageItem
 		want      string
@@ -58,7 +58,7 @@ func TestMime(t *testing.T) {
 }
 
 func TestIsPdf(t *testing.T) {
-	var cases = []struct {
+	cases := []struct {
 		intention string
 		input     StorageItem
 		want      bool
@@ -89,7 +89,7 @@ func TestIsPdf(t *testing.T) {
 }
 
 func TestIsImage(t *testing.T) {
-	var cases = []struct {
+	cases := []struct {
 		intention string
 		input     StorageItem
 		want      bool
@@ -120,7 +120,7 @@ func TestIsImage(t *testing.T) {
 }
 
 func TestIsVideo(t *testing.T) {
-	var cases = []struct {
+	cases := []struct {
 		intention string
 		input     StorageItem
 		want      bool
@@ -151,7 +151,7 @@ func TestIsVideo(t *testing.T) {
 }
 
 func TestDir(t *testing.T) {
-	var cases = []struct {
+	cases := []struct {
 		intention string
 		instance  StorageItem
 		want      string

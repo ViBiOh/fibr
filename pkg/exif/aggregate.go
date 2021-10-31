@@ -83,7 +83,6 @@ func (a App) computeAndSaveAggregate(dir provider.StorageItem) error {
 
 		return nil
 	})
-
 	if err != nil {
 		return fmt.Errorf("unable to aggregate: %s", err)
 	}
