@@ -81,7 +81,7 @@ func New(config Config, storage provider.Storage, prometheusRegisterer prometheu
 
 	imageReq := request.New().WithClient(thumbnailClient).Post(*config.imageURL).BasicAuth(strings.TrimSpace(*config.imageUser), *config.imagePass)
 	if !imageReq.IsZero() {
-		imageReq = imageReq.Path(fmt.Sprintf("/crop?width=%d&height=%d&stripmeta=true&noprofile=true&quality=80&type=jpeg", Width, Height))
+		imageReq = imageReq.Path(fmt.Sprintf("/crop?width=%d&height=%d&stripmeta=true&noprofile=true&quality=80&type=webp", Width, Height))
 	}
 
 	return App{

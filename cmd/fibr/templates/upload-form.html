@@ -329,6 +329,11 @@
       if (shareLabel) {
         shareLabel.innerHTML = 'Create a public read-only share on each file for';
       }
+
+      const form = document.getElementById('upload-form');
+      if (form) {
+        form.addEventListener('submit', upload)
+      }
     });
   </script>
 
@@ -372,7 +377,6 @@
         method="post"
         enctype="multipart/form-data"
         action="#"
-        onSubmit="return upload(event)"
       >
         <input type="hidden" name="method" value="POST" />
 

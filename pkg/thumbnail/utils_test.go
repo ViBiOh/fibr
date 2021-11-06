@@ -115,7 +115,7 @@ func TestGetThumbnailPath(t *testing.T) {
 			provider.StorageItem{
 				Pathname: "/path/to/file.png",
 			},
-			".fibr/path/to/file.jpg",
+			".fibr/path/to/file.webp",
 		},
 		{
 			"directory",

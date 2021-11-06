@@ -29,7 +29,7 @@ func (a App) GetChunk(filename string) (provider.StorageItem, error) {
 }
 
 func getThumbnailPath(item provider.StorageItem) string {
-	return getThumbnailExtension(item, "jpg")
+	return getThumbnailExtension(item, "webp")
 }
 
 func getStreamPath(item provider.StorageItem) string {

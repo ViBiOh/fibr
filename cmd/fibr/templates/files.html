@@ -81,7 +81,7 @@
             }
 
             const img = new Image();
-            img.src = `data:image/jpeg;base64,${thumbnails[id]}`;
+            img.src = `data:image/webp;base64,${thumbnails[id]}`;
             img.alt = picture.dataset.alt;
 
             replaceContent(picture, img);
