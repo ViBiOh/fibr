@@ -123,6 +123,10 @@ func NewStartEvent(item StorageItem) Event {
 func NewAccessEvent(item StorageItem, r *http.Request) Event {
 	metadata := make(map[string]string)
 	for key, values := range r.Header {
+		if strings.EqualFold(key, "Authorization") {
+			continue
+		}
+
 		metadata[key] = strings.Join(values, ", ")
 	}
 
