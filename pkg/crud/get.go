@@ -48,7 +48,7 @@ func (a App) getWithMessage(w http.ResponseWriter, r *http.Request, request prov
 		return "", 0, nil, nil
 	}
 
-	go a.notify(provider.NewAccessEvent(item))
+	go a.notify(provider.NewAccessEvent(item, r))
 
 	if !item.IsDir {
 		if query.GetBool(r, "browser") {

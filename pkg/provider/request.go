@@ -11,6 +11,12 @@ var (
 
 	// DefaultDisplay format
 	DefaultDisplay = "grid"
+
+	ipHeaders = []string{
+		"Cf-Connecting-Ip",
+		"X-Forwarded-For",
+		"X-Real-Ip",
+	}
 )
 
 // Preferences holds preferences of the user
@@ -124,4 +130,15 @@ func SetPrefsCookie(w http.ResponseWriter, request Request) {
 	})
 
 	w.Header().Add("content-language", "en")
+}
+
+// GetIP retrieves request original IP
+func GetIP(r *http.Request) string {
+	for _, header := range ipHeaders {
+		if ip := r.Header.Get(header); len(ip) != 0 {
+			return ip
+		}
+	}
+
+	return r.RemoteAddr
 }

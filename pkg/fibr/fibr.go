@@ -132,13 +132,5 @@ func (a App) parseRequest(r *http.Request) (provider.Request, error) {
 }
 
 func logRequest(r *http.Request) {
-	ip := r.Header.Get("X-Forwarded-For")
-	if len(ip) == 0 {
-		ip = r.Header.Get("X-Real-Ip")
-	}
-	if len(ip) == 0 {
-		ip = r.RemoteAddr
-	}
-
-	logger.Warn("Unauthenticated request: %s %s from %s", r.Method, r.URL.String(), ip)
+	logger.Warn("Unauthenticated request: %s %s from %s", r.Method, r.URL.String(), provider.GetIP(r))
 }

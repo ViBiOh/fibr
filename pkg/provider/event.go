@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -79,9 +80,10 @@ func (et *EventType) UnmarshalJSON(b []byte) error {
 
 // Event describes an event on fibr
 type Event struct {
-	New  *StorageItem `json:"new,omitempty"`
-	Item StorageItem  `json:"item"`
-	Type EventType    `json:"type"`
+	New      *StorageItem      `json:"new,omitempty"`
+	Metadata map[string]string `json:"metadata"`
+	Item     StorageItem       `json:"item"`
+	Type     EventType         `json:"type"`
 }
 
 // NewUploadEvent creates a new upload event
@@ -118,10 +120,19 @@ func NewStartEvent(item StorageItem) Event {
 }
 
 // NewAccessEvent creates a new access event
-func NewAccessEvent(item StorageItem) Event {
+func NewAccessEvent(item StorageItem, r *http.Request) Event {
+	metadata := make(map[string]string)
+	for key, values := range r.Header {
+		metadata[key] = strings.Join(values, ", ")
+	}
+
+	metadata["Method"] = r.Method
+	metadata["URL"] = r.URL.String()
+
 	return Event{
-		Type: AccessEvent,
-		Item: item,
+		Type:     AccessEvent,
+		Item:     item,
+		Metadata: metadata,
 	}
 }
 
@@ -168,7 +179,7 @@ func (e EventBus) Push(event Event) error {
 	select {
 	case <-e.done:
 		e.increaseMetric(event, "refused")
-		return errors.New("event bus is closed")
+		return errors.New("done signal is received")
 	case e.bus <- event:
 		e.increaseMetric(event, "push")
 		return nil

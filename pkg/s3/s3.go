@@ -20,9 +20,9 @@ import (
 
 // App of package
 type App struct {
+	client   *minio.Client
 	ignoreFn func(provider.StorageItem) bool
 	bucket   string
-	client   *minio.Client
 }
 
 // Config of package

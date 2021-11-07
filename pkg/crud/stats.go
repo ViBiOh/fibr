@@ -10,8 +10,8 @@ import (
 )
 
 type entry struct {
-	Key   string
 	Value interface{}
+	Key   string
 }
 
 // Stats render stats of the current
