@@ -40,31 +40,24 @@ func (a App) generate(item provider.StorageItem) error {
 		if err != nil {
 			return fmt.Errorf("unable to request video thumbnailer: %s", err)
 		}
-
-		file = resp.Body
-	}
-
-	if file == nil {
+	} else {
 		file, err = a.storageApp.ReaderFrom(item.Pathname) // will be closed by `.Send`
 		if err != nil {
 			return err
 		}
-	}
 
-	a.increaseMetric("image", "requested")
+		a.increaseMetric("image", "requested")
 
-	r, err := a.imageRequest.Build(ctx, file)
-	if err != nil {
-		return fmt.Errorf("unable to create request: %s", err)
-	}
+		r, err := a.imageRequest.Build(ctx, file)
+		if err != nil {
+			return fmt.Errorf("unable to create request: %s", err)
+		}
 
-	if !item.IsVideo() {
 		r.ContentLength = item.Size
-	}
-
-	resp, err = request.DoWithClient(thumbnailClient, r)
-	if err != nil {
-		return err
+		resp, err = request.DoWithClient(thumbnailClient, r)
+		if err != nil {
+			return fmt.Errorf("unable to request image thumbnailer: %s", err)
+		}
 	}
 
 	thumbnailPath := getThumbnailPath(item)
