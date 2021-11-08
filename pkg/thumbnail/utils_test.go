@@ -8,8 +8,6 @@ import (
 	"github.com/golang/mock/gomock"
 )
 
-var publicPath = "http://localhost"
-
 func TestCanHaveThumbnail(t *testing.T) {
 	cases := []struct {
 		intention string

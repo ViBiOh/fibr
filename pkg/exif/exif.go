@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/flags"
@@ -21,13 +20,6 @@ const (
 )
 
 var (
-	exasClient = &http.Client{
-		Timeout: 2 * time.Minute,
-		CheckRedirect: func(*http.Request, []*http.Request) error {
-			return http.ErrUseLastResponse
-		},
-	}
-
 	metadataFilenames = []string{
 		exifMetadataFilename,
 		geocodeMetadataFilename,
