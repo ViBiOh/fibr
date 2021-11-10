@@ -55,7 +55,7 @@ init:
 .PHONY: format
 format:
 	goimports -w $(shell find . -name "*.go")
-	gofumpt -s -w $(shell find . -name "*.go")
+	gofumpt -w $(shell find . -name "*.go")
 
 ## style: Check lint, code styling rules. e.g. pylint, phpcs, eslint, style (java) etc ...
 .PHONY: style
