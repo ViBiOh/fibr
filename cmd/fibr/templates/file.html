@@ -9,16 +9,7 @@
       grid-template-rows: auto 1fr;
     }
 
-    .image {
-      background-image: url({{ .File.Name }});
-      background-position: center;
-      background-repeat: no-repeat;
-      background-size: contain;
-      height: 100%;
-      width: 100%;
-    }
-
-    video, object {
+    img, video, object {
       border: 0;
       height: 100%;
       image-orientation: from-image;
@@ -28,7 +19,7 @@
       width: 100%;
     }
 
-    video {
+    img, video {
       object-position: center center;
     }
   </style>
@@ -42,7 +33,7 @@
     </video>
   {{ else }}
     {{ if .File.IsImage }}
-      <div id="content" class="image" title="{{ .File.Name }}"></div>
+      <img id="content" src="{{ .File.Name }}" alt="{{ .File.Name }}" />
     {{ else }}
       <object id="content" data="{{ .File.Name }}" type="{{ .File.Mime }}"></object>
     {{ end }}
