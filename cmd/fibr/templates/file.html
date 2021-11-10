@@ -9,14 +9,19 @@
       grid-template-rows: auto 1fr;
     }
 
+    #content {
+      display: flex;
+      overflow: auto;
+    }
+
     img, video, object {
       border: 0;
-      height: 100%;
       image-orientation: from-image;
       margin: 0 auto;
+      max-height: 100%;
+      max-width: 100%;
       object-fit: contain;
       object-position: top left;
-      width: 100%;
     }
 
     img, video {
@@ -24,20 +29,22 @@
     }
   </style>
 
-  {{ if .File.IsVideo }}
-    <video id="content" controls>
-      {{ if .HasStream }}
-        <source src="{{ .File.Name }}?stream" type="application/x-mpegURL"></source>
-      {{ end }}
-      <source src="{{ .File.Name }}" type="{{ .File.Mime }}"></source>
-    </video>
-  {{ else }}
-    {{ if .File.IsImage }}
-      <img id="content" src="{{ .File.Name }}" alt="{{ .File.Name }}" />
+  <div id="content">
+    {{ if .File.IsVideo }}
+      <video controls>
+        {{ if .HasStream }}
+          <source src="{{ .File.Name }}?stream" type="application/x-mpegURL"></source>
+        {{ end }}
+        <source src="{{ .File.Name }}" type="{{ .File.Mime }}"></source>
+      </video>
     {{ else }}
-      <object id="content" data="{{ .File.Name }}" type="{{ .File.Mime }}"></object>
+      {{ if .File.IsImage }}
+        <img src="{{ .File.Name }}" alt="{{ .File.Name }}" />
+      {{ else }}
+        <object data="{{ .File.Name }}" type="{{ .File.Mime }}"></object>
+      {{ end }}
     {{ end }}
-  {{ end }}
+  </div>
 
   {{ template "footer" . }}
 {{ end }}
