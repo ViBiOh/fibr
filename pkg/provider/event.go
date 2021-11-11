@@ -61,7 +61,7 @@ func (et EventType) MarshalJSON() ([]byte, error) {
 	return buffer.Bytes(), nil
 }
 
-// UnmarshalJSON unmarshal JSOn
+// UnmarshalJSON unmarshal JSON
 func (et *EventType) UnmarshalJSON(b []byte) error {
 	var strValue string
 	err := json.Unmarshal(b, &strValue)
