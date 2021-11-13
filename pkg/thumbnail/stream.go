@@ -2,6 +2,7 @@ package thumbnail
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -11,6 +12,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
+	"github.com/streadway/amqp"
 )
 
 // HasStream checks if given item has a streamable version
@@ -53,7 +55,29 @@ func (a App) shouldGenerateStream(ctx context.Context, item provider.StorageItem
 func (a App) generateStream(ctx context.Context, item provider.StorageItem) error {
 	a.increaseMetric("video", "stream")
 
-	resp, err := a.videoRequest.Method(http.MethodPut).Path(fmt.Sprintf("%s?output=%s", item.Pathname, url.QueryEscape(path.Dir(getStreamPath(item))))).Send(ctx, nil)
+	input := item.Pathname
+	output := path.Dir(getStreamPath(item))
+
+	payload, err := json.Marshal(map[string]string{
+		"input":  item.Pathname,
+		"output": path.Dir(getStreamPath(item)),
+	})
+	if err != nil {
+		return fmt.Errorf("unable to marshal stream request: %s", err)
+	}
+
+	if a.amqpClient != nil {
+		if err := a.amqpClient.Publish(amqp.Publishing{
+			ContentType: "application/json",
+			Body:        payload,
+		}, a.amqpExchange, a.amqpStreamRoutingKey); err != nil {
+			return fmt.Errorf("unable to publish amqp message: %s", err)
+		}
+
+		return nil
+	}
+
+	resp, err := a.videoRequest.Method(http.MethodPut).Path(fmt.Sprintf("%s?output=%s", input, url.QueryEscape(output))).Send(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("unable to send request: %s", err)
 	}

@@ -18,6 +18,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/fibr/pkg/webhook"
 	"github.com/ViBiOh/httputils/v4/pkg/alcotest"
+	"github.com/ViBiOh/httputils/v4/pkg/amqp"
 	"github.com/ViBiOh/httputils/v4/pkg/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/health"
 	"github.com/ViBiOh/httputils/v4/pkg/httputils"
@@ -64,6 +65,8 @@ func main() {
 	thumbnailConfig := thumbnail.Flags(fs, "thumbnail")
 	exifConfig := exif.Flags(fs, "exif")
 
+	amqpConfig := amqp.Flags(fs, "amqp")
+
 	disableAuth := flags.New("", "auth", "NoAuth").Default(false, nil).Label("Disable basic authentification").ToBool(fs)
 
 	logger.Fatal(fs.Parse(os.Args[1:]))
@@ -97,7 +100,12 @@ func main() {
 	eventBus, err := provider.NewEventBus(10, prometheusRegisterer)
 	logger.Fatal(err)
 
-	thumbnailApp, err := thumbnail.New(thumbnailConfig, storageProvider, prometheusRegisterer)
+	amqpClient, err := amqp.New(amqpConfig, prometheusApp.Registerer())
+	if err != nil {
+		logger.Error("unable to create amqp client: %s", err)
+	}
+
+	thumbnailApp, err := thumbnail.New(thumbnailConfig, storageProvider, prometheusRegisterer, amqpClient)
 	logger.Fatal(err)
 
 	exifApp, err := exif.New(exifConfig, storageProvider, prometheusRegisterer)

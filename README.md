@@ -196,6 +196,8 @@ Be careful when using the CLI, if someone list the processes on the system, they
 Usage of fibr:
   -address string
         [server] Listen address {FIBR_ADDRESS}
+  -amqpURI string
+        [amqp] Address in the form amqps?://<user>:<password>@<address>:<port>/<vhost> {FIBR_AMQP_URI}
   -authProfiles string
         [auth] Users profiles in the form 'id:profile1|profile2,id2:profile1' {FIBR_AUTH_PROFILES}
   -authUsers string
@@ -294,8 +296,12 @@ Usage of fibr:
         [share] Enable sharing feature {FIBR_SHARE} (default true)
   -shutdownTimeout string
         [server] Shutdown Timeout {FIBR_SHUTDOWN_TIMEOUT} (default "10s")
+  -thumbnailAmqpExchange string
+        [thumbnail] AMQP Exchange Name {FIBR_THUMBNAIL_AMQP_EXCHANGE} (default "fibr")
+  -thumbnailAmqpStreamRoutingKey string
+        [thumbnail] AMQP Routing Key for stream {FIBR_THUMBNAIL_AMQP_STREAM_ROUTING_KEY} (default "stream")
   -thumbnailDirectAccess
-        [thumbnail] Use Vith with direct access to filesystem (no large file upload to it, send a GET request, Basic Auth recommended) {FIBR_THUMBNAIL_DIRECT_ACCESS}
+        [thumbnail] Use Vith with direct access to filesystem (no large file upload to it, emit an AMQP message or send a GET request, Basic Auth recommended) {FIBR_THUMBNAIL_DIRECT_ACCESS}
   -thumbnailImagePassword string
         [thumbnail] Imaginary Basic Auth Password {FIBR_THUMBNAIL_IMAGE_PASSWORD}
   -thumbnailImageURL string
