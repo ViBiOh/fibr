@@ -52,13 +52,8 @@ var (
 		},
 	}
 
-	slowClient = &http.Client{
-		Timeout: 2 * time.Minute,
-		CheckRedirect: func(*http.Request, []*http.Request) error {
-			return http.ErrUseLastResponse
-		},
-	}
-
+	// SlowClient allows 2 minutes timeout
+	SlowClient   = request.CreateClient(2*time.Minute, request.NoRedirection)
 	errNotExists = errors.New("not exists")
 )
 
@@ -198,5 +193,5 @@ func SendLargeFile(ctx context.Context, storageApp Storage, item StorageItem, re
 
 	r.ContentLength = item.Size
 
-	return request.DoWithClient(slowClient, r)
+	return request.DoWithClient(SlowClient, r)
 }

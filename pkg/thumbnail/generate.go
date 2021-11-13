@@ -17,13 +17,6 @@ const (
 	defaultTimeout = time.Minute * 2
 )
 
-var thumbnailClient = &http.Client{
-	Timeout: 2 * time.Minute,
-	CheckRedirect: func(*http.Request, []*http.Request) error {
-		return http.ErrUseLastResponse
-	},
-}
-
 func (a App) generate(item provider.StorageItem) error {
 	var (
 		file io.ReadCloser
@@ -54,7 +47,7 @@ func (a App) generate(item provider.StorageItem) error {
 		}
 
 		r.ContentLength = item.Size
-		resp, err = request.DoWithClient(thumbnailClient, r)
+		resp, err = request.DoWithClient(provider.SlowClient, r)
 		if err != nil {
 			return fmt.Errorf("unable to request image thumbnailer: %s", err)
 		}

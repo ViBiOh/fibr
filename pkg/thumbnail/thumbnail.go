@@ -79,14 +79,14 @@ func New(config Config, storage provider.Storage, prometheusRegisterer prometheu
 		return App{}, err
 	}
 
-	imageReq := request.New().WithClient(thumbnailClient).Post(*config.imageURL).BasicAuth(strings.TrimSpace(*config.imageUser), *config.imagePass)
+	imageReq := request.New().Post(*config.imageURL).BasicAuth(strings.TrimSpace(*config.imageUser), *config.imagePass)
 	if !imageReq.IsZero() {
 		imageReq = imageReq.Path(fmt.Sprintf("/crop?width=%d&height=%d&stripmeta=true&noprofile=true&quality=80&type=webp", Width, Height))
 	}
 
 	return App{
 		imageRequest: imageReq,
-		videoRequest: request.New().WithClient(thumbnailClient).URL(*config.videoURL).BasicAuth(*config.videoUser, *config.videoPass),
+		videoRequest: request.New().URL(*config.videoURL).BasicAuth(*config.videoUser, *config.videoPass),
 
 		maxSize:      *config.maxSize,
 		minBitrate:   *config.minBitrate,
