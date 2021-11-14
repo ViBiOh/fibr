@@ -19,6 +19,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/webhook"
 	"github.com/ViBiOh/httputils/v4/pkg/alcotest"
 	"github.com/ViBiOh/httputils/v4/pkg/amqp"
+	"github.com/ViBiOh/httputils/v4/pkg/amqphandler"
 	"github.com/ViBiOh/httputils/v4/pkg/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/health"
 	"github.com/ViBiOh/httputils/v4/pkg/httputils"
@@ -66,6 +67,7 @@ func main() {
 	exifConfig := exif.Flags(fs, "exif")
 
 	amqpConfig := amqp.Flags(fs, "amqp")
+	amqphandlerConfig := amqphandler.Flags(fs, "amqp", flags.NewOverride("Exchange", "fibr"), flags.NewOverride("Queue", "fibr"), flags.NewOverride("RoutingKey", "fibr"))
 
 	disableAuth := flags.New("", "auth", "NoAuth").Default(false, nil).Label("Disable basic authentification").ToBool(fs)
 
@@ -110,13 +112,16 @@ func main() {
 	thumbnailApp, err := thumbnail.New(thumbnailConfig, storageProvider, prometheusRegisterer, amqpClient)
 	logger.Fatal(err)
 
-	exifApp, err := exif.New(exifConfig, storageProvider, prometheusRegisterer)
+	exifApp, err := exif.New(exifConfig, storageProvider, prometheusRegisterer, amqpClient)
 	logger.Fatal(err)
 
 	webhookApp, err := webhook.New(webhookConfig, storageProvider, prometheusRegisterer)
 	logger.Fatal(err)
 
 	rendererApp, err := renderer.New(rendererConfig, content, fibr.FuncMap(thumbnailApp))
+	logger.Fatal(err)
+
+	amqphandlerApp, err := amqphandler.New(amqphandlerConfig, amqpClient, exifApp.AmqpHandler)
 	logger.Fatal(err)
 
 	shareApp := share.New(shareConfig, storageProvider)
@@ -131,6 +136,7 @@ func main() {
 	fibrApp := fibr.New(&crudApp, rendererApp, shareApp, webhookApp, middlewareApp)
 	handler := rendererApp.Handler(fibrApp.TemplateFunc)
 
+	go amqphandlerApp.Start(healthApp.Done())
 	go webhookApp.Start(healthApp.Done())
 	go shareApp.Start(healthApp.Done())
 	go crudApp.Start(healthApp.Done())
@@ -140,5 +146,5 @@ func main() {
 	go appServer.Start("http", healthApp.End(), httputils.Handler(handler, healthApp, recoverer.Middleware, prometheusApp.Middleware, owasp.New(owaspConfig).Middleware))
 
 	healthApp.WaitForTermination(appServer.Done())
-	server.GracefulWait(appServer.Done(), promServer.Done())
+	server.GracefulWait(appServer.Done(), promServer.Done(), amqphandlerApp.Done())
 }

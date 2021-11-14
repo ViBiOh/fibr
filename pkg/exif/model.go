@@ -3,6 +3,8 @@ package exif
 import (
 	"strings"
 	"time"
+
+	"github.com/ViBiOh/exas/pkg/model"
 )
 
 type exif struct {
@@ -26,7 +28,7 @@ func newAggregate() locationAggregate {
 	return make(map[string]map[string]int64)
 }
 
-func (a *locationAggregate) ingest(geocoding geocode) {
+func (a *locationAggregate) ingest(geocoding model.Geocode) {
 	for _, level := range levels {
 		a.inc(level, geocoding.Address[level])
 	}

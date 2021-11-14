@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/ViBiOh/exas/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
@@ -43,8 +44,8 @@ func (a App) hasMetadata(item provider.StorageItem, suffix string) bool {
 	return err == nil
 }
 
-func (a App) loadExif(item provider.StorageItem) (exif, error) {
-	var data exif
+func (a App) loadExif(item provider.StorageItem) (model.Exif, error) {
+	var data model.Exif
 	return data, a.loadMetadata(item, exifMetadataFilename, &data)
 }
 

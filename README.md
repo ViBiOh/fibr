@@ -196,6 +196,16 @@ Be careful when using the CLI, if someone list the processes on the system, they
 Usage of fibr:
   -address string
         [server] Listen address {FIBR_ADDRESS}
+  -amqpExchange string
+        [amqp] Exchange name {FIBR_AMQP_EXCHANGE} (default "fibr")
+  -amqpMaxRetry uint
+        [amqp] Max send retries {FIBR_AMQP_MAX_RETRY} (default 3)
+  -amqpQueue string
+        [amqp] Queue name {FIBR_AMQP_QUEUE} (default "fibr")
+  -amqpRetryInterval string
+        [amqp] Interval duration when send fails {FIBR_AMQP_RETRY_INTERVAL} (default "1h")
+  -amqpRoutingKey string
+        [amqp] RoutingKey name {FIBR_AMQP_ROUTING_KEY} (default "fibr")
   -amqpURI string
         [amqp] Address in the form amqps?://<user>:<password>@<address>:<port>/<vhost> {FIBR_AMQP_URI}
   -authProfiles string
@@ -208,6 +218,10 @@ Usage of fibr:
         [owasp] Content-Security-Policy {FIBR_CSP} (default "default-src 'self'; base-uri 'self'; script-src 'nonce'; style-src 'nonce'; img-src 'self' data:")
   -exifAggregateOnStart
         [exif] Aggregate EXIF data per folder on start {FIBR_EXIF_AGGREGATE_ON_START}
+  -exifAmqpExchange string
+        [exif] AMQP Exchange Name {FIBR_EXIF_AMQP_EXCHANGE} (default "fibr")
+  -exifAmqpExifRoutingKey string
+        [exif] AMQP Routing Key for stream {FIBR_EXIF_AMQP_EXIF_ROUTING_KEY} (default "exif")
   -exifDateOnStart
         [exif] Change file date from EXIF date on start {FIBR_EXIF_DATE_ON_START}
   -exifDirectAccess

@@ -15,7 +15,7 @@ func TestFlags(t *testing.T) {
 	}{
 		{
 			"simple",
-			"Usage of simple:\n  -aggregateOnStart\n    \t[exif] Aggregate EXIF data per folder on start {SIMPLE_AGGREGATE_ON_START}\n  -dateOnStart\n    \t[exif] Change file date from EXIF date on start {SIMPLE_DATE_ON_START}\n  -directAccess\n    \t[exif] Use Exas with direct access to filesystem (no large file upload to it, send a GET request) {SIMPLE_DIRECT_ACCESS}\n  -maxSize int\n    \t[exif] Max file size (in bytes) for extracting exif (0 to no limit) {SIMPLE_MAX_SIZE} (default 209715200)\n  -password string\n    \t[exif] Exif Tool URL Basic Password {SIMPLE_PASSWORD}\n  -uRL string\n    \t[exif] Exif Tool URL (exas) {SIMPLE_URL} (default \"http://exas:1080\")\n  -user string\n    \t[exif] Exif Tool URL Basic User {SIMPLE_USER}\n",
+			"Usage of simple:\n  -aggregateOnStart\n    \t[exif] Aggregate EXIF data per folder on start {SIMPLE_AGGREGATE_ON_START}\n  -amqpExchange string\n    \t[exif] AMQP Exchange Name {SIMPLE_AMQP_EXCHANGE} (default \"fibr\")\n  -amqpExifRoutingKey string\n    \t[exif] AMQP Routing Key for stream {SIMPLE_AMQP_EXIF_ROUTING_KEY} (default \"exif\")\n  -dateOnStart\n    \t[exif] Change file date from EXIF date on start {SIMPLE_DATE_ON_START}\n  -directAccess\n    \t[exif] Use Exas with direct access to filesystem (no large file upload to it, send a GET request) {SIMPLE_DIRECT_ACCESS}\n  -maxSize int\n    \t[exif] Max file size (in bytes) for extracting exif (0 to no limit) {SIMPLE_MAX_SIZE} (default 209715200)\n  -password string\n    \t[exif] Exif Tool URL Basic Password {SIMPLE_PASSWORD}\n  -uRL string\n    \t[exif] Exif Tool URL (exas) {SIMPLE_URL} (default \"http://exas:1080\")\n  -user string\n    \t[exif] Exif Tool URL Basic User {SIMPLE_USER}\n",
 		},
 	}
 

@@ -3,6 +3,7 @@ package exif
 import (
 	"fmt"
 
+	"github.com/ViBiOh/exas/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 )
@@ -35,10 +36,14 @@ func (a App) EventConsumer(e provider.Event) {
 
 func (a App) handleStartEvent(item provider.StorageItem) error {
 	if a.CanHaveExif(item) {
-		var data exif
+		var data model.Exif
 		var err error
 
 		if !a.hasExif(item) {
+			if a.amqpClient != nil {
+				return a.askForExif(item)
+			}
+
 			if data, err = a.get(item); err != nil {
 				return fmt.Errorf("unable to get exif : %s", err)
 			}
@@ -63,6 +68,10 @@ func (a App) handleStartEvent(item provider.StorageItem) error {
 func (a App) handleUploadEvent(item provider.StorageItem) error {
 	if !a.CanHaveExif(item) {
 		return nil
+	}
+
+	if a.amqpClient != nil {
+		return a.askForExif(item)
 	}
 
 	data, err := a.get(item)

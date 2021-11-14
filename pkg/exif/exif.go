@@ -2,16 +2,20 @@ package exif
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"net/http"
 	"strings"
 
+	"github.com/ViBiOh/exas/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
+	amqpclient "github.com/ViBiOh/httputils/v4/pkg/amqp"
 	"github.com/ViBiOh/httputils/v4/pkg/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/httpjson"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/streadway/amqp"
 )
 
 const (
@@ -31,6 +35,10 @@ type App struct {
 
 	exifRequest request.Request
 
+	amqpClient         *amqpclient.Client
+	amqpExchange       string
+	amqpExifRoutingKey string
+
 	aggregateOnStart bool
 	dateOnStart      bool
 	directAccess     bool
@@ -42,6 +50,9 @@ type Config struct {
 	exifURL  *string
 	exifUser *string
 	exifPass *string
+
+	amqpExchange       *string
+	amqpExifRoutingKey *string
 
 	maxSize          *int
 	aggregateOnStart *bool
@@ -61,14 +72,26 @@ func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) Config 
 
 		dateOnStart:      flags.New(prefix, "exif", "DateOnStart").Default(false, nil).Label("Change file date from EXIF date on start").ToBool(fs),
 		aggregateOnStart: flags.New(prefix, "exif", "AggregateOnStart").Default(false, nil).Label("Aggregate EXIF data per folder on start").ToBool(fs),
+
+		amqpExchange:       flags.New(prefix, "exif", "AmqpExchange").Default("fibr", nil).Label("AMQP Exchange Name").ToString(fs),
+		amqpExifRoutingKey: flags.New(prefix, "exif", "AmqpExifRoutingKey").Default("exif", nil).Label("AMQP Routing Key for stream").ToString(fs),
 	}
 }
 
 // New creates new App from Config
-func New(config Config, storageApp provider.Storage, prometheusRegisterer prometheus.Registerer) (App, error) {
+func New(config Config, storageApp provider.Storage, prometheusRegisterer prometheus.Registerer, amqpClient *amqpclient.Client) (App, error) {
 	metrics, err := createMetrics(prometheusRegisterer, "exif", "aggregate")
 	if err != nil {
 		return App{}, err
+	}
+
+	var amqpExchange string
+	if amqpClient != nil {
+		amqpExchange = strings.TrimSpace(*config.amqpExchange)
+
+		if err := amqpClient.Publisher(amqpExchange, "direct", nil); err != nil {
+			return App{}, fmt.Errorf("unable to configure amqp: %s", err)
+		}
 	}
 
 	return App{
@@ -77,6 +100,9 @@ func New(config Config, storageApp provider.Storage, prometheusRegisterer promet
 		aggregateOnStart: *config.aggregateOnStart,
 		directAccess:     *config.directAccess,
 		maxSize:          int64(*config.maxSize),
+
+		amqpExchange:       amqpExchange,
+		amqpExifRoutingKey: strings.TrimSpace(*config.amqpExifRoutingKey),
 
 		storageApp: storageApp,
 
@@ -88,13 +114,13 @@ func (a App) enabled() bool {
 	return !a.exifRequest.IsZero()
 }
 
-func (a App) get(item provider.StorageItem) (exif, error) {
+func (a App) get(item provider.StorageItem) (model.Exif, error) {
 	exif, err := a.loadExif(item)
 	if err != nil {
 		return exif, fmt.Errorf("unable to load exif: %s", err)
 	}
 
-	if !exif.IsZero() {
+	if !exif.IsZero() || a.amqpClient != nil {
 		return exif, nil
 	}
 
@@ -130,4 +156,20 @@ func (a App) extractExif(ctx context.Context, item provider.StorageItem) (map[st
 	}
 
 	return data, nil
+}
+
+func (a App) askForExif(item provider.StorageItem) error {
+	payload, err := json.Marshal(item)
+	if err != nil {
+		return fmt.Errorf("unable to marshal stream amqp message: %s", err)
+	}
+
+	if err = a.amqpClient.Publish(amqp.Publishing{
+		ContentType: "application/json",
+		Body:        payload,
+	}, a.amqpExchange, a.amqpExifRoutingKey); err != nil {
+		return fmt.Errorf("unable to publish exif amqp message: %s", err)
+	}
+
+	return nil
 }
