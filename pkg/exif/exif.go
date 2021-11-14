@@ -88,26 +88,26 @@ func (a App) enabled() bool {
 	return !a.exifRequest.IsZero()
 }
 
-func (a App) get(item provider.StorageItem) (map[string]interface{}, error) {
-	exif, err := a.loadRawExif(item)
+func (a App) get(item provider.StorageItem) (exif, error) {
+	exif, err := a.loadExif(item)
 	if err != nil {
-		return nil, fmt.Errorf("unable to load exif: %s", err)
+		return exif, fmt.Errorf("unable to load exif: %s", err)
 	}
 
-	if len(exif) != 0 {
+	if !exif.IsZero() {
 		return exif, nil
 	}
 
 	data, err := a.extractExif(context.Background(), item)
 	if err != nil {
-		return data, fmt.Errorf("unable to extract exif: %s", err)
+		return exif, fmt.Errorf("unable to extract exif: %s", err)
 	}
 
 	if err := a.saveMetadata(item, exifMetadataFilename, data); err != nil {
-		return data, fmt.Errorf("unable to save exif: %s", err)
+		return exif, fmt.Errorf("unable to save exif: %s", err)
 	}
 
-	return data, nil
+	return a.loadExif(item)
 }
 
 func (a App) extractExif(ctx context.Context, item provider.StorageItem) (map[string]interface{}, error) {

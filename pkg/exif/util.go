@@ -43,11 +43,6 @@ func (a App) hasMetadata(item provider.StorageItem, suffix string) bool {
 	return err == nil
 }
 
-func (a App) loadRawExif(item provider.StorageItem) (map[string]interface{}, error) {
-	var data map[string]interface{}
-	return data, a.loadMetadata(item, exifMetadataFilename, &data)
-}
-
 func (a App) loadExif(item provider.StorageItem) (exif, error) {
 	var data exif
 	return data, a.loadMetadata(item, exifMetadataFilename, &data)
