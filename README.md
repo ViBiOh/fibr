@@ -212,8 +212,6 @@ Usage of fibr:
         [exif] Change file date from EXIF date on start {FIBR_EXIF_DATE_ON_START}
   -exifDirectAccess
         [exif] Use Exas with direct access to filesystem (no large file upload to it, send a GET request) {FIBR_EXIF_DIRECT_ACCESS}
-  -exifGeocodeURL string
-        [exif] Nominatim Geocode Service URL. This can leak GPS metadatas to a third-party (e.g. "https://nominatim.openstreetmap.org") {FIBR_EXIF_GEOCODE_URL}
   -exifMaxSize int
         [exif] Max file size (in bytes) for extracting exif (0 to no limit) {FIBR_EXIF_MAX_SIZE} (default 209715200)
   -exifPassword string

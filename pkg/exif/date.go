@@ -1,18 +1,22 @@
 package exif
 
 import (
-	"errors"
 	"fmt"
 	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/v4/pkg/logger"
 )
 
-func (a App) updateDate(item provider.StorageItem) error {
-	createDate, err := a.getDate(item)
-	if err != nil {
-		return fmt.Errorf("unable to get date: %s", err)
+func (a App) updateDate(item provider.StorageItem, data map[string]interface{}) error {
+	if data == nil {
+		var err error
+		if data, err = a.get(item); err != nil {
+			return fmt.Errorf("unable to get exif: %s", err)
+		}
 	}
+
+	createDate := getDate(data)
 
 	if createDate.IsZero() {
 		return nil
@@ -29,39 +33,16 @@ func (a App) updateDate(item provider.StorageItem) error {
 	return nil
 }
 
-func (a App) getDate(item provider.StorageItem) (time.Time, error) {
-	data, err := a.get(item)
-	if err != nil {
-		return time.Time{}, fmt.Errorf("unable to get exif: %s", err)
+func getDate(data map[string]interface{}) time.Time {
+	rawDate, ok := data["date"]
+	if !ok {
+		return time.Time{}
 	}
 
-	for _, exifDate := range exifDates {
-		rawCreateDate, ok := data[exifDate]
-		if !ok {
-			continue
-		}
-
-		createDateStr, ok := rawCreateDate.(string)
-		if !ok {
-			return time.Time{}, fmt.Errorf("key `%s` is not a string", exifDate)
-		}
-
-		createDate, err := parseDate(createDateStr)
-		if err == nil {
-			return createDate, nil
-		}
+	date, ok := rawDate.(time.Time)
+	if !ok {
+		logger.Error("date has invalid format `%s`", data["date"])
 	}
 
-	return time.Time{}, nil
-}
-
-func parseDate(raw string) (time.Time, error) {
-	for _, pattern := range datePatterns {
-		createDate, err := time.Parse(pattern, raw)
-		if err == nil {
-			return createDate, nil
-		}
-	}
-
-	return time.Time{}, errors.New("no matching pattern")
+	return date
 }

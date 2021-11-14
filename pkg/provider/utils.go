@@ -3,6 +3,7 @@ package provider
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -165,6 +166,27 @@ func RemoveIndex(arr []string, index int) []string {
 	}
 
 	return append(arr[:index], arr[index+1:]...)
+}
+
+// SaveJSON saves JSON content
+func SaveJSON(storageApp Storage, filename string, content interface{}) error {
+	writer, err := storageApp.WriterTo(filename)
+	if err != nil {
+		return fmt.Errorf("unable to get writer: %s", err)
+	}
+
+	if err = json.NewEncoder(writer).Encode(content); err != nil {
+		err = fmt.Errorf("unable to encode: %s", err)
+	}
+
+	if closeErr := writer.Close(); closeErr != nil {
+		if err != nil {
+			return fmt.Errorf("%s: %w", err, closeErr)
+		}
+		return fmt.Errorf("unable to close writer: %s", closeErr)
+	}
+
+	return err
 }
 
 // SendLargeFile in a request with buffered copy

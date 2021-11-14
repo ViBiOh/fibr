@@ -56,7 +56,7 @@ func (a *App) Create(pathname string, recursive bool, url string, types []provid
 		Types:     types,
 	}
 
-	return id, a.saveWebhooks()
+	return id, provider.SaveJSON(a.storageApp, webhookFilename, a.webhooks)
 }
 
 // Delete a webhook
@@ -70,5 +70,5 @@ func (a *App) Delete(id string) error {
 
 	delete(a.webhooks, id)
 
-	return a.saveWebhooks()
+	return provider.SaveJSON(a.storageApp, webhookFilename, a.webhooks)
 }

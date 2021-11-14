@@ -1,6 +1,20 @@
 package exif
 
-import "strings"
+import (
+	"strings"
+	"time"
+)
+
+type exif struct {
+	Date    time.Time `json:"date"`
+	Geocode geocode   `json:"geocode"`
+}
+
+type geocode struct {
+	Address   map[string]string `json:"address"`
+	Latitude  string            `json:"lat"`
+	Longitude string            `json:"lon"`
+}
 
 type locationAggregate map[string]map[string]int64
 

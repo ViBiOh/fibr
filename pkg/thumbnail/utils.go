@@ -10,7 +10,7 @@ import (
 
 // CanHaveThumbnail determine if thumbnail can be generated for given pathname
 func (a App) CanHaveThumbnail(item provider.StorageItem) bool {
-	return (item.IsImage() || item.IsPdf() || item.IsVideo()) && (a.maxSize == 0 || item.Size < a.maxSize)
+	return (item.IsImage() || item.IsPdf() || item.IsVideo()) && (a.maxSize == 0 || item.Size < a.maxSize || a.directAccess)
 }
 
 // HasThumbnail determine if thumbnail exist for given pathname

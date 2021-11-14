@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/flags"
@@ -15,41 +16,19 @@ import (
 
 const (
 	exifMetadataFilename      = ""
-	geocodeMetadataFilename   = "geocode"
 	aggregateMetadataFilename = "aggregate"
 )
 
-var (
-	metadataFilenames = []string{
-		exifMetadataFilename,
-		geocodeMetadataFilename,
-		aggregateMetadataFilename,
-	}
-
-	exifDates = []string{
-		"DateCreated",
-		"CreateDate",
-	}
-
-	datePatterns = []string{
-		"2006:01:02 15:04:05MST",
-		"2006:01:02 15:04:05-07:00",
-		"2006:01:02 15:04:05Z07:00",
-		"2006:01:02 15:04:05",
-		"2006:01:02",
-		"01/02/2006 15:04:05",
-		"1/02/2006 15:04:05",
-	}
-)
+var metadataFilenames = []string{
+	exifMetadataFilename,
+	aggregateMetadataFilename,
+}
 
 // App of package
 type App struct {
-	storageApp   provider.Storage
-	done         chan struct{}
-	geocodeQueue chan provider.StorageItem
-	metrics      map[string]*prometheus.CounterVec
+	storageApp provider.Storage
+	metrics    map[string]*prometheus.CounterVec
 
-	geocodeURL  string
 	exifRequest request.Request
 
 	aggregateOnStart bool
@@ -60,10 +39,9 @@ type App struct {
 
 // Config of package
 type Config struct {
-	exifURL    *string
-	exifUser   *string
-	exifPass   *string
-	geocodeURL *string
+	exifURL  *string
+	exifUser *string
+	exifPass *string
 
 	maxSize          *int
 	aggregateOnStart *bool
@@ -78,8 +56,6 @@ func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) Config 
 		exifUser: flags.New(prefix, "exif", "User").Default("", overrides).Label("Exif Tool URL Basic User").ToString(fs),
 		exifPass: flags.New(prefix, "exif", "Password").Default("", overrides).Label("Exif Tool URL Basic Password").ToString(fs),
 
-		geocodeURL: flags.New(prefix, "exif", "GeocodeURL").Default("", overrides).Label(fmt.Sprintf("Nominatim Geocode Service URL. This can leak GPS metadatas to a third-party (e.g. \"%s\")", publicNominatimURL)).ToString(fs),
-
 		directAccess: flags.New(prefix, "exif", "DirectAccess").Default(false, nil).Label("Use Exas with direct access to filesystem (no large file upload to it, send a GET request)").ToBool(fs),
 		maxSize:      flags.New(prefix, "exif", "MaxSize").Default(1024*1024*200, nil).Label("Max file size (in bytes) for extracting exif (0 to no limit)").ToInt(fs),
 
@@ -90,14 +66,13 @@ func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) Config 
 
 // New creates new App from Config
 func New(config Config, storageApp provider.Storage, prometheusRegisterer prometheus.Registerer) (App, error) {
-	metrics, err := createMetrics(prometheusRegisterer, "exif", "geocode", "aggregate")
+	metrics, err := createMetrics(prometheusRegisterer, "exif", "aggregate")
 	if err != nil {
 		return App{}, err
 	}
 
 	return App{
-		exifRequest:      request.New().URL(*config.exifURL).BasicAuth(*config.exifUser, *config.exifPass),
-		geocodeURL:       *config.geocodeURL,
+		exifRequest:      request.New().URL(strings.TrimSpace(*config.exifURL)).BasicAuth(strings.TrimSpace(*config.exifUser), *config.exifPass),
 		dateOnStart:      *config.dateOnStart,
 		aggregateOnStart: *config.aggregateOnStart,
 		directAccess:     *config.directAccess,
@@ -105,9 +80,7 @@ func New(config Config, storageApp provider.Storage, prometheusRegisterer promet
 
 		storageApp: storageApp,
 
-		metrics:      metrics,
-		done:         make(chan struct{}),
-		geocodeQueue: make(chan provider.StorageItem, 10),
+		metrics: metrics,
 	}, nil
 }
 
@@ -115,22 +88,8 @@ func (a App) enabled() bool {
 	return !a.exifRequest.IsZero()
 }
 
-// Start worker
-func (a App) Start(done <-chan struct{}) {
-	defer close(a.geocodeQueue)
-	defer close(a.done)
-
-	if !a.enabled() {
-		return
-	}
-
-	go a.processGeocodeQueue()
-
-	<-done
-}
-
 func (a App) get(item provider.StorageItem) (map[string]interface{}, error) {
-	exif, err := a.loadExif(item)
+	exif, err := a.loadRawExif(item)
 	if err != nil {
 		return nil, fmt.Errorf("unable to load exif: %s", err)
 	}
@@ -139,43 +98,36 @@ func (a App) get(item provider.StorageItem) (map[string]interface{}, error) {
 		return exif, nil
 	}
 
-	exif, err = a.fetchAndStoreExif(item)
+	data, err := a.extractExif(context.Background(), item)
 	if err != nil {
-		return nil, fmt.Errorf("unable to fetch: %s", err)
-	}
-
-	return exif, nil
-}
-
-func (a App) fetchAndStoreExif(item provider.StorageItem) (map[string]interface{}, error) {
-	a.increaseMetric("exif", "requested")
-
-	resp, err := a.requestExas(context.Background(), item)
-	if err != nil {
-		return nil, fmt.Errorf("unable to request exif: %s", err)
-	}
-
-	var exifs []map[string]interface{}
-	if err := httpjson.Read(resp, &exifs); err != nil {
-		return nil, fmt.Errorf("unable to read exas response: %s", err)
-	}
-
-	var data map[string]interface{}
-	if len(exifs) > 0 {
-		data = exifs[0]
+		return data, fmt.Errorf("unable to extract exif: %s", err)
 	}
 
 	if err := a.saveMetadata(item, exifMetadataFilename, data); err != nil {
-		return nil, fmt.Errorf("unable to save exif: %s", err)
+		return data, fmt.Errorf("unable to save exif: %s", err)
 	}
 
 	return data, nil
 }
 
-func (a App) requestExas(ctx context.Context, item provider.StorageItem) (*http.Response, error) {
+func (a App) extractExif(ctx context.Context, item provider.StorageItem) (map[string]interface{}, error) {
+	var data map[string]interface{}
+	var resp *http.Response
+	var err error
+
 	if a.directAccess {
-		return a.exifRequest.Method(http.MethodGet).Path(item.Pathname).Send(ctx, nil)
+		resp, err = a.exifRequest.Method(http.MethodGet).Path(item.Pathname).Send(ctx, nil)
+	} else {
+		resp, err = provider.SendLargeFile(ctx, a.storageApp, item, a.exifRequest.Method(http.MethodPost))
 	}
 
-	return provider.SendLargeFile(ctx, a.storageApp, item, a.exifRequest.Method(http.MethodPost))
+	if err != nil {
+		return data, fmt.Errorf("unable to fetch exif: %s", err)
+	}
+
+	if err := httpjson.Read(resp, &data); err != nil {
+		return data, fmt.Errorf("unable to read exif: %s", err)
+	}
+
+	return data, nil
 }

@@ -35,18 +35,17 @@ func (a App) EventConsumer(e provider.Event) {
 
 func (a App) handleStartEvent(item provider.StorageItem) error {
 	if a.CanHaveExif(item) {
+		var data map[string]interface{}
+		var err error
+
 		if !a.hasExif(item) {
-			if _, err := a.get(item); err != nil {
+			if data, err = a.get(item); err != nil {
 				return fmt.Errorf("unable to get exif : %s", err)
 			}
 		}
 
-		if !a.hasGeocode(item) {
-			a.geocode(item)
-		}
-
 		if a.dateOnStart {
-			if err := a.updateDate(item); err != nil {
+			if err := a.updateDate(item, data); err != nil {
 				return fmt.Errorf("unable to update date : %s", err)
 			}
 		}
@@ -66,11 +65,14 @@ func (a App) handleUploadEvent(item provider.StorageItem) error {
 		return nil
 	}
 
-	if err := a.updateDate(item); err != nil {
-		return fmt.Errorf("unable to update date: %s", err)
+	data, err := a.get(item)
+	if err != nil {
+		return fmt.Errorf("unable to extract exif: %s", err)
 	}
 
-	a.geocode(item)
+	if err := a.updateDate(item, data); err != nil {
+		return fmt.Errorf("unable to update date: %s", err)
+	}
 
 	if err := a.aggregate(item); err != nil {
 		return fmt.Errorf("unable to aggregate exif: %s", err)

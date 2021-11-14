@@ -8,12 +8,11 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/v4/pkg/logger"
 )
 
 // CanHaveExif determine if exif can be extracted for given pathname
 func (a App) CanHaveExif(item provider.StorageItem) bool {
-	return (item.IsImage() || item.IsVideo() || item.IsPdf()) && (a.maxSize == 0 || item.Size < a.maxSize)
+	return (item.IsImage() || item.IsVideo() || item.IsPdf()) && (a.maxSize == 0 || item.Size < a.maxSize || a.directAccess)
 }
 
 func getExifPath(item provider.StorageItem, suffix string) string {
@@ -35,10 +34,6 @@ func (a App) hasExif(item provider.StorageItem) bool {
 	return a.hasMetadata(item, exifMetadataFilename)
 }
 
-func (a App) hasGeocode(item provider.StorageItem) bool {
-	return a.hasMetadata(item, geocodeMetadataFilename)
-}
-
 func (a App) hasMetadata(item provider.StorageItem, suffix string) bool {
 	if !a.enabled() {
 		return false
@@ -48,14 +43,14 @@ func (a App) hasMetadata(item provider.StorageItem, suffix string) bool {
 	return err == nil
 }
 
-func (a App) loadExif(item provider.StorageItem) (map[string]interface{}, error) {
+func (a App) loadRawExif(item provider.StorageItem) (map[string]interface{}, error) {
 	var data map[string]interface{}
 	return data, a.loadMetadata(item, exifMetadataFilename, &data)
 }
 
-func (a App) loadGeocode(item provider.StorageItem) (geocode, error) {
-	var data geocode
-	return data, a.loadMetadata(item, geocodeMetadataFilename, &data)
+func (a App) loadExif(item provider.StorageItem) (exif, error) {
+	var data exif
+	return data, a.loadMetadata(item, exifMetadataFilename, &data)
 }
 
 func (a App) loadAggregate(item provider.StorageItem) (provider.Aggregate, error) {
@@ -93,19 +88,8 @@ func (a App) saveMetadata(item provider.StorageItem, suffix string, data interfa
 		}
 	}
 
-	writer, err := a.storageApp.WriterTo(filename)
-	if err != nil {
-		return fmt.Errorf("unable to get writer: %s", err)
-	}
-
-	defer func() {
-		if err := writer.Close(); err != nil {
-			logger.Error("unable to close file: %s", err)
-		}
-	}()
-
-	if err := json.NewEncoder(writer).Encode(data); err != nil {
-		return fmt.Errorf("unable to encode: %s", err)
+	if err := provider.SaveJSON(a.storageApp, filename, data); err != nil {
+		return fmt.Errorf("unable to save file: %s", err)
 	}
 
 	a.increaseMetric(suffix, "saved")

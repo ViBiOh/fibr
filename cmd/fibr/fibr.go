@@ -103,6 +103,8 @@ func main() {
 	amqpClient, err := amqp.New(amqpConfig, prometheusApp.Registerer())
 	if err != nil {
 		logger.Error("unable to create amqp client: %s", err)
+	} else {
+		defer amqpClient.Close()
 	}
 
 	thumbnailApp, err := thumbnail.New(thumbnailConfig, storageProvider, prometheusRegisterer, amqpClient)
@@ -132,7 +134,6 @@ func main() {
 	go webhookApp.Start(healthApp.Done())
 	go shareApp.Start(healthApp.Done())
 	go crudApp.Start(healthApp.Done())
-	go exifApp.Start(healthApp.Done())
 	go eventBus.Start(healthApp.Done(), shareApp.EventConsumer, thumbnailApp.EventConsumer, webhookApp.EventConsumer, exifApp.EventConsumer)
 
 	go promServer.Start("prometheus", healthApp.End(), prometheusApp.Handler())

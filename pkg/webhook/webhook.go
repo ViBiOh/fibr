@@ -74,54 +74,36 @@ func (a *App) Start(_ <-chan struct{}) {
 	}
 }
 
-func (a *App) loadWebhooks() (err error) {
+func (a *App) loadWebhooks() error {
 	file, err := a.storageApp.ReaderFrom(webhookFilename)
 	if err != nil {
 		if !provider.IsNotExist(err) {
-			return err
+			return fmt.Errorf("unable to read file: %s", err)
 		}
 
 		if err := a.storageApp.CreateDir(provider.MetadataDirectoryName); err != nil {
-			return err
+			return fmt.Errorf("unable to create directory: %s", err)
 		}
 
-		return a.saveWebhooks()
+		if err := provider.SaveJSON(a.storageApp, webhookFilename, a.webhooks); err != nil {
+			return fmt.Errorf("unable to save file: %s", err)
+		}
+		return nil
 	}
-
-	defer func() {
-		if err := file.Close(); err != nil {
-			logger.Error("unable to close webhook file: %s", err)
-		}
-	}()
 
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
 	if err = json.NewDecoder(file).Decode(&a.webhooks); err != nil {
-		return fmt.Errorf("unable to decode: %s", err)
+		err = fmt.Errorf("unable to decode: %s", err)
 	}
 
-	return nil
-}
-
-func (a *App) saveWebhooks() (err error) {
-	file, err := a.storageApp.WriterTo(webhookFilename)
-	if err != nil {
-		return err
-	}
-
-	defer func() {
-		if closeErr := file.Close(); closeErr != nil {
-			err = fmt.Errorf("%s: %w", err, closeErr)
+	if closeErr := file.Close(); closeErr != nil {
+		if err != nil {
+			return fmt.Errorf("%s: %w", err, closeErr)
 		}
-	}()
-
-	encoder := json.NewEncoder(file)
-	encoder.SetIndent("", "  ")
-
-	if err := encoder.Encode(a.webhooks); err != nil {
-		return fmt.Errorf("unable to encode: %s", err)
+		return fmt.Errorf("unable to close reader: %s", closeErr)
 	}
 
-	return nil
+	return err
 }

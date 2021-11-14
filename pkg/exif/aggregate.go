@@ -66,20 +66,20 @@ func (a App) computeAndSaveAggregate(dir provider.StorageItem) error {
 			return filepath.SkipDir
 		}
 
-		if a.hasExif(item) {
-			if itemDate, err := a.getDate(item); err == nil {
-				minDate, maxDate = aggregateDate(minDate, maxDate, itemDate)
-			}
+		if !a.hasExif(item) {
+			return nil
 		}
 
-		if a.hasGeocode(item) {
-			data, err := a.loadGeocode(item)
-			if err != nil {
-				return fmt.Errorf("unable to get geocode: %s", err)
-			}
-
-			directoryAggregate.ingest(data)
+		exifData, err := a.loadExif(item)
+		if err != nil {
+			return fmt.Errorf("unable load exif data: %s", err)
 		}
+
+		if !exifData.Date.IsZero() {
+			minDate, maxDate = aggregateDate(minDate, maxDate, exifData.Date)
+		}
+
+		directoryAggregate.ingest(exifData.Geocode)
 
 		return nil
 	})
