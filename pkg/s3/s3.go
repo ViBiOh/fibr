@@ -35,13 +35,13 @@ type Config struct {
 }
 
 // Flags adds flags for configuring package
-func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) Config {
+func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		endpoint:     flags.New(prefix, "s3", "Endpoint").Default("", overrides).Label("Storage Object endpoint").ToString(fs),
-		accessKey:    flags.New(prefix, "s3", "AccessKey").Default("", overrides).Label("Storage Object Access Key").ToString(fs),
-		secretAccess: flags.New(prefix, "s3", "SecretAccess").Default("", overrides).Label("Storage Object Secret Access").ToString(fs),
-		bucket:       flags.New(prefix, "s3", "Bucket").Default("", overrides).Label("Storage Object Bucket").ToString(fs),
-		useSSL:       flags.New(prefix, "s3", "SSL").Default(true, overrides).Label("Use SSL").ToBool(fs),
+		endpoint:     flags.New(prefix, "s3", "Endpoint").Default("", nil).Label("Storage Object endpoint").ToString(fs),
+		accessKey:    flags.New(prefix, "s3", "AccessKey").Default("", nil).Label("Storage Object Access Key").ToString(fs),
+		secretAccess: flags.New(prefix, "s3", "SecretAccess").Default("", nil).Label("Storage Object Secret Access").ToString(fs),
+		bucket:       flags.New(prefix, "s3", "Bucket").Default("", nil).Label("Storage Object Bucket").ToString(fs),
+		useSSL:       flags.New(prefix, "s3", "SSL").Default(true, nil).Label("Use SSL").ToBool(fs),
 	}
 }
 

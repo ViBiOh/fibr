@@ -59,11 +59,11 @@ type Config struct {
 }
 
 // Flags adds flags for configuring package
-func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) Config {
+func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		exifURL:  flags.New(prefix, "exif", "URL").Default("http://exas:1080", overrides).Label("Exif Tool URL (exas)").ToString(fs),
-		exifUser: flags.New(prefix, "exif", "User").Default("", overrides).Label("Exif Tool URL Basic User").ToString(fs),
-		exifPass: flags.New(prefix, "exif", "Password").Default("", overrides).Label("Exif Tool URL Basic Password").ToString(fs),
+		exifURL:  flags.New(prefix, "exif", "URL").Default("http://exas:1080", nil).Label("Exif Tool URL (exas)").ToString(fs),
+		exifUser: flags.New(prefix, "exif", "User").Default("", nil).Label("Exif Tool URL Basic User").ToString(fs),
+		exifPass: flags.New(prefix, "exif", "Password").Default("", nil).Label("Exif Tool URL Basic Password").ToString(fs),
 
 		directAccess: flags.New(prefix, "exif", "DirectAccess").Default(false, nil).Label("Use Exas with direct access to filesystem (no large file upload, send a GET request, Basic Auth recommended)").ToBool(fs),
 		maxSize:      flags.New(prefix, "exif", "MaxSize").Default(1024*1024*200, nil).Label("Max file size (in bytes) for extracting exif (0 to no limit). Not used if DirectAccess enabled.").ToInt(fs),

@@ -35,7 +35,7 @@ func (a App) EventConsumer(e provider.Event) {
 }
 
 func (a App) handleStartEvent(item provider.StorageItem) error {
-	if !a.CanHaveExif(item) || !a.hasExif(item) {
+	if !a.CanHaveExif(item) || a.hasExif(item) {
 		return nil
 	}
 
