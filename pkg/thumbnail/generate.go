@@ -20,15 +20,14 @@ const (
 )
 
 func (a App) generate(item provider.StorageItem) error {
-	var (
-		file io.ReadCloser
-		err  error
-	)
-
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
 	defer cancel()
 
-	var resp *http.Response
+	var (
+		file io.ReadCloser
+		resp *http.Response
+		err  error
+	)
 
 	if item.IsVideo() {
 		resp, err = a.requestVith(ctx, item)
@@ -45,12 +44,12 @@ func (a App) generate(item provider.StorageItem) error {
 			return err
 		}
 
-		a.increaseMetric("image", "requested")
-
 		r, err := a.imageRequest.Build(ctx, file)
 		if err != nil {
 			return fmt.Errorf("unable to create request: %s", err)
 		}
+
+		a.increaseMetric("image", "requested")
 
 		r.ContentLength = item.Size
 		resp, err = request.DoWithClient(provider.SlowClient, r)
@@ -72,18 +71,30 @@ func (a App) generate(item provider.StorageItem) error {
 	buffer := provider.BufferPool.Get().(*bytes.Buffer)
 	defer provider.BufferPool.Put(buffer)
 
-	if _, err := io.CopyBuffer(writer, resp.Body, buffer.Bytes()); err != nil {
-		return err
+	if _, err = io.CopyBuffer(writer, resp.Body, buffer.Bytes()); err != nil {
+		err = fmt.Errorf("unable to copy response: %s", err)
 	}
 
-	a.increaseMetric("image", "saved")
+	if closeErr := resp.Body.Close(); closeErr != nil {
+		if err != nil {
+			return fmt.Errorf("%s: %w", err, closeErr)
+		}
+		err = fmt.Errorf("unable to close body response: %s", err)
+	}
 
-	return nil
+	if closeErr := writer.Close(); closeErr != nil {
+		if err != nil {
+			return fmt.Errorf("%s: %w", err, closeErr)
+		}
+		return fmt.Errorf("unable to close writer: %s", err)
+	}
+
+	a.increaseMetric("thumbnail", "saved")
+
+	return err
 }
 
 func (a App) requestVith(ctx context.Context, item provider.StorageItem) (*http.Response, error) {
-	a.increaseMetric("video", "requested")
-
 	if a.amqpClient != nil {
 		payload, err := json.Marshal(map[string]string{
 			"input":  item.Pathname,
@@ -92,6 +103,8 @@ func (a App) requestVith(ctx context.Context, item provider.StorageItem) (*http.
 		if err != nil {
 			return nil, fmt.Errorf("unable to marshal video thumbnail amqp message: %s", err)
 		}
+
+		a.increaseMetric("video", "published")
 
 		if err := a.amqpClient.Publish(amqp.Publishing{
 			ContentType: "application/json",
@@ -102,6 +115,8 @@ func (a App) requestVith(ctx context.Context, item provider.StorageItem) (*http.
 
 		return nil, nil
 	}
+
+	a.increaseMetric("video", "requested")
 
 	if a.directAccess {
 		return a.videoRequest.Method(http.MethodGet).Path(item.Pathname).Send(ctx, nil)

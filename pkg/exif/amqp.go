@@ -16,13 +16,5 @@ func (a App) AmqpHandler(message amqp.Delivery) error {
 		return fmt.Errorf("unable to decode exif: %s", err)
 	}
 
-	if err := a.updateDate(resp.Item, resp.Exif); err != nil {
-		return fmt.Errorf("unable to update date: %s", err)
-	}
-
-	if err := a.aggregate(resp.Item); err != nil {
-		return fmt.Errorf("unable to aggregate exif: %s", err)
-	}
-
-	return nil
+	return a.processExif(resp.Item, resp.Exif)
 }

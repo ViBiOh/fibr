@@ -19,7 +19,7 @@ func (a App) CanHaveExif(item provider.StorageItem) bool {
 func getExifPath(item provider.StorageItem, suffix string) string {
 	fullPath := path.Join(provider.MetadataDirectoryName, item.Pathname)
 	if item.IsDir {
-		fullPath += "/"
+		return fmt.Sprintf("%s/%s.json", fullPath, suffix)
 	}
 
 	name := strings.TrimSuffix(fullPath, path.Ext(fullPath))

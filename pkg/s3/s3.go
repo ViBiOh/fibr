@@ -131,7 +131,7 @@ func (a App) WriterTo(pathname string) (io.WriteCloser, error) {
 
 	go func() {
 		if _, err := a.client.PutObject(context.Background(), a.bucket, getPath(pathname), reader, -1, minio.PutObjectOptions{}); err != nil {
-			if closeErr := writer.Close(); closeErr != nil {
+			if closeErr := reader.Close(); closeErr != nil {
 				err = fmt.Errorf("%s: %w", err, closeErr)
 			}
 

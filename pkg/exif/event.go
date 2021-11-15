@@ -3,6 +3,7 @@ package exif
 import (
 	"fmt"
 
+	"github.com/ViBiOh/exas/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 )
@@ -34,26 +35,20 @@ func (a App) EventConsumer(e provider.Event) {
 }
 
 func (a App) handleStartEvent(item provider.StorageItem) error {
-	if a.CanHaveExif(item) && !a.hasExif(item) {
-		if a.amqpClient != nil {
-			return a.askForExif(item)
-		}
-
-		data, err := a.get(item)
-		if err != nil {
-			return fmt.Errorf("unable to get exif : %s", err)
-		}
-
-		if err := a.updateDate(item, data); err != nil {
-			return fmt.Errorf("unable to update date : %s", err)
-		}
-
-		if err := a.aggregate(item); err != nil {
-			return fmt.Errorf("unable to aggregate exif : %s", err)
-		}
+	if !a.CanHaveExif(item) || !a.hasExif(item) {
+		return nil
 	}
 
-	return nil
+	if a.amqpClient != nil {
+		return a.askForExif(item)
+	}
+
+	data, err := a.get(item)
+	if err != nil {
+		return fmt.Errorf("unable to get exif : %s", err)
+	}
+
+	return a.processExif(item, data)
 }
 
 func (a App) handleUploadEvent(item provider.StorageItem) error {
@@ -67,15 +62,19 @@ func (a App) handleUploadEvent(item provider.StorageItem) error {
 
 	data, err := a.get(item)
 	if err != nil {
-		return fmt.Errorf("unable to extract exif: %s", err)
+		return fmt.Errorf("unable to get exif: %s", err)
 	}
 
-	if err := a.updateDate(item, data); err != nil {
+	return a.processExif(item, data)
+}
+
+func (a App) processExif(item provider.StorageItem, exif model.Exif) error {
+	if err := a.updateDate(item, exif); err != nil {
 		return fmt.Errorf("unable to update date: %s", err)
 	}
 
 	if err := a.aggregate(item); err != nil {
-		return fmt.Errorf("unable to aggregate exif: %s", err)
+		return fmt.Errorf("unable to aggregate folder: %s", err)
 	}
 
 	return nil
