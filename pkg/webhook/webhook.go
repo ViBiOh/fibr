@@ -10,6 +10,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
+	prom "github.com/ViBiOh/httputils/v4/pkg/prometheus"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -44,15 +45,10 @@ func New(config Config, storageApp provider.Storage, prometheusRegisterer promet
 		return &App{}, nil
 	}
 
-	counter, err := createMetric(prometheusRegisterer)
-	if err != nil {
-		return nil, fmt.Errorf("unable to create metric: %s", err)
-	}
-
 	return &App{
 		storageApp: storageApp,
 		webhooks:   make(map[string]provider.Webhook),
-		counter:    counter,
+		counter:    prom.CounterVec(prometheusRegisterer, "fibr", "webhook", "item", "code"),
 		hmacSecret: []byte(*config.hmacSecret),
 	}, nil
 }

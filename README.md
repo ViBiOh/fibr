@@ -37,9 +37,11 @@ Fibr creates a `.fibr` folder in _root folder_ for storing its metadata: shares'
 
 ### Sidecars
 
-Fibr generates thumbnails of images, PDF and videos when these [mime-types are detected](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types) and sidecars are provided. Sidecars are [h2non/imaginary](https://github.com/h2non/imaginary), [ViBiOh/vith](https://github.com/vibioh/vith) and [ViBiOh/exas](https://github.com/vibioh/exas).
+Fibr generates thumbnails of images, PDF and videos when these [mime-types are detected](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types) and sidecars are provided. Sidecars are [h2non/imaginary](https://github.com/h2non/imaginary), [ViBiOh/vith](https://github.com/vibioh/vith) and [ViBiOh/exas](https://github.com/vibioh/exas). Thumbnails are generated in [WebP](https://developers.google.com/speed/webp/) format, in their animated format for video thumbnail.
 
 You can refer to these projects for installing and configuring them and set `-thumbnailImageURL`, `-thumbnailVideoURL` and `-exifURL` options.
+
+Sidecars may have constraints regarding concurrent work (e.g. HLS conversion is a CPU-intensive task) or rate limit (e.g. geocoding can have rate-limiting). Call to these sidecars can be made with HTTP, which is not fault tolerant but easy to setup, or with an AMQP messaging, which is more resilient but more complex to setup. An easy-to-setup AMQP messaging instance can be done with [CloudAMQP](https://www.cloudamqp.com) (I have no affiliation of any kind to this company, just a happy customer). When AMQP connection URI is provided, Fibr will use it as default communication protocol instead of HTTP.
 
 #### HTTP Live Streaming
 

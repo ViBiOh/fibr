@@ -35,8 +35,6 @@ spec:
         mountPath: /data
     config:
       FIBR_AUTH_PROFILES: 1:admin
-      FIBR_EXIF_AGGREGATE_ON_START: 'true'
-      FIBR_EXIF_DATE_ON_START: 'true'
       FIBR_EXIF_DIRECT_ACCESS: 'true'
       FIBR_EXIF_URL: http://exas
       FIBR_IGNORE_PATTERN: '.st(folder|ignore)'

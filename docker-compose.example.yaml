@@ -11,8 +11,6 @@ services:
       FIBR_LOGGER_JSON: 'true'
       FIBR_EXIF_DIRECT_ACCESS: 'true'
       FIBR_THUMBNAIL_DIRECT_ACCESS: 'true'
-      FIBR_EXIF_MAX_SIZE: '0'
-      FIBR_THUMBNAIL_MAX_SIZE: '0'
     volumes:
       - ${DATA_DIR}:/data
     depends_on:

@@ -88,7 +88,12 @@ func (a App) saveMetadata(item provider.StorageItem, suffix string, data interfa
 		return fmt.Errorf("unable to save file: %s", err)
 	}
 
-	a.increaseMetric(suffix, "saved")
+	switch suffix {
+	case exifMetadataFilename:
+		a.increaseExif("saved")
+	case aggregateMetadataFilename:
+		a.increaseAggregate("saved")
+	}
 
 	return nil
 }
