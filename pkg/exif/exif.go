@@ -89,6 +89,7 @@ func New(config Config, storageApp provider.Storage, prometheusRegisterer promet
 		directAccess: *config.directAccess,
 		maxSize:      int64(*config.maxSize),
 
+		amqpClient:     amqpClient,
 		amqpExchange:   amqpExchange,
 		amqpRoutingKey: strings.TrimSpace(*config.amqpRoutingKey),
 
