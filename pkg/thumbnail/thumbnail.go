@@ -34,9 +34,10 @@ type App struct {
 	pathnameInput chan provider.StorageItem
 	metric        *prometheus.CounterVec
 
-	amqpClient           *amqp.Client
-	amqpExchange         string
-	amqpStreamRoutingKey string
+	amqpClient                   *amqp.Client
+	amqpExchange                 string
+	amqpStreamRoutingKey         string
+	amqpVideoThumbnailRoutingKey string
 
 	imageRequest request.Request
 	videoRequest request.Request
@@ -56,8 +57,9 @@ type Config struct {
 	videoUser *string
 	videoPass *string
 
-	amqpExchange         *string
-	amqpStreamRoutingKey *string
+	amqpExchange                 *string
+	amqpStreamRoutingKey         *string
+	amqpVideoThumbnailRoutingKey *string
 
 	maxSize      *int64
 	minBitrate   *uint64
@@ -79,8 +81,9 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 		maxSize:      flags.New(prefix, "thumbnail", "MaxSize").Default(1024*1024*200, nil).Label("Maximum file size (in bytes) for generating thumbnail (0 to no limit). Not used if DirectAccess enabled.").ToInt64(fs),
 		minBitrate:   flags.New(prefix, "vith", "MinBitrate").Default(80*1000*1000, nil).Label("Minimal video bitrate (in bits per second) to generate a streamable version (in HLS), if DirectAccess enabled").ToUint64(fs),
 
-		amqpExchange:         flags.New(prefix, "vith", "AmqpExchange").Default("fibr", nil).Label("AMQP Exchange Name").ToString(fs),
-		amqpStreamRoutingKey: flags.New(prefix, "vith", "AmqpStreamRoutingKey").Default("stream", nil).Label("AMQP Routing Key for stream").ToString(fs),
+		amqpExchange:                 flags.New(prefix, "vith", "AmqpExchange").Default("fibr", nil).Label("AMQP Exchange Name").ToString(fs),
+		amqpStreamRoutingKey:         flags.New(prefix, "vith", "AmqpStreamRoutingKey").Default("stream", nil).Label("AMQP Routing Key for stream").ToString(fs),
+		amqpVideoThumbnailRoutingKey: flags.New(prefix, "vith", "AmqpVideoThumbnailRoutingKey").Default("video-thumbnail", nil).Label("AMQP Routing Key for video thumbnail").ToString(fs),
 	}
 }
 
@@ -108,8 +111,9 @@ func New(config Config, storage provider.Storage, prometheusRegisterer prometheu
 		minBitrate:   *config.minBitrate,
 		directAccess: *config.directAccess,
 
-		amqpExchange:         amqpExchange,
-		amqpStreamRoutingKey: strings.TrimSpace(*config.amqpStreamRoutingKey),
+		amqpExchange:                 amqpExchange,
+		amqpStreamRoutingKey:         strings.TrimSpace(*config.amqpStreamRoutingKey),
+		amqpVideoThumbnailRoutingKey: strings.TrimSpace(*config.amqpVideoThumbnailRoutingKey),
 
 		storageApp:    storage,
 		amqpClient:    amqpClient,

@@ -3,6 +3,7 @@ package thumbnail
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -11,6 +12,7 @@ import (
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
+	"github.com/streadway/amqp"
 )
 
 const (
@@ -32,6 +34,10 @@ func (a App) generate(item provider.StorageItem) error {
 		resp, err = a.requestVith(ctx, item)
 		if err != nil {
 			return fmt.Errorf("unable to request video thumbnailer: %s", err)
+		}
+
+		if resp == nil {
+			return nil
 		}
 	} else {
 		file, err = a.storageApp.ReaderFrom(item.Pathname) // will be closed by `.Send`
@@ -77,6 +83,25 @@ func (a App) generate(item provider.StorageItem) error {
 
 func (a App) requestVith(ctx context.Context, item provider.StorageItem) (*http.Response, error) {
 	a.increaseMetric("video", "requested")
+
+	if a.amqpClient != nil {
+		payload, err := json.Marshal(map[string]string{
+			"input":  item.Pathname,
+			"output": getThumbnailPath(item),
+		})
+		if err != nil {
+			return nil, fmt.Errorf("unable to marshal video thumbnail amqp message: %s", err)
+		}
+
+		if err := a.amqpClient.Publish(amqp.Publishing{
+			ContentType: "application/json",
+			Body:        payload,
+		}, a.amqpExchange, a.amqpVideoThumbnailRoutingKey); err != nil {
+			return nil, fmt.Errorf("unable to publish video thumbnail amqp message: %s", err)
+		}
+
+		return nil, nil
+	}
 
 	if a.directAccess {
 		return a.videoRequest.Method(http.MethodGet).Path(item.Pathname).Send(ctx, nil)

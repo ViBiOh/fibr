@@ -218,18 +218,14 @@ Usage of fibr:
         [server] Certificate file {FIBR_CERT}
   -csp string
         [owasp] Content-Security-Policy {FIBR_CSP} (default "default-src 'self'; base-uri 'self'; script-src 'nonce'; style-src 'nonce'; img-src 'self' data:")
-  -exifAggregateOnStart
-        [exif] Aggregate EXIF data per folder on start {FIBR_EXIF_AGGREGATE_ON_START}
   -exifAmqpExchange string
         [exif] AMQP Exchange Name {FIBR_EXIF_AMQP_EXCHANGE} (default "fibr")
-  -exifAmqpExifRoutingKey string
-        [exif] AMQP Routing Key for stream {FIBR_EXIF_AMQP_EXIF_ROUTING_KEY} (default "exif")
-  -exifDateOnStart
-        [exif] Change file date from EXIF date on start {FIBR_EXIF_DATE_ON_START}
+  -exifAmqpRoutingKey string
+        [exif] AMQP Routing Key for exif {FIBR_EXIF_AMQP_ROUTING_KEY} (default "exif")
   -exifDirectAccess
-        [exif] Use Exas with direct access to filesystem (no large file upload to it, send a GET request) {FIBR_EXIF_DIRECT_ACCESS}
+        [exif] Use Exas with direct access to filesystem (no large file upload, send a GET request, Basic Auth recommended) {FIBR_EXIF_DIRECT_ACCESS}
   -exifMaxSize int
-        [exif] Max file size (in bytes) for extracting exif (0 to no limit) {FIBR_EXIF_MAX_SIZE} (default 209715200)
+        [exif] Max file size (in bytes) for extracting exif (0 to no limit). Not used if DirectAccess enabled. {FIBR_EXIF_MAX_SIZE} (default 209715200)
   -exifPassword string
         [exif] Exif Tool URL Basic Password {FIBR_EXIF_PASSWORD}
   -exifURL string
@@ -314,8 +310,10 @@ Usage of fibr:
         [thumbnail] AMQP Exchange Name {FIBR_THUMBNAIL_AMQP_EXCHANGE} (default "fibr")
   -thumbnailAmqpStreamRoutingKey string
         [thumbnail] AMQP Routing Key for stream {FIBR_THUMBNAIL_AMQP_STREAM_ROUTING_KEY} (default "stream")
+  -thumbnailAmqpVideoThumbnailRoutingKey string
+        [thumbnail] AMQP Routing Key for video thumbnail {FIBR_THUMBNAIL_AMQP_VIDEO_THUMBNAIL_ROUTING_KEY} (default "video-thumbnail")
   -thumbnailDirectAccess
-        [thumbnail] Use Vith with direct access to filesystem (no large file upload to it, emit an AMQP message or send a GET request, Basic Auth recommended) {FIBR_THUMBNAIL_DIRECT_ACCESS}
+        [thumbnail] Use Vith with direct access to filesystem (no large file upload, send a GET request, Basic Auth recommended) {FIBR_THUMBNAIL_DIRECT_ACCESS}
   -thumbnailImagePassword string
         [thumbnail] Imaginary Basic Auth Password {FIBR_THUMBNAIL_IMAGE_PASSWORD}
   -thumbnailImageURL string
@@ -323,7 +321,7 @@ Usage of fibr:
   -thumbnailImageUser string
         [thumbnail] Imaginary Basic Auth User {FIBR_THUMBNAIL_IMAGE_USER}
   -thumbnailMaxSize int
-        [thumbnail] Maximum file size (in bytes) for generating thumbnail (0 to no limit) {FIBR_THUMBNAIL_MAX_SIZE} (default 209715200)
+        [thumbnail] Maximum file size (in bytes) for generating thumbnail (0 to no limit). Not used if DirectAccess enabled. {FIBR_THUMBNAIL_MAX_SIZE} (default 209715200)
   -thumbnailMinBitrate uint
         [thumbnail] Minimal video bitrate (in bits per second) to generate a streamable version (in HLS), if DirectAccess enabled {FIBR_THUMBNAIL_MIN_BITRATE} (default 80000000)
   -thumbnailVideoPassword string

@@ -60,8 +60,8 @@ func (a App) generateStream(ctx context.Context, item provider.StorageItem) erro
 
 	if a.amqpClient != nil {
 		payload, err := json.Marshal(map[string]string{
-			"input":  item.Pathname,
-			"output": path.Dir(getStreamPath(item)),
+			"input":  input,
+			"output": output,
 		})
 		if err != nil {
 			return fmt.Errorf("unable to marshal stream amqp message: %s", err)
