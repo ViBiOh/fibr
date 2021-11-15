@@ -35,14 +35,14 @@ type App struct {
 	exifMetric      *prometheus.CounterVec
 	aggregateMetric *prometheus.CounterVec
 
-	exifRequest request.Request
-
 	amqpClient     *amqpclient.Client
 	amqpExchange   string
 	amqpRoutingKey string
 
-	directAccess bool
+	exifRequest request.Request
+
 	maxSize      int64
+	directAccess bool
 }
 
 // Config of package

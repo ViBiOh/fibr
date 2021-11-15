@@ -15,6 +15,6 @@ type Aggregate struct {
 
 // ExifResponse from AMQP
 type ExifResponse struct {
-	Item StorageItem `json:"item"`
 	Exif model.Exif  `json:"exif"`
+	Item StorageItem `json:"item"`
 }
