@@ -28,7 +28,7 @@ func (a App) shouldGenerateStream(ctx context.Context, item provider.StorageItem
 
 	a.increaseMetric("video", "headers")
 
-	resp, err := a.videoRequest.Method(http.MethodHead).Path(item.Pathname).Send(ctx, nil)
+	resp, err := a.vithRequest.Method(http.MethodHead).Path(item.Pathname).Send(ctx, nil)
 	if err != nil {
 		return false, fmt.Errorf("unable to retrieve metadata: %s", err)
 	}
@@ -77,7 +77,7 @@ func (a App) generateStream(ctx context.Context, item provider.StorageItem) erro
 		return nil
 	}
 
-	resp, err := a.videoRequest.Method(http.MethodPut).Path(fmt.Sprintf("%s?output=%s", input, url.QueryEscape(output))).Send(ctx, nil)
+	resp, err := a.vithRequest.Method(http.MethodPut).Path(fmt.Sprintf("%s?output=%s", input, url.QueryEscape(output))).Send(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("unable to send request: %s", err)
 	}
@@ -92,7 +92,7 @@ func (a App) generateStream(ctx context.Context, item provider.StorageItem) erro
 func (a App) renameStream(ctx context.Context, old, new provider.StorageItem) error {
 	a.increaseMetric("video", "rename")
 
-	resp, err := a.videoRequest.Method(http.MethodPatch).Path(fmt.Sprintf("%s?to=%s", getStreamPath(old), url.QueryEscape(getStreamPath(new)))).Send(ctx, nil)
+	resp, err := a.vithRequest.Method(http.MethodPatch).Path(fmt.Sprintf("%s?to=%s", getStreamPath(old), url.QueryEscape(getStreamPath(new)))).Send(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("unable to send request: %s", err)
 	}
@@ -107,7 +107,7 @@ func (a App) renameStream(ctx context.Context, old, new provider.StorageItem) er
 func (a App) deleteStream(ctx context.Context, item provider.StorageItem) error {
 	a.increaseMetric("video", "delete")
 
-	resp, err := a.videoRequest.Method(http.MethodDelete).Path(getStreamPath(item)).Send(ctx, nil)
+	resp, err := a.vithRequest.Method(http.MethodDelete).Path(getStreamPath(item)).Send(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("unable to send request: %s", err)
 	}

@@ -9,7 +9,7 @@ import (
 
 // EventConsumer handle event pushed to the event bus
 func (a App) EventConsumer(e provider.Event) {
-	if !a.videoEnabled() && !a.imageEnabled() {
+	if !a.vithEnabled() && !a.imaginaryEnabled() {
 		return
 	}
 
@@ -21,7 +21,7 @@ func (a App) EventConsumer(e provider.Event) {
 			return
 		}
 
-		if (e.Item.IsVideo() && !a.videoEnabled()) || (e.Item.IsImage() && !a.imageEnabled()) {
+		if ((e.Item.IsVideo() || e.Item.IsImage()) && !a.vithEnabled()) || (e.Item.IsPdf() && !a.imaginaryEnabled()) {
 			return
 		}
 

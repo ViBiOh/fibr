@@ -39,8 +39,8 @@ type App struct {
 	amqpStreamRoutingKey         string
 	amqpVideoThumbnailRoutingKey string
 
-	imageRequest request.Request
-	videoRequest request.Request
+	imaginaryRequest request.Request
+	vithRequest      request.Request
 
 	maxSize      int64
 	minBitrate   uint64
@@ -49,13 +49,13 @@ type App struct {
 
 // Config of package
 type Config struct {
-	imageURL  *string
-	imageUser *string
-	imagePass *string
+	imaginaryURL  *string
+	imaginaryUser *string
+	imaginaryPass *string
 
-	videoURL  *string
-	videoUser *string
-	videoPass *string
+	vithURL  *string
+	vithUser *string
+	vithPass *string
 
 	amqpExchange                 *string
 	amqpStreamRoutingKey         *string
@@ -69,13 +69,13 @@ type Config struct {
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		imageURL:  flags.New(prefix, "thumbnail", "ImageURL").Default("http://image:9000", nil).Label("Imaginary URL").ToString(fs),
-		imageUser: flags.New(prefix, "thumbnail", "ImageUser").Default("", nil).Label("Imaginary Basic Auth User").ToString(fs),
-		imagePass: flags.New(prefix, "thumbnail", "ImagePassword").Default("", nil).Label("Imaginary Basic Auth Password").ToString(fs),
+		imaginaryURL:  flags.New(prefix, "thumbnail", "ImaginaryURL").Default("http://image:9000", nil).Label("Imaginary URL").ToString(fs),
+		imaginaryUser: flags.New(prefix, "thumbnail", "ImaginaryUser").Default("", nil).Label("Imaginary Basic Auth User").ToString(fs),
+		imaginaryPass: flags.New(prefix, "thumbnail", "ImaginaryPassword").Default("", nil).Label("Imaginary Basic Auth Password").ToString(fs),
 
-		videoURL:  flags.New(prefix, "vith", "VideoURL").Default("http://video:1080", nil).Label("Video Thumbnail URL").ToString(fs),
-		videoUser: flags.New(prefix, "vith", "VideoUser").Default("", nil).Label("Video Thumbnail Basic Auth User").ToString(fs),
-		videoPass: flags.New(prefix, "vith", "VideoPassword").Default("", nil).Label("Video Thumbnail Basic Auth Password").ToString(fs),
+		vithURL:  flags.New(prefix, "vith", "VithURL").Default("http://video:1080", nil).Label("Vith Thumbnail URL").ToString(fs),
+		vithUser: flags.New(prefix, "vith", "VithUser").Default("", nil).Label("Vith Thumbnail Basic Auth User").ToString(fs),
+		vithPass: flags.New(prefix, "vith", "VithPassword").Default("", nil).Label("Vith Thumbnail Basic Auth Password").ToString(fs),
 
 		directAccess: flags.New(prefix, "vith", "DirectAccess").Default(false, nil).Label("Use Vith with direct access to filesystem (no large file upload, send a GET request, Basic Auth recommended)").ToBool(fs),
 		maxSize:      flags.New(prefix, "thumbnail", "MaxSize").Default(1024*1024*200, nil).Label("Maximum file size (in bytes) for generating thumbnail (0 to no limit). Not used if DirectAccess enabled.").ToInt64(fs),
@@ -89,7 +89,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 
 // New creates new App from Config
 func New(config Config, storage provider.Storage, prometheusRegisterer prometheus.Registerer, amqpClient *amqp.Client) (App, error) {
-	imageReq := request.New().WithClient(provider.SlowClient).Post(*config.imageURL).BasicAuth(strings.TrimSpace(*config.imageUser), *config.imagePass)
+	imageReq := request.New().WithClient(provider.SlowClient).Post(*config.imaginaryURL).BasicAuth(strings.TrimSpace(*config.imaginaryUser), *config.imaginaryPass)
 	if !imageReq.IsZero() {
 		imageReq = imageReq.Path(fmt.Sprintf("/crop?width=%d&height=%d&stripmeta=true&noprofile=true&quality=80&type=webp", Width, Height))
 	}
@@ -104,8 +104,8 @@ func New(config Config, storage provider.Storage, prometheusRegisterer prometheu
 	}
 
 	return App{
-		imageRequest: imageReq,
-		videoRequest: request.New().URL(*config.videoURL).BasicAuth(*config.videoUser, *config.videoPass),
+		imaginaryRequest: imageReq,
+		vithRequest:      request.New().URL(*config.vithURL).BasicAuth(*config.vithUser, *config.vithPass),
 
 		maxSize:      *config.maxSize,
 		minBitrate:   *config.minBitrate,
@@ -122,12 +122,12 @@ func New(config Config, storage provider.Storage, prometheusRegisterer prometheu
 	}, nil
 }
 
-func (a App) imageEnabled() bool {
-	return !a.imageRequest.IsZero()
+func (a App) imaginaryEnabled() bool {
+	return !a.imaginaryRequest.IsZero()
 }
 
-func (a App) videoEnabled() bool {
-	return !a.videoRequest.IsZero()
+func (a App) vithEnabled() bool {
+	return !a.vithRequest.IsZero()
 }
 
 // Stream check if stream is present and serve it

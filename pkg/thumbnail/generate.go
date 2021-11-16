@@ -29,7 +29,7 @@ func (a App) generate(item provider.StorageItem) error {
 		err  error
 	)
 
-	if item.IsVideo() {
+	if item.IsVideo() || item.IsImage() {
 		resp, err = a.requestVith(ctx, item)
 		if err != nil {
 			return fmt.Errorf("unable to request video thumbnailer: %s", err)
@@ -44,7 +44,7 @@ func (a App) generate(item provider.StorageItem) error {
 			return err
 		}
 
-		r, err := a.imageRequest.Build(ctx, file)
+		r, err := a.imaginaryRequest.Build(ctx, file)
 		if err != nil {
 			return fmt.Errorf("unable to create request: %s", err)
 		}
@@ -96,9 +96,10 @@ func (a App) generate(item provider.StorageItem) error {
 
 func (a App) requestVith(ctx context.Context, item provider.StorageItem) (*http.Response, error) {
 	if a.amqpClient != nil {
-		payload, err := json.Marshal(map[string]string{
+		payload, err := json.Marshal(map[string]interface{}{
 			"input":  item.Pathname,
 			"output": getThumbnailPath(item),
+			"video":  item.IsVideo(),
 		})
 		if err != nil {
 			return nil, fmt.Errorf("unable to marshal video thumbnail amqp message: %s", err)
@@ -119,8 +120,8 @@ func (a App) requestVith(ctx context.Context, item provider.StorageItem) (*http.
 	a.increaseMetric("video", "requested")
 
 	if a.directAccess {
-		return a.videoRequest.Method(http.MethodGet).Path(item.Pathname).Send(ctx, nil)
+		return a.vithRequest.Method(http.MethodGet).Path(fmt.Sprintf("%s?video=%t", item.Pathname, item.IsVideo())).Send(ctx, nil)
 	}
 
-	return provider.SendLargeFile(ctx, a.storageApp, item, a.videoRequest.Method(http.MethodPost))
+	return provider.SendLargeFile(ctx, a.storageApp, item, a.vithRequest.Method(http.MethodPost).Path(fmt.Sprintf("?video=%t", item.IsVideo())))
 }
