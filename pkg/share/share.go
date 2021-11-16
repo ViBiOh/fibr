@@ -161,7 +161,7 @@ func (a *App) refresh() error {
 			return err
 		}
 
-		return a.saveShares()
+		return provider.SaveJSON(a.storageApp, shareFilename, a.shares)
 	}
 
 	defer func() {
@@ -202,30 +202,8 @@ func (a *App) cleanShares(_ context.Context) error {
 		return nil
 	}
 
-	if err := a.saveShares(); err != nil {
+	if err := provider.SaveJSON(a.storageApp, shareFilename, a.shares); err != nil {
 		return fmt.Errorf("unable to save: %s", err)
-	}
-
-	return nil
-}
-
-func (a *App) saveShares() (err error) {
-	file, err := a.storageApp.WriterTo(shareFilename)
-	if err != nil {
-		return err
-	}
-
-	defer func() {
-		if closeErr := file.Close(); closeErr != nil {
-			err = fmt.Errorf("%s: %w", err, closeErr)
-		}
-	}()
-
-	encoder := json.NewEncoder(file)
-	encoder.SetIndent("", "  ")
-
-	if err := encoder.Encode(a.shares); err != nil {
-		return fmt.Errorf("unable to encode: %s", err)
 	}
 
 	return nil

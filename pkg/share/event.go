@@ -36,7 +36,7 @@ func (a *App) renameItem(old, new provider.StorageItem) error {
 		}
 	}
 
-	return a.saveShares()
+	return provider.SaveJSON(a.storageApp, shareFilename, a.shares)
 }
 
 func (a *App) deleteItem(item provider.StorageItem) error {
@@ -49,5 +49,5 @@ func (a *App) deleteItem(item provider.StorageItem) error {
 		}
 	}
 
-	return a.saveShares()
+	return provider.SaveJSON(a.storageApp, shareFilename, a.shares)
 }

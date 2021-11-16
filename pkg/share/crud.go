@@ -61,7 +61,7 @@ func (a *App) Create(filepath string, edit bool, password string, isDir bool, du
 		Duration: duration,
 	}
 
-	return id, a.saveShares()
+	return id, provider.SaveJSON(a.storageApp, shareFilename, a.shares)
 }
 
 // Delete a share
@@ -75,5 +75,5 @@ func (a *App) Delete(id string) error {
 
 	delete(a.shares, id)
 
-	return a.saveShares()
+	return provider.SaveJSON(a.storageApp, shareFilename, a.shares)
 }
