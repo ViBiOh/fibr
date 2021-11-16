@@ -34,13 +34,12 @@ type App struct {
 	pathnameInput chan provider.StorageItem
 	metric        *prometheus.CounterVec
 
-	amqpClient                   *amqp.Client
-	amqpExchange                 string
-	amqpStreamRoutingKey         string
-	amqpVideoThumbnailRoutingKey string
+	amqpClient              *amqp.Client
+	amqpExchange            string
+	amqpStreamRoutingKey    string
+	amqpThumbnailRoutingKey string
 
-	imaginaryRequest request.Request
-	vithRequest      request.Request
+	vithRequest request.Request
 
 	maxSize      int64
 	minBitrate   uint64
@@ -49,17 +48,13 @@ type App struct {
 
 // Config of package
 type Config struct {
-	imaginaryURL  *string
-	imaginaryUser *string
-	imaginaryPass *string
-
 	vithURL  *string
 	vithUser *string
 	vithPass *string
 
-	amqpExchange                 *string
-	amqpStreamRoutingKey         *string
-	amqpVideoThumbnailRoutingKey *string
+	amqpExchange            *string
+	amqpStreamRoutingKey    *string
+	amqpThumbnailRoutingKey *string
 
 	maxSize      *int64
 	minBitrate   *uint64
@@ -69,11 +64,7 @@ type Config struct {
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		imaginaryURL:  flags.New(prefix, "thumbnail", "ImaginaryURL").Default("http://image:9000", nil).Label("Imaginary URL").ToString(fs),
-		imaginaryUser: flags.New(prefix, "thumbnail", "ImaginaryUser").Default("", nil).Label("Imaginary Basic Auth User").ToString(fs),
-		imaginaryPass: flags.New(prefix, "thumbnail", "ImaginaryPassword").Default("", nil).Label("Imaginary Basic Auth Password").ToString(fs),
-
-		vithURL:  flags.New(prefix, "vith", "VithURL").Default("http://video:1080", nil).Label("Vith Thumbnail URL").ToString(fs),
+		vithURL:  flags.New(prefix, "vith", "VithURL").Default("http://vith:1080", nil).Label("Vith Thumbnail URL").ToString(fs),
 		vithUser: flags.New(prefix, "vith", "VithUser").Default("", nil).Label("Vith Thumbnail Basic Auth User").ToString(fs),
 		vithPass: flags.New(prefix, "vith", "VithPassword").Default("", nil).Label("Vith Thumbnail Basic Auth Password").ToString(fs),
 
@@ -81,19 +72,14 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 		maxSize:      flags.New(prefix, "thumbnail", "MaxSize").Default(1024*1024*200, nil).Label("Maximum file size (in bytes) for generating thumbnail (0 to no limit). Not used if DirectAccess enabled.").ToInt64(fs),
 		minBitrate:   flags.New(prefix, "vith", "MinBitrate").Default(80*1000*1000, nil).Label("Minimal video bitrate (in bits per second) to generate a streamable version (in HLS), if DirectAccess enabled").ToUint64(fs),
 
-		amqpExchange:                 flags.New(prefix, "vith", "AmqpExchange").Default("fibr", nil).Label("AMQP Exchange Name").ToString(fs),
-		amqpStreamRoutingKey:         flags.New(prefix, "vith", "AmqpStreamRoutingKey").Default("stream", nil).Label("AMQP Routing Key for stream").ToString(fs),
-		amqpVideoThumbnailRoutingKey: flags.New(prefix, "vith", "AmqpVideoThumbnailRoutingKey").Default("video-thumbnail", nil).Label("AMQP Routing Key for video thumbnail").ToString(fs),
+		amqpExchange:            flags.New(prefix, "vith", "AmqpExchange").Default("fibr", nil).Label("AMQP Exchange Name").ToString(fs),
+		amqpStreamRoutingKey:    flags.New(prefix, "vith", "AmqpStreamRoutingKey").Default("stream", nil).Label("AMQP Routing Key for stream").ToString(fs),
+		amqpThumbnailRoutingKey: flags.New(prefix, "vith", "AmqpThumbnailRoutingKey").Default("thumbnail", nil).Label("AMQP Routing Key for thumbnail").ToString(fs),
 	}
 }
 
 // New creates new App from Config
 func New(config Config, storage provider.Storage, prometheusRegisterer prometheus.Registerer, amqpClient *amqp.Client) (App, error) {
-	imageReq := request.New().WithClient(provider.SlowClient).Post(*config.imaginaryURL).BasicAuth(strings.TrimSpace(*config.imaginaryUser), *config.imaginaryPass)
-	if !imageReq.IsZero() {
-		imageReq = imageReq.Path(fmt.Sprintf("/crop?width=%d&height=%d&stripmeta=true&noprofile=true&quality=80&type=webp", Width, Height))
-	}
-
 	var amqpExchange string
 	if amqpClient != nil {
 		amqpExchange = strings.TrimSpace(*config.amqpExchange)
@@ -104,26 +90,21 @@ func New(config Config, storage provider.Storage, prometheusRegisterer prometheu
 	}
 
 	return App{
-		imaginaryRequest: imageReq,
-		vithRequest:      request.New().URL(*config.vithURL).BasicAuth(*config.vithUser, *config.vithPass),
+		vithRequest: request.New().URL(*config.vithURL).BasicAuth(*config.vithUser, *config.vithPass),
 
 		maxSize:      *config.maxSize,
 		minBitrate:   *config.minBitrate,
 		directAccess: *config.directAccess,
 
-		amqpExchange:                 amqpExchange,
-		amqpStreamRoutingKey:         strings.TrimSpace(*config.amqpStreamRoutingKey),
-		amqpVideoThumbnailRoutingKey: strings.TrimSpace(*config.amqpVideoThumbnailRoutingKey),
+		amqpExchange:            amqpExchange,
+		amqpStreamRoutingKey:    strings.TrimSpace(*config.amqpStreamRoutingKey),
+		amqpThumbnailRoutingKey: strings.TrimSpace(*config.amqpThumbnailRoutingKey),
 
 		storageApp:    storage,
 		amqpClient:    amqpClient,
 		metric:        prom.CounterVec(prometheusRegisterer, "fibr", "thumbnail", "item", "type", "state"),
 		pathnameInput: make(chan provider.StorageItem, 10),
 	}, nil
-}
-
-func (a App) imaginaryEnabled() bool {
-	return !a.imaginaryRequest.IsZero()
 }
 
 func (a App) vithEnabled() bool {

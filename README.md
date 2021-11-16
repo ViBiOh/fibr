@@ -167,8 +167,7 @@ docker run -d \
   -e FIBR_PUBLIC_URL="http://localhost:1080" \
   -e FIBR_AUTH_PROFILES="1:admin" \
   -e FIBR_AUTH_USERS="1:$(htpasswd -nBb login password)" \
-  -e FIBR_THUMBNAIL_IMAGE_URL="" \
-  -e FIBR_THUMBNAIL_VIDEO_URL="" \
+  -e FIBR_THUMBNAIL_VITH_URL="" \
   -e FIBR_EXIF_URL="" \
   vibioh/fibr
 ```
@@ -310,26 +309,20 @@ Usage of fibr:
         [thumbnail] AMQP Exchange Name {FIBR_THUMBNAIL_AMQP_EXCHANGE} (default "fibr")
   -thumbnailAmqpStreamRoutingKey string
         [thumbnail] AMQP Routing Key for stream {FIBR_THUMBNAIL_AMQP_STREAM_ROUTING_KEY} (default "stream")
-  -thumbnailAmqpVideoThumbnailRoutingKey string
-        [thumbnail] AMQP Routing Key for video thumbnail {FIBR_THUMBNAIL_AMQP_VIDEO_THUMBNAIL_ROUTING_KEY} (default "video-thumbnail")
+  -thumbnailAmqpThumbnailRoutingKey string
+        [thumbnail] AMQP Routing Key for thumbnail {FIBR_THUMBNAIL_AMQP_THUMBNAIL_ROUTING_KEY} (default "thumbnail")
   -thumbnailDirectAccess
         [thumbnail] Use Vith with direct access to filesystem (no large file upload, send a GET request, Basic Auth recommended) {FIBR_THUMBNAIL_DIRECT_ACCESS}
-  -thumbnailImagePassword string
-        [thumbnail] Imaginary Basic Auth Password {FIBR_THUMBNAIL_IMAGE_PASSWORD}
-  -thumbnailImageURL string
-        [thumbnail] Imaginary URL {FIBR_THUMBNAIL_IMAGE_URL} (default "http://image:9000")
-  -thumbnailImageUser string
-        [thumbnail] Imaginary Basic Auth User {FIBR_THUMBNAIL_IMAGE_USER}
   -thumbnailMaxSize int
         [thumbnail] Maximum file size (in bytes) for generating thumbnail (0 to no limit). Not used if DirectAccess enabled. {FIBR_THUMBNAIL_MAX_SIZE} (default 209715200)
   -thumbnailMinBitrate uint
         [thumbnail] Minimal video bitrate (in bits per second) to generate a streamable version (in HLS), if DirectAccess enabled {FIBR_THUMBNAIL_MIN_BITRATE} (default 80000000)
-  -thumbnailVideoPassword string
-        [thumbnail] Video Thumbnail Basic Auth Password {FIBR_THUMBNAIL_VIDEO_PASSWORD}
-  -thumbnailVideoURL string
-        [thumbnail] Video Thumbnail URL {FIBR_THUMBNAIL_VIDEO_URL} (default "http://video:1080")
-  -thumbnailVideoUser string
-        [thumbnail] Video Thumbnail Basic Auth User {FIBR_THUMBNAIL_VIDEO_USER}
+  -thumbnailVithPassword string
+        [thumbnail] Vith Thumbnail Basic Auth Password {FIBR_THUMBNAIL_VITH_PASSWORD}
+  -thumbnailVithURL string
+        [thumbnail] Vith Thumbnail URL {FIBR_THUMBNAIL_VITH_URL} (default "http://vith:1080")
+  -thumbnailVithUser string
+        [thumbnail] Vith Thumbnail Basic Auth User {FIBR_THUMBNAIL_VITH_USER}
   -title string
         Application title {FIBR_TITLE} (default "fibr")
   -url string

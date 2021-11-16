@@ -12,6 +12,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
+	"github.com/ViBiOh/vith/pkg/model"
 	"github.com/streadway/amqp"
 )
 
@@ -58,11 +59,16 @@ func (a App) generateStream(ctx context.Context, item provider.StorageItem) erro
 	input := item.Pathname
 	output := path.Dir(getStreamPath(item))
 
+	req := model.NewRequest(input, output, model.TypeVideo)
+
+	if item.IsImage() {
+		req.ItemType = model.TypeImage
+	} else if item.IsPdf() {
+		req.ItemType = model.TypePDF
+	}
+
 	if a.amqpClient != nil {
-		payload, err := json.Marshal(map[string]string{
-			"input":  input,
-			"output": output,
-		})
+		payload, err := json.Marshal(req)
 		if err != nil {
 			return fmt.Errorf("unable to marshal stream amqp message: %s", err)
 		}
