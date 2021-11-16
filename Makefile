@@ -95,17 +95,9 @@ run:
 		-publicURL "http://localhost:1080" \
 		-authProfiles "1:admin" \
 		-authUsers "1:`htpasswd -nBb admin admin`" \
-		-thumbnailImageURL "" \
 		-thumbnailVideoURL "" \
 		-exifURL "" \
 		-webhookSecret "secret"
-
-.PHONY: run-imaginary
-run-imaginary:
-	docker run --rm \
-		--name "imaginary" \
-		-p "9000:9000/tcp" \
-		"h2non/imaginary"
 
 .PHONY: run-vith
 run-vith:

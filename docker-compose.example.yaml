@@ -21,20 +21,21 @@ services:
     restart: on-failure:5
     read_only: true
 
-  image:
-    image: h2non/imaginary
-    restart: on-failure:5
-    read_only: true
-
   video:
     image: vibioh/vith
     environment:
       VITH_LOGGER_JSON: 'true'
       VITH_WORK_DIR: '/data'
+      VITH_IMAGINARY_URL: http://image:9000
     volumes:
       - ${DATA_DIR}:/data
     user: '${DATA_USER_ID}'
     restart: on-failure:5
+
+  image:
+    image: h2non/imaginary
+    restart: on-failure:5
+    read_only: true
 
   exas:
     image: vibioh/exas

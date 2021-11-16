@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/v4/pkg/request"
+	"github.com/ViBiOh/vith/pkg/model"
 	"github.com/streadway/amqp"
 )
 
@@ -23,39 +23,13 @@ func (a App) generate(item provider.StorageItem) error {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
 	defer cancel()
 
-	var (
-		file io.ReadCloser
-		resp *http.Response
-		err  error
-	)
+	resp, err := a.requestVith(ctx, item)
+	if err != nil {
+		return fmt.Errorf("unable to request video thumbnailer: %s", err)
+	}
 
-	if item.IsVideo() || item.IsImage() {
-		resp, err = a.requestVith(ctx, item)
-		if err != nil {
-			return fmt.Errorf("unable to request video thumbnailer: %s", err)
-		}
-
-		if resp == nil {
-			return nil
-		}
-	} else {
-		file, err = a.storageApp.ReaderFrom(item.Pathname) // will be closed by `.Send`
-		if err != nil {
-			return err
-		}
-
-		r, err := a.imaginaryRequest.Build(ctx, file)
-		if err != nil {
-			return fmt.Errorf("unable to create request: %s", err)
-		}
-
-		a.increaseMetric("image", "requested")
-
-		r.ContentLength = item.Size
-		resp, err = request.DoWithClient(provider.SlowClient, r)
-		if err != nil {
-			return fmt.Errorf("unable to request image thumbnailer: %s", err)
-		}
+	if resp == nil {
+		return nil
 	}
 
 	thumbnailPath := getThumbnailPath(item)
@@ -95,33 +69,36 @@ func (a App) generate(item provider.StorageItem) error {
 }
 
 func (a App) requestVith(ctx context.Context, item provider.StorageItem) (*http.Response, error) {
+	itemType := model.TypeVideo
+	if item.IsImage() {
+		itemType = model.TypeImage
+	} else if item.IsPdf() {
+		itemType = model.TypePDF
+	}
+
 	if a.amqpClient != nil {
-		payload, err := json.Marshal(map[string]interface{}{
-			"input":  item.Pathname,
-			"output": getThumbnailPath(item),
-			"video":  item.IsVideo(),
-		})
+		payload, err := json.Marshal(model.NewRequest(item.Pathname, getThumbnailPath(item), itemType))
 		if err != nil {
 			return nil, fmt.Errorf("unable to marshal video thumbnail amqp message: %s", err)
 		}
 
-		a.increaseMetric("video", "published")
+		a.increaseMetric(itemType.String(), "published")
 
 		if err := a.amqpClient.Publish(amqp.Publishing{
 			ContentType: "application/json",
 			Body:        payload,
-		}, a.amqpExchange, a.amqpVideoThumbnailRoutingKey); err != nil {
+		}, a.amqpExchange, a.amqpThumbnailRoutingKey); err != nil {
 			return nil, fmt.Errorf("unable to publish video thumbnail amqp message: %s", err)
 		}
 
 		return nil, nil
 	}
 
-	a.increaseMetric("video", "requested")
+	a.increaseMetric(itemType.String(), "requested")
 
 	if a.directAccess {
-		return a.vithRequest.Method(http.MethodGet).Path(fmt.Sprintf("%s?video=%t", item.Pathname, item.IsVideo())).Send(ctx, nil)
+		return a.vithRequest.Method(http.MethodGet).Path(fmt.Sprintf("%s?itemType=%s", item.Pathname, itemType.String())).Send(ctx, nil)
 	}
 
-	return provider.SendLargeFile(ctx, a.storageApp, item, a.vithRequest.Method(http.MethodPost).Path(fmt.Sprintf("?video=%t", item.IsVideo())))
+	return provider.SendLargeFile(ctx, a.storageApp, item, a.vithRequest.Method(http.MethodPost).Path(fmt.Sprintf("?itemType=%s", itemType.String())))
 }
