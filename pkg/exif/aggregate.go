@@ -66,10 +66,6 @@ func (a App) computeAndSaveAggregate(dir provider.StorageItem) error {
 			return filepath.SkipDir
 		}
 
-		if !a.hasExif(item) {
-			return nil
-		}
-
 		exifData, err := a.loadExif(item)
 		if err != nil {
 			return fmt.Errorf("unable load exif data: %s", err)
@@ -79,7 +75,9 @@ func (a App) computeAndSaveAggregate(dir provider.StorageItem) error {
 			minDate, maxDate = aggregateDate(minDate, maxDate, exifData.Date)
 		}
 
-		directoryAggregate.ingest(exifData.Geocode)
+		if !exifData.Geocode.IsZero() {
+			directoryAggregate.ingest(exifData.Geocode)
+		}
 
 		return nil
 	})

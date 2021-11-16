@@ -31,10 +31,6 @@ func getExifPath(item provider.StorageItem, suffix string) string {
 	return fmt.Sprintf("%s_%s.json", name, suffix)
 }
 
-func (a App) hasExif(item provider.StorageItem) bool {
-	return a.hasMetadata(item, exifMetadataFilename)
-}
-
 func (a App) hasMetadata(item provider.StorageItem, suffix string) bool {
 	if !a.enabled() {
 		return false
@@ -63,8 +59,15 @@ func (a App) loadMetadata(item provider.StorageItem, suffix string, content inte
 		return nil
 	}
 
-	if err := json.NewDecoder(reader).Decode(content); err != nil {
-		return fmt.Errorf("unable to decode: %s", err)
+	if err = json.NewDecoder(reader).Decode(content); err != nil {
+		err = fmt.Errorf("unable to decode: %s", err)
+	}
+
+	if closeErr := reader.Close(); closeErr != nil {
+		if err != nil {
+			return fmt.Errorf("%s: %w", err, closeErr)
+		}
+		return fmt.Errorf("unable to close reader: %s", closeErr)
 	}
 
 	return nil
