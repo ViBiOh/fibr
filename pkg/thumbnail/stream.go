@@ -30,7 +30,7 @@ func (a App) shouldGenerateStream(ctx context.Context, item provider.StorageItem
 	itemType := typeOfItem(item)
 	a.increaseMetric(itemType.String(), "headers")
 
-	resp, err := a.vithRequest.Method(http.MethodHead).Path(fmt.Sprintf("%s?itemType=%s", item.Pathname, itemType)).Send(ctx, nil)
+	resp, err := a.vithRequest.Method(http.MethodHead).Path(fmt.Sprintf("%s?type=%s", item.Pathname, itemType)).Send(ctx, nil)
 	if err != nil {
 		return false, fmt.Errorf("unable to retrieve metadata: %s", err)
 	}
@@ -101,7 +101,7 @@ func (a App) renameStream(ctx context.Context, old, new provider.StorageItem) er
 	itemType := typeOfItem(old)
 	a.increaseMetric(itemType.String(), "rename")
 
-	resp, err := a.vithRequest.Method(http.MethodPatch).Path(fmt.Sprintf("%s?to=%s&itemType=%s", getStreamPath(old), url.QueryEscape(getStreamPath(new)), itemType)).Send(ctx, nil)
+	resp, err := a.vithRequest.Method(http.MethodPatch).Path(fmt.Sprintf("%s?to=%s&type=%s", getStreamPath(old), url.QueryEscape(getStreamPath(new)), itemType)).Send(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("unable to send request: %s", err)
 	}
@@ -117,7 +117,7 @@ func (a App) deleteStream(ctx context.Context, item provider.StorageItem) error 
 	itemType := typeOfItem(item)
 	a.increaseMetric(itemType.String(), "delete")
 
-	resp, err := a.vithRequest.Method(http.MethodDelete).Path(fmt.Sprintf("%s?itemType=%s", getStreamPath(item), itemType)).Send(ctx, nil)
+	resp, err := a.vithRequest.Method(http.MethodDelete).Path(fmt.Sprintf("%s?type=%s", getStreamPath(item), itemType)).Send(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("unable to send request: %s", err)
 	}
