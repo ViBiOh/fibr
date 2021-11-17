@@ -16,5 +16,9 @@ func (a App) AmqpHandler(message amqp.Delivery) error {
 		return fmt.Errorf("unable to decode exif: %s", err)
 	}
 
+	if err := a.saveMetadata(resp.Item, exifMetadataFilename, resp.Exif); err != nil {
+		return fmt.Errorf("unable to save exif: %s", err)
+	}
+
 	return a.processExif(resp.Item, resp.Exif)
 }
