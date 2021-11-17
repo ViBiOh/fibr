@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/vith/pkg/model"
 )
 
 // CanHaveThumbnail determine if thumbnail can be generated for given pathname
@@ -43,4 +44,15 @@ func getThumbnailExtension(item provider.StorageItem, extension string) string {
 	}
 
 	return fmt.Sprintf("%s.%s", strings.TrimSuffix(fullPath, path.Ext(fullPath)), extension)
+}
+
+func typeOfItem(item provider.StorageItem) model.ItemType {
+	itemType := model.TypeVideo
+	if item.IsImage() {
+		itemType = model.TypeImage
+	} else if item.IsPdf() {
+		itemType = model.TypePDF
+	}
+
+	return itemType
 }

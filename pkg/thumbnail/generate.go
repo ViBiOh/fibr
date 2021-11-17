@@ -69,12 +69,7 @@ func (a App) generate(item provider.StorageItem) error {
 }
 
 func (a App) requestVith(ctx context.Context, item provider.StorageItem) (*http.Response, error) {
-	itemType := model.TypeVideo
-	if item.IsImage() {
-		itemType = model.TypeImage
-	} else if item.IsPdf() {
-		itemType = model.TypePDF
-	}
+	itemType := typeOfItem(item)
 
 	if a.amqpClient != nil {
 		payload, err := json.Marshal(model.NewRequest(item.Pathname, getThumbnailPath(item), itemType))
@@ -97,8 +92,8 @@ func (a App) requestVith(ctx context.Context, item provider.StorageItem) (*http.
 	a.increaseMetric(itemType.String(), "requested")
 
 	if a.directAccess {
-		return a.vithRequest.Method(http.MethodGet).Path(fmt.Sprintf("%s?itemType=%s", item.Pathname, itemType.String())).Send(ctx, nil)
+		return a.vithRequest.Method(http.MethodGet).Path(fmt.Sprintf("%s?itemType=%s", item.Pathname, itemType)).Send(ctx, nil)
 	}
 
-	return provider.SendLargeFile(ctx, a.storageApp, item, a.vithRequest.Method(http.MethodPost).Path(fmt.Sprintf("?itemType=%s", itemType.String())))
+	return provider.SendLargeFile(ctx, a.storageApp, item, a.vithRequest.Method(http.MethodPost).Path(fmt.Sprintf("?itemType=%s", itemType)))
 }
