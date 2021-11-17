@@ -107,10 +107,6 @@ func New(config Config, storage provider.Storage, prometheusRegisterer prometheu
 	}, nil
 }
 
-func (a App) vithEnabled() bool {
-	return !a.vithRequest.IsZero()
-}
-
 // Stream check if stream is present and serve it
 func (a App) Stream(w http.ResponseWriter, r *http.Request, item provider.StorageItem) {
 	if !a.HasStream(item) {

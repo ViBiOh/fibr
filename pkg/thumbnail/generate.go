@@ -23,8 +23,11 @@ func (a App) generate(item provider.StorageItem) error {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
 	defer cancel()
 
+	itemType := typeOfItem(item)
+
 	resp, err := a.requestVith(ctx, item)
 	if err != nil {
+		a.increaseMetric(itemType.String(), "error")
 		return fmt.Errorf("unable to request video thumbnailer: %s", err)
 	}
 
@@ -63,7 +66,7 @@ func (a App) generate(item provider.StorageItem) error {
 		return fmt.Errorf("unable to close writer: %s", err)
 	}
 
-	a.increaseMetric("thumbnail", "saved")
+	a.increaseMetric(itemType.String(), "save")
 
 	return err
 }
@@ -72,24 +75,26 @@ func (a App) requestVith(ctx context.Context, item provider.StorageItem) (*http.
 	itemType := typeOfItem(item)
 
 	if a.amqpClient != nil {
+		a.increaseMetric(itemType.String(), "publish")
+
 		payload, err := json.Marshal(model.NewRequest(item.Pathname, getThumbnailPath(item), itemType))
 		if err != nil {
-			return nil, fmt.Errorf("unable to marshal video thumbnail amqp message: %s", err)
+			a.increaseMetric(itemType.String(), "error")
+			return nil, fmt.Errorf("unable to marshal thumbnail amqp message: %s", err)
 		}
-
-		a.increaseMetric(itemType.String(), "published")
 
 		if err := a.amqpClient.Publish(amqp.Publishing{
 			ContentType: "application/json",
 			Body:        payload,
 		}, a.amqpExchange, a.amqpThumbnailRoutingKey); err != nil {
-			return nil, fmt.Errorf("unable to publish video thumbnail amqp message: %s", err)
+			a.increaseMetric(itemType.String(), "error")
+			return nil, fmt.Errorf("unable to publish thumbnail amqp message: %s", err)
 		}
 
 		return nil, nil
 	}
 
-	a.increaseMetric(itemType.String(), "requested")
+	a.increaseMetric(itemType.String(), "request")
 
 	if a.directAccess {
 		return a.vithRequest.Method(http.MethodGet).Path(fmt.Sprintf("%s?type=%s", item.Pathname, itemType)).Send(ctx, nil)

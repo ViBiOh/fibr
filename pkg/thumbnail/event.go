@@ -9,7 +9,7 @@ import (
 
 // EventConsumer handle event pushed to the event bus
 func (a App) EventConsumer(e provider.Event) {
-	if !a.vithEnabled() {
+	if a.vithRequest.IsZero() {
 		return
 	}
 

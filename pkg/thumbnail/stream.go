@@ -27,11 +27,11 @@ func (a App) shouldGenerateStream(ctx context.Context, item provider.StorageItem
 		return false, nil
 	}
 
-	itemType := typeOfItem(item)
-	a.increaseMetric(itemType.String(), "headers")
+	a.increaseMetric("stream", "bitrate")
 
-	resp, err := a.vithRequest.Method(http.MethodHead).Path(fmt.Sprintf("%s?type=%s", item.Pathname, itemType)).Send(ctx, nil)
+	resp, err := a.vithRequest.Method(http.MethodHead).Path(fmt.Sprintf("%s?type=%s", item.Pathname, typeOfItem(item))).Send(ctx, nil)
 	if err != nil {
+		a.increaseMetric("stream", "errror")
 		return false, fmt.Errorf("unable to retrieve metadata: %s", err)
 	}
 
@@ -42,6 +42,7 @@ func (a App) shouldGenerateStream(ctx context.Context, item provider.StorageItem
 
 	bitrate, err := strconv.ParseUint(rawBitrate, 10, 64)
 	if err != nil {
+		a.increaseMetric("stream", "errror")
 		return false, fmt.Errorf("unable to parse bitrate: %s", err)
 	}
 
@@ -55,23 +56,17 @@ func (a App) shouldGenerateStream(ctx context.Context, item provider.StorageItem
 }
 
 func (a App) generateStream(ctx context.Context, item provider.StorageItem) error {
-	itemType := typeOfItem(item)
-	a.increaseMetric(itemType.String(), "rename")
-
 	input := item.Pathname
 	output := path.Dir(getStreamPath(item))
 
-	req := model.NewRequest(input, output, model.TypeVideo)
-
-	if item.IsImage() {
-		req.ItemType = model.TypeImage
-	} else if item.IsPdf() {
-		req.ItemType = model.TypePDF
-	}
+	req := model.NewRequest(input, output, typeOfItem(item))
 
 	if a.amqpClient != nil {
+		a.increaseMetric("stream", "publish")
+
 		payload, err := json.Marshal(req)
 		if err != nil {
+			a.increaseMetric("stream", "errror")
 			return fmt.Errorf("unable to marshal stream amqp message: %s", err)
 		}
 
@@ -79,14 +74,18 @@ func (a App) generateStream(ctx context.Context, item provider.StorageItem) erro
 			ContentType: "application/json",
 			Body:        payload,
 		}, a.amqpExchange, a.amqpStreamRoutingKey); err != nil {
+			a.increaseMetric("stream", "error")
 			return fmt.Errorf("unable to publish stream amqp message: %s", err)
 		}
 
 		return nil
 	}
 
+	a.increaseMetric("stream", "request")
+
 	resp, err := a.vithRequest.Method(http.MethodPut).Path(fmt.Sprintf("%s?output=%s", input, url.QueryEscape(output))).Send(ctx, nil)
 	if err != nil {
+		a.increaseMetric("stream", "error")
 		return fmt.Errorf("unable to send request: %s", err)
 	}
 
@@ -98,11 +97,11 @@ func (a App) generateStream(ctx context.Context, item provider.StorageItem) erro
 }
 
 func (a App) renameStream(ctx context.Context, old, new provider.StorageItem) error {
-	itemType := typeOfItem(old)
-	a.increaseMetric(itemType.String(), "rename")
+	a.increaseMetric("stream", "rename")
 
-	resp, err := a.vithRequest.Method(http.MethodPatch).Path(fmt.Sprintf("%s?to=%s&type=%s", getStreamPath(old), url.QueryEscape(getStreamPath(new)), itemType)).Send(ctx, nil)
+	resp, err := a.vithRequest.Method(http.MethodPatch).Path(fmt.Sprintf("%s?to=%s&type=%s", getStreamPath(old), url.QueryEscape(getStreamPath(new)), typeOfItem(old))).Send(ctx, nil)
 	if err != nil {
+		a.increaseMetric("stream", "error")
 		return fmt.Errorf("unable to send request: %s", err)
 	}
 
@@ -114,11 +113,11 @@ func (a App) renameStream(ctx context.Context, old, new provider.StorageItem) er
 }
 
 func (a App) deleteStream(ctx context.Context, item provider.StorageItem) error {
-	itemType := typeOfItem(item)
-	a.increaseMetric(itemType.String(), "delete")
+	a.increaseMetric("stream", "delete")
 
-	resp, err := a.vithRequest.Method(http.MethodDelete).Path(fmt.Sprintf("%s?type=%s", getStreamPath(item), itemType)).Send(ctx, nil)
+	resp, err := a.vithRequest.Method(http.MethodDelete).Path(fmt.Sprintf("%s?type=%s", getStreamPath(item), typeOfItem(item))).Send(ctx, nil)
 	if err != nil {
+		a.increaseMetric("stream", "error")
 		return fmt.Errorf("unable to send request: %s", err)
 	}
 

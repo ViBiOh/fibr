@@ -93,9 +93,9 @@ func (a App) saveMetadata(item provider.StorageItem, suffix string, data interfa
 
 	switch suffix {
 	case exifMetadataFilename:
-		a.increaseExif("saved")
+		a.increaseExif("save")
 	case aggregateMetadataFilename:
-		a.increaseAggregate("saved")
+		a.increaseAggregate("save")
 	}
 
 	return nil

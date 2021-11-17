@@ -127,9 +127,10 @@ func (a App) get(item provider.StorageItem) (model.Exif, error) {
 }
 
 func (a App) extractExif(ctx context.Context, item provider.StorageItem) (map[string]interface{}, error) {
-	var data map[string]interface{}
 	var resp *http.Response
 	var err error
+
+	a.increaseExif("request")
 
 	if a.directAccess {
 		resp, err = a.exifRequest.Method(http.MethodGet).Path(item.Pathname).Send(ctx, nil)
@@ -138,10 +139,12 @@ func (a App) extractExif(ctx context.Context, item provider.StorageItem) (map[st
 	}
 
 	if err != nil {
-		return data, fmt.Errorf("unable to fetch exif: %s", err)
+		a.increaseExif("error")
+		return nil, fmt.Errorf("unable to fetch exif: %s", err)
 	}
 
-	if err := httpjson.Read(resp, &data); err != nil {
+	var data map[string]interface{}
+	if err = httpjson.Read(resp, &data); err != nil {
 		return data, fmt.Errorf("unable to read exif: %s", err)
 	}
 
@@ -149,15 +152,19 @@ func (a App) extractExif(ctx context.Context, item provider.StorageItem) (map[st
 }
 
 func (a App) askForExif(item provider.StorageItem) error {
+	a.increaseExif("publish")
+
 	payload, err := json.Marshal(item)
 	if err != nil {
-		return fmt.Errorf("unable to marshal stream amqp message: %s", err)
+		a.increaseExif("error")
+		return fmt.Errorf("unable to marshal exif amqp message: %s", err)
 	}
 
 	if err = a.amqpClient.Publish(amqp.Publishing{
 		ContentType: "application/json",
 		Body:        payload,
 	}, a.amqpExchange, a.amqpRoutingKey); err != nil {
+		a.increaseExif("error")
 		return fmt.Errorf("unable to publish exif amqp message: %s", err)
 	}
 
