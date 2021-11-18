@@ -136,7 +136,7 @@ func (a App) Start(done <-chan struct{}) {
 func (a App) sanitizeName(item provider.StorageItem) provider.StorageItem {
 	name, err := provider.SanitizeName(item.Pathname, false)
 	if err != nil {
-		logger.Error("unable to sanitize name %s: %s", item.Pathname, err)
+		logger.WithField("item", item.Pathname).Error("unable to sanitize name: %s", err)
 		return item
 	}
 

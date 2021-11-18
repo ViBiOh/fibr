@@ -168,11 +168,33 @@ func RemoveIndex(arr []string, index int) []string {
 	return append(arr[:index], arr[index+1:]...)
 }
 
+// LoadJSON loads JSON content
+func LoadJSON(storageApp Storage, filename string, content interface{}) error {
+	reader, err := storageApp.ReaderFrom(filename)
+	if err != nil {
+		return fmt.Errorf("unable to read: %w", err)
+	}
+
+	if err = json.NewDecoder(reader).Decode(content); err != nil {
+		err = fmt.Errorf("unable to decode: %s", err)
+	}
+
+	if closeErr := reader.Close(); closeErr != nil {
+		if err != nil {
+			err = fmt.Errorf("%s: %w", err, closeErr)
+		} else {
+			err = fmt.Errorf("unable to close: %s", err)
+		}
+	}
+
+	return err
+}
+
 // SaveJSON saves JSON content
 func SaveJSON(storageApp Storage, filename string, content interface{}) error {
 	writer, err := storageApp.WriterTo(filename)
 	if err != nil {
-		return fmt.Errorf("unable to get writer: %s", err)
+		return fmt.Errorf("unable to get writer: %w", err)
 	}
 
 	if err = json.NewEncoder(writer).Encode(content); err != nil {
@@ -183,7 +205,7 @@ func SaveJSON(storageApp Storage, filename string, content interface{}) error {
 		if err != nil {
 			return fmt.Errorf("%s: %w", err, closeErr)
 		}
-		return fmt.Errorf("unable to close writer: %s", closeErr)
+		return fmt.Errorf("unable to close: %s", closeErr)
 	}
 
 	return err
@@ -191,9 +213,9 @@ func SaveJSON(storageApp Storage, filename string, content interface{}) error {
 
 // SendLargeFile in a request with buffered copy
 func SendLargeFile(ctx context.Context, storageApp Storage, item StorageItem, req request.Request) (*http.Response, error) {
-	file, err := storageApp.ReaderFrom(item.Pathname) // will be closed by `.PipedWriter`
+	file, err := storageApp.ReaderFrom(item.Pathname) // will be closed by `PipeWriter`
 	if err != nil {
-		return nil, fmt.Errorf("unable to get reader: %s", err)
+		return nil, fmt.Errorf("unable to get reader: %w", err)
 	}
 
 	reader, writer := io.Pipe()
@@ -201,11 +223,21 @@ func SendLargeFile(ctx context.Context, storageApp Storage, item StorageItem, re
 		buffer := BufferPool.Get().(*bytes.Buffer)
 		defer BufferPool.Put(buffer)
 
-		if _, err := io.CopyBuffer(writer, file, buffer.Bytes()); err != nil {
-			logger.Error("unable to copy file: %s", err)
+		var err error
+
+		if _, err = io.CopyBuffer(writer, file, buffer.Bytes()); err != nil {
+			err = fmt.Errorf("unable to copy: %s", err)
 		}
 
-		_ = writer.CloseWithError(file.Close())
+		if closeErr := file.Close(); closeErr != nil {
+			if err != nil {
+				err = fmt.Errorf("%s: %w", err, closeErr)
+			} else {
+				err = fmt.Errorf("unable to close: %s", err)
+			}
+		}
+
+		_ = writer.CloseWithError(err)
 	}()
 
 	r, err := req.Build(ctx, reader)

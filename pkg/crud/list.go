@@ -47,16 +47,16 @@ func (a App) List(w http.ResponseWriter, request provider.Request, message rende
 	uri := request.URL("")
 
 	items := make([]provider.RenderItem, len(files))
-	for index, file := range files {
-		aggregate, err := a.exifApp.GetAggregateFor(file)
+	for index, item := range files {
+		aggregate, err := a.exifApp.GetAggregateFor(item)
 		if err != nil {
-			logger.Error("unable to read aggregate for `%s`: %s", file.Pathname, err)
+			logger.WithField("context", "crud.List").WithField("item", item.Pathname).Error("unable to read: %s", err)
 		}
 
 		items[index] = provider.RenderItem{
-			ID:          sha.New(file.Name),
+			ID:          sha.New(item.Name),
 			URI:         uri,
-			StorageItem: file,
+			StorageItem: item,
 			Aggregate:   aggregate,
 		}
 	}
@@ -144,23 +144,26 @@ func (a App) addFileToZip(zipWriter *zip.Writer, item provider.StorageItem, path
 
 	writer, err := zipWriter.CreateHeader(header)
 	if err != nil {
-		return err
+		return fmt.Errorf("unable to create zip header: %s", err)
 	}
 
-	file, err := a.storageApp.ReaderFrom(item.Pathname)
+	reader, err := a.storageApp.ReaderFrom(item.Pathname)
 	if err != nil {
-		return err
+		return fmt.Errorf("unable to read: %w", err)
 	}
-
-	defer func() {
-		if err := file.Close(); err != nil {
-			logger.Error("unable to close zip file: %s", err)
-		}
-	}()
 
 	buffer := provider.BufferPool.Get().(*bytes.Buffer)
 	defer provider.BufferPool.Put(buffer)
 
-	_, err = io.CopyBuffer(writer, file, buffer.Bytes())
+	_, err = io.CopyBuffer(writer, reader, buffer.Bytes())
+
+	if closeErr := reader.Close(); closeErr != nil {
+		if err != nil {
+			err = fmt.Errorf("%s: %w", err, closeErr)
+		} else {
+			err = fmt.Errorf("unable to close: %s", closeErr)
+		}
+	}
+
 	return err
 }

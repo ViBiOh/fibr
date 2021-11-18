@@ -23,51 +23,45 @@ func (a App) saveUploadedFile(request provider.Request, part *multipart.Part) (f
 		filename = path.Base(request.Share.Path)
 		filePath = request.Share.Path
 	} else {
-		filename, err = provider.SanitizeName(part.FileName(), true)
+		filename, err := provider.SanitizeName(part.FileName(), true)
 		if err != nil {
 			return "", err
 		}
 		filePath = request.GetFilepath(filename)
 	}
 
-	hostFile, err := a.storageApp.WriterTo(filePath)
+	var writer io.WriteCloser
+	writer, err = a.storageApp.WriterTo(filePath)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("unable to get writer: %w", err)
 	}
-
-	defer func() {
-		if err == nil {
-			return
-		}
-
-		if removeErr := a.storageApp.Remove(filePath); removeErr != nil {
-			err = fmt.Errorf("%s, unable to remove errored file: %s", err, removeErr)
-		}
-	}()
-
-	defer func() {
-		if closeErr := hostFile.Close(); closeErr != nil {
-			err = fmt.Errorf("%s, unable to close uploaded file: %s", err, closeErr)
-		}
-	}()
 
 	buffer := provider.BufferPool.Get().(*bytes.Buffer)
 	defer provider.BufferPool.Put(buffer)
 
-	if _, err = io.CopyBuffer(hostFile, part, buffer.Bytes()); err != nil {
-		return "", fmt.Errorf("error while copying file: %s", err)
+	if _, err = io.CopyBuffer(writer, part, buffer.Bytes()); err != nil {
+		err = fmt.Errorf("unable to copy file: %s", err)
+	}
+
+	if closeErr := writer.Close(); closeErr != nil {
+		err = fmt.Errorf("%s: %w", err, closeErr)
+	}
+
+	if err != nil {
+		if removeErr := a.storageApp.Remove(filePath); removeErr != nil {
+			err = fmt.Errorf("%s: %w", err, removeErr)
+		}
 	}
 
 	go func() {
-		// Waiting 5 seconds before sending hooks
-		time.Sleep(time.Second * 5)
+		// Waiting one second for filesystem cache refresh (S3 notably)
+		time.Sleep(time.Second)
 
-		info, err := a.storageApp.Info(filePath)
-		if err != nil {
-			logger.Error("unable to get info for upload event: %s", err)
+		if info, infoErr := a.storageApp.Info(filePath); infoErr != nil {
+			logger.Error("unable to get info for upload event: %s", infoErr)
+		} else {
+			a.notify(provider.NewUploadEvent(info))
 		}
-
-		a.notify(provider.NewUploadEvent(info))
 	}()
 
 	return filename, nil

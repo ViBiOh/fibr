@@ -42,7 +42,7 @@ func (a App) generate(item provider.StorageItem) error {
 
 	writer, err := a.storageApp.WriterTo(thumbnailPath)
 	if err != nil {
-		return fmt.Errorf("unable to get writer: %s", err)
+		return fmt.Errorf("unable to get writer: %w", err)
 	}
 
 	buffer := provider.BufferPool.Get().(*bytes.Buffer)
@@ -54,16 +54,16 @@ func (a App) generate(item provider.StorageItem) error {
 
 	if closeErr := resp.Body.Close(); closeErr != nil {
 		if err != nil {
-			return fmt.Errorf("%s: %w", err, closeErr)
+			err = fmt.Errorf("%s: %w", err, closeErr)
 		}
 		err = fmt.Errorf("unable to close body response: %s", err)
 	}
 
 	if closeErr := writer.Close(); closeErr != nil {
 		if err != nil {
-			return fmt.Errorf("%s: %w", err, closeErr)
+			err = fmt.Errorf("%s: %w", err, closeErr)
 		}
-		return fmt.Errorf("unable to close writer: %s", err)
+		err = fmt.Errorf("unable to close writer: %s", err)
 	}
 
 	a.increaseMetric(itemType.String(), "save")

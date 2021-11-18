@@ -22,7 +22,7 @@ func (a App) Browser(w http.ResponseWriter, request provider.Request, item provi
 
 	files, err := a.storageApp.List(item.Dir())
 	if err != nil {
-		logger.Error("unable to list neighbors files: %s", err)
+		logger.WithField("item", item.Pathname).Error("unable to list neighbors files: %s", err)
 	} else {
 		previous, next = getPreviousAndNext(item, files)
 	}

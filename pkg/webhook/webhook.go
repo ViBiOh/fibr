@@ -1,7 +1,6 @@
 package webhook
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
 	"path"
@@ -71,35 +70,20 @@ func (a *App) Start(_ <-chan struct{}) {
 }
 
 func (a *App) loadWebhooks() error {
-	file, err := a.storageApp.ReaderFrom(webhookFilename)
-	if err != nil {
-		if !provider.IsNotExist(err) {
-			return fmt.Errorf("unable to read file: %s", err)
-		}
-
-		if err := a.storageApp.CreateDir(provider.MetadataDirectoryName); err != nil {
-			return fmt.Errorf("unable to create directory: %s", err)
-		}
-
-		if err := provider.SaveJSON(a.storageApp, webhookFilename, a.webhooks); err != nil {
-			return fmt.Errorf("unable to save file: %s", err)
-		}
-		return nil
-	}
-
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
-	if err = json.NewDecoder(file).Decode(&a.webhooks); err != nil {
-		err = fmt.Errorf("unable to decode: %s", err)
-	}
-
-	if closeErr := file.Close(); closeErr != nil {
-		if err != nil {
-			return fmt.Errorf("%s: %w", err, closeErr)
+	if err := provider.LoadJSON(a.storageApp, webhookFilename, &a.webhooks); err != nil {
+		if !provider.IsNotExist(err) {
+			return err
 		}
-		return fmt.Errorf("unable to close reader: %s", closeErr)
+
+		if err := a.storageApp.CreateDir(provider.MetadataDirectoryName); err != nil {
+			return fmt.Errorf("unable to create dir: %s", err)
+		}
+
+		return provider.SaveJSON(a.storageApp, webhookFilename, &a.webhooks)
 	}
 
-	return err
+	return nil
 }

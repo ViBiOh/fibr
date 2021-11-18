@@ -76,19 +76,19 @@ func (a App) serveThumbnail(w http.ResponseWriter, r *http.Request, info provide
 	}
 }
 
-func (a App) serveFile(w http.ResponseWriter, r *http.Request, info provider.StorageItem) error {
-	file, err := a.storageApp.ReaderFrom(info.Pathname)
+func (a App) serveFile(w http.ResponseWriter, r *http.Request, item provider.StorageItem) error {
+	file, err := a.storageApp.ReaderFrom(item.Pathname)
 	if err != nil {
-		return fmt.Errorf("unable to get reader for `%s`: %s", info.Pathname, err)
+		return fmt.Errorf("unable to get reader for `%s`: %w", item.Pathname, err)
 	}
 
 	defer func() {
-		if err := file.Close(); err != nil {
-			logger.Error("unable to close content file: %s", err)
+		if err = file.Close(); err != nil {
+			logger.WithField("context", "crud.serveFile").WithField("item", item.Pathname).Error("unable to close: %s", err)
 		}
 	}()
 
-	http.ServeContent(w, r, info.Name, info.Date, file)
+	http.ServeContent(w, r, item.Name, item.Date, file)
 	return nil
 }
 

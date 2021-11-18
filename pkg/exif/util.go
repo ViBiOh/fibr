@@ -1,7 +1,6 @@
 package exif
 
 import (
-	"encoding/json"
 	"fmt"
 	"path"
 	"path/filepath"
@@ -51,26 +50,7 @@ func (a App) loadAggregate(item provider.StorageItem) (provider.Aggregate, error
 }
 
 func (a App) loadMetadata(item provider.StorageItem, suffix string, content interface{}) error {
-	reader, err := a.storageApp.ReaderFrom(getExifPath(item, suffix))
-	if err != nil {
-		if !provider.IsNotExist(err) {
-			return fmt.Errorf("unable to read: %s", err)
-		}
-		return nil
-	}
-
-	if err = json.NewDecoder(reader).Decode(content); err != nil {
-		err = fmt.Errorf("unable to decode: %s", err)
-	}
-
-	if closeErr := reader.Close(); closeErr != nil {
-		if err != nil {
-			return fmt.Errorf("%s: %w", err, closeErr)
-		}
-		return fmt.Errorf("unable to close reader: %s", closeErr)
-	}
-
-	return nil
+	return provider.LoadJSON(a.storageApp, getExifPath(item, suffix), content)
 }
 
 func (a App) saveMetadata(item provider.StorageItem, suffix string, data interface{}) error {
@@ -88,7 +68,7 @@ func (a App) saveMetadata(item provider.StorageItem, suffix string, data interfa
 	}
 
 	if err := provider.SaveJSON(a.storageApp, filename, data); err != nil {
-		return fmt.Errorf("unable to save file: %s", err)
+		return fmt.Errorf("unable to save: %s", err)
 	}
 
 	switch suffix {

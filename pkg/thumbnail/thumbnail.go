@@ -114,19 +114,19 @@ func (a App) Stream(w http.ResponseWriter, r *http.Request, item provider.Storag
 		return
 	}
 
-	file, err := a.storageApp.ReaderFrom(getStreamPath(item))
+	reader, err := a.storageApp.ReaderFrom(getStreamPath(item))
 	if err != nil {
 		httperror.InternalServerError(w, err)
 		return
 	}
 
 	defer func() {
-		if err := file.Close(); err != nil {
-			logger.Error("unable to close stream file: %s", err)
+		if closeErr := reader.Close(); closeErr != nil {
+			logger.WithField("context", "thumbnail.Stream").WithField("item", item.Pathname).Error("unable to close: %s", closeErr)
 		}
 	}()
 
-	http.ServeContent(w, r, item.Name, item.Date, file)
+	http.ServeContent(w, r, item.Name, item.Date, reader)
 }
 
 // Serve check if thumbnail is present and serve it
@@ -136,19 +136,19 @@ func (a App) Serve(w http.ResponseWriter, r *http.Request, item provider.Storage
 		return
 	}
 
-	file, err := a.storageApp.ReaderFrom(getThumbnailPath(item))
+	reader, err := a.storageApp.ReaderFrom(getThumbnailPath(item))
 	if err != nil {
 		httperror.InternalServerError(w, err)
 		return
 	}
 
 	defer func() {
-		if err := file.Close(); err != nil {
-			logger.Error("unable to close thumbnail file: %s", err)
+		if err := reader.Close(); err != nil {
+			logger.WithField("fn", "thumbnail.Serve").WithField("item", item.Pathname).WithField("item", item.Pathname).Error("unable to close: %s", err)
 		}
 	}()
 
-	http.ServeContent(w, r, item.Name, item.Date, file)
+	http.ServeContent(w, r, item.Name, item.Date, reader)
 }
 
 // List return all thumbnail in a base64 form
@@ -180,35 +180,32 @@ func (a App) List(w http.ResponseWriter, _ *http.Request, item provider.StorageI
 		provider.SafeWrite(w, `"`)
 		provider.SafeWrite(w, sha.New(item.Name))
 		provider.SafeWrite(w, `":"`)
-		a.encodeThumbnailContent(base64.NewEncoder(base64.StdEncoding, w), item)
+		a.encodeContent(base64.NewEncoder(base64.StdEncoding, w), item)
 		provider.SafeWrite(w, `"`)
 	}
 
 	provider.SafeWrite(w, "}")
 }
 
-func (a App) encodeThumbnailContent(encoder io.WriteCloser, item provider.StorageItem) {
-	defer func() {
-		if err := encoder.Close(); err != nil {
-			logger.Error("unable to close encoder: %s", err)
-		}
-	}()
-
-	file, err := a.storageApp.ReaderFrom(getThumbnailPath(item))
+func (a App) encodeContent(encoder io.WriteCloser, item provider.StorageItem) {
+	reader, err := a.storageApp.ReaderFrom(getThumbnailPath(item))
 	if err != nil {
-		logger.Error("unable to open %s: %s", item.Pathname, err)
+		logger.WithField("fn", "thumbnail.encodeContent").WithField("item", item.Pathname).Error("unable to open: %s", err)
+		return
 	}
-
-	defer func() {
-		if err := file.Close(); err != nil {
-			logger.Error("unable to close thumbnail item: %s", err)
-		}
-	}()
 
 	buffer := provider.BufferPool.Get().(*bytes.Buffer)
 	defer provider.BufferPool.Put(buffer)
 
-	if _, err := io.CopyBuffer(encoder, file, buffer.Bytes()); err != nil {
-		logger.Error("unable to copy thumbnail: %s", err)
+	if _, err = io.CopyBuffer(encoder, reader, buffer.Bytes()); err != nil {
+		logger.WithField("fn", "thumbnail.encodeContent").WithField("item", item.Pathname).Error("unable to copy: %s", err)
+	}
+
+	if err = reader.Close(); err != nil {
+		logger.WithField("fn", "thumbnail.encodeContent").WithField("item", item.Pathname).Error("unable to close item: %s", err)
+	}
+
+	if err = encoder.Close(); err != nil {
+		logger.WithField("fn", "thumbnail.encodeContent").WithField("item", item.Pathname).Error("unable to close encoder: %s", err)
 	}
 }

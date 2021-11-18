@@ -17,19 +17,19 @@ func (a App) EventConsumer(e provider.Event) {
 	switch e.Type {
 	case provider.StartEvent:
 		if err := a.handleStartEvent(e.Item); err != nil {
-			logger.Error("unable to start exif for `%s`: %s", e.Item.Pathname, err)
+			logger.WithField("context", "exif.EventConsumer").WithField("item", e.Item.Pathname).Error("unable to start: %s", err)
 		}
 	case provider.UploadEvent:
 		if err := a.handleUploadEvent(e.Item); err != nil {
-			logger.Error("unable to upload exif for `%s`: %s", e.Item.Pathname, err)
+			logger.WithField("context", "exif.EventConsumer").WithField("item", e.Item.Pathname).Error("unable to upload: %s", err)
 		}
 	case provider.RenameEvent:
 		if err := a.rename(e.Item, *e.New); err != nil {
-			logger.Error("unable to rename exif for `%s`: %s", e.Item.Pathname, err)
+			logger.WithField("context", "exif.EventConsumer").WithField("item", e.Item.Pathname).Error("unable to rename: %s", err)
 		}
 	case provider.DeleteEvent:
 		if err := a.delete(e.Item); err != nil {
-			logger.Error("unable to delete exif for `%s`: %s", e.Item.Pathname, err)
+			logger.WithField("context", "exif.EventConsumer").WithField("item", e.Item.Pathname).Error("unable to delete: %s", err)
 		}
 	}
 }

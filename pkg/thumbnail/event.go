@@ -23,7 +23,7 @@ func (a App) EventConsumer(e provider.Event) {
 
 		if !a.HasThumbnail(e.Item) {
 			if err := a.generate(e.Item); err != nil {
-				logger.Error("unable to generate thumbnail for `%s`: %s", e.Item.Pathname, err)
+				logger.WithField("context", "thumbnail.EventConsumer").WithField("item", e.Item.Pathname).Error("unable to generate: %s", err)
 			}
 		}
 
