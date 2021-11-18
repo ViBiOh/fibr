@@ -50,7 +50,7 @@ func (a App) List(w http.ResponseWriter, request provider.Request, message rende
 	for index, item := range files {
 		aggregate, err := a.exifApp.GetAggregateFor(item)
 		if err != nil {
-			logger.WithField("context", "crud.List").WithField("item", item.Pathname).Error("unable to read: %s", err)
+			logger.WithField("fn", "crud.List").WithField("item", item.Pathname).Error("unable to read: %s", err)
 		}
 
 		items[index] = provider.RenderItem{

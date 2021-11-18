@@ -25,7 +25,7 @@ func (a App) GetAggregateFor(item provider.StorageItem) (provider.Aggregate, err
 	}
 
 	aggregate, err := a.loadAggregate(item)
-	if err != nil {
+	if err != nil && !provider.IsNotExist(err) {
 		return aggregate, fmt.Errorf("unable to load aggregate: %s", err)
 	}
 

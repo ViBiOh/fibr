@@ -17,19 +17,19 @@ func (a App) EventConsumer(e provider.Event) {
 	switch e.Type {
 	case provider.StartEvent:
 		if err := a.handleStartEvent(e.Item); err != nil {
-			logger.WithField("context", "exif.EventConsumer").WithField("item", e.Item.Pathname).Error("unable to start: %s", err)
+			logger.WithField("fn", "exif.EventConsumer").WithField("item", e.Item.Pathname).Error("unable to start: %s", err)
 		}
 	case provider.UploadEvent:
 		if err := a.handleUploadEvent(e.Item); err != nil {
-			logger.WithField("context", "exif.EventConsumer").WithField("item", e.Item.Pathname).Error("unable to upload: %s", err)
+			logger.WithField("fn", "exif.EventConsumer").WithField("item", e.Item.Pathname).Error("unable to upload: %s", err)
 		}
 	case provider.RenameEvent:
 		if err := a.rename(e.Item, *e.New); err != nil {
-			logger.WithField("context", "exif.EventConsumer").WithField("item", e.Item.Pathname).Error("unable to rename: %s", err)
+			logger.WithField("fn", "exif.EventConsumer").WithField("item", e.Item.Pathname).Error("unable to rename: %s", err)
 		}
 	case provider.DeleteEvent:
 		if err := a.delete(e.Item); err != nil {
-			logger.WithField("context", "exif.EventConsumer").WithField("item", e.Item.Pathname).Error("unable to delete: %s", err)
+			logger.WithField("fn", "exif.EventConsumer").WithField("item", e.Item.Pathname).Error("unable to delete: %s", err)
 		}
 	}
 }

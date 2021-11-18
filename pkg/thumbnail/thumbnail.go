@@ -122,7 +122,7 @@ func (a App) Stream(w http.ResponseWriter, r *http.Request, item provider.Storag
 
 	defer func() {
 		if closeErr := reader.Close(); closeErr != nil {
-			logger.WithField("context", "thumbnail.Stream").WithField("item", item.Pathname).Error("unable to close: %s", closeErr)
+			logger.WithField("fn", "thumbnail.Stream").WithField("item", item.Pathname).Error("unable to close: %s", closeErr)
 		}
 	}()
 
@@ -152,7 +152,7 @@ func (a App) Serve(w http.ResponseWriter, r *http.Request, item provider.Storage
 }
 
 // List return all thumbnail in a base64 form
-func (a App) List(w http.ResponseWriter, _ *http.Request, item provider.StorageItem) {
+func (a App) List(w http.ResponseWriter, r *http.Request, item provider.StorageItem) {
 	items, err := a.storageApp.List(item.Pathname)
 	if err != nil {
 		httperror.InternalServerError(w, err)
@@ -164,27 +164,45 @@ func (a App) List(w http.ResponseWriter, _ *http.Request, item provider.StorageI
 	w.WriteHeader(http.StatusOK)
 
 	commaNeeded := false
-	provider.SafeWrite(w, "{")
+	done := r.Context().Done()
+
+	safeWrite(done, w, "{")
 
 	for _, item := range items {
-		if item.IsDir || !a.HasThumbnail(item) {
-			continue
-		}
+		select {
+		case <-done:
+			return
+		default:
+			if item.IsDir || !a.HasThumbnail(item) {
+				continue
+			}
 
-		if commaNeeded {
-			provider.SafeWrite(w, ",")
-		} else {
-			commaNeeded = true
-		}
+			if commaNeeded {
+				safeWrite(done, w, ",")
+			} else {
+				commaNeeded = true
+			}
 
-		provider.SafeWrite(w, `"`)
-		provider.SafeWrite(w, sha.New(item.Name))
-		provider.SafeWrite(w, `":"`)
-		a.encodeContent(base64.NewEncoder(base64.StdEncoding, w), item)
-		provider.SafeWrite(w, `"`)
+			safeWrite(done, w, `"`)
+			safeWrite(done, w, sha.New(item.Name))
+			safeWrite(done, w, `":"`)
+			a.encodeContent(base64.NewEncoder(base64.StdEncoding, w), item)
+			safeWrite(done, w, `"`)
+		}
 	}
 
-	provider.SafeWrite(w, "}")
+	safeWrite(done, w, "}")
+}
+
+func safeWrite(done <-chan struct{}, w io.Writer, content string) {
+	select {
+	case <-done:
+		return
+	default:
+		if _, err := io.WriteString(w, content); err != nil {
+			logger.Error("unable to write content: %s", err)
+		}
+	}
 }
 
 func (a App) encodeContent(encoder io.WriteCloser, item provider.StorageItem) {

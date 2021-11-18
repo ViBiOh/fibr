@@ -84,7 +84,7 @@ func (a App) serveFile(w http.ResponseWriter, r *http.Request, item provider.Sto
 
 	defer func() {
 		if err = file.Close(); err != nil {
-			logger.WithField("context", "crud.serveFile").WithField("item", item.Pathname).Error("unable to close: %s", err)
+			logger.WithField("fn", "crud.serveFile").WithField("item", item.Pathname).Error("unable to close: %s", err)
 		}
 	}()
 
