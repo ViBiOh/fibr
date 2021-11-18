@@ -2,12 +2,13 @@
 
 Web File Browser and Manager.
 
-- Lightweight (11MB self-sufficient binary, low memory consumption at runtime).
+- Lightweight (13MB self-sufficient binary, low memory consumption at runtime).
 - Mobile-first interface, with light payload. Dark themed.
 - Thumbnail generation for image, PDF and video (with help of sidecars)
 - Works in pure HTML or with very little javascript for improved file upload
 - Can share directory with ou without password and with or without edit right.
 - Support for basic filesystem and storage object (in beta)
+- Can communicate with sidecars in pure HTTP or AMQP
 
 ![](docs/fibr.png)
 
