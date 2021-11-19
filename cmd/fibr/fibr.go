@@ -1,8 +1,10 @@
 package main
 
 import (
+	"crypto/rand"
 	"embed"
 	"flag"
+	"fmt"
 	"os"
 
 	"github.com/ViBiOh/auth/v2/pkg/ident/basic"
@@ -42,6 +44,16 @@ func newLoginApp(basicConfig basicMemory.Config) provider.Auth {
 	return authMiddleware.New(basicApp, basicProviderProvider)
 }
 
+func generateIdentityName() string {
+	raw := make([]byte, 4)
+	if _, err := rand.Read(raw); err != nil {
+		logger.Error("unable to generate identity name: %s", err)
+		return "error"
+	}
+
+	return fmt.Sprintf("%x", raw)
+}
+
 func main() {
 	fs := flag.NewFlagSet("fibr", flag.ExitOnError)
 
@@ -57,7 +69,7 @@ func main() {
 	basicConfig := basicMemory.Flags(fs, "auth")
 
 	crudConfig := crud.Flags(fs, "")
-	shareConfig := share.Flags(fs, "")
+	shareConfig := share.Flags(fs, "share")
 	webhookConfig := webhook.Flags(fs, "webhook")
 	rendererConfig := renderer.Flags(fs, "", flags.NewOverride("PublicURL", "https://fibr.vibioh.fr"), flags.NewOverride("Title", "fibr"))
 
@@ -67,7 +79,8 @@ func main() {
 	exifConfig := exif.Flags(fs, "exif")
 
 	amqpConfig := amqp.Flags(fs, "amqp")
-	amqphandlerConfig := amqphandler.Flags(fs, "amqp", flags.NewOverride("Exchange", "fibr"), flags.NewOverride("Queue", "fibr"), flags.NewOverride("RoutingKey", "fibr"))
+	amqpExifConfig := amqphandler.Flags(fs, "amqpExif", flags.NewOverride("Exchange", "fibr"), flags.NewOverride("Queue", "fibr-exif"), flags.NewOverride("RoutingKey", "fibr"))
+	amqpShareConfig := amqphandler.Flags(fs, "amqpShare", flags.NewOverride("Exchange", "fibr-shares"), flags.NewOverride("Queue", "fibr-share-"+generateIdentityName()), flags.NewOverride("RoutingKey", "share"))
 
 	disableAuth := flags.New("", "auth", "NoAuth").Default(false, nil).Label("Disable basic authentification").ToBool(fs)
 
@@ -121,10 +134,15 @@ func main() {
 	rendererApp, err := renderer.New(rendererConfig, content, fibr.FuncMap(thumbnailApp))
 	logger.Fatal(err)
 
-	amqphandlerApp, err := amqphandler.New(amqphandlerConfig, amqpClient, exifApp.AmqpHandler)
+	shareApp, err := share.New(shareConfig, storageProvider, amqpClient)
 	logger.Fatal(err)
 
-	shareApp := share.New(shareConfig, storageProvider)
+	amqpExifApp, err := amqphandler.New(amqpExifConfig, amqpClient, exifApp.AmqpHandler)
+	logger.Fatal(err)
+
+	amqpShareApp, err := amqphandler.New(amqpShareConfig, amqpClient, shareApp.AmqpHandler)
+	logger.Fatal(err)
+
 	crudApp, err := crud.New(crudConfig, storageProvider, rendererApp, shareApp, webhookApp, thumbnailApp, exifApp, eventBus.Push)
 	logger.Fatal(err)
 
@@ -136,7 +154,8 @@ func main() {
 	fibrApp := fibr.New(&crudApp, rendererApp, shareApp, webhookApp, middlewareApp)
 	handler := rendererApp.Handler(fibrApp.TemplateFunc)
 
-	go amqphandlerApp.Start(healthApp.Done())
+	go amqpExifApp.Start(healthApp.Done())
+	go amqpShareApp.Start(healthApp.Done())
 	go webhookApp.Start(healthApp.Done())
 	go shareApp.Start(healthApp.Done())
 	go crudApp.Start(healthApp.Done())
@@ -146,5 +165,5 @@ func main() {
 	go appServer.Start("http", healthApp.End(), httputils.Handler(handler, healthApp, recoverer.Middleware, prometheusApp.Middleware, owasp.New(owaspConfig).Middleware))
 
 	healthApp.WaitForTermination(appServer.Done())
-	server.GracefulWait(appServer.Done(), promServer.Done(), amqphandlerApp.Done())
+	server.GracefulWait(appServer.Done(), promServer.Done(), amqpExifApp.Done(), amqpShareApp.Done())
 }

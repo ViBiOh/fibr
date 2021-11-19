@@ -1,6 +1,7 @@
 package share
 
 import (
+	"context"
 	"fmt"
 	"path"
 	"time"
@@ -42,26 +43,40 @@ func (a *App) Create(filepath string, edit bool, password string, isDir bool, du
 		return "", fmt.Errorf("share is disabled")
 	}
 
-	a.mutex.Lock()
-	defer a.mutex.Unlock()
+	var id string
 
-	id, err := a.generateID()
-	if err != nil {
-		return "", err
-	}
+	return id, a.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
+		var err error
+		id, err = a.generateID()
+		if err != nil {
+			return fmt.Errorf("unable to generate id: %s", err)
+		}
 
-	a.shares[id] = provider.Share{
-		ID:       id,
-		Path:     filepath,
-		RootName: path.Base(filepath),
-		Edit:     edit,
-		Password: password,
-		File:     !isDir,
-		Creation: a.clock.Now(),
-		Duration: duration,
-	}
+		share := provider.Share{
+			ID:       id,
+			Path:     filepath,
+			RootName: path.Base(filepath),
+			Edit:     edit,
+			Password: password,
+			File:     !isDir,
+			Creation: a.clock.Now(),
+			Duration: duration,
+		}
 
-	return id, provider.SaveJSON(a.storageApp, shareFilename, a.shares)
+		a.shares[id] = share
+
+		if err = provider.SaveJSON(a.storageApp, shareFilename, a.shares); err != nil {
+			return fmt.Errorf("unable to save shares: %s", err)
+		}
+
+		if a.amqpClient != nil {
+			if err = a.publishShare(share); err != nil {
+				return fmt.Errorf("unable to publish share creation: %s", err)
+			}
+		}
+
+		return nil
+	})
 }
 
 // Delete a share
@@ -70,10 +85,19 @@ func (a *App) Delete(id string) error {
 		return fmt.Errorf("share is disabled")
 	}
 
-	a.mutex.Lock()
-	defer a.mutex.Unlock()
+	return a.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
+		delete(a.shares, id)
 
-	delete(a.shares, id)
+		if err := provider.SaveJSON(a.storageApp, shareFilename, a.shares); err != nil {
+			return fmt.Errorf("unable to save shares: %s", err)
+		}
 
-	return provider.SaveJSON(a.storageApp, shareFilename, a.shares)
+		if a.amqpClient != nil {
+			if err := a.publishShare(provider.Share{ID: id}); err != nil {
+				return fmt.Errorf("unable to publish share deletion: %s", err)
+			}
+		}
+
+		return nil
+	})
 }
