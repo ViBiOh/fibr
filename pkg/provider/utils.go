@@ -169,46 +169,53 @@ func RemoveIndex(arr []string, index int) []string {
 }
 
 // LoadJSON loads JSON content
-func LoadJSON(storageApp Storage, filename string, content interface{}) error {
-	reader, err := storageApp.ReaderFrom(filename)
+func LoadJSON(storageApp Storage, filename string, content interface{}) (err error) {
+	var reader io.ReadCloser
+	reader, err = storageApp.ReaderFrom(filename)
 	if err != nil {
 		return fmt.Errorf("unable to read: %w", err)
 	}
+
+	defer func() {
+		if closeErr := reader.Close(); closeErr != nil {
+			if err != nil {
+				err = fmt.Errorf("%s: %w", err, closeErr)
+			} else {
+				err = fmt.Errorf("unable to close: %s", err)
+			}
+		}
+	}()
 
 	if err = json.NewDecoder(reader).Decode(content); err != nil {
 		err = fmt.Errorf("unable to decode: %s", err)
 	}
 
-	if closeErr := reader.Close(); closeErr != nil {
-		if err != nil {
-			err = fmt.Errorf("%s: %w", err, closeErr)
-		} else {
-			err = fmt.Errorf("unable to close: %s", err)
-		}
-	}
-
-	return err
+	return
 }
 
 // SaveJSON saves JSON content
-func SaveJSON(storageApp Storage, filename string, content interface{}) error {
-	writer, err := storageApp.WriterTo(filename)
+func SaveJSON(storageApp Storage, filename string, content interface{}) (err error) {
+	var writer io.WriteCloser
+	writer, err = storageApp.WriterTo(filename)
 	if err != nil {
 		return fmt.Errorf("unable to get writer: %w", err)
 	}
+
+	defer func() {
+		if closeErr := writer.Close(); closeErr != nil {
+			if err != nil {
+				err = fmt.Errorf("%s: %w", err, closeErr)
+			} else {
+				err = fmt.Errorf("unable to close: %s", err)
+			}
+		}
+	}()
 
 	if err = json.NewEncoder(writer).Encode(content); err != nil {
 		err = fmt.Errorf("unable to encode: %s", err)
 	}
 
-	if closeErr := writer.Close(); closeErr != nil {
-		if err != nil {
-			return fmt.Errorf("%s: %w", err, closeErr)
-		}
-		return fmt.Errorf("unable to close: %s", closeErr)
-	}
-
-	return err
+	return
 }
 
 // SendLargeFile in a request with buffered copy
@@ -220,21 +227,18 @@ func SendLargeFile(ctx context.Context, storageApp Storage, item StorageItem, re
 
 	reader, writer := io.Pipe()
 	go func() {
+		defer func() {
+			if closeErr := file.Close(); closeErr != nil {
+				logger.WithField("fn", "provider.SendLargeFile").WithField("item", item.Pathname).Error("unable to close: %s", closeErr)
+			}
+		}()
+
 		buffer := BufferPool.Get().(*bytes.Buffer)
 		defer BufferPool.Put(buffer)
 
 		var err error
-
 		if _, err = io.CopyBuffer(writer, file, buffer.Bytes()); err != nil {
 			err = fmt.Errorf("unable to copy: %s", err)
-		}
-
-		if closeErr := file.Close(); closeErr != nil {
-			if err != nil {
-				err = fmt.Errorf("%s: %w", err, closeErr)
-			} else {
-				err = fmt.Errorf("unable to close: %s", err)
-			}
 		}
 
 		_ = writer.CloseWithError(err)

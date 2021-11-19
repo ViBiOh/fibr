@@ -36,21 +36,31 @@ func (a App) saveUploadedFile(request provider.Request, part *multipart.Part) (f
 		return "", fmt.Errorf("unable to get writer: %w", err)
 	}
 
+	defer func() {
+		if err == nil {
+			return
+		}
+
+		if removeErr := a.storageApp.Remove(filePath); removeErr != nil {
+			err = fmt.Errorf("%s: %w", err, removeErr)
+		}
+	}()
+
+	defer func() {
+		if closeErr := writer.Close(); closeErr != nil {
+			if err != nil {
+				err = fmt.Errorf("%s: %w", err, closeErr)
+			} else {
+				err = fmt.Errorf("unable to close: %s", err)
+			}
+		}
+	}()
+
 	buffer := provider.BufferPool.Get().(*bytes.Buffer)
 	defer provider.BufferPool.Put(buffer)
 
 	if _, err = io.CopyBuffer(writer, part, buffer.Bytes()); err != nil {
-		err = fmt.Errorf("unable to copy file: %s", err)
-	}
-
-	if closeErr := writer.Close(); closeErr != nil {
-		err = fmt.Errorf("%s: %w", err, closeErr)
-	}
-
-	if err != nil {
-		if removeErr := a.storageApp.Remove(filePath); removeErr != nil {
-			err = fmt.Errorf("%s: %w", err, removeErr)
-		}
+		return filename, fmt.Errorf("unable to copy: %s", err)
 	}
 
 	go func() {

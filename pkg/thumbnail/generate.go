@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/v4/pkg/request"
 	"github.com/ViBiOh/vith/pkg/model"
 	"github.com/streadway/amqp"
 )
@@ -19,13 +20,14 @@ const (
 	defaultTimeout = time.Minute * 2
 )
 
-func (a App) generate(item provider.StorageItem) error {
+func (a App) generate(item provider.StorageItem) (err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
 	defer cancel()
 
 	itemType := typeOfItem(item)
 
-	resp, err := a.requestVith(ctx, item)
+	var resp *http.Response
+	resp, err = a.requestVith(ctx, item)
 	if err != nil {
 		a.increaseMetric(itemType.String(), "error")
 		return fmt.Errorf("unable to request video thumbnailer: %s", err)
@@ -35,35 +37,42 @@ func (a App) generate(item provider.StorageItem) error {
 		return nil
 	}
 
+	defer func() {
+		if closeErr := request.DiscardBody(resp.Body); closeErr != nil {
+			if err != nil {
+				err = fmt.Errorf("%s: %w", err, closeErr)
+			} else {
+				err = fmt.Errorf("unable to close body: %s", err)
+			}
+		}
+	}()
+
 	thumbnailPath := getThumbnailPath(item)
-	if err := a.storageApp.CreateDir(filepath.Dir(thumbnailPath)); err != nil {
+	if err = a.storageApp.CreateDir(filepath.Dir(thumbnailPath)); err != nil {
 		return fmt.Errorf("unable to create directory: %s", err)
 	}
 
-	writer, err := a.storageApp.WriterTo(thumbnailPath)
+	var writer io.WriteCloser
+	writer, err = a.storageApp.WriterTo(thumbnailPath)
 	if err != nil {
 		return fmt.Errorf("unable to get writer: %w", err)
 	}
+
+	defer func() {
+		if closeErr := writer.Close(); closeErr != nil {
+			if err != nil {
+				err = fmt.Errorf("%s: %w", err, closeErr)
+			} else {
+				err = fmt.Errorf("unable to close: %s", err)
+			}
+		}
+	}()
 
 	buffer := provider.BufferPool.Get().(*bytes.Buffer)
 	defer provider.BufferPool.Put(buffer)
 
 	if _, err = io.CopyBuffer(writer, resp.Body, buffer.Bytes()); err != nil {
 		err = fmt.Errorf("unable to copy response: %s", err)
-	}
-
-	if closeErr := resp.Body.Close(); closeErr != nil {
-		if err != nil {
-			err = fmt.Errorf("%s: %w", err, closeErr)
-		}
-		err = fmt.Errorf("unable to close body response: %s", err)
-	}
-
-	if closeErr := writer.Close(); closeErr != nil {
-		if err != nil {
-			err = fmt.Errorf("%s: %w", err, closeErr)
-		}
-		err = fmt.Errorf("unable to close writer: %s", err)
 	}
 
 	a.increaseMetric(itemType.String(), "save")

@@ -143,8 +143,8 @@ func (a App) Serve(w http.ResponseWriter, r *http.Request, item provider.Storage
 	}
 
 	defer func() {
-		if err := reader.Close(); err != nil {
-			logger.WithField("fn", "thumbnail.Serve").WithField("item", item.Pathname).WithField("item", item.Pathname).Error("unable to close: %s", err)
+		if closeErr := reader.Close(); closeErr != nil {
+			logger.WithField("fn", "thumbnail.Serve").WithField("item", item.Pathname).WithField("item", item.Pathname).Error("unable to close: %s", closeErr)
 		}
 	}()
 

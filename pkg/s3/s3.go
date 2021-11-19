@@ -130,12 +130,14 @@ func (a App) WriterTo(pathname string) (io.WriteCloser, error) {
 	reader, writer := io.Pipe()
 
 	go func() {
-		if _, err := a.client.PutObject(context.Background(), a.bucket, getPath(pathname), reader, -1, minio.PutObjectOptions{}); err != nil {
+		defer func() {
 			if closeErr := reader.Close(); closeErr != nil {
-				err = fmt.Errorf("%s: %w", err, closeErr)
+				logger.WithField("fn", "s3.WriterTo").WithField("item", pathname).Error("unable to close writer: %s", closeErr)
 			}
+		}()
 
-			logger.Error("unable to put object: %s", err)
+		if _, err := a.client.PutObject(context.Background(), a.bucket, getPath(pathname), reader, -1, minio.PutObjectOptions{}); err != nil {
+			logger.WithField("fn", "s3.WriterTo").WithField("item", pathname).Error("unable to put object: %s", err)
 		}
 	}()
 

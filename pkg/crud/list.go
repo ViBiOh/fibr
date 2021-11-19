@@ -133,7 +133,7 @@ func (a App) zipFiles(done <-chan struct{}, request provider.Request, zipWriter 
 	return nil
 }
 
-func (a App) addFileToZip(zipWriter *zip.Writer, item provider.StorageItem, pathname string) error {
+func (a App) addFileToZip(zipWriter *zip.Writer, item provider.StorageItem, pathname string) (err error) {
 	header := &zip.FileHeader{
 		Name:               path.Join(pathname, item.Name),
 		UncompressedSize64: uint64(item.Size),
@@ -154,28 +154,32 @@ func (a App) addFileToZip(zipWriter *zip.Writer, item provider.StorageItem, path
 		header.UncompressedSize = uint32(header.UncompressedSize64)
 	}
 
-	writer, err := zipWriter.CreateHeader(header)
+	var writer io.Writer
+	writer, err = zipWriter.CreateHeader(header)
 	if err != nil {
 		return fmt.Errorf("unable to create zip header: %s", err)
 	}
 
-	reader, err := a.storageApp.ReaderFrom(item.Pathname)
+	var reader io.ReadCloser
+	reader, err = a.storageApp.ReaderFrom(item.Pathname)
 	if err != nil {
 		return fmt.Errorf("unable to read: %w", err)
 	}
+
+	defer func() {
+		if closeErr := reader.Close(); closeErr != nil {
+			if err != nil {
+				err = fmt.Errorf("%s: %w", err, closeErr)
+			} else {
+				err = fmt.Errorf("unable to close: %s", closeErr)
+			}
+		}
+	}()
 
 	buffer := provider.BufferPool.Get().(*bytes.Buffer)
 	defer provider.BufferPool.Put(buffer)
 
 	_, err = io.CopyBuffer(writer, reader, buffer.Bytes())
 
-	if closeErr := reader.Close(); closeErr != nil {
-		if err != nil {
-			err = fmt.Errorf("%s: %w", err, closeErr)
-		} else {
-			err = fmt.Errorf("unable to close: %s", closeErr)
-		}
-	}
-
-	return err
+	return
 }
