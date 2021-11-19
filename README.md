@@ -40,7 +40,7 @@ Fibr creates a `.fibr` folder in _root folder_ for storing its metadata: shares'
 
 Fibr generates thumbnails of images, PDF and videos when these [mime-types are detected](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types) and sidecars are provided. Sidecars are [h2non/imaginary](https://github.com/h2non/imaginary), [ViBiOh/vith](https://github.com/vibioh/vith) and [ViBiOh/exas](https://github.com/vibioh/exas). Thumbnails are generated in [WebP](https://developers.google.com/speed/webp/) format, in their animated format for video thumbnail.
 
-You can refer to these projects for installing and configuring them and set `-thumbnailImageURL`, `-thumbnailVideoURL` and `-exifURL` options.
+You can refer to these projects for installing and configuring them and set `-thumbnailURL` and `-exifURL` options.
 
 Sidecars may have constraints regarding concurrent work (e.g. HLS conversion is a CPU-intensive task) or rate limit (e.g. geocoding can have rate-limiting). Call to these sidecars can be made with HTTP, which is not fault tolerant but easy to setup, or with an AMQP messaging, which is more resilient but more complex to setup. An easy-to-setup AMQP messaging instance can be done with [CloudAMQP](https://www.cloudamqp.com) (I have no affiliation of any kind to this company, just a happy customer). When AMQP connection URI is provided, Fibr will use it as default communication protocol instead of HTTP.
 
@@ -135,9 +135,13 @@ In order to work, your user **must have** `admin` profile sets with the `-authPr
 
 ### Metadatas
 
-With help of different sidecars, Fibr can generate image, video and PDF thumbnails. These sidecars can be self hosted with ease. It can also extract and enrich content displayed by looking at [EXIF Data](https://en.wikipedia.org/wiki/Exif), also with the help of a little sidecar. This behaviour are opt-out (if you remove the `url` of the service, Fibr will do nothing).
+With help of different sidecars, Fibr can generate image, video and PDF thumbnails. These sidecars can be self hosted with ease. It can also extract and enrich content displayed by looking at [EXIF Data](https://en.wikipedia.org/wiki/Exif), also with the help of a little sidecar. These behaviours are opt-out (if you remove the `url` of the service, Fibr will do nothing).
 
 For the last mile, Fibr can try to reverse geocoding the GPS data found in EXIF, using [Open Street Map](https://wiki.openstreetmap.org/wiki/Nominatim). Self-hosting this kind of service can be complicated and calling a third-party party with such sensible datas is an opt-in decision.
+
+### Metrics
+
+Fibr exposes a lot of metrics on the [Prometheus endpoint](#endpoints). Common metrics are exposed: Golang statistics, HTTP statuses and response time, AMQP statuses and sidecars/metadatas actions.
 
 ## Getting started
 
@@ -318,12 +322,12 @@ Usage of fibr:
         [thumbnail] Maximum file size (in bytes) for generating thumbnail (0 to no limit). Not used if DirectAccess enabled. {FIBR_THUMBNAIL_MAX_SIZE} (default 209715200)
   -thumbnailMinBitrate uint
         [thumbnail] Minimal video bitrate (in bits per second) to generate a streamable version (in HLS), if DirectAccess enabled {FIBR_THUMBNAIL_MIN_BITRATE} (default 80000000)
-  -thumbnailVithPassword string
-        [thumbnail] Vith Thumbnail Basic Auth Password {FIBR_THUMBNAIL_VITH_PASSWORD}
-  -thumbnailVithURL string
-        [thumbnail] Vith Thumbnail URL {FIBR_THUMBNAIL_VITH_URL} (default "http://vith:1080")
-  -thumbnailVithUser string
-        [thumbnail] Vith Thumbnail Basic Auth User {FIBR_THUMBNAIL_VITH_USER}
+  -thumbnailPassword string
+        [thumbnail] Vith Thumbnail Basic Auth Password {FIBR_THUMBNAIL_PASSWORD}
+  -thumbnailURL string
+        [thumbnail] Vith Thumbnail URL {FIBR_THUMBNAIL_URL} (default "http://vith:1080")
+  -thumbnailUser string
+        [thumbnail] Vith Thumbnail Basic Auth User {FIBR_THUMBNAIL_USER}
   -title string
         Application title {FIBR_TITLE} (default "fibr")
   -url string

@@ -95,7 +95,7 @@ run:
 		-publicURL "http://localhost:1080" \
 		-authProfiles "1:admin" \
 		-authUsers "1:`htpasswd -nBb admin admin`" \
-		-thumbnailVithURL "" \
+		-thumbnailURL "" \
 		-exifURL "" \
 		-webhookSecret "secret"
 

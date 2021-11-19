@@ -31,10 +31,6 @@ func getExifPath(item provider.StorageItem, suffix string) string {
 }
 
 func (a App) hasMetadata(item provider.StorageItem, suffix string) bool {
-	if !a.enabled() {
-		return false
-	}
-
 	_, err := a.storageApp.Info(getExifPath(item, suffix))
 	return err == nil
 }

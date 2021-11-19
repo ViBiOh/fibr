@@ -16,10 +16,6 @@ var (
 
 // GetAggregateFor return aggregated value for a given directory
 func (a App) GetAggregateFor(item provider.StorageItem) (provider.Aggregate, error) {
-	if !a.enabled() {
-		return provider.Aggregate{}, nil
-	}
-
 	if !item.IsDir {
 		return provider.Aggregate{}, nil
 	}
