@@ -1,6 +1,8 @@
 package share
 
 import (
+	"context"
+	"fmt"
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -26,28 +28,38 @@ func (a *App) EventConsumer(e provider.Event) {
 }
 
 func (a *App) renameItem(old, new provider.StorageItem) error {
-	a.mutex.Lock()
-	defer a.mutex.Unlock()
+	return a.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
+		for id, share := range a.shares {
+			if strings.HasPrefix(share.Path, old.Pathname) {
+				share.Path = strings.Replace(share.Path, old.Pathname, new.Pathname, 1)
+				a.shares[id] = share
 
-	for id, share := range a.shares {
-		if strings.HasPrefix(share.Path, old.Pathname) {
-			share.Path = strings.Replace(share.Path, old.Pathname, new.Pathname, 1)
-			a.shares[id] = share
+				if a.amqpClient != nil {
+					if err := a.publishShare(share); err != nil {
+						return fmt.Errorf("unable to publish share rename: %s", err)
+					}
+				}
+			}
 		}
-	}
 
-	return provider.SaveJSON(a.storageApp, shareFilename, a.shares)
+		return provider.SaveJSON(a.storageApp, shareFilename, a.shares)
+	})
 }
 
 func (a *App) deleteItem(item provider.StorageItem) error {
-	a.mutex.Lock()
-	defer a.mutex.Unlock()
+	return a.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
+		for id, share := range a.shares {
+			if strings.HasPrefix(share.Path, item.Pathname) {
+				delete(a.shares, id)
 
-	for id, share := range a.shares {
-		if strings.HasPrefix(share.Path, item.Pathname) {
-			delete(a.shares, id)
+				if a.amqpClient != nil {
+					if err := a.publishShare(provider.Share{ID: id}); err != nil {
+						return fmt.Errorf("unable to publish share deletion: %s", err)
+					}
+				}
+			}
 		}
-	}
 
-	return provider.SaveJSON(a.storageApp, shareFilename, a.shares)
+		return provider.SaveJSON(a.storageApp, shareFilename, a.shares)
+	})
 }

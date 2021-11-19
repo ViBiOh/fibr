@@ -154,8 +154,7 @@ go install github.com/ViBiOh/fibr/cmd/fibr@latest
 fibr \
   -noAuth \
   -fsDirectory "$(pwd)" \
-  -thumbnailImageURL "" \
-  -thumbnailVideoURL "" \
+  -thumbnailURL "" \
   -exifURL "" \
   -publicURL "http://localhost:1080"
 ```
@@ -172,7 +171,7 @@ docker run -d \
   -e FIBR_PUBLIC_URL="http://localhost:1080" \
   -e FIBR_AUTH_PROFILES="1:admin" \
   -e FIBR_AUTH_USERS="1:$(htpasswd -nBb login password)" \
-  -e FIBR_THUMBNAIL_VITH_URL="" \
+  -e FIBR_THUMBNAIL_URL="" \
   -e FIBR_EXIF_URL="" \
   vibioh/fibr
 ```
@@ -202,16 +201,26 @@ Be careful when using the CLI, if someone list the processes on the system, they
 Usage of fibr:
   -address string
         [server] Listen address {FIBR_ADDRESS}
-  -amqpExchange string
-        [amqp] Exchange name {FIBR_AMQP_EXCHANGE} (default "fibr")
-  -amqpMaxRetry uint
-        [amqp] Max send retries {FIBR_AMQP_MAX_RETRY} (default 3)
-  -amqpQueue string
-        [amqp] Queue name {FIBR_AMQP_QUEUE} (default "fibr")
-  -amqpRetryInterval string
-        [amqp] Interval duration when send fails {FIBR_AMQP_RETRY_INTERVAL} (default "1h")
-  -amqpRoutingKey string
-        [amqp] RoutingKey name {FIBR_AMQP_ROUTING_KEY} (default "fibr")
+  -amqpExifExchange string
+        [amqpExif] Exchange name {FIBR_AMQP_EXIF_EXCHANGE} (default "fibr")
+  -amqpExifMaxRetry uint
+        [amqpExif] Max send retries {FIBR_AMQP_EXIF_MAX_RETRY} (default 3)
+  -amqpExifQueue string
+        [amqpExif] Queue name {FIBR_AMQP_EXIF_QUEUE} (default "fibr-exif")
+  -amqpExifRetryInterval string
+        [amqpExif] Interval duration when send fails {FIBR_AMQP_EXIF_RETRY_INTERVAL} (default "1h")
+  -amqpExifRoutingKey string
+        [amqpExif] RoutingKey name {FIBR_AMQP_EXIF_ROUTING_KEY} (default "fibr")
+  -amqpShareExchange string
+        [amqpShare] Exchange name {FIBR_AMQP_SHARE_EXCHANGE} (default "fibr-shares")
+  -amqpShareMaxRetry uint
+        [amqpShare] Max send retries {FIBR_AMQP_SHARE_MAX_RETRY} (default 3)
+  -amqpShareQueue string
+        [amqpShare] Queue name {FIBR_AMQP_SHARE_QUEUE} (default "fibr-share-e85a25fe")
+  -amqpShareRetryInterval string
+        [amqpShare] Interval duration when send fails {FIBR_AMQP_SHARE_RETRY_INTERVAL} (default "1h")
+  -amqpShareRoutingKey string
+        [amqpShare] RoutingKey name {FIBR_AMQP_SHARE_ROUTING_KEY} (default "share")
   -amqpURI string
         [amqp] Address in the form amqps?://<user>:<password>@<address>:<port>/<vhost> {FIBR_AMQP_URI}
   -authProfiles string
@@ -306,8 +315,14 @@ Usage of fibr:
         [s3] Storage Object Secret Access {FIBR_S3_SECRET_ACCESS}
   -sanitizeOnStart
         [crud] Sanitize name on start {FIBR_SANITIZE_ON_START}
-  -share
-        [share] Enable sharing feature {FIBR_SHARE} (default true)
+  -shareAmqpExchange string
+        [share] AMQP Exchange Name {FIBR_SHARE_AMQP_EXCHANGE} (default "fibr-shares")
+  -shareAmqpExclusiveRoutingKey string
+        [share] AMQP Routing Key for exclusive lock on default exchange {FIBR_SHARE_AMQP_EXCLUSIVE_ROUTING_KEY} (default "fibr.semaphore.shares")
+  -shareAmqpRoutingKey string
+        [share] AMQP Routing Key for share {FIBR_SHARE_AMQP_ROUTING_KEY} (default "share")
+  -shareEnabled
+        [share] Enable sharing feature {FIBR_SHARE_ENABLED} (default true)
   -shutdownTimeout string
         [server] Shutdown Timeout {FIBR_SHUTDOWN_TIMEOUT} (default "10s")
   -thumbnailAmqpExchange string
@@ -348,6 +363,6 @@ Usage of fibr:
 
 Fibr doesn't handle multiple instances running at the same time on the same `rootFolder`, if you use [Sharing feature](#sharing).
 
-Shares' metadatas are stored in a file, loaded at the start of the application. If an _instance A_ adds a share, _instance B_ can't see it. If they are both behind the same load-balancer, it can leads to an erratic behavior.
+Shares' metadatas are stored in a file, loaded at the start of the application. If an _instance A_ adds a share, _instance B_ can't see it. If they are both behind the same load-balancer, it can leads to an erratic behavior. Fibr has also an internal cron that purge expired shares and write the new metadatas to the file. If _instance A_ adds a share and _instance B_ runs the cron, the share added in _instance A_ is lost.
 
-Fibr has also an internal cron that purge expired shares and write the new metadatas to the file. If _instance A_ adds a share and _instance B_ runs the cron, the share added in _instance A_ is lost. It's a known limitation I need to work on, without adding an external tool like Redis and without being I/O intensive on filesystem.
+If you enable AMQP, it can handle thoses behaviours by using an exclusive lock with an AMQP semaphore mechanism.
