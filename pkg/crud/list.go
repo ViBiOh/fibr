@@ -98,8 +98,14 @@ func (a App) Download(w http.ResponseWriter, r *http.Request, request provider.R
 
 	w.Header().Add("Content-Disposition", fmt.Sprintf("attachment; filename=%s.zip", filename))
 
-	if err := a.zipFiles(r.Context().Done(), request, zipWriter, ""); err != nil {
-		a.rendererApp.Error(w, r, err)
+	done := r.Context().Done()
+	if err := a.zipFiles(done, request, zipWriter, ""); err != nil {
+		select {
+		case <-done:
+			return
+		default:
+			a.rendererApp.Error(w, r, err)
+		}
 	}
 }
 
