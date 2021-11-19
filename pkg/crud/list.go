@@ -3,6 +3,7 @@ package crud
 import (
 	"archive/zip"
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -97,24 +98,29 @@ func (a App) Download(w http.ResponseWriter, r *http.Request, request provider.R
 
 	w.Header().Add("Content-Disposition", fmt.Sprintf("attachment; filename=%s.zip", filename))
 
-	if err := a.zipFiles(request, zipWriter, ""); err != nil {
+	if err := a.zipFiles(r.Context().Done(), request, zipWriter, ""); err != nil {
 		a.rendererApp.Error(w, r, err)
 	}
 }
 
-func (a App) zipFiles(request provider.Request, zipWriter *zip.Writer, pathname string) error {
+func (a App) zipFiles(done <-chan struct{}, request provider.Request, zipWriter *zip.Writer, pathname string) error {
 	files, err := a.storageApp.List(request.GetFilepath(pathname))
 	if err != nil {
-		return err
+		return fmt.Errorf("unable to list: %s", err)
 	}
 
 	for _, file := range files {
-		if file.IsDir {
-			if err := a.zipFiles(request, zipWriter, path.Join(pathname, file.Name)); err != nil {
+		select {
+		case <-done:
+			return errors.New("context is done for zipping files")
+		default:
+			if file.IsDir {
+				if err := a.zipFiles(done, request, zipWriter, path.Join(pathname, file.Name)); err != nil {
+					return err
+				}
+			} else if err := a.addFileToZip(zipWriter, file, pathname); err != nil {
 				return err
 			}
-		} else if err := a.addFileToZip(zipWriter, file, pathname); err != nil {
-			return err
 		}
 	}
 
