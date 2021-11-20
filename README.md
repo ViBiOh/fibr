@@ -205,6 +205,8 @@ Usage of fibr:
         [crud] AMQP Routing Key for exclusive lock on default exchange {FIBR_AMQP_EXCLUSIVE_ROUTING_KEY} (default "fibr.semaphore.start")
   -amqpExifExchange string
         [amqpExif] Exchange name {FIBR_AMQP_EXIF_EXCHANGE} (default "fibr")
+  -amqpExifExclusive
+        [amqpExif] Queue exclusive mode (for fanout exchange) {FIBR_AMQP_EXIF_EXCLUSIVE}
   -amqpExifMaxRetry uint
         [amqpExif] Max send retries {FIBR_AMQP_EXIF_MAX_RETRY} (default 3)
   -amqpExifQueue string
@@ -215,6 +217,8 @@ Usage of fibr:
         [amqpExif] RoutingKey name {FIBR_AMQP_EXIF_ROUTING_KEY} (default "fibr")
   -amqpShareExchange string
         [amqpShare] Exchange name {FIBR_AMQP_SHARE_EXCHANGE} (default "fibr-shares")
+  -amqpShareExclusive
+        [amqpShare] Queue exclusive mode (for fanout exchange) {FIBR_AMQP_SHARE_EXCLUSIVE} (default true)
   -amqpShareMaxRetry uint
         [amqpShare] Max send retries {FIBR_AMQP_SHARE_MAX_RETRY} (default 3)
   -amqpShareQueue string
