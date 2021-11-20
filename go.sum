@@ -37,8 +37,6 @@ github.com/ViBiOh/auth/v2 v2.11.21 h1:GjNliDLWtr6N1dWfAdT9ltOoP9ipGnBrw1L5saYnfl
 github.com/ViBiOh/auth/v2 v2.11.21/go.mod h1:vRLQGkwqudSAdYjxswxUpEcCHVd0n89ZmWzLWy6p9Mc=
 github.com/ViBiOh/exas v0.2.3 h1:crqioI1vAb2hSIcQ5CadWhOoj9n1alj/ZanqWHMhuAo=
 github.com/ViBiOh/exas v0.2.3/go.mod h1:tj3ygeN/KamwIn4+wJGsETi1r09OiKTrAgaEVB7ly/o=
-github.com/ViBiOh/httputils/v4 v4.29.7 h1:lI61B1NHvwPEOhPQesB2Ddx7R/K1q9q9X6JBcS2RLcg=
-github.com/ViBiOh/httputils/v4 v4.29.7/go.mod h1:r4OWjqIH9F9UG0irKIeNSHMWtdk/AzlXpnMHtpKQ7yo=
 github.com/ViBiOh/httputils/v4 v4.29.8 h1:D4dr1gsU6i6mxZcoHwyo7R6qtO0kxKwoO1UaldrdFzw=
 github.com/ViBiOh/httputils/v4 v4.29.8/go.mod h1:r4OWjqIH9F9UG0irKIeNSHMWtdk/AzlXpnMHtpKQ7yo=
 github.com/ViBiOh/vith v0.2.2 h1:prSeDwO1T92zKcl68OZimUOre1DBvuhPJHVavfSscZE=

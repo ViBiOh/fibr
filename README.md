@@ -229,6 +229,18 @@ Usage of fibr:
         [amqpShare] RoutingKey name {FIBR_AMQP_SHARE_ROUTING_KEY} (default "share")
   -amqpURI string
         [amqp] Address in the form amqps?://<user>:<password>@<address>:<port>/<vhost> {FIBR_AMQP_URI}
+  -amqpWebhookExchange string
+        [amqpWebhook] Exchange name {FIBR_AMQP_WEBHOOK_EXCHANGE} (default "fibr-webhook")
+  -amqpWebhookExclusive
+        [amqpWebhook] Queue exclusive mode (for fanout exchange) {FIBR_AMQP_WEBHOOK_EXCLUSIVE} (default true)
+  -amqpWebhookMaxRetry uint
+        [amqpWebhook] Max send retries {FIBR_AMQP_WEBHOOK_MAX_RETRY} (default 3)
+  -amqpWebhookQueue string
+        [amqpWebhook] Queue name {FIBR_AMQP_WEBHOOK_QUEUE} (default "fibr-webhook-<random>")
+  -amqpWebhookRetryInterval string
+        [amqpWebhook] Interval duration when send fails {FIBR_AMQP_WEBHOOK_RETRY_INTERVAL} (default "1h")
+  -amqpWebhookRoutingKey string
+        [amqpWebhook] RoutingKey name {FIBR_AMQP_WEBHOOK_ROUTING_KEY} (default "webhook")
   -authProfiles string
         [auth] Users profiles in the form 'id:profile1|profile2,id2:profile1' {FIBR_AUTH_PROFILES}
   -authUsers string
@@ -355,6 +367,12 @@ Usage of fibr:
         [alcotest] URL to check {FIBR_URL}
   -userAgent string
         [alcotest] User-Agent for check {FIBR_USER_AGENT} (default "Alcotest")
+  -webhookAmqpExchange string
+        [webhook] AMQP Exchange Name {FIBR_WEBHOOK_AMQP_EXCHANGE} (default "fibr-webhooks")
+  -webhookAmqpExclusiveRoutingKey string
+        [webhook] AMQP Routing Key for exclusive lock on default exchange {FIBR_WEBHOOK_AMQP_EXCLUSIVE_ROUTING_KEY} (default "fibr.semaphore.webhooks")
+  -webhookAmqpRoutingKey string
+        [webhook] AMQP Routing Key for webhook {FIBR_WEBHOOK_AMQP_ROUTING_KEY} (default "webhook")
   -webhookEnabled
         [webhook] Enable webhook feature {FIBR_WEBHOOK_ENABLED} (default true)
   -webhookSecret string

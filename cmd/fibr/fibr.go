@@ -81,6 +81,7 @@ func main() {
 	amqpConfig := amqp.Flags(fs, "amqp")
 	amqpExifConfig := amqphandler.Flags(fs, "amqpExif", flags.NewOverride("Exchange", "fibr"), flags.NewOverride("Queue", "fibr-exif"), flags.NewOverride("RoutingKey", "fibr"))
 	amqpShareConfig := amqphandler.Flags(fs, "amqpShare", flags.NewOverride("Exchange", "fibr-shares"), flags.NewOverride("Queue", "fibr-share-"+generateIdentityName()), flags.NewOverride("RoutingKey", "share"), flags.NewOverride("Exclusive", true))
+	amqpWebhookConfig := amqphandler.Flags(fs, "amqpWebhook", flags.NewOverride("Exchange", "fibr-webhook"), flags.NewOverride("Queue", "fibr-webhook-"+generateIdentityName()), flags.NewOverride("RoutingKey", "webhook"), flags.NewOverride("Exclusive", true))
 
 	disableAuth := flags.New("", "auth", "NoAuth").Default(false, nil).Label("Disable basic authentification").ToBool(fs)
 
@@ -128,7 +129,7 @@ func main() {
 	exifApp, err := exif.New(exifConfig, storageProvider, prometheusRegisterer, amqpClient)
 	logger.Fatal(err)
 
-	webhookApp, err := webhook.New(webhookConfig, storageProvider, prometheusRegisterer)
+	webhookApp, err := webhook.New(webhookConfig, storageProvider, prometheusRegisterer, amqpClient)
 	logger.Fatal(err)
 
 	rendererApp, err := renderer.New(rendererConfig, content, fibr.FuncMap(thumbnailApp))
@@ -141,6 +142,9 @@ func main() {
 	logger.Fatal(err)
 
 	amqpShareApp, err := amqphandler.New(amqpShareConfig, amqpClient, shareApp.AmqpHandler)
+	logger.Fatal(err)
+
+	amqpWebhookApp, err := amqphandler.New(amqpWebhookConfig, amqpClient, webhookApp.AmqpHandler)
 	logger.Fatal(err)
 
 	crudApp, err := crud.New(crudConfig, storageProvider, rendererApp, shareApp, webhookApp, thumbnailApp, exifApp, eventBus.Push, amqpClient)
@@ -156,6 +160,7 @@ func main() {
 
 	go amqpExifApp.Start(healthApp.Done())
 	go amqpShareApp.Start(healthApp.Done())
+	go amqpWebhookApp.Start(healthApp.Done())
 	go webhookApp.Start(healthApp.Done())
 	go shareApp.Start(healthApp.Done())
 	go crudApp.Start(healthApp.Done())
@@ -165,5 +170,5 @@ func main() {
 	go appServer.Start("http", healthApp.End(), httputils.Handler(handler, healthApp, recoverer.Middleware, prometheusApp.Middleware, owasp.New(owaspConfig).Middleware))
 
 	healthApp.WaitForTermination(appServer.Done())
-	server.GracefulWait(appServer.Done(), promServer.Done(), amqpExifApp.Done(), amqpShareApp.Done())
+	server.GracefulWait(appServer.Done(), promServer.Done(), amqpExifApp.Done(), amqpShareApp.Done(), amqpWebhookApp.Done())
 }

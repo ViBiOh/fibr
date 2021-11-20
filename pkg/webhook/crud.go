@@ -1,6 +1,7 @@
 package webhook
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -40,23 +41,36 @@ func (a *App) Create(pathname string, recursive bool, url string, types []provid
 		return "", fmt.Errorf("webhook is disabled")
 	}
 
-	a.mutex.Lock()
-	defer a.mutex.Unlock()
+	var id string
 
-	id, err := a.generateID()
-	if err != nil {
-		return "", err
-	}
+	return id, a.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
+		id, err := a.generateID()
+		if err != nil {
+			return fmt.Errorf("unable to generate id: %s", err)
+		}
 
-	a.webhooks[id] = provider.Webhook{
-		ID:        id,
-		Pathname:  pathname,
-		Recursive: recursive,
-		URL:       url,
-		Types:     types,
-	}
+		webhook := provider.Webhook{
+			ID:        id,
+			Pathname:  pathname,
+			Recursive: recursive,
+			URL:       url,
+			Types:     types,
+		}
 
-	return id, provider.SaveJSON(a.storageApp, webhookFilename, a.webhooks)
+		a.webhooks[id] = webhook
+
+		if err = provider.SaveJSON(a.storageApp, webhookFilename, a.webhooks); err != nil {
+			return fmt.Errorf("unable to save webhooks: %s", err)
+		}
+
+		if a.amqpClient != nil {
+			if err = a.amqpClient.PublishJSON(webhook, a.amqpExchange, a.amqpRoutingKey); err != nil {
+				return fmt.Errorf("unable to publish webhook creation: %s", err)
+			}
+		}
+
+		return nil
+	})
 }
 
 // Delete a webhook
@@ -65,10 +79,19 @@ func (a *App) Delete(id string) error {
 		return fmt.Errorf("webhook is disabled")
 	}
 
-	a.mutex.Lock()
-	defer a.mutex.Unlock()
+	return a.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
+		delete(a.webhooks, id)
 
-	delete(a.webhooks, id)
+		if err := provider.SaveJSON(a.storageApp, webhookFilename, a.webhooks); err != nil {
+			return fmt.Errorf("unable to save webhooks: %s", err)
+		}
 
-	return provider.SaveJSON(a.storageApp, webhookFilename, a.webhooks)
+		if a.amqpClient != nil {
+			if err := a.amqpClient.PublishJSON(provider.Webhook{ID: id}, a.amqpExchange, a.amqpRoutingKey); err != nil {
+				return fmt.Errorf("unable to publish webhook deletion: %s", err)
+			}
+		}
+
+		return nil
+	})
 }
