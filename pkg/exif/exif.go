@@ -2,7 +2,6 @@ package exif
 
 import (
 	"context"
-	"encoding/json"
 	"flag"
 	"fmt"
 	"net/http"
@@ -16,7 +15,6 @@ import (
 	prom "github.com/ViBiOh/httputils/v4/pkg/prometheus"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/streadway/amqp"
 )
 
 const (
@@ -119,7 +117,7 @@ func (a App) get(item provider.StorageItem) (model.Exif, error) {
 		return exif, fmt.Errorf("unable to extract exif: %s", err)
 	}
 
-	if err := a.saveMetadata(item, exifMetadataFilename, data); err != nil {
+	if err = a.saveMetadata(item, exifMetadataFilename, data); err != nil {
 		return exif, fmt.Errorf("unable to save exif: %s", err)
 	}
 
@@ -154,19 +152,5 @@ func (a App) extractExif(ctx context.Context, item provider.StorageItem) (map[st
 func (a App) askForExif(item provider.StorageItem) error {
 	a.increaseExif("publish")
 
-	payload, err := json.Marshal(item)
-	if err != nil {
-		a.increaseExif("error")
-		return fmt.Errorf("unable to marshal exif amqp message: %s", err)
-	}
-
-	if err = a.amqpClient.Publish(amqp.Publishing{
-		ContentType: "application/json",
-		Body:        payload,
-	}, a.amqpExchange, a.amqpRoutingKey); err != nil {
-		a.increaseExif("error")
-		return fmt.Errorf("unable to publish exif amqp message: %s", err)
-	}
-
-	return nil
+	return a.amqpClient.PublishJSON(item, a.amqpExchange, a.amqpRoutingKey)
 }

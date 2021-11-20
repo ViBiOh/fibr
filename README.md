@@ -201,6 +201,8 @@ Be careful when using the CLI, if someone list the processes on the system, they
 Usage of fibr:
   -address string
         [server] Listen address {FIBR_ADDRESS}
+  -amqpExclusiveRoutingKey string
+        [crud] AMQP Routing Key for exclusive lock on default exchange {FIBR_AMQP_EXCLUSIVE_ROUTING_KEY} (default "fibr.semaphore.start")
   -amqpExifExchange string
         [amqpExif] Exchange name {FIBR_AMQP_EXIF_EXCHANGE} (default "fibr")
   -amqpExifMaxRetry uint
@@ -216,7 +218,7 @@ Usage of fibr:
   -amqpShareMaxRetry uint
         [amqpShare] Max send retries {FIBR_AMQP_SHARE_MAX_RETRY} (default 3)
   -amqpShareQueue string
-        [amqpShare] Queue name {FIBR_AMQP_SHARE_QUEUE} (default "fibr-share-e85a25fe")
+        [amqpShare] Queue name {FIBR_AMQP_SHARE_QUEUE} (default "fibr-share-<random>")
   -amqpShareRetryInterval string
         [amqpShare] Interval duration when send fails {FIBR_AMQP_SHARE_RETRY_INTERVAL} (default "1h")
   -amqpShareRoutingKey string

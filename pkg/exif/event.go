@@ -116,11 +116,11 @@ func (a App) aggregateOnRename(old, new provider.StorageItem) error {
 		return nil
 	}
 
-	if err := a.aggregate(oldDir); err != nil {
+	if err = a.aggregate(oldDir); err != nil {
 		return fmt.Errorf("unable to aggregate old directory: %s", err)
 	}
 
-	if err := a.aggregate(newDir); err != nil {
+	if err = a.aggregate(newDir); err != nil {
 		return fmt.Errorf("unable to aggregate new directory: %s", err)
 	}
 

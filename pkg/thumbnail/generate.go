@@ -3,7 +3,6 @@ package thumbnail
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -13,7 +12,6 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 	"github.com/ViBiOh/vith/pkg/model"
-	"github.com/streadway/amqp"
 )
 
 const (
@@ -86,21 +84,12 @@ func (a App) requestVith(ctx context.Context, item provider.StorageItem) (*http.
 	if a.amqpClient != nil {
 		a.increaseMetric(itemType.String(), "publish")
 
-		payload, err := json.Marshal(model.NewRequest(item.Pathname, getThumbnailPath(item), itemType))
+		err := a.amqpClient.PublishJSON(model.NewRequest(item.Pathname, getThumbnailPath(item), itemType), a.amqpExchange, a.amqpThumbnailRoutingKey)
 		if err != nil {
 			a.increaseMetric(itemType.String(), "error")
-			return nil, fmt.Errorf("unable to marshal thumbnail amqp message: %s", err)
 		}
 
-		if err := a.amqpClient.Publish(amqp.Publishing{
-			ContentType: "application/json",
-			Body:        payload,
-		}, a.amqpExchange, a.amqpThumbnailRoutingKey); err != nil {
-			a.increaseMetric(itemType.String(), "error")
-			return nil, fmt.Errorf("unable to publish thumbnail amqp message: %s", err)
-		}
-
-		return nil, nil
+		return nil, err
 	}
 
 	a.increaseMetric(itemType.String(), "request")

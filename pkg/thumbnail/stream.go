@@ -2,7 +2,6 @@ package thumbnail
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -13,7 +12,6 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 	"github.com/ViBiOh/vith/pkg/model"
-	"github.com/streadway/amqp"
 )
 
 // HasStream checks if given item has a streamable version
@@ -64,21 +62,12 @@ func (a App) generateStream(ctx context.Context, item provider.StorageItem) erro
 	if a.amqpClient != nil {
 		a.increaseMetric("stream", "publish")
 
-		payload, err := json.Marshal(req)
+		err := a.amqpClient.PublishJSON(req, a.amqpExchange, a.amqpThumbnailRoutingKey)
 		if err != nil {
 			a.increaseMetric("stream", "errror")
-			return fmt.Errorf("unable to marshal stream amqp message: %s", err)
 		}
 
-		if err := a.amqpClient.Publish(amqp.Publishing{
-			ContentType: "application/json",
-			Body:        payload,
-		}, a.amqpExchange, a.amqpStreamRoutingKey); err != nil {
-			a.increaseMetric("stream", "error")
-			return fmt.Errorf("unable to publish stream amqp message: %s", err)
-		}
-
-		return nil
+		return err
 	}
 
 	a.increaseMetric("stream", "request")

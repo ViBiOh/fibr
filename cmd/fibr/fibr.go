@@ -143,7 +143,7 @@ func main() {
 	amqpShareApp, err := amqphandler.New(amqpShareConfig, amqpClient, shareApp.AmqpHandler)
 	logger.Fatal(err)
 
-	crudApp, err := crud.New(crudConfig, storageProvider, rendererApp, shareApp, webhookApp, thumbnailApp, exifApp, eventBus.Push)
+	crudApp, err := crud.New(crudConfig, storageProvider, rendererApp, shareApp, webhookApp, thumbnailApp, exifApp, eventBus.Push, amqpClient)
 	logger.Fatal(err)
 
 	var middlewareApp provider.Auth

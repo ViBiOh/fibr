@@ -8,8 +8,9 @@ import (
 )
 
 func (a App) updateDate(item provider.StorageItem, data model.Exif) error {
+	var err error
+
 	if data.IsZero() {
-		var err error
 		if data, err = a.get(item); err != nil {
 			return fmt.Errorf("unable to get exif: %s", err)
 		}
@@ -23,7 +24,7 @@ func (a App) updateDate(item provider.StorageItem, data model.Exif) error {
 		return nil
 	}
 
-	if err := a.storageApp.UpdateDate(item.Pathname, data.Date); err != nil {
+	if err = a.storageApp.UpdateDate(item.Pathname, data.Date); err != nil {
 		return fmt.Errorf("unable to update date: %s", err)
 	}
 

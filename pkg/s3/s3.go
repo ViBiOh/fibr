@@ -214,7 +214,7 @@ func (a App) Rename(oldName, newName string) error {
 			return convertError(err)
 		}
 
-		if err := a.client.RemoveObject(context.Background(), a.bucket, item.Pathname, minio.RemoveObjectOptions{}); err != nil {
+		if err = a.client.RemoveObject(context.Background(), a.bucket, item.Pathname, minio.RemoveObjectOptions{}); err != nil {
 			return convertError(fmt.Errorf("unable to delete object: %s", err))
 		}
 
@@ -229,7 +229,7 @@ func (a App) Remove(pathname string) error {
 			return err
 		}
 
-		if err := a.client.RemoveObject(context.Background(), a.bucket, item.Pathname, minio.RemoveObjectOptions{}); err != nil {
+		if err = a.client.RemoveObject(context.Background(), a.bucket, item.Pathname, minio.RemoveObjectOptions{}); err != nil {
 			return convertError(fmt.Errorf("unable to delete object: %s", err))
 		}
 

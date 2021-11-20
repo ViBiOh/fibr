@@ -1,14 +1,18 @@
 package crud
 
 import (
+	"context"
 	"errors"
 	"flag"
+	"fmt"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/ViBiOh/fibr/pkg/exif"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
+	"github.com/ViBiOh/httputils/v4/pkg/amqp"
 	"github.com/ViBiOh/httputils/v4/pkg/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
@@ -37,6 +41,9 @@ type App struct {
 	webhookApp    provider.WebhookManager
 	pushEvent     provider.EventProducer
 
+	amqpClient              *amqp.Client
+	amqpExclusiveRoutingKey string
+
 	rendererApp  renderer.App
 	exifApp      exif.App
 	thumbnailApp thumbnail.App
@@ -47,8 +54,9 @@ type App struct {
 
 // Config of package
 type Config struct {
-	ignore          *string
-	sanitizeOnStart *bool
+	ignore                  *string
+	amqpExclusiveRoutingKey *string
+	sanitizeOnStart         *bool
 }
 
 // Flags adds flags for configuring package
@@ -56,11 +64,13 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
 		ignore:          flags.New(prefix, "crud", "IgnorePattern").Default("", nil).Label("Ignore pattern when listing files or directory").ToString(fs),
 		sanitizeOnStart: flags.New(prefix, "crud", "SanitizeOnStart").Default(false, nil).Label("Sanitize name on start").ToBool(fs),
+
+		amqpExclusiveRoutingKey: flags.New(prefix, "crud", "AmqpExclusiveRoutingKey").Default("fibr.semaphore.start", nil).Label("AMQP Routing Key for exclusive lock on default exchange").ToString(fs),
 	}
 }
 
 // New creates new App from Config
-func New(config Config, storage provider.Storage, rendererApp renderer.App, shareApp provider.ShareManager, webhookApp provider.WebhookManager, thumbnailApp thumbnail.App, exifApp exif.App, eventProducer provider.EventProducer) (App, error) {
+func New(config Config, storage provider.Storage, rendererApp renderer.App, shareApp provider.ShareManager, webhookApp provider.WebhookManager, thumbnailApp thumbnail.App, exifApp exif.App, eventProducer provider.EventProducer, amqpClient *amqp.Client) (App, error) {
 	app := App{
 		sanitizeOnStart: *config.sanitizeOnStart,
 
@@ -72,6 +82,15 @@ func New(config Config, storage provider.Storage, rendererApp renderer.App, shar
 		exifApp:       exifApp,
 		shareApp:      shareApp,
 		webhookApp:    webhookApp,
+
+		amqpClient:              amqpClient,
+		amqpExclusiveRoutingKey: strings.TrimSpace(*config.amqpExclusiveRoutingKey),
+	}
+
+	if amqpClient != nil {
+		if err := amqpClient.SetupExclusive(app.amqpExclusiveRoutingKey); err != nil {
+			return app, fmt.Errorf("unable to setup amqp exclusive: %s", err)
+		}
 	}
 
 	var ignorePattern *regexp.Regexp
@@ -112,6 +131,23 @@ func New(config Config, storage provider.Storage, rendererApp renderer.App, shar
 
 // Start crud operations
 func (a App) Start(done <-chan struct{}) {
+	if a.amqpClient == nil {
+		a.start(done)
+		return
+	}
+
+	if err := a.amqpClient.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, time.Hour, func(_ context.Context) error {
+		a.start(done)
+		return nil
+	}); err != nil {
+		logger.Error("unable to get exclusive semaphore: %s", err)
+	}
+}
+
+func (a App) start(done <-chan struct{}) {
+	logger.Info("Starting startup check...")
+	defer logger.Info("Ending startup check.")
+
 	err := a.storageApp.Walk("", func(item provider.StorageItem, err error) error {
 		if err != nil {
 			return err

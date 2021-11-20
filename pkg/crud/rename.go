@@ -58,7 +58,7 @@ func (a App) Rename(w http.ResponseWriter, r *http.Request, request provider.Req
 	oldPath := request.GetFilepath(oldName)
 	newPath := provider.GetPathname(newFolder, newName, request.Share)
 
-	if _, err := a.storageApp.Info(newPath); err == nil {
+	if _, err = a.storageApp.Info(newPath); err == nil {
 		a.rendererApp.Error(w, r, model.WrapInvalid(errors.New("new name already exist")))
 		return
 	} else if !provider.IsNotExist(err) {

@@ -86,8 +86,8 @@ func (a App) List(w http.ResponseWriter, request provider.Request, message rende
 func (a App) Download(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	zipWriter := zip.NewWriter(w)
 	defer func() {
-		if err := zipWriter.Close(); err != nil {
-			logger.Error("unable to close zip: %s", err)
+		if closeErr := zipWriter.Close(); closeErr != nil {
+			logger.Error("unable to close zip: %s", closeErr)
 		}
 	}()
 
@@ -121,10 +121,10 @@ func (a App) zipFiles(done <-chan struct{}, request provider.Request, zipWriter 
 			return errors.New("context is done for zipping files")
 		default:
 			if file.IsDir {
-				if err := a.zipFiles(done, request, zipWriter, path.Join(pathname, file.Name)); err != nil {
+				if err = a.zipFiles(done, request, zipWriter, path.Join(pathname, file.Name)); err != nil {
 					return err
 				}
-			} else if err := a.addFileToZip(zipWriter, file, pathname); err != nil {
+			} else if err = a.addFileToZip(zipWriter, file, pathname); err != nil {
 				return err
 			}
 		}

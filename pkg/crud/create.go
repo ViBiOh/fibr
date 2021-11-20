@@ -32,7 +32,7 @@ func (a App) Create(w http.ResponseWriter, r *http.Request, request provider.Req
 
 	pathname := request.GetFilepath(name)
 
-	if err := a.storageApp.CreateDir(pathname); err != nil {
+	if err = a.storageApp.CreateDir(pathname); err != nil {
 		a.rendererApp.Error(w, r, model.WrapInternal(err))
 		return
 	}

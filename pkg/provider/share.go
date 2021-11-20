@@ -44,7 +44,7 @@ func (s Share) CheckPassword(authorizationHeader string) error {
 	}
 
 	password := dataStr[sepIndex+1:]
-	if err := bcrypt.CompareHashAndPassword([]byte(s.Password), []byte(password)); err != nil {
+	if err = bcrypt.CompareHashAndPassword([]byte(s.Password), []byte(password)); err != nil {
 		return errors.New("invalid credentials")
 	}
 
