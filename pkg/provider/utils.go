@@ -17,6 +17,7 @@ import (
 	"unicode"
 
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
+	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
@@ -178,11 +179,7 @@ func LoadJSON(storageApp Storage, filename string, content interface{}) (err err
 
 	defer func() {
 		if closeErr := reader.Close(); closeErr != nil {
-			if err != nil {
-				err = fmt.Errorf("%s: %w", err, closeErr)
-			} else {
-				err = fmt.Errorf("unable to close: %s", err)
-			}
+			err = model.WrapError(err, fmt.Errorf("unable to close: %s", closeErr))
 		}
 	}()
 
@@ -203,11 +200,7 @@ func SaveJSON(storageApp Storage, filename string, content interface{}) (err err
 
 	defer func() {
 		if closeErr := writer.Close(); closeErr != nil {
-			if err != nil {
-				err = fmt.Errorf("%s: %w", err, closeErr)
-			} else {
-				err = fmt.Errorf("unable to close: %s", err)
-			}
+			err = model.WrapError(err, fmt.Errorf("unable to close: %s", closeErr))
 		}
 	}()
 

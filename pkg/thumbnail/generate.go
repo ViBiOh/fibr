@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	httpModel "github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 	"github.com/ViBiOh/vith/pkg/model"
 )
@@ -37,11 +38,7 @@ func (a App) generate(item provider.StorageItem) (err error) {
 
 	defer func() {
 		if closeErr := request.DiscardBody(resp.Body); closeErr != nil {
-			if err != nil {
-				err = fmt.Errorf("%s: %w", err, closeErr)
-			} else {
-				err = fmt.Errorf("unable to close body: %s", err)
-			}
+			err = httpModel.WrapError(err, fmt.Errorf("unable to close: %s", closeErr))
 		}
 	}()
 
@@ -58,11 +55,7 @@ func (a App) generate(item provider.StorageItem) (err error) {
 
 	defer func() {
 		if closeErr := writer.Close(); closeErr != nil {
-			if err != nil {
-				err = fmt.Errorf("%s: %w", err, closeErr)
-			} else {
-				err = fmt.Errorf("unable to close: %s", err)
-			}
+			err = httpModel.WrapError(err, fmt.Errorf("unable to close: %s", closeErr))
 		}
 	}()
 

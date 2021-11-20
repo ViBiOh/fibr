@@ -48,11 +48,7 @@ func (a App) saveUploadedFile(request provider.Request, part *multipart.Part) (f
 
 	defer func() {
 		if closeErr := writer.Close(); closeErr != nil {
-			if err != nil {
-				err = fmt.Errorf("%s: %w", err, closeErr)
-			} else {
-				err = fmt.Errorf("unable to close: %s", err)
-			}
+			err = model.WrapError(err, fmt.Errorf("unable to close: %s", closeErr))
 		}
 	}()
 
