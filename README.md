@@ -230,7 +230,7 @@ Usage of fibr:
   -amqpURI string
         [amqp] Address in the form amqps?://<user>:<password>@<address>:<port>/<vhost> {FIBR_AMQP_URI}
   -amqpWebhookExchange string
-        [amqpWebhook] Exchange name {FIBR_AMQP_WEBHOOK_EXCHANGE} (default "fibr-webhook")
+        [amqpWebhook] Exchange name {FIBR_AMQP_WEBHOOK_EXCHANGE} (default "fibr-webhooks")
   -amqpWebhookExclusive
         [amqpWebhook] Queue exclusive mode (for fanout exchange) {FIBR_AMQP_WEBHOOK_EXCLUSIVE} (default true)
   -amqpWebhookMaxRetry uint
