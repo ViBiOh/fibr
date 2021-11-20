@@ -27,19 +27,3 @@ func (a *App) AmqpHandler(message amqp.Delivery) error {
 
 	return nil
 }
-
-func (a *App) publishShare(share provider.Share) error {
-	payload, err := json.Marshal(share)
-	if err != nil {
-		return fmt.Errorf("unable to marshal amqp message: %s", err)
-	}
-
-	if err := a.amqpClient.Publish(amqp.Publishing{
-		ContentType: "application/json",
-		Body:        payload,
-	}, a.amqpExchange, a.amqpRoutingKey); err != nil {
-		return fmt.Errorf("unable to publish amqp message: %s", err)
-	}
-
-	return nil
-}

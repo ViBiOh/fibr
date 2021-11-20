@@ -185,7 +185,7 @@ func (a *App) purgeExpiredShares() bool {
 			delete(a.shares, id)
 
 			if a.amqpClient != nil {
-				if err := a.publishShare(provider.Share{ID: id}); err != nil {
+				if err := a.amqpClient.PublishJSON(provider.Share{ID: id}, a.amqpExchange, a.amqpRoutingKey); err != nil {
 					logger.WithField("fn", "share.purgeExpiredShares").WithField("item", id).Error("unable to publish share purge: %s", err)
 				}
 			}

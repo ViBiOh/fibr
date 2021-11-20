@@ -35,7 +35,7 @@ func (a *App) renameItem(old, new provider.StorageItem) error {
 				a.shares[id] = share
 
 				if a.amqpClient != nil {
-					if err := a.publishShare(share); err != nil {
+					if err := a.amqpClient.PublishJSON(share, a.amqpExchange, a.amqpRoutingKey); err != nil {
 						return fmt.Errorf("unable to publish share rename: %s", err)
 					}
 				}
@@ -53,7 +53,7 @@ func (a *App) deleteItem(item provider.StorageItem) error {
 				delete(a.shares, id)
 
 				if a.amqpClient != nil {
-					if err := a.publishShare(provider.Share{ID: id}); err != nil {
+					if err := a.amqpClient.PublishJSON(provider.Share{ID: id}, a.amqpExchange, a.amqpRoutingKey); err != nil {
 						return fmt.Errorf("unable to publish share deletion: %s", err)
 					}
 				}

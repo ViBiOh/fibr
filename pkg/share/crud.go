@@ -70,7 +70,7 @@ func (a *App) Create(filepath string, edit bool, password string, isDir bool, du
 		}
 
 		if a.amqpClient != nil {
-			if err = a.publishShare(share); err != nil {
+			if err = a.amqpClient.PublishJSON(share, a.amqpExchange, a.amqpRoutingKey); err != nil {
 				return fmt.Errorf("unable to publish share creation: %s", err)
 			}
 		}
@@ -93,7 +93,7 @@ func (a *App) Delete(id string) error {
 		}
 
 		if a.amqpClient != nil {
-			if err := a.publishShare(provider.Share{ID: id}); err != nil {
+			if err := a.amqpClient.PublishJSON(provider.Share{ID: id}, a.amqpExchange, a.amqpRoutingKey); err != nil {
 				return fmt.Errorf("unable to publish share deletion: %s", err)
 			}
 		}
