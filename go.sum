@@ -37,8 +37,8 @@ github.com/ViBiOh/auth/v2 v2.11.22 h1:9n/1dPCDnn/Dny5mL7po4ecu9TrhC0gKTXEh5YtkSi
 github.com/ViBiOh/auth/v2 v2.11.22/go.mod h1:Gjgu7VjBsucII5dcnI55nSfV3sHecE2XWqG3hASnekI=
 github.com/ViBiOh/exas v0.2.3 h1:crqioI1vAb2hSIcQ5CadWhOoj9n1alj/ZanqWHMhuAo=
 github.com/ViBiOh/exas v0.2.3/go.mod h1:tj3ygeN/KamwIn4+wJGsETi1r09OiKTrAgaEVB7ly/o=
-github.com/ViBiOh/httputils/v4 v4.29.9 h1:u3NPL9BrfW0cQ5hJqaVatUtss1f94YtnsMbxymPwKhw=
-github.com/ViBiOh/httputils/v4 v4.29.9/go.mod h1:r4OWjqIH9F9UG0irKIeNSHMWtdk/AzlXpnMHtpKQ7yo=
+github.com/ViBiOh/httputils/v4 v4.29.10 h1:DFzGrknMPsy8PvllfU6SIsrpvI/jXqOBUmuDsMZjsBA=
+github.com/ViBiOh/httputils/v4 v4.29.10/go.mod h1:r4OWjqIH9F9UG0irKIeNSHMWtdk/AzlXpnMHtpKQ7yo=
 github.com/ViBiOh/vith v0.2.2 h1:prSeDwO1T92zKcl68OZimUOre1DBvuhPJHVavfSscZE=
 github.com/ViBiOh/vith v0.2.2/go.mod h1:1Btr+Kq1rfiaTrPdvi/tfylioTqSBjMFfhCT0F7AsZ8=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
