@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/ViBiOh/auth/v2 v2.11.22
 	github.com/ViBiOh/exas v0.2.3
-	github.com/ViBiOh/httputils/v4 v4.29.8
+	github.com/ViBiOh/httputils/v4 v4.29.9
 	github.com/ViBiOh/vith v0.2.2
 	github.com/golang/mock v1.6.0
 	github.com/minio/minio-go/v7 v7.0.15
