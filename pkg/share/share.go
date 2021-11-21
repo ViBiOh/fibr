@@ -101,7 +101,7 @@ func (a *App) Exclusive(ctx context.Context, name string, duration time.Duration
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
-	if a.amqpClient == nil {
+	fn := func() error {
 		if err := a.refresh(); err != nil {
 			return fmt.Errorf("unable to refresh shares: %s", err)
 		}
@@ -109,12 +109,12 @@ func (a *App) Exclusive(ctx context.Context, name string, duration time.Duration
 		return action(ctx)
 	}
 
-	return a.amqpClient.Exclusive(ctx, name, duration, func(ctx context.Context) error {
-		if err := a.refresh(); err != nil {
-			return fmt.Errorf("unable to refresh shares: %s", err)
-		}
+	if a.amqpClient == nil {
+		return fn()
+	}
 
-		return action(ctx)
+	return a.amqpClient.Exclusive(ctx, name, duration, func(ctx context.Context) error {
+		return fn()
 	})
 }
 

@@ -104,20 +104,20 @@ func (a *App) Exclusive(ctx context.Context, name string, duration time.Duration
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
-	if a.amqpClient == nil {
+	fn := func() error {
 		if err := a.loadWebhooks(); err != nil {
-			return fmt.Errorf("unable to load webhooks: %s", err)
+			return fmt.Errorf("unable to refresh webhooks: %s", err)
 		}
 
 		return action(ctx)
 	}
 
-	return a.amqpClient.Exclusive(ctx, name, duration, func(ctx context.Context) error {
-		if err := a.loadWebhooks(); err != nil {
-			return fmt.Errorf("unable to load webhooks: %s", err)
-		}
+	if a.amqpClient == nil {
+		return fn()
+	}
 
-		return action(ctx)
+	return a.amqpClient.Exclusive(ctx, name, duration, func(ctx context.Context) error {
+		return fn()
 	})
 }
 
