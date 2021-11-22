@@ -47,9 +47,7 @@ func (a App) saveUploadedFile(request provider.Request, part *multipart.Part) (f
 	}()
 
 	defer func() {
-		if closeErr := writer.Close(); closeErr != nil {
-			err = model.WrapError(err, fmt.Errorf("unable to close: %s", closeErr))
-		}
+		err = provider.HandleClose(writer, err)
 	}()
 
 	buffer := provider.BufferPool.Get().(*bytes.Buffer)

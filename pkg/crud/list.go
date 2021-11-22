@@ -12,7 +12,6 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
-	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 	"github.com/ViBiOh/httputils/v4/pkg/sha"
 )
@@ -168,9 +167,7 @@ func (a App) addFileToZip(zipWriter *zip.Writer, item provider.StorageItem, path
 	}
 
 	defer func() {
-		if closeErr := reader.Close(); closeErr != nil {
-			err = model.WrapError(err, fmt.Errorf("unable to close: %s", closeErr))
-		}
+		err = provider.HandleClose(reader, err)
 	}()
 
 	buffer := provider.BufferPool.Get().(*bytes.Buffer)

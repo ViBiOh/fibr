@@ -178,7 +178,7 @@ func LoadJSON(storageApp Storage, filename string, content interface{}) (err err
 	}
 
 	defer func() {
-		err = handleClose(reader, err)
+		err = HandleClose(reader, err)
 	}()
 
 	if err = json.NewDecoder(reader).Decode(content); err != nil {
@@ -197,7 +197,7 @@ func SaveJSON(storageApp Storage, filename string, content interface{}) (err err
 	}
 
 	defer func() {
-		err = handleClose(writer, err)
+		err = HandleClose(writer, err)
 	}()
 
 	if err = json.NewEncoder(writer).Encode(content); err != nil {
@@ -243,7 +243,8 @@ func SendLargeFile(ctx context.Context, storageApp Storage, item StorageItem, re
 	return request.DoWithClient(SlowClient, r)
 }
 
-func handleClose(closer io.Closer, err error) error {
+// HandleClose closes given closer respecting given err
+func HandleClose(closer io.Closer, err error) error {
 	if closeErr := closer.Close(); closeErr != nil {
 		return model.WrapError(err, fmt.Errorf("unable to close: %s", closeErr))
 	}
