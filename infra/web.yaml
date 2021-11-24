@@ -67,6 +67,8 @@ spec:
       runAsUser: 999
       runAsNonRoot: true
       allowPrivilegeEscalation: false
+    autoscaling:
+      enabled: false
     ingress:
       enabled: true
       compress: true
