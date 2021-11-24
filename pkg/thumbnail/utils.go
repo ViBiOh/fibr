@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"path"
 	"path/filepath"
-	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/sha"
@@ -13,7 +12,7 @@ import (
 
 // CanHaveThumbnail determine if thumbnail can be generated for given pathname
 func (a App) CanHaveThumbnail(item provider.StorageItem) bool {
-	return (item.IsImage() || item.IsPdf() || item.IsVideo()) && (a.maxSize == 0 || item.Size < a.maxSize || a.directAccess)
+	return !item.IsDir && (item.IsImage() || item.IsPdf() || item.IsVideo()) && (a.maxSize == 0 || item.Size < a.maxSize || a.directAccess)
 }
 
 // HasThumbnail determine if thumbnail exist for given pathname
@@ -32,16 +31,15 @@ func (a App) GetChunk(pathname string) (provider.StorageItem, error) {
 }
 
 func getThumbnailPath(item provider.StorageItem) string {
-	return fmt.Sprintf("%s/%s.%s", filepath.Dir(path.Join(provider.MetadataDirectoryName, item.Pathname)), sha.New(item.Name), "webp")
+	return getPathWithExtension(item, "webp")
 }
 
 func getStreamPath(item provider.StorageItem) string {
-	fullPath := path.Join(provider.MetadataDirectoryName, item.Pathname)
-	if item.IsDir {
-		return fullPath
-	}
+	return getPathWithExtension(item, "m3u8")
+}
 
-	return fmt.Sprintf("%s.%s", strings.TrimSuffix(fullPath, path.Ext(fullPath)), "m3u8")
+func getPathWithExtension(item provider.StorageItem, extension string) string {
+	return fmt.Sprintf("%s/%s.%s", filepath.Dir(path.Join(provider.MetadataDirectoryName, item.Pathname)), sha.New(item.Name), extension)
 }
 
 func typeOfItem(item provider.StorageItem) model.ItemType {

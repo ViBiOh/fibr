@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"path"
 	"strconv"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -55,9 +54,9 @@ func (a App) shouldGenerateStream(ctx context.Context, item provider.StorageItem
 
 func (a App) generateStream(ctx context.Context, item provider.StorageItem) error {
 	input := item.Pathname
-	output := path.Dir(getStreamPath(item))
+	output := getStreamPath(item)
 
-	req := model.NewRequest(input, output, typeOfItem(item))
+	req := model.NewRequest(input, getStreamPath(item), typeOfItem(item))
 
 	if a.amqpClient != nil {
 		a.increaseMetric("stream", "publish")

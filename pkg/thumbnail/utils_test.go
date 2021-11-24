@@ -137,15 +137,7 @@ func TestGetStreamPath(t *testing.T) {
 			provider.StorageItem{
 				Pathname: "/path/to/file.mov",
 			},
-			".fibr/path/to/file.m3u8",
-		},
-		{
-			"directory",
-			provider.StorageItem{
-				Pathname: "/path/to/file/",
-				IsDir:    true,
-			},
-			".fibr/path/to/file",
+			".fibr/path/to/dd29ecf524b030a65261e3059c48ab9e1ecb2585.m3u8",
 		},
 	}
 
