@@ -3,9 +3,11 @@ package thumbnail
 import (
 	"fmt"
 	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/v4/pkg/sha"
 	"github.com/ViBiOh/vith/pkg/model"
 )
 
@@ -24,26 +26,22 @@ func (a App) HasThumbnail(item provider.StorageItem) bool {
 	return err == nil
 }
 
-// GetChunk retrieve the storage item in the metdata
-func (a App) GetChunk(filename string) (provider.StorageItem, error) {
-	return a.storageApp.Info(path.Join(provider.MetadataDirectoryName, filename))
+// GetChunk retrieve the storage item in the metadata
+func (a App) GetChunk(pathname string) (provider.StorageItem, error) {
+	return a.storageApp.Info(path.Join(provider.MetadataDirectoryName, pathname))
 }
 
 func getThumbnailPath(item provider.StorageItem) string {
-	return getThumbnailExtension(item, "webp")
+	return fmt.Sprintf("%s/%s.%s", filepath.Dir(path.Join(provider.MetadataDirectoryName, item.Pathname)), sha.New(item.Name), "webp")
 }
 
 func getStreamPath(item provider.StorageItem) string {
-	return getThumbnailExtension(item, "m3u8")
-}
-
-func getThumbnailExtension(item provider.StorageItem, extension string) string {
 	fullPath := path.Join(provider.MetadataDirectoryName, item.Pathname)
 	if item.IsDir {
 		return fullPath
 	}
 
-	return fmt.Sprintf("%s.%s", strings.TrimSuffix(fullPath, path.Ext(fullPath)), extension)
+	return fmt.Sprintf("%s.%s", strings.TrimSuffix(fullPath, path.Ext(fullPath)), "m3u8")
 }
 
 func typeOfItem(item provider.StorageItem) model.ItemType {

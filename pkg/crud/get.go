@@ -18,11 +18,11 @@ func (a App) getWithMessage(w http.ResponseWriter, r *http.Request, request prov
 		return a.Stats(w, request, message)
 	}
 
-	filename := request.GetFilepath("")
-	item, err := a.storageApp.Info(filename)
+	pathname := request.GetFilepath("")
+	item, err := a.storageApp.Info(pathname)
 
-	if err != nil && provider.IsNotExist(err) && provider.StreamExtensions[filepath.Ext(filename)] {
-		item, err = a.thumbnailApp.GetChunk(filename)
+	if err != nil && provider.IsNotExist(err) && provider.StreamExtensions[filepath.Ext(pathname)] {
+		item, err = a.thumbnailApp.GetChunk(pathname)
 	}
 
 	if err != nil {

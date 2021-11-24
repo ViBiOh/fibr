@@ -113,7 +113,31 @@ func TestGetThumbnailPath(t *testing.T) {
 			provider.StorageItem{
 				Pathname: "/path/to/file.png",
 			},
-			".fibr/path/to/file.webp",
+			".fibr/path/to/dd29ecf524b030a65261e3059c48ab9e1ecb2585.webp",
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.intention, func(t *testing.T) {
+			if result := getThumbnailPath(tc.input); result != tc.want {
+				t.Errorf("getThumbnailPath() = %s, want %s", result, tc.want)
+			}
+		})
+	}
+}
+
+func TestGetStreamPath(t *testing.T) {
+	cases := []struct {
+		intention string
+		input     provider.StorageItem
+		want      string
+	}{
+		{
+			"simple",
+			provider.StorageItem{
+				Pathname: "/path/to/file.mov",
+			},
+			".fibr/path/to/file.m3u8",
 		},
 		{
 			"directory",
@@ -127,8 +151,8 @@ func TestGetThumbnailPath(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.intention, func(t *testing.T) {
-			if result := getThumbnailPath(tc.input); result != tc.want {
-				t.Errorf("getThumbnailPath() = %s, want %s", result, tc.want)
+			if result := getStreamPath(tc.input); result != tc.want {
+				t.Errorf("getStreamPath() = %s, want %s", result, tc.want)
 			}
 		})
 	}
