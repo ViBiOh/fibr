@@ -81,7 +81,7 @@ func (a App) computeAndSaveAggregate(dir provider.StorageItem) error {
 		return fmt.Errorf("unable to aggregate: %s", err)
 	}
 
-	return a.saveMetadata(dir, aggregateMetadataFilename, provider.Aggregate{
+	return a.saveMetadata(dir, provider.Aggregate{
 		Location: directoryAggregate.value(),
 		Start:    minDate,
 		End:      maxDate,

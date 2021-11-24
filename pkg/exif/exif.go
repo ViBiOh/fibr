@@ -17,16 +17,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-const (
-	exifMetadataFilename      = ""
-	aggregateMetadataFilename = "aggregate"
-)
-
-var metadataFilenames = []string{
-	exifMetadataFilename,
-	aggregateMetadataFilename,
-}
-
 // App of package
 type App struct {
 	storageApp      provider.Storage
@@ -117,7 +107,7 @@ func (a App) get(item provider.StorageItem) (model.Exif, error) {
 		return exif, fmt.Errorf("unable to extract exif: %s", err)
 	}
 
-	if err = a.saveMetadata(item, exifMetadataFilename, data); err != nil {
+	if err = a.saveMetadata(item, data); err != nil {
 		return exif, fmt.Errorf("unable to save exif: %s", err)
 	}
 

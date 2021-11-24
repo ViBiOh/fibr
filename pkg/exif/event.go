@@ -37,7 +37,7 @@ func (a App) EventConsumer(e provider.Event) {
 }
 
 func (a App) handleStartEvent(item provider.StorageItem) error {
-	if !a.CanHaveExif(item) || a.hasMetadata(item, exifMetadataFilename) {
+	if !a.CanHaveExif(item) || a.hasMetadata(item) {
 		return nil
 	}
 
@@ -83,15 +83,13 @@ func (a App) processExif(item provider.StorageItem, exif model.Exif) error {
 }
 
 func (a App) rename(old, new provider.StorageItem) error {
-	for _, suffix := range metadataFilenames {
-		oldPath := getExifPath(old, suffix)
-		if _, err := a.storageApp.Info(oldPath); provider.IsNotExist(err) {
-			return nil
-		}
+	oldPath := getExifPath(old)
+	if _, err := a.storageApp.Info(oldPath); provider.IsNotExist(err) {
+		return nil
+	}
 
-		if err := a.storageApp.Rename(oldPath, getExifPath(new, suffix)); err != nil {
-			return fmt.Errorf("unable to rename exif: %s", err)
-		}
+	if err := a.storageApp.Rename(oldPath, getExifPath(new)); err != nil {
+		return fmt.Errorf("unable to rename exif: %s", err)
 	}
 
 	if !old.IsDir {
@@ -130,10 +128,8 @@ func (a App) aggregateOnRename(old, new provider.StorageItem) error {
 }
 
 func (a App) delete(item provider.StorageItem) error {
-	for _, suffix := range metadataFilenames {
-		if err := a.storageApp.Remove(getExifPath(item, suffix)); err != nil {
-			return fmt.Errorf("unable to delete: %s", err)
-		}
+	if err := a.storageApp.Remove(getExifPath(item)); err != nil {
+		return fmt.Errorf("unable to delete: %s", err)
 	}
 
 	if !item.IsDir {

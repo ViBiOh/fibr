@@ -15,42 +15,36 @@ func (a App) CanHaveExif(item provider.StorageItem) bool {
 	return (item.IsImage() || item.IsVideo() || item.IsPdf()) && (a.maxSize == 0 || item.Size < a.maxSize || a.directAccess)
 }
 
-func getExifPath(item provider.StorageItem, suffix string) string {
+func getExifPath(item provider.StorageItem) string {
 	fullPath := path.Join(provider.MetadataDirectoryName, item.Pathname)
 	if item.IsDir {
-		return fmt.Sprintf("%s/%s.json", fullPath, suffix)
+		return fmt.Sprintf("%s/%s.json", fullPath, "aggregate")
 	}
 
-	name := fmt.Sprintf("%s/%s", filepath.Dir(fullPath), sha.New(item.Name))
-
-	if len(suffix) == 0 {
-		return fmt.Sprintf("%s.json", name)
-	}
-
-	return fmt.Sprintf("%s_%s.json", name, suffix)
+	return fmt.Sprintf("%s/%s.json", filepath.Dir(fullPath), sha.New(item.Name))
 }
 
-func (a App) hasMetadata(item provider.StorageItem, suffix string) bool {
-	_, err := a.storageApp.Info(getExifPath(item, suffix))
+func (a App) hasMetadata(item provider.StorageItem) bool {
+	_, err := a.storageApp.Info(getExifPath(item))
 	return err == nil
 }
 
 func (a App) loadExif(item provider.StorageItem) (model.Exif, error) {
 	var data model.Exif
-	return data, a.loadMetadata(item, exifMetadataFilename, &data)
+	return data, a.loadMetadata(item, &data)
 }
 
 func (a App) loadAggregate(item provider.StorageItem) (provider.Aggregate, error) {
 	var data provider.Aggregate
-	return data, a.loadMetadata(item, aggregateMetadataFilename, &data)
+	return data, a.loadMetadata(item, &data)
 }
 
-func (a App) loadMetadata(item provider.StorageItem, suffix string, content interface{}) error {
-	return provider.LoadJSON(a.storageApp, getExifPath(item, suffix), content)
+func (a App) loadMetadata(item provider.StorageItem, content interface{}) error {
+	return provider.LoadJSON(a.storageApp, getExifPath(item), content)
 }
 
-func (a App) saveMetadata(item provider.StorageItem, suffix string, data interface{}) error {
-	filename := getExifPath(item, suffix)
+func (a App) saveMetadata(item provider.StorageItem, data interface{}) error {
+	filename := getExifPath(item)
 	dirname := filepath.Dir(filename)
 
 	if _, err := a.storageApp.Info(dirname); err != nil {
@@ -67,11 +61,10 @@ func (a App) saveMetadata(item provider.StorageItem, suffix string, data interfa
 		return fmt.Errorf("unable to save: %s", err)
 	}
 
-	switch suffix {
-	case exifMetadataFilename:
-		a.increaseExif("save")
-	case aggregateMetadataFilename:
+	if item.IsDir {
 		a.increaseAggregate("save")
+	} else {
+		a.increaseExif("save")
 	}
 
 	return nil
