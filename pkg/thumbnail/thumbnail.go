@@ -126,6 +126,7 @@ func (a App) Stream(w http.ResponseWriter, r *http.Request, item provider.Storag
 		}
 	}()
 
+	w.Header().Add("Content-Type", "application/x-mpegURL")
 	http.ServeContent(w, r, item.Name, item.Date, reader)
 }
 
