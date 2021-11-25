@@ -8,13 +8,13 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 )
 
-var eventConsumerLogger = logger.WithField("fn", "exif.EventConsumer")
-
 // EventConsumer handle event pushed to the event bus
 func (a App) EventConsumer(e provider.Event) {
 	if !a.enabled() {
 		return
 	}
+	
+	eventConsumerLogger := logger.WithField("fn", "exif.EventConsumer")
 
 	switch e.Type {
 	case provider.StartEvent:
