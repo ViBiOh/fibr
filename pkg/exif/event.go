@@ -37,7 +37,15 @@ func (a App) EventConsumer(e provider.Event) {
 }
 
 func (a App) handleStartEvent(item provider.StorageItem) error {
-	if !a.CanHaveExif(item) || a.hasMetadata(item) {
+	if a.hasMetadata(item) {
+		return nil
+	}
+
+	if item.IsDir {
+		return a.aggregate(item)
+	}
+	
+	if !a.CanHaveExif(item) {
 		return nil
 	}
 
