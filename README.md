@@ -210,19 +210,19 @@ Usage of fibr:
   -amqpExifMaxRetry uint
         [amqpExif] Max send retries {FIBR_AMQP_EXIF_MAX_RETRY} (default 3)
   -amqpExifQueue string
-        [amqpExif] Queue name {FIBR_AMQP_EXIF_QUEUE} (default "fibr-exif")
+        [amqpExif] Queue name {FIBR_AMQP_EXIF_QUEUE} (default "fibr.exif")
   -amqpExifRetryInterval string
         [amqpExif] Interval duration when send fails {FIBR_AMQP_EXIF_RETRY_INTERVAL} (default "1h")
   -amqpExifRoutingKey string
-        [amqpExif] RoutingKey name {FIBR_AMQP_EXIF_ROUTING_KEY} (default "fibr")
+        [amqpExif] RoutingKey name {FIBR_AMQP_EXIF_ROUTING_KEY} (default "exif")
   -amqpShareExchange string
-        [amqpShare] Exchange name {FIBR_AMQP_SHARE_EXCHANGE} (default "fibr-shares")
+        [amqpShare] Exchange name {FIBR_AMQP_SHARE_EXCHANGE} (default "fibr.shares")
   -amqpShareExclusive
         [amqpShare] Queue exclusive mode (for fanout exchange) {FIBR_AMQP_SHARE_EXCLUSIVE} (default true)
   -amqpShareMaxRetry uint
         [amqpShare] Max send retries {FIBR_AMQP_SHARE_MAX_RETRY} (default 3)
   -amqpShareQueue string
-        [amqpShare] Queue name {FIBR_AMQP_SHARE_QUEUE} (default "fibr-share-<random>")
+        [amqpShare] Queue name {FIBR_AMQP_SHARE_QUEUE} (default "fibr.share-<random>")
   -amqpShareRetryInterval string
         [amqpShare] Interval duration when send fails {FIBR_AMQP_SHARE_RETRY_INTERVAL} (default "0")
   -amqpShareRoutingKey string
@@ -230,13 +230,13 @@ Usage of fibr:
   -amqpURI string
         [amqp] Address in the form amqps?://<user>:<password>@<address>:<port>/<vhost> {FIBR_AMQP_URI}
   -amqpWebhookExchange string
-        [amqpWebhook] Exchange name {FIBR_AMQP_WEBHOOK_EXCHANGE} (default "fibr-webhooks")
+        [amqpWebhook] Exchange name {FIBR_AMQP_WEBHOOK_EXCHANGE} (default "fibr.webhooks")
   -amqpWebhookExclusive
         [amqpWebhook] Queue exclusive mode (for fanout exchange) {FIBR_AMQP_WEBHOOK_EXCLUSIVE} (default true)
   -amqpWebhookMaxRetry uint
         [amqpWebhook] Max send retries {FIBR_AMQP_WEBHOOK_MAX_RETRY} (default 3)
   -amqpWebhookQueue string
-        [amqpWebhook] Queue name {FIBR_AMQP_WEBHOOK_QUEUE} (default "fibr-webhook-<random>")
+        [amqpWebhook] Queue name {FIBR_AMQP_WEBHOOK_QUEUE} (default "fibr.webhook-<random>")
   -amqpWebhookRetryInterval string
         [amqpWebhook] Interval duration when send fails {FIBR_AMQP_WEBHOOK_RETRY_INTERVAL} (default "0")
   -amqpWebhookRoutingKey string
@@ -334,7 +334,7 @@ Usage of fibr:
   -sanitizeOnStart
         [crud] Sanitize name on start {FIBR_SANITIZE_ON_START}
   -shareAmqpExchange string
-        [share] AMQP Exchange Name {FIBR_SHARE_AMQP_EXCHANGE} (default "fibr-shares")
+        [share] AMQP Exchange Name {FIBR_SHARE_AMQP_EXCHANGE} (default "fibr.shares")
   -shareAmqpExclusiveRoutingKey string
         [share] AMQP Routing Key for exclusive lock on default exchange {FIBR_SHARE_AMQP_EXCLUSIVE_ROUTING_KEY} (default "fibr.semaphore.shares")
   -shareAmqpRoutingKey string
@@ -368,7 +368,7 @@ Usage of fibr:
   -userAgent string
         [alcotest] User-Agent for check {FIBR_USER_AGENT} (default "Alcotest")
   -webhookAmqpExchange string
-        [webhook] AMQP Exchange Name {FIBR_WEBHOOK_AMQP_EXCHANGE} (default "fibr-webhooks")
+        [webhook] AMQP Exchange Name {FIBR_WEBHOOK_AMQP_EXCHANGE} (default "fibr.webhooks")
   -webhookAmqpExclusiveRoutingKey string
         [webhook] AMQP Routing Key for exclusive lock on default exchange {FIBR_WEBHOOK_AMQP_EXCLUSIVE_ROUTING_KEY} (default "fibr.semaphore.webhooks")
   -webhookAmqpRoutingKey string

@@ -52,7 +52,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 		enabled:    flags.New(prefix, "webhook", "Enabled").Default(true, nil).Label("Enable webhook feature").ToBool(fs),
 		hmacSecret: flags.New(prefix, "webhook", "Secret").Default("", nil).Label("Secret for HMAC Signature").ToString(fs),
 
-		amqpExchange:            flags.New(prefix, "webhook", "AmqpExchange").Default("fibr-webhooks", nil).Label("AMQP Exchange Name").ToString(fs),
+		amqpExchange:            flags.New(prefix, "webhook", "AmqpExchange").Default("fibr.webhooks", nil).Label("AMQP Exchange Name").ToString(fs),
 		amqpRoutingKey:          flags.New(prefix, "webhook", "AmqpRoutingKey").Default("webhook", nil).Label("AMQP Routing Key for webhook").ToString(fs),
 		amqpExclusiveRoutingKey: flags.New(prefix, "webhook", "AmqpExclusiveRoutingKey").Default("fibr.semaphore.webhooks", nil).Label("AMQP Routing Key for exclusive lock on default exchange").ToString(fs),
 	}

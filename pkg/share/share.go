@@ -51,7 +51,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
 		share: flags.New(prefix, "share", "Enabled").Default(true, nil).Label("Enable sharing feature").ToBool(fs),
 
-		amqpExchange:            flags.New(prefix, "share", "AmqpExchange").Default("fibr-shares", nil).Label("AMQP Exchange Name").ToString(fs),
+		amqpExchange:            flags.New(prefix, "share", "AmqpExchange").Default("fibr.shares", nil).Label("AMQP Exchange Name").ToString(fs),
 		amqpRoutingKey:          flags.New(prefix, "share", "AmqpRoutingKey").Default("share", nil).Label("AMQP Routing Key for share").ToString(fs),
 		amqpExclusiveRoutingKey: flags.New(prefix, "share", "AmqpExclusiveRoutingKey").Default("fibr.semaphore.shares", nil).Label("AMQP Routing Key for exclusive lock on default exchange").ToString(fs),
 	}
