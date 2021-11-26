@@ -13,27 +13,29 @@ func (a App) EventConsumer(e provider.Event) {
 	if !a.enabled() {
 		return
 	}
-	
-	eventConsumerLogger := logger.WithField("fn", "exif.EventConsumer")
 
 	switch e.Type {
 	case provider.StartEvent:
 		if err := a.handleStartEvent(e.Item); err != nil {
-			eventConsumerLogger.WithField("item", e.Item.Pathname).Error("unable to start: %s", err)
+			getEventLogger(e.Item).Error("unable to start: %s", err)
 		}
 	case provider.UploadEvent:
 		if err := a.handleUploadEvent(e.Item); err != nil {
-			eventConsumerLogger.WithField("item", e.Item.Pathname).Error("unable to upload: %s", err)
+			getEventLogger(e.Item).Error("unable to upload: %s", err)
 		}
 	case provider.RenameEvent:
 		if err := a.rename(e.Item, *e.New); err != nil {
-			eventConsumerLogger.WithField("item", e.Item.Pathname).Error("unable to rename: %s", err)
+			getEventLogger(e.Item).Error("unable to rename: %s", err)
 		}
 	case provider.DeleteEvent:
 		if err := a.delete(e.Item); err != nil {
-			eventConsumerLogger.WithField("item", e.Item.Pathname).Error("unable to delete: %s", err)
+			getEventLogger(e.Item).Error("unable to delete: %s", err)
 		}
 	}
+}
+
+func getEventLogger(item provider.StorageItem) logger.Provider {
+	return logger.WithField("fn", "exif.EventConsumer").WithField("item", item.Pathname)
 }
 
 func (a App) handleStartEvent(item provider.StorageItem) error {
@@ -44,7 +46,7 @@ func (a App) handleStartEvent(item provider.StorageItem) error {
 	if item.IsDir {
 		return a.aggregate(item)
 	}
-	
+
 	if !a.CanHaveExif(item) {
 		return nil
 	}

@@ -64,6 +64,9 @@ func (a App) computeAndSaveAggregate(dir provider.StorageItem) error {
 
 		exifData, err := a.loadExif(item)
 		if err != nil {
+			if provider.IsNotExist(err) {
+				return nil
+			}
 			return fmt.Errorf("unable load exif data: %s", err)
 		}
 
