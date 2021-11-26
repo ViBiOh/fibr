@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"time"
 
+	exas "github.com/ViBiOh/exas/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
@@ -13,6 +14,20 @@ var (
 
 	levels = []string{"city", "state", "country"}
 )
+
+// GetExifFor return exif value for a given item
+func (a App) GetExifFor(item provider.StorageItem) (exas.Exif, error) {
+	if item.IsDir {
+		return exas.Exif{}, nil
+	}
+
+	exif, err := a.loadExif(item)
+	if err != nil && !provider.IsNotExist(err) {
+		return exif, fmt.Errorf("unable to load aggregate: %s", err)
+	}
+
+	return exif, nil
+}
 
 // GetAggregateFor return aggregated value for a given directory
 func (a App) GetAggregateFor(item provider.StorageItem) (provider.Aggregate, error) {

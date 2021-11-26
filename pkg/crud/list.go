@@ -11,6 +11,7 @@ import (
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
+	"github.com/ViBiOh/httputils/v4/pkg/concurrent"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 	"github.com/ViBiOh/httputils/v4/pkg/sha"
@@ -48,19 +49,29 @@ func (a App) List(w http.ResponseWriter, request provider.Request, message rende
 	uri := request.URL("")
 
 	items := make([]provider.RenderItem, len(files))
-	for index, item := range files {
-		aggregate, err := a.exifApp.GetAggregateFor(item)
-		if err != nil {
-			logger.WithField("fn", "crud.List").WithField("item", item.Pathname).Error("unable to read: %s", err)
-		}
+	wg := concurrent.NewGroup(4)
 
-		items[index] = provider.RenderItem{
-			ID:          sha.New(item.Name),
-			URI:         uri,
-			StorageItem: item,
-			Aggregate:   aggregate,
-		}
+	for index, item := range files {
+		func(item provider.StorageItem, index int) {
+			wg.Go(func() error {
+				aggregate, err := a.exifApp.GetAggregateFor(item)
+				if err != nil {
+					logger.WithField("fn", "crud.List").WithField("item", item.Pathname).Error("unable to read: %s", err)
+				}
+
+				items[index] = provider.RenderItem{
+					ID:          sha.New(item.Name),
+					URI:         uri,
+					StorageItem: item,
+					Aggregate:   aggregate,
+				}
+
+				return nil
+			})
+		}(item, index)
 	}
+
+	_ = wg.Wait()
 
 	content := map[string]interface{}{
 		"Paths": getPathParts(uri),
