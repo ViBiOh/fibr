@@ -5,7 +5,10 @@ import (
 	"embed"
 	"flag"
 	"fmt"
+	"net/http"
 	"os"
+
+	_ "net/http/pprof"
 
 	"github.com/ViBiOh/auth/v2/pkg/ident/basic"
 	authMiddleware "github.com/ViBiOh/auth/v2/pkg/middleware"
@@ -90,6 +93,10 @@ func main() {
 	alcotest.DoAndExit(alcotestConfig)
 	logger.Global(logger.New(loggerConfig))
 	defer logger.Close()
+
+	go func() {
+		fmt.Println(http.ListenAndServe("localhost:9999", http.DefaultServeMux))
+	}()
 
 	appServer := server.New(appServerConfig)
 	promServer := server.New(promServerConfig)
