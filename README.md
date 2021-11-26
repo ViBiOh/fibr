@@ -224,7 +224,7 @@ Usage of fibr:
   -amqpShareQueue string
         [amqpShare] Queue name {FIBR_AMQP_SHARE_QUEUE} (default "fibr-share-<random>")
   -amqpShareRetryInterval string
-        [amqpShare] Interval duration when send fails {FIBR_AMQP_SHARE_RETRY_INTERVAL} (default "1h")
+        [amqpShare] Interval duration when send fails {FIBR_AMQP_SHARE_RETRY_INTERVAL} (default "0")
   -amqpShareRoutingKey string
         [amqpShare] RoutingKey name {FIBR_AMQP_SHARE_ROUTING_KEY} (default "share")
   -amqpURI string
@@ -238,7 +238,7 @@ Usage of fibr:
   -amqpWebhookQueue string
         [amqpWebhook] Queue name {FIBR_AMQP_WEBHOOK_QUEUE} (default "fibr-webhook-<random>")
   -amqpWebhookRetryInterval string
-        [amqpWebhook] Interval duration when send fails {FIBR_AMQP_WEBHOOK_RETRY_INTERVAL} (default "1h")
+        [amqpWebhook] Interval duration when send fails {FIBR_AMQP_WEBHOOK_RETRY_INTERVAL} (default "0")
   -amqpWebhookRoutingKey string
         [amqpWebhook] RoutingKey name {FIBR_AMQP_WEBHOOK_ROUTING_KEY} (default "webhook")
   -authProfiles string
