@@ -94,7 +94,7 @@ func (a App) enabled() bool {
 
 func (a App) get(item provider.StorageItem) (model.Exif, error) {
 	exif, err := a.loadExif(item)
-	if err != nil {
+	if err != nil && !provider.IsNotExist(err) {
 		return exif, fmt.Errorf("unable to load exif: %s", err)
 	}
 

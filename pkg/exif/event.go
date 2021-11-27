@@ -57,7 +57,7 @@ func (a App) handleStartEvent(item provider.StorageItem) error {
 
 	data, err := a.get(item)
 	if err != nil {
-		return fmt.Errorf("unable to get exif : %s", err)
+		return fmt.Errorf("unable to get exif: %s", err)
 	}
 
 	return a.processExif(item, data)

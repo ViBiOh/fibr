@@ -12,6 +12,7 @@
     #content {
       display: flex;
       overflow: auto;
+      position: relative;
     }
 
     img, video, object {
@@ -31,7 +32,58 @@
     img, video {
       object-position: center center;
     }
+
+    .code {
+      font-family: Courier new;
+    }
+
+    .exif-button {
+      bottom: 1rem;
+      position: absolute;
+      right: 1rem;
+    }
+
+    #exif-modal:target {
+      display: flex;
+      z-index: 5;
+    }
+
+    #exif-modal:target ~ .content {
+      pointer-events: none;
+    }
   </style>
+
+  {{ if .Exif }}
+    <div id="exif-modal" class="modal">
+      <div class="modal-content">
+        <h2 class="header">Exif data</h2>
+
+        {{ if or (not .Exif.Date.IsZero) .Exif.Geocode.Address }}
+          <p class="padding no-margin">
+            {{ if not .Exif.Date.IsZero }}
+              {{ .Exif.Date }}
+            {{ end }}
+            {{ if .Exif.Geocode.Address }}
+              {{ if not .Exif.Date.IsZero }}
+                ,
+              {{ end }}
+              {{ .Exif.Geocode.Address }}
+            {{ end }}
+          </p>
+        {{ end }}
+
+        <p class="padding no-margin code">
+          {{ range $key, $value := .Exif.Data }}
+            <strong>{{ $key }}:</strong> {{ $value }}<br>
+          {{ end }}
+        </p>
+
+        <p class="padding no-margin center">
+          <a href="#" class="button white">Close</a>
+        </p>
+      </div>
+    </div>
+  {{ end }}
 
   <div id="content">
     {{ if .File.IsVideo }}
@@ -47,6 +99,12 @@
       {{ else }}
         <object data="{{ .File.Name }}" type="{{ .File.Mime }}"></object>
       {{ end }}
+    {{ end }}
+
+    {{ if .Exif }}
+      <a href="#exif-modal" class="button button-icon exif-button" alt="Show exif">
+        <img class="icon exif" src="{{ url "/svg/info" }}?fill=black" alt="Exif">
+      </a>
     {{ end }}
   </div>
 
