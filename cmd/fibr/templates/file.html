@@ -58,16 +58,18 @@
       <div class="modal-content">
         <h2 class="header">Exif data</h2>
 
-        {{ if or (not .Exif.Date.IsZero) .Exif.Geocode.Address }}
-          <p class="padding no-margin">
-            {{ if not .Exif.Date.IsZero }}
-              {{ .Exif.Date }}
-            {{ end }}
-            {{ if .Exif.Geocode.Address }}
-              {{ if not .Exif.Date.IsZero }}
-                ,
-              {{ end }}
-              {{ .Exif.Geocode.Address }}
+        {{ if not .Exif.Date.IsZero) }}
+          <p class="padding no-margin code">
+            <strong>Date:</strong> {{ .Exif.Date }}<br>
+          </p>
+        {{ end }}
+
+        {{ if .Exif.Geocode.Address }}
+          <p class="padding no-margin code">
+            <strong>Location</strong><br>
+
+            {{ range $key, $value := .Exif.Geocode.Address }}
+                <em>{{ $key }}:</em> {{ $value }}<br>
             {{ end }}
           </p>
         {{ end }}
