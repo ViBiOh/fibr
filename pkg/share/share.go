@@ -27,7 +27,7 @@ var (
 type App struct {
 	storageApp provider.Storage
 	shares     map[string]provider.Share
-	clock      *clock.Clock
+	clock      clock.Clock
 
 	amqpClient              *amqp.Client
 	amqpExchange            string

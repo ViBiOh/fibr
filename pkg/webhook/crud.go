@@ -29,8 +29,8 @@ func (a *App) List() map[string]provider.Webhook {
 		return nil
 	}
 
-	a.mutex.RLock()
-	defer a.mutex.RUnlock()
+	a.RLock()
+	defer a.RUnlock()
 
 	return a.webhooks
 }
