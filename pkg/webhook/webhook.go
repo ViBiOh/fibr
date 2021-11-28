@@ -27,13 +27,15 @@ type App struct {
 	storageApp provider.Storage
 	webhooks   map[string]provider.Webhook
 	counter    *prometheus.CounterVec
-	hmacSecret []byte
-	mutex      sync.RWMutex
 
 	amqpClient              *amqp.Client
 	amqpExchange            string
 	amqpRoutingKey          string
 	amqpExclusiveRoutingKey string
+
+	hmacSecret []byte
+
+	sync.RWMutex
 }
 
 // Config of package
@@ -101,8 +103,8 @@ func (a *App) Enabled() bool {
 
 // Exclusive does action on webhook with exclusive lock
 func (a *App) Exclusive(ctx context.Context, name string, duration time.Duration, action func(ctx context.Context) error) error {
-	a.mutex.Lock()
-	defer a.mutex.Unlock()
+	a.Lock()
+	defer a.Unlock()
 
 	fn := func() error {
 		if err := a.loadWebhooks(); err != nil {

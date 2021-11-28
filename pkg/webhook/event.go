@@ -15,8 +15,8 @@ func (a *App) EventConsumer(e provider.Event) {
 		return
 	}
 
-	a.mutex.RLock()
-	defer a.mutex.RUnlock()
+	a.RLock()
+	defer a.RUnlock()
 
 	for _, webhook := range a.webhooks {
 		if !webhook.Match(e) {

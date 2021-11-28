@@ -16,8 +16,8 @@ func (a *App) AmqpHandler(message amqp.Delivery) error {
 		return fmt.Errorf("unable to decode: %s", err)
 	}
 
-	a.mutex.Lock()
-	defer a.mutex.Unlock()
+	a.Lock()
+	defer a.Unlock()
 
 	if len(webhook.Pathname) == 0 {
 		delete(a.webhooks, webhook.ID)

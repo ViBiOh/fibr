@@ -49,11 +49,11 @@ func (a App) List(w http.ResponseWriter, request provider.Request, message rende
 	uri := request.URL("")
 
 	items := make([]provider.RenderItem, len(files))
-	wg := concurrent.NewGroup(4)
+	wg := concurrent.NewLimited(4)
 
 	for index, item := range files {
 		func(item provider.StorageItem, index int) {
-			wg.Go(func() error {
+			wg.Go(func() {
 				aggregate, err := a.exifApp.GetAggregateFor(item)
 				if err != nil {
 					logger.WithField("fn", "crud.List").WithField("item", item.Pathname).Error("unable to read: %s", err)
@@ -65,13 +65,11 @@ func (a App) List(w http.ResponseWriter, request provider.Request, message rende
 					StorageItem: item,
 					Aggregate:   aggregate,
 				}
-
-				return nil
 			})
 		}(item, index)
 	}
 
-	_ = wg.Wait()
+	wg.Wait()
 
 	content := map[string]interface{}{
 		"Paths": getPathParts(uri),
