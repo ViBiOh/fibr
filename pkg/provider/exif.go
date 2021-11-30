@@ -8,8 +8,8 @@ import (
 
 // Aggregate contains aggregated data for a folder
 type Aggregate struct {
-	Start    time.Time `json:"start"`
-	End      time.Time `json:"end"`
+	Start    time.Time `json:"start,omitempty"`
+	End      time.Time `json:"end,omitempty"`
 	Location string    `json:"location"`
 }
 
