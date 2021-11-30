@@ -43,7 +43,7 @@ func (a App) handleStartEvent(item provider.StorageItem) error {
 		return nil
 	}
 
-	if item.IsDir {
+	if item.IsDir && len(item.Pathname) != 0 {
 		return a.aggregate(item)
 	}
 
