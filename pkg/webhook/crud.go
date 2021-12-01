@@ -43,8 +43,8 @@ func (a *App) Create(pathname string, recursive bool, url string, types []provid
 
 	var id string
 
-	return id, a.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
-		id, err := a.generateID()
+	return id, a.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) (err error) {
+		id, err = a.generateID()
 		if err != nil {
 			return fmt.Errorf("unable to generate id: %s", err)
 		}
