@@ -43,8 +43,12 @@ func (a App) handleStartEvent(item provider.StorageItem) error {
 		return nil
 	}
 
-	if item.IsDir && len(item.Pathname) != 0 {
-		return a.aggregate(item)
+	if item.IsDir {
+		if len(item.Pathname) != 0 {
+			return a.aggregate(item)
+		}
+
+		return nil
 	}
 
 	if !a.CanHaveExif(item) {

@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/rand"
 	"embed"
+	"errors"
 	"flag"
 	"fmt"
 	"net/http"
@@ -124,9 +125,9 @@ func main() {
 	logger.Fatal(err)
 
 	amqpClient, err := amqp.New(amqpConfig, prometheusApp.Registerer())
-	if err != nil {
+	if err != nil && !errors.Is(err, amqp.ErrNoConfig) {
 		logger.Error("unable to create amqp client: %s", err)
-	} else {
+	} else if amqpClient != nil {
 		defer amqpClient.Close()
 	}
 

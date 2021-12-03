@@ -107,6 +107,10 @@ func (a App) get(item provider.StorageItem) (model.Exif, error) {
 		return exif, fmt.Errorf("unable to extract exif: %s", err)
 	}
 
+	if len(data) == 0 {
+		return exif, nil
+	}
+
 	if err = a.saveMetadata(item, data); err != nil {
 		return exif, fmt.Errorf("unable to save exif: %s", err)
 	}
