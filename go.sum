@@ -33,12 +33,12 @@ cloud.google.com/go/storage v1.10.0/go.mod h1:FLPqc6j+Ki4BU591ie1oL6qBQGu2Bl/tZ9
 dmitri.shuralyov.com/gpu/mtl v0.0.0-20190408044501-666a987793e9/go.mod h1:H6x//7gZCb22OMCxBHrMx7a5I7Hp++hsVxbQ4BYO7hU=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
-github.com/ViBiOh/auth/v2 v2.11.24 h1:2IsuJ8MUw3iFojcc7+zF01fVzmtH5onOKh8YHGCTB3E=
-github.com/ViBiOh/auth/v2 v2.11.24/go.mod h1:D5dK7pBLB21oi5bqmDE1ZedbVZiofLtHeVypdKICmNA=
+github.com/ViBiOh/auth/v2 v2.11.25 h1:lcBte7RZUDFiitw3x6I0K6MBnse5pVF7Lb6GS7YLCrQ=
+github.com/ViBiOh/auth/v2 v2.11.25/go.mod h1:Srgn7Z4bVLOLHFf3K262RKUQfttn2CgJbxknDir1ml0=
 github.com/ViBiOh/exas v0.2.4 h1:SD0V4BVBgQIGOrdv77WN/0ioHF3aXSibzMcd35R9zZQ=
 github.com/ViBiOh/exas v0.2.4/go.mod h1:DfqGNIGpM1yoYhRq9WqEHS90hiTMRWr1BTMkol0MBmc=
-github.com/ViBiOh/httputils/v4 v4.31.0 h1:CJ6HeVEpPtZCKcY7DO3TuIWa4mGx6huu6m6Ifk2hi0o=
-github.com/ViBiOh/httputils/v4 v4.31.0/go.mod h1:yi0L3aLmBWyxm+V0G/OJ19M6IGJ6PBeYQMpWeJCaHcI=
+github.com/ViBiOh/httputils/v4 v4.31.1 h1:rG2WEEKiz4iIQnAild68/hrghIvRRUeC1rPHtmQ5hY8=
+github.com/ViBiOh/httputils/v4 v4.31.1/go.mod h1:yi0L3aLmBWyxm+V0G/OJ19M6IGJ6PBeYQMpWeJCaHcI=
 github.com/ViBiOh/vith v0.2.2 h1:prSeDwO1T92zKcl68OZimUOre1DBvuhPJHVavfSscZE=
 github.com/ViBiOh/vith v0.2.2/go.mod h1:1Btr+Kq1rfiaTrPdvi/tfylioTqSBjMFfhCT0F7AsZ8=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=

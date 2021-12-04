@@ -12,26 +12,13 @@ import (
 type Type string
 
 const (
-	// TypeFeature as defined in https://datatracker.ietf.org/doc/html/rfc7946#section-1.4
-	TypeFeature Type = "Feature"
 	// TypeFeatureCollection as defined in https://datatracker.ietf.org/doc/html/rfc7946#section-1.4
 	TypeFeatureCollection Type = "FeatureCollection"
+	// TypeFeature as defined in https://datatracker.ietf.org/doc/html/rfc7946#section-1.4
+	TypeFeature Type = "Feature"
 	// TypePoint as defined in https://datatracker.ietf.org/doc/html/rfc7946#section-1.4
 	TypePoint Type = "Point"
 )
-
-// Geometry description
-type Geometry struct {
-	Type        Type       `json:"type"`
-	Coordinates []Position `json:"coordinates"`
-}
-
-// Feature description
-type Feature struct {
-	Type       Type                   `json:"type"`
-	Geometry   *Geometry              `json:"geometry"`
-	Properties map[string]interface{} `json:"properties"`
-}
 
 // FeatureCollection description
 type FeatureCollection struct {
@@ -39,16 +26,23 @@ type FeatureCollection struct {
 	Features []Feature `json:"features"`
 }
 
-// NewPoint creates a Point from given position
-func NewPoint(position Position) Geometry {
-	return Geometry{
-		Type:        TypePoint,
-		Coordinates: []Position{position},
+// NewFeatureCollection creates a FeatureCollection from given features
+func NewFeatureCollection(features []Feature) FeatureCollection {
+	return FeatureCollection{
+		Type:     TypeFeatureCollection,
+		Features: features,
 	}
 }
 
+// Feature description
+type Feature struct {
+	Type       Type                   `json:"type"`
+	Geometry   interface{}            `json:"geometry"`
+	Properties map[string]interface{} `json:"properties"`
+}
+
 // NewFeature creates a Feature from given geometry and properties
-func NewFeature(geometry *Geometry, properties map[string]interface{}) Feature {
+func NewFeature(geometry interface{}, properties map[string]interface{}) Feature {
 	return Feature{
 		Type:       TypeFeature,
 		Geometry:   geometry,
@@ -56,11 +50,17 @@ func NewFeature(geometry *Geometry, properties map[string]interface{}) Feature {
 	}
 }
 
-// NewFeatureCollection creates a FeatureCollection from given features
-func NewFeatureCollection(features []Feature) FeatureCollection {
-	return FeatureCollection{
-		Type:     TypeFeatureCollection,
-		Features: features,
+// Point description
+type Point struct {
+	Type        Type     `json:"type"`
+	Coordinates Position `json:"coordinates"`
+}
+
+// NewPoint creates a Point from given position
+func NewPoint(position Position) Point {
+	return Point{
+		Type:        TypePoint,
+		Coordinates: position,
 	}
 }
 
