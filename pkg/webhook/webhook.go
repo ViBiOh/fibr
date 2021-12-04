@@ -118,9 +118,19 @@ func (a *App) Exclusive(ctx context.Context, name string, duration time.Duration
 		return fn()
 	}
 
-	return a.amqpClient.Exclusive(ctx, name, duration, func(ctx context.Context) error {
+exclusive:
+	acquired, err := a.amqpClient.Exclusive(ctx, name, duration, func(ctx context.Context) error {
 		return fn()
 	})
+	if err != nil {
+		return err
+	}
+	if !acquired {
+		time.Sleep(time.Second)
+		goto exclusive
+	}
+
+	return nil
 }
 
 // Start worker

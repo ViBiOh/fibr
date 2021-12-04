@@ -97,7 +97,7 @@ func (a *App) Enabled() bool {
 }
 
 // Exclusive does action on shares with exclusive lock
-func (a *App) Exclusive(ctx context.Context, name string, duration time.Duration, action func(ctx context.Context) error) error {
+func (a *App) Exclusive(ctx context.Context, name string, duration time.Duration, action func(ctx context.Context) error) (bool, error) {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
@@ -110,12 +110,22 @@ func (a *App) Exclusive(ctx context.Context, name string, duration time.Duration
 	}
 
 	if a.amqpClient == nil {
-		return fn()
+		return true, fn()
 	}
 
-	return a.amqpClient.Exclusive(ctx, name, duration, func(ctx context.Context) error {
+exclusive:
+	acquired, err := a.amqpClient.Exclusive(ctx, name, duration, func(ctx context.Context) error {
 		return fn()
 	})
+	if err != nil {
+		return true, err
+	}
+	if !acquired {
+		time.Sleep(time.Second)
+		goto exclusive
+	}
+
+	return true, nil
 }
 
 // Get returns a share based on path

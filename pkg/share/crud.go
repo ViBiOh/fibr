@@ -45,7 +45,7 @@ func (a *App) Create(filepath string, edit bool, password string, isDir bool, du
 
 	var id string
 
-	return id, a.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
+	_, err := a.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
 		var err error
 		id, err = a.generateID()
 		if err != nil {
@@ -77,6 +77,8 @@ func (a *App) Create(filepath string, edit bool, password string, isDir bool, du
 
 		return nil
 	})
+
+	return id, err
 }
 
 // Delete a share
@@ -85,7 +87,7 @@ func (a *App) Delete(id string) error {
 		return fmt.Errorf("share is disabled")
 	}
 
-	return a.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
+	_, err := a.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
 		delete(a.shares, id)
 
 		if err := provider.SaveJSON(a.storageApp, shareFilename, a.shares); err != nil {
@@ -100,4 +102,6 @@ func (a *App) Delete(id string) error {
 
 		return nil
 	})
+
+	return err
 }

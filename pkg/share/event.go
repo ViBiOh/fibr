@@ -28,7 +28,7 @@ func (a *App) EventConsumer(e provider.Event) {
 }
 
 func (a *App) renameItem(old, new provider.StorageItem) error {
-	return a.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
+	_, err := a.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
 		for id, share := range a.shares {
 			if strings.HasPrefix(share.Path, old.Pathname) {
 				share.Path = strings.Replace(share.Path, old.Pathname, new.Pathname, 1)
@@ -44,10 +44,12 @@ func (a *App) renameItem(old, new provider.StorageItem) error {
 
 		return provider.SaveJSON(a.storageApp, shareFilename, a.shares)
 	})
+
+	return err
 }
 
 func (a *App) deleteItem(item provider.StorageItem) error {
-	return a.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
+	_, err := a.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
 		for id, share := range a.shares {
 			if strings.HasPrefix(share.Path, item.Pathname) {
 				delete(a.shares, id)
@@ -62,4 +64,6 @@ func (a *App) deleteItem(item provider.StorageItem) error {
 
 		return provider.SaveJSON(a.storageApp, shareFilename, a.shares)
 	})
+
+	return err
 }

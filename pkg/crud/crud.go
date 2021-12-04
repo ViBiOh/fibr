@@ -136,7 +136,7 @@ func (a App) Start(done <-chan struct{}) {
 		return
 	}
 
-	if err := a.amqpClient.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, time.Hour, func(_ context.Context) error {
+	if _, err := a.amqpClient.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, time.Hour, func(_ context.Context) error {
 		a.start(done)
 		return nil
 	}); err != nil {
