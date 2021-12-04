@@ -57,7 +57,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 		maxSize:      flags.New(prefix, "exif", "MaxSize").Default(1024*1024*200, nil).Label("Max file size (in bytes) for extracting exif (0 to no limit). Not used if DirectAccess enabled.").ToInt(fs),
 
 		amqpExchange:   flags.New(prefix, "exif", "AmqpExchange").Default("fibr", nil).Label("AMQP Exchange Name").ToString(fs),
-		amqpRoutingKey: flags.New(prefix, "exif", "AmqpRoutingKey").Default("exif", nil).Label("AMQP Routing Key for exif").ToString(fs),
+		amqpRoutingKey: flags.New(prefix, "exif", "AmqpRoutingKey").Default("exif_input", nil).Label("AMQP Routing Key for exif").ToString(fs),
 	}
 }
 

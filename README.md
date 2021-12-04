@@ -252,7 +252,7 @@ Usage of fibr:
   -exifAmqpExchange string
         [exif] AMQP Exchange Name {FIBR_EXIF_AMQP_EXCHANGE} (default "fibr")
   -exifAmqpRoutingKey string
-        [exif] AMQP Routing Key for exif {FIBR_EXIF_AMQP_ROUTING_KEY} (default "exif")
+        [exif] AMQP Routing Key for exif {FIBR_EXIF_AMQP_ROUTING_KEY} (default "exif_input")
   -exifDirectAccess
         [exif] Use Exas with direct access to filesystem (no large file upload, send a GET request, Basic Auth recommended) {FIBR_EXIF_DIRECT_ACCESS}
   -exifMaxSize int
