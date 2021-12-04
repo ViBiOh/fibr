@@ -6,7 +6,10 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/ViBiOh/fibr/pkg/geo"
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/v4/pkg/httperror"
+	"github.com/ViBiOh/httputils/v4/pkg/httpjson"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/query"
@@ -31,6 +34,11 @@ func (a App) getWithMessage(w http.ResponseWriter, r *http.Request, request prov
 		}
 
 		return "", 0, nil, model.WrapInternal(err)
+	}
+
+	if query.GetBool(r, "geojson") {
+		a.serveGeoJSON(w, r, item)
+		return "", 0, nil, nil
 	}
 
 	if query.GetBool(r, "thumbnail") {
@@ -68,11 +76,40 @@ func (a App) getWithMessage(w http.ResponseWriter, r *http.Request, request prov
 	return a.List(w, request, message)
 }
 
-func (a App) serveThumbnail(w http.ResponseWriter, r *http.Request, info provider.StorageItem) {
-	if info.IsDir {
-		a.thumbnailApp.List(w, r, info)
+func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, item provider.StorageItem) {
+	if !item.IsDir {
+		w.WriteHeader(http.StatusNoContent)
+	}
+
+	items, err := a.storageApp.List(item.Pathname)
+	if err != nil {
+		httperror.InternalServerError(w, err)
+		return
+	}
+
+	var features []geo.Feature
+
+	for _, item := range items {
+		exif, err := a.exifApp.GetExifFor(item)
+		if err != nil {
+			logger.WithField("item", item.Pathname).Error("unable to get exif: %s", err)
+		}
+
+		if exif.Geocode.Longitude > 0 {
+			point := geo.NewPoint(geo.NewPosition(exif.Geocode.Longitude, exif.Geocode.Latitude, 0))
+			features = append(features, geo.NewFeature(&point, nil))
+		}
+	}
+
+	httpjson.Write(w, http.StatusOK, geo.NewFeatureCollection(features))
+	return
+}
+
+func (a App) serveThumbnail(w http.ResponseWriter, r *http.Request, item provider.StorageItem) {
+	if item.IsDir {
+		a.thumbnailApp.List(w, r, item)
 	} else {
-		a.thumbnailApp.Serve(w, r, info)
+		a.thumbnailApp.Serve(w, r, item)
 	}
 }
 
