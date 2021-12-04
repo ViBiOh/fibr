@@ -214,7 +214,7 @@ Usage of fibr:
   -amqpExifRetryInterval string
         [amqpExif] Interval duration when send fails {FIBR_AMQP_EXIF_RETRY_INTERVAL} (default "1h")
   -amqpExifRoutingKey string
-        [amqpExif] RoutingKey name {FIBR_AMQP_EXIF_ROUTING_KEY} (default "exif")
+        [amqpExif] RoutingKey name {FIBR_AMQP_EXIF_ROUTING_KEY} (default "exif_output")
   -amqpShareExchange string
         [amqpShare] Exchange name {FIBR_AMQP_SHARE_EXCHANGE} (default "fibr.shares")
   -amqpShareExclusive
