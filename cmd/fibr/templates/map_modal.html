@@ -65,15 +65,29 @@
         }
 
         async function loadLeaflet() {
-          await addStyle('https://unpkg.com/leaflet@1.7.1/dist/leaflet.css', 'sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==', '')
-          await addScript('https://unpkg.com/leaflet@1.7.1/dist/leaflet.js', 'sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==', '')
+          await addStyle(
+            'https://unpkg.com/leaflet@1.7.1/dist/leaflet.css',
+            'sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==',
+            '',
+          );
+          await addScript(
+            'https://unpkg.com/leaflet@1.7.1/dist/leaflet.js',
+            'sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==',
+            '',
+          );
         }
 
+        let map;
         async function renderMap() {
-          await loadLeaflet()
+          if (map) {
+            map.invalidateSize(); // force re-render
+            return;
+          }
+
+          await loadLeaflet();
 
           // create Leaflet map
-          const map = L.map('photos-map', {
+          map = L.map('photos-map', {
             center: [46.227638, 2.213749], // France 🇫🇷
             zoom: 6,
           });
@@ -91,7 +105,11 @@
           }
 
           // fit bounds of map
-          map.fitBounds(geojson.features.map(f => L.GeoJSON.coordsToLatLng(f.geometry.coordinates)));
+          map.fitBounds(
+            geojson.features.map((f) =>
+              L.GeoJSON.coordsToLatLng(f.geometry.coordinates),
+            ),
+          );
 
           // draw geojson
           L.geoJSON(geojson, {
@@ -103,15 +121,15 @@
             onEachFeature: function (feature, layer) {
               layer.bindPopup(
                 `<a href="${feature.properties.name}?browser">
-                  <img src="${feature.properties.name}?thumbnail" alt="Image thumbnail">
+                   <img src="${feature.properties.name}?thumbnail" alt="Image thumbnail">
                  </a>
                  <br>
                  <span>${feature.properties.date}</span>`,
                 {
                   maxWidth: 'auto',
                   closeButton: false,
-                  className: 'thumbnail-popup'
-                }
+                  className: 'thumbnail-popup',
+                },
               );
             },
           }).addTo(map);
@@ -119,20 +137,24 @@
 
         function listenTarget(event) {
           if (document.location.hash == '#map') {
-            renderMap()
-            window.removeEventListener('popstate', listenTarget);
+            renderMap();
           }
         }
 
         document.addEventListener('readystatechange', async (event) => {
           if (event.target.readyState === 'complete') {
             if (document.location.hash == '#map') {
-              renderMap()
+              renderMap();
             } else {
-              window.addEventListener('popstate', listenTarget);
+              window.addEventListener('popstate', () => {
+                if (document.location.hash == '#map') {
+                  renderMap();
+                }
+              });
             }
           }
         });
+
       </script>
     </div>
   </div>
