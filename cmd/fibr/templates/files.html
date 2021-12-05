@@ -124,7 +124,7 @@
         #webhook-form-{{ .ID }}:target,
       {{ end }}
     {{ end }}
-    #map-modal:target,
+    #map:target,
     #upload-modal:target,
     #upload-success:target,
     #folder-modal:target,
@@ -150,7 +150,7 @@
         #webhook-form-{{ .ID }}:target ~ .content,
       {{ end }}
     {{ end }}
-    #map-modal:target ~ .content,
+    #map:target ~ .content,
     #upload-modal:target ~ .content,
     #upload-success:target ~ .content,
     #folder-modal:target ~ .content,
@@ -364,7 +364,7 @@
       {{ end }}
 
       {{ if gt (len .Files) 0 }}
-        <a class="padding" href="#map-modal" download>
+        <a class="padding" href="#map" download>
           <img class="icon" src="{{ url "/svg/map?fill=silver" }}" alt="View on map">
         </a>
       {{ end }}

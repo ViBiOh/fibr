@@ -1,5 +1,5 @@
 {{ define "map-modal" }}
-  <div id="map-modal" class="modal">
+  <div id="map" class="modal">
     <div class="modal-content">
       <h2 class="header no-margin">Map</h2>
       <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="" />
@@ -15,6 +15,11 @@
         #photos-map {
           height: 50rem;
           width: 50rem;
+        }
+
+        .thumbnail-popup {
+          height: 15rem;
+          width: 15rem;
         }
       </style>
 
@@ -33,41 +38,64 @@
           return response.json();
         }
 
-        document.addEventListener("readystatechange", async (event) => {
-          if (event.target.readyState === "complete") {
-            // create Leaflet map
-            const map = L.map('photos-map');
+        async function renderMap() {
+          // create Leaflet map
+          const map = L.map('photos-map');
 
-            // add the OpenStreetMap tiles
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-              maxZoom: 19,
-              attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
-            }).addTo(map);
+          // add the OpenStreetMap tiles
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution:
+              '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>',
+          }).addTo(map);
 
-            const geojson = await fetchGeoJSON()
-            if (!geojson || !geojson.features) {
-              return
-            }
+          const geojson = await fetchGeoJSON();
+          if (!geojson || !geojson.features) {
+            return;
+          }
 
-            // fit bounds of map
-            map.fitBounds(geojson.features.map(f => {
-              const coordinates = f.geometry.coordinates
+          // fit bounds of map
+          map.fitBounds(
+            geojson.features.map((f) => {
+              const coordinates = f.geometry.coordinates;
               return [coordinates[1], coordinates[0]];
-            }))
+            })
+          );
 
-            // draw geojson
-            L.geoJSON(geojson, {
-              pointToLayer: function (feature, latlng) {
-                return L.circleMarker(latlng, {
-                  radius: 8,
-                });
-              },
-              onEachFeature:  function (feature, layer) {
-                layer.bindPopup(`<a href="${feature.properties.name}?browser"><img src="${feature.properties.name}?thumbnail" alt="Image thumbnail"></a>`, {
-                  maxWidth: "auto"
-                });
-              },
-            }).addTo(map);
+          // draw geojson
+          L.geoJSON(geojson, {
+            pointToLayer: function (feature, latlng) {
+              return L.circleMarker(latlng, {
+                radius: 8,
+              });
+            },
+            onEachFeature: function (feature, layer) {
+              layer.bindPopup(
+                `<a href="${feature.properties.name}?browser"><img src="${feature.properties.name}?thumbnail" alt="Image thumbnail"></a>`,
+                {
+                  maxWidth: 'auto',
+                  closeButton: false,
+                  className: 'thumbnail-popup'
+                }
+              );
+            },
+          }).addTo(map);
+        }
+
+        function listenTarget(event) {
+          if (document.location.hash == '#map') {
+            renderMap()
+            window.removeEventListener('popstate', listenTarget);
+          }
+        }
+
+        document.addEventListener('readystatechange', async (event) => {
+          if (event.target.readyState === 'complete') {
+            if (document.location.hash == '#map') {
+              renderMap()
+            } else {
+              window.addEventListener('popstate', listenTarget);
+            }
           }
         });
       </script>
