@@ -73,7 +73,7 @@ func (a App) List(w http.ResponseWriter, request provider.Request, message rende
 	wg.Go(func() {
 		if aggregate, err := a.exifApp.GetAggregateFor(provider.StorageItem{
 			IsDir:    true,
-			Pathname: request.Path,
+			Pathname: request.GetFilepath(""),
 		}); err != nil {
 			logger.WithField("fn", "crud.List").WithField("item", request.Path).Error("unable to get aggregate: %s", err)
 		} else if len(aggregate.Location) != 0 {
