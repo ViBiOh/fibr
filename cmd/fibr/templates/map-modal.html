@@ -18,8 +18,9 @@
         }
 
         .thumbnail-popup {
+          bottom: 25px !important;
           height: 15rem;
-          width: 15rem;
+          width: 19rem;
         }
       </style>
 
@@ -71,7 +72,11 @@
             },
             onEachFeature: function (feature, layer) {
               layer.bindPopup(
-                `<a href="${feature.properties.name}?browser"><img src="${feature.properties.name}?thumbnail" alt="Image thumbnail"></a>`,
+                `<a href="${feature.properties.name}?browser">
+                  <img src="${feature.properties.name}?thumbnail" alt="Image thumbnail">
+                 </a>
+                 <br>
+                 <span>${feature.properties.date}</span>`,
                 {
                   maxWidth: 'auto',
                   closeButton: false,
