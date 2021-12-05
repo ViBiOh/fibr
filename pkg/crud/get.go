@@ -96,7 +96,7 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 			logger.WithField("item", item.Pathname).Error("unable to get exif: %s", err)
 		}
 
-		if exif.Geocode.Longitude > 0 {
+		if exif.Geocode.Longitude != 0 && exif.Geocode.Latitude != 0 {
 			point := geo.NewPoint(geo.NewPosition(exif.Geocode.Longitude, exif.Geocode.Latitude, 0))
 			features = append(features, geo.NewFeature(&point, map[string]interface{}{
 				"name": item.Name,
