@@ -31,7 +31,9 @@
     {{ end }}
   {{ end }}
 
-  {{ template "map-modal" . }}
+  {{ if $root.HasMap }}
+    {{ template "map-modal" . }}
+  {{ end }}
 
   <script type="text/javascript" nonce="{{ .nonce }}">
         /**
@@ -364,7 +366,7 @@
         </a>
       {{ end }}
 
-      {{ if gt (len .Files) 0 }}
+      {{ if $root.HasMap }}
         <a class="padding" href="#map" download>
           <img class="icon" src="{{ url "/svg/map?fill=silver" }}" alt="View on map">
         </a>

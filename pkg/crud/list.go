@@ -69,6 +69,18 @@ func (a App) List(w http.ResponseWriter, request provider.Request, message rende
 		}(item, index)
 	}
 
+	var hasMap bool
+	wg.Go(func() {
+		if aggregate, err := a.exifApp.GetAggregateFor(provider.StorageItem{
+			IsDir:    true,
+			Pathname: request.Path,
+		}); err != nil {
+			logger.WithField("fn", "crud.List").WithField("item", request.Path).Error("unable to get aggregate: %s", err)
+		} else if len(aggregate.Location) != 0 {
+			hasMap = true
+		}
+	})
+
 	wg.Wait()
 
 	content := map[string]interface{}{
@@ -78,6 +90,7 @@ func (a App) List(w http.ResponseWriter, request provider.Request, message rende
 
 		"Request": request,
 		"Message": message,
+		"HasMap":  hasMap,
 	}
 
 	if request.CanShare {
