@@ -100,6 +100,7 @@
     #menu {
       padding-left: 0.5rem;
       padding-top: 0.5rem;
+      overflow: auto;
     }
 
     #files {
@@ -333,7 +334,7 @@
         <img class="icon" src="{{ url "/svg/th?fill=silver" }}" alt="Grid">
       </a>
 
-      <span class="padding-left">{{ len .Files }}<span {{ if .Request.CanEdit }}class="hide-xs"{{ end }}> element{{ if gt (len .Files) 1 }}s{{ end }}</span></span>
+      <span class="padding-left {{ if .Request.CanEdit }}hide-s{{ end }}">{{ len .Files }}<span {{ if .Request.CanEdit }}class="hide-xs"{{ end }}> element{{ if gt (len .Files) 1 }}s{{ end }}</span></span>
       <span class="flex-grow"></span>
 
       {{ if .Request.CanEdit }}
