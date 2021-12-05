@@ -7,15 +7,12 @@
         <a href="#" class="button white small">Close</a>
       </h2>
 
-      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="" />
-      <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
-      
       <div id="photos-map"></div>
 
       <style type="text/css" nonce="{{ .nonce }}">
         #photos-map {
-          height: 100vh;
-          width: 100vw;
+          height: 80vh;
+          width: 90vw;
         }
 
         .thumbnail-popup {
@@ -40,9 +37,46 @@
           return response.json();
         }
 
+        async function addStyle(src, integrity, crossorigin) {
+          return new Promise((resolve) => {
+            const style = document.createElement('link');
+            style.rel = 'stylesheet';
+            style.href = src;
+            style.integrity = integrity;
+            style.crossOrigin = crossorigin;
+            style.onload = resolve;
+
+            document.querySelector('head').appendChild(style);
+          });
+        }
+
+        async function addScript(src, integrity, crossorigin) {
+          return new Promise((resolve) => {
+            const script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = src;
+            script.async = 'true';
+            script.integrity = integrity;
+            script.crossOrigin = crossorigin;
+            script.onload = resolve;
+
+            document.querySelector('head').appendChild(script);
+          });
+        }
+
+        async function loadLeaflet() {
+          await addStyle('https://unpkg.com/leaflet@1.7.1/dist/leaflet.css', 'sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==', '')
+          await addScript('https://unpkg.com/leaflet@1.7.1/dist/leaflet.js', 'sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==', '')
+        }
+
         async function renderMap() {
+          await loadLeaflet()
+
           // create Leaflet map
-          const map = L.map('photos-map');
+          const map = L.map('photos-map', {
+            center: [46.227638, 2.213749], // France 🇫🇷
+            zoom: 6,
+          });
 
           // add the OpenStreetMap tiles
           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
