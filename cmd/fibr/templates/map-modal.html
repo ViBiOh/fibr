@@ -1,0 +1,76 @@
+{{ define "map-modal" }}
+  <div id="map-modal" class="modal">
+    <div class="modal-content">
+      <h2 class="header no-margin">Map</h2>
+      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="" />
+      <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+      
+      <div id="photos-map"></div>
+
+      <p class="padding no-margin center">
+        <a href="#" class="button white">Close</a>
+      </p>
+
+      <style type="text/css" nonce="{{ .nonce }}">
+        #photos-map {
+          height: 50rem;
+          width: 50rem;
+        }
+      </style>
+
+      <script type="text/javascript" nonce="{{ .nonce }}">
+        async function fetchGeoJSON() {
+          const response = await fetch('?geojson', { credentials: 'same-origin' });
+
+          if (response.status >= 400) {
+            throw new Error('unable to load geojson');
+          }
+
+          if (response.status === 204) {
+            return null;
+          }
+
+          return response.json();
+        }
+
+        document.addEventListener("readystatechange", async (event) => {
+          if (event.target.readyState === "complete") {
+            // create Leaflet map
+            const map = L.map('photos-map');
+
+            // add the OpenStreetMap tiles
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+              maxZoom: 19,
+              attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+            }).addTo(map);
+
+            const geojson = await fetchGeoJSON()
+            if (!geojson || !geojson.features) {
+              return
+            }
+
+            // fit bounds of map
+            map.fitBounds(geojson.features.map(f => {
+              const coordinates = f.geometry.coordinates
+              return [coordinates[1], coordinates[0]];
+            }))
+
+            // draw geojson
+            L.geoJSON(geojson, {
+              pointToLayer: function (feature, latlng) {
+                return L.circleMarker(latlng, {
+                  radius: 8,
+                });
+              },
+              onEachFeature:  function (feature, layer) {
+                layer.bindPopup(`<a href="${feature.properties.name}?browser"><img src="${feature.properties.name}?thumbnail" alt="Image thumbnail"></a>`, {
+                  maxWidth: "auto"
+                });
+              },
+            }).addTo(map);
+          }
+        });
+      </script>
+    </div>
+  </div>
+{{ end }}

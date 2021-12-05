@@ -31,6 +31,8 @@
     {{ end }}
   {{ end }}
 
+  {{ template "map-modal" . }}
+
   <script type="text/javascript" nonce="{{ .nonce }}">
         /**
      * Remove all child and append given one
@@ -122,6 +124,7 @@
         #webhook-form-{{ .ID }}:target,
       {{ end }}
     {{ end }}
+    #map-modal:target,
     #upload-modal:target,
     #upload-success:target,
     #folder-modal:target,
@@ -147,6 +150,7 @@
         #webhook-form-{{ .ID }}:target ~ .content,
       {{ end }}
     {{ end }}
+    #map-modal:target ~ .content,
     #upload-modal:target ~ .content,
     #upload-success:target ~ .content,
     #folder-modal:target ~ .content,
@@ -356,6 +360,12 @@
       {{ if gt (len .Files) 0 }}
         <a class="padding" href="?download" download>
           <img class="icon" src="{{ url "/svg/download?fill=silver" }}" alt="Download">
+        </a>
+      {{ end }}
+
+      {{ if gt (len .Files) 0 }}
+        <a class="padding" href="#map-modal" download>
+          <img class="icon" src="{{ url "/svg/map?fill=silver" }}" alt="View on map">
         </a>
       {{ end }}
     </div>

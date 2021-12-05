@@ -98,7 +98,7 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 		if exif.Geocode.Longitude > 0 {
 			point := geo.NewPoint(geo.NewPosition(exif.Geocode.Longitude, exif.Geocode.Latitude, 0))
 			features = append(features, geo.NewFeature(&point, map[string]interface{}{
-				"url": request.URL(item.Pathname),
+				"name": item.Name,
 			}))
 		}
 	}
