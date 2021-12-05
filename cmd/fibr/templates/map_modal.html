@@ -91,12 +91,7 @@
           }
 
           // fit bounds of map
-          map.fitBounds(
-            geojson.features.map((f) => {
-              const coordinates = f.geometry.coordinates;
-              return [coordinates[1], coordinates[0]];
-            })
-          );
+          map.fitBounds(geojson.features.map(f => L.GeoJSON.coordsToLatLng(f.geometry.coordinates)));
 
           // draw geojson
           L.geoJSON(geojson, {
