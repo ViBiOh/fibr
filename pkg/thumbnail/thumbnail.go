@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"path"
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -137,7 +138,8 @@ func (a App) Serve(w http.ResponseWriter, r *http.Request, item provider.Storage
 		return
 	}
 
-	reader, err := a.storageApp.ReaderFrom(getThumbnailPath(item))
+	thumbnailPath := getThumbnailPath(item)
+	reader, err := a.storageApp.ReaderFrom(thumbnailPath)
 	if err != nil {
 		httperror.InternalServerError(w, err)
 		return
@@ -149,7 +151,7 @@ func (a App) Serve(w http.ResponseWriter, r *http.Request, item provider.Storage
 		}
 	}()
 
-	http.ServeContent(w, r, item.Name, item.Date, reader)
+	http.ServeContent(w, r, path.Base(thumbnailPath), item.Date, reader)
 }
 
 // List return all thumbnail in a base64 form
