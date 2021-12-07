@@ -113,12 +113,8 @@
 
           // draw geojson
           L.geoJSON(geojson, {
-            pointToLayer: function (feature, latlng) {
-              return L.circleMarker(latlng, {
-                radius: 8,
-              });
-            },
-            onEachFeature: function (feature, layer) {
+            pointToLayer: (_, latlng) => L.circleMarker(latlng),
+            onEachFeature: (feature, layer) => {
               layer.bindPopup(
                 `<a href="${feature.properties.name}?browser">
                    <img src="${feature.properties.name}?thumbnail" alt="Image thumbnail">
