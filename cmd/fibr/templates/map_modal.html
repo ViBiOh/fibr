@@ -11,6 +11,7 @@
 
       <style type="text/css" nonce="{{ .nonce }}">
         #photos-map {
+          color: var(--dark);
           height: 80vh;
           width: 90vw;
         }
@@ -42,9 +43,12 @@
             const style = document.createElement('link');
             style.rel = 'stylesheet';
             style.href = src;
-            style.integrity = integrity;
-            style.crossOrigin = crossorigin;
             style.onload = resolve;
+
+            if (integrity) {
+              style.integrity = integrity;
+              style.crossOrigin = crossorigin;
+            }
 
             document.querySelector('head').appendChild(style);
           });
@@ -56,25 +60,22 @@
             script.type = 'text/javascript';
             script.src = src;
             script.async = 'true';
-            script.integrity = integrity;
-            script.crossOrigin = crossorigin;
             script.onload = resolve;
+
+            if (integrity) {
+              script.integrity = integrity;
+              script.crossOrigin = crossorigin;
+            }
 
             document.querySelector('head').appendChild(script);
           });
         }
 
         async function loadLeaflet() {
-          await addStyle(
-            'https://unpkg.com/leaflet@1.7.1/dist/leaflet.css',
-            'sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==',
-            '',
-          );
-          await addScript(
-            'https://unpkg.com/leaflet@1.7.1/dist/leaflet.js',
-            'sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==',
-            '',
-          );
+          await addStyle('https://unpkg.com/leaflet@1.7.1/dist/leaflet.css', 'sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==', '');
+          await addStyle('https://unpkg.com/leaflet.markercluster@1.5.1/dist/MarkerCluster.Default.css', '', '');
+          await addScript('https://unpkg.com/leaflet@1.7.1/dist/leaflet.js', 'sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==', '');
+          await addScript('https://unpkg.com/leaflet.markercluster@1.5.1/dist/leaflet.markercluster.js', '', '');
         }
 
         let map;
@@ -104,31 +105,36 @@
             return;
           }
 
-          // fit bounds of map
-          map.fitBounds(
-            geojson.features.map((f) =>
-              L.GeoJSON.coordsToLatLng(f.geometry.coordinates),
-            ),
-          );
+          const markers = L.markerClusterGroup({
+            zoomToBoundsOnClick: false,
+          });
 
-          // draw geojson
-          L.geoJSON(geojson, {
-            pointToLayer: (_, latlng) => L.circleMarker(latlng),
-            onEachFeature: (feature, layer) => {
-              layer.bindPopup(
-                `<a href="${feature.properties.name}?browser">
-                   <img src="${feature.properties.name}?thumbnail" alt="Image thumbnail">
-                 </a>
-                 <br>
-                 <span>${feature.properties.date}</span>`,
-                {
-                  maxWidth: 'auto',
-                  closeButton: false,
-                  className: 'thumbnail-popup',
-                },
-              );
-            },
-          }).addTo(map);
+          const bounds = [];
+          geojson.features.map((f) => {
+            const coord = L.GeoJSON.coordsToLatLng(f.geometry.coordinates);
+
+            bounds.push(coord);
+            markers.addLayer(L.circleMarker(coord).bindPopup(
+              `<a href="${f.properties.name}?browser">
+                 <img src="${f.properties.name}?thumbnail" alt="Image thumbnail">
+               </a>
+               <br>
+               <span>${f.properties.date}</span>`,
+              {
+                maxWidth: 'auto',
+                closeButton: false,
+                className: 'thumbnail-popup',
+              },
+            ));
+          });
+
+          markers.on('clusterclick', (a) => {
+            map.fitBounds(a.layer.getAllChildMarkers().map(m => m.getLatLng()));
+          });
+
+          // fit bounds of map
+          map.fitBounds(bounds);
+          map.addLayer(markers);
         }
 
         function listenTarget(event) {
@@ -150,7 +156,6 @@
             }
           }
         });
-
       </script>
     </div>
   </div>
