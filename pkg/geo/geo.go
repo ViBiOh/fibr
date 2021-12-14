@@ -36,9 +36,9 @@ func NewFeatureCollection(features []Feature) FeatureCollection {
 
 // Feature description
 type Feature struct {
-	Type       Type                   `json:"type"`
-	Geometry   interface{}            `json:"geometry"`
 	Properties map[string]interface{} `json:"properties"`
+	Geometry   interface{}            `json:"geometry"`
+	Type       Type                   `json:"type"`
 }
 
 // NewFeature creates a Feature from given geometry and properties
