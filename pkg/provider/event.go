@@ -83,17 +83,19 @@ func (et *EventType) UnmarshalJSON(b []byte) error {
 type Event struct {
 	Time     time.Time         `json:"time"`
 	New      *StorageItem      `json:"new,omitempty"`
-	Metadata map[string]string `json:"metadata"`
+	Metadata map[string]string `json:"metadata,omitempty"`
 	Item     StorageItem       `json:"item"`
 	Type     EventType         `json:"type"`
+	URL      string            `json:"url,omitempty"`
 }
 
 // NewUploadEvent creates a new upload event
-func NewUploadEvent(item StorageItem) Event {
+func NewUploadEvent(request Request, item StorageItem) Event {
 	return Event{
 		Time: time.Now(),
 		Type: UploadEvent,
 		Item: item,
+		URL:  request.URL(item.Name),
 	}
 }
 
@@ -108,11 +110,12 @@ func NewRenameEvent(old, new StorageItem) Event {
 }
 
 // NewDeleteEvent creates a new delete event
-func NewDeleteEvent(item StorageItem) Event {
+func NewDeleteEvent(request Request, item StorageItem) Event {
 	return Event{
 		Time: time.Now(),
 		Type: DeleteEvent,
 		Item: item,
+		URL:  request.URL(""),
 	}
 }
 
@@ -144,6 +147,7 @@ func NewAccessEvent(item StorageItem, r *http.Request) Event {
 		Type:     AccessEvent,
 		Item:     item,
 		Metadata: metadata,
+		URL:      r.URL.RawPath,
 	}
 }
 

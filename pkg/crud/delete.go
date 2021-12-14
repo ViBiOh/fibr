@@ -39,7 +39,7 @@ func (a App) Delete(w http.ResponseWriter, r *http.Request, request provider.Req
 		provider.SetPrefsCookie(w, deletePreferences(request, pathname))
 	}
 
-	go a.notify(provider.NewDeleteEvent(info))
+	go a.notify(provider.NewDeleteEvent(request, info))
 
 	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/?d=%s", request.URL(""), request.Layout("")), renderer.NewSuccessMessage("%s successfully deleted", info.Name))
 }
