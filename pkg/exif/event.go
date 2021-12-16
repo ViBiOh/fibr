@@ -51,20 +51,7 @@ func (a App) handleStartEvent(item provider.StorageItem) error {
 		return nil
 	}
 
-	if !a.CanHaveExif(item) {
-		return nil
-	}
-
-	if a.amqpClient != nil {
-		return a.askForExif(item)
-	}
-
-	data, err := a.get(item)
-	if err != nil {
-		return fmt.Errorf("unable to get exif: %s", err)
-	}
-
-	return a.processExif(item, data)
+	return a.handleUploadEvent(item)
 }
 
 func (a App) handleUploadEvent(item provider.StorageItem) error {
@@ -73,15 +60,19 @@ func (a App) handleUploadEvent(item provider.StorageItem) error {
 	}
 
 	if a.amqpClient != nil {
-		return a.askForExif(item)
+		return a.publishExifRequest(item)
 	}
 
-	data, err := a.get(item)
+	exif, err := a.extractAndSaveExif(item)
 	if err != nil {
-		return fmt.Errorf("unable to get exif: %s", err)
+		return fmt.Errorf("unable to extract and save exif: %s", err)
 	}
 
-	return a.processExif(item, data)
+	if exif.IsZero() {
+		return nil
+	}
+
+	return a.processExif(item, exif)
 }
 
 func (a App) processExif(item provider.StorageItem, exif model.Exif) error {

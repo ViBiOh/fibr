@@ -92,35 +92,26 @@ func (a App) enabled() bool {
 	return !a.exifRequest.IsZero()
 }
 
-func (a App) get(item provider.StorageItem) (model.Exif, error) {
-	exif, err := a.loadExif(item)
-	if err != nil && !provider.IsNotExist(err) {
-		return exif, fmt.Errorf("unable to load exif: %s", err)
-	}
-
-	if !exif.IsZero() || a.amqpClient != nil {
-		return exif, nil
-	}
-
-	data, err := a.extractExif(context.Background(), item)
+func (a App) extractAndSaveExif(item provider.StorageItem) (exif model.Exif, err error) {
+	exif, err = a.extractExif(context.Background(), item)
 	if err != nil {
-		return exif, fmt.Errorf("unable to extract exif: %s", err)
+		err = fmt.Errorf("unable to extract exif: %s", err)
+		return
 	}
 
-	if len(data) == 0 {
-		return exif, nil
+	if exif.IsZero() {
+		return
 	}
 
-	if err = a.saveMetadata(item, data); err != nil {
-		return exif, fmt.Errorf("unable to save exif: %s", err)
+	if err = a.saveMetadata(item, exif); err != nil {
+		err = fmt.Errorf("unable to save exif: %s", err)
 	}
 
-	return a.loadExif(item)
+	return
 }
 
-func (a App) extractExif(ctx context.Context, item provider.StorageItem) (map[string]interface{}, error) {
+func (a App) extractExif(ctx context.Context, item provider.StorageItem) (exif model.Exif, err error) {
 	var resp *http.Response
-	var err error
 
 	a.increaseExif("request")
 
@@ -132,18 +123,18 @@ func (a App) extractExif(ctx context.Context, item provider.StorageItem) (map[st
 
 	if err != nil {
 		a.increaseExif("error")
-		return nil, fmt.Errorf("unable to fetch exif: %s", err)
+		err = fmt.Errorf("unable to fetch exif: %s", err)
+		return
 	}
 
-	var data map[string]interface{}
-	if err = httpjson.Read(resp, &data); err != nil {
-		return data, fmt.Errorf("unable to read exif: %s", err)
+	if err = httpjson.Read(resp, &exif); err != nil {
+		err = fmt.Errorf("unable to read exif: %s", err)
 	}
 
-	return data, nil
+	return
 }
 
-func (a App) askForExif(item provider.StorageItem) error {
+func (a App) publishExifRequest(item provider.StorageItem) error {
 	a.increaseExif("publish")
 
 	return a.amqpClient.PublishJSON(item, a.amqpExchange, a.amqpRoutingKey)

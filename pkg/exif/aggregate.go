@@ -23,7 +23,7 @@ func (a App) GetExifFor(item provider.StorageItem) (exas.Exif, error) {
 
 	exif, err := a.loadExif(item)
 	if err != nil && !provider.IsNotExist(err) {
-		return exif, fmt.Errorf("unable to load aggregate: %s", err)
+		return exif, fmt.Errorf("unable to load exif: %s", err)
 	}
 
 	return exif, nil
