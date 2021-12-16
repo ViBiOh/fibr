@@ -37,20 +37,22 @@
       font-family: Courier new;
     }
 
-    .exif-button {
-      bottom: 1rem;
-      position: absolute;
-      right: 1rem;
-    }
+    {{ if not .Exif.IsZero }}
+      .exif-button {
+        bottom: 1rem;
+        position: absolute;
+        right: 1rem;
+      }
 
-    #exif-modal:target {
-      display: flex;
-      z-index: 5;
-    }
+      #exif-modal:target {
+        display: flex;
+        z-index: 5;
+      }
 
-    #exif-modal:target ~ .content {
-      pointer-events: none;
-    }
+      #exif-modal:target ~ .content {
+        pointer-events: none;
+      }
+    {{ end }}
   </style>
 
   {{ if not .Exif.IsZero }}
@@ -103,7 +105,7 @@
       {{ end }}
     {{ end }}
 
-    {{ if .Exif }}
+    {{ if not .Exif.IsZero }}
       <a href="#exif-modal" class="button button-icon exif-button" alt="Show exif">
         <img class="icon exif" src="{{ url "/svg/info" }}?fill=black" alt="Exif">
       </a>
