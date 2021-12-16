@@ -53,7 +53,7 @@
     }
   </style>
 
-  {{ if .Exif }}
+  {{ if not .Exif.IsZero }}
     <div id="exif-modal" class="modal">
       <div class="modal-content">
         <h2 class="header">Exif data</h2>
