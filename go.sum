@@ -37,8 +37,8 @@ github.com/ViBiOh/auth/v2 v2.11.26 h1:u6OtqcW/dS63I0lRTdfJIbn2zoMtt/XhPW7cVddjN9
 github.com/ViBiOh/auth/v2 v2.11.26/go.mod h1:91TDza3bhtZbv3ncIsKSCOTb/t2Kdj0g9teqAEFn6Zc=
 github.com/ViBiOh/exas v0.2.4 h1:SD0V4BVBgQIGOrdv77WN/0ioHF3aXSibzMcd35R9zZQ=
 github.com/ViBiOh/exas v0.2.4/go.mod h1:DfqGNIGpM1yoYhRq9WqEHS90hiTMRWr1BTMkol0MBmc=
-github.com/ViBiOh/httputils/v4 v4.31.2 h1:XyQMavPC2Y6WvWi585xc5G0htuGeV6+cjN4tT48bXh8=
-github.com/ViBiOh/httputils/v4 v4.31.2/go.mod h1:yi0L3aLmBWyxm+V0G/OJ19M6IGJ6PBeYQMpWeJCaHcI=
+github.com/ViBiOh/httputils/v4 v4.32.0 h1:MDMngVRmhuvzs22XW183iVJH+O5EjaZKra50NLRKX48=
+github.com/ViBiOh/httputils/v4 v4.32.0/go.mod h1:Zt9tegJMu5PbjR8oc3aTsLk62lVvMTuN9VaBS6GOqIY=
 github.com/ViBiOh/vith v0.2.2 h1:prSeDwO1T92zKcl68OZimUOre1DBvuhPJHVavfSscZE=
 github.com/ViBiOh/vith v0.2.2/go.mod h1:1Btr+Kq1rfiaTrPdvi/tfylioTqSBjMFfhCT0F7AsZ8=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
@@ -247,11 +247,10 @@ github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXf
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=
 github.com/stretchr/testify v1.4.0 h1:2E4SXV/wtOkTonXsotYi4li6zVWxYlZuYNCXe9XRJyk=
 github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
-github.com/tdewolff/minify/v2 v2.9.22 h1:PlmaAakaJHdMMdTTwjjsuSwIxKqWPTlvjTj6a/g/ILU=
-github.com/tdewolff/minify/v2 v2.9.22/go.mod h1:dNlaFdXaIxgSXh3UFASqjTY0/xjpDkkCsYHA1NCGnmQ=
-github.com/tdewolff/parse/v2 v2.5.21/go.mod h1:WzaJpRSbwq++EIQHYIRTpbYKNA3gn9it1Ik++q4zyho=
-github.com/tdewolff/parse/v2 v2.5.22 h1:KXMHTyx4VTL6Zu9a94SULQalDMvtP5FQq10mnSfaoGs=
-github.com/tdewolff/parse/v2 v2.5.22/go.mod h1:WzaJpRSbwq++EIQHYIRTpbYKNA3gn9it1Ik++q4zyho=
+github.com/tdewolff/minify/v2 v2.9.24 h1:4wlbX+U5IgVa8fH//mlwzv+2g47MN7lu3s9HClAHc28=
+github.com/tdewolff/minify/v2 v2.9.24/go.mod h1:L/bwPtsU/Xx30MxCndlClCMMiLbqROgkR4vZT+QIGXA=
+github.com/tdewolff/parse/v2 v2.5.26 h1:a/q3lwDCi4GIQ+sSbs4UOHuObhqp8GHAhfqop/zDyQQ=
+github.com/tdewolff/parse/v2 v2.5.26/go.mod h1:WzaJpRSbwq++EIQHYIRTpbYKNA3gn9it1Ik++q4zyho=
 github.com/tdewolff/test v1.0.6 h1:76mzYJQ83Op284kMT+63iCNCI7NEERsIN8dLM+RiKr4=
 github.com/tdewolff/test v1.0.6/go.mod h1:6DAvZliBAAnD7rhVgwaM7DE5/d9NMOAJ09SqYqeK4QE=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=

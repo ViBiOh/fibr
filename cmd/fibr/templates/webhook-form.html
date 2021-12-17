@@ -19,6 +19,22 @@
     <label for="recursive">Recursive on children folders</label>
   </p>
 
+  <p class="padding no-margin flex">
+    <span class="flex-grow center">
+      <label for="webhook-kind-raw" class="block">
+        <img class="icon icon-large clickable" src="{{ url "/svg/webhook?fill=silver" }}" alt="raw logo" title="raw">
+      </label>
+      <input id="webhook-kind-raw" type="radio" name="kind" value="raw" checked>
+    </span>
+
+    <span class="flex-grow center">
+      <label for="webhook-kind-discord" class="block">
+        <img class="icon icon-large clickable" src="{{ url "/svg/discord" }}" alt="discord logo" title="discord">
+      </label>
+      <input id="webhook-kind-discord" type="radio" name="kind" value="discord">
+    </span>
+  </p>
+
   <p class="padding no-margin">
     <label for="url" class="block">URL</label>
     <input id="url" class="full" type="text" name="url" value="" placeholder="http://website.com/fibr" />

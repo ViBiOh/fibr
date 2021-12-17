@@ -35,6 +35,12 @@ func (a App) createWebhook(w http.ResponseWriter, r *http.Request, request provi
 		return
 	}
 
+	kind, err := provider.ParseWebhookKind(r.Form.Get("kind"))
+	if err != nil {
+		a.rendererApp.Error(w, r, model.WrapInvalid(fmt.Errorf("unable to parse kind: %s", err)))
+		return
+	}
+
 	target, err := url.Parse(r.Form.Get("url"))
 	if err != nil {
 		a.rendererApp.Error(w, r, model.WrapInvalid(fmt.Errorf("unable to parse url: %s", err)))
@@ -67,7 +73,7 @@ func (a App) createWebhook(w http.ResponseWriter, r *http.Request, request provi
 		return
 	}
 
-	id, err := a.webhookApp.Create(info.Pathname, recursive, target.String(), eventTypes)
+	id, err := a.webhookApp.Create(info.Pathname, recursive, kind, target.String(), eventTypes)
 	if err != nil {
 		a.rendererApp.Error(w, r, model.WrapInternal(err))
 		return

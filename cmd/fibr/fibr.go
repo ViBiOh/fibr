@@ -134,13 +134,13 @@ func main() {
 	thumbnailApp, err := thumbnail.New(thumbnailConfig, storageProvider, prometheusRegisterer, amqpClient)
 	logger.Fatal(err)
 
+	rendererApp, err := renderer.New(rendererConfig, content, fibr.FuncMap(thumbnailApp))
+	logger.Fatal(err)
+
 	exifApp, err := exif.New(exifConfig, storageProvider, prometheusRegisterer, amqpClient)
 	logger.Fatal(err)
 
-	webhookApp, err := webhook.New(webhookConfig, storageProvider, prometheusRegisterer, amqpClient)
-	logger.Fatal(err)
-
-	rendererApp, err := renderer.New(rendererConfig, content, fibr.FuncMap(thumbnailApp))
+	webhookApp, err := webhook.New(webhookConfig, storageProvider, prometheusRegisterer, amqpClient, rendererApp)
 	logger.Fatal(err)
 
 	shareApp, err := share.New(shareConfig, storageProvider, amqpClient)

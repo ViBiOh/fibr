@@ -84,9 +84,9 @@ type Event struct {
 	Time     time.Time         `json:"time"`
 	New      *StorageItem      `json:"new,omitempty"`
 	Metadata map[string]string `json:"metadata,omitempty"`
+	URL      string            `json:"url,omitempty"`
 	Item     StorageItem       `json:"item"`
 	Type     EventType         `json:"type"`
-	URL      string            `json:"url,omitempty"`
 }
 
 // NewUploadEvent creates a new upload event
@@ -147,7 +147,7 @@ func NewAccessEvent(item StorageItem, r *http.Request) Event {
 		Type:     AccessEvent,
 		Item:     item,
 		Metadata: metadata,
-		URL:      r.URL.RawPath,
+		URL:      r.URL.String(),
 	}
 }
 
