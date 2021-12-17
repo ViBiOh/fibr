@@ -29,7 +29,7 @@ func (a App) generate(item provider.StorageItem) (err error) {
 	resp, err = a.requestVith(ctx, item)
 	if err != nil {
 		a.increaseMetric(itemType.String(), "error")
-		return fmt.Errorf("unable to request video thumbnailer: %s", err)
+		return fmt.Errorf("unable to request thumbnailer: %s", err)
 	}
 
 	if resp == nil {
