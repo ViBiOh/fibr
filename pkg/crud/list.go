@@ -114,7 +114,7 @@ func (a App) Download(w http.ResponseWriter, r *http.Request, request provider.R
 	}()
 
 	filename := path.Base(request.Path)
-	if filename == "/" && len(request.Share.ID) != 0 {
+	if filename == "/" && !request.Share.IsZero() {
 		filename = path.Base(path.Join(request.Share.RootName, request.Path))
 	}
 

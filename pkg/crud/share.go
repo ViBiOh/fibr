@@ -13,6 +13,45 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+func (a App) bestSharePath(request provider.Request, name string) string {
+	if !request.Share.IsZero() {
+		return request.URL(name)
+	}
+
+	var remaingPath string
+	var bestShare provider.Share
+
+	for _, share := range a.shareApp.List() {
+		if !strings.HasPrefix(request.Path, share.Path) {
+			continue
+		}
+
+		if bestShare.IsZero() {
+			bestShare = share
+			remaingPath = strings.TrimPrefix(request.Path, share.Path)
+			continue
+		}
+
+		if len(share.Password) > 0 && len(bestShare.Password) == 0 {
+			continue
+		}
+
+		newRemainingPath := strings.TrimPrefix(request.Path, share.Path)
+		if len(newRemainingPath) > len(remaingPath) {
+			continue
+		}
+
+		bestShare = share
+		remaingPath = newRemainingPath
+	}
+
+	if !bestShare.IsZero() {
+		return provider.URL(remaingPath, name, bestShare)
+	}
+
+	return request.URL(name)
+}
+
 func (a App) createShare(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !a.shareApp.Enabled() {
 		a.rendererApp.Error(w, r, model.WrapInternal(errors.New("share is disabled")))

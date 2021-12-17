@@ -81,21 +81,23 @@ func (et *EventType) UnmarshalJSON(b []byte) error {
 
 // Event describes an event on fibr
 type Event struct {
-	Time     time.Time         `json:"time"`
-	New      *StorageItem      `json:"new,omitempty"`
-	Metadata map[string]string `json:"metadata,omitempty"`
-	URL      string            `json:"url,omitempty"`
-	Item     StorageItem       `json:"item"`
-	Type     EventType         `json:"type"`
+	Time         time.Time         `json:"time"`
+	New          *StorageItem      `json:"new,omitempty"`
+	Metadata     map[string]string `json:"metadata,omitempty"`
+	URL          string            `json:"url,omitempty"`
+	ShareableURL string            `json:"shareable_url,omitempty"`
+	Item         StorageItem       `json:"item"`
+	Type         EventType         `json:"type"`
 }
 
 // NewUploadEvent creates a new upload event
-func NewUploadEvent(request Request, item StorageItem) Event {
+func NewUploadEvent(request Request, item StorageItem, shareableURL string) Event {
 	return Event{
-		Time: time.Now(),
-		Type: UploadEvent,
-		Item: item,
-		URL:  request.URL(item.Name),
+		Time:         time.Now(),
+		Type:         UploadEvent,
+		Item:         item,
+		URL:          request.URL(item.Name),
+		ShareableURL: shareableURL,
 	}
 }
 

@@ -62,7 +62,7 @@ func checkFolderName(formName string, request provider.Request) (string, error) 
 		return "", model.WrapInvalid(ErrAbsoluteFolder)
 	}
 
-	if len(request.Share.ID) != 0 {
+	if !request.Share.IsZero() {
 		shareURIPrefix := fmt.Sprintf("/%s", request.Share.ID)
 
 		if !strings.HasPrefix(name, shareURIPrefix) {

@@ -92,9 +92,14 @@ func (a *App) eventText(event provider.Event) string {
 	case provider.CreateDir:
 		return fmt.Sprintf("🗂 A directory `%s` has been created: %s", event.Item.Name, a.rendererApp.PublicURL(event.URL))
 	case provider.UploadEvent:
-		return fmt.Sprintf("💾 A file has been uploaded: %s", a.rendererApp.PublicURL(event.URL))
+		url := event.URL
+		if len(event.ShareableURL) != 0 {
+			url = event.ShareableURL
+		}
+
+		return fmt.Sprintf("💾 A file has been uploaded: %s", a.rendererApp.PublicURL(url))
 	case provider.RenameEvent:
-		return fmt.Sprintf("➡️ `%s` has been renamed to `%s`: %s", event.Item.Pathname, event.New.Pathname, a.rendererApp.PublicURL(event.URL))
+		return fmt.Sprintf("➡️ `%s` has been renamed to `%s`", event.Item.Pathname, event.New.Pathname)
 	case provider.DeleteEvent:
 		return fmt.Sprintf("❌ `%s` has been deleted : %s", event.Item.Name, a.rendererApp.PublicURL(event.URL))
 	case provider.StartEvent:

@@ -19,11 +19,11 @@ import (
 func (a App) saveUploadedFile(request provider.Request, part *multipart.Part) (filename string, err error) {
 	var filePath string
 
-	if len(request.Share.ID) != 0 && request.Share.File {
+	if !request.Share.IsZero() && request.Share.File {
 		filename = path.Base(request.Share.Path)
 		filePath = request.Share.Path
 	} else {
-		filename, err := provider.SanitizeName(part.FileName(), true)
+		filename, err = provider.SanitizeName(part.FileName(), true)
 		if err != nil {
 			return "", err
 		}
@@ -64,7 +64,7 @@ func (a App) saveUploadedFile(request provider.Request, part *multipart.Part) (f
 		if info, infoErr := a.storageApp.Info(filePath); infoErr != nil {
 			logger.Error("unable to get info for upload event: %s", infoErr)
 		} else {
-			a.notify(provider.NewUploadEvent(request, info))
+			a.notify(provider.NewUploadEvent(request, info, a.bestSharePath(request, filename)))
 		}
 	}()
 

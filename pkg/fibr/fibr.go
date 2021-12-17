@@ -38,7 +38,7 @@ func New(crudApp provider.Crud, rendererApp renderer.App, shareApp provider.Shar
 
 func (a App) parseShare(request *provider.Request, authorizationHeader string) error {
 	share := a.shareApp.Get(request.Path)
-	if len(share.ID) == 0 {
+	if share.IsZero() {
 		return nil
 	}
 
@@ -101,7 +101,7 @@ func (a App) parseRequest(r *http.Request) (provider.Request, error) {
 		return request, model.WrapUnauthorized(err)
 	}
 
-	if len(request.Share.ID) != 0 {
+	if !request.Share.IsZero() {
 		if request.Share.IsExpired(time.Now()) {
 			return request, model.WrapNotFound(errors.New("link has expired"))
 		}

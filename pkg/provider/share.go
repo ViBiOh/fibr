@@ -21,6 +21,11 @@ type Share struct {
 	File     bool          `json:"file"`
 }
 
+// IsZero verifies that instance is hydrated
+func (s Share) IsZero() bool {
+	return len(s.ID) == 0
+}
+
 // CheckPassword verifies that request has correct password for share
 func (s Share) CheckPassword(authorizationHeader string) error {
 	if s.Password == "" {

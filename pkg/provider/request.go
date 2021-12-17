@@ -68,7 +68,7 @@ func (r Request) LayoutPath(path string) string {
 func (r Request) Title() string {
 	parts := []string{"fibr"}
 
-	if len(r.Share.ID) != 0 {
+	if !r.Share.IsZero() {
 		parts = append(parts, r.Share.RootName)
 	}
 
@@ -87,7 +87,7 @@ func (r Request) Title() string {
 func (r Request) Description() string {
 	parts := []string{"FIle BRowser"}
 
-	if len(r.Share.ID) != 0 {
+	if !r.Share.IsZero() {
 		parts = append(parts, r.Share.RootName)
 	}
 
