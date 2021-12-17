@@ -15,10 +15,12 @@ const (
 	Raw WebhookKind = iota
 	// Discord webhook
 	Discord
+	// Slack webhook
+	Slack
 )
 
 // WebhookKindValues string values
-var WebhookKindValues = []string{"raw", "discord"}
+var WebhookKindValues = []string{"raw", "discord", "slack"}
 
 // ParseWebhookKind parse raw string into a WebhookKind
 func ParseWebhookKind(value string) (WebhookKind, error) {

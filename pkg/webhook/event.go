@@ -16,8 +16,12 @@ type discordPayload struct {
 	Content string `json:"content"`
 }
 
+type slackPayload struct {
+	Text string `json:"text"`
+}
+
 // EventConsumer handle event pushed to the event bus
-func (a *App) EventConsumer(e provider.Event) {
+func (a *App) EventConsumer(event provider.Event) {
 	if !a.Enabled() {
 		return
 	}
@@ -26,7 +30,7 @@ func (a *App) EventConsumer(e provider.Event) {
 	defer a.RUnlock()
 
 	for _, webhook := range a.webhooks {
-		if !webhook.Match(e) {
+		if !webhook.Match(event) {
 			continue
 		}
 
@@ -35,9 +39,11 @@ func (a *App) EventConsumer(e provider.Event) {
 
 		switch webhook.Kind {
 		case provider.Raw:
-			statusCode, err = a.rawHandle(context.Background(), webhook, e)
+			statusCode, err = a.rawHandle(context.Background(), webhook, event)
 		case provider.Discord:
-			statusCode, err = a.discordHandle(context.Background(), webhook, e)
+			statusCode, err = a.discordHandle(context.Background(), webhook, event)
+		case provider.Slack:
+			statusCode, err = a.slackHandle(context.Background(), webhook, event)
 		default:
 			logger.Warn("unknown kind `%d` for webhook", webhook.Kind)
 		}
@@ -68,25 +74,34 @@ func (a *App) rawHandle(ctx context.Context, webhook provider.Webhook, event pro
 }
 
 func (a *App) discordHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
-	var content string
+	return send(ctx, request.New().Post(webhook.URL), discordPayload{
+		Content: a.eventText(event),
+	})
+}
+
+func (a *App) slackHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
+	return send(ctx, request.New().Post(webhook.URL), slackPayload{
+		Text: a.eventText(event),
+	})
+}
+
+func (a *App) eventText(event provider.Event) string {
 	switch event.Type {
 	case provider.AccessEvent:
-		content = a.discordAccess(event)
+		return a.discordAccess(event)
 	case provider.CreateDir:
-		content = fmt.Sprintf("🗂 A directory `%s` has been created: %s", event.Item.Name, a.rendererApp.PublicURL(event.URL))
+		return fmt.Sprintf("🗂 A directory `%s` has been created: %s", event.Item.Name, a.rendererApp.PublicURL(event.URL))
 	case provider.UploadEvent:
-		content = fmt.Sprintf("💾 A file has been uploaded: %s", a.rendererApp.PublicURL(event.URL))
+		return fmt.Sprintf("💾 A file has been uploaded: %s", a.rendererApp.PublicURL(event.URL))
 	case provider.RenameEvent:
-		content = fmt.Sprintf("➡️ `%s` has been renamed to `%s`: %s", event.Item.Pathname, event.New.Pathname, a.rendererApp.PublicURL(event.URL))
+		return fmt.Sprintf("➡️ `%s` has been renamed to `%s`: %s", event.Item.Pathname, event.New.Pathname, a.rendererApp.PublicURL(event.URL))
 	case provider.DeleteEvent:
-		content = fmt.Sprintf("❌ `%s` has been deleted : %s", event.Item.Name, a.rendererApp.PublicURL(event.URL))
+		return fmt.Sprintf("❌ `%s` has been deleted : %s", event.Item.Name, a.rendererApp.PublicURL(event.URL))
 	case provider.StartEvent:
-		content = fmt.Sprintf("🚀 Fibr starts routine for path `%s`", event.Item.Pathname)
+		return fmt.Sprintf("🚀 Fibr starts routine for path `%s`", event.Item.Pathname)
+	default:
+		return fmt.Sprintf("🙄 Event `%s` occurred on `%s`", event.Type, event.Item.Name)
 	}
-
-	return send(ctx, request.New().Post(webhook.URL), discordPayload{
-		Content: content,
-	})
 }
 
 func (a *App) discordAccess(event provider.Event) string {
