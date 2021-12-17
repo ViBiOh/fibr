@@ -41,13 +41,13 @@ func (a App) Rename(w http.ResponseWriter, r *http.Request, request provider.Req
 
 	newFolder, err := getNewFolder(r, request)
 	if err != nil {
-		a.rendererApp.Error(w, r, model.WrapInternal(err))
+		a.rendererApp.Error(w, r, err)
 		return
 	}
 
 	newName, err := getNewName(r)
 	if err != nil {
-		a.rendererApp.Error(w, r, model.WrapInternal(err))
+		a.rendererApp.Error(w, r, err)
 		return
 	}
 

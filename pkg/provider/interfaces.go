@@ -46,7 +46,7 @@ type ShareManager interface {
 //go:generate mockgen -destination ../mocks/webhook.go -mock_names WebhookManager=Webhook -package mocks github.com/ViBiOh/fibr/pkg/provider WebhookManager
 type WebhookManager interface {
 	Enabled() bool
-	Create(string, bool, string, []EventType) (string, error)
+	Create(string, bool, WebhookKind, string, []EventType) (string, error)
 	Delete(string) error
 	List() map[string]Webhook
 }

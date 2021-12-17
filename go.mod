@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/ViBiOh/auth/v2 v2.11.26
 	github.com/ViBiOh/exas v0.2.4
-	github.com/ViBiOh/httputils/v4 v4.31.2
+	github.com/ViBiOh/httputils/v4 v4.32.0
 	github.com/ViBiOh/vith v0.2.2
 	github.com/golang/mock v1.6.0
 	github.com/minio/minio-go/v7 v7.0.18
@@ -35,8 +35,8 @@ require (
 	github.com/prometheus/procfs v0.7.3 // indirect
 	github.com/rs/xid v1.3.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
-	github.com/tdewolff/minify/v2 v2.9.22 // indirect
-	github.com/tdewolff/parse/v2 v2.5.22 // indirect
+	github.com/tdewolff/minify/v2 v2.9.24 // indirect
+	github.com/tdewolff/parse/v2 v2.5.26 // indirect
 	golang.org/x/net v0.0.0-20211203184738-4852103109b8 // indirect
 	golang.org/x/sys v0.0.0-20211204120058-94396e421777 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect

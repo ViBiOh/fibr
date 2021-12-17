@@ -88,6 +88,8 @@ The request sent is a POST with 15s timeout with the given payload structure:
 
 ```json
 {
+  "time": "2021-02-25:12:32.244914+01:00",
+  "url": "/eventual_share_id/path/to/payload.json",
   "item": {
     "date": "2021-08-10T19:31:28.952325533Z",
     "name": "payload.json",
@@ -99,7 +101,7 @@ The request sent is a POST with 15s timeout with the given payload structure:
 }
 ```
 
-It will contains an extra key `new` with the same structure of `item` in case of a `rename` event.
+It will contains an extra key `new` with the same structure of `item` in case of a `rename` event, and a `metadata` map in case of `access` event, that contains a dump of HTTP Header (except `Authorization`).
 
 The webhook can be recursive (all children folders will be notified too) for event choosen.
 
