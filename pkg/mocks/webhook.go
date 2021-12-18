@@ -63,25 +63,11 @@ func (mr *WebhookMockRecorder) Delete(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*Webhook)(nil).Delete), arg0)
 }
 
-// Enabled mocks base method.
-func (m *Webhook) Enabled() bool {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Enabled")
-	ret0, _ := ret[0].(bool)
-	return ret0
-}
-
-// Enabled indicates an expected call of Enabled.
-func (mr *WebhookMockRecorder) Enabled() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Enabled", reflect.TypeOf((*Webhook)(nil).Enabled))
-}
-
 // List mocks base method.
-func (m *Webhook) List() map[string]provider.Webhook {
+func (m *Webhook) List() []provider.Webhook {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List")
-	ret0, _ := ret[0].(map[string]provider.Webhook)
+	ret0, _ := ret[0].([]provider.Webhook)
 	return ret0
 }
 

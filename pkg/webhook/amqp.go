@@ -17,13 +17,14 @@ func (a *App) AmqpHandler(message amqp.Delivery) error {
 	}
 
 	a.Lock()
-	defer a.Unlock()
 
 	if len(webhook.Pathname) == 0 {
 		delete(a.webhooks, webhook.ID)
 	} else {
 		a.webhooks[webhook.ID] = webhook
 	}
+
+	a.Unlock()
 
 	return nil
 }

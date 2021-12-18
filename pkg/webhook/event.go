@@ -22,10 +22,6 @@ type slackPayload struct {
 
 // EventConsumer handle event pushed to the event bus
 func (a *App) EventConsumer(event provider.Event) {
-	if !a.Enabled() {
-		return
-	}
-
 	a.RLock()
 	defer a.RUnlock()
 

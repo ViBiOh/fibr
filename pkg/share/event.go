@@ -11,10 +11,6 @@ import (
 
 // EventConsumer handle event pushed to the event bus
 func (a *App) EventConsumer(e provider.Event) {
-	if !a.Enabled() {
-		return
-	}
-
 	switch e.Type {
 	case provider.RenameEvent:
 		if err := a.renameItem(e.Item, *e.New); err != nil {

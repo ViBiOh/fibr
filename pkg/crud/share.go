@@ -1,7 +1,6 @@
 package crud
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"path"
@@ -53,11 +52,6 @@ func (a App) bestSharePath(request provider.Request, name string) string {
 }
 
 func (a App) createShare(w http.ResponseWriter, r *http.Request, request provider.Request) {
-	if !a.shareApp.Enabled() {
-		a.rendererApp.Error(w, r, model.WrapInternal(errors.New("share is disabled")))
-		return
-	}
-
 	if !request.CanShare {
 		a.rendererApp.Error(w, r, model.WrapForbidden(ErrNotAuthorized))
 		return
@@ -120,11 +114,6 @@ func (a App) createShare(w http.ResponseWriter, r *http.Request, request provide
 }
 
 func (a App) deleteShare(w http.ResponseWriter, r *http.Request, request provider.Request) {
-	if !a.shareApp.Enabled() {
-		a.rendererApp.Error(w, r, model.WrapInternal(errors.New("share is disabled")))
-		return
-	}
-
 	if !request.CanShare {
 		a.rendererApp.Error(w, r, model.WrapForbidden(ErrNotAuthorized))
 		return

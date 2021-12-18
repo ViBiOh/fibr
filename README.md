@@ -341,8 +341,6 @@ Usage of fibr:
         [share] AMQP Routing Key for exclusive lock on default exchange {FIBR_SHARE_AMQP_EXCLUSIVE_ROUTING_KEY} (default "fibr.semaphore.shares")
   -shareAmqpRoutingKey string
         [share] AMQP Routing Key for share {FIBR_SHARE_AMQP_ROUTING_KEY} (default "share")
-  -shareEnabled
-        [share] Enable sharing feature {FIBR_SHARE_ENABLED} (default true)
   -shutdownTimeout string
         [server] Shutdown Timeout {FIBR_SHUTDOWN_TIMEOUT} (default "10s")
   -thumbnailAmqpExchange string
@@ -375,8 +373,6 @@ Usage of fibr:
         [webhook] AMQP Routing Key for exclusive lock on default exchange {FIBR_WEBHOOK_AMQP_EXCLUSIVE_ROUTING_KEY} (default "fibr.semaphore.webhooks")
   -webhookAmqpRoutingKey string
         [webhook] AMQP Routing Key for webhook {FIBR_WEBHOOK_AMQP_ROUTING_KEY} (default "webhook")
-  -webhookEnabled
-        [webhook] Enable webhook feature {FIBR_WEBHOOK_ENABLED} (default true)
   -webhookSecret string
         [webhook] Secret for HMAC Signature {FIBR_WEBHOOK_SECRET}
   -writeTimeout string

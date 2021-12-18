@@ -24,23 +24,24 @@ func (a *App) generateID() (string, error) {
 }
 
 // List webhooks
-func (a *App) List() map[string]provider.Webhook {
-	if !a.Enabled() {
-		return nil
+func (a *App) List() (webhooks []provider.Webhook) {
+	a.RLock()
+
+	var i int64
+	webhooks = make([]provider.Webhook, len(a.webhooks))
+
+	for _, value := range a.webhooks {
+		webhooks[i] = value
+		i++
 	}
 
-	a.RLock()
-	defer a.RUnlock()
+	a.RUnlock()
 
-	return a.webhooks
+	return webhooks
 }
 
 // Create a webhook
 func (a *App) Create(pathname string, recursive bool, kind provider.WebhookKind, url string, types []provider.EventType) (string, error) {
-	if !a.Enabled() {
-		return "", fmt.Errorf("webhook is disabled")
-	}
-
 	var id string
 
 	return id, a.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) (err error) {
@@ -76,10 +77,6 @@ func (a *App) Create(pathname string, recursive bool, kind provider.WebhookKind,
 
 // Delete a webhook
 func (a *App) Delete(id string) error {
-	if !a.Enabled() {
-		return fmt.Errorf("webhook is disabled")
-	}
-
 	return a.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
 		delete(a.webhooks, id)
 

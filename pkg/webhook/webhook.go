@@ -42,7 +42,6 @@ type App struct {
 
 // Config of package
 type Config struct {
-	enabled    *bool
 	hmacSecret *string
 
 	amqpExchange            *string
@@ -53,7 +52,6 @@ type Config struct {
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		enabled:    flags.New(prefix, "webhook", "Enabled").Default(true, nil).Label("Enable webhook feature").ToBool(fs),
 		hmacSecret: flags.New(prefix, "webhook", "Secret").Default("", nil).Label("Secret for HMAC Signature").ToString(fs),
 
 		amqpExchange:            flags.New(prefix, "webhook", "AmqpExchange").Default("fibr.webhooks", nil).Label("AMQP Exchange Name").ToString(fs),
@@ -64,10 +62,6 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 
 // New creates new App from Config
 func New(config Config, storageApp provider.Storage, prometheusRegisterer prometheus.Registerer, amqpClient *amqp.Client, rendererApp renderer.App) (*App, error) {
-	if !*config.enabled {
-		return &App{}, nil
-	}
-
 	var amqpExchange string
 	var amqpExclusiveRoutingKey string
 
@@ -97,11 +91,6 @@ func New(config Config, storageApp provider.Storage, prometheusRegisterer promet
 		amqpRoutingKey:          strings.TrimSpace(*config.amqpRoutingKey),
 		amqpExclusiveRoutingKey: amqpExclusiveRoutingKey,
 	}, nil
-}
-
-// Enabled checks if requirements are met
-func (a *App) Enabled() bool {
-	return a.storageApp != nil
 }
 
 // Exclusive does action on webhook with exclusive lock
@@ -138,10 +127,6 @@ exclusive:
 
 // Start worker
 func (a *App) Start(_ <-chan struct{}) {
-	if !a.Enabled() {
-		return
-	}
-
 	if err := a.loadWebhooks(); err != nil {
 		logger.Error("unable to refresh webhooks: %s", err)
 		return

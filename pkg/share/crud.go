@@ -26,23 +26,24 @@ func (a *App) generateID() (string, error) {
 }
 
 // List shares
-func (a *App) List() map[string]provider.Share {
-	if !a.Enabled() {
-		return nil
+func (a *App) List() (shares []provider.Share) {
+	a.RLock()
+
+	var i int64
+	shares = make([]provider.Share, len(a.shares))
+
+	for _, value := range a.shares {
+		shares[i] = value
+		i++
 	}
 
-	a.mutex.RLock()
-	defer a.mutex.RUnlock()
+	a.RUnlock()
 
-	return a.shares
+	return shares
 }
 
 // Create a share
 func (a *App) Create(filepath string, edit bool, password string, isDir bool, duration time.Duration) (string, error) {
-	if !a.Enabled() {
-		return "", fmt.Errorf("share is disabled")
-	}
-
 	var id string
 
 	_, err := a.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
@@ -83,10 +84,6 @@ func (a *App) Create(filepath string, edit bool, password string, isDir bool, du
 
 // Delete a share
 func (a *App) Delete(id string) error {
-	if !a.Enabled() {
-		return fmt.Errorf("share is disabled")
-	}
-
 	_, err := a.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
 		delete(a.shares, id)
 

@@ -111,8 +111,8 @@ func (a App) parseRequest(r *http.Request) (provider.Request, error) {
 
 	if a.loginApp == nil {
 		request.CanEdit = true
-		request.CanShare = a.shareApp.Enabled()
-		request.CanWebhook = a.webhookApp.Enabled()
+		request.CanShare = true
+		request.CanWebhook = true
 		return request, nil
 	}
 
@@ -124,8 +124,8 @@ func (a App) parseRequest(r *http.Request) (provider.Request, error) {
 
 	if a.loginApp.IsAuthorized(authModel.StoreUser(r.Context(), user), "admin") {
 		request.CanEdit = true
-		request.CanShare = a.shareApp.Enabled()
-		request.CanWebhook = a.webhookApp.Enabled()
+		request.CanShare = true
+		request.CanWebhook = true
 	}
 
 	return request, nil

@@ -12,11 +12,6 @@ import (
 )
 
 func (a App) createWebhook(w http.ResponseWriter, r *http.Request, request provider.Request) {
-	if !a.webhookApp.Enabled() {
-		a.rendererApp.Error(w, r, model.WrapInternal(errors.New("webhook is disabled")))
-		return
-	}
-
 	if !request.CanWebhook {
 		a.rendererApp.Error(w, r, model.WrapForbidden(ErrNotAuthorized))
 		return
@@ -90,11 +85,6 @@ func (a App) createWebhook(w http.ResponseWriter, r *http.Request, request provi
 }
 
 func (a App) deleteWebhook(w http.ResponseWriter, r *http.Request, request provider.Request) {
-	if !a.webhookApp.Enabled() {
-		a.rendererApp.Error(w, r, model.WrapInternal(errors.New("webhook is disabled")))
-		return
-	}
-
 	if !request.CanWebhook {
 		a.rendererApp.Error(w, r, model.WrapForbidden(ErrNotAuthorized))
 		return

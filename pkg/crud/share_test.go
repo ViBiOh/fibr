@@ -83,27 +83,27 @@ func TestBestSharePath(t *testing.T) {
 			case "no share":
 				mockShare.EXPECT().List().Return(nil)
 			case "matching share":
-				mockShare.EXPECT().List().Return(map[string]provider.Share{
-					"abcdef123456": {
+				mockShare.EXPECT().List().Return([]provider.Share{
+					{
 						ID:   "abcdef123456",
 						Path: "/website",
 					},
 				})
 			case "distance share":
-				mockShare.EXPECT().List().Return(map[string]provider.Share{
-					"123456abcdef": {
+				mockShare.EXPECT().List().Return([]provider.Share{
+					{
 						ID:   "abcdef123456",
 						Path: "/newsite/",
 					},
-					"a1b2c3d4e5f6": {
+					{
 						ID:   "a1b2c3d4e5f6",
 						Path: "/website/path/to",
 					},
-					"abcdef123456": {
+					{
 						ID:   "abcdef123456",
 						Path: "/website/path/to/deep/",
 					},
-					"654321fedcba": {
+					{
 						ID:       "654321fedcba",
 						Path:     "/website/path/to/deep/folder",
 						Password: "secret",

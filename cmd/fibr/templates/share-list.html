@@ -66,15 +66,15 @@
           {{ $root := . }}
 
           <tbody>
-            {{ range $key, $value := .Shares }}
+            {{ range .Shares }}
               <tr class="share-content">
                 <td>
-                  <a href="{{ url "/" }}{{ $value.ID }}/">
-                    <code>{{ $value.ID }}</code>
+                  <a href="{{ url "/" }}{{ .ID }}/">
+                    <code>{{ .ID }}</code>
                   </a>
                 </td>
                 <th scope="row" class="ellipsis path">
-                  <code>{{ $value.Path }}</code>
+                  <code>{{ .Path }}</code>
                 </th>
                 <td class="center">
                   {{ if .Edit }}
@@ -85,15 +85,15 @@
                   {{ end }}
                   {{ if .Duration }}
                     <img class="icon" src="{{ url "/svg/hourglass?fill=silver" }}" alt="Duration">
-                    {{ $value.Duration.Hours }}h
+                    {{ .Duration.Hours }}h
                   {{ end }}
                 </td>
                 <td >
                   <form method="post">
                     <input type="hidden" name="type" value="share" />
                     <input type="hidden" name="method" value="DELETE" />
-                    <input type="hidden" name="id" value="{{ $value.ID }}" />
-                    <button type="submit" onclick="return confirm('Are you sure you want to delete share for {{ $value.Path }}?')" class="button button-icon" alt="Delete">
+                    <input type="hidden" name="id" value="{{ .ID }}" />
+                    <button type="submit" onclick="return confirm('Are you sure you want to delete share for {{ .Path }}?')" class="button button-icon" alt="Delete">
                       <img class="icon" src="{{ url "/svg/times?fill=silver" }}" alt="Delete">
                     </button>
                   </form>

@@ -16,14 +16,15 @@ func (a *App) AmqpHandler(message amqp.Delivery) error {
 		return fmt.Errorf("unable to decode: %s", err)
 	}
 
-	a.mutex.Lock()
-	defer a.mutex.Unlock()
+	a.Lock()
 
 	if len(share.Path) == 0 {
 		delete(a.shares, share.ID)
 	} else {
 		a.shares[share.ID] = share
 	}
+
+	a.Unlock()
 
 	return nil
 }

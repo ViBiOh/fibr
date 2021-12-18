@@ -34,7 +34,7 @@ type App struct {
 	amqpRoutingKey          string
 	amqpExclusiveRoutingKey string
 
-	mutex sync.RWMutex
+	sync.RWMutex
 }
 
 // Config of package
@@ -42,15 +42,11 @@ type Config struct {
 	amqpExchange            *string
 	amqpRoutingKey          *string
 	amqpExclusiveRoutingKey *string
-
-	share *bool
 }
 
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		share: flags.New(prefix, "share", "Enabled").Default(true, nil).Label("Enable sharing feature").ToBool(fs),
-
 		amqpExchange:            flags.New(prefix, "share", "AmqpExchange").Default("fibr.shares", nil).Label("AMQP Exchange Name").ToString(fs),
 		amqpRoutingKey:          flags.New(prefix, "share", "AmqpRoutingKey").Default("share", nil).Label("AMQP Routing Key for share").ToString(fs),
 		amqpExclusiveRoutingKey: flags.New(prefix, "share", "AmqpExclusiveRoutingKey").Default("fibr.semaphore.shares", nil).Label("AMQP Routing Key for exclusive lock on default exchange").ToString(fs),
@@ -59,10 +55,6 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 
 // New creates new App from Config
 func New(config Config, storageApp provider.Storage, amqpClient *amqp.Client) (*App, error) {
-	if !*config.share {
-		return &App{}, nil
-	}
-
 	var amqpExchange string
 	var amqpExclusiveRoutingKey string
 
@@ -91,15 +83,10 @@ func New(config Config, storageApp provider.Storage, amqpClient *amqp.Client) (*
 	}, nil
 }
 
-// Enabled checks if requirements are met
-func (a *App) Enabled() bool {
-	return a.storageApp != nil
-}
-
 // Exclusive does action on shares with exclusive lock
 func (a *App) Exclusive(ctx context.Context, name string, duration time.Duration, action func(ctx context.Context) error) (bool, error) {
-	a.mutex.Lock()
-	defer a.mutex.Unlock()
+	a.Lock()
+	defer a.Unlock()
 
 	fn := func() error {
 		if err := a.refresh(); err != nil {
@@ -130,14 +117,10 @@ exclusive:
 
 // Get returns a share based on path
 func (a *App) Get(requestPath string) provider.Share {
-	if !a.Enabled() {
-		return provider.NoneShare
-	}
-
 	cleanPath := strings.TrimPrefix(requestPath, "/")
 
-	a.mutex.RLock()
-	defer a.mutex.RUnlock()
+	a.RLock()
+	defer a.RUnlock()
 
 	for key, share := range a.shares {
 		if strings.HasPrefix(cleanPath, key) {
@@ -150,10 +133,6 @@ func (a *App) Get(requestPath string) provider.Share {
 
 // Start worker
 func (a *App) Start(done <-chan struct{}) {
-	if !a.Enabled() {
-		return
-	}
-
 	if err := a.refresh(); err != nil {
 		logger.Error("unable to refresh shares: %s", err)
 		return

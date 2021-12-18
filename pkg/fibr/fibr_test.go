@@ -280,10 +280,11 @@ func TestParseRequest(t *testing.T) {
 				r: httptest.NewRequest(http.MethodGet, "/", nil),
 			},
 			provider.Request{
-				Path:     "/",
-				Display:  provider.DefaultDisplay,
-				CanEdit:  true,
-				CanShare: false,
+				Path:       "/",
+				Display:    provider.DefaultDisplay,
+				CanEdit:    true,
+				CanShare:   true,
+				CanWebhook: true,
 			},
 			nil,
 		},
@@ -341,8 +342,8 @@ func TestParseRequest(t *testing.T) {
 				Path:       adminPath,
 				Display:    provider.DefaultDisplay,
 				CanEdit:    true,
-				CanShare:   false,
-				CanWebhook: false,
+				CanShare:   true,
+				CanWebhook: true,
 			},
 			nil,
 		},
@@ -356,8 +357,8 @@ func TestParseRequest(t *testing.T) {
 				Path:       adminPath,
 				Display:    provider.DefaultDisplay,
 				CanEdit:    true,
-				CanShare:   false,
-				CanWebhook: false,
+				CanShare:   true,
+				CanWebhook: true,
 				Preferences: provider.Preferences{
 					ListLayoutPath: []string{"assets", "documents/monthly"},
 				},
@@ -382,16 +383,10 @@ func TestParseRequest(t *testing.T) {
 
 			switch tc.intention {
 			case "no auth":
-				webhookMock.EXPECT().Enabled().Return(false)
-				shareMock.EXPECT().Enabled().Return(false)
 				shareMock.EXPECT().Get(gomock.Any()).Return(provider.Share{})
 			case "admin user":
-				webhookMock.EXPECT().Enabled().Return(true)
-				shareMock.EXPECT().Enabled().Return(true)
 				shareMock.EXPECT().Get(gomock.Any()).Return(provider.Share{})
 			case "empty cookie", "cookie value":
-				webhookMock.EXPECT().Enabled().Return(false)
-				shareMock.EXPECT().Enabled().Return(false)
 				shareMock.EXPECT().Get(gomock.Any()).Return(provider.Share{})
 			case "invalid auth", "non admin user":
 				shareMock.EXPECT().Get(gomock.Any()).Return(provider.Share{})

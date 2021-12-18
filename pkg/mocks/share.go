@@ -64,20 +64,6 @@ func (mr *ShareMockRecorder) Delete(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*Share)(nil).Delete), arg0)
 }
 
-// Enabled mocks base method.
-func (m *Share) Enabled() bool {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Enabled")
-	ret0, _ := ret[0].(bool)
-	return ret0
-}
-
-// Enabled indicates an expected call of Enabled.
-func (mr *ShareMockRecorder) Enabled() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Enabled", reflect.TypeOf((*Share)(nil).Enabled))
-}
-
 // Get mocks base method.
 func (m *Share) Get(arg0 string) provider.Share {
 	m.ctrl.T.Helper()
@@ -93,10 +79,10 @@ func (mr *ShareMockRecorder) Get(arg0 interface{}) *gomock.Call {
 }
 
 // List mocks base method.
-func (m *Share) List() map[string]provider.Share {
+func (m *Share) List() []provider.Share {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List")
-	ret0, _ := ret[0].(map[string]provider.Share)
+	ret0, _ := ret[0].([]provider.Share)
 	return ret0
 }
 
