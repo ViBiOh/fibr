@@ -3,7 +3,7 @@ module github.com/ViBiOh/fibr
 go 1.17
 
 require (
-	github.com/ViBiOh/auth/v2 v2.11.26
+	github.com/ViBiOh/auth/v2 v2.11.28
 	github.com/ViBiOh/exas v0.2.4
 	github.com/ViBiOh/httputils/v4 v4.32.0
 	github.com/ViBiOh/vith v0.2.2
@@ -11,7 +11,7 @@ require (
 	github.com/minio/minio-go/v7 v7.0.18
 	github.com/prometheus/client_golang v1.11.0
 	github.com/streadway/amqp v1.0.0
-	golang.org/x/crypto v0.0.0-20211209193657-4570a0811e8b
+	golang.org/x/crypto v0.0.0-20211215153901-e495a2d5b3d3
 	golang.org/x/text v0.3.7
 )
 
@@ -37,8 +37,8 @@ require (
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/tdewolff/minify/v2 v2.9.24 // indirect
 	github.com/tdewolff/parse/v2 v2.5.26 // indirect
-	golang.org/x/net v0.0.0-20211203184738-4852103109b8 // indirect
-	golang.org/x/sys v0.0.0-20211204120058-94396e421777 // indirect
+	golang.org/x/net v0.0.0-20211216030914-fe4d6282115f // indirect
+	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
 	gopkg.in/ini.v1 v1.66.2 // indirect
 )
