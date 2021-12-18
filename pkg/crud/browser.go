@@ -3,10 +3,10 @@ package crud
 import (
 	"net/http"
 	"path"
-	"sync"
 
 	exas "github.com/ViBiOh/exas/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/v4/pkg/concurrent"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 	"github.com/ViBiOh/httputils/v4/pkg/sha"
@@ -24,12 +24,9 @@ func (a App) Browser(w http.ResponseWriter, request provider.Request, item provi
 	pathParts := getPathParts(request.URL(""))
 	breadcrumbs := pathParts[:len(pathParts)-1]
 
-	var wg sync.WaitGroup
+	wg := concurrent.NewLimited(2)
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-
+	wg.Go(func() {
 		var err error
 		files, err = a.storageApp.List(item.Dir())
 		if err != nil {
@@ -37,18 +34,15 @@ func (a App) Browser(w http.ResponseWriter, request provider.Request, item provi
 		} else {
 			previous, next = getPreviousAndNext(item, files)
 		}
-	}()
+	})
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-
+	wg.Go(func() {
 		var err error
 		exif, err = a.exifApp.GetExifFor(item)
 		if err != nil {
 			logger.WithField("item", item.Pathname).Error("unable to load exif: %s", err)
 		}
-	}()
+	})
 
 	wg.Wait()
 

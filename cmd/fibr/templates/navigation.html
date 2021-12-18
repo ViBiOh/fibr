@@ -4,7 +4,7 @@
      * Go back from state.
      */
     function goBack() {
-      {{ if eq .Request.Display "browser" }}
+      {{ if .Parent }}
         window.location.href = '/{{ .Parent }}';
       {{ else }}
         const previousHash = document.location.hash;
