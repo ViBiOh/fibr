@@ -58,7 +58,11 @@
   {{ if not .Exif.IsZero }}
     <div id="exif-modal" class="modal">
       <div class="modal-content">
-        <h2 class="header">Exif data</h2>
+        <h2 class="flex flex-center header no-margin">
+          <span>Exif data</span>
+          <span class="flex-grow"></span>
+          <a href="#" class="button white small">Close</a>
+        </h2>
 
         {{ if not .Exif.Date.IsZero }}
           <p class="padding no-margin code">
@@ -80,10 +84,6 @@
           {{ range $key, $value := .Exif.Data }}
             <strong>{{ $key }}:</strong> {{ $value }}<br>
           {{ end }}
-        </p>
-
-        <p class="padding no-margin center">
-          <a href="#" class="button white">Close</a>
         </p>
       </div>
     </div>

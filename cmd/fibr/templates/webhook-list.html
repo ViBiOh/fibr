@@ -48,7 +48,11 @@
 
   <div id="webhook-list" class="modal">
     <div class="modal-content">
-      <h2 class="header">Webhooks</h2>
+      <h2 class="flex flex-center header no-margin">
+        <span>Webhooks</span>
+        <span class="flex-grow"></span>
+        <a href="#" class="button white small">Close</a>
+      </h2>
 
       {{ if len .Webhooks }}
         <table id="webhooks" class="full padding">
@@ -122,7 +126,6 @@
       {{ end }}
 
       <p class="padding no-margin center">
-        <a href="#" class="button white">Cancel</a>
         <a href="#webhook-form" class="button bg-primary">Add</a>
       </p>
     </div>

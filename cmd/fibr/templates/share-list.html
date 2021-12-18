@@ -48,7 +48,11 @@
 
   <div id="share-list" class="modal">
     <div class="modal-content">
-      <h2 class="header">Shared folders</h2>
+      <h2 class="flex flex-center header no-margin">
+        <span>Shared folders</span>
+        <span class="flex-grow"></span>
+        <a href="#" class="button white small">Close</a>
+      </h2>
 
       {{ if len .Shares }}
         <table id="shares" class="full padding">
@@ -109,7 +113,6 @@
       {{ end }}
 
       <p class="padding no-margin center">
-        <a href="#" class="button white">Cancel</a>
         <a href="#share-form" class="button bg-primary">Add</a>
       </p>
     </div>
