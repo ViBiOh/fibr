@@ -58,6 +58,7 @@
             <tr>
               <th scope="col">Path</th>
               <th scope="col">URL</th>
+              <th scope="col">Events</th>
               <td></td>
             </tr>
           </thead>
@@ -73,6 +74,33 @@
                 <th scope="row" class="ellipsis url">
                   <code>{{ .URL }}</code>
                 </th>
+                <th scope="row">
+                  {{ if eq (len .Types) 6 }}
+                    All
+                  {{ else }}
+                    {{ range .Types }}
+                      {{ if eq .String "upload" }}
+                        <img class="icon" src="{{ url "/svg/cloud-upload-alt?fill=silver" }}" alt="upload icon" title="upload">
+                      {{ end }}
+                      {{ if eq .String "create" }}
+                        <img class="icon" src="{{ url "/svg/folder?fill=silver" }}" alt="folder icon" title="create">
+                      {{ end }}
+                      {{ if eq .String "rename" }}
+                        <img class="icon" src="{{ url "/svg/edit?fill=silver" }}" alt="edit icon" title="rename">
+                      {{ end }}
+                      {{ if eq .String "delete" }}
+                        <img class="icon" src="{{ url "/svg/times?fill=silver" }}" alt="delete icon" title="delete">
+                      {{ end }}
+                      {{ if eq .String "start" }}
+                        <img class="icon" src="{{ url "/svg/play?fill=silver" }}" alt="delete icon" title="start">
+                      {{ end }}
+                      {{ if eq .String "access" }}
+                        <img class="icon" src="{{ url "/svg/info?fill=silver" }}" alt="access icon" title="access">
+                      {{ end }}
+                    {{ end }}
+                  {{ end }}
+                </th>
+
                 <td >
                   <form method="post">
                     <input type="hidden" name="type" value="webhook" />

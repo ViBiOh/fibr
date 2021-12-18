@@ -17,10 +17,12 @@ const (
 	Discord
 	// Slack webhook
 	Slack
+	// Telegram webhook
+	Telegram
 )
 
 // WebhookKindValues string values
-var WebhookKindValues = []string{"raw", "discord", "slack"}
+var WebhookKindValues = []string{"raw", "discord", "slack", "telegram"}
 
 // ParseWebhookKind parse raw string into a WebhookKind
 func ParseWebhookKind(value string) (WebhookKind, error) {

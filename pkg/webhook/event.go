@@ -3,6 +3,7 @@ package webhook
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -40,6 +41,8 @@ func (a *App) EventConsumer(event provider.Event) {
 			statusCode, err = a.discordHandle(context.Background(), webhook, event)
 		case provider.Slack:
 			statusCode, err = a.slackHandle(context.Background(), webhook, event)
+		case provider.Telegram:
+			statusCode, err = a.telegramHandle(context.Background(), webhook, event)
 		default:
 			logger.Warn("unknown kind `%d` for webhook", webhook.Kind)
 		}
@@ -52,39 +55,43 @@ func (a *App) EventConsumer(event provider.Event) {
 	}
 }
 
-func send(ctx context.Context, req request.Request, payload interface{}) (int, error) {
+func send(ctx context.Context, id string, req request.Request, payload interface{}) (int, error) {
 	resp, err := req.JSON(ctx, payload)
 	if err != nil {
-		return 0, fmt.Errorf("unable to send discord webhook: %s", err)
+		return 0, fmt.Errorf("unable to send webhook with id `%s`: %s", id, err)
 	}
 
 	if err = request.DiscardBody(resp.Body); err != nil {
-		return resp.StatusCode, fmt.Errorf("unable to discard discord body: %s", err)
+		return resp.StatusCode, fmt.Errorf("unable to discard body for webhook with id `%s`: %s", id, err)
 	}
 
 	return resp.StatusCode, nil
 }
 
 func (a *App) rawHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
-	return send(ctx, request.New().Post(webhook.URL).Header("User-Agent", "fibr-webhook").WithSignatureAuthorization("fibr", a.hmacSecret), event)
+	return send(ctx, webhook.ID, request.New().Post(webhook.URL).Header("User-Agent", "fibr-webhook").WithSignatureAuthorization("fibr", a.hmacSecret), event)
 }
 
 func (a *App) discordHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
-	return send(ctx, request.New().Post(webhook.URL), discordPayload{
+	return send(ctx, webhook.ID, request.New().Post(webhook.URL), discordPayload{
 		Content: a.eventText(event),
 	})
 }
 
 func (a *App) slackHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
-	return send(ctx, request.New().Post(webhook.URL), slackPayload{
+	return send(ctx, webhook.ID, request.New().Post(webhook.URL), slackPayload{
 		Text: a.eventText(event),
 	})
+}
+
+func (a *App) telegramHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
+	return send(ctx, webhook.ID, request.New().Post(fmt.Sprintf("%s&message=%s", webhook.URL, url.QueryEscape(a.eventText(event)))), nil)
 }
 
 func (a *App) eventText(event provider.Event) string {
 	switch event.Type {
 	case provider.AccessEvent:
-		return a.discordAccess(event)
+		return a.accessEvent(event)
 	case provider.CreateDir:
 		return fmt.Sprintf("🗂 A directory `%s` has been created: %s", event.Item.Name, a.rendererApp.PublicURL(event.URL))
 	case provider.UploadEvent:
@@ -105,12 +112,12 @@ func (a *App) eventText(event provider.Event) string {
 	}
 }
 
-func (a *App) discordAccess(event provider.Event) string {
+func (a *App) accessEvent(event provider.Event) string {
 	content := strings.Builder{}
 	content.WriteString(fmt.Sprintf("💻 Someone connected to Fibr from %s at %s", a.rendererApp.PublicURL(event.URL), event.Time.Format(time.RFC3339)))
 
 	if len(event.Metadata) > 0 {
-		content.WriteString("```\n")
+		content.WriteString("\n```\n")
 
 		for key, value := range event.Metadata {
 			content.WriteString(fmt.Sprintf("%s: %s\n", key, value))

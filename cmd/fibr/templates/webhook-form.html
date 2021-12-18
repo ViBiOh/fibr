@@ -40,11 +40,23 @@
       </label>
       <input id="webhook-kind-slack" type="radio" name="kind" value="slack">
     </span>
+
+    <span class="flex-grow center">
+      <label for="webhook-kind-telegram" class="block">
+        <img class="icon icon-large clickable" src="{{ url "/svg/telegram" }}" alt="telegram logo" title="telegram">
+      </label>
+      <input id="webhook-kind-telegram" type="radio" name="kind" value="telegram">
+    </span>
   </p>
 
   <p class="padding no-margin">
-    <label for="url" class="block">URL</label>
-    <input id="url" class="full" type="text" name="url" value="" placeholder="http://website.com/fibr" />
+    <label id="webhook-url-label" for="webhook-url" class="block">URL</label>
+    <input id="webhook-url" class="full" type="text" name="url" value="" placeholder="http://website.com/fibr" />
+  </p>
+
+  <p id="telegram-chat-id" class="padding no-margin hidden">
+    <label for="webhook-telegram-id" class="block">Chat ID</label>
+    <input id="webhook-telegram-id" class="full" type="text" name="chat-id" value="" placeholder="12345678" />
   </p>
 
   <p class="padding no-margin">
@@ -58,6 +70,50 @@
       <option value="access">access</option>
     </select>
   </p>
+
+  <script type="text/javascript" nonce="{{ .nonce }}">
+    const urlLabel = document.getElementById('webhook-url-label');
+    const urlWebhook = document.getElementById('webhook-url');
+    const telegramChatID = document.getElementById('telegram-chat-id');
+
+    document.getElementById('webhook-kind-raw').addEventListener('change', (e) => {
+      if (e.target.value === 'raw') {
+        urlWebhook.placeholder = 'http://website.com/fibr';
+        urlLabel.innerHTML = 'URL';
+        telegramChatID.classList.add('hidden');
+      }
+    });
+
+    document
+      .getElementById('webhook-kind-discord')
+      .addEventListener('change', (e) => {
+        if (e.target.value === 'discord') {
+          urlWebhook.placeholder = 'https://discord.com/api/webhooks/...';
+          urlLabel.innerHTML = 'URL';
+          telegramChatID.classList.add('hidden');
+        }
+      });
+
+    document
+      .getElementById('webhook-kind-slack')
+      .addEventListener('change', (e) => {
+        if (e.target.value === 'slack') {
+          urlWebhook.placeholder = 'https://hooks.slack.com/services/...';
+          urlLabel.innerHTML = 'URL';
+          telegramChatID.classList.add('hidden');
+        }
+      });
+
+    document
+      .getElementById('webhook-kind-telegram')
+      .addEventListener('change', (e) => {
+        if (e.target.value === 'telegram') {
+          urlLabel.innerHTML = 'Token';
+          urlWebhook.placeholder = 'Bot token';
+          telegramChatID.classList.remove('hidden');
+        }
+      });
+  </script>
 
   {{ template "form_buttons" "Connect" }}
 {{ end }}

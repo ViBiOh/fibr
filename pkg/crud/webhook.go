@@ -11,6 +11,10 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
+func generateTelegramURL(botToken, chatID string) string {
+	return fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage?chat_id=%s", url.PathEscape(botToken), url.QueryEscape(chatID))
+}
+
 func (a App) createWebhook(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !request.CanWebhook {
 		a.rendererApp.Error(w, r, model.WrapForbidden(ErrNotAuthorized))
@@ -38,13 +42,23 @@ func (a App) createWebhook(w http.ResponseWriter, r *http.Request, request provi
 
 	webhookURL := r.Form.Get("url")
 	if len(webhookURL) == 0 {
-		a.rendererApp.Error(w, r, model.WrapInvalid(errors.New("url is required")))
+		a.rendererApp.Error(w, r, model.WrapInvalid(errors.New("url or token is required")))
 		return
 	}
 
-	if _, err = url.Parse(webhookURL); err != nil {
-		a.rendererApp.Error(w, r, model.WrapInvalid(fmt.Errorf("unable to parse url: %s", err)))
-		return
+	if kind == provider.Telegram {
+		chatID := r.Form.Get("chat-id")
+		if len(chatID) == 0 {
+			a.rendererApp.Error(w, r, model.WrapInvalid(errors.New("chat ID is required")))
+			return
+		}
+
+		webhookURL = generateTelegramURL(webhookURL, chatID)
+	} else {
+		if _, err = url.Parse(webhookURL); err != nil {
+			a.rendererApp.Error(w, r, model.WrapInvalid(fmt.Errorf("unable to parse url: %s", err)))
+			return
+		}
 	}
 
 	rawEventTypes := r.Form["types"]
