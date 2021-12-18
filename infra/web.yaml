@@ -25,7 +25,7 @@ spec:
     nameOverride: fibr
     image:
       name: vibioh/fibr
-      tag: '202112181251' # {"$imagepolicy": "default:flux-fibr-web:tag"}
+      tag: '202112181503' # {"$imagepolicy": "default:flux-fibr-web:tag"}
     volumes:
       - name: data
         persistentVolumeClaim:
