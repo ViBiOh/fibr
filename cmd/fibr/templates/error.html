@@ -1,6 +1,26 @@
 {{ define "error" }}
   {{ template "header" . }}
 
+  <script type="text/javascript" nonce="{{ .nonce }}">
+    document.addEventListener('readystatechange', async (event) => {
+      if (event.target.readyState === 'complete') {
+        const link = document.getElementById("go-back");
+
+        if (link) {
+          link.setAttribute("href", document.referrer);
+          link.addEventListener("click", (e) => {
+            e.preventDefault();
+            history.back();
+            setTimeout(() => {
+              window.location.reload(true)
+            }, 4)
+            return false;
+          });
+        }
+      }
+    });
+  </script>
+
   <header class="header center">
     <h1 class="no-margin no-padding">
       {{ template "root_link" . }}
@@ -10,6 +30,10 @@
   <h2 class="padding no-margin center bg-danger">Error</h2>
 
   {{ template "message" .Message }}
+
+  <h3 class="center">
+    <a id="go-back" href="#">Go Back</a>
+  </h3>
 
   {{ template "footer" . }}
 {{ end }}

@@ -18,7 +18,7 @@ func (a *App) AmqpHandler(message amqp.Delivery) error {
 
 	a.Lock()
 
-	if len(share.Path) == 0 {
+	if share.Creation.IsZero() {
 		delete(a.shares, share.ID)
 	} else {
 		a.shares[share.ID] = share

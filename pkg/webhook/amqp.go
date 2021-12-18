@@ -18,7 +18,7 @@ func (a *App) AmqpHandler(message amqp.Delivery) error {
 
 	a.Lock()
 
-	if len(webhook.Pathname) == 0 {
+	if len(webhook.URL) == 0 {
 		delete(a.webhooks, webhook.ID)
 	} else {
 		a.webhooks[webhook.ID] = webhook

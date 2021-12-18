@@ -36,8 +36,13 @@ func (a App) createWebhook(w http.ResponseWriter, r *http.Request, request provi
 		return
 	}
 
-	target, err := url.Parse(r.Form.Get("url"))
-	if err != nil {
+	webhookURL := r.Form.Get("url")
+	if len(webhookURL) == 0 {
+		a.rendererApp.Error(w, r, model.WrapInvalid(errors.New("url is required")))
+		return
+	}
+
+	if _, err = url.Parse(webhookURL); err != nil {
 		a.rendererApp.Error(w, r, model.WrapInvalid(fmt.Errorf("unable to parse url: %s", err)))
 		return
 	}
@@ -68,7 +73,7 @@ func (a App) createWebhook(w http.ResponseWriter, r *http.Request, request provi
 		return
 	}
 
-	id, err := a.webhookApp.Create(info.Pathname, recursive, kind, target.String(), eventTypes)
+	id, err := a.webhookApp.Create(info.Pathname, recursive, kind, webhookURL, eventTypes)
 	if err != nil {
 		a.rendererApp.Error(w, r, model.WrapInternal(err))
 		return
