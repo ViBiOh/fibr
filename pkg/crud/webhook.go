@@ -28,48 +28,10 @@ func (a App) createWebhook(w http.ResponseWriter, r *http.Request, request provi
 		return
 	}
 
-	recursive, err := getFormBool(r.Form.Get("recursive"))
+	recursive, kind, webhookURL, eventTypes, err := checkWebhookForm(r)
 	if err != nil {
-		a.rendererApp.Error(w, r, model.WrapInvalid(err))
+		a.rendererApp.Error(w, r, err)
 		return
-	}
-
-	kind, err := provider.ParseWebhookKind(r.Form.Get("kind"))
-	if err != nil {
-		a.rendererApp.Error(w, r, model.WrapInvalid(fmt.Errorf("unable to parse kind: %s", err)))
-		return
-	}
-
-	webhookURL := r.Form.Get("url")
-	if len(webhookURL) == 0 {
-		a.rendererApp.Error(w, r, model.WrapInvalid(errors.New("url or token is required")))
-		return
-	}
-
-	if kind == provider.Telegram {
-		chatID := r.Form.Get("chat-id")
-		if len(chatID) == 0 {
-			a.rendererApp.Error(w, r, model.WrapInvalid(errors.New("chat ID is required")))
-			return
-		}
-
-		webhookURL = generateTelegramURL(webhookURL, chatID)
-	} else {
-		if _, err = url.Parse(webhookURL); err != nil {
-			a.rendererApp.Error(w, r, model.WrapInvalid(fmt.Errorf("unable to parse url: %s", err)))
-			return
-		}
-	}
-
-	rawEventTypes := r.Form["types"]
-	eventTypes := make([]provider.EventType, len(rawEventTypes))
-	for i, rawEventType := range rawEventTypes {
-		eType, err := provider.ParseEventType(rawEventType)
-		if err != nil {
-			a.rendererApp.Error(w, r, model.WrapInvalid(err))
-			return
-		}
-		eventTypes[i] = eType
 	}
 
 	info, err := a.storageApp.Info(request.Path)
@@ -101,6 +63,60 @@ func (a App) createWebhook(w http.ResponseWriter, r *http.Request, request provi
 	}
 
 	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/?d=%s#webhook-list", request.URL(""), request.Layout("")), renderer.NewSuccessMessage("Webhook successfully created with ID: %s", id))
+}
+
+func checkWebhookForm(r *http.Request) (recursive bool, kind provider.WebhookKind, webhookURL string, eventTypes []provider.EventType, err error) {
+	recursive, err = getFormBool(r.Form.Get("recursive"))
+	if err != nil {
+		err = model.WrapInvalid(err)
+		return
+	}
+
+	kind, err = provider.ParseWebhookKind(r.Form.Get("kind"))
+	if err != nil {
+		err = model.WrapInvalid(fmt.Errorf("unable to parse kind: %s", err))
+		return
+	}
+
+	webhookURL = r.Form.Get("url")
+	if len(webhookURL) == 0 {
+		err = model.WrapInvalid(errors.New("url or token is required"))
+		return
+	}
+
+	if kind == provider.Telegram {
+		chatID := r.Form.Get("chat-id")
+		if len(chatID) == 0 {
+			err = model.WrapInvalid(errors.New("chat ID is required"))
+			return
+		}
+
+		webhookURL = generateTelegramURL(webhookURL, chatID)
+	} else {
+		if _, err = url.Parse(webhookURL); err != nil {
+			err = model.WrapInvalid(fmt.Errorf("unable to parse url: %s", err))
+			return
+		}
+	}
+
+	rawEventTypes := r.Form["types"]
+	if len(rawEventTypes) == 0 {
+		err = model.WrapInvalid(errors.New("at least one event type has to be chosen"))
+		return
+	}
+
+	eventTypes = make([]provider.EventType, len(rawEventTypes))
+	for i, rawEventType := range rawEventTypes {
+		var eType provider.EventType
+		eType, err = provider.ParseEventType(rawEventType)
+		if err != nil {
+			err = model.WrapInvalid(err)
+			return
+		}
+		eventTypes[i] = eType
+	}
+
+	return
 }
 
 func (a App) deleteWebhook(w http.ResponseWriter, r *http.Request, request provider.Request) {
