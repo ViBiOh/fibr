@@ -12,7 +12,6 @@ import (
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/amqp"
-	"github.com/ViBiOh/httputils/v4/pkg/concurrent"
 	"github.com/ViBiOh/httputils/v4/pkg/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/httperror"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
@@ -29,11 +28,6 @@ const (
 	// Height is the width of each thumbnail generated
 	Height = 150
 )
-
-type thumbnailContent struct {
-	io.ReadCloser
-	provider.StorageItem
-}
 
 // App of package
 type App struct {
@@ -186,8 +180,12 @@ func (a App) List(w http.ResponseWriter, r *http.Request, item provider.StorageI
 
 	safeWrite(isDone, w, "{")
 
-	for thumbnailEncoder := range a.getThumbnailsToEncode(isDone, items) {
+	for _, item := range items {
 		if isDone() {
+			return
+		}
+
+		if !a.HasThumbnail(item) {
 			continue
 		}
 
@@ -198,9 +196,9 @@ func (a App) List(w http.ResponseWriter, r *http.Request, item provider.StorageI
 		}
 
 		safeWrite(isDone, w, `"`)
-		safeWrite(isDone, w, sha.New(thumbnailEncoder.Name))
+		safeWrite(isDone, w, sha.New(item.Name))
 		safeWrite(isDone, w, `":"`)
-		a.encodeContent(base64.NewEncoder(base64.StdEncoding, w), thumbnailEncoder)
+		a.encodeContent(base64.NewEncoder(base64.StdEncoding, w), item)
 		safeWrite(isDone, w, `"`)
 	}
 
@@ -217,67 +215,29 @@ func safeWrite(isDone func() bool, w io.Writer, content string) {
 	}
 }
 
-func (a App) getThumbnailsToEncode(isDone func() bool, items []provider.StorageItem) (thumbnailToEncode <-chan thumbnailContent) {
-	workersCount := uint64(4)
-	wg := concurrent.NewLimited(workersCount)
-
-	output := make(chan thumbnailContent, workersCount)
-	thumbnailToEncode = output
-
-	go func() {
-		for _, item := range items {
-			if isDone() {
-				break
-			}
-
-			func(item provider.StorageItem) {
-				wg.Go(func() {
-					if reader := a.getContentReader(item); reader != nil {
-						output <- thumbnailContent{
-							reader,
-							item,
-						}
-					}
-				})
-			}(item)
-		}
-
-		wg.Wait()
-		close(output)
-	}()
-
-	return
-}
-
-func (a App) getContentReader(item provider.StorageItem) io.ReadCloser {
-	if !a.HasThumbnail(item) {
-		return nil
-	}
-
+func (a App) encodeContent(encoder io.WriteCloser, item provider.StorageItem) {
 	reader, err := a.storageApp.ReaderFrom(getThumbnailPath(item))
 	if err != nil {
-		logger.WithField("fn", "thumbnail.getContentReader").WithField("item", item.Pathname).Error("unable to open: %s", err)
-		return nil
+		logEncodeContentError(item).Error("unable to open: %s", err)
+		return
 	}
 
-	return reader
-}
-
-func (a App) encodeContent(encoder io.WriteCloser, reader io.ReadCloser) {
 	buffer := provider.BufferPool.Get().(*bytes.Buffer)
 	defer provider.BufferPool.Put(buffer)
 
-	var err error
-
 	if _, err = io.CopyBuffer(encoder, reader, buffer.Bytes()); err != nil {
-		logger.WithField("fn", "thumbnail.encodeContent").Error("unable to copy: %s", err)
+		logEncodeContentError(item).Error("unable to copy: %s", err)
 	}
 
 	if err = reader.Close(); err != nil {
-		logger.WithField("fn", "thumbnail.encodeContent").Error("unable to close item: %s", err)
+		logEncodeContentError(item).Error("unable to close item: %s", err)
 	}
 
 	if err = encoder.Close(); err != nil {
-		logger.WithField("fn", "thumbnail.encodeContent").Error("unable to close encoder: %s", err)
+		logEncodeContentError(item).Error("unable to close encoder: %s", err)
 	}
+}
+
+func logEncodeContentError(item provider.StorageItem) logger.FieldsContext {
+	return logger.WithField("fn", "thumbnail.encodeContent").WithField("item", item.Pathname)
 }
