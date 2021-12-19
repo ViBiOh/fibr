@@ -12,6 +12,7 @@ import (
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/amqp"
+	"github.com/ViBiOh/httputils/v4/pkg/concurrent"
 	"github.com/ViBiOh/httputils/v4/pkg/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/httperror"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
@@ -28,6 +29,11 @@ const (
 	// Height is the width of each thumbnail generated
 	Height = 150
 )
+
+type thumbnailContent struct {
+	io.ReadCloser
+	provider.StorageItem
+}
 
 // App of package
 type App struct {
@@ -166,67 +172,112 @@ func (a App) List(w http.ResponseWriter, r *http.Request, item provider.StorageI
 	w.Header().Add("Cache-Control", "no-cache")
 	w.WriteHeader(http.StatusOK)
 
-	commaNeeded := false
 	done := r.Context().Done()
-
-	safeWrite(done, w, "{")
-
-	for _, item := range items {
+	isDone := func() bool {
 		select {
 		case <-done:
-			return
+			return true
 		default:
-			if item.IsDir || !a.HasThumbnail(item) {
-				continue
-			}
-
-			if commaNeeded {
-				safeWrite(done, w, ",")
-			} else {
-				commaNeeded = true
-			}
-
-			safeWrite(done, w, `"`)
-			safeWrite(done, w, sha.New(item.Name))
-			safeWrite(done, w, `":"`)
-			a.encodeContent(base64.NewEncoder(base64.StdEncoding, w), item)
-			safeWrite(done, w, `"`)
+			return false
 		}
 	}
 
-	safeWrite(done, w, "}")
+	commaNeeded := false
+
+	safeWrite(isDone, w, "{")
+
+	for thumbnailEncoder := range a.getThumbnailsToEncode(isDone, items) {
+		if isDone() {
+			continue
+		}
+
+		if commaNeeded {
+			safeWrite(isDone, w, ",")
+		} else {
+			commaNeeded = true
+		}
+
+		safeWrite(isDone, w, `"`)
+		safeWrite(isDone, w, sha.New(thumbnailEncoder.Name))
+		safeWrite(isDone, w, `":"`)
+		a.encodeContent(base64.NewEncoder(base64.StdEncoding, w), thumbnailEncoder)
+		safeWrite(isDone, w, `"`)
+	}
+
+	safeWrite(isDone, w, "}")
 }
 
-func safeWrite(done <-chan struct{}, w io.Writer, content string) {
-	select {
-	case <-done:
+func safeWrite(isDone func() bool, w io.Writer, content string) {
+	if isDone() {
 		return
-	default:
-		if _, err := io.WriteString(w, content); err != nil {
-			logger.Error("unable to write content: %s", err)
-		}
+	}
+
+	if _, err := io.WriteString(w, content); err != nil {
+		logger.Error("unable to write content: %s", err)
 	}
 }
 
-func (a App) encodeContent(encoder io.WriteCloser, item provider.StorageItem) {
+func (a App) getThumbnailsToEncode(isDone func() bool, items []provider.StorageItem) (thumbnailToEncode <-chan thumbnailContent) {
+	workersCount := uint64(4)
+	wg := concurrent.NewLimited(workersCount)
+
+	output := make(chan thumbnailContent, workersCount)
+	thumbnailToEncode = output
+
+	go func() {
+		for _, item := range items {
+			if isDone() {
+				break
+			}
+
+			func(item provider.StorageItem) {
+				wg.Go(func() {
+					if reader := a.getContentReader(item); reader != nil {
+						output <- thumbnailContent{
+							reader,
+							item,
+						}
+					}
+				})
+			}(item)
+		}
+
+		wg.Wait()
+		close(output)
+	}()
+
+	return
+}
+
+func (a App) getContentReader(item provider.StorageItem) io.ReadCloser {
+	if !a.HasThumbnail(item) {
+		return nil
+	}
+
 	reader, err := a.storageApp.ReaderFrom(getThumbnailPath(item))
 	if err != nil {
-		logger.WithField("fn", "thumbnail.encodeContent").WithField("item", item.Pathname).Error("unable to open: %s", err)
-		return
+		logger.WithField("fn", "thumbnail.getContentReader").WithField("item", item.Pathname).Error("unable to open: %s", err)
+		return nil
 	}
 
+	return reader
+}
+
+func (a App) encodeContent(encoder io.WriteCloser, reader io.ReadCloser) {
 	buffer := provider.BufferPool.Get().(*bytes.Buffer)
 	defer provider.BufferPool.Put(buffer)
 
+	var err error
+
 	if _, err = io.CopyBuffer(encoder, reader, buffer.Bytes()); err != nil {
-		logger.WithField("fn", "thumbnail.encodeContent").WithField("item", item.Pathname).Error("unable to copy: %s", err)
+		logger.WithField("fn", "thumbnail.encodeContent").Error("unable to copy: %s", err)
 	}
 
 	if err = reader.Close(); err != nil {
-		logger.WithField("fn", "thumbnail.encodeContent").WithField("item", item.Pathname).Error("unable to close item: %s", err)
+		logger.WithField("fn", "thumbnail.encodeContent").Error("unable to close item: %s", err)
 	}
 
 	if err = encoder.Close(); err != nil {
-		logger.WithField("fn", "thumbnail.encodeContent").WithField("item", item.Pathname).Error("unable to close encoder: %s", err)
+		logger.WithField("fn", "thumbnail.encodeContent").Error("unable to close encoder: %s", err)
 	}
 }

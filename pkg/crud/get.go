@@ -106,7 +106,6 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 	}
 
 	httpjson.Write(w, http.StatusOK, geo.NewFeatureCollection(features))
-	return
 }
 
 func (a App) serveThumbnail(w http.ResponseWriter, r *http.Request, item provider.StorageItem) {
