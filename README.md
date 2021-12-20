@@ -159,8 +159,7 @@ fibr \
   -noAuth \
   -fsDirectory "$(pwd)" \
   -thumbnailURL "" \
-  -exifURL "" \
-  -publicURL "http://localhost:1080"
+  -exifURL ""
 ```
 
 ### As a single Docker container, with admin/password user
@@ -169,10 +168,9 @@ For long-living sharing with password and self-contained app in Docker, with no 
 
 ```bash
 docker run -d \
-  -p 1080:180/tcp \
+  -p 1080:1080/tcp \
   --name fibr \
   -v ${PWD}:/data/ \
-  -e FIBR_PUBLIC_URL="http://localhost:1080" \
   -e FIBR_AUTH_PROFILES="1:admin" \
   -e FIBR_AUTH_USERS="1:$(htpasswd -nBb login password)" \
   -e FIBR_THUMBNAIL_URL="" \
@@ -184,7 +182,11 @@ docker run -d \
 
 For prod-ready run with thumbnails generation of image, PDF and videos, _this is the recommended approach_.
 
-You can inspire yourself from the [docker-compose.example.yaml](docker-compose.example.yaml) file I personnaly used. Beware of `-authUsers` option: bcrypted passwords contain dollar sign, which `docker-compose` tries to resolve as a shell variable, [you must escape it](https://docs.docker.com/compose/compose-file/compose-file-v2/#variable-substitution).
+You can inspire yourself from the [docker-compose.yaml](docker-compose.yaml) file I personnaly used. Beware of `-authUsers` option: bcrypted passwords contain dollar sign, which `docker-compose` tries to resolve as a shell variable, [you must escape it](https://docs.docker.com/compose/compose-file/compose-file-v2/#variable-substitution).
+
+```bash
+DATA_USER_ID="$(id -u)" DATA_DIR="$(pwd)" BASIC_USERS="1:$(htpasswd -nBb login password)" docker compose up
+```
 
 You'll find a Kubernetes exemple in the [`infra/`](infra/) folder, using my [`app chart`](https://github.com/ViBiOh/charts/tree/main/app). My personnal k8s runs on `arm64` and thumbnail converters are not yet ready for this architecture, so I use a mix of `helm` and `docker-compose.yaml`.
 
@@ -322,7 +324,7 @@ Usage of fibr:
   -prometheusWriteTimeout string
         [prometheus] Write Timeout {FIBR_PROMETHEUS_WRITE_TIMEOUT} (default "10s")
   -publicURL string
-        Public URL {FIBR_PUBLIC_URL} (default "https://fibr.vibioh.fr")
+        Public URL {FIBR_PUBLIC_URL} (default "http://localhost:1080")
   -readTimeout string
         [server] Read Timeout {FIBR_READ_TIMEOUT} (default "2m")
   -s3AccessKey string

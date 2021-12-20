@@ -7,26 +7,24 @@ services:
     environment:
       FIBR_AUTH_PROFILES: 1:admin
       FIBR_AUTH_USERS: '${BASIC_USERS}'
-      FIBR_IGNORE_PATTERN: '.st(folder|ignore)'
-      FIBR_LOGGER_JSON: 'true'
       FIBR_EXIF_DIRECT_ACCESS: 'true'
       FIBR_THUMBNAIL_DIRECT_ACCESS: 'true'
+    ports:
+      - 1080:1080/tcp
     volumes:
       - ${DATA_DIR}:/data
     depends_on:
       - image
-      - video
+      - vith
       - exas
     user: '${DATA_USER_ID}'
     restart: on-failure:5
     read_only: true
 
-  video:
+  vith:
     image: vibioh/vith
     environment:
-      VITH_LOGGER_JSON: 'true'
       VITH_WORK_DIR: '/data'
-      VITH_IMAGINARY_URL: http://image:9000
     volumes:
       - ${DATA_DIR}:/data
     user: '${DATA_USER_ID}'
@@ -40,7 +38,6 @@ services:
   exas:
     image: vibioh/exas
     environment:
-      EXAS_LOGGER_JSON: 'true'
       EXAS_WORK_DIR: '/data'
     volumes:
       - ${DATA_DIR}:/data

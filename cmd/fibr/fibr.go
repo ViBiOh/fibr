@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 
 	_ "net/http/pprof"
 
@@ -75,7 +76,7 @@ func main() {
 	crudConfig := crud.Flags(fs, "")
 	shareConfig := share.Flags(fs, "share")
 	webhookConfig := webhook.Flags(fs, "webhook")
-	rendererConfig := renderer.Flags(fs, "", flags.NewOverride("PublicURL", "https://fibr.vibioh.fr"), flags.NewOverride("Title", "fibr"))
+	rendererConfig := renderer.Flags(fs, "", flags.NewOverride("PublicURL", "http://localhost:1080"), flags.NewOverride("Title", "fibr"))
 
 	filesystemConfig := filesystem.Flags(fs, "fs")
 	s3Config := s3.Flags(fs, "s3")
@@ -136,6 +137,10 @@ func main() {
 
 	rendererApp, err := renderer.New(rendererConfig, content, fibr.FuncMap(thumbnailApp))
 	logger.Fatal(err)
+
+	if strings.HasPrefix(rendererApp.PublicURL(""), "http://localhost") {
+		logger.Warn("PublicURL has a development/debug value. You may configure `FIBR_PUBLIC_URL` environment variable")
+	}
 
 	exifApp, err := exif.New(exifConfig, storageProvider, prometheusRegisterer, amqpClient)
 	logger.Fatal(err)
