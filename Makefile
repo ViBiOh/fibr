@@ -92,9 +92,7 @@ run:
 	$(MAIN_RUNNER) \
 		-fsDirectory "$(PWD)" \
 		-ignorePattern ".git" \
-		-publicURL "http://localhost:1080" \
 		-authProfiles "1:admin" \
 		-authUsers "1:`htpasswd -nBb admin admin`" \
 		-thumbnailURL "" \
-		-exifURL "" \
-		-webhookSecret "secret"
+		-exifURL ""
