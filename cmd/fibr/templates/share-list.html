@@ -46,6 +46,23 @@
     }
   </style>
 
+  <script type="text/javascript" nonce="{{ .nonce }}">
+    document.addEventListener('readystatechange', async (event) => {
+      if (event.target.readyState === 'complete') {
+        {{ range .Shares }}
+          const shareDelete{{ raw .ID }} = document.getElementById('webhook-delete-{{ .ID }}');
+          if (shareDelete{{ raw .ID }}) {
+            shareDelete{{ raw .ID }}.addEventListener('click', (e) => {
+              if (!confirm('Are you sure you want to delete share for {{ .Path }}?')) {
+                e.preventDefault()
+              }
+            });
+          }
+        {{ end }}
+      }
+    });
+  </script>
+
   <div id="share-list" class="modal">
     <div class="modal-content">
       <h2 class="flex flex-center header no-margin">
@@ -97,7 +114,7 @@
                     <input type="hidden" name="type" value="share" />
                     <input type="hidden" name="method" value="DELETE" />
                     <input type="hidden" name="id" value="{{ .ID }}" />
-                    <button type="submit" onclick="return confirm('Are you sure you want to delete share for {{ .Path }}?')" class="button button-icon" alt="Delete">
+                    <button id="share-delete-{{ .ID }}" type="submit" class="button button-icon" alt="Delete">
                       <img class="icon" src="{{ url "/svg/times?fill=silver" }}" alt="Delete">
                     </button>
                   </form>

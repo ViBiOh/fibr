@@ -271,8 +271,13 @@
         const file = values.files[i];
 
         try {
-          const uploadFilename = await uploadFile(values.method, file, share, duration);
-          const parts = uploadFilename.split("\n")
+          const uploadFilename = await uploadFile(
+            values.method,
+            file,
+            share,
+            duration,
+          );
+          const parts = uploadFilename.split('\n');
           if (parts.length > 1) {
             shares.set(parts[1], file);
           }
@@ -330,9 +335,14 @@
         shareLabel.innerHTML = 'Create a public read-only share on each file for';
       }
 
+      const cancelButton = document.getElementById('upload-cancel');
+      if (cancelButton) {
+        cancelButton.addEventListener('click', abort);
+      }
+
       const form = document.getElementById('upload-form');
       if (form) {
-        form.addEventListener('submit', upload)
+        form.addEventListener('submit', upload);
       }
     });
   </script>
@@ -396,7 +406,7 @@
         <div id="upload-list" class="upload-width full"></div>
 
         <p class="padding no-margin center">
-          <a href="#" class="button white" onclick="abort(event)">Cancel</a>
+          <a id="upload-cancel" href="#" class="button white">Cancel</a>
           <button id="upload-button" type="submit" class="button bg-primary">Upload</button>
         </p>
       </form>
