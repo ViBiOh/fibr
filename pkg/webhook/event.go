@@ -69,23 +69,23 @@ func send(ctx context.Context, id string, req request.Request, payload interface
 }
 
 func (a *App) rawHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
-	return send(ctx, webhook.ID, request.New().Post(webhook.URL).Header("User-Agent", "fibr-webhook").WithSignatureAuthorization("fibr", a.hmacSecret), event)
+	return send(ctx, webhook.ID, request.Post(webhook.URL).Header("User-Agent", "fibr-webhook").WithSignatureAuthorization("fibr", a.hmacSecret), event)
 }
 
 func (a *App) discordHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
-	return send(ctx, webhook.ID, request.New().Post(webhook.URL), discordPayload{
+	return send(ctx, webhook.ID, request.Post(webhook.URL), discordPayload{
 		Content: a.eventText(event),
 	})
 }
 
 func (a *App) slackHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
-	return send(ctx, webhook.ID, request.New().Post(webhook.URL), slackPayload{
+	return send(ctx, webhook.ID, request.Post(webhook.URL), slackPayload{
 		Text: a.eventText(event),
 	})
 }
 
 func (a *App) telegramHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
-	return send(ctx, webhook.ID, request.New().Post(fmt.Sprintf("%s&message=%s", webhook.URL, url.QueryEscape(a.eventText(event)))), nil)
+	return send(ctx, webhook.ID, request.Post(fmt.Sprintf("%s&message=%s", webhook.URL, url.QueryEscape(a.eventText(event)))), nil)
 }
 
 func (a *App) eventText(event provider.Event) string {

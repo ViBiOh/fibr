@@ -35,94 +35,114 @@
     {{ template "map-modal" . }}
   {{ end }}
 
-  <script type="text/javascript" nonce="{{ .nonce }}">
-        /**
-     * Remove all child and append given one
-     * @param {Element} element Element to clear
-     * @param {Element} newContent Element to put in place
-     */
-    function replaceContent(element, newContent) {
-      while (element.firstChild) {
-        element.removeChild(element.firstChild);
-      }
-
-      if (newContent) {
-        element.appendChild(newContent);
-      }
-    }
-
-    /**
-     * Async image loading
-     */
-    async function getThumbnails() {
-      const response = await fetch('?thumbnail', { credentials: 'same-origin' });
-
-      if (response.status >= 400) {
-        throw new Error('unable to load thumbnails');
-      }
-
-      if (response.status === 204) {
-        return {};
-      }
-
-      return response.json();
-    }
-
-    // from https://developers.google.com/speed/webp/faq#how_can_i_detect_browser_support_for_webp
-    async function isWebPCompatible() {
-      const animatedImage = 'UklGRlIAAABXRUJQVlA4WAoAAAASAAAAAAAAAAAAQU5JTQYAAAD/////AABBTk1GJgAAAAAAAAAAAAAAAAAAAGQAAABWUDhMDQAAAC8AAAAQBxAREYiI/gcA';
-
-      return new Promise((resolve, reject) => {
-        var image = new Image();
-        image.onload = () => {
-          if (image.width > 0 && image.height > 0) {
-            resolve();
-          } else {
-            reject();
-          }
-        };
-
-        image.onerror = reject;
-        image.src = `data:image/webp;base64,${animatedImage}`;
-      });
-    }
-
-    window.addEventListener(
-      'load',
-      async () => {
-        try {
-          await isWebPCompatible();
-        } catch (e) {
-          console.error('Your browser is not compatible with WebP format.', e);
-          return;
+  {{ if eq .Request.Display "grid" }}
+    <script type="text/javascript" nonce="{{ .nonce }}">
+          /**
+       * Remove all child and append given one
+       * @param {Element} element Element to clear
+       * @param {Element} newContent Element to put in place
+       */
+      function replaceContent(element, newContent) {
+        while (element.firstChild) {
+          element.removeChild(element.firstChild);
         }
 
-        document.querySelectorAll('[data-picture]').forEach((picture) => {
-          replaceContent(picture, generateThrobber());
-        });
+        if (newContent) {
+          element.appendChild(newContent);
+        }
+      }
 
-        try {
-          const thumbnails = await getThumbnails();
+      /**
+       * Async image loading
+       */
+      async function getThumbnails() {
+        const response = await fetch('?thumbnail', { credentials: 'same-origin' });
 
-          Object.keys(thumbnails).forEach((id) => {
-            const picture = document.getElementById(`picture-${id}`);
-            if (!picture) {
-              return;
+        if (response.status >= 400) {
+          throw new Error('unable to load thumbnails');
+        }
+
+        if (response.status === 204) {
+          return {};
+        }
+
+        return response.json();
+      }
+
+      // from https://developers.google.com/speed/webp/faq#how_can_i_detect_browser_support_for_webp
+      async function isWebPCompatible() {
+        const animatedImage = 'UklGRlIAAABXRUJQVlA4WAoAAAASAAAAAAAAAAAAQU5JTQYAAAD/////AABBTk1GJgAAAAAAAAAAAAAAAAAAAGQAAABWUDhMDQAAAC8AAAAQBxAREYiI/gcA';
+
+        return new Promise((resolve, reject) => {
+          var image = new Image();
+          image.onload = () => {
+            if (image.width > 0 && image.height > 0) {
+              resolve();
+            } else {
+              reject();
             }
+          };
 
-            const img = new Image();
-            img.src = `data:image/webp;base64,${thumbnails[id]}`;
-            img.alt = picture.dataset.alt;
+          image.onerror = reject;
+          image.src = `data:image/webp;base64,${animatedImage}`;
+        });
+      }
 
-            replaceContent(picture, img);
+      /**
+       * Restore default layout when no thumbnail is possible
+       */
+      function displayNoThumbnail(picture) {
+        const img = document.createElement('img');
+        img.classList.add('throbber', 'icon-large');
+        img.src = '{{ url "/svg/file-image?fill=silver" }}';
+        img.alt = 'Image file';
+
+        const span = document.createElement('span');
+        span.classList.add('filename', 'ellipsis');
+        span.innerHTML = picture.dataset.alt.replace('Thumbnail of ', '');
+
+        replaceContent(picture, img);
+        picture.after(span)
+      }
+
+      window.addEventListener(
+        'load',
+        async () => {
+          try {
+            await isWebPCompatible();
+          } catch (e) {
+            console.error('Your browser is not compatible with WebP format.', e);
+            document.querySelectorAll('[data-picture]').forEach(displayNoThumbnail);
+            return;
+          }
+
+          document.querySelectorAll('[data-picture]').forEach((picture) => {
+            replaceContent(picture, generateThrobber());
           });
-        } catch (e) {
-          console.error(e);
-        }
-      },
-      false,
-    );
-  </script>
+
+          try {
+            const thumbnails = await getThumbnails();
+
+            Object.keys(thumbnails).forEach((id) => {
+              const picture = document.getElementById(`picture-${id}`);
+              if (!picture) {
+                return;
+              }
+
+              const img = new Image();
+              img.src = `data:image/webp;base64,${thumbnails[id]}`;
+              img.alt = picture.dataset.alt;
+
+              replaceContent(picture, img);
+            });
+          } catch (e) {
+            console.error(e);
+          }
+        },
+        false,
+      );
+    </script>
+  {{ end }}
 
   <style type="text/css" nonce="{{ .nonce }}">
     #menu {

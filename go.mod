@@ -3,12 +3,12 @@ module github.com/ViBiOh/fibr
 go 1.17
 
 require (
-	github.com/ViBiOh/auth/v2 v2.11.28
+	github.com/ViBiOh/auth/v2 v2.11.29
 	github.com/ViBiOh/exas v0.2.4
-	github.com/ViBiOh/httputils/v4 v4.32.0
+	github.com/ViBiOh/httputils/v4 v4.33.0
 	github.com/ViBiOh/vith v0.2.2
 	github.com/golang/mock v1.6.0
-	github.com/minio/minio-go/v7 v7.0.18
+	github.com/minio/minio-go/v7 v7.0.19
 	github.com/prometheus/client_golang v1.11.0
 	github.com/streadway/amqp v1.0.0
 	golang.org/x/crypto v0.0.0-20211215153901-e495a2d5b3d3
