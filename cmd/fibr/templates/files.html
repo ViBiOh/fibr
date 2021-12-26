@@ -101,10 +101,6 @@
       list-style: none;
     }
 
-    .thumbnail {
-      max-height: 100%;
-    }
-
     {{ range .Files }}
       {{ if $root.Request.CanEdit }}
         #delete-modal-{{ .ID }}:target,
@@ -263,7 +259,7 @@
         width: 100%;
       }
 
-      .filelink picture img {
+      .filelink img {
         vertical-align: middle;
         width: 100%;
       }
