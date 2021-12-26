@@ -9,7 +9,6 @@ import (
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
-	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/query"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
@@ -18,14 +17,6 @@ import (
 // FuncMap is the map of function available in templates
 func FuncMap(thumbnailApp thumbnail.App) template.FuncMap {
 	return template.FuncMap{
-		"thumbnail": func(item provider.RenderItem) template.URL {
-			content, err := thumbnailApp.Base64(item.StorageItem)
-			if err != nil {
-				logger.WithField("item", item.Pathname).Error("unable to get base64 of thumbnail: %s", err)
-				return ""
-			}
-			return template.URL(fmt.Sprintf("data:image/webp;base64,%s", content))
-		},
 		"rebuildPaths": func(parts []string, index int) string {
 			return fmt.Sprintf("/%s", path.Join(parts[:index+1]...))
 		},

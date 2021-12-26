@@ -1,11 +1,8 @@
 package thumbnail
 
 import (
-	"bytes"
-	"encoding/base64"
 	"flag"
 	"fmt"
-	"io"
 	"net/http"
 	"path"
 	"strings"
@@ -151,32 +148,4 @@ func (a App) Serve(w http.ResponseWriter, r *http.Request, item provider.Storage
 	}()
 
 	http.ServeContent(w, r, path.Base(thumbnailPath), item.Date, reader)
-}
-
-// Base64 encodes thumbnail of given path in base64 string
-func (a App) Base64(item provider.StorageItem) (string, error) {
-	reader, err := a.storageApp.ReaderFrom(getThumbnailPath(item))
-	if err != nil {
-		return "", fmt.Errorf("unable to open: %s", err)
-	}
-
-	var writer strings.Builder
-	encoder := base64.NewEncoder(base64.StdEncoding, &writer)
-
-	copyBuffer := provider.BufferPool.Get().(*bytes.Buffer)
-	defer provider.BufferPool.Put(copyBuffer)
-
-	if _, err = io.CopyBuffer(encoder, reader, copyBuffer.Bytes()); err != nil {
-		return "", fmt.Errorf("unable to copy: %s", err)
-	}
-
-	if err = reader.Close(); err != nil {
-		return "", fmt.Errorf("unable to close item: %s", err)
-	}
-
-	if err = encoder.Close(); err != nil {
-		return "", fmt.Errorf("unable to close encoder: %s", err)
-	}
-
-	return writer.String(), nil
 }
