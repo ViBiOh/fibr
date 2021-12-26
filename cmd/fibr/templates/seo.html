@@ -33,9 +33,9 @@
 
   {{ if .Cover.Img }}
     {{ if .File }}
-      <meta property="og:image" content="{{ publicURL (.Request.URL "") }}?thumbnail&v={{ .Version }}">
+      <meta property="og:image" content="{{ publicURL (.Request.URL "") }}?thumbnail">
     {{ else }}
-      <meta property="og:image" content="{{ publicURL (.Request.URL .Cover.Img.Name) }}?thumbnail&v={{ .Version }}">
+      <meta property="og:image" content="{{ publicURL (.Request.URL .Cover.Img.Name) }}?thumbnail">
     {{ end }}
     <meta property="og:image:type" content="image/webp">
     <meta property="og:image:width" content="{{ .Cover.ImgWidth }}">

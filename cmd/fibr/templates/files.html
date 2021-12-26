@@ -82,7 +82,7 @@
             await isWebPCompatible();
           } catch (e) {
             console.error('Your browser is not compatible with WebP format.', e);
-            document.querySelectorAll('[data-thumbnail]').forEach(displayNoThumbnail);
+            thumbnails.forEach(displayNoThumbnail);
           }
         },
         false,
@@ -315,6 +315,24 @@
     {{ end }}
   </style>
 
+  <link rel="preload" as="image" href="{{ url "/svg/list?fill=silver" }}">
+  <link rel="preload" as="image" href="{{ url "/svg/th?fill=silver" }}">
+
+  {{ if .Request.CanEdit }}
+    <link rel="preload" as="image" href="{{ url "/svg/cloud-upload-alt?fill=silver" }}">
+    <link rel="preload" as="image" href="{{ url "/svg/folder?fill=silver" }}">
+    <link rel="preload" as="image" href="{{ url "/svg/times?fill=silver" }}">
+    <link rel="preload" as="image" href="{{ url "/svg/pencil-alt?fill=silver" }}">
+  {{ end }}
+
+  {{ if .Request.CanShare }}
+    <link rel="preload" as="image" href="{{ url "/svg/share-alt-square?fill=silver" }}">
+  {{ end }}
+
+  {{ if .Request.CanWebhook }}
+    <link rel="preload" as="image" href="{{ url "/svg/webhook?fill=silver" }}">
+  {{ end }}
+
   <div class="content">
     <div id="menu" class="flex flex-center">
       <a id="list-display" class="button button-icon" href="?d=list">
@@ -400,7 +418,7 @@
             {{ end }}
 
             {{ if and (eq $root.Request.Display "grid") (hasThumbnail .) .IsVideo }}
-              <img class="icon icon-overlay" src="{{ url "/svg/play?fill=rgba(192, 192, 192, 0.8)" }}" alt="Play video">
+              <img class="icon icon-overlay" src="{{ url "/svg/play?fill=rgba(192,192,192,0.8)" }}" alt="Play video">
             {{ end }}
           </a>
 
