@@ -378,57 +378,6 @@
                 <img class="icon {{ if eq $root.Request.Display "grid" }}icon-large{{ end }}" src="{{ url "/svg/" }}{{ iconFromExtension . }}?fill=silver" alt="File">
               {{ end }}
               <span class="filename ellipsis {{ if eq $root.Request.Display "list" }}padding-left{{ end }}">{{ .Name }}</span>
-
-              {{ if .IsDir }}
-                {{ if or .Aggregate.Location (not .Aggregate.Start.IsZero) }}
-                  {{- $startDate := .Aggregate.Start.Format "Jan 2006" -}}
-                  {{- $endDate := .Aggregate.End.Format "Jan 2006" -}}
-
-                  {{- if eq $root.Request.Display "grid" -}}
-                    <img
-                      class="icon exif"
-                      src="{{ url "/svg/info" }}?fill=silver"
-                      alt="Exif"
-                      title="
-                        {{- if .Aggregate.Location }}
-                          {{- .Aggregate.Location }}
-                        {{- end }}
-
-                        {{- if not .Aggregate.Start.IsZero }}
-                          {{- if and .Aggregate.Location }}
-{{ end }}
-                          {{- $startDate }}
-                        {{- end }}
-
-                        {{- if ne $startDate $endDate }} - {{ $endDate }}
-                        {{- end -}}
-                      "
-                    >
-                  {{ else }}
-                    <em class="exif ellipsis {{ if eq $root.Request.Display "list" }}padding-left{{ end }}">
-                      (
-
-                      {{- if .Aggregate.Location }}
-                        {{- .Aggregate.Location }}
-                      {{- end }}
-
-                      {{- if not .Aggregate.Start.IsZero }}
-                        {{- if and .Aggregate.Location }}
-                          |
-                        {{ end }}
-
-                        {{- $startDate }}
-
-                        {{- if ne $startDate $endDate }}
-                          - {{ $endDate }}
-                        {{- end }}
-                      {{- end -}}
-
-                      )
-                    </em>
-                  {{ end}}
-                {{ end }}
-              {{ end }}
             {{ end }}
 
             <a href="{{ .Name }}?download" class="button button-icon file-download" alt="Download" download>
@@ -454,6 +403,57 @@
               <img class="icon icon-overlay" src="{{ url "/svg/play?fill=rgba(192, 192, 192, 0.8)" }}" alt="Play video">
             {{ end }}
           </a>
+
+          {{ if .IsDir }}
+            {{ if or .Aggregate.Location (not .Aggregate.Start.IsZero) }}
+              {{- $startDate := .Aggregate.Start.Format "Jan 2006" -}}
+              {{- $endDate := .Aggregate.End.Format "Jan 2006" -}}
+
+              {{- if eq $root.Request.Display "grid" -}}
+                <img
+                  class="icon exif"
+                  src="{{ url "/svg/info" }}?fill=silver"
+                  alt="Exif"
+                  title="
+                    {{- if .Aggregate.Location }}
+                      {{- .Aggregate.Location }}
+                    {{- end }}
+
+                    {{- if not .Aggregate.Start.IsZero }}
+                      {{- if and .Aggregate.Location }}
+{{ end }}
+                      {{- $startDate }}
+                    {{- end }}
+
+                    {{- if ne $startDate $endDate }} - {{ $endDate }}
+                    {{- end -}}
+                  "
+                >
+              {{ else }}
+                <em class="exif ellipsis {{ if eq $root.Request.Display "list" }}padding-left{{ end }}">
+                  (
+
+                  {{- if .Aggregate.Location }}
+                    {{- .Aggregate.Location }}
+                  {{- end }}
+
+                  {{- if not .Aggregate.Start.IsZero }}
+                    {{- if and .Aggregate.Location }}
+                      |
+                    {{ end }}
+
+                    {{- $startDate }}
+
+                    {{- if ne $startDate $endDate }}
+                      - {{ $endDate }}
+                    {{- end }}
+                  {{- end -}}
+
+                  )
+                </em>
+              {{ end}}
+            {{ end }}
+          {{ end }}
         </li>
       {{ end }}
     </ul>
