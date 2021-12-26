@@ -10,5 +10,5 @@ metadata:
     app.kubernetes.io/managed-by: kubectl
 spec:
   rateLimit:
-    average: 150
-    burst: 150
+    average: 200
+    burst: 100
