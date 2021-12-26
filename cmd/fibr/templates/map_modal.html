@@ -16,7 +16,7 @@
           width: 90vw;
         }
 
-        .thumbnail {
+        .thumbnail-img {
           height: 15rem;
         }
 
@@ -120,7 +120,7 @@
             bounds.push(coord);
             markers.addLayer(L.circleMarker(coord).bindPopup(
               `<a href="${f.properties.name}?browser">
-                 <img src="${f.properties.name}?thumbnail" alt="Image thumbnail" class="thumbnail">
+                 <img src="${f.properties.name}?thumbnail" alt="Image thumbnail" class="thumbnail-img">
                </a>
                <br>
                <span>${f.properties.date}</span>`,
