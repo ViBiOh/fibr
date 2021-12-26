@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/amqp"
@@ -24,6 +25,8 @@ const (
 	// Height is the width of each thumbnail generated
 	Height = 150
 )
+
+var cacheDuration string = fmt.Sprintf("private, max-age=%.0f", time.Duration(time.Minute*5).Seconds())
 
 // App of package
 type App struct {
@@ -146,6 +149,8 @@ func (a App) Serve(w http.ResponseWriter, r *http.Request, item provider.Storage
 			logger.WithField("fn", "thumbnail.Serve").WithField("item", item.Pathname).WithField("item", item.Pathname).Error("unable to close: %s", closeErr)
 		}
 	}()
+
+	w.Header().Add("Cache-Control", cacheDuration)
 
 	http.ServeContent(w, r, path.Base(thumbnailPath), item.Date, reader)
 }

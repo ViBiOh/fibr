@@ -1,0 +1,14 @@
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: fibr
+  namespace: default
+  labels:
+    app.kubernetes.io/name: fibr
+    app.kubernetes.io/instance: fibr
+    app.kubernetes.io/managed-by: kubectl
+spec:
+  rateLimit:
+    average: 150
+    burst: 150
