@@ -24,7 +24,7 @@ func (a App) Browser(w http.ResponseWriter, request provider.Request, item provi
 	pathParts := getPathParts(request.URL(""))
 	breadcrumbs := pathParts[:len(pathParts)-1]
 
-	wg := concurrent.NewLimited(2)
+	wg := concurrent.NewSimple()
 
 	wg.Go(func() {
 		var err error
