@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"strings"
 
 	_ "net/http/pprof"
 
@@ -137,10 +136,6 @@ func main() {
 
 	rendererApp, err := renderer.New(rendererConfig, content, fibr.FuncMap(thumbnailApp))
 	logger.Fatal(err)
-
-	if strings.HasPrefix(rendererApp.PublicURL(""), "http://localhost") {
-		logger.Warn("PublicURL has a development/debug value. You may configure `FIBR_PUBLIC_URL` environment variable")
-	}
 
 	exifApp, err := exif.New(exifConfig, storageProvider, prometheusRegisterer, amqpClient)
 	logger.Fatal(err)

@@ -17,7 +17,6 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	prom "github.com/ViBiOh/httputils/v4/pkg/prometheus"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
-	"github.com/ViBiOh/httputils/v4/pkg/sha"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -154,90 +153,30 @@ func (a App) Serve(w http.ResponseWriter, r *http.Request, item provider.Storage
 	http.ServeContent(w, r, path.Base(thumbnailPath), item.Date, reader)
 }
 
-// List return all thumbnail in a base64 form
-func (a App) List(w http.ResponseWriter, r *http.Request, item provider.StorageItem) {
-	items, err := a.storageApp.List(item.Pathname)
-	if err != nil {
-		httperror.InternalServerError(w, err)
-		return
-	}
-
-	w.Header().Add("Content-Type", "application/json; charset=utf-8")
-	w.Header().Add("Cache-Control", "no-cache")
-	w.WriteHeader(http.StatusOK)
-
-	done := r.Context().Done()
-	isDone := func() bool {
-		select {
-		case <-done:
-			return true
-		default:
-			return false
-		}
-	}
-
-	commaNeeded := false
-
-	safeWrite(isDone, w, "{")
-
-	for _, item := range items {
-		if isDone() {
-			return
-		}
-
-		if !a.HasThumbnail(item) {
-			continue
-		}
-
-		if commaNeeded {
-			safeWrite(isDone, w, ",")
-		} else {
-			commaNeeded = true
-		}
-
-		safeWrite(isDone, w, `"`)
-		safeWrite(isDone, w, sha.New(item.Name))
-		safeWrite(isDone, w, `":"`)
-		a.encodeContent(base64.NewEncoder(base64.StdEncoding, w), item)
-		safeWrite(isDone, w, `"`)
-	}
-
-	safeWrite(isDone, w, "}")
-}
-
-func safeWrite(isDone func() bool, w io.Writer, content string) {
-	if isDone() {
-		return
-	}
-
-	if _, err := io.WriteString(w, content); err != nil {
-		logger.Error("unable to write content: %s", err)
-	}
-}
-
-func (a App) encodeContent(encoder io.WriteCloser, item provider.StorageItem) {
+// Base64 encodes thumbnail of given path in base64 string
+func (a App) Base64(item provider.StorageItem) (string, error) {
 	reader, err := a.storageApp.ReaderFrom(getThumbnailPath(item))
 	if err != nil {
-		logEncodeContentError(item).Error("unable to open: %s", err)
-		return
+		return "", fmt.Errorf("unable to open: %s", err)
 	}
 
-	buffer := provider.BufferPool.Get().(*bytes.Buffer)
-	defer provider.BufferPool.Put(buffer)
+	var writer strings.Builder
+	encoder := base64.NewEncoder(base64.StdEncoding, &writer)
 
-	if _, err = io.CopyBuffer(encoder, reader, buffer.Bytes()); err != nil {
-		logEncodeContentError(item).Error("unable to copy: %s", err)
+	copyBuffer := provider.BufferPool.Get().(*bytes.Buffer)
+	defer provider.BufferPool.Put(copyBuffer)
+
+	if _, err = io.CopyBuffer(encoder, reader, copyBuffer.Bytes()); err != nil {
+		return "", fmt.Errorf("unable to copy: %s", err)
 	}
 
 	if err = reader.Close(); err != nil {
-		logEncodeContentError(item).Error("unable to close item: %s", err)
+		return "", fmt.Errorf("unable to close item: %s", err)
 	}
 
 	if err = encoder.Close(); err != nil {
-		logEncodeContentError(item).Error("unable to close encoder: %s", err)
+		return "", fmt.Errorf("unable to close encoder: %s", err)
 	}
-}
 
-func logEncodeContentError(item provider.StorageItem) logger.FieldsContext {
-	return logger.WithField("fn", "thumbnail.encodeContent").WithField("item", item.Pathname)
+	return writer.String(), nil
 }
