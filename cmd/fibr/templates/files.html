@@ -370,7 +370,7 @@
         {{ end }}
           <a class="filelink center ellipsis" href="{{ .Name }}{{ if .IsDir }}/?d={{ $root.Request.Layout .Name }}{{ else }}?browser{{ end }}" title="{{ .Name }}">
             {{ if and (eq $root.Request.Display "grid") (hasThumbnail .) }}
-              <img data-thumbnail class="block no-margin" src="{{ publicURL ($root.Request.URL .Name) }}?thumbnail&v={{ $root.Version }}" alt="Thumbnail of {{ .Name }}" />
+              <img data-thumbnail class="no-margin" src="{{ publicURL ($root.Request.URL .Name) }}?thumbnail&v={{ $root.Version }}" alt="Thumbnail of {{ .Name }}" />
             {{ else }}
               {{ if .IsDir }}
                 <img class="icon {{ if eq $root.Request.Display "grid" }}icon-large{{ end }}" src="{{ url "/svg/folder?fill=silver" }}" alt="Folder">
