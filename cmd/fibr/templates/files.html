@@ -60,14 +60,14 @@
        * Restore default layout when no thumbnail is possible
        */
       function displayNoThumbnail(img) {
+        const span = document.createElement('span');
+        span.classList.add('filename', 'ellipsis');
+        span.innerHTML = img.alt;
+        img.after(span)
+
         img.src = '{{ url "/svg/file-image?fill=silver" }}';
         img.classList.add('icon', 'icon-large');
         img.alt = 'Image file';
-
-        const span = document.createElement('span');
-        span.classList.add('filename', 'ellipsis');
-        span.innerHTML = img.dataset.alt;
-        img.after(span)
       }
 
       window.addEventListener(
@@ -374,9 +374,7 @@
         {{ end }}
           <a class="filelink center ellipsis" href="{{ .Name }}{{ if .IsDir }}/?d={{ $root.Request.Layout .Name }}{{ else }}?browser{{ end }}" title="{{ .Name }}">
             {{ if and (eq $root.Request.Display "grid") (hasThumbnail .) }}
-              <picture class="no-margin">
-                <img data-thumbnail src="{{ publicURL ($root.Request.URL .Name) }}?thumbnail&v={{ $root.Version }}" alt="Thumbnail of {{ .Name }}" />
-              </picture>
+              <img data-thumbnail class="no-margin" src="{{ publicURL ($root.Request.URL .Name) }}?thumbnail&v={{ $root.Version }}" alt="Thumbnail of {{ .Name }}" />
             {{ else }}
               {{ if .IsDir }}
                 <img class="icon {{ if eq $root.Request.Display "grid" }}icon-large{{ end }}" src="{{ url "/svg/folder?fill=silver" }}" alt="Folder">
