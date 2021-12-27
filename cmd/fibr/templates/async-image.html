@@ -1,0 +1,7 @@
+{{ define "async-image" }}
+  <picture id="picture-{{ .File.ID }}" class="no-margin" data-thumbnail data-alt="Thumbnail of {{ .File.Name }}">
+    <noscript>
+      <img class="thumbnail full" src="{{ url (.Request.URL .File.Name) }}?thumbnail" alt="Thumbnail of {{ .File.Name }}" />
+    </noscript>
+  </picture>
+{{ end }}
