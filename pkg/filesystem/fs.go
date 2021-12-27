@@ -193,8 +193,15 @@ func (a App) Rename(oldName, newName string) error {
 		return convertError(err)
 	}
 
-	if err := a.CreateDir(filepath.Dir(newName)); err != nil {
-		return convertError(err)
+	newDirPath := path.Dir(strings.TrimSuffix(newName, "/"))
+	if _, err := a.Info(newDirPath); err != nil {
+		if provider.IsNotExist(err) {
+			if err = a.CreateDir(newDirPath); err != nil {
+				return convertError(err)
+			}
+		} else {
+			return fmt.Errorf("unable to check if new directory exists: %s", err)
+		}
 	}
 
 	return convertError(os.Rename(a.path(oldName), a.path(newName)))

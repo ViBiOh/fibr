@@ -17,12 +17,6 @@ import (
 // FuncMap is the map of function available in templates
 func FuncMap(thumbnailApp thumbnail.App) template.FuncMap {
 	return template.FuncMap{
-		"asyncImage": func(file provider.RenderItem, request provider.Request) map[string]interface{} {
-			return map[string]interface{}{
-				"File":    file,
-				"Request": request,
-			}
-		},
 		"rebuildPaths": func(parts []string, index int) string {
 			return fmt.Sprintf("/%s", path.Join(parts[:index+1]...))
 		},

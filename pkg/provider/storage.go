@@ -113,7 +113,8 @@ func (a ByHybridSort) Less(i, j int) bool {
 // RenderItem is a storage item with an id
 type RenderItem struct {
 	Aggregate
-	ID  string
-	URI string
+	ID     string
+	URL    string
+	Folder string
 	StorageItem
 }

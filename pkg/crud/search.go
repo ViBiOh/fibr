@@ -8,7 +8,6 @@ import (
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	httpModel "github.com/ViBiOh/httputils/v4/pkg/model"
-	"github.com/ViBiOh/httputils/v4/pkg/sha"
 )
 
 const (
@@ -49,9 +48,10 @@ func (a App) search(r *http.Request, request provider.Request) (string, int, map
 			return nil
 		}
 
+		url, folder := request.Item(item)
 		items = append(items, provider.RenderItem{
-			ID:          sha.New(item.Name),
-			URI:         request.URL(""),
+			URL:         url,
+			Folder:      folder,
 			StorageItem: item,
 		})
 

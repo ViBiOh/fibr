@@ -63,9 +63,9 @@
     <ul id="files" class="no-margin no-padding">
       {{ range .Files }}
         <li class="file">
-          <a class="filelink center ellipsis" href="{{ .Name }}?browser" title="{{ .Name }}">
+          <a class="filelink center ellipsis" href="{{ .URL }}?browser" title="{{ .URL }}">
             <img class="icon" src="{{ url "/svg/" }}{{ iconFromExtension . }}?fill=silver" alt="File">
-            <span class="filename ellipsis padding-left">{{ .Name }}</span>
+            <span class="filename ellipsis padding-left">{{ .URL }}</span>
           </a>
         </li>
       {{ end }}

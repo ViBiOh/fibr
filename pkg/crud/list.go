@@ -46,8 +46,6 @@ func (a App) List(request provider.Request, message renderer.Message) (string, i
 		return "", 0, nil, err
 	}
 
-	uri := request.URL("")
-
 	items := make([]provider.RenderItem, len(files))
 	wg := concurrent.NewLimited(4)
 
@@ -59,9 +57,11 @@ func (a App) List(request provider.Request, message renderer.Message) (string, i
 					logger.WithField("fn", "crud.List").WithField("item", item.Pathname).Error("unable to read: %s", err)
 				}
 
+				url, folder := request.Item(item)
 				items[index] = provider.RenderItem{
 					ID:          sha.New(item.Name),
-					URI:         uri,
+					URL:         url,
+					Folder:      folder,
 					StorageItem: item,
 					Aggregate:   aggregate,
 				}
@@ -84,7 +84,7 @@ func (a App) List(request provider.Request, message renderer.Message) (string, i
 	wg.Wait()
 
 	content := map[string]interface{}{
-		"Paths": getPathParts(uri),
+		"Paths": getPathParts(request.URL("")),
 		"Files": items,
 		"Cover": a.getCover(files),
 

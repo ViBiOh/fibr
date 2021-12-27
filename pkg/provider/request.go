@@ -2,6 +2,7 @@ package provider
 
 import (
 	"net/http"
+	"path"
 	"strings"
 )
 
@@ -44,6 +45,17 @@ func (r Request) GetFilepath(name string) string {
 	}
 
 	return pathname
+}
+
+// Item compute URL and Folder of item relative to the given request
+func (r Request) Item(item StorageItem) (string, string) {
+	pathname := item.Pathname
+
+	if !r.Share.IsZero() {
+		pathname = strings.TrimPrefix(pathname, r.Share.Path)
+	}
+
+	return strings.TrimPrefix(pathname, r.Path), path.Dir(pathname)
 }
 
 // URL of request
