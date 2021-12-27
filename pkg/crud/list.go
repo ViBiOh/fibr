@@ -40,7 +40,7 @@ func (a App) getCover(files []provider.StorageItem) map[string]interface{} {
 }
 
 // List render directory web view of given dirPath
-func (a App) List(w http.ResponseWriter, request provider.Request, message renderer.Message) (string, int, map[string]interface{}, error) {
+func (a App) List(request provider.Request, message renderer.Message) (string, int, map[string]interface{}, error) {
 	files, err := a.storageApp.List(request.GetFilepath(""))
 	if err != nil {
 		return "", 0, nil, err

@@ -148,11 +148,7 @@ func (a App) start(done <-chan struct{}) {
 	logger.Info("Starting startup check...")
 	defer logger.Info("Ending startup check.")
 
-	err := a.storageApp.Walk("", func(item provider.StorageItem, err error) error {
-		if err != nil {
-			return err
-		}
-
+	err := a.storageApp.Walk("", func(item provider.StorageItem) error {
 		select {
 		case <-done:
 			return errors.New("server is shutting down")

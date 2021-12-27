@@ -154,12 +154,12 @@ func (a App) UpdateDate(pathname string, date time.Time) error {
 }
 
 // Walk browses item recursively
-func (a App) Walk(pathname string, walkFn func(provider.StorageItem, error) error) error {
+func (a App) Walk(pathname string, walkFn func(provider.StorageItem) error) error {
 	pathname = path.Join(a.rootDirectory, pathname)
 
 	return convertError(filepath.Walk(pathname, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
-			return walkFn(provider.StorageItem{}, err)
+			return err
 		}
 
 		item := convertToItem(a.getRelativePath(path), info)
@@ -170,7 +170,7 @@ func (a App) Walk(pathname string, walkFn func(provider.StorageItem, error) erro
 			return nil
 		}
 
-		return walkFn(item, err)
+		return walkFn(item)
 	}))
 }
 

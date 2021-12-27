@@ -138,7 +138,7 @@ func (mr *StorageMockRecorder) UpdateDate(arg0, arg1 interface{}) *gomock.Call {
 }
 
 // Walk mocks base method.
-func (m *Storage) Walk(arg0 string, arg1 func(provider.StorageItem, error) error) error {
+func (m *Storage) Walk(arg0 string, arg1 func(provider.StorageItem) error) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Walk", arg0, arg1)
 	ret0, _ := ret[0].(error)

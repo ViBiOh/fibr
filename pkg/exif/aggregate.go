@@ -64,11 +64,7 @@ func (a App) computeAndSaveAggregate(dir provider.StorageItem) error {
 	directoryAggregate := newAggregate()
 	var minDate, maxDate time.Time
 
-	err := a.storageApp.Walk(dir.Pathname, func(item provider.StorageItem, err error) error {
-		if err != nil {
-			return err
-		}
-
+	err := a.storageApp.Walk(dir.Pathname, func(item provider.StorageItem) error {
 		if item.Pathname == dir.Pathname {
 			return nil
 		}

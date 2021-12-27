@@ -39,11 +39,7 @@ func (a App) Stats(w http.ResponseWriter, request provider.Request, message rend
 func (a App) computeStats(pathname string) (map[string]uint64, error) {
 	var filesCount, directoriesCount, filesSize, metadataSize uint64
 
-	err := a.storageApp.Walk(pathname, func(item provider.StorageItem, err error) error {
-		if err != nil {
-			return err
-		}
-
+	err := a.storageApp.Walk(pathname, func(item provider.StorageItem) error {
 		if item.IsDir {
 			directoriesCount++
 		} else {
@@ -58,12 +54,8 @@ func (a App) computeStats(pathname string) (map[string]uint64, error) {
 	}
 
 	metadataPath := filepath.Join(provider.MetadataDirectoryName, pathname)
-	if _, err := a.rawStorageApp.Info(metadataPath); err == nil {
-		err = a.rawStorageApp.Walk(metadataPath, func(item provider.StorageItem, err error) error {
-			if err != nil {
-				return err
-			}
-
+	if _, err = a.rawStorageApp.Info(metadataPath); err == nil {
+		err = a.rawStorageApp.Walk(metadataPath, func(item provider.StorageItem) error {
 			if !item.IsDir {
 				metadataSize += uint64(item.Size)
 			}

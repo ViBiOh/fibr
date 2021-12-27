@@ -162,7 +162,7 @@ func (a App) UpdateDate(pathname string, date time.Time) error {
 }
 
 // Walk browses item recursively
-func (a App) Walk(pathname string, walkFn func(provider.StorageItem, error) error) error {
+func (a App) Walk(pathname string, walkFn func(provider.StorageItem) error) error {
 	objectsCh := a.client.ListObjects(context.Background(), a.bucket, minio.ListObjectsOptions{
 		Prefix:    getPath(pathname),
 		Recursive: true,
@@ -174,7 +174,7 @@ func (a App) Walk(pathname string, walkFn func(provider.StorageItem, error) erro
 			continue
 		}
 
-		if err := walkFn(item, nil); err != nil {
+		if err := walkFn(item); err != nil {
 			return err
 		}
 	}
@@ -197,19 +197,14 @@ func (a App) Rename(oldName, newName string) error {
 	oldRoot := getPath(oldName)
 	newRoot := getPath(newName)
 
-	return a.Walk(oldRoot, func(item provider.StorageItem, err error) error {
-		if err != nil {
-			return err
-		}
-
-		_, err = a.client.CopyObject(context.Background(), minio.CopyDestOptions{
+	return a.Walk(oldRoot, func(item provider.StorageItem) error {
+		_, err := a.client.CopyObject(context.Background(), minio.CopyDestOptions{
 			Bucket: a.bucket,
 			Object: strings.Replace(item.Pathname, oldRoot, newRoot, -1),
 		}, minio.CopySrcOptions{
 			Bucket: a.bucket,
 			Object: item.Pathname,
 		})
-
 		if err != nil {
 			return convertError(err)
 		}
@@ -224,12 +219,8 @@ func (a App) Rename(oldName, newName string) error {
 
 // Remove file or directory from storage
 func (a App) Remove(pathname string) error {
-	return a.Walk(pathname, func(item provider.StorageItem, err error) error {
-		if err != nil {
-			return err
-		}
-
-		if err = a.client.RemoveObject(context.Background(), a.bucket, item.Pathname, minio.RemoveObjectOptions{}); err != nil {
+	return a.Walk(pathname, func(item provider.StorageItem) error {
+		if err := a.client.RemoveObject(context.Background(), a.bucket, item.Pathname, minio.RemoveObjectOptions{}); err != nil {
 			return convertError(fmt.Errorf("unable to delete object: %s", err))
 		}
 

@@ -37,6 +37,10 @@ func (a App) getWithMessage(w http.ResponseWriter, r *http.Request, request prov
 		return "", 0, nil, model.WrapInternal(err)
 	}
 
+	if query.GetBool(r, "search") {
+		return a.search(r, request)
+	}
+
 	if query.GetBool(r, "geojson") {
 		a.serveGeoJSON(w, r, request, item)
 		return "", 0, nil, nil
@@ -74,7 +78,7 @@ func (a App) getWithMessage(w http.ResponseWriter, r *http.Request, request prov
 	}
 
 	provider.SetPrefsCookie(w, request)
-	return a.List(w, request, message)
+	return a.List(request, message)
 }
 
 func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provider.Request, item provider.StorageItem) {

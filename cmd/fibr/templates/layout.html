@@ -58,5 +58,7 @@
     }
   </style>
 
-  {{ template "message" .Message }}
+  {{ if .Message }}
+    {{ template "message" .Message }}
+  {{ end }}
 {{ end }}

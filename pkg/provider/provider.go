@@ -39,7 +39,7 @@ type Storage interface {
 	List(pathname string) ([]StorageItem, error)
 	WriterTo(pathname string) (io.WriteCloser, error)
 	ReaderFrom(pathname string) (io.ReadSeekCloser, error)
-	Walk(pathname string, walkFn func(StorageItem, error) error) error
+	Walk(pathname string, walkFn func(StorageItem) error) error
 	CreateDir(pathname string) error
 	Rename(oldName, newName string) error
 	Remove(pathname string) error
