@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"fmt"
 	"net/http"
 	"path"
 	"strings"
@@ -52,7 +53,7 @@ func (r Request) Item(item StorageItem) (string, string) {
 	pathname := item.Pathname
 
 	if !r.Share.IsZero() {
-		pathname = strings.TrimPrefix(pathname, r.Share.Path)
+		pathname = fmt.Sprintf("/%s/%s", r.Share.ID, strings.TrimPrefix(pathname, r.Share.Path))
 	}
 
 	return strings.TrimPrefix(pathname, r.Path), path.Dir(pathname)
