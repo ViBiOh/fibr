@@ -85,23 +85,69 @@
         }
       }
 
+      // From https://developer.mozilla.org/en-US/docs/Web/API/ReadableStreamDefaultReader/read#example_2_-_handling_text_line_by_line
+      async function* readLineByLine(response) {
+        const utf8Decoder = new TextDecoder('utf-8');
+        const reader = response.body.getReader();
+        let { value: chunk, done: readerDone } = await reader.read();
+        chunk = chunk ? utf8Decoder.decode(chunk, { stream: true }) : '';
+
+        let re = /\r\n|\n|\r/gm;
+        let startIndex = 0;
+
+        for (;;) {
+          const result = re.exec(chunk);
+          if (!result) {
+            if (readerDone) {
+              break;
+            }
+
+            const remainder = chunk.substr(startIndex);
+            ({ value: chunk, done: readerDone } = await reader.read());
+            chunk = remainder + (chunk ? utf8Decoder.decode(chunk, { stream: true }) : '');
+            startIndex = re.lastIndex = 0;
+            continue;
+          }
+
+          yield chunk.substring(startIndex, result.index);
+          startIndex = re.lastIndex;
+        }
+
+        if (startIndex < chunk.length) {
+          yield chunk.substr(startIndex);
+        }
+      }
+
       /**
        * Async image loading
        */
-      async function getThumbnails() {
+      async function fetchThumbnail() {
         const response = await fetch('?thumbnail', { credentials: 'same-origin' });
 
         if (response.status >= 400) {
           throw new Error('unable to load thumbnails');
         }
 
-        if (response.status === 204) {
-          return {};
+        for await (let line of readLineByLine(response)) {
+          const parts = line.split(',');
+          if (parts.length != 2) {
+            console.error('invalid line for thumbnail:', line);
+            continue;
+          }
+
+          const picture = document.getElementById(`picture-${parts[0]}`);
+          if (!picture) {
+            return;
+          }
+
+          const img = new Image();
+          img.src = `data:image/webp;base64,${parts[1]}`;
+          img.alt = picture.dataset.alt;
+          img.classList.add('thumbnail');
+
+          replaceContent(picture, img);
         }
-
-        return response.json();
       }
-
 
       window.addEventListener(
         'load',
@@ -124,21 +170,7 @@
           });
 
           try {
-            const thumbnails = await getThumbnails();
-
-            Object.keys(thumbnails).forEach((id) => {
-              const picture = document.getElementById(`picture-${id}`);
-              if (!picture) {
-                return;
-              }
-
-              const img = new Image();
-              img.src = `data:image/webp;base64,${thumbnails[id]}`;
-              img.alt = picture.dataset.alt;
-              img.classList.add('thumbnail');
-
-              replaceContent(picture, img);
-            });
+            await fetchThumbnail();
           } catch (e) {
             console.error(e);
           }

@@ -167,7 +167,7 @@ func (a App) List(w http.ResponseWriter, r *http.Request, item provider.StorageI
 		return
 	}
 
-	w.Header().Add("Content-Type", "application/json; charset=utf-8")
+	w.Header().Add("Content-Type", "text/plain; charset=utf-8")
 	w.Header().Add("Cache-Control", "no-cache")
 	w.WriteHeader(http.StatusOK)
 
@@ -181,10 +181,6 @@ func (a App) List(w http.ResponseWriter, r *http.Request, item provider.StorageI
 		}
 	}
 
-	commaNeeded := false
-
-	safeWrite(isDone, w, "{")
-
 	for _, item := range items {
 		if isDone() {
 			return
@@ -194,20 +190,11 @@ func (a App) List(w http.ResponseWriter, r *http.Request, item provider.StorageI
 			continue
 		}
 
-		if commaNeeded {
-			safeWrite(isDone, w, ",")
-		} else {
-			commaNeeded = true
-		}
-
-		safeWrite(isDone, w, `"`)
 		safeWrite(isDone, w, sha.New(item.Name))
-		safeWrite(isDone, w, `":"`)
+		safeWrite(isDone, w, `,`)
 		a.encodeContent(base64.NewEncoder(base64.StdEncoding, w), item)
-		safeWrite(isDone, w, `"`)
+		safeWrite(isDone, w, "\n")
 	}
-
-	safeWrite(isDone, w, "}")
 }
 
 func safeWrite(isDone func() bool, w io.Writer, content string) {
