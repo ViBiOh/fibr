@@ -1,7 +1,6 @@
 package provider
 
 import (
-	"fmt"
 	"net/http"
 	"path"
 	"strings"
@@ -49,14 +48,29 @@ func (r Request) GetFilepath(name string) string {
 }
 
 // Item compute URL and Folder of item relative to the given request
-func (r Request) Item(item StorageItem) (string, string) {
+func (r Request) Item(item StorageItem) string {
 	pathname := item.Pathname
 
 	if !r.Share.IsZero() {
-		pathname = fmt.Sprintf("/%s/%s", r.Share.ID, strings.TrimPrefix(pathname, r.Share.Path))
+		pathname = strings.TrimPrefix(pathname, r.Share.Path)
 	}
 
-	return strings.TrimPrefix(pathname, r.Path), path.Dir(pathname)
+	return strings.TrimPrefix(pathname, r.Path)
+}
+
+// Folder compute Folder path of an item relative to the given request
+func (r Request) Folder(item StorageItem) string {
+	pathname := item.Pathname
+
+	if !r.Share.IsZero() {
+		pathname = strings.TrimPrefix(pathname, r.Share.Path)
+	}
+
+	if !strings.HasPrefix(pathname, "/") {
+		pathname = "/" + pathname
+	}
+
+	return path.Dir(pathname)
 }
 
 // URL of request

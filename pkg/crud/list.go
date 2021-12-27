@@ -57,11 +57,10 @@ func (a App) List(request provider.Request, message renderer.Message) (string, i
 					logger.WithField("fn", "crud.List").WithField("item", item.Pathname).Error("unable to read: %s", err)
 				}
 
-				url, folder := request.Item(item)
 				items[index] = provider.RenderItem{
 					ID:          sha.New(item.Name),
-					URL:         url,
-					Folder:      folder,
+					URL:         request.Item(item),
+					Folder:      request.Folder(item),
 					StorageItem: item,
 					Aggregate:   aggregate,
 				}

@@ -48,10 +48,8 @@ func (a App) search(r *http.Request, request provider.Request) (string, int, map
 			return nil
 		}
 
-		url, folder := request.Item(item)
 		items = append(items, provider.RenderItem{
-			URL:         url,
-			Folder:      folder,
+			URL:         request.Item(item),
 			StorageItem: item,
 		})
 

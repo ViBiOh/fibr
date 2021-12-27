@@ -102,18 +102,18 @@ func (a App) Rename(w http.ResponseWriter, r *http.Request, request provider.Req
 }
 
 func getNewFolder(r *http.Request, request provider.Request) (string, error) {
-	newFolder, httpErr := checkFolderName(r.FormValue("newFolder"), request)
-	if httpErr != nil {
-		return "", httpErr
+	newFolder, err := checkFolderName(r.FormValue("newFolder"), request)
+	if err != nil {
+		return "", err
 	}
 
 	return provider.SanitizeName(newFolder, false)
 }
 
 func getNewName(r *http.Request) (string, error) {
-	newName, httpErr := checkFormName(r, "newName")
-	if httpErr != nil {
-		return "", httpErr
+	newName, err := checkFormName(r, "newName")
+	if err != nil {
+		return "", err
 	}
 
 	return provider.SanitizeName(newName, true)

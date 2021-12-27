@@ -41,7 +41,7 @@ func getPreviousAndNext(file provider.StorageItem, files []provider.StorageItem)
 
 func checkFormName(r *http.Request, formName string) (string, error) {
 	name := r.FormValue(formName)
-	if name == "" {
+	if len(name) == 0 {
 		return "", model.WrapInvalid(ErrEmptyName)
 	}
 
@@ -52,24 +52,13 @@ func checkFormName(r *http.Request, formName string) (string, error) {
 	return name, nil
 }
 
-func checkFolderName(formName string, request provider.Request) (string, error) {
-	name := formName
-	if name == "" {
+func checkFolderName(name string, request provider.Request) (string, error) {
+	if len(name) == 0 {
 		return "", model.WrapInvalid(ErrEmptyFolder)
 	}
 
 	if !strings.HasPrefix(name, "/") {
 		return "", model.WrapInvalid(ErrAbsoluteFolder)
-	}
-
-	if !request.Share.IsZero() {
-		shareURIPrefix := fmt.Sprintf("/%s", request.Share.ID)
-
-		if !strings.HasPrefix(name, shareURIPrefix) {
-			return "", model.WrapForbidden(ErrNotAuthorized)
-		}
-
-		name = strings.TrimPrefix(name, shareURIPrefix)
 	}
 
 	return name, nil
