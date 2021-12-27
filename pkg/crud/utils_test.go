@@ -184,32 +184,6 @@ func TestCheckFolderName(t *testing.T) {
 			model.WrapInvalid(ErrAbsoluteFolder),
 		},
 		{
-			"share",
-			args{
-				folderName: templatesPath,
-				request: provider.Request{
-					Share: provider.Share{
-						ID: "abcdef1234",
-					},
-				},
-			},
-			"",
-			model.WrapForbidden(ErrNotAuthorized),
-		},
-		{
-			"valid share",
-			args{
-				folderName: "/abcdef1234/templates",
-				request: provider.Request{
-					Share: provider.Share{
-						ID: "abcdef1234",
-					},
-				},
-			},
-			templatesPath,
-			nil,
-		},
-		{
 			"valid",
 			args{
 				folderName: templatesPath,

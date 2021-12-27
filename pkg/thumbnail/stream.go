@@ -3,6 +3,7 @@ package thumbnail
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -17,6 +18,14 @@ import (
 func (a App) HasStream(item provider.StorageItem) bool {
 	_, err := a.storageApp.Info(getStreamPath(item))
 	return err == nil
+}
+
+func discardBody(body io.ReadCloser) error {
+	if err := request.DiscardBody(body); err != nil {
+		return fmt.Errorf("unable to discard body: %s", err)
+	}
+
+	return nil
 }
 
 func (a App) shouldGenerateStream(ctx context.Context, item provider.StorageItem) (bool, error) {
@@ -77,11 +86,7 @@ func (a App) generateStream(ctx context.Context, item provider.StorageItem) erro
 		return fmt.Errorf("unable to send request: %s", err)
 	}
 
-	if err := request.DiscardBody(resp.Body); err != nil {
-		return fmt.Errorf("unable to discard body: %s", err)
-	}
-
-	return nil
+	return discardBody(resp.Body)
 }
 
 func (a App) renameStream(ctx context.Context, old, new provider.StorageItem) error {
@@ -93,11 +98,7 @@ func (a App) renameStream(ctx context.Context, old, new provider.StorageItem) er
 		return fmt.Errorf("unable to send request: %s", err)
 	}
 
-	if err := request.DiscardBody(resp.Body); err != nil {
-		return fmt.Errorf("unable to discard body: %s", err)
-	}
-
-	return nil
+	return discardBody(resp.Body)
 }
 
 func (a App) deleteStream(ctx context.Context, item provider.StorageItem) error {
@@ -109,9 +110,5 @@ func (a App) deleteStream(ctx context.Context, item provider.StorageItem) error 
 		return fmt.Errorf("unable to send request: %s", err)
 	}
 
-	if err := request.DiscardBody(resp.Body); err != nil {
-		return fmt.Errorf("unable to discard body: %s", err)
-	}
-
-	return nil
+	return discardBody(resp.Body)
 }
