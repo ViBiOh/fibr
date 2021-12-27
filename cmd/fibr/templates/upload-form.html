@@ -14,21 +14,6 @@
       e.stopPropagation();
     }
 
-    /**
-     * Remove all child and append given one
-     * @param {Element} element Element to clear
-     * @param {Element} newContent Element to put in place
-     */
-    function replaceContent(element, newContent) {
-      while (element.firstChild) {
-        element.removeChild(element.firstChild);
-      }
-
-      if (newContent) {
-        element.appendChild(newContent);
-      }
-    }
-
     dropZone.addEventListener('dragover', eventNoop);
     dropZone.addEventListener('dragleave', eventNoop);
     dropZone.addEventListener('drop', (e) => {

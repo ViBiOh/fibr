@@ -70,11 +70,44 @@
         img.alt = 'Image file';
       }
 
+      /**
+       * Remove all child and append given one
+       * @param {Element} element Element to clear
+       * @param {Element} newContent Element to put in place
+       */
+      function replaceContent(element, newContent) {
+        while (element.firstChild) {
+          element.removeChild(element.firstChild);
+        }
+
+        if (newContent) {
+          element.appendChild(newContent);
+        }
+      }
+
+      /**
+       * Async image loading
+       */
+      async function getThumbnails() {
+        const response = await fetch('?thumbnail', { credentials: 'same-origin' });
+
+        if (response.status >= 400) {
+          throw new Error('unable to load thumbnails');
+        }
+
+        if (response.status === 204) {
+          return {};
+        }
+
+        return response.json();
+      }
+
+
       window.addEventListener(
         'load',
         async () => {
-          const thumbnails = document.querySelectorAll('[data-thumbnail]');
-          if (!thumbnails) {
+          const thumbnailsElem = document.querySelectorAll('[data-thumbnail]');
+          if (!thumbnailsElem) {
             return;
           }
 
@@ -82,7 +115,32 @@
             await isWebPCompatible();
           } catch (e) {
             console.error('Your browser is not compatible with WebP format.', e);
-            thumbnails.forEach(displayNoThumbnail);
+            thumbnailsElem.forEach(displayNoThumbnail);
+            return;
+          }
+
+          thumbnailsElem.forEach((picture) => {
+            replaceContent(picture, generateThrobber('throbber-white'));
+          });
+
+          try {
+            const thumbnails = await getThumbnails();
+
+            Object.keys(thumbnails).forEach((id) => {
+              const picture = document.getElementById(`picture-${id}`);
+              if (!picture) {
+                return;
+              }
+
+              const img = new Image();
+              img.src = `data:image/webp;base64,${thumbnails[id]}`;
+              img.alt = picture.dataset.alt;
+              img.classList.add('thumbnail');
+
+              replaceContent(picture, img);
+            });
+          } catch (e) {
+            console.error(e);
           }
         },
         false,
@@ -260,6 +318,7 @@
       }
 
       .thumbnail {
+        max-height: 100%;
         vertical-align: middle;
         width: 100%;
       }
@@ -388,7 +447,7 @@
         {{ end }}
           <a class="filelink center ellipsis" href="{{ .Name }}{{ if .IsDir }}/?d={{ $root.Request.Layout .Name }}{{ else }}?browser{{ end }}" title="{{ .Name }}">
             {{ if and (eq $root.Request.Display "grid") (hasThumbnail .) }}
-              <img data-thumbnail class="no-margin thumbnail" src="{{ publicURL ($root.Request.URL .Name) }}?thumbnail&v={{ $root.Version }}" alt="Thumbnail of {{ .Name }}" />
+              {{ template "async-image" asyncImage . $root.Request }}
             {{ else }}
               {{ if .IsDir }}
                 <img class="icon {{ if eq $root.Request.Display "grid" }}icon-large{{ end }}" src="{{ url "/svg/folder?fill=silver" }}" alt="Folder">

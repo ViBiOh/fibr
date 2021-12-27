@@ -110,7 +110,7 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 
 func (a App) serveThumbnail(w http.ResponseWriter, r *http.Request, item provider.StorageItem) {
 	if item.IsDir {
-		w.WriteHeader(http.StatusNotFound)
+		a.thumbnailApp.List(w, r, item)
 	} else {
 		a.thumbnailApp.Serve(w, r, item)
 	}

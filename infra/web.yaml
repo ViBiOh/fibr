@@ -73,6 +73,5 @@ spec:
     ingress:
       enabled: true
       compress: true
-      rateLimit: false
       hosts:
         - fibr.vibioh.fr
