@@ -477,7 +477,7 @@
         {{ else }}
           <li class="file">
         {{ end }}
-          <a class="filelink center ellipsis" href="{{ .URL }}{{ if .IsDir }}/?d={{ $root.Request.LayoutPath .URL }}{{ else }}?browser{{ end }}" title="{{ .URL }}">
+          <a class="filelink center ellipsis" href="{{ .URL }}{{ if .IsDir }}/?d={{ $root.Request.LayoutPath ($root.Request.AbsURL .URL) }}{{ else }}?browser{{ end }}" title="{{ .URL }}">
             {{ if and (eq $root.Request.Display "grid") (hasThumbnail .) }}
               {{ template "async-image" . }}
             {{ else }}
