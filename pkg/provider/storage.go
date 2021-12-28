@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/ViBiOh/httputils/v4/pkg/sha"
 )
 
 // StorageItem describe item on a storage provider
@@ -117,4 +119,14 @@ type RenderItem struct {
 	URL  string
 	Path string
 	StorageItem
+}
+
+// StorageToRender converts StorageItem to RenderItem
+func StorageToRender(item StorageItem, request Request) RenderItem {
+	return RenderItem{
+		ID:          sha.New(item.Name),
+		URL:         request.RelativeURL(item),
+		Path:        request.RootPath(item),
+		StorageItem: item,
+	}
 }

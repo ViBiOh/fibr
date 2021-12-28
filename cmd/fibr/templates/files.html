@@ -477,7 +477,7 @@
         {{ else }}
           <li class="file">
         {{ end }}
-          <a class="filelink center ellipsis" href="{{ .Name }}{{ if .IsDir }}/?d={{ $root.Request.Layout .Name }}{{ else }}?browser{{ end }}" title="{{ .Name }}">
+          <a class="filelink center ellipsis" href="{{ .URL }}{{ if .IsDir }}/?d={{ $root.Request.Layout .Name }}{{ else }}?browser{{ end }}" title="{{ .Name }}">
             {{ if and (eq $root.Request.Display "grid") (hasThumbnail .) }}
               {{ template "async-image" . }}
             {{ else }}
@@ -486,7 +486,7 @@
               {{ else }}
                 <img class="icon {{ if eq $root.Request.Display "grid" }}icon-large{{ end }}" src="{{ url "/svg/" }}{{ iconFromExtension . }}?fill=silver" alt="File">
               {{ end }}
-              <span class="filename ellipsis {{ if eq $root.Request.Display "list" }}padding-left{{ end }}">{{ .Name }}</span>
+              <span class="filename ellipsis {{ if eq $root.Request.Display "list" }}padding-left{{ end }}">{{ .URL }}</span>
             {{ end }}
 
             <a href="{{ .Name }}?download" class="button button-icon file-download" alt="Download" download>

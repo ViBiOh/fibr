@@ -14,7 +14,6 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/concurrent"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
-	"github.com/ViBiOh/httputils/v4/pkg/sha"
 )
 
 const (
@@ -57,13 +56,9 @@ func (a App) List(request provider.Request, message renderer.Message) (string, i
 					logger.WithField("fn", "crud.List").WithField("item", item.Pathname).Error("unable to read: %s", err)
 				}
 
-				items[index] = provider.RenderItem{
-					ID:          sha.New(item.Name),
-					URL:         request.RelativeURL(item),
-					Path:        request.RootPath(item),
-					StorageItem: item,
-					Aggregate:   aggregate,
-				}
+				render := provider.StorageToRender(item, request)
+				render.Aggregate = aggregate
+				items[index] = render
 			})
 		}(item, index)
 	}

@@ -39,13 +39,13 @@
       {{ if or .Previous .Next }}
         <nav class="flex">
           {{ if .Previous }}
-            <a class="button button-icon" href="{{ .Previous.Name }}{{ if not .Previous.IsDir }}?browser{{ end }}">
+            <a class="button button-icon" href="{{ .Previous.URL }}{{ if not .Previous.IsDir }}?browser{{ end }}">
               <img class="icon" src="{{ url "/svg/arrow-left?fill=silver" }}" alt="Previous file">
             </a>
           {{ end }}
 
           {{ if .Next }}
-            <a class="button button-icon" href="{{ .Next.Name }}{{ if not .Next.IsDir }}?browser{{ end }}">
+            <a class="button button-icon" href="{{ .Next.URL }}{{ if not .Next.IsDir }}?browser{{ end }}">
               <img class="icon" src="{{ url "/svg/arrow-right?fill=silver" }}" alt="Next file">
             </a>
           {{ end }}
