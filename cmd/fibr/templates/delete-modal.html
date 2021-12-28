@@ -6,10 +6,10 @@
       <form method="post" action="#">
         <input type="hidden" name="type" value="file" />
         <input type="hidden" name="method" value="DELETE" />
-        <input type="hidden" name="name" value="{{ .Name }}{{ if .IsDir }}/{{ end }}" />
+        <input type="hidden" name="name" value="{{ .URL }}{{ if .IsDir }}/{{ end }}" />
 
         <p class="padding no-margin center">
-          Are you sure you want to delete <strong>{{ .Name }}</strong>?
+          Are you sure you want to delete <strong>{{ .URL }}</strong>?
         </p>
 
         {{ template "form_buttons" "Confirm" }}
