@@ -40,7 +40,13 @@ type Request struct {
 
 // AbsURL compute absolute URL for the given name
 func (r Request) AbsURL(name string) string {
-	return path.Join(r.SelfURL, name)
+	url := path.Join(r.SelfURL, name)
+
+	if strings.HasSuffix(name, "/") {
+		url += "/"
+	}
+
+	return url
 }
 
 func (r Request) relativePath(item StorageItem) string {
