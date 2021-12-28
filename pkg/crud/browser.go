@@ -26,15 +26,19 @@ func (a App) Browser(w http.ResponseWriter, request provider.Request, item provi
 
 	wg := concurrent.NewSimple()
 
-	wg.Go(func() {
-		var err error
-		files, err = a.storageApp.List(item.Dir())
-		if err != nil {
-			logger.WithField("item", item.Pathname).Error("unable to list neighbors files: %s", err)
-		} else {
-			previous, next = getPreviousAndNext(item, files)
-		}
-	})
+	if request.Share.IsZero() || !request.Share.File {
+		wg.Go(func() {
+			var err error
+			files, err = a.storageApp.List(item.Dir())
+			if err != nil {
+				logger.WithField("item", item.Pathname).Error("unable to list neighbors files: %s", err)
+			} else {
+				previous, next = getPreviousAndNext(item, files)
+			}
+		})
+	} else {
+		files = []provider.StorageItem{item}
+	}
 
 	wg.Go(func() {
 		var err error
@@ -50,6 +54,8 @@ func (a App) Browser(w http.ResponseWriter, request provider.Request, item provi
 		"Paths": breadcrumbs,
 		"File": provider.RenderItem{
 			ID:          sha.New(item.Name),
+			URL:         request.RelativeURL(item),
+			Path:        request.RootPath(item),
 			StorageItem: item,
 		},
 		"Exif":      exif,

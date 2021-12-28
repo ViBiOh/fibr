@@ -28,10 +28,12 @@
     </h1>
 
     {{ if .File }}
-        <h2 class="small bg-grey no-margin full ellipsis">
-          ↳&nbsp;
-          <a href="{{ .File.Name }}">{{ .File.Name }}</a>
-        </h2>
+        {{ if not .Request.Share.File }}
+          <h2 class="small bg-grey no-margin full ellipsis">
+            ↳&nbsp;
+            <a href="{{ .File.Name }}">{{ .File.Name }}</a>
+          </h2>
+        {{ end }}
       </span>
 
       {{ if or .Previous .Next }}

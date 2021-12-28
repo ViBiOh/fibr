@@ -90,18 +90,20 @@
   {{ end }}
 
   <div id="content">
+    {{ $src := .Request.AbsURL .File.URL }}
+
     {{ if .File.IsVideo }}
       <video controls>
         {{ if .HasStream }}
-          <source src="{{ .File.Name }}?stream" type="application/x-mpegURL"></source>
+          <source src="{{ $src }}?stream" type="application/x-mpegURL"></source>
         {{ end }}
-        <source src="{{ .File.Name }}" type="{{ .File.Mime }}"></source>
+        <source src="{{ $src }}" type="{{ .File.Mime }}"></source>
       </video>
     {{ else }}
       {{ if .File.IsImage }}
-        <img src="{{ .File.Name }}" alt="{{ .File.Name }}" />
+        <img src="{{ $src }}" alt="{{ .File.Name }}" />
       {{ else }}
-        <object data="{{ .File.Name }}" type="{{ .File.Mime }}"></object>
+        <object data="{{ $src }}" type="{{ .File.Mime }}"></object>
       {{ end }}
     {{ end }}
 

@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"fmt"
 	"net/http"
 	"path"
 	"strings"
@@ -42,31 +43,23 @@ func (r Request) AbsURL(name string) string {
 	return path.Join(r.SelfURL, name)
 }
 
-// RelativeURL compute relative URL of item for that request
-func (r Request) RelativeURL(item StorageItem) string {
-	url := item.Pathname
-
+func (r Request) relativePath(item StorageItem) string {
 	if !r.Share.IsZero() {
-		url = strings.TrimPrefix(url, r.Share.Path)
+		return fmt.Sprintf("/%s", strings.TrimPrefix(item.Pathname, r.Share.Path))
 	}
 
-	return strings.TrimPrefix(url, r.Path)
+	return item.Pathname
+}
+
+// RelativeURL compute relative URL of item for that request
+func (r Request) RelativeURL(item StorageItem) string {
+	return strings.TrimPrefix(r.relativePath(item), r.Path)
 }
 
 // RootPath compute root path of an item for that request.
 // For a share, rootPath is the root of shared folder
 func (r Request) RootPath(item StorageItem) string {
-	pathname := item.Pathname
-
-	if !r.Share.IsZero() {
-		pathname = strings.TrimPrefix(pathname, r.Share.Path)
-	}
-
-	if !strings.HasPrefix(pathname, "/") {
-		pathname = "/" + pathname
-	}
-
-	return path.Dir(pathname)
+	return path.Dir(r.relativePath(item))
 }
 
 // GetFilepath of request
