@@ -15,7 +15,7 @@
     <div class="modal-content">
       <h2 class="header">Share {{ .URL }}</h2>
 
-      <form method="post" action="{{ .URL }}{{ if .IsDir }}/{{ end }}">
+      <form method="post" action="{{ .URL }}">
         {{ template "share-form" . }}
       </form>
     </div>

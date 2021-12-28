@@ -50,11 +50,17 @@ func (r Request) AbsURL(name string) string {
 }
 
 func (r Request) relativePath(item StorageItem) string {
+	pathname := item.Pathname
+
 	if !r.Share.IsZero() {
-		return fmt.Sprintf("/%s", strings.TrimPrefix(item.Pathname, r.Share.Path))
+		pathname = fmt.Sprintf("/%s", strings.TrimPrefix(pathname, r.Share.Path))
 	}
 
-	return item.Pathname
+	if item.IsDir {
+		pathname += "/"
+	}
+
+	return pathname
 }
 
 // RelativeURL compute relative URL of item for that request
