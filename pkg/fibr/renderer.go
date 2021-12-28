@@ -18,7 +18,7 @@ import (
 func FuncMap(thumbnailApp thumbnail.App) template.FuncMap {
 	return template.FuncMap{
 		"rebuildPaths": func(parts []string, index int) string {
-			return fmt.Sprintf("/%s/", path.Join(parts[:index+1]...))
+			return fmt.Sprintf("/%s", path.Join(parts[:index+1]...))
 		},
 		"raw": func(content string) template.JS {
 			return template.JS(content)
