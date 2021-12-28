@@ -73,14 +73,9 @@ func (r Request) GetFilepath(name string) string {
 	return pathname
 }
 
-// Layout returns layout of given name based on preferences
-func (r Request) Layout(name string) string {
-	return r.LayoutPath(r.AbsURL(name))
-}
-
 // LayoutPath returns layout of given path based on preferences
 func (r Request) LayoutPath(path string) string {
-	if FindIndex(r.Preferences.ListLayoutPath, path) != -1 {
+	if FindIndex(r.Preferences.ListLayoutPath, r.AbsURL(path)) != -1 {
 		return "list"
 	}
 	return DefaultDisplay

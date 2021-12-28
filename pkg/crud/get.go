@@ -57,7 +57,7 @@ func (a App) getWithMessage(w http.ResponseWriter, r *http.Request, request prov
 	}
 
 	if item.IsDir && !strings.HasSuffix(r.URL.Path, "/") {
-		a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/?d=%s", r.URL.Path, request.Layout("")), renderer.Message{})
+		a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/?d=%s", r.URL.Path, request.Display), renderer.Message{})
 		return "", 0, nil, nil
 	}
 

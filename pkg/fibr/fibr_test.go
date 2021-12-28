@@ -89,7 +89,6 @@ func TestParseShare(t *testing.T) {
 			},
 			&provider.Request{
 				Path:     "/index.html",
-				SelfURL:  "/a1b2c3d4f5/index.html",
 				CanEdit:  false,
 				CanShare: false,
 				Display:  provider.DefaultDisplay,
@@ -130,7 +129,6 @@ func TestParseShare(t *testing.T) {
 			},
 			&provider.Request{
 				Path:     "/index.html",
-				SelfURL:  "/f5d4c3b2a1/index.html",
 				CanEdit:  true,
 				CanShare: false,
 				Display:  provider.DefaultDisplay,
@@ -269,7 +267,7 @@ func TestParseRequest(t *testing.T) {
 			},
 			provider.Request{
 				Path:     "/",
-				SelfURL:  "/a1b2c3d4f5",
+				SelfURL:  "/a1b2c3d4f5/",
 				Display:  provider.DefaultDisplay,
 				CanEdit:  false,
 				CanShare: false,
