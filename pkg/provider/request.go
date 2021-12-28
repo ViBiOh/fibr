@@ -29,6 +29,7 @@ type Preferences struct {
 type Request struct {
 	Path        string
 	Display     string
+	SelfURL     string
 	Preferences Preferences
 	Share       Share
 	CanEdit     bool
@@ -36,30 +37,25 @@ type Request struct {
 	CanWebhook  bool
 }
 
-// GetFilepath of request
-func (r Request) GetFilepath(name string) string {
-	pathname := GetPathname(r.Path, name, r.Share)
-
-	if len(name) == 0 && strings.HasSuffix(r.Path, "/") && !r.Share.File {
-		return Dirname(pathname)
-	}
-
-	return pathname
+// AbsURL compute absolute URL for the given name
+func (r Request) AbsURL(name string) string {
+	return path.Join(r.SelfURL, name)
 }
 
-// Item compute URL and Folder of item relative to the given request
-func (r Request) Item(item StorageItem) string {
-	pathname := item.Pathname
+// RelativeURL compute relative URL of item for that request
+func (r Request) RelativeURL(item StorageItem) string {
+	url := item.Pathname
 
 	if !r.Share.IsZero() {
-		pathname = strings.TrimPrefix(pathname, r.Share.Path)
+		url = strings.TrimPrefix(url, r.Share.Path)
 	}
 
-	return strings.TrimPrefix(pathname, r.Path)
+	return strings.TrimPrefix(url, r.Path)
 }
 
-// Folder compute Folder path of an item relative to the given request
-func (r Request) Folder(item StorageItem) string {
+// RootPath compute root path of an item for that request.
+// For a share, rootPath is the root of shared folder
+func (r Request) RootPath(item StorageItem) string {
 	pathname := item.Pathname
 
 	if !r.Share.IsZero() {
@@ -73,14 +69,20 @@ func (r Request) Folder(item StorageItem) string {
 	return path.Dir(pathname)
 }
 
-// URL of request
-func (r Request) URL(name string) string {
-	return URL(r.Path, name, r.Share)
+// GetFilepath of request
+func (r Request) GetFilepath(name string) string {
+	pathname := GetPathname(r.Path, name, r.Share)
+
+	if len(name) == 0 && strings.HasSuffix(r.Path, "/") && !r.Share.File {
+		return Dirname(pathname)
+	}
+
+	return pathname
 }
 
 // Layout returns layout of given name based on preferences
 func (r Request) Layout(name string) string {
-	return r.LayoutPath(r.URL(name))
+	return r.LayoutPath(r.AbsURL(name))
 }
 
 // LayoutPath returns layout of given path based on preferences
@@ -131,7 +133,7 @@ func (r Request) Description() string {
 
 func computeListLayoutPaths(request Request) string {
 	listLayoutPaths := request.Preferences.ListLayoutPath
-	path := request.URL("")
+	path := request.SelfURL
 
 	switch request.Display {
 	case "list":

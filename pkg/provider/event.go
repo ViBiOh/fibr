@@ -96,7 +96,7 @@ func NewUploadEvent(request Request, item StorageItem, shareableURL string) Even
 		Time:         time.Now(),
 		Type:         UploadEvent,
 		Item:         item,
-		URL:          request.URL(item.Name),
+		URL:          request.AbsURL(item.Name),
 		ShareableURL: shareableURL,
 	}
 }
@@ -117,7 +117,7 @@ func NewDeleteEvent(request Request, item StorageItem) Event {
 		Time: time.Now(),
 		Type: DeleteEvent,
 		Item: item,
-		URL:  request.URL(""),
+		URL:  request.SelfURL,
 	}
 }
 

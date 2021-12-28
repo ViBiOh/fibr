@@ -59,8 +59,8 @@ func (a App) List(request provider.Request, message renderer.Message) (string, i
 
 				items[index] = provider.RenderItem{
 					ID:          sha.New(item.Name),
-					URL:         request.Item(item),
-					Folder:      request.Folder(item),
+					URL:         request.RelativeURL(item),
+					Path:        request.RootPath(item),
 					StorageItem: item,
 					Aggregate:   aggregate,
 				}
@@ -83,7 +83,7 @@ func (a App) List(request provider.Request, message renderer.Message) (string, i
 	wg.Wait()
 
 	content := map[string]interface{}{
-		"Paths": getPathParts(request.URL("")),
+		"Paths": getPathParts(request.SelfURL),
 		"Files": items,
 		"Cover": a.getCover(files),
 

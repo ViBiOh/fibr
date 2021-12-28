@@ -14,10 +14,10 @@ import (
 
 func (a App) bestSharePath(request provider.Request, name string) string {
 	if !request.Share.IsZero() {
-		return request.URL(name)
+		return request.AbsURL(name)
 	}
 
-	var remaingPath string
+	var remainingPath string
 	var bestShare provider.Share
 
 	for _, share := range a.shareApp.List() {
@@ -27,7 +27,7 @@ func (a App) bestSharePath(request provider.Request, name string) string {
 
 		if bestShare.IsZero() {
 			bestShare = share
-			remaingPath = strings.TrimPrefix(request.Path, share.Path)
+			remainingPath = strings.TrimPrefix(request.Path, share.Path)
 			continue
 		}
 
@@ -36,19 +36,19 @@ func (a App) bestSharePath(request provider.Request, name string) string {
 		}
 
 		newRemainingPath := strings.TrimPrefix(request.Path, share.Path)
-		if len(newRemainingPath) > len(remaingPath) {
+		if len(newRemainingPath) > len(remainingPath) {
 			continue
 		}
 
 		bestShare = share
-		remaingPath = newRemainingPath
+		remainingPath = newRemainingPath
 	}
 
 	if !bestShare.IsZero() {
-		return provider.URL(remaingPath, name, bestShare)
+		return provider.URL(remainingPath, name, bestShare)
 	}
 
-	return request.URL(name)
+	return request.AbsURL(name)
 }
 
 func (a App) createShare(w http.ResponseWriter, r *http.Request, request provider.Request) {
@@ -105,7 +105,7 @@ func (a App) createShare(w http.ResponseWriter, r *http.Request, request provide
 		return
 	}
 
-	redirection := request.URL("")
+	redirection := request.SelfURL
 	if !info.IsDir {
 		redirection = path.Dir(redirection)
 	}
@@ -131,5 +131,5 @@ func (a App) deleteShare(w http.ResponseWriter, r *http.Request, request provide
 		return
 	}
 
-	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/?d=%s#share-list", request.URL(""), request.Layout("")), renderer.NewSuccessMessage("Share with id %s successfully deleted", id))
+	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/?d=%s#share-list", request.SelfURL, request.Layout("")), renderer.NewSuccessMessage("Share with id %s successfully deleted", id))
 }

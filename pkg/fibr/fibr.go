@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"path"
 	"strings"
 	"time"
 
@@ -49,6 +50,7 @@ func (a App) parseShare(request *provider.Request, authorizationHeader string) e
 	request.Share = share
 	request.CanEdit = share.Edit
 	request.Path = strings.TrimPrefix(request.Path, fmt.Sprintf("/%s", share.ID))
+	request.SelfURL = path.Join("/", share.ID, request.Path)
 
 	return nil
 }
@@ -95,6 +97,12 @@ func (a App) parseRequest(r *http.Request) (provider.Request, error) {
 		Display:     parseDisplay(r),
 		Preferences: parsePreferences(r),
 	}
+
+	if !strings.HasPrefix(request.Path, "/") {
+		request.Path = "/" + request.Path
+	}
+
+	request.SelfURL = request.Path
 
 	if err := a.parseShare(&request, r.Header.Get("Authorization")); err != nil {
 		logRequest(r)

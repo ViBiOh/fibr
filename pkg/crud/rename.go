@@ -90,7 +90,7 @@ func (a App) Rename(w http.ResponseWriter, r *http.Request, request provider.Req
 	}
 
 	var message string
-	uri := request.URL("")
+	uri := request.SelfURL
 
 	if newFolder != uri {
 		message = fmt.Sprintf("%s successfully moved to %s", oldItem.Name, provider.URL(newFolder, newName, request.Share))

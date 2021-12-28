@@ -17,7 +17,8 @@ func TestURL(t *testing.T) {
 		{
 			"empty",
 			Request{
-				Path: "",
+				Path:    "/",
+				SelfURL: "/",
 			},
 			"",
 			"/",
@@ -25,7 +26,8 @@ func TestURL(t *testing.T) {
 		{
 			"simple",
 			Request{
-				Path: "index",
+				Path:    "/index",
+				SelfURL: "/index",
 			},
 			"",
 			"/index",
@@ -33,7 +35,8 @@ func TestURL(t *testing.T) {
 		{
 			"with given path",
 			Request{
-				Path: "index/templates",
+				Path:    "/index/templates",
+				SelfURL: "/index/templates",
 			},
 			"root.html",
 			"/index/templates/root.html",
@@ -41,7 +44,8 @@ func TestURL(t *testing.T) {
 		{
 			"with share",
 			Request{
-				Path: "index",
+				Path:    "/index",
+				SelfURL: "/abcd1234/index",
 				Share: Share{
 					ID:   "abcd1234",
 					Path: "index",
@@ -54,7 +58,7 @@ func TestURL(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.intention, func(t *testing.T) {
-			if result := tc.request.URL(tc.name); result != tc.want {
+			if result := tc.request.AbsURL(tc.name); result != tc.want {
 				t.Errorf("URL() = `%s`, want `%s`", result, tc.want)
 			}
 		})

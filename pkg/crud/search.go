@@ -49,7 +49,8 @@ func (a App) search(r *http.Request, request provider.Request) (string, int, map
 		}
 
 		items = append(items, provider.RenderItem{
-			URL:         request.Item(item),
+			URL:         request.RelativeURL(item),
+			Path:        request.RootPath(item),
 			StorageItem: item,
 		})
 
@@ -61,7 +62,7 @@ func (a App) search(r *http.Request, request provider.Request) (string, int, map
 	}
 
 	return "search", http.StatusOK, map[string]interface{}{
-		"Paths": getPathParts(request.URL("")),
+		"Paths": getPathParts(request.SelfURL),
 		"Files": items,
 
 		"Request": request,

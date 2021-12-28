@@ -62,7 +62,7 @@ func (a App) createWebhook(w http.ResponseWriter, r *http.Request, request provi
 		return
 	}
 
-	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/?d=%s#webhook-list", request.URL(""), request.Layout("")), renderer.NewSuccessMessage("Webhook successfully created with ID: %s", id))
+	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/?d=%s#webhook-list", request.SelfURL, request.Layout("")), renderer.NewSuccessMessage("Webhook successfully created with ID: %s", id))
 }
 
 func checkWebhookForm(r *http.Request) (recursive bool, kind provider.WebhookKind, webhookURL string, eventTypes []provider.EventType, err error) {
@@ -137,5 +137,5 @@ func (a App) deleteWebhook(w http.ResponseWriter, r *http.Request, request provi
 		return
 	}
 
-	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/?d=%s#webhook-list", request.URL(""), request.Layout("")), renderer.NewSuccessMessage("Webhook with id %s successfully deleted", id))
+	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/?d=%s#webhook-list", request.SelfURL, request.Layout("")), renderer.NewSuccessMessage("Webhook with id %s successfully deleted", id))
 }

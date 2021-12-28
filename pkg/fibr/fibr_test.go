@@ -89,6 +89,7 @@ func TestParseShare(t *testing.T) {
 			},
 			&provider.Request{
 				Path:     "/index.html",
+				SelfURL:  "/a1b2c3d4f5/index.html",
 				CanEdit:  false,
 				CanShare: false,
 				Display:  provider.DefaultDisplay,
@@ -129,6 +130,7 @@ func TestParseShare(t *testing.T) {
 			},
 			&provider.Request{
 				Path:     "/index.html",
+				SelfURL:  "/f5d4c3b2a1/index.html",
 				CanEdit:  true,
 				CanShare: false,
 				Display:  provider.DefaultDisplay,
@@ -252,6 +254,7 @@ func TestParseRequest(t *testing.T) {
 			},
 			provider.Request{
 				Path:     "/f5d4c3b2a1/",
+				SelfURL:  "/f5d4c3b2a1/",
 				Display:  provider.DefaultDisplay,
 				CanEdit:  false,
 				CanShare: false,
@@ -266,6 +269,7 @@ func TestParseRequest(t *testing.T) {
 			},
 			provider.Request{
 				Path:     "/",
+				SelfURL:  "/a1b2c3d4f5",
 				Display:  provider.DefaultDisplay,
 				CanEdit:  false,
 				CanShare: false,
@@ -281,6 +285,7 @@ func TestParseRequest(t *testing.T) {
 			},
 			provider.Request{
 				Path:       "/",
+				SelfURL:    "/",
 				Display:    provider.DefaultDisplay,
 				CanEdit:    true,
 				CanShare:   true,
@@ -296,6 +301,7 @@ func TestParseRequest(t *testing.T) {
 			},
 			provider.Request{
 				Path:     invalidPath,
+				SelfURL:  invalidPath,
 				Display:  provider.DefaultDisplay,
 				CanEdit:  false,
 				CanShare: false,
@@ -310,6 +316,7 @@ func TestParseRequest(t *testing.T) {
 			},
 			provider.Request{
 				Path:       "/guest",
+				SelfURL:    "/guest",
 				Display:    provider.DefaultDisplay,
 				CanEdit:    false,
 				CanShare:   false,
@@ -325,6 +332,7 @@ func TestParseRequest(t *testing.T) {
 			},
 			provider.Request{
 				Path:       adminPath,
+				SelfURL:    adminPath,
 				Display:    provider.DefaultDisplay,
 				CanEdit:    true,
 				CanShare:   true,
@@ -340,6 +348,7 @@ func TestParseRequest(t *testing.T) {
 			},
 			provider.Request{
 				Path:       adminPath,
+				SelfURL:    adminPath,
 				Display:    provider.DefaultDisplay,
 				CanEdit:    true,
 				CanShare:   true,
@@ -355,6 +364,7 @@ func TestParseRequest(t *testing.T) {
 			},
 			provider.Request{
 				Path:       adminPath,
+				SelfURL:    adminPath,
 				Display:    provider.DefaultDisplay,
 				CanEdit:    true,
 				CanShare:   true,

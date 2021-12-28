@@ -20,7 +20,12 @@ func (a App) HasStream(item provider.StorageItem) bool {
 	return err == nil
 }
 
-func discardBody(body io.ReadCloser) error {
+func (a App) handleVithResponse(err error, body io.ReadCloser) error {
+	if err != nil {
+		a.increaseMetric("stream", "error")
+		return fmt.Errorf("unable to send request: %s", err)
+	}
+
 	if err := request.DiscardBody(body); err != nil {
 		return fmt.Errorf("unable to discard body: %s", err)
 	}
@@ -81,34 +86,19 @@ func (a App) generateStream(ctx context.Context, item provider.StorageItem) erro
 	a.increaseMetric("stream", "request")
 
 	resp, err := a.vithRequest.Method(http.MethodPut).Path(fmt.Sprintf("%s?output=%s", input, url.QueryEscape(output))).Send(ctx, nil)
-	if err != nil {
-		a.increaseMetric("stream", "error")
-		return fmt.Errorf("unable to send request: %s", err)
-	}
-
-	return discardBody(resp.Body)
+	return a.handleVithResponse(err, resp.Body)
 }
 
 func (a App) renameStream(ctx context.Context, old, new provider.StorageItem) error {
 	a.increaseMetric("stream", "rename")
 
 	resp, err := a.vithRequest.Method(http.MethodPatch).Path(fmt.Sprintf("%s?to=%s&type=%s", getStreamPath(old), url.QueryEscape(getStreamPath(new)), typeOfItem(old))).Send(ctx, nil)
-	if err != nil {
-		a.increaseMetric("stream", "error")
-		return fmt.Errorf("unable to send request: %s", err)
-	}
-
-	return discardBody(resp.Body)
+	return a.handleVithResponse(err, resp.Body)
 }
 
 func (a App) deleteStream(ctx context.Context, item provider.StorageItem) error {
 	a.increaseMetric("stream", "delete")
 
 	resp, err := a.vithRequest.Method(http.MethodDelete).Path(fmt.Sprintf("%s?type=%s", getStreamPath(item), typeOfItem(item))).Send(ctx, nil)
-	if err != nil {
-		a.increaseMetric("stream", "error")
-		return fmt.Errorf("unable to send request: %s", err)
-	}
-
-	return discardBody(resp.Body)
+	return a.handleVithResponse(err, resp.Body)
 }

@@ -60,7 +60,7 @@ func TestGetFilepath(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.intention, func(t *testing.T) {
 			if result := tc.request.GetFilepath(tc.input); result != tc.want {
-				t.Errorf("%#v.GetFilepath(`%s`) = `%s`, want `%s`", tc.request, tc.input, result, tc.want)
+				t.Errorf("GetFilepath() = `%s`, want `%s`", result, tc.want)
 			}
 		})
 	}

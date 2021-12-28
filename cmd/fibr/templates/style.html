@@ -215,7 +215,7 @@
       body::before {
         {{ $url := publicURL "/" }}
         {{ with .Request }}
-          {{ $url = publicURL (.URL "") }}
+          {{ $url = publicURL .SelfURL }}
         {{ end }}
         content: 'Save ink, share link. {{ $url }}';
       }

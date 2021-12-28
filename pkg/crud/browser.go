@@ -21,7 +21,7 @@ func (a App) Browser(w http.ResponseWriter, request provider.Request, item provi
 		exif     exas.Exif
 	)
 
-	pathParts := getPathParts(request.URL(""))
+	pathParts := getPathParts(request.SelfURL)
 	breadcrumbs := pathParts[:len(pathParts)-1]
 
 	wg := concurrent.NewSimple()
