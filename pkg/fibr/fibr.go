@@ -50,7 +50,6 @@ func (a App) parseShare(request *provider.Request, authorizationHeader string) e
 	request.Share = share
 	request.CanEdit = share.Edit
 	request.Path = strings.TrimPrefix(request.Path, fmt.Sprintf("/%s", share.ID))
-	request.SelfURL = path.Join("/", share.ID, request.Path)
 
 	return nil
 }
