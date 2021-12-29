@@ -252,7 +252,6 @@ func TestParseRequest(t *testing.T) {
 			},
 			provider.Request{
 				Path:     "/f5d4c3b2a1/",
-				SelfURL:  "/f5d4c3b2a1/",
 				Display:  provider.DefaultDisplay,
 				CanEdit:  false,
 				CanShare: false,
@@ -267,7 +266,6 @@ func TestParseRequest(t *testing.T) {
 			},
 			provider.Request{
 				Path:     "/",
-				SelfURL:  "/a1b2c3d4f5/",
 				Display:  provider.DefaultDisplay,
 				CanEdit:  false,
 				CanShare: false,
@@ -283,7 +281,6 @@ func TestParseRequest(t *testing.T) {
 			},
 			provider.Request{
 				Path:       "/",
-				SelfURL:    "/",
 				Display:    provider.DefaultDisplay,
 				CanEdit:    true,
 				CanShare:   true,
@@ -298,8 +295,8 @@ func TestParseRequest(t *testing.T) {
 				r: httptest.NewRequest(http.MethodGet, invalidPath, nil),
 			},
 			provider.Request{
-				Path:     invalidPath,
-				SelfURL:  invalidPath,
+				Path:     "/",
+				Item:     "invalid",
 				Display:  provider.DefaultDisplay,
 				CanEdit:  false,
 				CanShare: false,
@@ -313,8 +310,8 @@ func TestParseRequest(t *testing.T) {
 				r: httptest.NewRequest(http.MethodGet, "/guest", nil),
 			},
 			provider.Request{
-				Path:       "/guest",
-				SelfURL:    "/guest",
+				Path:       "/",
+				Item:       "guest",
 				Display:    provider.DefaultDisplay,
 				CanEdit:    false,
 				CanShare:   false,
@@ -329,8 +326,8 @@ func TestParseRequest(t *testing.T) {
 				r: httptest.NewRequest(http.MethodGet, adminPath, nil),
 			},
 			provider.Request{
-				Path:       adminPath,
-				SelfURL:    adminPath,
+				Path:       "/",
+				Item:       "admin",
 				Display:    provider.DefaultDisplay,
 				CanEdit:    true,
 				CanShare:   true,
@@ -345,8 +342,8 @@ func TestParseRequest(t *testing.T) {
 				r: adminRequestWithEmptyCookie,
 			},
 			provider.Request{
-				Path:       adminPath,
-				SelfURL:    adminPath,
+				Path:       "/",
+				Item:       "admin",
 				Display:    provider.DefaultDisplay,
 				CanEdit:    true,
 				CanShare:   true,
@@ -361,8 +358,8 @@ func TestParseRequest(t *testing.T) {
 				r: adminRequestWithCookie,
 			},
 			provider.Request{
-				Path:       adminPath,
-				SelfURL:    adminPath,
+				Path:       "/",
+				Item:       "admin",
 				Display:    provider.DefaultDisplay,
 				CanEdit:    true,
 				CanShare:   true,

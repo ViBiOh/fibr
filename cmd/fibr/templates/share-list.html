@@ -50,9 +50,9 @@
     document.addEventListener('readystatechange', async (event) => {
       if (event.target.readyState === 'complete') {
         {{ range .Shares }}
-          const shareDelete{{ raw .ID }} = document.getElementById('share-delete-{{ .ID }}');
-          if (shareDelete{{ raw .ID }}) {
-            shareDelete{{ raw .ID }}.addEventListener('click', (e) => {
+          const shareDelete{{ js .ID }} = document.getElementById('share-delete-{{ .ID }}');
+          if (shareDelete{{ js .ID }}) {
+            shareDelete{{ js .ID }}.addEventListener('click', (e) => {
               if (!confirm('Are you sure you want to delete share for {{ .Path }}?')) {
                 e.preventDefault()
               }

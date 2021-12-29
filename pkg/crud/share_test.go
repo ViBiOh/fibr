@@ -25,8 +25,7 @@ func TestBestSharePath(t *testing.T) {
 			App{},
 			args{
 				request: provider.Request{
-					Path:    "/",
-					SelfURL: "/abcdef123456",
+					Path: "/",
 					Share: provider.Share{
 						ID:   "abcdef123456",
 						Path: "/website",
@@ -41,8 +40,7 @@ func TestBestSharePath(t *testing.T) {
 			App{},
 			args{
 				request: provider.Request{
-					Path:    "/website",
-					SelfURL: "/website",
+					Path: "/website",
 				},
 				name: "index.html",
 			},
@@ -53,8 +51,7 @@ func TestBestSharePath(t *testing.T) {
 			App{},
 			args{
 				request: provider.Request{
-					Path:    "/website",
-					SelfURL: "/website",
+					Path: "/website",
 				},
 				name: "index.html",
 			},
@@ -65,8 +62,7 @@ func TestBestSharePath(t *testing.T) {
 			App{},
 			args{
 				request: provider.Request{
-					Path:    "/website/path/to/deep/folder",
-					SelfURL: "/website/path/to/deep/folder",
+					Path: "/website/path/to/deep/folder",
 				},
 				name: "index.html",
 			},

@@ -4,63 +4,197 @@ import (
 	"testing"
 )
 
-func TestGetFilepath(t *testing.T) {
+func TestAbsoluteURL(t *testing.T) {
+	type args struct {
+		name string
+	}
+
 	cases := []struct {
 		intention string
-		request   Request
-		input     string
+		instance  Request
+		args      args
 		want      string
 	}{
 		{
 			"simple",
 			Request{
-				Path: "index",
+				Path: "/",
 			},
-			"",
-			"/index",
+			args{
+				name: "index.html",
+			},
+			"/index.html",
 		},
 		{
-			"directory",
+			"dir",
 			Request{
-				Path: "www/",
+				Path: "/",
 			},
-			"",
-			"/www/",
+			args{
+				name: "folder/",
+			},
+			"/folder/",
 		},
 		{
-			"directory file",
+			"share",
 			Request{
-				Path: "www/",
-			},
-			"index.html",
-			"/www/index.html",
-		},
-		{
-			"with given path",
-			Request{
-				Path: "index",
-			},
-			"root.html",
-			"/index/root.html",
-		},
-		{
-			"with share",
-			Request{
-				Path: "index",
+				Path: "/",
 				Share: Share{
-					ID:   "a1b2c3d4",
-					Path: "/shared/",
+					ID:   "abcdef123456",
+					Path: "/folder",
 				},
 			},
-			"root.html",
-			"/shared/index/root.html",
+			args{
+				name: "index.html",
+			},
+			"/abcdef123456/index.html",
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.intention, func(t *testing.T) {
+			if got := tc.instance.AbsoluteURL(tc.args.name); got != tc.want {
+				t.Errorf("AbsoluteURL() = `%s`, want `%s`", got, tc.want)
+			}
+		})
+	}
+}
+
+func TestRelativeURL(t *testing.T) {
+	type args struct {
+		item StorageItem
+	}
+
+	cases := []struct {
+		intention string
+		instance  Request
+		args      args
+		want      string
+	}{
+		{
+			"simple",
+			Request{
+				Path: "/",
+			},
+			args{
+				item: StorageItem{
+					Pathname: "/index.html",
+				},
+			},
+			"index.html",
+		},
+		{
+			"dir",
+			Request{
+				Path: "/",
+			},
+			args{
+				item: StorageItem{
+					Pathname: "/folder",
+					IsDir:    true,
+				},
+			},
+			"folder/",
+		},
+		{
+			"share",
+			Request{
+				Path: "/subpath/",
+				Share: Share{
+					ID:   "abcdef123456",
+					Path: "/folder/",
+				},
+			},
+			args{
+				item: StorageItem{
+					Pathname: "/folder/subpath/index.html",
+				},
+			},
+			"index.html",
+		},
+		{
+			"nested folder",
+			Request{
+				Path: "/sub/folder/",
+			},
+			args{
+				item: StorageItem{
+					Pathname: "/sub/folder/index.html",
+				},
+			},
+			"index.html",
 		},
 	}
 
 	for _, tc := range cases {
 		t.Run(tc.intention, func(t *testing.T) {
-			if result := tc.request.GetFilepath(tc.input); result != tc.want {
-				t.Errorf("GetFilepath() = `%s`, want `%s`", result, tc.want)
+			if got := tc.instance.RelativeURL(tc.args.item); got != tc.want {
+				t.Errorf("RelativeURL() = `%s`, want `%s`", got, tc.want)
+			}
+		})
+	}
+}
+
+func TestFilepath(t *testing.T) {
+	type args struct {
+		name string
+	}
+
+	cases := []struct {
+		intention string
+		request   Request
+		args      args
+		want      string
+	}{
+		{
+			"simple",
+			Request{
+				Path: "/index.html",
+			},
+			args{
+				name: "",
+			},
+			"/index.html",
+		},
+		{
+			"directory",
+			Request{
+				Path: "/www/",
+			},
+			args{
+				name: "",
+			},
+			"/www/",
+		},
+		{
+			"directory file",
+			Request{
+				Path: "/www/",
+			},
+			args{
+				name: "index.html",
+			},
+			"/www/index.html",
+		},
+		{
+			"with share",
+			Request{
+				Path: "/folder/",
+				Share: Share{
+					ID:   "abcdef123456",
+					Path: "/shared/",
+				},
+			},
+			args{
+				name: "root.html",
+			},
+			"/shared/folder/root.html",
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.intention, func(t *testing.T) {
+			if result := tc.request.SubPath(tc.args.name); result != tc.want {
+				t.Errorf("Filepath() = `%s`, want `%s`", result, tc.want)
 			}
 		})
 	}

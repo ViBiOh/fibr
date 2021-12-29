@@ -30,12 +30,12 @@ func (a App) Create(w http.ResponseWriter, r *http.Request, request provider.Req
 		return
 	}
 
-	pathname := request.GetFilepath(name)
+	pathname := request.SubPath(name)
 
 	if err = a.storageApp.CreateDir(pathname); err != nil {
 		a.rendererApp.Error(w, r, model.WrapInternal(err))
 		return
 	}
 
-	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/?d=%s", request.AbsURL(name), request.Display), renderer.NewSuccessMessage("Directory %s successfully created", path.Base(pathname)))
+	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/?d=%s", request.AbsoluteURL(name), request.Display), renderer.NewSuccessMessage("Directory %s successfully created", path.Base(pathname)))
 }

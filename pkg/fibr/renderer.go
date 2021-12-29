@@ -20,7 +20,7 @@ func FuncMap(thumbnailApp thumbnail.App) template.FuncMap {
 		"rebuildPaths": func(parts []string, index int) string {
 			return fmt.Sprintf("/%s/", path.Join(parts[:index+1]...))
 		},
-		"raw": func(content string) template.JS {
+		"js": func(content string) template.JS {
 			return template.JS(content)
 		},
 		"iconFromExtension": func(file provider.RenderItem) string {
@@ -79,11 +79,9 @@ func (a App) TemplateFunc(w http.ResponseWriter, r *http.Request) (string, int, 
 		return "", 0, nil, err
 	}
 
-	if r.Method == http.MethodGet {
-		return a.crudApp.Get(w, r, request)
-	}
-
 	switch r.Method {
+	case http.MethodGet:
+		return a.crudApp.Get(w, r, request)
 	case http.MethodPost:
 		a.crudApp.Post(w, r, request)
 	case http.MethodPut:

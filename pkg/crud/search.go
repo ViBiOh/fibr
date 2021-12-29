@@ -31,7 +31,7 @@ func (a App) search(r *http.Request, request provider.Request) (string, int, map
 
 	mimes := params["mimes"]
 
-	err = a.storageApp.Walk(request.GetFilepath(""), func(item provider.StorageItem) error {
+	err = a.storageApp.Walk(request.Filepath(), func(item provider.StorageItem) error {
 		if item.IsDir {
 			return nil
 		}
@@ -48,11 +48,7 @@ func (a App) search(r *http.Request, request provider.Request) (string, int, map
 			return nil
 		}
 
-		items = append(items, provider.RenderItem{
-			URL:         request.RelativeURL(item),
-			Path:        request.RootPath(item),
-			StorageItem: item,
-		})
+		items = append(items, provider.StorageToRender(item, request))
 
 		return nil
 	})
@@ -62,7 +58,7 @@ func (a App) search(r *http.Request, request provider.Request) (string, int, map
 	}
 
 	return "search", http.StatusOK, map[string]interface{}{
-		"Paths": getPathParts(request.SelfURL),
+		"Paths": getPathParts(request.Path),
 		"Files": items,
 
 		"Request": request,

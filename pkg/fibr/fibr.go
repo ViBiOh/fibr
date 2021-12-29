@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"path"
 	"strings"
 	"time"
 
@@ -37,7 +38,7 @@ func New(crudApp provider.Crud, rendererApp renderer.App, shareApp provider.Shar
 }
 
 func (a App) parseShare(request *provider.Request, authorizationHeader string) error {
-	share := a.shareApp.Get(request.Path)
+	share := a.shareApp.Get(request.Filepath())
 	if share.IsZero() {
 		return nil
 	}
@@ -96,11 +97,14 @@ func (a App) parseRequest(r *http.Request) (provider.Request, error) {
 		Preferences: parsePreferences(r),
 	}
 
+	if !strings.HasSuffix(request.Path, "/") {
+		request.Item = path.Base(request.Path)
+		request.Path = path.Dir(request.Path)
+	}
+
 	if !strings.HasPrefix(request.Path, "/") {
 		request.Path = "/" + request.Path
 	}
-
-	request.SelfURL = request.Path
 
 	if err := a.parseShare(&request, r.Header.Get("Authorization")); err != nil {
 		logRequest(r)

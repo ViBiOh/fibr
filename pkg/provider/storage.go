@@ -126,7 +126,7 @@ func StorageToRender(item StorageItem, request Request) RenderItem {
 	return RenderItem{
 		ID:          sha.New(item.Name),
 		URL:         request.RelativeURL(item),
-		Path:        request.RootPath(item),
+		Path:        request.Path,
 		StorageItem: item,
 	}
 }

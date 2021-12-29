@@ -18,11 +18,7 @@ import (
 )
 
 func (a App) getWithMessage(w http.ResponseWriter, r *http.Request, request provider.Request, message renderer.Message) (string, int, map[string]interface{}, error) {
-	if query.GetBool(r, "stats") {
-		return a.Stats(w, request, message)
-	}
-
-	pathname := request.GetFilepath("")
+	pathname := request.Filepath()
 	item, err := a.storageApp.Info(pathname)
 
 	if err != nil && provider.IsNotExist(err) && provider.StreamExtensions[filepath.Ext(pathname)] {
@@ -35,6 +31,15 @@ func (a App) getWithMessage(w http.ResponseWriter, r *http.Request, request prov
 		}
 
 		return "", 0, nil, model.WrapInternal(err)
+	}
+
+	if item.IsDir && !strings.HasSuffix(r.URL.Path, "/") {
+		a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/?d=%s", r.URL.Path, request.Display), renderer.Message{})
+		return "", 0, nil, nil
+	}
+
+	if query.GetBool(r, "stats") {
+		return a.Stats(w, request, message)
 	}
 
 	if query.GetBool(r, "search") {
@@ -53,11 +58,6 @@ func (a App) getWithMessage(w http.ResponseWriter, r *http.Request, request prov
 
 	if query.GetBool(r, "stream") {
 		a.thumbnailApp.Stream(w, r, item)
-		return "", 0, nil, nil
-	}
-
-	if item.IsDir && !strings.HasSuffix(r.URL.Path, "/") {
-		a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/?d=%s", r.URL.Path, request.Display), renderer.Message{})
 		return "", 0, nil, nil
 	}
 

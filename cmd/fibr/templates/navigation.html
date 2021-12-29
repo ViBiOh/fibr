@@ -4,8 +4,9 @@
      * Go back from state.
      */
     function goBack() {
-      {{ if .Parent }}
-        window.location.href = '/{{ .Parent }}';
+      {{ if .File }}
+        {{ $url := .Request.AbsoluteURL "/" }}
+        window.location.href = '{{ url $url }}?d={{ .Request.LayoutPath $url }}';
       {{ else }}
         const previousHash = document.location.hash;
         document.location.hash = '';
@@ -21,7 +22,7 @@
      */
     function goToPrevious() {
       {{ if .Previous }}
-        window.location.href = '{{ .Previous.URL }}{{ if not .Previous.IsDir }}?browser{{ end }}';
+        window.location.href = '{{ url (.Request.AbsoluteURL .Previous.URL) }}?browser';
       {{ end }}
     }
 
@@ -30,7 +31,7 @@
      */
     function goToNext() {
       {{ if .Next }}
-        window.location.href = '{{ .Next.URL }}{{ if not .Next.IsDir }}?browser{{ end }}';
+        window.location.href = '{{ url (.Request.AbsoluteURL .Next.URL) }}?browser';
       {{ end }}
     }
 

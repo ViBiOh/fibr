@@ -50,9 +50,9 @@
     document.addEventListener('readystatechange', async (event) => {
       if (event.target.readyState === 'complete') {
         {{ range .Webhooks }}
-          const webhookDelete{{ raw .ID }} = document.getElementById('webhook-delete-{{ .ID }}');
-          if (webhookDelete{{ raw .ID }}) {
-            webhookDelete{{ raw .ID }}.addEventListener('click', (e) => {
+          const webhookDelete{{ js .ID }} = document.getElementById('webhook-delete-{{ .ID }}');
+          if (webhookDelete{{ js .ID }}) {
+            webhookDelete{{ js .ID }}.addEventListener('click', (e) => {
               if (!confirm('Are you sure you want to delete webhook for {{ .Pathname }}?')) {
                 e.preventDefault()
               }

@@ -6,7 +6,7 @@
   {{ with .Request }}
     {{ $title = .Title }}
     {{ $description = .Description }}
-    {{ $url = publicURL .SelfURL }}
+    {{ $url = publicURL .Path }}
   {{ end }}
 
   {{ if .File }}
@@ -26,16 +26,16 @@
 
   {{ if .File }}
     {{ if .File.IsVideo }}
-      <meta property="og:video" content="{{ publicURL .Request.SelfURL }}">
+      <meta property="og:video" content="{{ $url }}">
       <meta property="og:video:type" content="{{ .File.Mime }}">
     {{ end }}
   {{ end }}
 
   {{ if .Cover.Img }}
     {{ if .File }}
-      <meta property="og:image" content="{{ publicURL .Request.SelfURL }}?thumbnail">
+      <meta property="og:image" content="{{ publicURL (.Request.AbsoluteURL .Request.Item) }}?thumbnail">
     {{ else }}
-      <meta property="og:image" content="{{ publicURL (.Request.AbsURL .Cover.Img.Name) }}?thumbnail">
+      <meta property="og:image" content="{{ publicURL (.Request.AbsoluteURL .Cover.Img.Name) }}?thumbnail">
     {{ end }}
     <meta property="og:image:type" content="image/webp">
     <meta property="og:image:width" content="{{ .Cover.ImgWidth }}">

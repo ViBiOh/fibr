@@ -128,7 +128,7 @@ func (a *App) Get(requestPath string) provider.Share {
 		}
 	}
 
-	return provider.NoneShare
+	return provider.Share{}
 }
 
 // Start worker

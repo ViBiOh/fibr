@@ -55,7 +55,7 @@ func (a App) Rename(w http.ResponseWriter, r *http.Request, request provider.Req
 		newName = provider.Dirname(newName)
 	}
 
-	oldPath := request.GetFilepath(oldName)
+	oldPath := request.SubPath(oldName)
 	newPath := provider.GetPathname(newFolder, newName, request.Share)
 
 	if _, err = a.storageApp.Info(newPath); err == nil {
@@ -90,7 +90,7 @@ func (a App) Rename(w http.ResponseWriter, r *http.Request, request provider.Req
 	}
 
 	var message string
-	uri := request.SelfURL
+	uri := request.Path
 
 	if newFolder != uri {
 		message = fmt.Sprintf("%s successfully moved to %s", oldItem.Name, provider.URL(newFolder, newName, request.Share))

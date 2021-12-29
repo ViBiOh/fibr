@@ -8,9 +8,6 @@ import (
 )
 
 var (
-	// NoneShare is an undefined Share
-	NoneShare = Share{}
-
 	// DefaultDisplay format
 	DefaultDisplay = "grid"
 
@@ -29,8 +26,8 @@ type Preferences struct {
 // Request from user
 type Request struct {
 	Path        string
+	Item        string
 	Display     string
-	SelfURL     string
 	Preferences Preferences
 	Share       Share
 	CanEdit     bool
@@ -38,18 +35,25 @@ type Request struct {
 	CanWebhook  bool
 }
 
-// AbsURL compute absolute URL for the given name
-func (r Request) AbsURL(name string) string {
-	url := path.Join(r.SelfURL, name)
+// AbsoluteURL compute absolute URL for the given name
+func (r Request) AbsoluteURL(name string) string {
+	pathname := r.Path
 
-	if strings.HasSuffix(name, "/") {
-		url += "/"
+	if !r.Share.IsZero() {
+		pathname = fmt.Sprintf("/%s%s", r.Share.ID, pathname)
 	}
 
-	return url
+	pathname = path.Join(pathname, name)
+
+	if strings.HasSuffix(name, "/") {
+		pathname += "/"
+	}
+
+	return pathname
 }
 
-func (r Request) relativePath(item StorageItem) string {
+// RelativeURL compute relative URL of item for that request
+func (r Request) RelativeURL(item StorageItem) string {
 	pathname := item.Pathname
 
 	if !r.Share.IsZero() {
@@ -60,26 +64,30 @@ func (r Request) relativePath(item StorageItem) string {
 		pathname += "/"
 	}
 
-	return pathname
+	return strings.TrimPrefix(pathname, r.Path)
 }
 
-// RelativeURL compute relative URL of item for that request
-func (r Request) RelativeURL(item StorageItem) string {
-	return strings.TrimPrefix(r.relativePath(item), r.Path)
+// Filepath returns the pathname of the request
+func (r Request) Filepath() string {
+	return r.SubPath(r.Item)
 }
 
-// RootPath compute root path of an item for that request.
-// For a share, rootPath is the root of shared folder
-func (r Request) RootPath(item StorageItem) string {
-	return path.Dir(r.relativePath(item))
-}
+// SubPath returns the pathname of given name
+func (r Request) SubPath(name string) string {
+	pathname := r.Path
 
-// GetFilepath of request
-func (r Request) GetFilepath(name string) string {
-	pathname := GetPathname(r.Path, name, r.Share)
+	if !r.Share.IsZero() {
+		pathname = fmt.Sprintf("/%s%s", r.Share.Path, pathname)
+	}
 
-	if len(name) == 0 && strings.HasSuffix(r.Path, "/") && !r.Share.File {
-		return Dirname(pathname)
+	if len(name) == 0 {
+		return pathname
+	}
+
+	pathname = path.Join(pathname, name)
+
+	if strings.HasSuffix(name, "/") {
+		pathname += "/"
 	}
 
 	return pathname
@@ -133,7 +141,7 @@ func (r Request) Description() string {
 
 func computeListLayoutPaths(request Request) string {
 	listLayoutPaths := request.Preferences.ListLayoutPath
-	path := request.SelfURL
+	path := request.Path
 
 	switch request.Display {
 	case "list":

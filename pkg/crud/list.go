@@ -40,7 +40,9 @@ func (a App) getCover(files []provider.StorageItem) map[string]interface{} {
 
 // List render directory web view of given dirPath
 func (a App) List(request provider.Request, message renderer.Message) (string, int, map[string]interface{}, error) {
-	files, err := a.storageApp.List(request.GetFilepath(""))
+	pathname := request.Filepath()
+
+	files, err := a.storageApp.List(pathname)
 	if err != nil {
 		return "", 0, nil, err
 	}
@@ -67,7 +69,7 @@ func (a App) List(request provider.Request, message renderer.Message) (string, i
 	wg.Go(func() {
 		if aggregate, err := a.exifApp.GetAggregateFor(provider.StorageItem{
 			IsDir:    true,
-			Pathname: request.GetFilepath(""),
+			Pathname: pathname,
 		}); err != nil {
 			logger.WithField("fn", "crud.List").WithField("item", request.Path).Error("unable to get aggregate: %s", err)
 		} else if len(aggregate.Location) != 0 {
@@ -78,7 +80,7 @@ func (a App) List(request provider.Request, message renderer.Message) (string, i
 	wg.Wait()
 
 	content := map[string]interface{}{
-		"Paths": getPathParts(request.SelfURL),
+		"Paths": getPathParts(request.AbsoluteURL("")),
 		"Files": items,
 		"Cover": a.getCover(files),
 
@@ -126,7 +128,7 @@ func (a App) Download(w http.ResponseWriter, r *http.Request, request provider.R
 }
 
 func (a App) zipFiles(done <-chan struct{}, request provider.Request, zipWriter *zip.Writer, pathname string) error {
-	files, err := a.storageApp.List(request.GetFilepath(pathname))
+	files, err := a.storageApp.List(request.SubPath(pathname))
 	if err != nil {
 		return fmt.Errorf("unable to list: %s", err)
 	}

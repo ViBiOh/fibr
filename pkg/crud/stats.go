@@ -16,7 +16,7 @@ type entry struct {
 
 // Stats render stats of the current
 func (a App) Stats(w http.ResponseWriter, request provider.Request, message renderer.Message) (string, int, map[string]interface{}, error) {
-	pathname := request.GetFilepath("")
+	pathname := request.Filepath()
 
 	stats, err := a.computeStats(pathname)
 	if err != nil {

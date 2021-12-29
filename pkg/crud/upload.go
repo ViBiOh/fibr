@@ -27,7 +27,7 @@ func (a App) saveUploadedFile(request provider.Request, part *multipart.Part) (f
 		if err != nil {
 			return "", err
 		}
-		filePath = request.GetFilepath(filename)
+		filePath = request.SubPath(filename)
 	}
 
 	var writer io.WriteCloser
@@ -127,5 +127,5 @@ func (a App) Upload(w http.ResponseWriter, r *http.Request, request provider.Req
 		message = fmt.Sprintf("%s. Share ID is %s", message, shareID)
 	}
 
-	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/?d=%s", request.SelfURL, request.Display), renderer.NewSuccessMessage(message))
+	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s?d=%s", request.Path, request.Display), renderer.NewSuccessMessage(message))
 }

@@ -2,7 +2,6 @@ package crud
 
 import (
 	"net/http"
-	"path"
 
 	exas "github.com/ViBiOh/exas/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -19,9 +18,6 @@ func (a App) Browser(w http.ResponseWriter, request provider.Request, item provi
 		files    []provider.StorageItem
 		exif     exas.Exif
 	)
-
-	pathParts := getPathParts(request.SelfURL)
-	breadcrumbs := pathParts[:len(pathParts)-1]
 
 	wg := concurrent.NewSimple()
 
@@ -59,14 +55,14 @@ func (a App) Browser(w http.ResponseWriter, request provider.Request, item provi
 	wg.Wait()
 
 	return "file", http.StatusOK, map[string]interface{}{
-		"Paths":     breadcrumbs,
+		"Paths":     getPathParts(request.AbsoluteURL("")),
 		"File":      provider.StorageToRender(item, request),
 		"Exif":      exif,
 		"Cover":     a.getCover(files),
 		"HasStream": item.IsVideo() && a.thumbnailApp.HasStream(item),
-		"Parent":    path.Join(breadcrumbs...),
-		"Previous":  previous,
-		"Next":      next,
+
+		"Previous": previous,
+		"Next":     next,
 
 		"Request": request,
 		"Message": message,
