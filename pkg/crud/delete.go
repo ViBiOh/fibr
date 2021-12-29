@@ -41,7 +41,7 @@ func (a App) Delete(w http.ResponseWriter, r *http.Request, request provider.Req
 
 	go a.notify(provider.NewDeleteEvent(request, info))
 
-	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s?d=%s", request.Path, request.Display), renderer.NewSuccessMessage("%s successfully deleted", info.Name))
+	a.rendererApp.Redirect(w, r, fmt.Sprintf("?d=%s", request.Display), renderer.NewSuccessMessage("%s successfully deleted", info.Name))
 }
 
 func deletePreferences(request provider.Request, oldPath string) provider.Request {

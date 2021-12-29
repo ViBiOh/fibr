@@ -90,15 +90,14 @@ func (a App) Rename(w http.ResponseWriter, r *http.Request, request provider.Req
 	}
 
 	var message string
-	uri := request.Path
 
-	if newFolder != uri {
+	if newFolder != request.Path {
 		message = fmt.Sprintf("%s successfully moved to %s", oldItem.Name, provider.URL(newFolder, newName, request.Share))
 	} else {
 		message = fmt.Sprintf("%s successfully renamed to %s", oldItem.Name, newItem.Name)
 	}
 
-	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/?d=%s", uri, request.Display), renderer.NewSuccessMessage(message))
+	a.rendererApp.Redirect(w, r, fmt.Sprintf("?d=%s", request.Display), renderer.NewSuccessMessage(message))
 }
 
 func getNewFolder(r *http.Request, request provider.Request) (string, error) {
