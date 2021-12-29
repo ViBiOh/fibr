@@ -13,7 +13,7 @@
 {{ define "share-file" }}
   <div id="share-form-{{ .ID }}" class="modal">
     <div class="modal-content">
-      <h2 class="header">Share {{ .URL }}</h2>
+      <h2 class="header">Share {{ .Name }}</h2>
 
       <form method="post" action="{{ .URL }}">
         {{ template "share-form" . }}

@@ -16,7 +16,7 @@
       list-style: none;
     }
 
-    #search {
+    #search-icon {
       background-color: var(--primary);
     }
 
@@ -47,9 +47,11 @@
     }
   </style>
 
+  {{ template "search-modal" . }}
+
   <div class="content">
     <div id="menu" class="flex flex-center">
-      <a id="search" class="button button-icon" href="#">
+      <a id="search-icon" class="button button-icon" href="#">
         <img class="icon" src="{{ url "/svg/search?fill=silver" }}" alt="Search">
       </a>
 

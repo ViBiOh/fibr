@@ -35,6 +35,8 @@
     {{ template "map-modal" . }}
   {{ end }}
 
+  {{ template "search-modal" . }}
+
   {{ if eq .Request.Display "grid" }}
     <script type="text/javascript" nonce="{{ .nonce }}">
       // from https://developers.google.com/speed/webp/faq#how_can_i_detect_browser_support_for_webp
@@ -477,7 +479,7 @@
         {{ else }}
           <li class="file">
         {{ end }}
-          <a class="filelink center ellipsis" href="{{ .URL }}{{ if .IsDir }}?d={{ $root.Request.LayoutPath ($root.Request.AbsURL .URL) }}{{ else }}?browser{{ end }}" title="{{ .URL }}">
+          <a class="filelink center ellipsis" href="{{ .URL }}{{ if .IsDir }}?d={{ $root.Request.LayoutPath ($root.Request.AbsURL .URL) }}{{ else }}?browser{{ end }}" title="{{ .Name }}">
             {{ if and (eq $root.Request.Display "grid") (hasThumbnail .) }}
               {{ template "async-image" . }}
             {{ else }}
@@ -504,7 +506,7 @@
 
             {{ if $root.Request.CanShare }}
               <a href="#share-form-{{ .ID }}" class="button button-icon file-share" alt="Share">
-                <img class="icon" src="{{ url "/svg/share-alt-square?fill=silver" }}" alt="Share {{ .URL }}">
+                <img class="icon" src="{{ url "/svg/share-alt-square?fill=silver" }}" alt="Share {{ .Name }}">
               </a>
             {{ end }}
 

@@ -29,7 +29,7 @@ func (a App) search(r *http.Request, request provider.Request) (string, int, map
 		return "", 0, nil, httpModel.WrapInvalid(err)
 	}
 
-	mimes := params["mime"]
+	mimes := params["mimes"]
 
 	err = a.storageApp.Walk(request.GetFilepath(""), func(item provider.StorageItem) error {
 		if item.IsDir {
