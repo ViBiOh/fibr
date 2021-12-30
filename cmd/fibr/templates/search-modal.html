@@ -9,22 +9,32 @@
       pointer-events: none;
     }
   </style>
+
   <div id="search" class="modal">
     <div class="modal-content">
       <h2 class="flex flex-center header no-margin">Search files</h2>
 
-      <form method="GET" id="search-form" action="">
-        <input type="hidden" name="search" value="true">
+      <form method="GET" id="search-form" action="#">
+        <input type="hidden" name="search">
 
         <p class="padding no-margin">
-          <label for="q" class="block">Name</label>
-          <input id="q" type="text" name="q" value="{{ if .Search.q }}{{ index .Search.q 0 }}{{ end }}" placeholder="Searched string..." class="full">
+          <label for="name" class="block">Name</label>
+          <input id="name" name="name" type="text" value="{{ if .Search.name }}{{ index .Search.name 0 }}{{ end }}" placeholder="Searched regexp..." class="full">
         </p>
 
         <p class="padding no-margin">
-          <label for="mimes" class="block">Types</label>
-          <select id="mimes" name="mimes" class="full" multiple>
+          <label for="types" class="block">Types</label>
+          <select id="types" name="types" class="full" multiple>
             <option value=""></option>
+            <option value="archive" {{ if .Search.types }}{{ if contains .Search.types "archive" }}selected{{ end }}{{ end }}>Archive</option>
+            <option value="audio" {{ if .Search.types }}{{ if contains .Search.types "audio" }}selected{{ end }}{{ end }}>Audio</option>
+            <option value="code" {{ if .Search.types }}{{ if contains .Search.types "code" }}selected{{ end }}{{ end }}>Code</option>
+            <option value="excel" {{ if .Search.types }}{{ if contains .Search.types "excel" }}selected{{ end }}{{ end }}>Excel</option>
+            <option value="image" {{ if .Search.types }}{{ if contains .Search.types "image" }}selected{{ end }}{{ end }}>Image</option>
+            <option value="pdf" {{ if .Search.types }}{{ if contains .Search.types "pdf" }}selected{{ end }}{{ end }}>PDF</option>
+            <option value="video" {{ if .Search.types }}{{ if contains .Search.types "video" }}selected{{ end }}{{ end }}>Video</option>
+            <option value="stream" {{ if .Search.types }}{{ if contains .Search.types "stream" }}selected{{ end }}{{ end }}>Stream</option>
+            <option value="word" {{ if .Search.types }}{{ if contains .Search.types "word" }}selected{{ end }}{{ end }}>Word</option>
           </select>
         </p>
 

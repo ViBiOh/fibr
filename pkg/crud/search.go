@@ -3,6 +3,7 @@ package crud
 import (
 	"fmt"
 	"net/http"
+	"regexp"
 	"strings"
 	"time"
 
@@ -19,6 +20,16 @@ func (a App) search(r *http.Request, request provider.Request) (string, int, map
 
 	params := r.URL.Query()
 
+	var pattern *regexp.Regexp
+	name := strings.TrimSpace(params.Get("name"))
+	if len(name) > 0 {
+		var err error
+		pattern, err = regexp.Compile(name)
+		if err != nil {
+			return "", 0, nil, httpModel.WrapInvalid(err)
+		}
+	}
+
 	before, err := parseDate(strings.TrimSpace(params.Get("before")))
 	if err != nil {
 		return "", 0, nil, httpModel.WrapInvalid(err)
@@ -29,7 +40,7 @@ func (a App) search(r *http.Request, request provider.Request) (string, int, map
 		return "", 0, nil, httpModel.WrapInvalid(err)
 	}
 
-	mimes := params["mimes"]
+	mimes := computeMimes(params["types"])
 
 	err = a.storageApp.Walk(request.Filepath(), func(item provider.StorageItem) error {
 		if item.IsDir {
@@ -48,6 +59,10 @@ func (a App) search(r *http.Request, request provider.Request) (string, int, map
 			return nil
 		}
 
+		if pattern != nil && !pattern.MatchString(item.Pathname) {
+			return nil
+		}
+
 		items = append(items, provider.StorageToRender(item, request))
 
 		return nil
@@ -58,11 +73,65 @@ func (a App) search(r *http.Request, request provider.Request) (string, int, map
 	}
 
 	return "search", http.StatusOK, map[string]interface{}{
-		"Paths": getPathParts(request.Path),
-		"Files": items,
+		"Paths":  getPathParts(request.Path),
+		"Files":  items,
+		"Search": params,
 
 		"Request": request,
 	}, nil
+}
+
+func computeMimes(aliases []string) []string {
+	var output []string
+
+	for _, alias := range aliases {
+		switch alias {
+		case "archive":
+			output = append(output, getKeysOfMapBool(provider.ArchiveExtensions)...)
+		case "audio":
+			output = append(output, getKeysOfMapBool(provider.AudioExtensions)...)
+		case "code":
+			output = append(output, getKeysOfMapBool(provider.CodeExtensions)...)
+		case "excel":
+			output = append(output, getKeysOfMapBool(provider.ExcelExtensions)...)
+		case "image":
+			output = append(output, getKeysOfMapBool(provider.ImageExtensions)...)
+		case "pdf":
+			output = append(output, getKeysOfMapBool(provider.PdfExtensions)...)
+		case "video":
+			output = append(output, getKeysOfMapString(provider.VideoExtensions)...)
+		case "stream":
+			output = append(output, getKeysOfMapBool(provider.StreamExtensions)...)
+		case "word":
+			output = append(output, getKeysOfMapBool(provider.WordExtensions)...)
+		}
+	}
+
+	return output
+}
+
+func getKeysOfMapBool(input map[string]bool) []string {
+	output := make([]string, len(input))
+	var i int64
+
+	for key := range input {
+		output[i] = key
+		i++
+	}
+
+	return output
+}
+
+func getKeysOfMapString(input map[string]string) []string {
+	output := make([]string, len(input))
+	var i int64
+
+	for key := range input {
+		output[i] = key
+		i++
+	}
+
+	return output
 }
 
 func matchMimes(item provider.StorageItem, mimes []string) bool {
@@ -70,7 +139,7 @@ func matchMimes(item provider.StorageItem, mimes []string) bool {
 		return true
 	}
 
-	itemMime := item.Mime()
+	itemMime := item.Extension()
 	for _, mime := range mimes {
 		if strings.EqualFold(mime, itemMime) {
 			return true

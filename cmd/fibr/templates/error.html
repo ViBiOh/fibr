@@ -10,10 +10,10 @@
           link.setAttribute('href', document.referrer);
           link.addEventListener('click', (e) => {
             e.preventDefault();
-            history.back();
-            setTimeout(() => {
+            window.addEventListener('popstate', () => {
               window.location.reload(true);
-            }, 4);
+            });
+            history.back();
             return false;
           });
         }

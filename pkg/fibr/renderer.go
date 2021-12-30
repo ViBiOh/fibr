@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"net/http"
 	"path"
+	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
@@ -22,6 +23,18 @@ func FuncMap(thumbnailApp thumbnail.App) template.FuncMap {
 		},
 		"js": func(content string) template.JS {
 			return template.JS(content)
+		},
+		"join": func(arr []string) string {
+			return strings.Join(arr, ",")
+		},
+		"contains": func(arr []string, value string) bool {
+			for _, item := range arr {
+				if item == value {
+					return true
+				}
+			}
+
+			return false
 		},
 		"iconFromExtension": func(file provider.RenderItem) string {
 			extension := file.Extension()

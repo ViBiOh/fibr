@@ -3,29 +3,26 @@
 
   {{ template "navigation" . }}
 
-  <header class="header full-screen{{ if .File }} flex flex-center{{ end }}">
-    {{ if .File }}
-      <span class="flex-grow flex-ellipsis">
-    {{ end }}
+  <header class="header full-screen flex flex-center">
+    <span class="flex-grow flex-ellipsis">
+      <h1 class="medium no-margin no-padding" itemscope itemtype="http://schema.org/BreadcrumbList">
+        <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+          {{ template "root_link" . }}
+        </span>
 
-    <h1 class="medium no-margin no-padding" itemscope itemtype="http://schema.org/BreadcrumbList">
-      <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
-        {{ template "root_link" . }}
-      </span>
+        {{ range $index, $path := .Paths }}
+          {{ if or (not $root.Request.Share.ID) (ne $index 0) }}
+            {{ $fullPath := rebuildPaths $root.Paths $index }}
 
-      {{ range $index, $path := .Paths }}
-        {{ if or (not $root.Request.Share.ID) (ne $index 0) }}
-          {{ $fullPath := rebuildPaths $root.Paths $index }}
-
-          <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
-             / 
-            <a href="{{ url $fullPath }}?d={{ $root.Request.LayoutPath $fullPath }}" itemprop="item">
-              <span itemprop="name">{{ $path }}</span>
-            </a>
-          </span>
+            <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+               / 
+              <a href="{{ url $fullPath }}?d={{ $root.Request.LayoutPath $fullPath }}" itemprop="item">
+                <span itemprop="name">{{ $path }}</span>
+              </a>
+            </span>
+          {{ end }}
         {{ end }}
-      {{ end }}
-    </h1>
+      </h1>
 
     {{ if .File }}
         {{ if not .Request.Share.File }}
@@ -51,6 +48,11 @@
           {{ end }}
         </nav>
       {{ end }}
+    {{ else }}
+      </span>
+      <a class="padding" href="#search" download>
+        <img class="icon" src="{{ url "/svg/search?fill=silver" }}" alt="Search files">
+      </a>
     {{ end }}
   </header>
 

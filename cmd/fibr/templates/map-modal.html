@@ -1,4 +1,15 @@
 {{ define "map-modal" }}
+  <style type="text/css" nonce="{{ .nonce }}">
+    #map:target {
+      display: flex;
+      z-index: 5;
+    }
+
+    #map:target ~ .content {
+      pointer-events: none;
+    }
+  </style>
+
   <div id="map" class="modal">
     <div class="modal-content no-background">
       <h2 class="flex flex-center header no-margin">
