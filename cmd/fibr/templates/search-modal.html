@@ -8,6 +8,10 @@
     #search:target ~ .content {
       pointer-events: none;
     }
+
+    #size {
+      width: 7rem;
+    }
   </style>
 
   <div id="search" class="modal">
@@ -41,8 +45,28 @@
         <p class="padding no-margin">
           <label for="after" class="block">After</label>
           <input id="after" name="after" type="date" placeholder="2020-01-31" value="{{ with .Search.after }}{{ index . 0 }}{{ end }}">
+
           <label for="before" class="block">Before</label>
           <input id="before" name="before" type="date" placeholder="2020-12-31" value="{{ with .Search.before }}{{ index . 0 }}{{ end }}">
+        </p>
+
+        <p class="padding no-margin">
+          <label for="size" class="block">Size</label>
+
+          <span class="flex flex-center">
+            <select name="sizeOrder">
+              <option value="gt" {{ with .Search.sizeOrder }}{{ if eq (index . 0) "gt"}}selected{{ end }}{{ end }}>Greater than</option>
+              <option value="lt" {{ with .Search.sizeOrder }}{{ if eq (index . 0) "lt"}}selected{{ end }}{{ end }}>Lower than</option>
+            </select>
+
+            <input id="size" name="size" type="number" min="0" value="{{ with .Search.size }}{{ index . 0 }}{{ end }}">
+
+            <select name="sizeUnit">
+              <option value="kb" {{ with .Search.sizeUnit }}{{ if eq (index . 0) "kb" }}selected{{ end }}{{ end }}>Kilobytes</option>
+              <option value="mb" {{ with .Search.sizeUnit }}{{ if eq (index . 0) "mb" }}selected{{ end }}{{ end }}>Megabytes</option>
+              <option value="gb" {{ with .Search.sizeUnit }}{{ if eq (index . 0) "gb" }}selected{{ end }}{{ end }}>Gigabytes</option>
+            </select>
+          </span>
         </p>
 
         {{ template "form_buttons" "Search" }}

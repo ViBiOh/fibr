@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -13,6 +14,9 @@ import (
 
 const (
 	isoDateLayout = "2006-01-02"
+	kilobytes     = 1 << 10
+	megabytes     = 1 << 20
+	gigabytes     = 1 << 30
 )
 
 func (a App) search(r *http.Request, request provider.Request) (string, int, map[string]interface{}, error) {
@@ -40,10 +44,22 @@ func (a App) search(r *http.Request, request provider.Request) (string, int, map
 		return "", 0, nil, httpModel.WrapInvalid(err)
 	}
 
+	size, err := strconv.ParseInt(strings.TrimSpace(params.Get("size")), 10, 64)
+	if err != nil {
+		return "", 0, nil, httpModel.WrapInvalid(err)
+	}
+
+	size = computeSize(strings.TrimSpace(params.Get("sizeUnit")), size)
+	greaterThan := strings.TrimSpace(params.Get("sizeOrder")) == "gt"
+
 	mimes := computeMimes(params["types"])
 
 	err = a.storageApp.Walk(request.Filepath(), func(item provider.StorageItem) error {
 		if item.IsDir {
+			return nil
+		}
+
+		if !matchSize(item, size, greaterThan) {
 			return nil
 		}
 
@@ -79,6 +95,19 @@ func (a App) search(r *http.Request, request provider.Request) (string, int, map
 
 		"Request": request,
 	}, nil
+}
+
+func computeSize(unit string, size int64) int64 {
+	switch unit {
+	case "kb":
+		return kilobytes * size
+	case "mb":
+		return megabytes * size
+	case "gb":
+		return gigabytes * size
+	default:
+		return size
+	}
 }
 
 func computeMimes(aliases []string) []string {
@@ -132,6 +161,18 @@ func getKeysOfMapString(input map[string]string) []string {
 	}
 
 	return output
+}
+
+func matchSize(item provider.StorageItem, size int64, greaterThan bool) bool {
+	if size == 0 {
+		return true
+	}
+
+	if (size - item.Size) > 0 == greaterThan {
+		return false
+	}
+
+	return true
 }
 
 func matchMimes(item provider.StorageItem, mimes []string) bool {
