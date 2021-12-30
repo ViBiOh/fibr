@@ -80,10 +80,9 @@ func (a App) List(request provider.Request, message renderer.Message) (string, i
 	wg.Wait()
 
 	content := map[string]interface{}{
-		"Paths": getPathParts(request),
-		"Files": items,
-		"Cover": a.getCover(files),
-
+		"Paths":   getPathParts(request),
+		"Files":   items,
+		"Cover":   a.getCover(files),
 		"Request": request,
 		"Message": message,
 		"HasMap":  hasMap,

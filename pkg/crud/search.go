@@ -1,6 +1,7 @@
 package crud
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -20,21 +21,135 @@ const (
 	gigabytes     = 1 << 30
 )
 
-func (a App) search(r *http.Request, request provider.Request) (string, int, map[string]interface{}, error) {
-	var items []provider.RenderItem
-	var err error
+// SerializableRegexp is a regexp you can serialize
+type SerializableRegexp struct {
+	re *regexp.Regexp
+}
 
-	params := r.URL.Query()
-
-	pattern, before, after, size, greaterThan, err := parseSearch(params)
-	if err != nil {
-		return "", 0, nil, httpModel.WrapInvalid(err)
+// MarshalJSON marshals the regexp as a a string
+func (sr SerializableRegexp) MarshalJSON() ([]byte, error) {
+	if sr.re == nil {
+		return nil, nil
 	}
 
-	mimes := computeMimes(params["types"])
+	return json.Marshal(sr.re.String())
+}
 
+// UnmarshalJSON unmarshal JSOn
+func (sr *SerializableRegexp) UnmarshalJSON(b []byte) error {
+	var strValue string
+	err := json.Unmarshal(b, &strValue)
+	if err != nil {
+		return fmt.Errorf("unable to unmarshal serializable regexp: %s", err)
+	}
+
+	value, err := regexp.Compile(strValue)
+	if err != nil {
+		return fmt.Errorf("unable to parse serializable regexp: %s", err)
+	}
+
+	*sr = SerializableRegexp{
+		re: value,
+	}
+	return nil
+}
+
+type search struct {
+	Pattern     SerializableRegexp `json:"pattern,omitempty"`
+	Before      time.Time          `json:"before,omitempty"`
+	After       time.Time          `json:"fter,omitempty"`
+	Mimes       []string           `json:"mimes,omitempty"`
+	Size        int64              `json:"size,omitempty"`
+	GreaterThan bool               `json:"greaterThan,omitempty"`
+}
+
+func parseSearch(params url.Values) (output search, err error) {
+	if name := strings.TrimSpace(params.Get("name")); len(name) > 0 {
+		output.Pattern.re, err = regexp.Compile(name)
+		if err != nil {
+			return
+		}
+	}
+
+	output.Before, err = parseDate(strings.TrimSpace(params.Get("before")))
+	if err != nil {
+		return
+	}
+
+	output.After, err = parseDate(strings.TrimSpace(params.Get("after")))
+	if err != nil {
+		return
+	}
+
+	rawSize := strings.TrimSpace(params.Get("size"))
+	if len(rawSize) > 0 {
+		output.Size, err = strconv.ParseInt(rawSize, 10, 64)
+		if err != nil {
+			return
+		}
+	}
+
+	output.Size = computeSize(strings.TrimSpace(params.Get("sizeUnit")), output.Size)
+	output.GreaterThan = strings.TrimSpace(params.Get("sizeOrder")) == "gt"
+	output.Mimes = computeMimes(params["types"])
+
+	return
+}
+
+func (s search) match(item provider.StorageItem) bool {
+	if !s.matchSize(item) {
+		return false
+	}
+
+	if !s.Before.IsZero() && item.Date.After(s.Before) {
+		return false
+	}
+
+	if !s.After.IsZero() && item.Date.Before(s.After) {
+		return false
+	}
+
+	if !s.matchMimes(item) {
+		return false
+	}
+
+	if s.Pattern.re != nil && !s.Pattern.re.MatchString(item.Pathname) {
+		return false
+	}
+
+	return true
+}
+
+func (s search) matchSize(item provider.StorageItem) bool {
+	if s.Size == 0 {
+		return true
+	}
+
+	if (s.Size - item.Size) > 0 == s.GreaterThan {
+		return false
+	}
+
+	return true
+}
+
+func (s search) matchMimes(item provider.StorageItem) bool {
+	if len(s.Mimes) == 0 {
+		return true
+	}
+
+	itemMime := item.Extension()
+	for _, mime := range s.Mimes {
+		if strings.EqualFold(mime, itemMime) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (a App) searchFiles(criterions search, request provider.Request) (items []provider.RenderItem, err error) {
 	err = a.storageApp.Walk(request.Filepath(), func(item provider.StorageItem) error {
-		if item.IsDir || !match(item, size, greaterThan, before, after, mimes, pattern) {
+		if item.IsDir || !criterions.match(item) {
 			return nil
 		}
 
@@ -43,49 +158,28 @@ func (a App) search(r *http.Request, request provider.Request) (string, int, map
 		return nil
 	})
 
+	return
+}
+
+func (a App) search(r *http.Request, request provider.Request) (string, int, map[string]interface{}, error) {
+	params := r.URL.Query()
+
+	criterions, err := parseSearch(params)
+	if err != nil {
+		return "", 0, nil, httpModel.WrapInvalid(err)
+	}
+
+	items, err := a.searchFiles(criterions, request)
 	if err != nil {
 		return "", 0, nil, err
 	}
 
 	return "search", http.StatusOK, map[string]interface{}{
-		"Paths":  getPathParts(request),
-		"Files":  items,
-		"Search": params,
-
+		"Paths":   getPathParts(request),
+		"Files":   items,
+		"Search":  params,
 		"Request": request,
 	}, nil
-}
-
-func parseSearch(params url.Values) (pattern *regexp.Regexp, before, after time.Time, size int64, greaterThan bool, err error) {
-	if name := strings.TrimSpace(params.Get("name")); len(name) > 0 {
-		pattern, err = regexp.Compile(name)
-		if err != nil {
-			return
-		}
-	}
-
-	before, err = parseDate(strings.TrimSpace(params.Get("before")))
-	if err != nil {
-		return
-	}
-
-	after, err = parseDate(strings.TrimSpace(params.Get("after")))
-	if err != nil {
-		return
-	}
-
-	rawSize := strings.TrimSpace(params.Get("size"))
-	if len(rawSize) > 0 {
-		size, err = strconv.ParseInt(rawSize, 10, 64)
-		if err != nil {
-			return
-		}
-	}
-
-	size = computeSize(strings.TrimSpace(params.Get("sizeUnit")), size)
-	greaterThan = strings.TrimSpace(params.Get("sizeOrder")) == "gt"
-
-	return
 }
 
 func computeSize(unit string, size int64) int64 {
@@ -152,57 +246,6 @@ func getKeysOfMapString(input map[string]string) []string {
 	}
 
 	return output
-}
-
-func match(item provider.StorageItem, size int64, greaterThan bool, before, after time.Time, mimes []string, pattern *regexp.Regexp) bool {
-	if !matchSize(item, size, greaterThan) {
-		return false
-	}
-
-	if !before.IsZero() && item.Date.After(before) {
-		return false
-	}
-
-	if !after.IsZero() && item.Date.Before(after) {
-		return false
-	}
-
-	if !matchMimes(item, mimes) {
-		return false
-	}
-
-	if pattern != nil && !pattern.MatchString(item.Pathname) {
-		return false
-	}
-
-	return true
-}
-
-func matchSize(item provider.StorageItem, size int64, greaterThan bool) bool {
-	if size == 0 {
-		return true
-	}
-
-	if (size - item.Size) > 0 == greaterThan {
-		return false
-	}
-
-	return true
-}
-
-func matchMimes(item provider.StorageItem, mimes []string) bool {
-	if len(mimes) == 0 {
-		return true
-	}
-
-	itemMime := item.Extension()
-	for _, mime := range mimes {
-		if strings.EqualFold(mime, itemMime) {
-			return true
-		}
-	}
-
-	return false
 }
 
 func parseDate(raw string) (time.Time, error) {
