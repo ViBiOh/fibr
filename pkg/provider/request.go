@@ -117,6 +117,14 @@ func (r Request) Title() string {
 		}
 	}
 
+	if len(r.Item) > 0 {
+		itemPath := strings.Trim(r.Item, "/")
+
+		if itemPath != "" {
+			parts = append(parts, itemPath)
+		}
+	}
+
 	return strings.Join(parts, " - ")
 }
 
@@ -133,6 +141,14 @@ func (r Request) Description() string {
 
 		if requestPath != "" {
 			parts = append(parts, requestPath)
+		}
+	}
+
+	if len(r.Item) > 0 {
+		itemPath := strings.Trim(r.Item, "/")
+
+		if itemPath != "" {
+			parts = append(parts, itemPath)
 		}
 	}
 

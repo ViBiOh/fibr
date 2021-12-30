@@ -113,7 +113,7 @@ func TestGetThumbnailPath(t *testing.T) {
 			provider.StorageItem{
 				Pathname: "/path/to/file.png",
 			},
-			".fibr/path/to/dd29ecf524b030a65261e3059c48ab9e1ecb2585.webp",
+			"/.fibr/path/to/dd29ecf524b030a65261e3059c48ab9e1ecb2585.webp",
 		},
 	}
 
@@ -137,7 +137,7 @@ func TestGetStreamPath(t *testing.T) {
 			provider.StorageItem{
 				Pathname: "/path/to/file.mov",
 			},
-			".fibr/path/to/dd29ecf524b030a65261e3059c48ab9e1ecb2585.m3u8",
+			"/.fibr/path/to/dd29ecf524b030a65261e3059c48ab9e1ecb2585.m3u8",
 		},
 	}
 

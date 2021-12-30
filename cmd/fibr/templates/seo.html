@@ -34,13 +34,14 @@
   {{ if .Cover.Img }}
     {{ if .File }}
       <meta property="og:image" content="{{ publicURL (.Request.AbsoluteURL .Request.Item) }}?thumbnail">
+      <meta property="og:image:alt" content="Thumbnail of {{ .File.Name }}">
     {{ else }}
       <meta property="og:image" content="{{ publicURL (.Request.AbsoluteURL .Cover.Img.Name) }}?thumbnail">
+      <meta property="og:image:alt" content="Thumbnail of content">
     {{ end }}
     <meta property="og:image:type" content="image/webp">
     <meta property="og:image:width" content="{{ .Cover.ImgWidth }}">
     <meta property="og:image:width" content="{{ .Cover.ImgWidth }}">
-    <meta property="og:image:alt" content="Thumbnail of content">
   {{ else }}
     <meta property="og:image" content="{{ publicURL "/images/favicon/android-chrome-512x512.png" }}?v={{ .Version }}">
     <meta property="og:image:type" content="image/png">

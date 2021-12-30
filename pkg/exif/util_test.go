@@ -23,7 +23,7 @@ func TestGetExifPath(t *testing.T) {
 					Pathname: "/photos/image.jpeg",
 				},
 			},
-			".fibr/photos/dd29ecf524b030a65261e3059c48ab9e1ecb2585.json",
+			"/.fibr/photos/dd29ecf524b030a65261e3059c48ab9e1ecb2585.json",
 		},
 		{
 			"simple",
@@ -33,7 +33,7 @@ func TestGetExifPath(t *testing.T) {
 					IsDir:    true,
 				},
 			},
-			".fibr/photos/aggregate.json",
+			"/.fibr/photos/aggregate.json",
 		},
 	}
 

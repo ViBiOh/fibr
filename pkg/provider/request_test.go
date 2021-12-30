@@ -166,6 +166,16 @@ func TestFilepath(t *testing.T) {
 			"/www/",
 		},
 		{
+			"sub directory",
+			Request{
+				Path: "/",
+			},
+			args{
+				name: "www/",
+			},
+			"/www/",
+		},
+		{
 			"directory file",
 			Request{
 				Path: "/www/",
