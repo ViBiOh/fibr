@@ -21,32 +21,38 @@ const (
 
 func (a App) search(r *http.Request, request provider.Request) (string, int, map[string]interface{}, error) {
 	var items []provider.RenderItem
+	var err error
 
 	params := r.URL.Query()
 
 	var pattern *regexp.Regexp
 	name := strings.TrimSpace(params.Get("name"))
 	if len(name) > 0 {
-		var err error
 		pattern, err = regexp.Compile(name)
 		if err != nil {
 			return "", 0, nil, httpModel.WrapInvalid(err)
 		}
 	}
 
-	before, err := parseDate(strings.TrimSpace(params.Get("before")))
+	var before time.Time
+	before, err = parseDate(strings.TrimSpace(params.Get("before")))
 	if err != nil {
 		return "", 0, nil, httpModel.WrapInvalid(err)
 	}
 
-	after, err := parseDate(strings.TrimSpace(params.Get("after")))
+	var after time.Time
+	after, err = parseDate(strings.TrimSpace(params.Get("after")))
 	if err != nil {
 		return "", 0, nil, httpModel.WrapInvalid(err)
 	}
 
-	size, err := strconv.ParseInt(strings.TrimSpace(params.Get("size")), 10, 64)
-	if err != nil {
-		return "", 0, nil, httpModel.WrapInvalid(err)
+	var size int64
+	rawSize := strings.TrimSpace(params.Get("size"))
+	if len(rawSize) > 0 {
+		size, err = strconv.ParseInt(rawSize, 10, 64)
+		if err != nil {
+			return "", 0, nil, httpModel.WrapInvalid(err)
+		}
 	}
 
 	size = computeSize(strings.TrimSpace(params.Get("sizeUnit")), size)
