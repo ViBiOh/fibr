@@ -3,6 +3,7 @@ package crud
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"regexp"
 	"strconv"
 	"strings"
@@ -25,63 +26,15 @@ func (a App) search(r *http.Request, request provider.Request) (string, int, map
 
 	params := r.URL.Query()
 
-	var pattern *regexp.Regexp
-	name := strings.TrimSpace(params.Get("name"))
-	if len(name) > 0 {
-		pattern, err = regexp.Compile(name)
-		if err != nil {
-			return "", 0, nil, httpModel.WrapInvalid(err)
-		}
-	}
-
-	var before time.Time
-	before, err = parseDate(strings.TrimSpace(params.Get("before")))
+	pattern, before, after, size, greaterThan, err := parseSearch(params)
 	if err != nil {
 		return "", 0, nil, httpModel.WrapInvalid(err)
 	}
-
-	var after time.Time
-	after, err = parseDate(strings.TrimSpace(params.Get("after")))
-	if err != nil {
-		return "", 0, nil, httpModel.WrapInvalid(err)
-	}
-
-	var size int64
-	rawSize := strings.TrimSpace(params.Get("size"))
-	if len(rawSize) > 0 {
-		size, err = strconv.ParseInt(rawSize, 10, 64)
-		if err != nil {
-			return "", 0, nil, httpModel.WrapInvalid(err)
-		}
-	}
-
-	size = computeSize(strings.TrimSpace(params.Get("sizeUnit")), size)
-	greaterThan := strings.TrimSpace(params.Get("sizeOrder")) == "gt"
 
 	mimes := computeMimes(params["types"])
 
 	err = a.storageApp.Walk(request.Filepath(), func(item provider.StorageItem) error {
-		if item.IsDir {
-			return nil
-		}
-
-		if !matchSize(item, size, greaterThan) {
-			return nil
-		}
-
-		if !before.IsZero() && item.Date.After(before) {
-			return nil
-		}
-
-		if !after.IsZero() && item.Date.Before(after) {
-			return nil
-		}
-
-		if !matchMimes(item, mimes) {
-			return nil
-		}
-
-		if pattern != nil && !pattern.MatchString(item.Pathname) {
+		if item.IsDir || !match(item, size, greaterThan, before, after, mimes, pattern) {
 			return nil
 		}
 
@@ -101,6 +54,38 @@ func (a App) search(r *http.Request, request provider.Request) (string, int, map
 
 		"Request": request,
 	}, nil
+}
+
+func parseSearch(params url.Values) (pattern *regexp.Regexp, before, after time.Time, size int64, greaterThan bool, err error) {
+	if name := strings.TrimSpace(params.Get("name")); len(name) > 0 {
+		pattern, err = regexp.Compile(name)
+		if err != nil {
+			return
+		}
+	}
+
+	before, err = parseDate(strings.TrimSpace(params.Get("before")))
+	if err != nil {
+		return
+	}
+
+	after, err = parseDate(strings.TrimSpace(params.Get("after")))
+	if err != nil {
+		return
+	}
+
+	rawSize := strings.TrimSpace(params.Get("size"))
+	if len(rawSize) > 0 {
+		size, err = strconv.ParseInt(rawSize, 10, 64)
+		if err != nil {
+			return
+		}
+	}
+
+	size = computeSize(strings.TrimSpace(params.Get("sizeUnit")), size)
+	greaterThan = strings.TrimSpace(params.Get("sizeOrder")) == "gt"
+
+	return
 }
 
 func computeSize(unit string, size int64) int64 {
@@ -167,6 +152,30 @@ func getKeysOfMapString(input map[string]string) []string {
 	}
 
 	return output
+}
+
+func match(item provider.StorageItem, size int64, greaterThan bool, before, after time.Time, mimes []string, pattern *regexp.Regexp) bool {
+	if !matchSize(item, size, greaterThan) {
+		return false
+	}
+
+	if !before.IsZero() && item.Date.After(before) {
+		return false
+	}
+
+	if !after.IsZero() && item.Date.Before(after) {
+		return false
+	}
+
+	if !matchMimes(item, mimes) {
+		return false
+	}
+
+	if pattern != nil && !pattern.MatchString(item.Pathname) {
+		return false
+	}
+
+	return true
 }
 
 func matchSize(item provider.StorageItem, size int64, greaterThan bool) bool {

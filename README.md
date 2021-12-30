@@ -11,6 +11,7 @@ Web File Browser and Manager.
 - Can share directory with ou without password and with or without edit right.
 - Can communicate with sidecars in pure HTTP or AMQP
 - Can send webhooks for different event types to various providers
+- Basic search for files on metadatas without indexation
 
 ![](docs/fibr.png)
 
