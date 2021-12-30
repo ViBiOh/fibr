@@ -22,7 +22,7 @@ const (
 
 func (a App) getCover(files []provider.StorageItem) map[string]interface{} {
 	for _, file := range files {
-		if file.IsVideo() {
+		if file.IsDir || file.IsVideo() {
 			continue
 		}
 

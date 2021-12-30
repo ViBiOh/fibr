@@ -18,7 +18,7 @@ func getPreviousAndNext(file provider.StorageItem, files []provider.StorageItem)
 	)
 
 	for index, neighbor := range files {
-		if neighbor.IsDir != file.IsDir {
+		if neighbor.IsDir {
 			continue
 		}
 

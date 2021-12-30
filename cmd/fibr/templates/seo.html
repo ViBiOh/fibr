@@ -24,29 +24,37 @@
   <meta property="og:title" content="{{ $title }}">
   <meta property="og:description" content="{{ $description }}">
 
+  {{ $needCover := true }}
+
   {{ if .File }}
     {{ if .File.IsVideo }}
       <meta property="og:video" content="{{ $url }}">
       <meta property="og:video:type" content="{{ .File.Mime }}">
     {{ end }}
-  {{ end }}
 
-  {{ if .Cover.Img }}
-    {{ if .File }}
+    {{ if hasThumbnail .File }}
       <meta property="og:image" content="{{ publicURL (.Request.AbsoluteURL .Request.Item) }}?thumbnail">
       <meta property="og:image:alt" content="Thumbnail of {{ .File.Name }}">
-    {{ else }}
-      <meta property="og:image" content="{{ publicURL (.Request.AbsoluteURL .Cover.Img.Name) }}?thumbnail">
-      <meta property="og:image:alt" content="Thumbnail of content">
+      <meta property="og:image:type" content="image/webp">
+      <meta property="og:image:width" content="150">
+      <meta property="og:image:width" content="150">
+      {{ $needCover = false }}
     {{ end }}
-    <meta property="og:image:type" content="image/webp">
-    <meta property="og:image:width" content="{{ .Cover.ImgWidth }}">
-    <meta property="og:image:width" content="{{ .Cover.ImgWidth }}">
-  {{ else }}
-    <meta property="og:image" content="{{ publicURL "/images/favicon/android-chrome-512x512.png" }}?v={{ .Version }}">
-    <meta property="og:image:type" content="image/png">
-    <meta property="og:image:height" content="512">
-    <meta property="og:image:width" content="512">
-    <meta property="og:image:alt" content="Fibr logo">
+  {{ end }}
+
+  {{ if $needCover }}
+    {{ if .Cover.Img }}
+      <meta property="og:image" content="{{ publicURL (.Request.AbsoluteURL .Cover.Img.Name) }}?thumbnail">
+      <meta property="og:image:alt" content="Thumbnail of folder">
+      <meta property="og:image:type" content="image/webp">
+      <meta property="og:image:width" content="{{ .Cover.ImgWidth }}">
+      <meta property="og:image:width" content="{{ .Cover.ImgWidth }}">
+    {{ else }}
+      <meta property="og:image" content="{{ publicURL "/images/favicon/android-chrome-512x512.png" }}?v={{ .Version }}">
+      <meta property="og:image:type" content="image/png">
+      <meta property="og:image:height" content="512">
+      <meta property="og:image:width" content="512">
+      <meta property="og:image:alt" content="Fibr logo">
+    {{ end }}
   {{ end }}
 {{ end }}

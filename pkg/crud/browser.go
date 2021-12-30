@@ -23,22 +23,7 @@ func (a App) Browser(w http.ResponseWriter, request provider.Request, item provi
 
 	if request.Share.IsZero() || !request.Share.File {
 		wg.Go(func() {
-			var err error
-			files, err = a.storageApp.List(item.Dir())
-			if err != nil {
-				logger.WithField("item", item.Pathname).Error("unable to list neighbors files: %s", err)
-			} else {
-				previousItem, nextItem := getPreviousAndNext(item, files)
-
-				if previousItem != nil {
-					content := provider.StorageToRender(*previousItem, request)
-					previous = &content
-				}
-				if nextItem != nil {
-					content := provider.StorageToRender(*nextItem, request)
-					next = &content
-				}
-			}
+			files, previous, next = a.getFilesPreviousAndNext(item, request)
 		})
 	} else {
 		files = []provider.StorageItem{item}
@@ -67,4 +52,26 @@ func (a App) Browser(w http.ResponseWriter, request provider.Request, item provi
 		"Request": request,
 		"Message": message,
 	}, nil
+}
+
+func (a App) getFilesPreviousAndNext(item provider.StorageItem, request provider.Request) (files []provider.StorageItem, previous *provider.RenderItem, next *provider.RenderItem) {
+	var err error
+	files, err = a.storageApp.List(item.Dir())
+	if err != nil {
+		logger.WithField("item", item.Pathname).Error("unable to list neighbors files: %s", err)
+		return
+	}
+
+	previousItem, nextItem := getPreviousAndNext(item, files)
+
+	if previousItem != nil {
+		content := provider.StorageToRender(*previousItem, request)
+		previous = &content
+	}
+	if nextItem != nil {
+		content := provider.StorageToRender(*nextItem, request)
+		next = &content
+	}
+
+	return
 }
