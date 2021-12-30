@@ -2,10 +2,7 @@ package geo
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
-	"strconv"
-	"strings"
 )
 
 // Type is a type of GeoJSON Object
@@ -92,45 +89,4 @@ func (p Position) MarshalJSON() ([]byte, error) {
 	buffer.WriteString(`]`)
 
 	return buffer.Bytes(), nil
-}
-
-// UnmarshalJSON unmarshal Position
-func (p *Position) UnmarshalJSON(b []byte) (err error) {
-	if len(b) == 0 {
-		return errors.New("invalid empty Position")
-	}
-
-	strValue := string(b)
-	if !strings.HasPrefix(strValue, "[") || !strings.HasSuffix(strValue, "]") {
-		err = errors.New("Position is not an array of float")
-		return
-	}
-
-	parts := strings.Split(strValue[1:len(strValue)-1], ",")
-	if len(parts) < 2 {
-		err = errors.New("Position must contains at least 2 float")
-		return
-	}
-
-	p.Longitude, err = strconv.ParseFloat(parts[0], 64)
-	if err != nil {
-		err = fmt.Errorf("unable to parse Position's longitude: %s", err)
-		return
-	}
-
-	p.Longitude, err = strconv.ParseFloat(parts[1], 64)
-	if err != nil {
-		err = fmt.Errorf("unable to parse Position's latitude: %s", err)
-		return
-	}
-
-	if len(parts) == 3 {
-		p.Altitude, err = strconv.ParseFloat(parts[2], 64)
-		if err != nil {
-			err = fmt.Errorf("unable to parse Position's altitude: %s", err)
-			return
-		}
-	}
-
-	return
 }

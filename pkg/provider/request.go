@@ -8,8 +8,12 @@ import (
 )
 
 var (
+	// GridDisplay format
+	GridDisplay = "grid"
+	// ListDisplay format
+	ListDisplay = "list"
 	// DefaultDisplay format
-	DefaultDisplay = "grid"
+	DefaultDisplay = GridDisplay
 
 	ipHeaders = []string{
 		"Cf-Connecting-Ip",

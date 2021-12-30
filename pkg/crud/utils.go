@@ -64,8 +64,8 @@ func checkFolderName(name string, request provider.Request) (string, error) {
 	return name, nil
 }
 
-func getPathParts(uri string) []string {
-	cleanURI := strings.Trim(uri, "/")
+func getPathParts(request provider.Request) []string {
+	cleanURI := strings.Trim(request.AbsoluteURL(""), "/")
 	if cleanURI == "" {
 		return nil
 	}

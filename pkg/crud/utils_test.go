@@ -218,7 +218,7 @@ func TestCheckFolderName(t *testing.T) {
 
 func TestGetPathParts(t *testing.T) {
 	type args struct {
-		uri string
+		request provider.Request
 	}
 
 	cases := []struct {
@@ -229,14 +229,18 @@ func TestGetPathParts(t *testing.T) {
 		{
 			"root",
 			args{
-				uri: "/",
+				request: provider.Request{
+					Path: "/",
+				},
 			},
 			nil,
 		},
 		{
 			"simple",
 			args{
-				uri: "/hello/world/",
+				request: provider.Request{
+					Path: "/hello/world/",
+				},
 			},
 			[]string{"hello", "world"},
 		},
@@ -244,7 +248,7 @@ func TestGetPathParts(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.intention, func(t *testing.T) {
-			if got := getPathParts(tc.args.uri); !reflect.DeepEqual(got, tc.want) {
+			if got := getPathParts(tc.args.request); !reflect.DeepEqual(got, tc.want) {
 				t.Errorf("getPathParts() = %v, want %v", got, tc.want)
 			}
 		})

@@ -40,7 +40,7 @@ func (a App) Browser(w http.ResponseWriter, request provider.Request, item provi
 	wg.Wait()
 
 	return "file", http.StatusOK, map[string]interface{}{
-		"Paths":     getPathParts(request.AbsoluteURL("")),
+		"Paths":     getPathParts(request),
 		"File":      provider.StorageToRender(item, request),
 		"Exif":      exif,
 		"Cover":     a.getCover(files),

@@ -14,6 +14,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
+	httpModel "github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
@@ -35,57 +36,6 @@ func New(crudApp provider.Crud, rendererApp renderer.App, shareApp provider.Shar
 		webhookApp:  webhookApp,
 		loginApp:    loginApp,
 	}
-}
-
-func (a App) parseShare(request *provider.Request, authorizationHeader string) error {
-	share := a.shareApp.Get(request.Filepath())
-	if share.IsZero() {
-		return nil
-	}
-
-	if err := share.CheckPassword(authorizationHeader); err != nil {
-		return err
-	}
-
-	request.Share = share
-	request.CanEdit = share.Edit
-	request.Path = strings.TrimPrefix(request.Path, fmt.Sprintf("/%s", share.ID))
-
-	return nil
-}
-
-func convertAuthenticationError(err error) error {
-	if errors.Is(err, auth.ErrForbidden) {
-		return model.WrapForbidden(errors.New("you're not authorized to speak to me"))
-	}
-
-	if errors.Is(err, ident.ErrMalformedAuth) {
-		return model.WrapInvalid(err)
-	}
-
-	return model.WrapUnauthorized(err)
-}
-
-func parsePreferences(r *http.Request) provider.Preferences {
-	var preferences provider.Preferences
-
-	if cookie, err := r.Cookie("list_layout_paths"); err == nil {
-		if value := cookie.Value; len(value) > 0 {
-			preferences.ListLayoutPath = strings.Split(value, ",")
-		}
-	}
-
-	return preferences
-}
-
-func parseDisplay(r *http.Request) string {
-	display := r.URL.Query().Get("d")
-
-	if len(display) != 0 {
-		return display
-	}
-
-	return provider.DefaultDisplay
 }
 
 func (a App) parseRequest(r *http.Request) (provider.Request, error) {
@@ -139,6 +89,54 @@ func (a App) parseRequest(r *http.Request) (provider.Request, error) {
 	}
 
 	return request, nil
+}
+
+func parseDisplay(r *http.Request) string {
+	switch r.URL.Query().Get("d") {
+	case provider.ListDisplay:
+		return provider.ListDisplay
+	default:
+		return provider.DefaultDisplay
+	}
+}
+
+func parsePreferences(r *http.Request) (preferences provider.Preferences) {
+	if cookie, err := r.Cookie("list_layout_paths"); err == nil {
+		if value := cookie.Value; len(value) > 0 {
+			preferences.ListLayoutPath = strings.Split(value, ",")
+		}
+	}
+
+	return
+}
+
+func (a App) parseShare(request *provider.Request, authorizationHeader string) error {
+	share := a.shareApp.Get(request.Filepath())
+	if share.IsZero() {
+		return nil
+	}
+
+	if err := share.CheckPassword(authorizationHeader); err != nil {
+		return err
+	}
+
+	request.Share = share
+	request.CanEdit = share.Edit
+	request.Path = strings.TrimPrefix(request.Path, fmt.Sprintf("/%s", share.ID))
+
+	return nil
+}
+
+func convertAuthenticationError(err error) error {
+	if errors.Is(err, auth.ErrForbidden) {
+		return httpModel.WrapForbidden(errors.New("you're not authorized to speak to me with this terms"))
+	}
+
+	if errors.Is(err, ident.ErrMalformedAuth) {
+		return httpModel.WrapInvalid(err)
+	}
+
+	return httpModel.WrapUnauthorized(err)
 }
 
 func logRequest(r *http.Request) {

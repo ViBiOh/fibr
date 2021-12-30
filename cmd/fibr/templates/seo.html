@@ -1,26 +1,28 @@
 {{ define "seo" }}
   {{ $title := "fibr" }}
   {{ $description := "FIle BRowser" }}
-  {{ $url := publicURL "/" }}
+  {{ $url := "/" }}
+
+  {{ if .File }}
+    {{ if not .File.IsDir }}
+      {{ $url = .File.URL }}
+    {{ end }}
+  {{ end }}
 
   {{ with .Request }}
     {{ $title = .Title }}
     {{ $description = .Description }}
-    {{ $url = publicURL .Path }}
+    {{ $url = .AbsoluteURL $url }}
   {{ end }}
 
-  {{ if .File }}
-    {{ if not .File.IsDir }}
-      {{ $url = printf "%s%s" $url "?browser" }}
-    {{ end }}
-  {{ end }}
+  {{ $url = publicURL $url }}
 
   <title>{{ $title }}</title>
   <meta name="description" content="{{ $description }}">
-  <link rel="canonical" href="{{ $url }}">
+  <link rel="canonical" href="{{ $url }}?browser">
 
   <meta property="og:type" content="website">
-  <meta property="og:url" content="{{ $url }}">
+  <meta property="og:url" content="{{ $url }}?browser">
   <meta property="og:title" content="{{ $title }}">
   <meta property="og:description" content="{{ $description }}">
 

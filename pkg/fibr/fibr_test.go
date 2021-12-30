@@ -191,7 +191,7 @@ func TestConvertAuthenticationError(t *testing.T) {
 		{
 			"forbidden",
 			args{
-				err: fmt.Errorf("forbidden access: %w", auth.ErrForbidden),
+				err: fmt.Errorf("no secret defense: %w", auth.ErrForbidden),
 			},
 			httpModel.ErrForbidden,
 		},

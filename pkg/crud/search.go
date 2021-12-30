@@ -48,7 +48,7 @@ func (a App) search(r *http.Request, request provider.Request) (string, int, map
 	}
 
 	return "search", http.StatusOK, map[string]interface{}{
-		"Paths":  getPathParts(request.Path),
+		"Paths":  getPathParts(request),
 		"Files":  items,
 		"Search": params,
 
