@@ -8,27 +8,11 @@ import (
 type Type string
 
 const (
-	// TypeFeatureCollection as defined in https://datatracker.ietf.org/doc/html/rfc7946#section-1.4
-	TypeFeatureCollection Type = "FeatureCollection"
 	// TypeFeature as defined in https://datatracker.ietf.org/doc/html/rfc7946#section-1.4
 	TypeFeature Type = "Feature"
 	// TypePoint as defined in https://datatracker.ietf.org/doc/html/rfc7946#section-1.4
 	TypePoint Type = "Point"
 )
-
-// FeatureCollection description
-type FeatureCollection struct {
-	Type     Type      `json:"type"`
-	Features []Feature `json:"features"`
-}
-
-// NewFeatureCollection creates a FeatureCollection from given features
-func NewFeatureCollection(features []Feature) FeatureCollection {
-	return FeatureCollection{
-		Type:     TypeFeatureCollection,
-		Features: features,
-	}
-}
 
 // Feature description
 type Feature struct {

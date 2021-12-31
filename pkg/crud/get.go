@@ -137,7 +137,7 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 	var commaNeeded bool
 	encoder := json.NewEncoder(w)
 
-	provider.SafeWrite(w, "[")
+	provider.SafeWrite(w, `{"type":"FeatureCollection","features":[`)
 
 	for _, item := range files {
 		if isDone() {
@@ -168,7 +168,7 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 		commaNeeded = true
 	}
 
-	provider.SafeWrite(w, "]")
+	provider.SafeWrite(w, "]}")
 }
 
 // Get output content
