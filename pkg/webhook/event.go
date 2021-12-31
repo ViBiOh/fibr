@@ -93,18 +93,18 @@ func (a *App) eventText(event provider.Event) string {
 	case provider.AccessEvent:
 		return a.accessEvent(event)
 	case provider.CreateDir:
-		return fmt.Sprintf("🗂 A directory `%s` has been created: %s?browser", event.Item.Name, a.rendererApp.PublicURL(event.URL))
+		return fmt.Sprintf("🗂 A directory `%s` has been created: %s?browser", event.Item.Name, event.URL)
 	case provider.UploadEvent:
 		url := event.URL
 		if len(event.ShareableURL) != 0 {
 			url = event.ShareableURL
 		}
 
-		return fmt.Sprintf("💾 A file has been uploaded: %s?browser", a.rendererApp.PublicURL(url))
+		return fmt.Sprintf("💾 A file has been uploaded: %s?browser", url)
 	case provider.RenameEvent:
 		return fmt.Sprintf("➡️ `%s` has been renamed to `%s`", event.Item.Pathname, event.New.Pathname)
 	case provider.DeleteEvent:
-		return fmt.Sprintf("❌ `%s` has been deleted : %s?browser", event.Item.Name, a.rendererApp.PublicURL(event.URL))
+		return fmt.Sprintf("❌ `%s` has been deleted : %s?browser", event.Item.Name, event.URL)
 	case provider.StartEvent:
 		return fmt.Sprintf("🚀 Fibr starts routine for path `%s`", event.Item.Pathname)
 	default:

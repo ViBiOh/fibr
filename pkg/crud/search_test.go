@@ -8,9 +8,7 @@ import (
 
 func TestMatchSize(t *testing.T) {
 	type args struct {
-		item        provider.StorageItem
-		size        int64
-		greaterThan bool
+		item provider.StorageItem
 	}
 
 	cases := []struct {

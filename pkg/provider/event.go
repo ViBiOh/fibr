@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -91,13 +92,13 @@ type Event struct {
 }
 
 // NewUploadEvent creates a new upload event
-func NewUploadEvent(request Request, item StorageItem, shareableURL string) Event {
+func NewUploadEvent(request Request, item StorageItem, shareableURL string, rendererApp renderer.App) Event {
 	return Event{
 		Time:         time.Now(),
 		Type:         UploadEvent,
 		Item:         item,
-		URL:          request.AbsoluteURL(item.Name),
-		ShareableURL: shareableURL,
+		URL:          rendererApp.PublicURL(request.AbsoluteURL(item.Name)),
+		ShareableURL: rendererApp.PublicURL(shareableURL),
 	}
 }
 
@@ -112,12 +113,12 @@ func NewRenameEvent(old, new StorageItem) Event {
 }
 
 // NewDeleteEvent creates a new delete event
-func NewDeleteEvent(request Request, item StorageItem) Event {
+func NewDeleteEvent(request Request, item StorageItem, rendererApp renderer.App) Event {
 	return Event{
 		Time: time.Now(),
 		Type: DeleteEvent,
 		Item: item,
-		URL:  request.Path,
+		URL:  rendererApp.PublicURL(request.AbsoluteURL("")),
 	}
 }
 
