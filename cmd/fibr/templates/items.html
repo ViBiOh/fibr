@@ -1,0 +1,88 @@
+{{ define "items-style" }}
+  <style type="text/css" nonce="{{ .nonce }}">
+    #files {
+      list-style: none;
+    }
+
+    {{ if eq .Request.Display "list" }}
+      #list-display {
+        background-color: var(--primary);
+      }
+
+      .file {
+        align-items: center;
+        display: flex;
+        margin: 0.5rem 1rem 0;
+      }
+
+      .filelink {
+        align-items: center;
+        display: inline-flex;
+        height: 2.5rem;
+        width: 45rem;
+      }
+
+      @media screen and (min-width: 640px) {
+        .file .button-icon {
+          padding: 0;
+        }
+
+        .filelink {
+          flex: 1 1;
+          width: auto;
+        }
+      }
+
+      .filename {
+        display: inline-block;
+        flex: 1 1;
+        text-align: left;
+      }
+
+      .exif {
+        display: inline-block;
+        flex: 0.5 0.5;
+        font-size: 1rem;
+        text-align: right;
+      }
+    {{ else }}
+      #grid-display {
+        background-color: var(--primary);
+      }
+
+      #files {
+        display: grid;
+        grid-gap: .5rem;
+        grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+        margin: .5rem;
+      }
+
+      .tile {
+        align-items: center;
+        background-color: var(--grey);
+        display: flex;
+        min-height: 14rem;
+      }
+
+      .file {
+        padding: 0.5rem;
+      }
+
+      .filelink {
+        width: 100%;
+      }
+
+      .filename {
+        display: block;
+        margin-top: 0.5rem;
+        text-align: center;
+      }
+
+      .exif {
+        position: absolute;
+        bottom: 0.5rem;
+        right:  0.5rem;
+      }
+    {{ end }}
+  </style>
+{{ end }}

@@ -16,46 +16,23 @@
       flex-wrap: wrap;
       justify-content: flex-end;
     }
-
-    #files {
-      list-style: none;
-    }
-
-    #search-icon {
-      background-color: var(--primary);
-    }
-
-    .file {
-      align-items: center;
-      display: flex;
-      margin: 0.5rem 1rem 0;
-    }
-
-    .filelink {
-      align-items: center;
-      display: inline-flex;
-      height: 2.5rem;
-      width: 45rem;
-    }
-
-    .filename {
-      display: inline-block;
-      flex: 1 1;
-      text-align: left;
-    }
-
-    @media screen and (max-width: 640px) {
-      .filelink {
-        flex: 1 1;
-        width: auto;
-      }
-    }
   </style>
 
   {{ template "search-modal" . }}
+  {{ template "items-style" . }}
+  {{ if eq .Request.Display "grid" }}
+    {{ template "async-image" . }}
+  {{ end }}
 
   <div class="content">
     <div id="menu" class="flex flex-center">
+      <a id="list-display" class="button button-icon" href="?d=list&{{ raw .Search.Encode }}">
+        <img class="icon" src="{{ url "/svg/list?fill=silver" }}" alt="List">
+      </a>
+      <a id="grid-display" class="button button-icon" href="?d=grid&{{ raw .Search.Encode }}">
+        <img class="icon" src="{{ url "/svg/th?fill=silver" }}" alt="Grid">
+      </a>
+
       <span class="padding-left">
         {{ len .Files }} element{{ if gt (len .Files) 1 }}s{{ end }}
       </span>
@@ -74,10 +51,18 @@
 
     <ul id="files" class="no-margin no-padding">
       {{ range .Files }}
-        <li class="file">
-          <a class="filelink center ellipsis" href="{{ .URL }}?browser" title="{{ .URL }}">
-            <img class="icon" src="{{ url "/svg/" }}{{ iconFromExtension . }}?fill=silver" alt="File">
-            <span class="filename ellipsis padding-left">{{ .URL }}</span>
+        <li class="tile relative {{ if or (ne $root.Request.Display "grid") (not (hasThumbnail .)) }}file{{ end }}">
+          <a class="filelink center ellipsis" href="{{ .URL }}{{ if .IsDir }}?d={{ $root.Request.LayoutPath ($root.Request.AbsoluteURL .URL) }}{{ else }}?browser{{ end }}" title="{{ .Name }}">
+            {{ if and (eq $root.Request.Display "grid") (hasThumbnail .) }}
+              {{ template "async-image-item" . }}
+            {{ else }}
+              {{ if .IsDir }}
+                <img class="icon {{ if eq $root.Request.Display "grid" }}icon-large{{ end }}" src="{{ url "/svg/folder?fill=silver" }}" alt="Folder">
+              {{ else }}
+                <img class="icon {{ if eq $root.Request.Display "grid" }}icon-large{{ end }}" src="{{ url "/svg/" }}{{ iconFromExtension . }}?fill=silver" alt="File">
+              {{ end }}
+              <span class="filename ellipsis {{ if eq $root.Request.Display "list" }}padding-left{{ end }}">{{ .URL }}</span>
+            {{ end }}
           </a>
         </li>
       {{ end }}

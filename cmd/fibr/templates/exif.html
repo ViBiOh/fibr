@@ -1,0 +1,60 @@
+{{ define "exif-modal-btn" }}
+  {{ if not .Exif.IsZero }}
+    <a href="#exif-modal" class="button button-icon exif-button" alt="Show exif">
+      <img class="icon exif" src="{{ url "/svg/info" }}?fill=black" alt="Exif">
+    </a>
+  {{ end }}
+{{ end }}
+
+{{ define "exif-modal" }}
+  {{ if not .Exif.IsZero }}
+    <style type="text/css" nonce="{{ .nonce }}">
+      .exif-button {
+        bottom: 1rem;
+        position: absolute;
+        right: 1rem;
+      }
+
+      #exif-modal:target {
+        display: flex;
+        z-index: 5;
+      }
+
+      #exif-modal:target ~ .content {
+        pointer-events: none;
+      }
+    </style>
+
+    <div id="exif-modal" class="modal">
+      <div class="modal-content">
+        <h2 class="flex flex-center header no-margin">
+          <span>Exif data</span>
+          <span class="flex-grow"></span>
+          <a href="#" class="button white small">Close</a>
+        </h2>
+
+        {{ if not .Exif.Date.IsZero }}
+          <p class="padding no-margin code">
+            <strong>Date:</strong> {{ .Exif.Date }}<br>
+          </p>
+        {{ end }}
+
+        {{ if .Exif.Geocode.Address }}
+          <p class="padding no-margin code">
+            <strong>Location</strong><br>
+
+            {{ range $key, $value := .Exif.Geocode.Address }}
+                <em>{{ $key }}:</em> {{ $value }}<br>
+            {{ end }}
+          </p>
+        {{ end }}
+
+        <p class="padding no-margin code">
+          {{ range $key, $value := .Exif.Data }}
+            <strong>{{ $key }}:</strong> {{ $value }}<br>
+          {{ end }}
+        </p>
+      </div>
+    </div>
+  {{ end }}
+{{ end }}

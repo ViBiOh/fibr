@@ -24,6 +24,9 @@ func FuncMap(thumbnailApp thumbnail.App) template.FuncMap {
 		"js": func(content string) template.JS {
 			return template.JS(content)
 		},
+		"raw": func(content string) template.URL {
+			return template.URL(content)
+		},
 		"join": func(arr []string) string {
 			return strings.Join(arr, ",")
 		},

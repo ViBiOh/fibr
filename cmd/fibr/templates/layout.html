@@ -51,7 +51,7 @@
     {{ else }}
       </span>
       <a class="padding" href="#search" download>
-        <img class="icon" src="{{ url "/svg/search?fill=silver" }}" alt="Search files">
+        <img class="icon" src="{{ url "/svg/search?fill=" }}{{ if .Search }}limegreen{{ else }}silver{{ end }}" alt="Search files">
       </a>
     {{ end }}
   </header>

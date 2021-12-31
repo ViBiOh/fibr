@@ -49,15 +49,16 @@
 
   {{ template "search-modal" . }}
 
+  {{ template "items-style" . }}
+  {{ if eq .Request.Display "grid" }}
+    {{ template "async-image" . }}
+  {{ end }}
+
   <style type="text/css" nonce="{{ .nonce }}">
     #menu {
       padding-left: 0.5rem;
       padding-top: 0.5rem;
       overflow: auto;
-    }
-
-    #files {
-      list-style: none;
     }
 
     {{ range .Files }}
@@ -110,42 +111,6 @@
     }
 
     {{ if eq .Request.Display "list" }}
-      #list-display {
-        background-color: var(--primary);
-      }
-
-      .file {
-        align-items: center;
-        display: flex;
-        margin: 0.5rem 1rem 0;
-      }
-
-      @media screen and (min-width: 640px) {
-        .file .button-icon {
-          padding: 0;
-        }
-      }
-
-      .filelink {
-        align-items: center;
-        display: inline-flex;
-        height: 2.5rem;
-        width: 45rem;
-      }
-
-      .filename {
-        display: inline-block;
-        flex: 1 1;
-        text-align: left;
-      }
-
-      .exif {
-        display: inline-block;
-        flex: 0.5 0.5;
-        font-size: 1rem;
-        text-align: right;
-      }
-
       .file-download,
       .file-edit,
       .file-delete,
@@ -174,11 +139,6 @@
       }
 
       @media screen and (max-width: 640px) {
-        .filelink {
-          flex: 1 1;
-          width: auto;
-        }
-
         .file-download,
         .file-edit,
         .file-delete,
@@ -186,48 +146,7 @@
           display: inline-block;
         }
       }
-    {{ end }}
-
-    {{ if eq .Request.Display "grid" }}
-      #grid-display {
-        background-color: var(--primary);
-      }
-
-      #files {
-        display: grid;
-        grid-gap: .5rem;
-        grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
-        margin: .5rem;
-      }
-
-      #files > * {
-        align-items: center;
-        background-color: var(--grey);
-        display: flex;
-        min-height: 14rem;
-        position: relative;
-      }
-
-      .file {
-        padding: 0.5rem;
-      }
-
-      .filelink {
-        width: 100%;
-      }
-
-      .filename {
-        display: block;
-        margin-top: 0.5rem;
-        text-align: center;
-      }
-
-      .exif {
-        position: absolute;
-        bottom: 0.5rem;
-        right:  0.5rem;
-      }
-
+    {{ else }}
       .file-download,
       .file-edit,
       .file-delete,
@@ -266,10 +185,6 @@
       }
     {{ end }}
   </style>
-
-  {{ if eq .Request.Display "grid" }}
-    {{ template "async-image" . }}
-  {{ end }}
 
   <div class="content">
     <div id="menu" class="flex flex-center">
@@ -319,11 +234,7 @@
 
     <ul id="files" class="no-margin no-padding">
       {{ range .Files }}
-        {{ if and (eq $root.Request.Display "grid") (hasThumbnail .) }}
-          <li class="image relative">
-        {{ else }}
-          <li class="file">
-        {{ end }}
+        <li class="tile relative {{ if or (ne $root.Request.Display "grid") (not (hasThumbnail .)) }}file{{ end }}">
           <a class="filelink center ellipsis" href="{{ .URL }}{{ if .IsDir }}?d={{ $root.Request.LayoutPath ($root.Request.AbsoluteURL .URL) }}{{ else }}?browser{{ end }}" title="{{ .Name }}">
             {{ if and (eq $root.Request.Display "grid") (hasThumbnail .) }}
               {{ template "async-image-item" . }}
