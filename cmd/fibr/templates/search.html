@@ -24,6 +24,10 @@
     {{ template "async-image" . }}
   {{ end }}
 
+  {{ if .HasMap }}
+    {{ template "map-modal" . }}
+  {{ end }}
+
   <div class="content">
     <div id="menu" class="flex flex-center">
       <a id="list-display" class="button button-icon" href="?d=list&{{ raw .Search.Encode }}">
@@ -47,6 +51,20 @@
           {{ end }}
         {{ end }}
       </span>
+
+      <span class="flex-grow"></span>
+
+      {{ if gt (len .Files) 0 }}
+        <a class="padding" href="?download&{{ raw .Search.Encode }}" download>
+          <img class="icon" src="{{ url "/svg/download?fill=silver" }}" alt="Download">
+        </a>
+      {{ end }}
+
+      {{ if .HasMap }}
+        <a class="padding" href="#map" download>
+          <img class="icon" src="{{ url "/svg/map?fill=silver" }}" alt="View on map">
+        </a>
+      {{ end }}
     </div>
 
     <ul id="files" class="no-margin no-padding">

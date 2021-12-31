@@ -40,7 +40,14 @@
 
       <script type="text/javascript" nonce="{{ .nonce }}">
         async function fetchGeoJSON() {
-          const response = await fetch('?geojson', { credentials: 'same-origin' });
+          fetchURL = document.location.search
+          if (fetchURL.includes('?')) {
+            fetchURL += "&geojson"
+          } else {
+            fetchURL += "?geojson"
+          }
+
+          const response = await fetch(fetchURL, { credentials: 'same-origin' });
 
           if (response.status >= 400) {
             throw new Error('unable to load geojson');

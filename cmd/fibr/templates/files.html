@@ -43,7 +43,7 @@
     {{ end }}
   {{ end }}
 
-  {{ if $root.HasMap }}
+  {{ if .HasMap }}
     {{ template "map-modal" . }}
   {{ end }}
 
@@ -225,7 +225,7 @@
         </a>
       {{ end }}
 
-      {{ if $root.HasMap }}
+      {{ if .HasMap }}
         <a class="padding" href="#map" download>
           <img class="icon" src="{{ url "/svg/map?fill=silver" }}" alt="View on map">
         </a>

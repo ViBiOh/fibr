@@ -101,13 +101,14 @@
      * Async image loading
      */
     async function fetchThumbnail() {
-      thumbnailURL = document.location.search
-      if (!thumbnailURL.includes('?')) {
-        thumbnailURL = "?"
+      fetchURL = document.location.search
+      if (fetchURL.includes('?')) {
+        fetchURL += "&thumbnail"
+      } else {
+        fetchURL += "?thumbnail"
       }
-      thumbnailURL += "&thumbnail"
 
-      const response = await fetch(thumbnailURL, { credentials: 'same-origin' });
+      const response = await fetch(fetchURL, { credentials: 'same-origin' });
 
       if (response.status >= 400) {
         throw new Error('unable to load thumbnails');
