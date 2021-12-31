@@ -159,7 +159,7 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 
 		point := geo.NewPoint(geo.NewPosition(exif.Geocode.Longitude, exif.Geocode.Latitude))
 		if err := encoder.Encode(geo.NewFeature(&point, map[string]interface{}{
-			"name": item.Name,
+			"url":  request.RelativeURL(item),
 			"date": exif.Date.Format(time.RFC850),
 		})); err != nil {
 			logger.WithField("item", item.Pathname).Error("unable to encode feature: %s", err)
