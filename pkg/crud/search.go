@@ -1,7 +1,6 @@
 package crud
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -21,77 +20,44 @@ const (
 	gigabytes     = 1 << 30
 )
 
-// SerializableRegexp is a regexp you can serialize
-type SerializableRegexp struct {
-	re *regexp.Regexp
-}
-
-// MarshalJSON marshals the regexp as a a string
-func (sr SerializableRegexp) MarshalJSON() ([]byte, error) {
-	if sr.re == nil {
-		return nil, nil
-	}
-
-	return json.Marshal(sr.re.String())
-}
-
-// UnmarshalJSON unmarshal JSOn
-func (sr *SerializableRegexp) UnmarshalJSON(b []byte) error {
-	var strValue string
-	err := json.Unmarshal(b, &strValue)
-	if err != nil {
-		return fmt.Errorf("unable to unmarshal serializable regexp: %s", err)
-	}
-
-	value, err := regexp.Compile(strValue)
-	if err != nil {
-		return fmt.Errorf("unable to parse serializable regexp: %s", err)
-	}
-
-	*sr = SerializableRegexp{
-		re: value,
-	}
-	return nil
-}
-
 type search struct {
-	Pattern     SerializableRegexp `json:"pattern,omitempty"`
-	Before      time.Time          `json:"before,omitempty"`
-	After       time.Time          `json:"fter,omitempty"`
-	Mimes       []string           `json:"mimes,omitempty"`
-	Size        int64              `json:"size,omitempty"`
-	GreaterThan bool               `json:"greaterThan,omitempty"`
+	pattern     *regexp.Regexp
+	before      time.Time
+	after       time.Time
+	mimes       []string
+	size        int64
+	greaterThan bool
 }
 
 func parseSearch(params url.Values) (output search, err error) {
 	if name := strings.TrimSpace(params.Get("name")); len(name) > 0 {
-		output.Pattern.re, err = regexp.Compile(name)
+		output.pattern, err = regexp.Compile(name)
 		if err != nil {
 			return
 		}
 	}
 
-	output.Before, err = parseDate(strings.TrimSpace(params.Get("before")))
+	output.before, err = parseDate(strings.TrimSpace(params.Get("before")))
 	if err != nil {
 		return
 	}
 
-	output.After, err = parseDate(strings.TrimSpace(params.Get("after")))
+	output.after, err = parseDate(strings.TrimSpace(params.Get("after")))
 	if err != nil {
 		return
 	}
 
 	rawSize := strings.TrimSpace(params.Get("size"))
 	if len(rawSize) > 0 {
-		output.Size, err = strconv.ParseInt(rawSize, 10, 64)
+		output.size, err = strconv.ParseInt(rawSize, 10, 64)
 		if err != nil {
 			return
 		}
 	}
 
-	output.Size = computeSize(strings.TrimSpace(params.Get("sizeUnit")), output.Size)
-	output.GreaterThan = strings.TrimSpace(params.Get("sizeOrder")) == "gt"
-	output.Mimes = computeMimes(params["types"])
+	output.size = computeSize(strings.TrimSpace(params.Get("sizeUnit")), output.size)
+	output.greaterThan = strings.TrimSpace(params.Get("sizeOrder")) == "gt"
+	output.mimes = computeMimes(params["types"])
 
 	return
 }
@@ -101,11 +67,11 @@ func (s search) match(item provider.StorageItem) bool {
 		return false
 	}
 
-	if !s.Before.IsZero() && item.Date.After(s.Before) {
+	if !s.before.IsZero() && item.Date.After(s.before) {
 		return false
 	}
 
-	if !s.After.IsZero() && item.Date.Before(s.After) {
+	if !s.after.IsZero() && item.Date.Before(s.after) {
 		return false
 	}
 
@@ -113,7 +79,7 @@ func (s search) match(item provider.StorageItem) bool {
 		return false
 	}
 
-	if s.Pattern.re != nil && !s.Pattern.re.MatchString(item.Pathname) {
+	if s.pattern != nil && !s.pattern.MatchString(item.Pathname) {
 		return false
 	}
 
@@ -121,11 +87,11 @@ func (s search) match(item provider.StorageItem) bool {
 }
 
 func (s search) matchSize(item provider.StorageItem) bool {
-	if s.Size == 0 {
+	if s.size == 0 {
 		return true
 	}
 
-	if (s.Size - item.Size) > 0 == s.GreaterThan {
+	if (s.size - item.Size) > 0 == s.greaterThan {
 		return false
 	}
 
@@ -133,12 +99,12 @@ func (s search) matchSize(item provider.StorageItem) bool {
 }
 
 func (s search) matchMimes(item provider.StorageItem) bool {
-	if len(s.Mimes) == 0 {
+	if len(s.mimes) == 0 {
 		return true
 	}
 
 	itemMime := item.Extension()
-	for _, mime := range s.Mimes {
+	for _, mime := range s.mimes {
 		if strings.EqualFold(mime, itemMime) {
 			return true
 		}
@@ -147,13 +113,20 @@ func (s search) matchMimes(item provider.StorageItem) bool {
 	return false
 }
 
-func (a App) searchFiles(criterions search, request provider.Request) (items []provider.RenderItem, err error) {
+func (a App) searchFiles(r *http.Request, request provider.Request) (items []provider.StorageItem, err error) {
+	params := r.URL.Query()
+
+	criterions, err := parseSearch(params)
+	if err != nil {
+		return nil, httpModel.WrapInvalid(err)
+	}
+
 	err = a.storageApp.Walk(request.Filepath(), func(item provider.StorageItem) error {
 		if item.IsDir || !criterions.match(item) {
 			return nil
 		}
 
-		items = append(items, provider.StorageToRender(item, request))
+		items = append(items, item)
 
 		return nil
 	})
@@ -161,23 +134,16 @@ func (a App) searchFiles(criterions search, request provider.Request) (items []p
 	return
 }
 
-func (a App) search(r *http.Request, request provider.Request) (string, int, map[string]interface{}, error) {
-	params := r.URL.Query()
-
-	criterions, err := parseSearch(params)
-	if err != nil {
-		return "", 0, nil, httpModel.WrapInvalid(err)
-	}
-
-	items, err := a.searchFiles(criterions, request)
-	if err != nil {
-		return "", 0, nil, err
+func (a App) search(r *http.Request, request provider.Request, files []provider.StorageItem) (string, int, map[string]interface{}, error) {
+	items := make([]provider.RenderItem, len(files))
+	for i, item := range files {
+		items[i] = provider.StorageToRender(item, request)
 	}
 
 	return "search", http.StatusOK, map[string]interface{}{
 		"Paths":   getPathParts(request),
 		"Files":   items,
-		"Search":  params,
+		"Search":  r.URL.Query(),
 		"Request": request,
 	}, nil
 }

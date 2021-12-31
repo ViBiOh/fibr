@@ -1,7 +1,6 @@
 package geo
 
 import (
-	"bytes"
 	"fmt"
 )
 
@@ -65,28 +64,17 @@ func NewPoint(position Position) Point {
 type Position struct {
 	Longitude float64
 	Latitude  float64
-	Altitude  float64
 }
 
 // NewPosition creates a new position
-func NewPosition(lon, lat, alt float64) Position {
+func NewPosition(lon, lat float64) Position {
 	return Position{
 		Longitude: lon,
 		Latitude:  lat,
-		Altitude:  alt,
 	}
 }
 
 // MarshalJSON marshals the position as an array
 func (p Position) MarshalJSON() ([]byte, error) {
-	buffer := bytes.NewBufferString(`[`)
-
-	fmt.Fprintf(buffer, "%f,%f", p.Longitude, p.Latitude)
-	if p.Altitude != 0 {
-		fmt.Fprintf(buffer, ",%f", p.Altitude)
-	}
-
-	buffer.WriteString(`]`)
-
-	return buffer.Bytes(), nil
+	return []byte(fmt.Sprintf("[%f,%f]", p.Longitude, p.Latitude)), nil
 }

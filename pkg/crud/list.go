@@ -3,7 +3,6 @@ package crud
 import (
 	"archive/zip"
 	"bytes"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -39,14 +38,7 @@ func (a App) getCover(files []provider.StorageItem) map[string]interface{} {
 }
 
 // List render directory web view of given dirPath
-func (a App) List(request provider.Request, message renderer.Message) (string, int, map[string]interface{}, error) {
-	pathname := request.Filepath()
-
-	files, err := a.storageApp.List(pathname)
-	if err != nil {
-		return "", 0, nil, err
-	}
-
+func (a App) List(request provider.Request, message renderer.Message, files []provider.StorageItem) (string, int, map[string]interface{}, error) {
 	items := make([]provider.RenderItem, len(files))
 	wg := concurrent.NewLimited(4)
 
@@ -69,7 +61,7 @@ func (a App) List(request provider.Request, message renderer.Message) (string, i
 	wg.Go(func() {
 		if aggregate, err := a.exifApp.GetAggregateFor(provider.StorageItem{
 			IsDir:    true,
-			Pathname: pathname,
+			Pathname: request.Filepath(),
 		}); err != nil {
 			logger.WithField("fn", "crud.List").WithField("item", request.Path).Error("unable to get aggregate: %s", err)
 		} else if len(aggregate.Location) != 0 {
@@ -100,7 +92,7 @@ func (a App) List(request provider.Request, message renderer.Message) (string, i
 }
 
 // Download content of a directory into a streamed zip
-func (a App) Download(w http.ResponseWriter, r *http.Request, request provider.Request) {
+func (a App) Download(w http.ResponseWriter, r *http.Request, request provider.Request, items []provider.StorageItem) {
 	zipWriter := zip.NewWriter(w)
 	defer func() {
 		if closeErr := zipWriter.Close(); closeErr != nil {
@@ -115,33 +107,35 @@ func (a App) Download(w http.ResponseWriter, r *http.Request, request provider.R
 
 	w.Header().Add("Content-Disposition", fmt.Sprintf("attachment; filename=%s.zip", filename))
 
-	done := r.Context().Done()
-	if err := a.zipFiles(done, request, zipWriter, ""); err != nil {
-		select {
-		case <-done:
-			return
-		default:
-			a.rendererApp.Error(w, r, err)
-		}
+	if err := a.zipItems(r.Context().Done(), request, zipWriter, items); err != nil {
+		a.rendererApp.Error(w, r, err)
 	}
 }
 
-func (a App) zipFiles(done <-chan struct{}, request provider.Request, zipWriter *zip.Writer, pathname string) error {
-	files, err := a.storageApp.List(request.SubPath(pathname))
-	if err != nil {
-		return fmt.Errorf("unable to list: %s", err)
-	}
-
-	for _, file := range files {
+func (a App) zipItems(done <-chan struct{}, request provider.Request, zipWriter *zip.Writer, items []provider.StorageItem) (err error) {
+	for _, item := range items {
 		select {
 		case <-done:
-			return errors.New("context is done for zipping files")
+			logger.Error("context is done for zipping files")
+			return nil
 		default:
-			if file.IsDir {
-				if err = a.zipFiles(done, request, zipWriter, path.Join(pathname, file.Name)); err != nil {
-					return err
+			relativeURL := request.RelativeURL(item)
+
+			if !item.IsDir {
+				if err = a.addFileToZip(zipWriter, item, relativeURL); err != nil {
+					return
 				}
-			} else if err = a.addFileToZip(zipWriter, file, pathname); err != nil {
+				continue
+			}
+
+			var nestedItems []provider.StorageItem
+			nestedItems, err = a.storageApp.List(request.SubPath(relativeURL))
+			if err != nil {
+				err = fmt.Errorf("unable to zip nested folder `%s`: %s", relativeURL, err)
+				return
+			}
+
+			if err = a.zipItems(done, request, zipWriter, nestedItems); err != nil {
 				return err
 			}
 		}
@@ -152,18 +146,13 @@ func (a App) zipFiles(done <-chan struct{}, request provider.Request, zipWriter 
 
 func (a App) addFileToZip(zipWriter *zip.Writer, item provider.StorageItem, pathname string) (err error) {
 	header := &zip.FileHeader{
-		Name:               path.Join(pathname, item.Name),
+		Name:               pathname,
 		UncompressedSize64: uint64(item.Size),
 		UncompressedSize:   uint32(item.Size),
 		Modified:           item.Date,
 		Method:             zip.Deflate,
 	}
-
-	if item.IsDir {
-		header.SetMode(0o700)
-	} else {
-		header.SetMode(0o600)
-	}
+	header.SetMode(0o600)
 
 	if header.UncompressedSize64 > uint32max {
 		header.UncompressedSize = uint32max

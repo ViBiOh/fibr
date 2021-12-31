@@ -135,6 +135,15 @@ func SafeWrite(w io.Writer, content string) {
 	}
 }
 
+// DoneWriter writes content to writer with error handling and done checking
+func DoneWriter(isDone func() bool, w io.Writer, content string) {
+	if isDone() {
+		return
+	}
+
+	SafeWrite(w, content)
+}
+
 // ErrNotExist create a NotExist error
 func ErrNotExist(err error) error {
 	return fmt.Errorf("%s: %w", err, errNotExists)

@@ -16,7 +16,7 @@ import (
 type Crud interface {
 	Start(done <-chan struct{})
 	Browser(http.ResponseWriter, Request, StorageItem, renderer.Message) (string, int, map[string]interface{}, error)
-	List(Request, renderer.Message) (string, int, map[string]interface{}, error)
+	List(Request, renderer.Message, []StorageItem) (string, int, map[string]interface{}, error)
 	Get(http.ResponseWriter, *http.Request, Request) (string, int, map[string]interface{}, error)
 	Post(http.ResponseWriter, *http.Request, Request)
 	Create(http.ResponseWriter, *http.Request, Request)

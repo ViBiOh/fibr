@@ -22,8 +22,8 @@ func TestMatchSize(t *testing.T) {
 		{
 			"no size",
 			search{
-				Size:        0,
-				GreaterThan: true,
+				size:        0,
+				greaterThan: true,
 			},
 			args{
 				item: provider.StorageItem{Size: 1000},
@@ -33,8 +33,8 @@ func TestMatchSize(t *testing.T) {
 		{
 			"greater for greater",
 			search{
-				Size:        900,
-				GreaterThan: true,
+				size:        900,
+				greaterThan: true,
 			},
 			args{
 				item: provider.StorageItem{Size: 1000},
@@ -44,8 +44,8 @@ func TestMatchSize(t *testing.T) {
 		{
 			"greater for lower",
 			search{
-				Size:        900,
-				GreaterThan: false,
+				size:        900,
+				greaterThan: false,
 			},
 			args{
 				item: provider.StorageItem{Size: 1000},
@@ -55,8 +55,8 @@ func TestMatchSize(t *testing.T) {
 		{
 			"lower for lower",
 			search{
-				Size:        900,
-				GreaterThan: false,
+				size:        900,
+				greaterThan: false,
 			},
 			args{
 				item: provider.StorageItem{Size: 800},

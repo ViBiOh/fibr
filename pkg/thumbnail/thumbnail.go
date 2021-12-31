@@ -160,13 +160,7 @@ func (a App) Serve(w http.ResponseWriter, r *http.Request, item provider.Storage
 }
 
 // List return all thumbnail in a base64 form
-func (a App) List(w http.ResponseWriter, r *http.Request, item provider.StorageItem) {
-	items, err := a.storageApp.List(item.Pathname)
-	if err != nil {
-		httperror.InternalServerError(w, err)
-		return
-	}
-
+func (a App) List(w http.ResponseWriter, r *http.Request, items []provider.StorageItem) {
 	w.Header().Add("Content-Type", "text/plain; charset=utf-8")
 	w.Header().Add("Cache-Control", "no-cache")
 	w.WriteHeader(http.StatusOK)
@@ -190,20 +184,10 @@ func (a App) List(w http.ResponseWriter, r *http.Request, item provider.StorageI
 			continue
 		}
 
-		safeWrite(isDone, w, sha.New(item.Name))
-		safeWrite(isDone, w, `,`)
+		provider.DoneWriter(isDone, w, sha.New(item.Name))
+		provider.DoneWriter(isDone, w, `,`)
 		a.encodeContent(base64.NewEncoder(base64.StdEncoding, w), item)
-		safeWrite(isDone, w, "\n")
-	}
-}
-
-func safeWrite(isDone func() bool, w io.Writer, content string) {
-	if isDone() {
-		return
-	}
-
-	if _, err := io.WriteString(w, content); err != nil {
-		logger.Error("unable to write content: %s", err)
+		provider.DoneWriter(isDone, w, "\n")
 	}
 }
 

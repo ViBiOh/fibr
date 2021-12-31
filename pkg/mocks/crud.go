@@ -96,9 +96,9 @@ func (mr *CrudMockRecorder) Get(arg0, arg1, arg2 interface{}) *gomock.Call {
 }
 
 // List mocks base method.
-func (m *Crud) List(arg0 provider.Request, arg1 renderer.Message) (string, int, map[string]interface{}, error) {
+func (m *Crud) List(arg0 provider.Request, arg1 renderer.Message, arg2 []provider.StorageItem) (string, int, map[string]interface{}, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "List", arg0, arg1)
+	ret := m.ctrl.Call(m, "List", arg0, arg1, arg2)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(int)
 	ret2, _ := ret[2].(map[string]interface{})
@@ -107,9 +107,9 @@ func (m *Crud) List(arg0 provider.Request, arg1 renderer.Message) (string, int, 
 }
 
 // List indicates an expected call of List.
-func (mr *CrudMockRecorder) List(arg0, arg1 interface{}) *gomock.Call {
+func (mr *CrudMockRecorder) List(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*Crud)(nil).List), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*Crud)(nil).List), arg0, arg1, arg2)
 }
 
 // Post mocks base method.
