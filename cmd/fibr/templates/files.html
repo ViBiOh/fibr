@@ -5,17 +5,29 @@
 
   {{ $root := . }}
 
+  <link rel="preload" as="image" href="{{ url "/svg/list?fill=silver" }}">
+  <link rel="preload" as="image" href="{{ url "/svg/th?fill=silver" }}">
+
   {{ if .Request.CanEdit }}
+    <link rel="preload" as="image" href="{{ url "/svg/cloud-upload-alt?fill=silver" }}">
+    <link rel="preload" as="image" href="{{ url "/svg/folder?fill=silver" }}">
+    <link rel="preload" as="image" href="{{ url "/svg/times?fill=silver" }}">
+    <link rel="preload" as="image" href="{{ url "/svg/pencil-alt?fill=silver" }}">
+
     {{ template "upload-modal" . }}
     {{ template "folder-modal" . }}
   {{ end }}
 
   {{ if .Request.CanShare }}
+    <link rel="preload" as="image" href="{{ url "/svg/share-alt-square?fill=silver" }}">
+
     {{ template "share-directory" . }}
     {{ template "share-list" . }}
   {{ end }}
 
   {{ if .Request.CanWebhook }}
+    <link rel="preload" as="image" href="{{ url "/svg/webhook?fill=silver" }}">
+
     {{ template "webhook-directory" . }}
     {{ template "webhook-list" . }}
   {{ end }}
@@ -36,151 +48,6 @@
   {{ end }}
 
   {{ template "search-modal" . }}
-
-  {{ if eq .Request.Display "grid" }}
-    <script type="text/javascript" nonce="{{ .nonce }}">
-      // from https://developers.google.com/speed/webp/faq#how_can_i_detect_browser_support_for_webp
-      async function isWebPCompatible() {
-        const animatedImage = 'UklGRlIAAABXRUJQVlA4WAoAAAASAAAAAAAAAAAAQU5JTQYAAAD/////AABBTk1GJgAAAAAAAAAAAAAAAAAAAGQAAABWUDhMDQAAAC8AAAAQBxAREYiI/gcA';
-
-        return new Promise((resolve, reject) => {
-          var image = new Image();
-          image.onload = () => {
-            if (image.width > 0 && image.height > 0) {
-              resolve();
-            } else {
-              reject();
-            }
-          };
-
-          image.onerror = reject;
-          image.src = `data:image/webp;base64,${animatedImage}`;
-        });
-      }
-
-      /**
-       * Restore default layout when no thumbnail is possible
-       */
-      function displayNoThumbnail(img) {
-        const span = document.createElement('span');
-        span.classList.add('filename', 'ellipsis');
-        span.innerHTML = img.alt.replace("Thumbnail of ", "");
-        img.after(span)
-
-        img.src = '{{ url "/svg/file-image?fill=silver" }}';
-        img.classList.add('icon', 'icon-large');
-        img.alt = 'Image file';
-      }
-
-      /**
-       * Remove all child and append given one
-       * @param {Element} element Element to clear
-       * @param {Element} newContent Element to put in place
-       */
-      function replaceContent(element, newContent) {
-        while (element.firstChild) {
-          element.removeChild(element.firstChild);
-        }
-
-        if (newContent) {
-          element.appendChild(newContent);
-        }
-      }
-
-      // From https://developer.mozilla.org/en-US/docs/Web/API/ReadableStreamDefaultReader/read#example_2_-_handling_text_line_by_line
-      async function* readLineByLine(response) {
-        const utf8Decoder = new TextDecoder('utf-8');
-        const reader = response.body.getReader();
-        let { value: chunk, done: readerDone } = await reader.read();
-        chunk = chunk ? utf8Decoder.decode(chunk, { stream: true }) : '';
-
-        let re = /\r\n|\n|\r/gm;
-        let startIndex = 0;
-
-        for (;;) {
-          const result = re.exec(chunk);
-          if (!result) {
-            if (readerDone) {
-              break;
-            }
-
-            const remainder = chunk.substr(startIndex);
-            ({ value: chunk, done: readerDone } = await reader.read());
-            chunk = remainder + (chunk ? utf8Decoder.decode(chunk, { stream: true }) : '');
-            startIndex = re.lastIndex = 0;
-            continue;
-          }
-
-          yield chunk.substring(startIndex, result.index);
-          startIndex = re.lastIndex;
-        }
-
-        if (startIndex < chunk.length) {
-          yield chunk.substr(startIndex);
-        }
-      }
-
-      /**
-       * Async image loading
-       */
-      async function fetchThumbnail() {
-        const response = await fetch('?thumbnail', { credentials: 'same-origin' });
-
-        if (response.status >= 400) {
-          throw new Error('unable to load thumbnails');
-        }
-
-        for await (let line of readLineByLine(response)) {
-          const parts = line.split(',');
-          if (parts.length != 2) {
-            console.error('invalid line for thumbnail:', line);
-            continue;
-          }
-
-          const picture = document.getElementById(`picture-${parts[0]}`);
-          if (!picture) {
-            return;
-          }
-
-          const img = new Image();
-          img.src = `data:image/webp;base64,${parts[1]}`;
-          img.alt = picture.dataset.alt;
-          img.classList.add('thumbnail');
-
-          replaceContent(picture, img);
-        }
-      }
-
-      window.addEventListener(
-        'load',
-        async () => {
-          const thumbnailsElem = document.querySelectorAll('[data-thumbnail]');
-          if (!thumbnailsElem) {
-            return;
-          }
-
-          try {
-            await isWebPCompatible();
-          } catch (e) {
-            console.error('Your browser is not compatible with WebP format.', e);
-            thumbnailsElem.forEach(displayNoThumbnail);
-            return;
-          }
-
-          thumbnailsElem.forEach((picture) => {
-            replaceContent(picture, generateThrobber('throbber-white'));
-          });
-
-          try {
-            await fetchThumbnail();
-          } catch (e) {
-            console.error(e);
-          }
-        },
-        false,
-      );
-    </script>
-  {{ end }}
 
   <style type="text/css" nonce="{{ .nonce }}">
     #menu {
@@ -349,12 +216,6 @@
         width: 100%;
       }
 
-      .thumbnail {
-        max-height: 100%;
-        vertical-align: middle;
-        width: 100%;
-      }
-
       .filename {
         display: block;
         margin-top: 0.5rem;
@@ -406,22 +267,8 @@
     {{ end }}
   </style>
 
-  <link rel="preload" as="image" href="{{ url "/svg/list?fill=silver" }}">
-  <link rel="preload" as="image" href="{{ url "/svg/th?fill=silver" }}">
-
-  {{ if .Request.CanEdit }}
-    <link rel="preload" as="image" href="{{ url "/svg/cloud-upload-alt?fill=silver" }}">
-    <link rel="preload" as="image" href="{{ url "/svg/folder?fill=silver" }}">
-    <link rel="preload" as="image" href="{{ url "/svg/times?fill=silver" }}">
-    <link rel="preload" as="image" href="{{ url "/svg/pencil-alt?fill=silver" }}">
-  {{ end }}
-
-  {{ if .Request.CanShare }}
-    <link rel="preload" as="image" href="{{ url "/svg/share-alt-square?fill=silver" }}">
-  {{ end }}
-
-  {{ if .Request.CanWebhook }}
-    <link rel="preload" as="image" href="{{ url "/svg/webhook?fill=silver" }}">
+  {{ if eq .Request.Display "grid" }}
+    {{ template "async-image" . }}
   {{ end }}
 
   <div class="content">
@@ -479,7 +326,7 @@
         {{ end }}
           <a class="filelink center ellipsis" href="{{ .URL }}{{ if .IsDir }}?d={{ $root.Request.LayoutPath ($root.Request.AbsoluteURL .URL) }}{{ else }}?browser{{ end }}" title="{{ .Name }}">
             {{ if and (eq $root.Request.Display "grid") (hasThumbnail .) }}
-              {{ template "async-image" . }}
+              {{ template "async-image-item" . }}
             {{ else }}
               {{ if .IsDir }}
                 <img class="icon {{ if eq $root.Request.Display "grid" }}icon-large{{ end }}" src="{{ url "/svg/folder?fill=silver" }}" alt="Folder">
