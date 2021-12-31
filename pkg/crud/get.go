@@ -164,6 +164,8 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 		})); err != nil {
 			logger.WithField("item", item.Pathname).Error("unable to encode feature: %s", err)
 		}
+
+		commaNeeded = true
 	}
 
 	provider.SafeWrite(w, "]")
