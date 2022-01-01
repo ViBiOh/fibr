@@ -136,8 +136,16 @@ func (a App) searchFiles(r *http.Request, request provider.Request) (items []pro
 
 func (a App) search(r *http.Request, request provider.Request, files []provider.StorageItem) (string, int, map[string]interface{}, error) {
 	items := make([]provider.RenderItem, len(files))
+	var hasMap bool
+
 	for i, item := range files {
 		items[i] = provider.StorageToRender(item, request)
+
+		if !hasMap {
+			if exif, err := a.exifApp.GetExifFor(item); err == nil && exif.Geocode.Longitude != 0 && exif.Geocode.Latitude != 0 {
+				hasMap = true
+			}
+		}
 	}
 
 	return "search", http.StatusOK, map[string]interface{}{
@@ -145,6 +153,7 @@ func (a App) search(r *http.Request, request provider.Request, files []provider.
 		"Files":   items,
 		"Search":  r.URL.Query(),
 		"Request": request,
+		"HasMap":  hasMap,
 	}, nil
 }
 
