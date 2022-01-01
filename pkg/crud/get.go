@@ -48,7 +48,9 @@ func (a App) getWithMessage(w http.ResponseWriter, r *http.Request, request prov
 func (a App) handleFile(w http.ResponseWriter, r *http.Request, request provider.Request, item provider.StorageItem, message renderer.Message) (string, int, map[string]interface{}, error) {
 	if query.GetBool(r, "thumbnail") {
 		a.thumbnailApp.Serve(w, r, item)
+		return "", 0, nil, nil
 	}
+
 	if query.GetBool(r, "stream") {
 		a.thumbnailApp.Stream(w, r, item)
 		return "", 0, nil, nil
