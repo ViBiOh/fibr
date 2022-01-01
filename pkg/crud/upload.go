@@ -74,30 +74,30 @@ func (a App) saveUploadedFile(request provider.Request, part *multipart.Part) (f
 // Upload saves form files to filesystem
 func (a App) Upload(w http.ResponseWriter, r *http.Request, request provider.Request, values map[string]string, part *multipart.Part) {
 	if !request.CanEdit {
-		a.rendererApp.Error(w, r, model.WrapForbidden(ErrNotAuthorized))
+		a.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
 		return
 	}
 
 	if part == nil {
-		a.rendererApp.Error(w, r, model.WrapInvalid(errors.New("no file provided for save")))
+		a.error(w, r, request, model.WrapInvalid(errors.New("no file provided for save")))
 		return
 	}
 
 	shared, err := getFormBool(values["share"])
 	if err != nil {
-		a.rendererApp.Error(w, r, model.WrapInvalid(err))
+		a.error(w, r, request, model.WrapInvalid(err))
 		return
 	}
 
 	duration, err := getFormDuration(values["duration"])
 	if err != nil {
-		a.rendererApp.Error(w, r, model.WrapInvalid(err))
+		a.error(w, r, request, model.WrapInvalid(err))
 		return
 	}
 
 	filename, err := a.saveUploadedFile(request, part)
 	if err != nil {
-		a.rendererApp.Error(w, r, model.WrapInternal(err))
+		a.error(w, r, request, model.WrapInternal(err))
 		return
 	}
 
@@ -105,7 +105,7 @@ func (a App) Upload(w http.ResponseWriter, r *http.Request, request provider.Req
 	if shared {
 		id, err := a.shareApp.Create(path.Join(request.Path, filename), false, "", false, duration)
 		if err != nil {
-			a.rendererApp.Error(w, r, model.WrapInternal(err))
+			a.error(w, r, request, model.WrapInternal(err))
 			return
 		}
 

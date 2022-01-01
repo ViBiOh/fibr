@@ -17,41 +17,41 @@ func generateTelegramURL(botToken, chatID string) string {
 
 func (a App) createWebhook(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !request.CanWebhook {
-		a.rendererApp.Error(w, r, model.WrapForbidden(ErrNotAuthorized))
+		a.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
 		return
 	}
 
 	var err error
 	err = r.ParseForm()
 	if err != nil {
-		a.rendererApp.Error(w, r, model.WrapInvalid(fmt.Errorf("unable to parse form: %s", err)))
+		a.error(w, r, request, model.WrapInvalid(fmt.Errorf("unable to parse form: %s", err)))
 		return
 	}
 
 	recursive, kind, webhookURL, eventTypes, err := checkWebhookForm(r)
 	if err != nil {
-		a.rendererApp.Error(w, r, err)
+		a.error(w, r, request, err)
 		return
 	}
 
 	info, err := a.storageApp.Info(request.Path)
 	if err != nil {
 		if provider.IsNotExist(err) {
-			a.rendererApp.Error(w, r, model.WrapNotFound(err))
+			a.error(w, r, request, model.WrapNotFound(err))
 		} else {
-			a.rendererApp.Error(w, r, model.WrapInternal(err))
+			a.error(w, r, request, model.WrapInternal(err))
 		}
 		return
 	}
 
 	if !info.IsDir {
-		a.rendererApp.Error(w, r, model.WrapInvalid(errors.New("webhook are only available on directories")))
+		a.error(w, r, request, model.WrapInvalid(errors.New("webhook are only available on directories")))
 		return
 	}
 
 	id, err := a.webhookApp.Create(info.Pathname, recursive, kind, webhookURL, eventTypes)
 	if err != nil {
-		a.rendererApp.Error(w, r, model.WrapInternal(err))
+		a.error(w, r, request, model.WrapInternal(err))
 		return
 	}
 
@@ -121,14 +121,14 @@ func checkWebhookForm(r *http.Request) (recursive bool, kind provider.WebhookKin
 
 func (a App) deleteWebhook(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !request.CanWebhook {
-		a.rendererApp.Error(w, r, model.WrapForbidden(ErrNotAuthorized))
+		a.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
 		return
 	}
 
 	id := r.FormValue("id")
 
 	if err := a.webhookApp.Delete(id); err != nil {
-		a.rendererApp.Error(w, r, model.WrapInternal(err))
+		a.error(w, r, request, model.WrapInternal(err))
 		return
 	}
 

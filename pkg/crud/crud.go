@@ -5,6 +5,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"net/http"
 	"regexp"
 	"strings"
 	"time"
@@ -194,4 +195,8 @@ func (a App) rename(item provider.StorageItem, name string) provider.StorageItem
 	}
 
 	return renamedItem
+}
+
+func (a App) error(w http.ResponseWriter, r *http.Request, request provider.Request, err error) {
+	a.rendererApp.Error(w, r, map[string]interface{}{"Request": request}, err)
 }

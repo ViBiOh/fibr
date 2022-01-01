@@ -108,7 +108,7 @@ func (a App) Download(w http.ResponseWriter, r *http.Request, request provider.R
 	w.Header().Add("Content-Disposition", fmt.Sprintf("attachment; filename=%s.zip", filename))
 
 	if err := a.zipItems(r.Context().Done(), request, zipWriter, items); err != nil {
-		a.rendererApp.Error(w, r, err)
+		a.error(w, r, request, err)
 	}
 }
 

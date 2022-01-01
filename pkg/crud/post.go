@@ -64,12 +64,12 @@ func (a App) Post(w http.ResponseWriter, r *http.Request, request provider.Reque
 	if strings.HasPrefix(contentType, "multipart/form-data") {
 		values, file, err := parseMultipart(r)
 		if err != nil {
-			a.rendererApp.Error(w, r, model.WrapInternal(fmt.Errorf("unable to parse multipart request: %s", err)))
+			a.error(w, r, request, model.WrapInternal(fmt.Errorf("unable to parse multipart request: %s", err)))
 			return
 		}
 
 		if values["method"] != http.MethodPost {
-			a.rendererApp.Error(w, r, model.WrapMethodNotAllowed(fmt.Errorf("unknown method `%s` for multipart", values["method"])))
+			a.error(w, r, request, model.WrapMethodNotAllowed(fmt.Errorf("unknown method `%s` for multipart", values["method"])))
 			return
 		}
 
@@ -77,7 +77,7 @@ func (a App) Post(w http.ResponseWriter, r *http.Request, request provider.Reque
 		return
 	}
 
-	a.rendererApp.Error(w, r, model.WrapMethodNotAllowed(fmt.Errorf("unknown content-type %s", contentType)))
+	a.error(w, r, request, model.WrapMethodNotAllowed(fmt.Errorf("unknown content-type %s", contentType)))
 }
 
 func (a App) handlePostShare(w http.ResponseWriter, r *http.Request, request provider.Request, method string) {
@@ -87,7 +87,7 @@ func (a App) handlePostShare(w http.ResponseWriter, r *http.Request, request pro
 	case http.MethodDelete:
 		a.deleteShare(w, r, request)
 	default:
-		a.rendererApp.Error(w, r, model.WrapMethodNotAllowed(fmt.Errorf("unknown share method `%s` for %s", method, r.URL.Path)))
+		a.error(w, r, request, model.WrapMethodNotAllowed(fmt.Errorf("unknown share method `%s` for %s", method, r.URL.Path)))
 	}
 }
 
@@ -98,7 +98,7 @@ func (a App) handlePostWebhook(w http.ResponseWriter, r *http.Request, request p
 	case http.MethodDelete:
 		a.deleteWebhook(w, r, request)
 	default:
-		a.rendererApp.Error(w, r, model.WrapMethodNotAllowed(fmt.Errorf("unknown webhook method `%s` for %s", method, r.URL.Path)))
+		a.error(w, r, request, model.WrapMethodNotAllowed(fmt.Errorf("unknown webhook method `%s` for %s", method, r.URL.Path)))
 	}
 }
 
@@ -111,6 +111,6 @@ func (a App) handlePost(w http.ResponseWriter, r *http.Request, request provider
 	case http.MethodDelete:
 		a.Delete(w, r, request)
 	default:
-		a.rendererApp.Error(w, r, model.WrapMethodNotAllowed(fmt.Errorf("unknown method `%s` for %s", method, r.URL.Path)))
+		a.error(w, r, request, model.WrapMethodNotAllowed(fmt.Errorf("unknown method `%s` for %s", method, r.URL.Path)))
 	}
 }

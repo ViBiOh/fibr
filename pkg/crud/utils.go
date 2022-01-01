@@ -90,3 +90,7 @@ func getFormDuration(val string) (time.Duration, error) {
 
 	return time.ParseDuration(fmt.Sprintf("%sh", value))
 }
+
+func errorReturn(request provider.Request, err error) (string, int, map[string]interface{}, error) {
+	return "", 0, map[string]interface{}{"Request": request}, err
+}

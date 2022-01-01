@@ -29,25 +29,25 @@ func (a App) doRename(oldPath, newPath string, oldItem provider.StorageItem) (pr
 // Rename rename given path to a new one
 func (a App) Rename(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !request.CanEdit {
-		a.rendererApp.Error(w, r, model.WrapForbidden(ErrNotAuthorized))
+		a.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
 		return
 	}
 
 	oldName, err := checkFormName(r, "name")
 	if err != nil && !errors.Is(err, ErrEmptyName) {
-		a.rendererApp.Error(w, r, err)
+		a.error(w, r, request, err)
 		return
 	}
 
 	newFolder, err := getNewFolder(r, request)
 	if err != nil {
-		a.rendererApp.Error(w, r, err)
+		a.error(w, r, request, err)
 		return
 	}
 
 	newName, err := getNewName(r)
 	if err != nil {
-		a.rendererApp.Error(w, r, err)
+		a.error(w, r, request, err)
 		return
 	}
 
@@ -59,10 +59,10 @@ func (a App) Rename(w http.ResponseWriter, r *http.Request, request provider.Req
 	newPath := provider.GetPathname(newFolder, newName, request.Share)
 
 	if _, err = a.storageApp.Info(newPath); err == nil {
-		a.rendererApp.Error(w, r, model.WrapInvalid(errors.New("new name already exist")))
+		a.error(w, r, request, model.WrapInvalid(errors.New("new name already exist")))
 		return
 	} else if !provider.IsNotExist(err) {
-		a.rendererApp.Error(w, r, model.WrapInternal(err))
+		a.error(w, r, request, model.WrapInternal(err))
 		return
 	}
 
@@ -74,13 +74,13 @@ func (a App) Rename(w http.ResponseWriter, r *http.Request, request provider.Req
 			err = model.WrapNotFound(err)
 		}
 
-		a.rendererApp.Error(w, r, err)
+		a.error(w, r, request, err)
 		return
 	}
 
 	newItem, err := a.doRename(oldPath, newPath, oldItem)
 	if err != nil {
-		a.rendererApp.Error(w, r, model.WrapInternal(err))
+		a.error(w, r, request, model.WrapInternal(err))
 		return
 	}
 

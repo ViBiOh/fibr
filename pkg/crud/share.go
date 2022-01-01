@@ -53,7 +53,7 @@ func (a App) bestSharePath(request provider.Request, name string) string {
 
 func (a App) createShare(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !request.CanShare {
-		a.rendererApp.Error(w, r, model.WrapForbidden(ErrNotAuthorized))
+		a.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
 		return
 	}
 
@@ -61,13 +61,13 @@ func (a App) createShare(w http.ResponseWriter, r *http.Request, request provide
 
 	edit, err := getFormBool(r.FormValue("edit"))
 	if err != nil {
-		a.rendererApp.Error(w, r, model.WrapInvalid(err))
+		a.error(w, r, request, model.WrapInvalid(err))
 		return
 	}
 
 	duration, err := getFormDuration(r.FormValue("duration"))
 	if err != nil {
-		a.rendererApp.Error(w, r, model.WrapInvalid(err))
+		a.error(w, r, request, model.WrapInvalid(err))
 		return
 	}
 
@@ -75,7 +75,7 @@ func (a App) createShare(w http.ResponseWriter, r *http.Request, request provide
 	if passwordValue := strings.TrimSpace(r.FormValue("password")); passwordValue != "" {
 		hash, err := bcrypt.GenerateFromPassword([]byte(passwordValue), a.bcryptCost)
 		if err != nil {
-			a.rendererApp.Error(w, r, model.WrapInternal(err))
+			a.error(w, r, request, model.WrapInternal(err))
 			return
 		}
 
@@ -85,16 +85,16 @@ func (a App) createShare(w http.ResponseWriter, r *http.Request, request provide
 	info, err := a.storageApp.Info(request.Path)
 	if err != nil {
 		if provider.IsNotExist(err) {
-			a.rendererApp.Error(w, r, model.WrapNotFound(err))
+			a.error(w, r, request, model.WrapNotFound(err))
 		} else {
-			a.rendererApp.Error(w, r, model.WrapInternal(err))
+			a.error(w, r, request, model.WrapInternal(err))
 		}
 		return
 	}
 
 	id, err := a.shareApp.Create(request.Path, edit, password, info.IsDir, duration)
 	if err != nil {
-		a.rendererApp.Error(w, r, model.WrapInternal(err))
+		a.error(w, r, request, model.WrapInternal(err))
 		return
 	}
 
@@ -115,14 +115,14 @@ func (a App) createShare(w http.ResponseWriter, r *http.Request, request provide
 
 func (a App) deleteShare(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !request.CanShare {
-		a.rendererApp.Error(w, r, model.WrapForbidden(ErrNotAuthorized))
+		a.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
 		return
 	}
 
 	id := r.FormValue("id")
 
 	if err := a.shareApp.Delete(id); err != nil {
-		a.rendererApp.Error(w, r, model.WrapInternal(err))
+		a.error(w, r, request, model.WrapInternal(err))
 		return
 	}
 
