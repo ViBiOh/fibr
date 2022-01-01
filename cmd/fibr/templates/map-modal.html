@@ -172,7 +172,7 @@
 
           // fit bounds of map
           if (bounds.length) {
-            map.on('zoomend', () => {
+            map.once('zoomend', () => {
               container.removeChild(throbber);
             });
             map.fitBounds(bounds);
