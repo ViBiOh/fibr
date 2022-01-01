@@ -26,10 +26,10 @@ func (a App) getWithMessage(w http.ResponseWriter, r *http.Request, request prov
 
 	if err != nil {
 		if provider.IsNotExist(err) {
-			return "", 0, nil, model.WrapNotFound(err)
+			return "", 0, map[string]interface{}{"Request": request}, model.WrapNotFound(err)
 		}
 
-		return "", 0, nil, model.WrapInternal(err)
+		return "", 0, map[string]interface{}{"Request": request}, model.WrapNotFound(err)
 	}
 
 	if item.IsDir && !strings.HasSuffix(r.URL.Path, "/") {
@@ -87,7 +87,7 @@ func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.
 
 	items, err := a.listFiles(r, request)
 	if err != nil {
-		return "", 0, nil, err
+		return "", 0, map[string]interface{}{"Request": request}, err
 	}
 
 	if query.GetBool(r, "geojson") {
@@ -102,7 +102,7 @@ func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.
 
 	if query.GetBool(r, "download") {
 		a.Download(w, r, request, items)
-		return "", 0, nil, err
+		return "", 0, map[string]interface{}{"Request": request}, err
 	}
 
 	if query.GetBool(r, "search") {

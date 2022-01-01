@@ -1,7 +1,9 @@
 {{ define "message" }}
-  {{ if gt (len .Content) 0 }}
-    <p class="message padding center full no-margin {{ if eq .Level "success" }}success{{ else if eq .Level "error" }}danger{{ end }}">
-      {{ .Content }}
-    </p>
+  {{ if .Content }}
+    {{ if gt (len .Content) 0 }}
+      <p class="message padding center full no-margin {{ if eq .Level "success" }}success{{ else if eq .Level "error" }}danger{{ end }}">
+        {{ .Content }}
+      </p>
+    {{ end }}
   {{ end }}
 {{ end }}

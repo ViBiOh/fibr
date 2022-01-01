@@ -92,7 +92,7 @@ func (a App) TemplateFunc(w http.ResponseWriter, r *http.Request) (string, int, 
 		if errors.Is(err, model.ErrUnauthorized) {
 			w.Header().Add("WWW-Authenticate", `Basic realm="fibr" charset="UTF-8"`)
 		}
-		return "", 0, nil, err
+		return "", 0, map[string]interface{}{"Request": request}, err
 	}
 
 	switch r.Method {

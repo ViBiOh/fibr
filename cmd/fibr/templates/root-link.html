@@ -1,4 +1,4 @@
-{{ define "root_link" }}
+{{ define "root-link" }}
   {{ $rootURL := url "/" }}
   {{ if .Request.Share.ID }}
     {{ $rootURL = printf "%s%s/" $rootURL .Request.Share.ID }}

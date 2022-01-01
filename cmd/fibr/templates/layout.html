@@ -7,7 +7,7 @@
     <span class="flex-grow flex-ellipsis">
       <h1 class="medium no-margin no-padding" itemscope itemtype="http://schema.org/BreadcrumbList">
         <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
-          {{ template "root_link" . }}
+          {{ template "root-link" . }}
         </span>
 
         {{ range $index, $path := .Paths }}
