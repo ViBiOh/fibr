@@ -38,6 +38,10 @@
           width: 19rem;
         }
 
+        .map-throbber {
+          z-index: 500;
+        }
+
         .map-throbber .throbber-dot {
           height: 3.2rem;
           width: 3.2rem;
@@ -168,11 +172,15 @@
 
           // fit bounds of map
           if (bounds.length) {
+            map.on('zoomend', () => {
+              container.removeChild(throbber);
+            });
             map.fitBounds(bounds);
+          } else {
+            container.removeChild(throbber);
           }
-          map.addLayer(markers);
 
-          container.removeChild(throbber);
+          map.addLayer(markers);
         }
 
         document.addEventListener('readystatechange', async (event) => {
