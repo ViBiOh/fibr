@@ -11,11 +11,6 @@
       padding-top: 0.5rem;
       overflow: auto;
     }
-
-    #criterions {
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
   </style>
 
   {{ template "search-modal" . }}
@@ -39,17 +34,6 @@
 
       <span class="padding-left">
         {{ len .Files }} element{{ if gt (len .Files) 1 }}s{{ end }}
-      </span>
-
-      <span class="flex-grow"></span>
-
-      <span id="criterions" class="flex padding-right">
-        {{ range $key, $values := .Search }}
-          {{ $value := join $values }}
-          {{ if $value }}
-            <span class="padding-left">{{ $key }}={{ $value }}</span>
-          {{ end }}
-        {{ end }}
       </span>
 
       <span class="flex-grow"></span>
