@@ -18,10 +18,11 @@
         <a href="#" class="button white small">Close</a>
       </h2>
 
-      <div id="photos-map"></div>
+      <div id="map-container" class="flex flex-center"></div>
 
       <style type="text/css" nonce="{{ .nonce }}">
-        #photos-map {
+        #map-container {
+          background-color: var(--grey);
           color: var(--dark);
           height: 80vh;
           width: 90vw;
@@ -35,6 +36,11 @@
           bottom: 55px !important;
           height: 15rem;
           width: 19rem;
+        }
+
+        .map-throbber .throbber-dot {
+          height: 3.2rem;
+          width: 3.2rem;
         }
       </style>
 
@@ -107,12 +113,18 @@
             return;
           }
 
+          const container = document.getElementById('map-container');
+          const throbber = generateThrobber(['map-throbber', 'throbber-white']);
+          if (container) {
+            container.appendChild(throbber)
+          }
+
           await loadLeaflet();
 
           // create Leaflet map
-          map = L.map('photos-map', {
+          map = L.map('map-container', {
             center: [46.227638, 2.213749], // France 🇫🇷
-            zoom: 6,
+            zoom: 5,
           });
 
           // add the OpenStreetMap tiles
@@ -155,14 +167,12 @@
           });
 
           // fit bounds of map
-          map.fitBounds(bounds);
-          map.addLayer(markers);
-        }
-
-        function listenTarget(event) {
-          if (document.location.hash == '#map') {
-            renderMap();
+          if (bounds.length) {
+            map.fitBounds(bounds);
           }
+          map.addLayer(markers);
+
+          container.removeChild(throbber);
         }
 
         document.addEventListener('readystatechange', async (event) => {

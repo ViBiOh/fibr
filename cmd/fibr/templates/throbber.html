@@ -1,26 +1,4 @@
 {{ define "throbber" }}
-  <script type="text/javascript" nonce="{{ .nonce }}">
-    /**
-     * Generate a throbber.
-     * @return {Element}
-     */
-    function generateThrobber(className) {
-      const wrapper = document.createElement('div');
-      wrapper.classList.add('throbber');
-      if (className) {
-        wrapper.classList.add(className);
-      }
-
-      for (let i = 1; i < 4; i++) {
-        const dot = document.createElement('div');
-        dot.classList.add('throbber-dot', `throbber-dot-${i}`);
-        wrapper.appendChild(dot);
-      }
-
-      return wrapper;
-    }
-  </script>
-
   <style type="text/css" nonce="{{ .nonce }}">
     .throbber {
       margin: auto;
@@ -60,4 +38,24 @@
       }
     }
   </style>
+
+  <script type="text/javascript" nonce="{{ .nonce }}">
+    /**
+     * Generate a throbber.
+     * @return {Element}
+     */
+    function generateThrobber(classNames = []) {
+      const wrapper = document.createElement('div');
+      wrapper.classList.add('throbber');
+      classNames.forEach(className => wrapper.classList.add(className));
+
+      for (let i = 1; i < 4; i++) {
+        const dot = document.createElement('div');
+        dot.classList.add('throbber-dot', `throbber-dot-${i}`);
+        wrapper.appendChild(dot);
+      }
+
+      return wrapper;
+    }
+  </script>
 {{ end }}
