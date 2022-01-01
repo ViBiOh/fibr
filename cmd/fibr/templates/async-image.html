@@ -49,21 +49,6 @@
       picture.alt = 'Image file';
     }
 
-    /**
-     * Remove all child and append given one.
-     * @param {Element} element Element to clear
-     * @param {Element} newContent Element to put in place
-     */
-    function replaceContent(element, newContent) {
-      while (element.firstChild) {
-        element.removeChild(element.firstChild);
-      }
-
-      if (newContent) {
-        element.appendChild(newContent);
-      }
-    }
-
     // From https://developer.mozilla.org/en-US/docs/Web/API/ReadableStreamDefaultReader/read#example_2_-_handling_text_line_by_line
     async function* readLineByLine(response) {
       const utf8Decoder = new TextDecoder('utf-8');
