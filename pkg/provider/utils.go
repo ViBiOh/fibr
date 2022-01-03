@@ -9,7 +9,6 @@ import (
 	"io"
 	"net/http"
 	"path"
-	"path/filepath"
 	"regexp"
 	"strings"
 	"sync"
@@ -59,12 +58,17 @@ var (
 	errNotExists = errors.New("not exists")
 )
 
-// Join concatenates two string respecting slashes
-func Join(pathname, name string) string {
-	pathname = path.Join(pathname, name)
+// Join concatenates strings respecting terminal slashes
+func Join(parts ...string) string {
+	pathname := path.Join(parts...)
 
-	if strings.HasSuffix(name, "/") {
-		pathname += "/"
+	for i := len(parts) - 1; i >= 0; i-- {
+		if part := parts[i]; len(part) != 0 {
+			if strings.HasSuffix(part, "/") {
+				pathname += "/"
+			}
+			break
+		}
 	}
 
 	return pathname
@@ -80,34 +84,12 @@ func Dirname(name string) string {
 
 // GetPathname computes pathname for given params
 func GetPathname(folder, name string, share Share) string {
-	pathname := filepath.Join(buildPath(folder, name, share.Path)...)
-
-	if strings.HasSuffix(name, "/") {
-		return Dirname(pathname)
-	}
-
-	return pathname
+	return Join("/", share.Path, folder, name)
 }
 
-// URL computes public URI for given params
+// URL computes URL for given params
 func URL(folder, name string, share Share) string {
-	return path.Join(buildPath(folder, name, share.ID)...)
-}
-
-func buildPath(folder, name, share string) []string {
-	parts := []string{"/"}
-
-	if len(share) > 0 {
-		parts = append(parts, share)
-	}
-
-	parts = append(parts, folder)
-
-	if len(name) > 0 {
-		parts = append(parts, name)
-	}
-
-	return parts
+	return Join("/", share.ID, folder, name)
 }
 
 // SanitizeName return sanitized name (remove diacritics)

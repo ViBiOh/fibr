@@ -38,19 +38,6 @@ type Request struct {
 	CanWebhook  bool
 }
 
-// AbsoluteURL compute absolute URL for the given name
-func (r Request) AbsoluteURL(name string) string {
-	pathname := r.Path
-
-	if !r.Share.IsZero() {
-		pathname = fmt.Sprintf("/%s%s", r.Share.ID, pathname)
-	}
-
-	pathname = Join(pathname, name)
-
-	return pathname
-}
-
 // RelativeURL compute relative URL of item for that request
 func (r Request) RelativeURL(item StorageItem) string {
 	pathname := item.Pathname
@@ -66,6 +53,11 @@ func (r Request) RelativeURL(item StorageItem) string {
 	return strings.TrimPrefix(pathname, r.Path)
 }
 
+// AbsoluteURL compute absolute URL for the given name
+func (r Request) AbsoluteURL(name string) string {
+	return Join("/", r.Share.ID, r.Path, name)
+}
+
 // Filepath returns the pathname of the request
 func (r Request) Filepath() string {
 	return r.SubPath(r.Item)
@@ -73,19 +65,7 @@ func (r Request) Filepath() string {
 
 // SubPath returns the pathname of given name
 func (r Request) SubPath(name string) string {
-	pathname := r.Path
-
-	if !r.Share.IsZero() {
-		pathname = Join(r.Share.Path, pathname)
-	}
-
-	if len(name) == 0 {
-		return pathname
-	}
-
-	pathname = Join(pathname, name)
-
-	return pathname
+	return Join(r.Share.Path, r.Path, name)
 }
 
 // LayoutPath returns layout of given path based on preferences
