@@ -37,8 +37,6 @@ func (a App) getWithMessage(w http.ResponseWriter, r *http.Request, request prov
 		return "", 0, nil, nil
 	}
 
-	go a.notify(provider.NewAccessEvent(item, r))
-
 	if !item.IsDir {
 		return a.handleFile(w, r, request, item, message)
 	}
@@ -58,6 +56,9 @@ func (a App) handleFile(w http.ResponseWriter, r *http.Request, request provider
 
 	if query.GetBool(r, "browser") {
 		provider.SetPrefsCookie(w, request)
+
+		go a.notify(provider.NewAccessEvent(provider.StorageItem{}, r))
+
 		return a.Browser(w, request, item, message)
 	}
 
@@ -104,6 +105,8 @@ func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.
 		a.Download(w, r, request, items)
 		return errorReturn(request, err)
 	}
+
+	go a.notify(provider.NewAccessEvent(provider.StorageItem{}, r))
 
 	if query.GetBool(r, "search") {
 		return a.search(r, request, items)

@@ -59,6 +59,17 @@ var (
 	errNotExists = errors.New("not exists")
 )
 
+// Join concatenates two string respecting slashes
+func Join(pathname, name string) string {
+	pathname = path.Join(pathname, name)
+
+	if strings.HasSuffix(name, "/") {
+		pathname += "/"
+	}
+
+	return pathname
+}
+
 // Dirname ensures given name is a dirname, with a trailing slash
 func Dirname(name string) string {
 	if !strings.HasSuffix(name, "/") {

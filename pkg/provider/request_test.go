@@ -199,6 +199,34 @@ func TestFilepath(t *testing.T) {
 			},
 			"/shared/folder/root.html",
 		},
+		{
+			"root share",
+			Request{
+				Path: "/",
+				Share: Share{
+					ID:   "abcdef123456",
+					Path: "/shared/",
+				},
+			},
+			args{
+				name: "",
+			},
+			"/shared/",
+		},
+		{
+			"shared folder",
+			Request{
+				Path: "/",
+				Share: Share{
+					ID:   "abcdef123456",
+					Path: "/shared/",
+				},
+			},
+			args{
+				name: "www/",
+			},
+			"/shared/www/",
+		},
 	}
 
 	for _, tc := range cases {

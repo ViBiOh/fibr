@@ -3,7 +3,6 @@ package provider
 import (
 	"fmt"
 	"net/http"
-	"path"
 	"strings"
 )
 
@@ -47,11 +46,7 @@ func (r Request) AbsoluteURL(name string) string {
 		pathname = fmt.Sprintf("/%s%s", r.Share.ID, pathname)
 	}
 
-	pathname = path.Join(pathname, name)
-
-	if strings.HasSuffix(name, "/") {
-		pathname += "/"
-	}
+	pathname = Join(pathname, name)
 
 	return pathname
 }
@@ -81,18 +76,14 @@ func (r Request) SubPath(name string) string {
 	pathname := r.Path
 
 	if !r.Share.IsZero() {
-		pathname = fmt.Sprintf("/%s%s", r.Share.Path, pathname)
+		pathname = Join(r.Share.Path, pathname)
 	}
 
 	if len(name) == 0 {
 		return pathname
 	}
 
-	pathname = path.Join(pathname, name)
-
-	if strings.HasSuffix(name, "/") {
-		pathname += "/"
-	}
+	pathname = Join(pathname, name)
 
 	return pathname
 }
