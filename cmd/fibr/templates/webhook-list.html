@@ -1,5 +1,14 @@
 {{ define "webhook-list" }}
   <style type="text/css" nonce="{{ .nonce }}">
+    #webhook-list:target {
+      display: flex;
+      z-index: 5;
+    }
+
+    #webhook-list:target ~ .content {
+      pointer-events: none;
+    }
+
     #webhooks {
       border-spacing: 0;
       display: block;

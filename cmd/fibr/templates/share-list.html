@@ -1,5 +1,14 @@
 {{ define "share-list" }}
   <style type="text/css" nonce="{{ .nonce }}">
+    #share-list:target {
+      display: flex;
+      z-index: 5;
+    }
+
+    #share-list:target ~ .content {
+      pointer-events: none;
+    }
+
     #shares {
       border-spacing: 0;
       display: block;

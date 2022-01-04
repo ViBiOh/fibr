@@ -75,13 +75,7 @@
         #webhook-form-{{ .ID }}:target,
       {{ end }}
     {{ end }}
-    #upload-modal:target,
-    #upload-success:target,
-    #folder-modal:target,
-    #share-form:target,
-    #share-list:target,
-    #webhook-form:target,
-    #webhook-list:target {
+    #folder-modal:target {
       display: flex;
       z-index: 5;
     }
@@ -100,13 +94,7 @@
         #webhook-form-{{ .ID }}:target ~ .content,
       {{ end }}
     {{ end }}
-    #upload-modal:target ~ .content,
-    #upload-success:target ~ .content,
-    #folder-modal:target ~ .content,
-    #share-form:target ~ .content,
-    #share-list:target ~ .content,
-    #webhook-form:target ~ .content,
-    #webhook-list:target ~ .content {
+    #folder-modal:target ~ .content {
       pointer-events: none;
     }
 

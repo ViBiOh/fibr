@@ -1,4 +1,15 @@
 {{ define "share-directory" }}
+  <style type="text/css" nonce="{{ .nonce }}">
+    #share-form:target {
+      display: flex;
+      z-index: 5;
+    }
+
+    #share-form:target ~ .content {
+      pointer-events: none;
+    }
+  </style>
+
   <div id="share-form" class="modal">
     <div class="modal-content">
       <h2 class="header">Share this directory</h2>
