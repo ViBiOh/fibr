@@ -40,7 +40,7 @@ func (a App) getWithMessage(w http.ResponseWriter, r *http.Request, request prov
 	if !item.IsDir {
 		return a.handleFile(w, r, request, item, message)
 	}
-	return a.handleDir(w, r, request, message)
+	return a.handleDir(w, r, request, item, message)
 }
 
 func (a App) handleFile(w http.ResponseWriter, r *http.Request, request provider.Request, item provider.StorageItem, message renderer.Message) (string, int, map[string]interface{}, error) {
@@ -57,7 +57,7 @@ func (a App) handleFile(w http.ResponseWriter, r *http.Request, request provider
 	if query.GetBool(r, "browser") {
 		provider.SetPrefsCookie(w, request)
 
-		go a.notify(provider.NewAccessEvent(provider.StorageItem{}, r))
+		go a.notify(provider.NewAccessEvent(item, r))
 
 		return a.Browser(w, request, item, message)
 	}
@@ -81,7 +81,7 @@ func (a App) serveFile(w http.ResponseWriter, r *http.Request, item provider.Sto
 	return nil
 }
 
-func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.Request, message renderer.Message) (string, int, map[string]interface{}, error) {
+func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.Request, item provider.StorageItem, message renderer.Message) (string, int, map[string]interface{}, error) {
 	if query.GetBool(r, "stats") {
 		return a.Stats(w, request, message)
 	}
@@ -106,7 +106,7 @@ func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.
 		return errorReturn(request, err)
 	}
 
-	go a.notify(provider.NewAccessEvent(provider.StorageItem{}, r))
+	go a.notify(provider.NewAccessEvent(item, r))
 
 	if query.GetBool(r, "search") {
 		return a.search(r, request, items)
