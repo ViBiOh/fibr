@@ -4,18 +4,16 @@ import (
 	"context"
 	"fmt"
 	"net/url"
+	"path"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 )
-
-type discordPayload struct {
-	Content string `json:"content"`
-}
 
 type slackPayload struct {
 	Text string `json:"text"`
@@ -81,8 +79,40 @@ func (a *App) rawHandle(ctx context.Context, webhook provider.Webhook, event pro
 }
 
 func (a *App) discordHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
+	if event.Type != provider.UploadEvent {
+		return send(ctx, webhook.ID, request.Post(webhook.URL), discordPayload{
+			Content: a.eventText(event),
+		})
+	}
+
+	url := event.GetURL()
+	title := path.Base(path.Dir(event.Item.Pathname))
+	if title == "/" {
+		title = "fibr"
+	}
+
+	embed := discordEmbed{
+		Title:       title,
+		Type:        "rich",
+		Description: "💾 A file has been uploaded",
+		URL:         url + "?browser",
+		Fields: []discordField{{
+			Name:   "item",
+			Value:  event.Item.Name,
+			Inline: true,
+		}},
+	}
+
+	if a.thumbnailApp.CanHaveThumbnail(event.Item) {
+		embed.Thumbnail = &discordContent{
+			URL:    url + "?thumbnail",
+			Width:  thumbnail.Width,
+			Height: thumbnail.Height,
+		}
+	}
+
 	return send(ctx, webhook.ID, request.Post(webhook.URL), discordPayload{
-		Content: a.eventText(event),
+		Embeds: []discordEmbed{embed},
 	})
 }
 
@@ -101,13 +131,13 @@ func (a *App) eventText(event provider.Event) string {
 	case provider.AccessEvent:
 		return a.accessEvent(event)
 	case provider.CreateDir:
-		return fmt.Sprintf("🗂 A directory `%s` has been created: %s?browser", event.Item.Name, event.URL)
+		return fmt.Sprintf("🗂 A directory `%s` has been created: %s", event.Item.Name, event.GetURL())
 	case provider.UploadEvent:
 		return fmt.Sprintf("💾 A file has been uploaded: %s?browser", event.GetURL())
 	case provider.RenameEvent:
 		return fmt.Sprintf("➡️ `%s` has been renamed to `%s`", event.Item.Pathname, event.New.Pathname)
 	case provider.DeleteEvent:
-		return fmt.Sprintf("❌ `%s` has been deleted : %s?browser", event.Item.Name, event.URL)
+		return fmt.Sprintf("❌ `%s` has been deleted : %s", event.Item.Name, event.GetURL())
 	case provider.StartEvent:
 		return fmt.Sprintf("🚀 Fibr starts routine for path `%s`", event.Item.Pathname)
 	default:
