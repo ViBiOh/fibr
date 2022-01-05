@@ -91,6 +91,15 @@ type Event struct {
 	Type         EventType         `json:"type"`
 }
 
+// GetURL returns the appropriate URL for the event
+func (e Event) GetURL() string {
+	if len(e.ShareableURL) > 0 {
+		return e.ShareableURL
+	}
+
+	return e.URL
+}
+
 // NewUploadEvent creates a new upload event
 func NewUploadEvent(request Request, item StorageItem, shareableURL string, rendererApp renderer.App) Event {
 	return Event{

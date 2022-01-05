@@ -58,8 +58,8 @@ func (a App) saveUploadedFile(request provider.Request, part *multipart.Part) (f
 	}
 
 	go func() {
-		// Waiting one second for filesystem cache refresh (S3 notably)
-		time.Sleep(time.Second)
+		// Waiting two seconds for filesystem cache refresh (S3 notably) and thumbnail generation
+		time.Sleep(time.Second * 2)
 
 		if info, infoErr := a.storageApp.Info(filePath); infoErr != nil {
 			logger.Error("unable to get info for upload event: %s", infoErr)

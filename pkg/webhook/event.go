@@ -14,7 +14,29 @@ import (
 )
 
 type discordPayload struct {
-	Content string `json:"content"`
+	Content string         `json:"content"`
+	Embeds  []discordEmbed `json:"embeds,omitempty"`
+}
+
+type discordEmbed struct {
+	Title       string          `json:"tile"`
+	Description string          `json:"description"`
+	URL         string          `json:"url"`
+	Thumbnail   *discordContent `json:"thumbnail,omitempty"`
+	Video       *discordContent `json:"video,omitempty"`
+	Fields      []discordField  `json:"fields,omitempty"`
+}
+
+type discordContent struct {
+	URL    string `json:"url"`
+	Height int64  `json:"height"`
+	Width  int64  `json:"width"`
+}
+
+type discordField struct {
+	Name   string `json:"name"`
+	Value  string `json:"value"`
+	Inline bool   `json:"inline,omitempty"`
 }
 
 type slackPayload struct {
@@ -73,9 +95,43 @@ func (a *App) rawHandle(ctx context.Context, webhook provider.Webhook, event pro
 }
 
 func (a *App) discordHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
-	return send(ctx, webhook.ID, request.Post(webhook.URL), discordPayload{
-		Content: a.eventText(event),
-	})
+	var payload discordPayload
+
+	switch event.Type {
+	case provider.UploadEvent:
+		url := event.GetURL()
+
+		embed := discordEmbed{
+			Title:       "fibr",
+			Description: "💾 A file has been uploaded",
+			URL:         url + "?browser",
+			Fields: []discordField{{
+				Name:   "name",
+				Value:  event.Item.Name,
+				Inline: true,
+			}},
+		}
+
+		if a.thumbnailApp.HasThumbnail(event.Item) {
+			embed.Thumbnail = &discordContent{
+				URL:    url + "?thumbnail",
+				Height: embed.Thumbnail.Height,
+				Width:  embed.Thumbnail.Width,
+			}
+		}
+
+		if event.Item.IsVideo() {
+			embed.Video = &discordContent{
+				URL: url,
+			}
+		}
+
+		payload.Embeds = append(payload.Embeds, embed)
+	default:
+		payload.Content = a.eventText(event)
+	}
+
+	return send(ctx, webhook.ID, request.Post(webhook.URL), payload)
 }
 
 func (a *App) slackHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
@@ -95,12 +151,7 @@ func (a *App) eventText(event provider.Event) string {
 	case provider.CreateDir:
 		return fmt.Sprintf("🗂 A directory `%s` has been created: %s?browser", event.Item.Name, event.URL)
 	case provider.UploadEvent:
-		url := event.URL
-		if len(event.ShareableURL) != 0 {
-			url = event.ShareableURL
-		}
-
-		return fmt.Sprintf("💾 A file has been uploaded: %s?browser", url)
+		return fmt.Sprintf("💾 A file has been uploaded: %s?browser", event.GetURL())
 	case provider.RenameEvent:
 		return fmt.Sprintf("➡️ `%s` has been renamed to `%s`", event.Item.Pathname, event.New.Pathname)
 	case provider.DeleteEvent:

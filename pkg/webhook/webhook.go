@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v4/pkg/amqp"
 	"github.com/ViBiOh/httputils/v4/pkg/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
@@ -25,17 +26,19 @@ var (
 
 // App of package
 type App struct {
-	storageApp  provider.Storage
-	rendererApp renderer.App
-	webhooks    map[string]provider.Webhook
-	counter     *prometheus.CounterVec
+	storageApp provider.Storage
+	webhooks   map[string]provider.Webhook
+	counter    *prometheus.CounterVec
 
 	amqpClient              *amqp.Client
 	amqpExchange            string
-	amqpRoutingKey          string
 	amqpExclusiveRoutingKey string
+	amqpRoutingKey          string
 
 	hmacSecret []byte
+
+	rendererApp  renderer.App
+	thumbnailApp thumbnail.App
 
 	sync.RWMutex
 }
@@ -61,7 +64,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 }
 
 // New creates new App from Config
-func New(config Config, storageApp provider.Storage, prometheusRegisterer prometheus.Registerer, amqpClient *amqp.Client, rendererApp renderer.App) (*App, error) {
+func New(config Config, storageApp provider.Storage, prometheusRegisterer prometheus.Registerer, amqpClient *amqp.Client, rendererApp renderer.App, thumbnailApp thumbnail.App) (*App, error) {
 	var amqpExchange string
 	var amqpExclusiveRoutingKey string
 
@@ -80,11 +83,12 @@ func New(config Config, storageApp provider.Storage, prometheusRegisterer promet
 	}
 
 	return &App{
-		storageApp:  storageApp,
-		rendererApp: rendererApp,
-		webhooks:    make(map[string]provider.Webhook),
-		counter:     prom.CounterVec(prometheusRegisterer, "fibr", "webhook", "item", "code"),
-		hmacSecret:  []byte(*config.hmacSecret),
+		storageApp:   storageApp,
+		rendererApp:  rendererApp,
+		thumbnailApp: thumbnailApp,
+		webhooks:     make(map[string]provider.Webhook),
+		counter:      prom.CounterVec(prometheusRegisterer, "fibr", "webhook", "item", "code"),
+		hmacSecret:   []byte(*config.hmacSecret),
 
 		amqpClient:              amqpClient,
 		amqpExchange:            amqpExchange,

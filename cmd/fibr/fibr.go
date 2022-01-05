@@ -140,7 +140,7 @@ func main() {
 	exifApp, err := exif.New(exifConfig, storageProvider, prometheusRegisterer, amqpClient)
 	logger.Fatal(err)
 
-	webhookApp, err := webhook.New(webhookConfig, storageProvider, prometheusRegisterer, amqpClient, rendererApp)
+	webhookApp, err := webhook.New(webhookConfig, storageProvider, prometheusRegisterer, amqpClient, rendererApp, thumbnailApp)
 	logger.Fatal(err)
 
 	shareApp, err := share.New(shareConfig, storageProvider, amqpClient)
