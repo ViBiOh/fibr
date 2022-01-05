@@ -1,7 +1,7 @@
 {{ define "async-image-item" }}
   <picture id="picture-{{ .ID }}" class="no-margin" data-thumbnail data-alt="Thumbnail of {{ .URL }}" data-icon="{{ iconFromExtension . }}">
     <noscript>
-      <img class="thumbnail full" src="{{ .URL }}?thumbnail" alt="Thumbnail of {{ .URL }}" />
+      <img class="thumbnail full" src="{{ .URL }}?thumbnail" alt="Thumbnail of {{ .URL }}" loading="lazy" />
     </noscript>
   </picture>
 {{ end }}

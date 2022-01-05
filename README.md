@@ -252,6 +252,8 @@ Usage of fibr:
         [auth] Users profiles in the form 'id:profile1|profile2,id2:profile1' {FIBR_AUTH_PROFILES}
   -authUsers string
         [auth] Users credentials in the form 'id:login:password,id2:login2:password2' {FIBR_AUTH_USERS}
+  -bcryptDuration string
+        [crud] Wanted bcrypt duration for calculating effective cost {FIBR_BCRYPT_DURATION} (default "0.25s")
   -cert string
         [server] Certificate file {FIBR_CERT}
   -csp string

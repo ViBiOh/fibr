@@ -57,6 +57,7 @@ type App struct {
 type Config struct {
 	ignore                  *string
 	amqpExclusiveRoutingKey *string
+	bcryptDuration          *string
 	sanitizeOnStart         *bool
 }
 
@@ -65,6 +66,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
 		ignore:          flags.New(prefix, "crud", "IgnorePattern").Default("", nil).Label("Ignore pattern when listing files or directory").ToString(fs),
 		sanitizeOnStart: flags.New(prefix, "crud", "SanitizeOnStart").Default(false, nil).Label("Sanitize name on start").ToBool(fs),
+		bcryptDuration:  flags.New(prefix, "crud", "BcryptDuration").Default("0.25s", nil).Label("Wanted bcrypt duration for calculating effective cost").ToString(fs),
 
 		amqpExclusiveRoutingKey: flags.New(prefix, "crud", "AmqpExclusiveRoutingKey").Default("fibr.semaphore.start", nil).Label("AMQP Routing Key for exclusive lock on default exchange").ToString(fs),
 	}
@@ -118,7 +120,12 @@ func New(config Config, storage provider.Storage, rendererApp renderer.App, shar
 		return false
 	})
 
-	bcryptCost, err := findBcryptBestCost(time.Second / 4)
+	bcryptDuration, err := time.ParseDuration(strings.TrimSpace(*config.bcryptDuration))
+	if err != nil {
+		return app, fmt.Errorf("unable to parse bcrypt duration: %s", err)
+	}
+
+	bcryptCost, err := findBcryptBestCost(bcryptDuration)
 	if err != nil {
 		logger.Error("unable to find best bcrypt cost: %s", err)
 		bcryptCost = bcrypt.DefaultCost
