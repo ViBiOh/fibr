@@ -161,6 +161,11 @@ func (a App) Serve(w http.ResponseWriter, r *http.Request, item provider.Storage
 
 // List return all thumbnail in a base64 form
 func (a App) List(w http.ResponseWriter, r *http.Request, items []provider.StorageItem) {
+	if len(items) == 0 {
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
+
 	w.Header().Add("Content-Type", "text/plain; charset=utf-8")
 	w.Header().Add("Cache-Control", "no-cache")
 	w.WriteHeader(http.StatusOK)

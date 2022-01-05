@@ -113,7 +113,7 @@ func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.
 	}
 
 	provider.SetPrefsCookie(w, request)
-	return a.List(request, message, items)
+	return a.List(request, message, item, items)
 }
 
 func (a App) listFiles(r *http.Request, request provider.Request) ([]provider.StorageItem, error) {
@@ -124,7 +124,12 @@ func (a App) listFiles(r *http.Request, request provider.Request) ([]provider.St
 	return a.storageApp.List(request.Filepath())
 }
 
-func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provider.Request, files []provider.StorageItem) {
+func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provider.Request, items []provider.StorageItem) {
+	if len(items) == 0 {
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
+
 	w.Header().Add("Content-Type", "application/json; charset=utf-8")
 	w.Header().Add("Cache-Control", "no-cache")
 	w.WriteHeader(http.StatusOK)
@@ -144,7 +149,7 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 
 	provider.SafeWrite(w, `{"type":"FeatureCollection","features":[`)
 
-	for _, item := range files {
+	for _, item := range items {
 		if isDone() {
 			return
 		}

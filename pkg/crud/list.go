@@ -38,7 +38,7 @@ func (a App) getCover(files []provider.StorageItem) map[string]interface{} {
 }
 
 // List render directory web view of given dirPath
-func (a App) List(request provider.Request, message renderer.Message, files []provider.StorageItem) (string, int, map[string]interface{}, error) {
+func (a App) List(request provider.Request, message renderer.Message, item provider.StorageItem, files []provider.StorageItem) (string, int, map[string]interface{}, error) {
 	items := make([]provider.RenderItem, len(files))
 	wg := concurrent.NewLimited(4)
 
@@ -59,10 +59,7 @@ func (a App) List(request provider.Request, message renderer.Message, files []pr
 
 	var hasMap bool
 	wg.Go(func() {
-		if aggregate, err := a.exifApp.GetAggregateFor(provider.StorageItem{
-			IsDir:    true,
-			Pathname: request.Filepath(),
-		}); err != nil {
+		if aggregate, err := a.exifApp.GetAggregateFor(item); err != nil {
 			logger.WithField("fn", "crud.List").WithField("item", request.Path).Error("unable to get aggregate: %s", err)
 		} else if len(aggregate.Location) != 0 {
 			hasMap = true
