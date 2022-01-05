@@ -14,29 +14,7 @@ import (
 )
 
 type discordPayload struct {
-	Content string         `json:"content"`
-	Embeds  []discordEmbed `json:"embeds,omitempty"`
-}
-
-type discordEmbed struct {
-	Title       string          `json:"tile"`
-	Description string          `json:"description"`
-	URL         string          `json:"url"`
-	Thumbnail   *discordContent `json:"thumbnail,omitempty"`
-	Video       *discordContent `json:"video,omitempty"`
-	Fields      []discordField  `json:"fields,omitempty"`
-}
-
-type discordContent struct {
-	URL    string `json:"url"`
-	Height int64  `json:"height"`
-	Width  int64  `json:"width"`
-}
-
-type discordField struct {
-	Name   string `json:"name"`
-	Value  string `json:"value"`
-	Inline bool   `json:"inline,omitempty"`
+	Content string `json:"content"`
 }
 
 type slackPayload struct {
@@ -75,6 +53,14 @@ func (a *App) EventConsumer(event provider.Event) {
 			logger.Error("error while sending webhook: %s", err)
 		}
 	}
+
+	go func() {
+		if event.Type == provider.DeleteEvent {
+			if err := a.deleteItem(event.Item); err != nil {
+				logger.Error("unable to delete webhooks for item: %s", err)
+			}
+		}
+	}()
 }
 
 func send(ctx context.Context, id string, req request.Request, payload interface{}) (int, error) {
@@ -95,43 +81,9 @@ func (a *App) rawHandle(ctx context.Context, webhook provider.Webhook, event pro
 }
 
 func (a *App) discordHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
-	var payload discordPayload
-
-	switch event.Type {
-	case provider.UploadEvent:
-		url := event.GetURL()
-
-		embed := discordEmbed{
-			Title:       "fibr",
-			Description: "💾 A file has been uploaded",
-			URL:         url + "?browser",
-			Fields: []discordField{{
-				Name:   "name",
-				Value:  event.Item.Name,
-				Inline: true,
-			}},
-		}
-
-		if a.thumbnailApp.HasThumbnail(event.Item) {
-			embed.Thumbnail = &discordContent{
-				URL:    url + "?thumbnail",
-				Height: embed.Thumbnail.Height,
-				Width:  embed.Thumbnail.Width,
-			}
-		}
-
-		if event.Item.IsVideo() {
-			embed.Video = &discordContent{
-				URL: url,
-			}
-		}
-
-		payload.Embeds = append(payload.Embeds, embed)
-	default:
-		payload.Content = a.eventText(event)
-	}
-
-	return send(ctx, webhook.ID, request.Post(webhook.URL), payload)
+	return send(ctx, webhook.ID, request.Post(webhook.URL), discordPayload{
+		Content: a.eventText(event),
+	})
 }
 
 func (a *App) slackHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
@@ -178,4 +130,18 @@ func (a *App) accessEvent(event provider.Event) string {
 	}
 
 	return content.String()
+}
+
+func (a *App) deleteItem(item provider.StorageItem) error {
+	return a.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
+		for id, webhook := range a.webhooks {
+			if webhook.Pathname == item.Pathname {
+				if err := a.delete(id); err != nil {
+					return fmt.Errorf("unable to delete webhook `%s`: %s", id, err)
+				}
+			}
+		}
+
+		return nil
+	})
 }

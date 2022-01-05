@@ -85,20 +85,24 @@ func (a *App) Create(filepath string, edit bool, password string, isDir bool, du
 // Delete a share
 func (a *App) Delete(id string) error {
 	_, err := a.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
-		delete(a.shares, id)
-
-		if err := provider.SaveJSON(a.storageApp, shareFilename, a.shares); err != nil {
-			return fmt.Errorf("unable to save shares: %s", err)
-		}
-
-		if a.amqpClient != nil {
-			if err := a.amqpClient.PublishJSON(provider.Share{ID: id}, a.amqpExchange, a.amqpRoutingKey); err != nil {
-				return fmt.Errorf("unable to publish share deletion: %s", err)
-			}
-		}
-
-		return nil
+		return a.delete(id)
 	})
 
 	return err
+}
+
+func (a *App) delete(id string) error {
+	delete(a.shares, id)
+
+	if err := provider.SaveJSON(a.storageApp, shareFilename, a.shares); err != nil {
+		return fmt.Errorf("unable to save shares: %s", err)
+	}
+
+	if a.amqpClient != nil {
+		if err := a.amqpClient.PublishJSON(provider.Share{ID: id}, a.amqpExchange, a.amqpRoutingKey); err != nil {
+			return fmt.Errorf("unable to publish share deletion: %s", err)
+		}
+	}
+
+	return nil
 }

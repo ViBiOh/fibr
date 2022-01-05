@@ -48,17 +48,13 @@ func (a *App) deleteItem(item provider.StorageItem) error {
 	_, err := a.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
 		for id, share := range a.shares {
 			if strings.HasPrefix(share.Path, item.Pathname) {
-				delete(a.shares, id)
-
-				if a.amqpClient != nil {
-					if err := a.amqpClient.PublishJSON(provider.Share{ID: id}, a.amqpExchange, a.amqpRoutingKey); err != nil {
-						return fmt.Errorf("unable to publish share deletion: %s", err)
-					}
+				if err := a.delete(id); err != nil {
+					return fmt.Errorf("unable to delete share `%s`: %s", id, err)
 				}
 			}
 		}
 
-		return provider.SaveJSON(a.storageApp, shareFilename, a.shares)
+		return nil
 	})
 
 	return err

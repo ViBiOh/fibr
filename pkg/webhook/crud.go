@@ -78,18 +78,22 @@ func (a *App) Create(pathname string, recursive bool, kind provider.WebhookKind,
 // Delete a webhook
 func (a *App) Delete(id string) error {
 	return a.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
-		delete(a.webhooks, id)
-
-		if err := provider.SaveJSON(a.storageApp, webhookFilename, a.webhooks); err != nil {
-			return fmt.Errorf("unable to save webhooks: %s", err)
-		}
-
-		if a.amqpClient != nil {
-			if err := a.amqpClient.PublishJSON(provider.Webhook{ID: id}, a.amqpExchange, a.amqpRoutingKey); err != nil {
-				return fmt.Errorf("unable to publish webhook deletion: %s", err)
-			}
-		}
-
-		return nil
+		return a.delete(id)
 	})
+}
+
+func (a *App) delete(id string) error {
+	delete(a.webhooks, id)
+
+	if err := provider.SaveJSON(a.storageApp, webhookFilename, a.webhooks); err != nil {
+		return fmt.Errorf("unable to save webhooks: %s", err)
+	}
+
+	if a.amqpClient != nil {
+		if err := a.amqpClient.PublishJSON(provider.Webhook{ID: id}, a.amqpExchange, a.amqpRoutingKey); err != nil {
+			return fmt.Errorf("unable to publish webhook deletion: %s", err)
+		}
+	}
+
+	return nil
 }

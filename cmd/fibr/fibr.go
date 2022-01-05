@@ -172,7 +172,7 @@ func main() {
 	go webhookApp.Start(healthApp.Done())
 	go shareApp.Start(healthApp.Done())
 	go crudApp.Start(healthApp.Done())
-	go eventBus.Start(healthApp.Done(), shareApp.EventConsumer, thumbnailApp.EventConsumer, webhookApp.EventConsumer, exifApp.EventConsumer)
+	go eventBus.Start(healthApp.Done(), shareApp.EventConsumer, thumbnailApp.EventConsumer, exifApp.EventConsumer, webhookApp.EventConsumer)
 
 	go promServer.Start("prometheus", healthApp.End(), prometheusApp.Handler())
 	go appServer.Start("http", healthApp.End(), httputils.Handler(handler, healthApp, recoverer.Middleware, prometheusApp.Middleware, owasp.New(owaspConfig).Middleware))
