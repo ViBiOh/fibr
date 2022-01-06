@@ -15,10 +15,6 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 )
 
-type slackPayload struct {
-	Text string `json:"text"`
-}
-
 // EventConsumer handle event pushed to the event bus
 func (a *App) EventConsumer(event provider.Event) {
 	a.RLock()
@@ -117,8 +113,41 @@ func (a *App) discordHandle(ctx context.Context, webhook provider.Webhook, event
 }
 
 func (a *App) slackHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
+	if event.Type != provider.UploadEvent {
+		return send(ctx, webhook.ID, request.Post(webhook.URL), slackPayload{
+			Text: a.eventText(event),
+		})
+	}
+
+	url := event.GetURL()
+	title := path.Base(path.Dir(event.Item.Pathname))
+	if title == "/" {
+		title = "fibr"
+	}
+
+	section := slackSection{
+		Type:   "section",
+		Text:   newText("💾 A file has been uploaded"),
+		Fields: []slackText{newText(fmt.Sprintf("*item*\n%s", event.Item.Name))},
+	}
+
+	if a.thumbnailApp.CanHaveThumbnail(event.Item) {
+		section.Accessory = &slackImage{
+			Type: "image",
+			URL:  url + "?thumbnail",
+			Alt:  fmt.Sprintf("Thumbnail of %s", event.Item.Name),
+		}
+	}
+
 	return send(ctx, webhook.ID, request.Post(webhook.URL), slackPayload{
 		Text: a.eventText(event),
+		Blocks: []slackSection{
+			{
+				Type: "section",
+				Text: newText(fmt.Sprintf("*<%s?browser|%s>*", url, title)),
+			},
+			section,
+		},
 	})
 }
 
