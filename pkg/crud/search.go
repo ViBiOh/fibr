@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/url"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -130,6 +131,8 @@ func (a App) searchFiles(r *http.Request, request provider.Request) (items []pro
 
 		return nil
 	})
+
+	sort.Sort(provider.ByHybridSort(items))
 
 	return
 }
