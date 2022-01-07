@@ -50,7 +50,7 @@
   {{ template "search-modal" . }}
 
   {{ template "items-style" . }}
-  {{ if eq .Request.Display "grid" }}
+  {{ if and (eq .Request.Display "grid") .HasThumbnail }}
     {{ template "async-image" . }}
   {{ end }}
 
