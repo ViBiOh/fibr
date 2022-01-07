@@ -71,7 +71,7 @@ func (r Request) SubPath(name string) string {
 // LayoutPath returns layout of given path based on preferences
 func (r Request) LayoutPath(path string) string {
 	if FindIndex(r.Preferences.ListLayoutPath, path) != -1 {
-		return "list"
+		return ListDisplay
 	}
 	return DefaultDisplay
 }
@@ -79,26 +79,7 @@ func (r Request) LayoutPath(path string) string {
 // Title returns title of the page
 func (r Request) Title() string {
 	parts := []string{"fibr"}
-
-	if !r.Share.IsZero() {
-		parts = append(parts, r.Share.RootName)
-	}
-
-	if len(r.Path) > 0 {
-		requestPath := strings.Trim(r.Path, "/")
-
-		if requestPath != "" {
-			parts = append(parts, requestPath)
-		}
-	}
-
-	if len(r.Item) > 0 {
-		itemPath := strings.Trim(r.Item, "/")
-
-		if itemPath != "" {
-			parts = append(parts, itemPath)
-		}
-	}
+	parts = append(parts, r.contentParts()...)
 
 	return strings.Join(parts, " - ")
 }
@@ -106,6 +87,13 @@ func (r Request) Title() string {
 // Description returns description of the page
 func (r Request) Description() string {
 	parts := []string{"FIle BRowser"}
+	parts = append(parts, r.contentParts()...)
+
+	return strings.Join(parts, " - ")
+}
+
+func (r Request) contentParts() []string {
+	var parts []string
 
 	if !r.Share.IsZero() {
 		parts = append(parts, r.Share.RootName)
@@ -127,7 +115,7 @@ func (r Request) Description() string {
 		}
 	}
 
-	return strings.Join(parts, " - ")
+	return parts
 }
 
 func computeListLayoutPaths(request Request) string {
@@ -135,7 +123,7 @@ func computeListLayoutPaths(request Request) string {
 	path := request.Path
 
 	switch request.Display {
-	case "list":
+	case ListDisplay:
 		if index := FindIndex(listLayoutPaths, path); index == -1 {
 			listLayoutPaths = append(listLayoutPaths, path)
 		}

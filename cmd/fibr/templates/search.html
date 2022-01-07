@@ -11,6 +11,42 @@
       padding-top: 0.5rem;
       overflow: auto;
     }
+
+    {{ if eq .Request.Display "list" }}
+      .file-download {
+        display: none;
+      }
+
+      .file:hover .file-download {
+        display: inline-block;
+      }
+
+      .file-download .icon {
+        margin: 0;
+      }
+
+      @media screen and (max-width: 640px) {
+        .file-download {
+          display: inline-block;
+        }
+      }
+    {{ else }}
+      .file-download {
+        background-color: var(--dark);
+        display: none;
+        padding: 0.5rem;
+        position: absolute;
+      }
+
+      .file-download {
+        left: 0.5rem;
+        top: 0.5rem;
+      }
+
+      #files > *:hover .file-download {
+        display: block;
+      }
+    {{ end }}
   </style>
 
   {{ template "search-modal" . }}
@@ -62,13 +98,13 @@
                 <img class="icon icon-overlay" src="{{ url "/svg/play?fill=rgba(192,192,192,0.8)" }}" alt="Play video">
               {{ end }}
             {{ else }}
-              {{ if .IsDir }}
-                <img class="icon {{ if eq $root.Request.Display "grid" }}icon-large{{ end }}" src="{{ url "/svg/folder?fill=silver" }}" alt="Folder">
-              {{ else }}
-                <img class="icon {{ if eq $root.Request.Display "grid" }}icon-large{{ end }}" src="{{ url "/svg/" }}{{ iconFromExtension . }}?fill=silver" alt="File">
-              {{ end }}
+              <img class="icon {{ if eq $root.Request.Display "grid" }}icon-large{{ end }}" src="{{ url "/svg/" }}{{ if .IsDir }}folder{{ else }}{{ iconFromExtension . }}{{ end }}?fill=silver" alt="{{ if .IsDir }}Folder{{ else }}File{{ end }}">
               <span class="filename ellipsis {{ if eq $root.Request.Display "list" }}padding-left{{ end }}">{{ .URL }}</span>
             {{ end }}
+
+            <a href="{{ .URL }}?download" class="button button-icon file-download" alt="Download" download="{{ .Name }}">
+              <img class="icon" src="{{ url "/svg/download?fill=silver" }}" alt="Download">
+            </a>
           </a>
         </li>
       {{ end }}

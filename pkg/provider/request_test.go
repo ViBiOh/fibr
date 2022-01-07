@@ -255,7 +255,7 @@ func TestLayoutPath(t *testing.T) {
 			args{
 				path: "/reports",
 			},
-			"grid",
+			GridDisplay,
 		},
 		{
 			"empty list",
@@ -267,7 +267,7 @@ func TestLayoutPath(t *testing.T) {
 			args{
 				path: "/reports",
 			},
-			"list",
+			ListDisplay,
 		},
 	}
 
