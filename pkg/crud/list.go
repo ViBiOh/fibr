@@ -42,18 +42,12 @@ func (a App) List(request provider.Request, message renderer.Message, item provi
 	items := make([]provider.RenderItem, len(files))
 	wg := concurrent.NewLimited(4)
 
-	var hasThumbnail bool
-
 	for index, item := range files {
 		func(item provider.StorageItem, index int) {
 			wg.Go(func() {
 				aggregate, err := a.exifApp.GetAggregateFor(item)
 				if err != nil {
 					logger.WithField("fn", "crud.List").WithField("item", item.Pathname).Error("unable to read: %s", err)
-				}
-
-				if !hasThumbnail && request.Display == provider.GridDisplay {
-					hasThumbnail = a.thumbnailApp.HasThumbnail(item)
 				}
 
 				render := provider.StorageToRender(item, request)
@@ -75,13 +69,12 @@ func (a App) List(request provider.Request, message renderer.Message, item provi
 	wg.Wait()
 
 	content := map[string]interface{}{
-		"Paths":        getPathParts(request),
-		"Files":        items,
-		"Cover":        a.getCover(files),
-		"Request":      request,
-		"Message":      message,
-		"HasMap":       hasMap,
-		"HasThumbnail": hasThumbnail,
+		"Paths":   getPathParts(request),
+		"Files":   items,
+		"Cover":   a.getCover(files),
+		"Request": request,
+		"Message": message,
+		"HasMap":  hasMap,
 	}
 
 	if request.CanShare {

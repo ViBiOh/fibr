@@ -43,15 +43,11 @@
     {{ end }}
   {{ end }}
 
+  {{ template "search-modal" . }}
+  {{ template "items-style" . }}
+
   {{ if .HasMap }}
     {{ template "map-modal" . }}
-  {{ end }}
-
-  {{ template "search-modal" . }}
-
-  {{ template "items-style" . }}
-  {{ if and (eq .Request.Display "grid") .HasThumbnail }}
-    {{ template "async-image" . }}
   {{ end }}
 
   <style type="text/css" nonce="{{ .nonce }}">
@@ -220,11 +216,17 @@
       {{ end }}
     </div>
 
+    {{ $hasThumbnail := false }}
+
     <ul id="files" class="no-margin no-padding">
       {{ range .Files }}
         <li class="tile relative {{ if or (ne $root.Request.Display "grid") (not (hasThumbnail .)) }}file{{ end }}">
           <a class="filelink center ellipsis" href="{{ .URL }}{{ if .IsDir }}?d={{ $root.Request.LayoutPath ($root.Request.AbsoluteURL .URL) }}{{ else }}?browser{{ end }}" title="{{ .Name }}">
             {{ if and (eq $root.Request.Display "grid") (hasThumbnail .) }}
+              {{ if not $hasThumbnail }}
+                {{ $hasThumbnail = true }}
+              {{ end }}
+
               {{ template "async-image-item" . }}
 
               {{ if .IsVideo }}
@@ -306,6 +308,10 @@
             {{ end }}
           {{ end }}
         </li>
+      {{ end }}
+
+      {{ if $hasThumbnail }}
+        {{ template "async-image" . }}
       {{ end }}
     </ul>
   </div>

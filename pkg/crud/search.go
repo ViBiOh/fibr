@@ -140,7 +140,6 @@ func (a App) searchFiles(r *http.Request, request provider.Request) (items []pro
 func (a App) search(r *http.Request, request provider.Request, files []provider.StorageItem) (string, int, map[string]interface{}, error) {
 	items := make([]provider.RenderItem, len(files))
 	var hasMap bool
-	var hasThumbnail bool
 
 	for i, item := range files {
 		items[i] = provider.StorageToRender(item, request)
@@ -151,18 +150,14 @@ func (a App) search(r *http.Request, request provider.Request, files []provider.
 			}
 		}
 
-		if !hasThumbnail && request.Display == provider.GridDisplay {
-			hasThumbnail = a.thumbnailApp.HasThumbnail(item)
-		}
 	}
 
 	return "search", http.StatusOK, map[string]interface{}{
-		"Paths":        getPathParts(request),
-		"Files":        items,
-		"Search":       r.URL.Query(),
-		"Request":      request,
-		"HasMap":       hasMap,
-		"HasThumbnail": hasThumbnail,
+		"Paths":   getPathParts(request),
+		"Files":   items,
+		"Search":  r.URL.Query(),
+		"Request": request,
+		"HasMap":  hasMap,
 	}, nil
 }
 
