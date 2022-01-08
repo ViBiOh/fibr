@@ -107,6 +107,12 @@ func (a *App) discordHandle(ctx context.Context, webhook provider.Webhook, event
 		}
 	}
 
+	if event.Item.IsVideo() {
+		embed.Video = &discordContent{
+			URL: url,
+		}
+	}
+
 	return send(ctx, webhook.ID, request.Post(webhook.URL), discordPayload{
 		Embeds: []discordEmbed{embed},
 	})

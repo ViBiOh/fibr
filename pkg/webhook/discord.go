@@ -11,6 +11,7 @@ type discordEmbed struct {
 	Description string          `json:"description,omitempty"`
 	URL         string          `json:"url,omitempty"`
 	Thumbnail   *discordContent `json:"thumbnail,omitempty"`
+	Video       *discordContent `json:"video,omitempty"`
 	Fields      []discordField  `json:"fields,omitempty"`
 }
 
