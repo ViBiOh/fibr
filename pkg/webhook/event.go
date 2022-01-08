@@ -111,6 +111,8 @@ func (a *App) discordHandle(ctx context.Context, webhook provider.Webhook, event
 	content, _ := json.Marshal(payload)
 	fmt.Printf("Sending payload to discord: `%s`\n", content)
 
+	time.Sleep(time.Second * 10)
+
 	return send(ctx, webhook.ID, request.Post(webhook.URL), payload)
 }
 
