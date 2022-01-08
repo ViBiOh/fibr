@@ -2,6 +2,7 @@ package webhook
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/url"
 	"path"
@@ -103,9 +104,14 @@ func (a *App) discordHandle(ctx context.Context, webhook provider.Webhook, event
 		}
 	}
 
-	return send(ctx, webhook.ID, request.Post(webhook.URL), discordPayload{
+	payload := discordPayload{
 		Embeds: []discordEmbed{embed},
-	})
+	}
+
+	content, _ := json.Marshal(payload)
+	fmt.Printf("Sending payload to discord: `%s`\n", content)
+
+	return send(ctx, webhook.ID, request.Post(webhook.URL), payload)
 }
 
 func (a *App) slackHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
