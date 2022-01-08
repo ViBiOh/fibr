@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 )
@@ -89,7 +88,6 @@ func (a *App) discordHandle(ctx context.Context, webhook provider.Webhook, event
 
 	embed := discordEmbed{
 		Title:       title,
-		Type:        "rich",
 		Description: "💾 A file has been uploaded",
 		URL:         url + "?browser",
 		Fields: []discordField{{
@@ -101,15 +99,7 @@ func (a *App) discordHandle(ctx context.Context, webhook provider.Webhook, event
 
 	if a.thumbnailApp.CanHaveThumbnail(event.Item) {
 		embed.Thumbnail = &discordContent{
-			URL:    url + "?thumbnail",
-			Width:  thumbnail.Width,
-			Height: thumbnail.Height,
-		}
-	}
-
-	if event.Item.IsVideo() {
-		embed.Video = &discordContent{
-			URL: url,
+			URL: url + "?thumbnail",
 		}
 	}
 

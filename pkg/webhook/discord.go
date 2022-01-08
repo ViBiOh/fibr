@@ -7,18 +7,14 @@ type discordPayload struct {
 
 type discordEmbed struct {
 	Title       string          `json:"title,omitempty"`
-	Type        string          `json:"type,omitempty"`
 	Description string          `json:"description,omitempty"`
 	URL         string          `json:"url,omitempty"`
 	Thumbnail   *discordContent `json:"thumbnail,omitempty"`
-	Video       *discordContent `json:"video,omitempty"`
 	Fields      []discordField  `json:"fields,omitempty"`
 }
 
 type discordContent struct {
-	URL    string `json:"url,omitempty"`
-	Height int    `json:"height,omitempty"`
-	Width  int    `json:"width,omitempty"`
+	URL string `json:"url,omitempty"`
 }
 
 type discordField struct {
