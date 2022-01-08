@@ -155,6 +155,7 @@ func (a App) Serve(w http.ResponseWriter, r *http.Request, item provider.Storage
 	}()
 
 	w.Header().Add("Cache-Control", cacheDuration)
+	w.Header().Add("Content-Disposition", fmt.Sprintf("inline; filename=%s", path.Base(thumbnailPath)))
 
 	http.ServeContent(w, r, path.Base(thumbnailPath), item.Date, reader)
 }
