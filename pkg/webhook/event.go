@@ -2,7 +2,6 @@ package webhook
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/url"
 	"path"
@@ -99,21 +98,14 @@ func (a *App) discordHandle(ctx context.Context, webhook provider.Webhook, event
 	}
 
 	if a.thumbnailApp.CanHaveThumbnail(event.Item) {
-		embed.Thumbnail = &discordContent{
+		embed.Image = &discordContent{
 			URL: url + "?thumbnail",
 		}
 	}
 
-	payload := discordPayload{
+	return send(ctx, webhook.ID, request.Post(webhook.URL), discordPayload{
 		Embeds: []discordEmbed{embed},
-	}
-
-	content, _ := json.Marshal(payload)
-	fmt.Printf("Sending payload to discord: `%s`\n", content)
-
-	time.Sleep(time.Second * 10)
-
-	return send(ctx, webhook.ID, request.Post(webhook.URL), payload)
+	})
 }
 
 func (a *App) slackHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
