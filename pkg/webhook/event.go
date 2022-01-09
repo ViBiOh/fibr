@@ -106,7 +106,7 @@ func (a *App) discordHandle(ctx context.Context, webhook provider.Webhook, event
 		}
 	}
 
-	time.Sleep(10)
+	time.Sleep(time.Second * 10)
 
 	return send(ctx, webhook.ID, request.Post(webhook.URL), discordPayload{
 		Embeds: []discordEmbed{embed},
