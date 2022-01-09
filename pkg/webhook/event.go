@@ -97,8 +97,10 @@ func (a *App) discordHandle(ctx context.Context, webhook provider.Webhook, event
 		}},
 	}
 
-	// Waiting a couples of seconds before checking for thumbnail
-	time.Sleep(time.Second * 15)
+	if a.amqpClient != nil {
+		// Waiting a couple of seconds before checking for thumbnail
+		time.Sleep(time.Second * 15)
+	}
 
 	if a.thumbnailApp.HasThumbnail(event.Item) {
 		embed.Thumbnail = &discordContent{
