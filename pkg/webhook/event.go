@@ -97,16 +97,14 @@ func (a *App) discordHandle(ctx context.Context, webhook provider.Webhook, event
 		}},
 	}
 
-	if a.thumbnailApp.CanHaveThumbnail(event.Item) {
+	// Waiting a couples of seconds before checking for thumbnail
+	time.Sleep(time.Second * 15)
+
+	if a.thumbnailApp.HasThumbnail(event.Item) {
 		embed.Thumbnail = &discordContent{
 			URL: url + "?thumbnail",
 		}
-		embed.Image = &discordContent{
-			URL: url + "?thumbnail",
-		}
 	}
-
-	time.Sleep(time.Second * 10)
 
 	return send(ctx, webhook.ID, request.Post(webhook.URL), discordPayload{
 		Embeds: []discordEmbed{embed},
