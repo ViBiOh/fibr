@@ -98,6 +98,9 @@ func (a *App) discordHandle(ctx context.Context, webhook provider.Webhook, event
 	}
 
 	if a.thumbnailApp.CanHaveThumbnail(event.Item) {
+		embed.Thumbnail = &discordContent{
+			URL: url + "?thumbnail",
+		}
 		embed.Image = &discordContent{
 			URL: url + "?thumbnail",
 		}

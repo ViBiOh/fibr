@@ -9,6 +9,7 @@ type discordEmbed struct {
 	Title       string          `json:"title,omitempty"`
 	Description string          `json:"description,omitempty"`
 	URL         string          `json:"url,omitempty"`
+	Thumbnail   *discordContent `json:"thumbnail,omitempty"`
 	Image       *discordContent `json:"image,omitempty"`
 	Fields      []discordField  `json:"fields,omitempty"`
 }
