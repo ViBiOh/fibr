@@ -11,15 +11,14 @@ import (
 
 	_ "net/http/pprof"
 
+	"github.com/ViBiOh/absto/pkg/absto"
 	"github.com/ViBiOh/auth/v2/pkg/ident/basic"
 	authMiddleware "github.com/ViBiOh/auth/v2/pkg/middleware"
 	basicMemory "github.com/ViBiOh/auth/v2/pkg/store/memory"
 	"github.com/ViBiOh/fibr/pkg/crud"
 	"github.com/ViBiOh/fibr/pkg/exif"
 	"github.com/ViBiOh/fibr/pkg/fibr"
-	"github.com/ViBiOh/fibr/pkg/filesystem"
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/fibr/pkg/s3"
 	"github.com/ViBiOh/fibr/pkg/share"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/fibr/pkg/webhook"
@@ -77,8 +76,7 @@ func main() {
 	webhookConfig := webhook.Flags(fs, "webhook")
 	rendererConfig := renderer.Flags(fs, "", flags.NewOverride("PublicURL", "http://localhost:1080"), flags.NewOverride("Title", "fibr"))
 
-	filesystemConfig := filesystem.Flags(fs, "fs")
-	s3Config := s3.Flags(fs, "s3")
+	abstoConfig := absto.Flags(fs, "storage")
 	thumbnailConfig := thumbnail.Flags(fs, "thumbnail")
 	exifConfig := exif.Flags(fs, "exif")
 
@@ -104,23 +102,11 @@ func main() {
 	prometheusApp := prometheus.New(prometheusConfig)
 	healthApp := health.New(healthConfig)
 
-	s3App, err := s3.New(s3Config)
+	prometheusRegisterer := prometheusApp.Registerer()
+
+	storageProvider, err := absto.New(abstoConfig)
 	logger.Fatal(err)
 
-	var storageProvider provider.Storage
-
-	if s3App.Enabled() {
-		logger.Info("Serving content from s3")
-		storageProvider = s3App
-	} else {
-		fsApp, err := filesystem.New(filesystemConfig)
-		logger.Fatal(err)
-
-		logger.Info("Serving content from filesystem")
-		storageProvider = fsApp
-	}
-
-	prometheusRegisterer := prometheusApp.Registerer()
 	eventBus, err := provider.NewEventBus(10, prometheusRegisterer)
 	logger.Fatal(err)
 

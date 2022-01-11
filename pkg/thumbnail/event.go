@@ -3,6 +3,7 @@ package thumbnail
 import (
 	"context"
 
+	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 )
@@ -25,7 +26,7 @@ func (a App) EventConsumer(e provider.Event) {
 	}
 }
 
-func (a App) generateItem(item provider.StorageItem) {
+func (a App) generateItem(item absto.Item) {
 	if !a.CanHaveThumbnail(item) {
 		return
 	}
@@ -47,7 +48,7 @@ func (a App) generateItem(item provider.StorageItem) {
 	}
 }
 
-func (a App) rename(old, new provider.StorageItem) {
+func (a App) rename(old, new absto.Item) {
 	oldPath := getThumbnailPath(old)
 	if _, err := a.storageApp.Info(oldPath); provider.IsNotExist(err) {
 		return
@@ -64,7 +65,7 @@ func (a App) rename(old, new provider.StorageItem) {
 	}
 }
 
-func (a App) delete(item provider.StorageItem) {
+func (a App) delete(item absto.Item) {
 	if err := a.storageApp.Remove(getThumbnailPath(item)); err != nil {
 		logger.Error("unable to delete thumbnail: %s", err)
 	}

@@ -158,7 +158,7 @@ This is for local purpose with simple and hassle-free sharing in a private netwo
 go install github.com/ViBiOh/fibr/cmd/fibr@latest
 fibr \
   -noAuth \
-  -fsDirectory "$(pwd)" \
+  -storageDirectory "$(pwd)" \
   -thumbnailURL "" \
   -exifURL ""
 ```
@@ -274,8 +274,6 @@ Usage of fibr:
         [exif] Exif Tool URL Basic User {FIBR_EXIF_USER}
   -frameOptions string
         [owasp] X-Frame-Options {FIBR_FRAME_OPTIONS} (default "SAMEORIGIN")
-  -fsDirectory string
-        [fs] Path to served directory {FIBR_FS_DIRECTORY} (default "/data")
   -graceDuration string
         [http] Grace duration when SIGTERM received {FIBR_GRACE_DURATION} (default "30s")
   -hsts
@@ -330,16 +328,6 @@ Usage of fibr:
         Public URL {FIBR_PUBLIC_URL} (default "http://localhost:1080")
   -readTimeout string
         [server] Read Timeout {FIBR_READ_TIMEOUT} (default "2m")
-  -s3AccessKey string
-        [s3] Storage Object Access Key {FIBR_S3_ACCESS_KEY}
-  -s3Bucket string
-        [s3] Storage Object Bucket {FIBR_S3_BUCKET}
-  -s3Endpoint string
-        [s3] Storage Object endpoint {FIBR_S3_ENDPOINT}
-  -s3SSL
-        [s3] Use SSL {FIBR_S3_SSL} (default true)
-  -s3SecretAccess string
-        [s3] Storage Object Secret Access {FIBR_S3_SECRET_ACCESS}
   -sanitizeOnStart
         [crud] Sanitize name on start {FIBR_SANITIZE_ON_START}
   -shareAmqpExchange string
@@ -350,6 +338,18 @@ Usage of fibr:
         [share] AMQP Routing Key for share {FIBR_SHARE_AMQP_ROUTING_KEY} (default "share")
   -shutdownTimeout string
         [server] Shutdown Timeout {FIBR_SHUTDOWN_TIMEOUT} (default "10s")
+  -storageAccessKey string
+        [storage] Storage Object Access Key {FIBR_STORAGE_ACCESS_KEY}
+  -storageBucket string
+        [storage] Storage Object Bucket {FIBR_STORAGE_BUCKET}
+  -storageDirectory string
+        [storage] Path to directory {FIBR_STORAGE_DIRECTORY} (default "/data")
+  -storageEndpoint string
+        [storage] Storage Object endpoint {FIBR_STORAGE_ENDPOINT}
+  -storageSSL
+        [storage] Use SSL {FIBR_STORAGE_SSL} (default true)
+  -storageSecretAccess string
+        [storage] Storage Object Secret Access {FIBR_STORAGE_SECRET_ACCESS}
   -thumbnailAmqpExchange string
         [thumbnail] AMQP Exchange Name {FIBR_THUMBNAIL_AMQP_EXCHANGE} (default "fibr")
   -thumbnailAmqpStreamRoutingKey string

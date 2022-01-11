@@ -15,6 +15,7 @@ import (
 	"time"
 	"unicode"
 
+	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
@@ -172,7 +173,7 @@ func RemoveIndex(arr []string, index int) []string {
 }
 
 // LoadJSON loads JSON content
-func LoadJSON(storageApp Storage, filename string, content interface{}) (err error) {
+func LoadJSON(storageApp absto.Storage, filename string, content interface{}) (err error) {
 	var reader io.ReadCloser
 	reader, err = storageApp.ReaderFrom(filename)
 	if err != nil {
@@ -191,7 +192,7 @@ func LoadJSON(storageApp Storage, filename string, content interface{}) (err err
 }
 
 // SaveJSON saves JSON content
-func SaveJSON(storageApp Storage, filename string, content interface{}) (err error) {
+func SaveJSON(storageApp absto.Storage, filename string, content interface{}) (err error) {
 	var writer io.WriteCloser
 	writer, err = storageApp.WriterTo(filename)
 	if err != nil {
@@ -210,7 +211,7 @@ func SaveJSON(storageApp Storage, filename string, content interface{}) (err err
 }
 
 // SendLargeFile in a request with buffered copy
-func SendLargeFile(ctx context.Context, storageApp Storage, item StorageItem, req request.Request) (*http.Response, error) {
+func SendLargeFile(ctx context.Context, storageApp absto.Storage, item absto.Item, req request.Request) (*http.Response, error) {
 	file, err := storageApp.ReaderFrom(item.Pathname) // will be closed by `PipeWriter`
 	if err != nil {
 		return nil, fmt.Errorf("unable to get reader: %w", err)

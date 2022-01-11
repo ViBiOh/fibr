@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"time"
 
+	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	httpModel "github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
@@ -19,7 +20,7 @@ const (
 	defaultTimeout = time.Minute * 2
 )
 
-func (a App) generate(item provider.StorageItem) (err error) {
+func (a App) generate(item absto.Item) (err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
 	defer cancel()
 
@@ -71,7 +72,7 @@ func (a App) generate(item provider.StorageItem) (err error) {
 	return err
 }
 
-func (a App) requestVith(ctx context.Context, item provider.StorageItem) (*http.Response, error) {
+func (a App) requestVith(ctx context.Context, item absto.Item) (*http.Response, error) {
 	itemType := typeOfItem(item)
 
 	if a.amqpClient != nil {

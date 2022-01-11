@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"time"
 
+	absto "github.com/ViBiOh/absto/pkg/model"
 	exas "github.com/ViBiOh/exas/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
@@ -16,7 +17,7 @@ var (
 )
 
 // GetExifFor return exif value for a given item
-func (a App) GetExifFor(item provider.StorageItem) (exas.Exif, error) {
+func (a App) GetExifFor(item absto.Item) (exas.Exif, error) {
 	if item.IsDir {
 		return exas.Exif{}, nil
 	}
@@ -30,7 +31,7 @@ func (a App) GetExifFor(item provider.StorageItem) (exas.Exif, error) {
 }
 
 // GetAggregateFor return aggregated value for a given directory
-func (a App) GetAggregateFor(item provider.StorageItem) (provider.Aggregate, error) {
+func (a App) GetAggregateFor(item absto.Item) (provider.Aggregate, error) {
 	if !item.IsDir {
 		return provider.Aggregate{}, nil
 	}
@@ -43,7 +44,7 @@ func (a App) GetAggregateFor(item provider.StorageItem) (provider.Aggregate, err
 	return aggregate, nil
 }
 
-func (a App) aggregate(item provider.StorageItem) error {
+func (a App) aggregate(item absto.Item) error {
 	if !item.IsDir {
 		file, err := a.getDirOf(item)
 		if err != nil {
@@ -60,11 +61,11 @@ func (a App) aggregate(item provider.StorageItem) error {
 	return nil
 }
 
-func (a App) computeAndSaveAggregate(dir provider.StorageItem) error {
+func (a App) computeAndSaveAggregate(dir absto.Item) error {
 	directoryAggregate := newAggregate()
 	var minDate, maxDate time.Time
 
-	err := a.storageApp.Walk(dir.Pathname, func(item provider.StorageItem) error {
+	err := a.storageApp.Walk(dir.Pathname, func(item absto.Item) error {
 		if item.Pathname == dir.Pathname {
 			return nil
 		}
@@ -118,6 +119,6 @@ func aggregateDate(min, max, current time.Time) (time.Time, time.Time) {
 	return min, max
 }
 
-func (a App) getDirOf(item provider.StorageItem) (provider.StorageItem, error) {
+func (a App) getDirOf(item absto.Item) (absto.Item, error) {
 	return a.storageApp.Info(item.Dir())
 }

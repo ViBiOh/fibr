@@ -7,7 +7,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/ViBiOh/exas/pkg/model"
+	absto "github.com/ViBiOh/absto/pkg/model"
+	exas "github.com/ViBiOh/exas/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	amqpclient "github.com/ViBiOh/httputils/v4/pkg/amqp"
 	"github.com/ViBiOh/httputils/v4/pkg/flags"
@@ -19,7 +20,7 @@ import (
 
 // App of package
 type App struct {
-	storageApp      provider.Storage
+	storageApp      absto.Storage
 	exifMetric      *prometheus.CounterVec
 	aggregateMetric *prometheus.CounterVec
 
@@ -62,7 +63,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 }
 
 // New creates new App from Config
-func New(config Config, storageApp provider.Storage, prometheusRegisterer prometheus.Registerer, amqpClient *amqpclient.Client) (App, error) {
+func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheus.Registerer, amqpClient *amqpclient.Client) (App, error) {
 	var amqpExchange string
 	if amqpClient != nil {
 		amqpExchange = strings.TrimSpace(*config.amqpExchange)
@@ -92,7 +93,7 @@ func (a App) enabled() bool {
 	return !a.exifRequest.IsZero()
 }
 
-func (a App) extractAndSaveExif(item provider.StorageItem) (exif model.Exif, err error) {
+func (a App) extractAndSaveExif(item absto.Item) (exif exas.Exif, err error) {
 	exif, err = a.extractExif(context.Background(), item)
 	if err != nil {
 		err = fmt.Errorf("unable to extract exif: %s", err)
@@ -110,7 +111,7 @@ func (a App) extractAndSaveExif(item provider.StorageItem) (exif model.Exif, err
 	return
 }
 
-func (a App) extractExif(ctx context.Context, item provider.StorageItem) (exif model.Exif, err error) {
+func (a App) extractExif(ctx context.Context, item absto.Item) (exif exas.Exif, err error) {
 	var resp *http.Response
 
 	a.increaseExif("request")
@@ -134,7 +135,7 @@ func (a App) extractExif(ctx context.Context, item provider.StorageItem) (exif m
 	return
 }
 
-func (a App) publishExifRequest(item provider.StorageItem) error {
+func (a App) publishExifRequest(item absto.Item) error {
 	a.increaseExif("publish")
 
 	return a.amqpClient.PublishJSON(item, a.amqpExchange, a.amqpRoutingKey)

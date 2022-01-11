@@ -6,17 +6,20 @@ import (
 	"net/http"
 	"time"
 
+	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/auth/v2/pkg/ident"
 	"github.com/ViBiOh/auth/v2/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
+//go:generate mockgen -destination ../mocks/storage.go -mock_names Storage=Storage -package mocks github.com/ViBiOh/absto/pkg/model Storage
+
 // Crud for user to interfact with filesystem
 //go:generate mockgen -destination ../mocks/crud.go -mock_names Crud=Crud -package mocks github.com/ViBiOh/fibr/pkg/provider Crud
 type Crud interface {
 	Start(done <-chan struct{})
-	Browser(http.ResponseWriter, Request, StorageItem, renderer.Message) (string, int, map[string]interface{}, error)
-	List(Request, renderer.Message, StorageItem, []StorageItem) (string, int, map[string]interface{}, error)
+	Browser(http.ResponseWriter, Request, absto.Item, renderer.Message) (string, int, map[string]interface{}, error)
+	List(Request, renderer.Message, absto.Item, []absto.Item) (string, int, map[string]interface{}, error)
 	Get(http.ResponseWriter, *http.Request, Request) (string, int, map[string]interface{}, error)
 	Post(http.ResponseWriter, *http.Request, Request)
 	Create(http.ResponseWriter, *http.Request, Request)

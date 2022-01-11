@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+
+	absto "github.com/ViBiOh/absto/pkg/model"
 )
 
 // WebhookKind defines constant for webhook kind
@@ -95,7 +97,7 @@ func (w Webhook) hasType(eventType EventType) bool {
 }
 
 // Match determine if storage item match webhook
-func (w Webhook) matchItem(item StorageItem) bool {
+func (w Webhook) matchItem(item absto.Item) bool {
 	if len(item.Name) == 0 {
 		return false
 	}

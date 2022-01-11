@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"net/http"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 
+	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/geo"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
@@ -43,7 +45,7 @@ func (a App) getWithMessage(w http.ResponseWriter, r *http.Request, request prov
 	return a.handleDir(w, r, request, item, message)
 }
 
-func (a App) handleFile(w http.ResponseWriter, r *http.Request, request provider.Request, item provider.StorageItem, message renderer.Message) (string, int, map[string]interface{}, error) {
+func (a App) handleFile(w http.ResponseWriter, r *http.Request, request provider.Request, item absto.Item, message renderer.Message) (string, int, map[string]interface{}, error) {
 	if query.GetBool(r, "thumbnail") {
 		a.thumbnailApp.Serve(w, r, item)
 		return "", 0, nil, nil
@@ -65,7 +67,7 @@ func (a App) handleFile(w http.ResponseWriter, r *http.Request, request provider
 	return "", 0, nil, a.serveFile(w, r, item)
 }
 
-func (a App) serveFile(w http.ResponseWriter, r *http.Request, item provider.StorageItem) error {
+func (a App) serveFile(w http.ResponseWriter, r *http.Request, item absto.Item) error {
 	file, err := a.storageApp.ReaderFrom(item.Pathname)
 	if err != nil {
 		return fmt.Errorf("unable to get reader for `%s`: %w", item.Pathname, err)
@@ -81,7 +83,7 @@ func (a App) serveFile(w http.ResponseWriter, r *http.Request, item provider.Sto
 	return nil
 }
 
-func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.Request, item provider.StorageItem, message renderer.Message) (string, int, map[string]interface{}, error) {
+func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.Request, item absto.Item, message renderer.Message) (string, int, map[string]interface{}, error) {
 	if query.GetBool(r, "stats") {
 		return a.Stats(w, request, message)
 	}
@@ -116,15 +118,19 @@ func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.
 	return a.List(request, message, item, items)
 }
 
-func (a App) listFiles(r *http.Request, request provider.Request) ([]provider.StorageItem, error) {
+func (a App) listFiles(r *http.Request, request provider.Request) (items []absto.Item, err error) {
 	if query.GetBool(r, "search") {
-		return a.searchFiles(r, request)
+		items, err = a.searchFiles(r, request)
+	} else {
+		items, err = a.storageApp.List(request.Filepath())
 	}
 
-	return a.storageApp.List(request.Filepath())
+	sort.Sort(provider.ByHybridSort(items))
+
+	return items, err
 }
 
-func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provider.Request, items []provider.StorageItem) {
+func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provider.Request, items []absto.Item) {
 	if len(items) == 0 {
 		w.WriteHeader(http.StatusNoContent)
 		return

@@ -9,6 +9,7 @@ import (
 	http "net/http"
 	reflect "reflect"
 
+	model "github.com/ViBiOh/absto/pkg/model"
 	provider "github.com/ViBiOh/fibr/pkg/provider"
 	renderer "github.com/ViBiOh/httputils/v4/pkg/renderer"
 	gomock "github.com/golang/mock/gomock"
@@ -38,7 +39,7 @@ func (m *Crud) EXPECT() *CrudMockRecorder {
 }
 
 // Browser mocks base method.
-func (m *Crud) Browser(arg0 http.ResponseWriter, arg1 provider.Request, arg2 provider.StorageItem, arg3 renderer.Message) (string, int, map[string]interface{}, error) {
+func (m *Crud) Browser(arg0 http.ResponseWriter, arg1 provider.Request, arg2 model.Item, arg3 renderer.Message) (string, int, map[string]interface{}, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Browser", arg0, arg1, arg2, arg3)
 	ret0, _ := ret[0].(string)
@@ -96,7 +97,7 @@ func (mr *CrudMockRecorder) Get(arg0, arg1, arg2 interface{}) *gomock.Call {
 }
 
 // List mocks base method.
-func (m *Crud) List(arg0 provider.Request, arg1 renderer.Message, arg2 provider.StorageItem, arg3 []provider.StorageItem) (string, int, map[string]interface{}, error) {
+func (m *Crud) List(arg0 provider.Request, arg1 renderer.Message, arg2 model.Item, arg3 []model.Item) (string, int, map[string]interface{}, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", arg0, arg1, arg2, arg3)
 	ret0, _ := ret[0].(string)

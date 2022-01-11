@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/amqp"
 	"github.com/ViBiOh/httputils/v4/pkg/flags"
@@ -34,8 +35,8 @@ var cacheDuration string = fmt.Sprintf("private, max-age=%.0f", time.Duration(ti
 
 // App of package
 type App struct {
-	storageApp    provider.Storage
-	pathnameInput chan provider.StorageItem
+	storageApp    absto.Storage
+	pathnameInput chan absto.Item
 	metric        *prometheus.CounterVec
 
 	amqpClient              *amqp.Client
@@ -83,7 +84,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 }
 
 // New creates new App from Config
-func New(config Config, storage provider.Storage, prometheusRegisterer prometheus.Registerer, amqpClient *amqp.Client) (App, error) {
+func New(config Config, storage absto.Storage, prometheusRegisterer prometheus.Registerer, amqpClient *amqp.Client) (App, error) {
 	var amqpExchange string
 	if amqpClient != nil {
 		amqpExchange = strings.TrimSpace(*config.amqpExchange)
@@ -107,12 +108,12 @@ func New(config Config, storage provider.Storage, prometheusRegisterer prometheu
 		storageApp:    storage,
 		amqpClient:    amqpClient,
 		metric:        prom.CounterVec(prometheusRegisterer, "fibr", "thumbnail", "item", "type", "state"),
-		pathnameInput: make(chan provider.StorageItem, 10),
+		pathnameInput: make(chan absto.Item, 10),
 	}, nil
 }
 
 // Stream check if stream is present and serve it
-func (a App) Stream(w http.ResponseWriter, r *http.Request, item provider.StorageItem) {
+func (a App) Stream(w http.ResponseWriter, r *http.Request, item absto.Item) {
 	if !a.HasStream(item) {
 		w.WriteHeader(http.StatusNoContent)
 		return
@@ -135,7 +136,7 @@ func (a App) Stream(w http.ResponseWriter, r *http.Request, item provider.Storag
 }
 
 // Serve check if thumbnail is present and serve it
-func (a App) Serve(w http.ResponseWriter, r *http.Request, item provider.StorageItem) {
+func (a App) Serve(w http.ResponseWriter, r *http.Request, item absto.Item) {
 	if !a.CanHaveThumbnail(item) || !a.HasThumbnail(item) {
 		w.WriteHeader(http.StatusNoContent)
 		return
@@ -161,7 +162,7 @@ func (a App) Serve(w http.ResponseWriter, r *http.Request, item provider.Storage
 }
 
 // List return all thumbnail in a base64 form
-func (a App) List(w http.ResponseWriter, r *http.Request, items []provider.StorageItem) {
+func (a App) List(w http.ResponseWriter, r *http.Request, items []absto.Item) {
 	if len(items) == 0 {
 		w.WriteHeader(http.StatusNoContent)
 		return
@@ -197,7 +198,7 @@ func (a App) List(w http.ResponseWriter, r *http.Request, items []provider.Stora
 	}
 }
 
-func (a App) encodeContent(encoder io.WriteCloser, item provider.StorageItem) {
+func (a App) encodeContent(encoder io.WriteCloser, item absto.Item) {
 	reader, err := a.storageApp.ReaderFrom(getThumbnailPath(item))
 	if err != nil {
 		logEncodeContentError(item).Error("unable to open: %s", err)
@@ -220,6 +221,6 @@ func (a App) encodeContent(encoder io.WriteCloser, item provider.StorageItem) {
 	}
 }
 
-func logEncodeContentError(item provider.StorageItem) logger.FieldsContext {
+func logEncodeContentError(item absto.Item) logger.FieldsContext {
 	return logger.WithField("fn", "thumbnail.encodeContent").WithField("item", item.Pathname)
 }

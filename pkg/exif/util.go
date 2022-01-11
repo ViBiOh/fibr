@@ -5,17 +5,18 @@ import (
 	"path"
 	"path/filepath"
 
-	"github.com/ViBiOh/exas/pkg/model"
+	absto "github.com/ViBiOh/absto/pkg/model"
+	exas "github.com/ViBiOh/exas/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/sha"
 )
 
 // CanHaveExif determine if exif can be extracted for given pathname
-func (a App) CanHaveExif(item provider.StorageItem) bool {
+func (a App) CanHaveExif(item absto.Item) bool {
 	return (item.IsImage() || item.IsVideo() || item.IsPdf()) && (a.maxSize == 0 || item.Size < a.maxSize || a.directAccess)
 }
 
-func getExifPath(item provider.StorageItem) string {
+func getExifPath(item absto.Item) string {
 	fullPath := path.Join(provider.MetadataDirectoryName, item.Pathname)
 	if item.IsDir {
 		return fmt.Sprintf("%s/%s.json", fullPath, "aggregate")
@@ -24,26 +25,26 @@ func getExifPath(item provider.StorageItem) string {
 	return fmt.Sprintf("%s/%s.json", filepath.Dir(fullPath), sha.New(item.Name))
 }
 
-func (a App) hasMetadata(item provider.StorageItem) bool {
+func (a App) hasMetadata(item absto.Item) bool {
 	_, err := a.storageApp.Info(getExifPath(item))
 	return err == nil
 }
 
-func (a App) loadExif(item provider.StorageItem) (model.Exif, error) {
-	var data model.Exif
+func (a App) loadExif(item absto.Item) (exas.Exif, error) {
+	var data exas.Exif
 	return data, a.loadMetadata(item, &data)
 }
 
-func (a App) loadAggregate(item provider.StorageItem) (provider.Aggregate, error) {
+func (a App) loadAggregate(item absto.Item) (provider.Aggregate, error) {
 	var data provider.Aggregate
 	return data, a.loadMetadata(item, &data)
 }
 
-func (a App) loadMetadata(item provider.StorageItem, content interface{}) error {
+func (a App) loadMetadata(item absto.Item, content interface{}) error {
 	return provider.LoadJSON(a.storageApp, getExifPath(item), content)
 }
 
-func (a App) saveMetadata(item provider.StorageItem, data interface{}) error {
+func (a App) saveMetadata(item absto.Item, data interface{}) error {
 	filename := getExifPath(item)
 	dirname := filepath.Dir(filename)
 

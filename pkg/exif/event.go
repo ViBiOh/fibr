@@ -3,7 +3,8 @@ package exif
 import (
 	"fmt"
 
-	"github.com/ViBiOh/exas/pkg/model"
+	absto "github.com/ViBiOh/absto/pkg/model"
+	exas "github.com/ViBiOh/exas/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 )
@@ -34,11 +35,11 @@ func (a App) EventConsumer(e provider.Event) {
 	}
 }
 
-func getEventLogger(item provider.StorageItem) logger.Provider {
+func getEventLogger(item absto.Item) logger.Provider {
 	return logger.WithField("fn", "exif.EventConsumer").WithField("item", item.Pathname)
 }
 
-func (a App) handleStartEvent(item provider.StorageItem) error {
+func (a App) handleStartEvent(item absto.Item) error {
 	if a.hasMetadata(item) {
 		return nil
 	}
@@ -54,7 +55,7 @@ func (a App) handleStartEvent(item provider.StorageItem) error {
 	return a.handleUploadEvent(item)
 }
 
-func (a App) handleUploadEvent(item provider.StorageItem) error {
+func (a App) handleUploadEvent(item absto.Item) error {
 	if !a.CanHaveExif(item) {
 		return nil
 	}
@@ -75,7 +76,7 @@ func (a App) handleUploadEvent(item provider.StorageItem) error {
 	return a.processExif(item, exif)
 }
 
-func (a App) processExif(item provider.StorageItem, exif model.Exif) error {
+func (a App) processExif(item absto.Item, exif exas.Exif) error {
 	if err := a.updateDate(item, exif); err != nil {
 		return fmt.Errorf("unable to update date: %s", err)
 	}
@@ -87,7 +88,7 @@ func (a App) processExif(item provider.StorageItem, exif model.Exif) error {
 	return nil
 }
 
-func (a App) rename(old, new provider.StorageItem) error {
+func (a App) rename(old, new absto.Item) error {
 	oldPath := getExifPath(old)
 	if _, err := a.storageApp.Info(oldPath); provider.IsNotExist(err) {
 		return nil
@@ -106,7 +107,7 @@ func (a App) rename(old, new provider.StorageItem) error {
 	return nil
 }
 
-func (a App) aggregateOnRename(old, new provider.StorageItem) error {
+func (a App) aggregateOnRename(old, new absto.Item) error {
 	oldDir, err := a.getDirOf(old)
 	if err != nil {
 		return fmt.Errorf("unable to get old directory: %s", err)
@@ -132,7 +133,7 @@ func (a App) aggregateOnRename(old, new provider.StorageItem) error {
 	return nil
 }
 
-func (a App) delete(item provider.StorageItem) error {
+func (a App) delete(item absto.Item) error {
 	if err := a.storageApp.Remove(getExifPath(item)); err != nil {
 		return fmt.Errorf("unable to delete: %s", err)
 	}

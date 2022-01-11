@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+
+	absto "github.com/ViBiOh/absto/pkg/model"
 )
 
 var (
@@ -39,7 +41,7 @@ type Request struct {
 }
 
 // RelativeURL compute relative URL of item for that request
-func (r Request) RelativeURL(item StorageItem) string {
+func (r Request) RelativeURL(item absto.Item) string {
 	pathname := item.Pathname
 
 	if !r.Share.IsZero() {

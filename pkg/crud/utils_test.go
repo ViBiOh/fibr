@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 )
@@ -20,21 +21,21 @@ var (
 
 func TestGetPreviousAndNext(t *testing.T) {
 	type args struct {
-		file  provider.StorageItem
-		files []provider.StorageItem
+		file  absto.Item
+		files []absto.Item
 	}
 
 	cases := []struct {
 		intention    string
 		args         args
-		wantPrevious *provider.StorageItem
-		wantNext     *provider.StorageItem
+		wantPrevious *absto.Item
+		wantNext     *absto.Item
 	}{
 		{
 			"one item",
 			args{
-				file: provider.StorageItem{Name: filename},
-				files: []provider.StorageItem{
+				file: absto.Item{Name: filename},
+				files: []absto.Item{
 					{Name: filename},
 				},
 			},
@@ -44,29 +45,29 @@ func TestGetPreviousAndNext(t *testing.T) {
 		{
 			"no next item",
 			args{
-				file: provider.StorageItem{Name: filename},
-				files: []provider.StorageItem{
+				file: absto.Item{Name: filename},
+				files: []absto.Item{
 					{Name: ".git", IsDir: true},
 					{Name: otherFilename},
 					{Name: filename},
 				},
 			},
-			&provider.StorageItem{Name: otherFilename},
+			&absto.Item{Name: otherFilename},
 			nil,
 		},
 		{
 			"full items",
 			args{
-				file: provider.StorageItem{Name: filename},
-				files: []provider.StorageItem{
+				file: absto.Item{Name: filename},
+				files: []absto.Item{
 					{Name: ".git", IsDir: true},
 					{Name: otherFilename},
 					{Name: filename},
 					{Name: "main.go"},
 				},
 			},
-			&provider.StorageItem{Name: otherFilename},
-			&provider.StorageItem{Name: "main.go"},
+			&absto.Item{Name: otherFilename},
+			&absto.Item{Name: "main.go"},
 		},
 	}
 

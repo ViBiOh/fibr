@@ -3,12 +3,12 @@ package exif
 import (
 	"testing"
 
-	"github.com/ViBiOh/fibr/pkg/provider"
+	absto "github.com/ViBiOh/absto/pkg/model"
 )
 
 func TestGetExifPath(t *testing.T) {
 	type args struct {
-		item provider.StorageItem
+		item absto.Item
 	}
 
 	cases := []struct {
@@ -19,7 +19,7 @@ func TestGetExifPath(t *testing.T) {
 		{
 			"simple",
 			args{
-				item: provider.StorageItem{
+				item: absto.Item{
 					Pathname: "/photos/image.jpeg",
 				},
 			},
@@ -28,7 +28,7 @@ func TestGetExifPath(t *testing.T) {
 		{
 			"simple",
 			args{
-				item: provider.StorageItem{
+				item: absto.Item{
 					Pathname: "/photos",
 					IsDir:    true,
 				},

@@ -8,14 +8,14 @@ import (
 	"net/url"
 	"strconv"
 
-	"github.com/ViBiOh/fibr/pkg/provider"
+	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 	"github.com/ViBiOh/vith/pkg/model"
 )
 
 // HasStream checks if given item has a streamable version
-func (a App) HasStream(item provider.StorageItem) bool {
+func (a App) HasStream(item absto.Item) bool {
 	_, err := a.storageApp.Info(getStreamPath(item))
 	return err == nil
 }
@@ -33,7 +33,7 @@ func (a App) handleVithResponse(err error, body io.ReadCloser) error {
 	return nil
 }
 
-func (a App) shouldGenerateStream(ctx context.Context, item provider.StorageItem) (bool, error) {
+func (a App) shouldGenerateStream(ctx context.Context, item absto.Item) (bool, error) {
 	if !a.directAccess {
 		return false, nil
 	}
@@ -66,7 +66,7 @@ func (a App) shouldGenerateStream(ctx context.Context, item provider.StorageItem
 	return bitrate >= a.minBitrate, nil
 }
 
-func (a App) generateStream(ctx context.Context, item provider.StorageItem) error {
+func (a App) generateStream(ctx context.Context, item absto.Item) error {
 	input := item.Pathname
 	output := getStreamPath(item)
 
@@ -89,14 +89,14 @@ func (a App) generateStream(ctx context.Context, item provider.StorageItem) erro
 	return a.handleVithResponse(err, resp.Body)
 }
 
-func (a App) renameStream(ctx context.Context, old, new provider.StorageItem) error {
+func (a App) renameStream(ctx context.Context, old, new absto.Item) error {
 	a.increaseMetric("stream", "rename")
 
 	resp, err := a.vithRequest.Method(http.MethodPatch).Path(fmt.Sprintf("%s?to=%s&type=%s", getStreamPath(old), url.QueryEscape(getStreamPath(new)), typeOfItem(old))).Send(ctx, nil)
 	return a.handleVithResponse(err, resp.Body)
 }
 
-func (a App) deleteStream(ctx context.Context, item provider.StorageItem) error {
+func (a App) deleteStream(ctx context.Context, item absto.Item) error {
 	a.increaseMetric("stream", "delete")
 
 	resp, err := a.vithRequest.Method(http.MethodDelete).Path(fmt.Sprintf("%s?type=%s", getStreamPath(item), typeOfItem(item))).Send(ctx, nil)

@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -83,11 +84,11 @@ func (et *EventType) UnmarshalJSON(b []byte) error {
 // Event describes an event on fibr
 type Event struct {
 	Time         time.Time         `json:"time"`
-	New          *StorageItem      `json:"new,omitempty"`
+	New          *absto.Item       `json:"new,omitempty"`
 	Metadata     map[string]string `json:"metadata,omitempty"`
 	URL          string            `json:"url,omitempty"`
 	ShareableURL string            `json:"shareable_url,omitempty"`
-	Item         StorageItem       `json:"item"`
+	Item         absto.Item        `json:"item"`
 	Type         EventType         `json:"type"`
 }
 
@@ -101,7 +102,7 @@ func (e Event) GetURL() string {
 }
 
 // NewUploadEvent creates a new upload event
-func NewUploadEvent(request Request, item StorageItem, shareableURL string, rendererApp renderer.App) Event {
+func NewUploadEvent(request Request, item absto.Item, shareableURL string, rendererApp renderer.App) Event {
 	return Event{
 		Time:         time.Now(),
 		Type:         UploadEvent,
@@ -112,7 +113,7 @@ func NewUploadEvent(request Request, item StorageItem, shareableURL string, rend
 }
 
 // NewRenameEvent creates a new rename event
-func NewRenameEvent(old, new StorageItem) Event {
+func NewRenameEvent(old, new absto.Item) Event {
 	return Event{
 		Time: time.Now(),
 		Type: RenameEvent,
@@ -122,7 +123,7 @@ func NewRenameEvent(old, new StorageItem) Event {
 }
 
 // NewDeleteEvent creates a new delete event
-func NewDeleteEvent(request Request, item StorageItem, rendererApp renderer.App) Event {
+func NewDeleteEvent(request Request, item absto.Item, rendererApp renderer.App) Event {
 	return Event{
 		Time: time.Now(),
 		Type: DeleteEvent,
@@ -132,7 +133,7 @@ func NewDeleteEvent(request Request, item StorageItem, rendererApp renderer.App)
 }
 
 // NewStartEvent creates a new start event
-func NewStartEvent(item StorageItem) Event {
+func NewStartEvent(item absto.Item) Event {
 	return Event{
 		Time: time.Now(),
 		Type: StartEvent,
@@ -141,7 +142,7 @@ func NewStartEvent(item StorageItem) Event {
 }
 
 // NewAccessEvent creates a new access event
-func NewAccessEvent(item StorageItem, r *http.Request) Event {
+func NewAccessEvent(item absto.Item, r *http.Request) Event {
 	metadata := make(map[string]string)
 	for key, values := range r.Header {
 		if strings.EqualFold(key, "Authorization") {

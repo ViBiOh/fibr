@@ -3,12 +3,12 @@ package crud
 import (
 	"testing"
 
-	"github.com/ViBiOh/fibr/pkg/provider"
+	absto "github.com/ViBiOh/absto/pkg/model"
 )
 
 func TestMatchSize(t *testing.T) {
 	type args struct {
-		item provider.StorageItem
+		item absto.Item
 	}
 
 	cases := []struct {
@@ -24,7 +24,7 @@ func TestMatchSize(t *testing.T) {
 				greaterThan: true,
 			},
 			args{
-				item: provider.StorageItem{Size: 1000},
+				item: absto.Item{Size: 1000},
 			},
 			true,
 		},
@@ -35,7 +35,7 @@ func TestMatchSize(t *testing.T) {
 				greaterThan: true,
 			},
 			args{
-				item: provider.StorageItem{Size: 1000},
+				item: absto.Item{Size: 1000},
 			},
 			true,
 		},
@@ -46,7 +46,7 @@ func TestMatchSize(t *testing.T) {
 				greaterThan: false,
 			},
 			args{
-				item: provider.StorageItem{Size: 1000},
+				item: absto.Item{Size: 1000},
 			},
 			false,
 		},
@@ -57,7 +57,7 @@ func TestMatchSize(t *testing.T) {
 				greaterThan: false,
 			},
 			args{
-				item: provider.StorageItem{Size: 800},
+				item: absto.Item{Size: 800},
 			},
 			true,
 		},

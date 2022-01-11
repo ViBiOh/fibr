@@ -2,6 +2,8 @@ package provider
 
 import (
 	"testing"
+
+	absto "github.com/ViBiOh/absto/pkg/model"
 )
 
 func TestAbsoluteURL(t *testing.T) {
@@ -61,7 +63,7 @@ func TestAbsoluteURL(t *testing.T) {
 
 func TestRelativeURL(t *testing.T) {
 	type args struct {
-		item StorageItem
+		item absto.Item
 	}
 
 	cases := []struct {
@@ -76,7 +78,7 @@ func TestRelativeURL(t *testing.T) {
 				Path: "/",
 			},
 			args{
-				item: StorageItem{
+				item: absto.Item{
 					Pathname: "/index.html",
 				},
 			},
@@ -88,7 +90,7 @@ func TestRelativeURL(t *testing.T) {
 				Path: "/",
 			},
 			args{
-				item: StorageItem{
+				item: absto.Item{
 					Pathname: "/folder",
 					IsDir:    true,
 				},
@@ -105,7 +107,7 @@ func TestRelativeURL(t *testing.T) {
 				},
 			},
 			args{
-				item: StorageItem{
+				item: absto.Item{
 					Pathname: "/folder/subpath/index.html",
 				},
 			},
@@ -117,7 +119,7 @@ func TestRelativeURL(t *testing.T) {
 				Path: "/sub/folder/",
 			},
 			args{
-				item: StorageItem{
+				item: absto.Item{
 					Pathname: "/sub/folder/index.html",
 				},
 			},

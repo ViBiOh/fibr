@@ -6,19 +6,20 @@ import (
 	"net/http"
 	"strings"
 
+	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
-func (a App) doRename(oldPath, newPath string, oldItem provider.StorageItem) (provider.StorageItem, error) {
+func (a App) doRename(oldPath, newPath string, oldItem absto.Item) (absto.Item, error) {
 	if err := a.storageApp.Rename(oldPath, newPath); err != nil {
-		return provider.StorageItem{}, err
+		return absto.Item{}, err
 	}
 
 	newItem, err := a.storageApp.Info(newPath)
 	if err != nil {
-		return provider.StorageItem{}, err
+		return absto.Item{}, err
 	}
 
 	go a.notify(provider.NewRenameEvent(oldItem, newItem))

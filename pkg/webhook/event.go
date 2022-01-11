@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
@@ -192,7 +193,7 @@ func (a *App) accessEvent(event provider.Event) string {
 	return content.String()
 }
 
-func (a *App) deleteItem(item provider.StorageItem) error {
+func (a *App) deleteItem(item absto.Item) error {
 	return a.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
 		for id, webhook := range a.webhooks {
 			if webhook.Pathname == item.Pathname {

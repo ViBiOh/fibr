@@ -3,6 +3,7 @@ package crud
 import (
 	"net/http"
 
+	absto "github.com/ViBiOh/absto/pkg/model"
 	exas "github.com/ViBiOh/exas/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/concurrent"
@@ -11,11 +12,11 @@ import (
 )
 
 // Browser render file web view
-func (a App) Browser(w http.ResponseWriter, request provider.Request, item provider.StorageItem, message renderer.Message) (string, int, map[string]interface{}, error) {
+func (a App) Browser(w http.ResponseWriter, request provider.Request, item absto.Item, message renderer.Message) (string, int, map[string]interface{}, error) {
 	var (
 		previous *provider.RenderItem
 		next     *provider.RenderItem
-		files    []provider.StorageItem
+		files    []absto.Item
 		exif     exas.Exif
 	)
 
@@ -26,7 +27,7 @@ func (a App) Browser(w http.ResponseWriter, request provider.Request, item provi
 			files, previous, next = a.getFilesPreviousAndNext(item, request)
 		})
 	} else {
-		files = []provider.StorageItem{item}
+		files = []absto.Item{item}
 	}
 
 	wg.Go(func() {
@@ -54,7 +55,7 @@ func (a App) Browser(w http.ResponseWriter, request provider.Request, item provi
 	}, nil
 }
 
-func (a App) getFilesPreviousAndNext(item provider.StorageItem, request provider.Request) (files []provider.StorageItem, previous *provider.RenderItem, next *provider.RenderItem) {
+func (a App) getFilesPreviousAndNext(item absto.Item, request provider.Request) (files []absto.Item, previous *provider.RenderItem, next *provider.RenderItem) {
 	var err error
 	files, err = a.storageApp.List(item.Dir())
 	if err != nil {

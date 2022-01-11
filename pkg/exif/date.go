@@ -3,11 +3,11 @@ package exif
 import (
 	"fmt"
 
-	"github.com/ViBiOh/exas/pkg/model"
-	"github.com/ViBiOh/fibr/pkg/provider"
+	absto "github.com/ViBiOh/absto/pkg/model"
+	exas "github.com/ViBiOh/exas/pkg/model"
 )
 
-func (a App) updateDate(item provider.StorageItem, data model.Exif) error {
+func (a App) updateDate(item absto.Item, data exas.Exif) error {
 	if data.Date.IsZero() || item.Date.Equal(data.Date) {
 		return nil
 	}

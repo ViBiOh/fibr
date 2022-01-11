@@ -9,6 +9,7 @@ import (
 	"sync"
 	"time"
 
+	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v4/pkg/amqp"
@@ -26,7 +27,7 @@ var (
 
 // App of package
 type App struct {
-	storageApp provider.Storage
+	storageApp absto.Storage
 	webhooks   map[string]provider.Webhook
 	counter    *prometheus.CounterVec
 
@@ -64,7 +65,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 }
 
 // New creates new App from Config
-func New(config Config, storageApp provider.Storage, prometheusRegisterer prometheus.Registerer, amqpClient *amqp.Client, rendererApp renderer.App, thumbnailApp thumbnail.App) (*App, error) {
+func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheus.Registerer, amqpClient *amqp.Client, rendererApp renderer.App, thumbnailApp thumbnail.App) (*App, error) {
 	var amqpExchange string
 	var amqpExclusiveRoutingKey string
 

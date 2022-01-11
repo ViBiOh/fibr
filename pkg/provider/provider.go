@@ -1,10 +1,5 @@
 package provider
 
-import (
-	"io"
-	"time"
-)
-
 const (
 	// MetadataDirectoryName directory where metadata are stored
 	MetadataDirectoryName = "/.fibr"
@@ -30,18 +25,3 @@ var (
 	// WordExtensions contains extensions of Word
 	WordExtensions = map[string]bool{".doc": true, ".docx": true, ".docm": true}
 )
-
-// Storage describe action on a storage provider
-//go:generate mockgen -destination ../mocks/storage.go -mock_names Storage=Storage -package mocks github.com/ViBiOh/fibr/pkg/provider Storage
-type Storage interface {
-	WithIgnoreFn(ignoreFn func(StorageItem) bool) Storage
-	Info(pathname string) (StorageItem, error)
-	List(pathname string) ([]StorageItem, error)
-	WriterTo(pathname string) (io.WriteCloser, error)
-	ReaderFrom(pathname string) (io.ReadSeekCloser, error)
-	Walk(pathname string, walkFn func(StorageItem) error) error
-	CreateDir(pathname string) error
-	Rename(oldName, newName string) error
-	Remove(pathname string) error
-	UpdateDate(pathname string, date time.Time) error
-}

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 )
@@ -23,7 +24,7 @@ func (a *App) EventConsumer(e provider.Event) {
 	}
 }
 
-func (a *App) renameItem(old, new provider.StorageItem) error {
+func (a *App) renameItem(old, new absto.Item) error {
 	_, err := a.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
 		for id, share := range a.shares {
 			if strings.HasPrefix(share.Path, old.Pathname) {
@@ -44,7 +45,7 @@ func (a *App) renameItem(old, new provider.StorageItem) error {
 	return err
 }
 
-func (a *App) deleteItem(item provider.StorageItem) error {
+func (a *App) deleteItem(item absto.Item) error {
 	_, err := a.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
 		for id, share := range a.shares {
 			if strings.HasPrefix(share.Path, item.Pathname) {

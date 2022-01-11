@@ -3,8 +3,8 @@ package thumbnail
 import (
 	"testing"
 
+	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/mocks"
-	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/golang/mock/gomock"
 )
 
@@ -12,19 +12,19 @@ func TestCanHaveThumbnail(t *testing.T) {
 	cases := []struct {
 		intention string
 		instance  App
-		input     provider.StorageItem
+		input     absto.Item
 		want      bool
 	}{
 		{
 			"empty",
 			App{},
-			provider.StorageItem{},
+			absto.Item{},
 			false,
 		},
 		{
 			"image",
 			App{},
-			provider.StorageItem{
+			absto.Item{
 				Name: "test.png",
 			},
 			true,
@@ -32,7 +32,7 @@ func TestCanHaveThumbnail(t *testing.T) {
 		{
 			"pdf",
 			App{},
-			provider.StorageItem{
+			absto.Item{
 				Name: "test.pdf",
 			},
 			true,
@@ -40,7 +40,7 @@ func TestCanHaveThumbnail(t *testing.T) {
 		{
 			"video",
 			App{},
-			provider.StorageItem{
+			absto.Item{
 				Name: "test.avi",
 			},
 			true,
@@ -60,13 +60,13 @@ func TestHasThumbnail(t *testing.T) {
 	cases := []struct {
 		intention string
 		instance  App
-		input     provider.StorageItem
+		input     absto.Item
 		want      bool
 	}{
 		{
 			"not found",
 			App{},
-			provider.StorageItem{
+			absto.Item{
 				Pathname: "path/to/error",
 				IsDir:    true,
 			},
@@ -75,7 +75,7 @@ func TestHasThumbnail(t *testing.T) {
 		{
 			"found",
 			App{},
-			provider.StorageItem{
+			absto.Item{
 				Pathname: "path/to/valid",
 			},
 			true,
@@ -92,7 +92,7 @@ func TestHasThumbnail(t *testing.T) {
 			tc.instance.storageApp = storageMock
 
 			if tc.intention == "found" {
-				storageMock.EXPECT().Info(gomock.Any()).Return(provider.StorageItem{}, nil)
+				storageMock.EXPECT().Info(gomock.Any()).Return(absto.Item{}, nil)
 			}
 
 			if result := tc.instance.HasThumbnail(tc.input); result != tc.want {
@@ -105,12 +105,12 @@ func TestHasThumbnail(t *testing.T) {
 func TestGetThumbnailPath(t *testing.T) {
 	cases := []struct {
 		intention string
-		input     provider.StorageItem
+		input     absto.Item
 		want      string
 	}{
 		{
 			"simple",
-			provider.StorageItem{
+			absto.Item{
 				Pathname: "/path/to/file.png",
 			},
 			"/.fibr/path/to/dd29ecf524b030a65261e3059c48ab9e1ecb2585.webp",
@@ -129,12 +129,12 @@ func TestGetThumbnailPath(t *testing.T) {
 func TestGetStreamPath(t *testing.T) {
 	cases := []struct {
 		intention string
-		input     provider.StorageItem
+		input     absto.Item
 		want      string
 	}{
 		{
 			"simple",
-			provider.StorageItem{
+			absto.Item{
 				Pathname: "/path/to/file.mov",
 			},
 			"/.fibr/path/to/dd29ecf524b030a65261e3059c48ab9e1ecb2585.m3u8",

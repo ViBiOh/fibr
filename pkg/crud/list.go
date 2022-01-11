@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"path"
 
+	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v4/pkg/concurrent"
@@ -19,7 +20,7 @@ const (
 	uint32max = (1 << 32) - 1
 )
 
-func (a App) getCover(files []provider.StorageItem) map[string]interface{} {
+func (a App) getCover(files []absto.Item) map[string]interface{} {
 	for _, file := range files {
 		if file.IsDir || file.IsVideo() {
 			continue
@@ -38,12 +39,12 @@ func (a App) getCover(files []provider.StorageItem) map[string]interface{} {
 }
 
 // List render directory web view of given dirPath
-func (a App) List(request provider.Request, message renderer.Message, item provider.StorageItem, files []provider.StorageItem) (string, int, map[string]interface{}, error) {
+func (a App) List(request provider.Request, message renderer.Message, item absto.Item, files []absto.Item) (string, int, map[string]interface{}, error) {
 	items := make([]provider.RenderItem, len(files))
 	wg := concurrent.NewLimited(4)
 
 	for index, item := range files {
-		func(item provider.StorageItem, index int) {
+		func(item absto.Item, index int) {
 			wg.Go(func() {
 				aggregate, err := a.exifApp.GetAggregateFor(item)
 				if err != nil {
@@ -89,7 +90,7 @@ func (a App) List(request provider.Request, message renderer.Message, item provi
 }
 
 // Download content of a directory into a streamed zip
-func (a App) Download(w http.ResponseWriter, r *http.Request, request provider.Request, items []provider.StorageItem) {
+func (a App) Download(w http.ResponseWriter, r *http.Request, request provider.Request, items []absto.Item) {
 	zipWriter := zip.NewWriter(w)
 	defer func() {
 		if closeErr := zipWriter.Close(); closeErr != nil {
@@ -109,7 +110,7 @@ func (a App) Download(w http.ResponseWriter, r *http.Request, request provider.R
 	}
 }
 
-func (a App) zipItems(done <-chan struct{}, request provider.Request, zipWriter *zip.Writer, items []provider.StorageItem) (err error) {
+func (a App) zipItems(done <-chan struct{}, request provider.Request, zipWriter *zip.Writer, items []absto.Item) (err error) {
 	for _, item := range items {
 		select {
 		case <-done:
@@ -125,7 +126,7 @@ func (a App) zipItems(done <-chan struct{}, request provider.Request, zipWriter 
 				continue
 			}
 
-			var nestedItems []provider.StorageItem
+			var nestedItems []absto.Item
 			nestedItems, err = a.storageApp.List(request.SubPath(relativeURL))
 			if err != nil {
 				err = fmt.Errorf("unable to zip nested folder `%s`: %s", relativeURL, err)
@@ -141,7 +142,7 @@ func (a App) zipItems(done <-chan struct{}, request provider.Request, zipWriter 
 	return nil
 }
 
-func (a App) addFileToZip(zipWriter *zip.Writer, item provider.StorageItem, pathname string) (err error) {
+func (a App) addFileToZip(zipWriter *zip.Writer, item absto.Item, pathname string) (err error) {
 	header := &zip.FileHeader{
 		Name:               pathname,
 		UncompressedSize64: uint64(item.Size),

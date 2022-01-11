@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/exif"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
@@ -36,8 +37,8 @@ var (
 
 // App of package
 type App struct {
-	rawStorageApp provider.Storage
-	storageApp    provider.Storage
+	rawStorageApp absto.Storage
+	storageApp    absto.Storage
 	shareApp      provider.ShareManager
 	webhookApp    provider.WebhookManager
 	pushEvent     provider.EventProducer
@@ -73,7 +74,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 }
 
 // New creates new App from Config
-func New(config Config, storage provider.Storage, rendererApp renderer.App, shareApp provider.ShareManager, webhookApp provider.WebhookManager, thumbnailApp thumbnail.App, exifApp exif.App, eventProducer provider.EventProducer, amqpClient *amqp.Client) (App, error) {
+func New(config Config, storage absto.Storage, rendererApp renderer.App, shareApp provider.ShareManager, webhookApp provider.WebhookManager, thumbnailApp thumbnail.App, exifApp exif.App, eventProducer provider.EventProducer, amqpClient *amqp.Client) (App, error) {
 	app := App{
 		sanitizeOnStart: *config.sanitizeOnStart,
 
@@ -108,7 +109,7 @@ func New(config Config, storage provider.Storage, rendererApp renderer.App, shar
 		logger.Info("Ignoring files with pattern `%s`", ignore)
 	}
 
-	app.storageApp = storage.WithIgnoreFn(func(item provider.StorageItem) bool {
+	app.storageApp = storage.WithIgnoreFn(func(item absto.Item) bool {
 		if item.IsDir && item.Name == provider.MetadataDirectoryName {
 			return true
 		}
@@ -156,7 +157,7 @@ func (a App) start(done <-chan struct{}) {
 	logger.Info("Starting startup check...")
 	defer logger.Info("Ending startup check.")
 
-	err := a.storageApp.Walk("", func(item provider.StorageItem) error {
+	err := a.storageApp.Walk("", func(item absto.Item) error {
 		select {
 		case <-done:
 			return errors.New("server is shutting down")
@@ -173,7 +174,7 @@ func (a App) start(done <-chan struct{}) {
 	}
 }
 
-func (a App) sanitizeName(item provider.StorageItem) provider.StorageItem {
+func (a App) sanitizeName(item absto.Item) absto.Item {
 	name, err := provider.SanitizeName(item.Pathname, false)
 	if err != nil {
 		logger.WithField("item", item.Pathname).Error("unable to sanitize name: %s", err)
@@ -192,7 +193,7 @@ func (a App) sanitizeName(item provider.StorageItem) provider.StorageItem {
 	return a.rename(item, name)
 }
 
-func (a App) rename(item provider.StorageItem, name string) provider.StorageItem {
+func (a App) rename(item absto.Item, name string) absto.Item {
 	logger.Info("Renaming `%s` to `%s`", item.Pathname, name)
 
 	renamedItem, err := a.doRename(item.Pathname, name, item)

@@ -3,12 +3,12 @@ module github.com/ViBiOh/fibr
 go 1.17
 
 require (
+	github.com/ViBiOh/absto v0.0.0-20220110215615-18e04b0a06f5
 	github.com/ViBiOh/auth/v2 v2.11.32
 	github.com/ViBiOh/exas v0.2.4
 	github.com/ViBiOh/httputils/v4 v4.34.2
 	github.com/ViBiOh/vith v0.2.2
 	github.com/golang/mock v1.6.0
-	github.com/minio/minio-go/v7 v7.0.20
 	github.com/prometheus/client_golang v1.11.0
 	github.com/streadway/amqp v1.0.0
 	golang.org/x/crypto v0.0.0-20211215153901-e495a2d5b3d3
@@ -26,6 +26,7 @@ require (
 	github.com/klauspost/cpuid/v2 v2.0.9 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
+	github.com/minio/minio-go/v7 v7.0.20 // indirect
 	github.com/minio/sha256-simd v1.0.0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect

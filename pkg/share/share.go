@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/amqp"
 	"github.com/ViBiOh/httputils/v4/pkg/clock"
@@ -25,7 +26,7 @@ var (
 
 // App of package
 type App struct {
-	storageApp provider.Storage
+	storageApp absto.Storage
 	shares     map[string]provider.Share
 	clock      clock.Clock
 
@@ -54,7 +55,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 }
 
 // New creates new App from Config
-func New(config Config, storageApp provider.Storage, amqpClient *amqp.Client) (*App, error) {
+func New(config Config, storageApp absto.Storage, amqpClient *amqp.Client) (*App, error) {
 	var amqpExchange string
 	var amqpExclusiveRoutingKey string
 

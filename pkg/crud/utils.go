@@ -7,14 +7,15 @@ import (
 	"strings"
 	"time"
 
+	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 )
 
-func getPreviousAndNext(file provider.StorageItem, files []provider.StorageItem) (*provider.StorageItem, *provider.StorageItem) {
+func getPreviousAndNext(file absto.Item, files []absto.Item) (*absto.Item, *absto.Item) {
 	var (
 		found    bool
-		previous *provider.StorageItem
+		previous *absto.Item
 	)
 
 	for index, neighbor := range files {

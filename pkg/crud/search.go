@@ -5,11 +5,11 @@ import (
 	"net/http"
 	"net/url"
 	"regexp"
-	"sort"
 	"strconv"
 	"strings"
 	"time"
 
+	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	httpModel "github.com/ViBiOh/httputils/v4/pkg/model"
 )
@@ -63,7 +63,7 @@ func parseSearch(params url.Values) (output search, err error) {
 	return
 }
 
-func (s search) match(item provider.StorageItem) bool {
+func (s search) match(item absto.Item) bool {
 	if !s.matchSize(item) {
 		return false
 	}
@@ -87,7 +87,7 @@ func (s search) match(item provider.StorageItem) bool {
 	return true
 }
 
-func (s search) matchSize(item provider.StorageItem) bool {
+func (s search) matchSize(item absto.Item) bool {
 	if s.size == 0 {
 		return true
 	}
@@ -99,7 +99,7 @@ func (s search) matchSize(item provider.StorageItem) bool {
 	return true
 }
 
-func (s search) matchMimes(item provider.StorageItem) bool {
+func (s search) matchMimes(item absto.Item) bool {
 	if len(s.mimes) == 0 {
 		return true
 	}
@@ -114,7 +114,7 @@ func (s search) matchMimes(item provider.StorageItem) bool {
 	return false
 }
 
-func (a App) searchFiles(r *http.Request, request provider.Request) (items []provider.StorageItem, err error) {
+func (a App) searchFiles(r *http.Request, request provider.Request) (items []absto.Item, err error) {
 	params := r.URL.Query()
 
 	criterions, err := parseSearch(params)
@@ -122,7 +122,7 @@ func (a App) searchFiles(r *http.Request, request provider.Request) (items []pro
 		return nil, httpModel.WrapInvalid(err)
 	}
 
-	err = a.storageApp.Walk(request.Filepath(), func(item provider.StorageItem) error {
+	err = a.storageApp.Walk(request.Filepath(), func(item absto.Item) error {
 		if item.IsDir || !criterions.match(item) {
 			return nil
 		}
@@ -132,12 +132,10 @@ func (a App) searchFiles(r *http.Request, request provider.Request) (items []pro
 		return nil
 	})
 
-	sort.Sort(provider.ByHybridSort(items))
-
 	return
 }
 
-func (a App) search(r *http.Request, request provider.Request, files []provider.StorageItem) (string, int, map[string]interface{}, error) {
+func (a App) search(r *http.Request, request provider.Request, files []absto.Item) (string, int, map[string]interface{}, error) {
 	items := make([]provider.RenderItem, len(files))
 	var hasMap bool
 

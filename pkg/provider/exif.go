@@ -3,7 +3,8 @@ package provider
 import (
 	"time"
 
-	"github.com/ViBiOh/exas/pkg/model"
+	absto "github.com/ViBiOh/absto/pkg/model"
+	exas "github.com/ViBiOh/exas/pkg/model"
 )
 
 // Aggregate contains aggregated data for a folder
@@ -15,6 +16,6 @@ type Aggregate struct {
 
 // ExifResponse from AMQP
 type ExifResponse struct {
-	Exif model.Exif  `json:"exif"`
-	Item StorageItem `json:"item"`
+	Exif exas.Exif  `json:"exif"`
+	Item absto.Item `json:"item"`
 }
