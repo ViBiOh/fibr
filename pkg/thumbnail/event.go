@@ -50,7 +50,7 @@ func (a App) generateItem(item absto.Item) {
 
 func (a App) rename(old, new absto.Item) {
 	oldPath := getThumbnailPath(old)
-	if _, err := a.storageApp.Info(oldPath); provider.IsNotExist(err) {
+	if _, err := a.storageApp.Info(oldPath); absto.IsNotExist(err) {
 		return
 	}
 

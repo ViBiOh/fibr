@@ -6,6 +6,7 @@ import (
 	"path"
 	"strings"
 
+	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
@@ -84,7 +85,7 @@ func (a App) createShare(w http.ResponseWriter, r *http.Request, request provide
 
 	info, err := a.storageApp.Info(request.Path)
 	if err != nil {
-		if provider.IsNotExist(err) {
+		if absto.IsNotExist(err) {
 			a.error(w, r, request, model.WrapNotFound(err))
 		} else {
 			a.error(w, r, request, model.WrapInternal(err))

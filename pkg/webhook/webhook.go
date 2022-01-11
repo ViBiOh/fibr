@@ -140,7 +140,7 @@ func (a *App) Start(_ <-chan struct{}) {
 
 func (a *App) loadWebhooks() error {
 	if err := provider.LoadJSON(a.storageApp, webhookFilename, &a.webhooks); err != nil {
-		if !provider.IsNotExist(err) {
+		if !absto.IsNotExist(err) {
 			return err
 		}
 

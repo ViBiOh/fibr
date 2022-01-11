@@ -49,7 +49,7 @@ func (a App) saveMetadata(item absto.Item, data interface{}) error {
 	dirname := filepath.Dir(filename)
 
 	if _, err := a.storageApp.Info(dirname); err != nil {
-		if !provider.IsNotExist(err) {
+		if !absto.IsNotExist(err) {
 			return fmt.Errorf("unable to check directory existence: %s", err)
 		}
 

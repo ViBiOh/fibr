@@ -152,7 +152,7 @@ func (a *App) Start(done <-chan struct{}) {
 
 func (a *App) refresh() error {
 	if err := provider.LoadJSON(a.storageApp, shareFilename, &a.shares); err != nil {
-		if !provider.IsNotExist(err) {
+		if !absto.IsNotExist(err) {
 			return err
 		}
 

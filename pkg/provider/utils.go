@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -55,8 +54,7 @@ var (
 	}
 
 	// SlowClient allows 2 minutes timeout
-	SlowClient   = request.CreateClient(2*time.Minute, request.NoRedirection)
-	errNotExists = errors.New("not exists")
+	SlowClient = request.CreateClient(2*time.Minute, request.NoRedirection)
 )
 
 // Join concatenates strings respecting terminal slashes
@@ -136,20 +134,6 @@ func DoneWriter(isDone func() bool, w io.Writer, content string) {
 	}
 
 	SafeWrite(w, content)
-}
-
-// ErrNotExist create a NotExist error
-func ErrNotExist(err error) error {
-	return fmt.Errorf("%s: %w", err, errNotExists)
-}
-
-// IsNotExist checks if error match a not found
-func IsNotExist(err error) bool {
-	if err == nil {
-		return false
-	}
-
-	return errors.Is(err, errNotExists)
 }
 
 // FindIndex finds index of given value into array, or -1 if not found

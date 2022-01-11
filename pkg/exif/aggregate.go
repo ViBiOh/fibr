@@ -23,7 +23,7 @@ func (a App) GetExifFor(item absto.Item) (exas.Exif, error) {
 	}
 
 	exif, err := a.loadExif(item)
-	if err != nil && !provider.IsNotExist(err) {
+	if err != nil && !absto.IsNotExist(err) {
 		return exif, fmt.Errorf("unable to load exif: %s", err)
 	}
 
@@ -37,7 +37,7 @@ func (a App) GetAggregateFor(item absto.Item) (provider.Aggregate, error) {
 	}
 
 	aggregate, err := a.loadAggregate(item)
-	if err != nil && !provider.IsNotExist(err) {
+	if err != nil && !absto.IsNotExist(err) {
 		return aggregate, fmt.Errorf("unable to load aggregate: %s", err)
 	}
 
@@ -76,7 +76,7 @@ func (a App) computeAndSaveAggregate(dir absto.Item) error {
 
 		exifData, err := a.loadExif(item)
 		if err != nil {
-			if provider.IsNotExist(err) {
+			if absto.IsNotExist(err) {
 				return nil
 			}
 			return fmt.Errorf("unable load exif data: %s", err)

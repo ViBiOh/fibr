@@ -90,7 +90,7 @@ func (a App) processExif(item absto.Item, exif exas.Exif) error {
 
 func (a App) rename(old, new absto.Item) error {
 	oldPath := getExifPath(old)
-	if _, err := a.storageApp.Info(oldPath); provider.IsNotExist(err) {
+	if _, err := a.storageApp.Info(oldPath); absto.IsNotExist(err) {
 		return nil
 	}
 

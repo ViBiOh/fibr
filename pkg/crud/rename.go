@@ -62,14 +62,14 @@ func (a App) Rename(w http.ResponseWriter, r *http.Request, request provider.Req
 	if _, err = a.storageApp.Info(newPath); err == nil {
 		a.error(w, r, request, model.WrapInvalid(errors.New("new name already exist")))
 		return
-	} else if !provider.IsNotExist(err) {
+	} else if !absto.IsNotExist(err) {
 		a.error(w, r, request, model.WrapInternal(err))
 		return
 	}
 
 	oldItem, err := a.storageApp.Info(oldPath)
 	if err != nil {
-		if !provider.IsNotExist(err) {
+		if !absto.IsNotExist(err) {
 			err = model.WrapInternal(err)
 		} else {
 			err = model.WrapNotFound(err)

@@ -1,7 +1,6 @@
 package provider
 
 import (
-	"errors"
 	"io"
 	"reflect"
 	"testing"
@@ -97,38 +96,6 @@ func TestSafeWrite(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.intention, func(t *testing.T) {
 			SafeWrite(tc.args.writer, tc.args.content)
-		})
-	}
-}
-
-func TestIsNotExist(t *testing.T) {
-	cases := []struct {
-		intention string
-		input     error
-		want      bool
-	}{
-		{
-			"nil error",
-			nil,
-			false,
-		},
-		{
-			"empty error",
-			errors.New("invalid value"),
-			false,
-		},
-		{
-			"file error",
-			ErrNotExist(errors.New("index.html: no such file or directory")),
-			true,
-		},
-	}
-
-	for _, testCase := range cases {
-		t.Run(testCase.intention, func(t *testing.T) {
-			if result := IsNotExist(testCase.input); result != testCase.want {
-				t.Errorf("IsNotExist() = %#v, want %#v", result, testCase.want)
-			}
 		})
 	}
 }

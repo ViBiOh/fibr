@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 
+	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
@@ -36,7 +37,7 @@ func (a App) createWebhook(w http.ResponseWriter, r *http.Request, request provi
 
 	info, err := a.storageApp.Info(request.Path)
 	if err != nil {
-		if provider.IsNotExist(err) {
+		if absto.IsNotExist(err) {
 			a.error(w, r, request, model.WrapNotFound(err))
 		} else {
 			a.error(w, r, request, model.WrapInternal(err))

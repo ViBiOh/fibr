@@ -22,12 +22,12 @@ func (a App) getWithMessage(w http.ResponseWriter, r *http.Request, request prov
 	pathname := request.Filepath()
 	item, err := a.storageApp.Info(pathname)
 
-	if err != nil && provider.IsNotExist(err) && provider.StreamExtensions[filepath.Ext(pathname)] {
+	if err != nil && absto.IsNotExist(err) && provider.StreamExtensions[filepath.Ext(pathname)] {
 		item, err = a.thumbnailApp.GetChunk(pathname)
 	}
 
 	if err != nil {
-		if provider.IsNotExist(err) {
+		if absto.IsNotExist(err) {
 			return errorReturn(request, model.WrapNotFound(err))
 		}
 
