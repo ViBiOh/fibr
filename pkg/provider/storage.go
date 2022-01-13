@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"mime"
 	"strings"
 	"time"
 
@@ -65,6 +66,20 @@ type RenderItem struct {
 	URL  string
 	Path string
 	absto.Item
+}
+
+// Mime gives Mime Type of item
+func (r RenderItem) Mime() string {
+	extension := r.Extension()
+	if mimeType := mime.TypeByExtension(extension); mimeType != "" {
+		return mimeType
+	}
+
+	if CodeExtensions[extension] {
+		return "text/plain; charset=utf-8"
+	}
+
+	return ""
 }
 
 // StorageToRender converts Item to RenderItem
