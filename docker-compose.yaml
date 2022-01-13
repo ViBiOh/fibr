@@ -24,7 +24,7 @@ services:
   vith:
     image: vibioh/vith
     environment:
-      VITH_WORK_DIR: '/data'
+      VITH_STORAGE_DIRECTORY: '/data'
     volumes:
       - ${DATA_DIR}:/data
     user: '${DATA_USER_ID}'
