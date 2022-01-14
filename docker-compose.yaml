@@ -38,7 +38,7 @@ services:
   exas:
     image: vibioh/exas
     environment:
-      EXAS_WORK_DIR: '/data'
+      EXAS_STORAGE_DIRECTORY: '/data'
     volumes:
       - ${DATA_DIR}:/data
     user: '${DATA_USER_ID}'
