@@ -63,7 +63,7 @@ func Join(parts ...string) string {
 
 	for i := len(parts) - 1; i >= 0; i-- {
 		if part := parts[i]; len(part) != 0 {
-			if strings.HasSuffix(part, "/") {
+			if strings.HasSuffix(part, "/") && !strings.HasSuffix(pathname, "/") {
 				pathname += "/"
 			}
 			break
@@ -158,6 +158,10 @@ func RemoveIndex(arr []string, index int) []string {
 
 // LoadJSON loads JSON content
 func LoadJSON(storageApp absto.Storage, filename string, content interface{}) (err error) {
+	if _, err = storageApp.Info(filename); err != nil {
+		return fmt.Errorf("unable to get info: %w", err)
+	}
+
 	var reader io.ReadCloser
 	reader, err = storageApp.ReaderFrom(filename)
 	if err != nil {
@@ -169,7 +173,7 @@ func LoadJSON(storageApp absto.Storage, filename string, content interface{}) (e
 	}()
 
 	if err = json.NewDecoder(reader).Decode(content); err != nil {
-		err = fmt.Errorf("unable to decode: %s", err)
+		err = fmt.Errorf("unable to decode: %w", err)
 	}
 
 	return
@@ -188,7 +192,7 @@ func SaveJSON(storageApp absto.Storage, filename string, content interface{}) (e
 	}()
 
 	if err = json.NewEncoder(writer).Encode(content); err != nil {
-		err = fmt.Errorf("unable to encode: %s", err)
+		err = fmt.Errorf("unable to encode: %w", err)
 	}
 
 	return
@@ -214,7 +218,7 @@ func SendLargeFile(ctx context.Context, storageApp absto.Storage, item absto.Ite
 
 		var err error
 		if _, err = io.CopyBuffer(writer, file, buffer.Bytes()); err != nil {
-			err = fmt.Errorf("unable to copy: %s", err)
+			err = fmt.Errorf("unable to copy: %w", err)
 		}
 
 		_ = writer.CloseWithError(err)
