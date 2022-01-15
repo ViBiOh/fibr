@@ -10,6 +10,7 @@ import (
 	"path"
 	"time"
 
+	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
@@ -30,8 +31,9 @@ func (a App) saveUploadedFile(request provider.Request, part *multipart.Part) (f
 		filePath = request.SubPath(filename)
 	}
 
-	var writer io.WriteCloser
-	writer, err = a.storageApp.WriterTo(filePath)
+	var writer io.Writer
+	var closer absto.Closer
+	writer, closer, err = a.storageApp.WriterTo(filePath)
 	if err != nil {
 		return "", fmt.Errorf("unable to get writer: %w", err)
 	}
@@ -47,7 +49,9 @@ func (a App) saveUploadedFile(request provider.Request, part *multipart.Part) (f
 	}()
 
 	defer func() {
-		err = provider.HandleClose(writer, err)
+		if closeErr := closer(); closeErr != nil {
+			err = model.WrapError(err, fmt.Errorf("unable to close: %s", closeErr))
+		}
 	}()
 
 	buffer := provider.BufferPool.Get().(*bytes.Buffer)

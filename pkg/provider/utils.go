@@ -181,14 +181,17 @@ func LoadJSON(storageApp absto.Storage, filename string, content interface{}) (e
 
 // SaveJSON saves JSON content
 func SaveJSON(storageApp absto.Storage, filename string, content interface{}) (err error) {
-	var writer io.WriteCloser
-	writer, err = storageApp.WriterTo(filename)
+	var writer io.Writer
+	var closer absto.Closer
+	writer, closer, err = storageApp.WriterTo(filename)
 	if err != nil {
 		return fmt.Errorf("unable to get writer: %w", err)
 	}
 
 	defer func() {
-		err = HandleClose(writer, err)
+		if closeErr := closer(); closeErr != nil {
+			err = model.WrapError(err, fmt.Errorf("unable to close: %s", closeErr))
+		}
 	}()
 
 	if err = json.NewEncoder(writer).Encode(content); err != nil {

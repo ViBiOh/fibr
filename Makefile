@@ -90,7 +90,6 @@ build:
 .PHONY: run
 run:
 	$(MAIN_RUNNER) \
-		-storageDirectory "$(PWD)" \
 		-ignorePattern ".git" \
 		-authProfiles "1:admin" \
 		-authUsers "1:`htpasswd -nBb admin admin`" \

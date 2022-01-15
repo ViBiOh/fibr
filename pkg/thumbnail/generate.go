@@ -11,9 +11,10 @@ import (
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/v4/pkg/model"
 	httpModel "github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
-	"github.com/ViBiOh/vith/pkg/model"
+	vith "github.com/ViBiOh/vith/pkg/model"
 )
 
 const (
@@ -48,15 +49,16 @@ func (a App) generate(item absto.Item) (err error) {
 		return fmt.Errorf("unable to create directory: %s", err)
 	}
 
-	var writer io.WriteCloser
-	writer, err = a.storageApp.WriterTo(thumbnailPath)
+	var writer io.Writer
+	var closer absto.Closer
+	writer, closer, err = a.storageApp.WriterTo(thumbnailPath)
 	if err != nil {
 		return fmt.Errorf("unable to get writer: %w", err)
 	}
 
 	defer func() {
-		if closeErr := writer.Close(); closeErr != nil {
-			err = httpModel.WrapError(err, fmt.Errorf("unable to close: %s", closeErr))
+		if closeErr := closer(); closeErr != nil {
+			err = model.WrapError(err, fmt.Errorf("unable to close: %s", closeErr))
 		}
 	}()
 
@@ -78,7 +80,7 @@ func (a App) requestVith(ctx context.Context, item absto.Item) (*http.Response, 
 	if a.amqpClient != nil {
 		a.increaseMetric(itemType.String(), "publish")
 
-		err := a.amqpClient.PublishJSON(model.NewRequest(item.Pathname, getThumbnailPath(item), itemType), a.amqpExchange, a.amqpThumbnailRoutingKey)
+		err := a.amqpClient.PublishJSON(vith.NewRequest(item.Pathname, getThumbnailPath(item), itemType), a.amqpExchange, a.amqpThumbnailRoutingKey)
 		if err != nil {
 			a.increaseMetric(itemType.String(), "error")
 		}

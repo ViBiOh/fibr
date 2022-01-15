@@ -208,12 +208,13 @@ func (mr *StorageMockRecorder) WithIgnoreFn(arg0 interface{}) *gomock.Call {
 }
 
 // WriterTo mocks base method.
-func (m *Storage) WriterTo(arg0 string) (io.WriteCloser, error) {
+func (m *Storage) WriterTo(arg0 string) (io.Writer, model.Closer, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "WriterTo", arg0)
-	ret0, _ := ret[0].(io.WriteCloser)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(io.Writer)
+	ret1, _ := ret[1].(model.Closer)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
 }
 
 // WriterTo indicates an expected call of WriterTo.
