@@ -3,10 +3,11 @@ module github.com/ViBiOh/fibr
 go 1.17
 
 require (
-	github.com/ViBiOh/absto v0.0.5
-	github.com/ViBiOh/auth/v2 v2.11.33
+	github.com/ViBiOh/absto v0.0.6
+	github.com/ViBiOh/auth/v2 v2.11.34
 	github.com/ViBiOh/exas v0.2.4
-	github.com/ViBiOh/httputils/v4 v4.34.3
+	github.com/ViBiOh/flags v0.0.1
+	github.com/ViBiOh/httputils/v4 v4.34.4
 	github.com/ViBiOh/vith v0.3.0
 	github.com/golang/mock v1.6.0
 	github.com/prometheus/client_golang v1.11.0

@@ -13,8 +13,8 @@ import (
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/amqp"
-	"github.com/ViBiOh/httputils/v4/pkg/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/httperror"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	prom "github.com/ViBiOh/httputils/v4/pkg/prometheus"
@@ -221,6 +221,6 @@ func (a App) encodeContent(encoder io.WriteCloser, item absto.Item) {
 	}
 }
 
-func logEncodeContentError(item absto.Item) logger.FieldsContext {
+func logEncodeContentError(item absto.Item) logger.Provider {
 	return logger.WithField("fn", "thumbnail.encodeContent").WithField("item", item.Pathname)
 }
