@@ -44,6 +44,10 @@ func (a App) generate(item absto.Item) (err error) {
 		}
 	}()
 
+	if resp.StatusCode == http.StatusNoContent {
+		return nil
+	}
+
 	thumbnailPath := getThumbnailPath(item)
 	if err = a.storageApp.CreateDir(filepath.Dir(thumbnailPath)); err != nil {
 		return fmt.Errorf("unable to create directory: %s", err)
@@ -56,17 +60,15 @@ func (a App) generate(item absto.Item) (err error) {
 		return fmt.Errorf("unable to get writer: %w", err)
 	}
 
-	defer func() {
-		if closeErr := closer(); closeErr != nil {
-			err = model.WrapError(err, fmt.Errorf("unable to close: %s", closeErr))
-		}
-	}()
-
 	buffer := provider.BufferPool.Get().(*bytes.Buffer)
 	defer provider.BufferPool.Put(buffer)
 
 	if _, err = io.CopyBuffer(writer, resp.Body, buffer.Bytes()); err != nil {
 		err = fmt.Errorf("unable to copy response: %s", err)
+	}
+
+	if closeErr := closer(); closeErr != nil {
+		err = model.WrapError(err, fmt.Errorf("unable to close: %s", closeErr))
 	}
 
 	a.increaseMetric(itemType.String(), "save")
@@ -76,22 +78,17 @@ func (a App) generate(item absto.Item) (err error) {
 
 func (a App) requestVith(ctx context.Context, item absto.Item) (*http.Response, error) {
 	itemType := typeOfItem(item)
+	outputName := getThumbnailPath(item)
 
 	if a.amqpClient != nil {
 		a.increaseMetric(itemType.String(), "publish")
-
-		err := a.amqpClient.PublishJSON(vith.NewRequest(item.Pathname, getThumbnailPath(item), itemType), a.amqpExchange, a.amqpThumbnailRoutingKey)
-		if err != nil {
-			a.increaseMetric(itemType.String(), "error")
-		}
-
-		return nil, err
+		return nil, a.amqpClient.PublishJSON(vith.NewRequest(item.Pathname, outputName, itemType), a.amqpExchange, a.amqpThumbnailRoutingKey)
 	}
 
 	a.increaseMetric(itemType.String(), "request")
 
 	if a.directAccess {
-		return a.vithRequest.Method(http.MethodGet).Path(fmt.Sprintf("%s?type=%s", item.Pathname, itemType)).Send(ctx, nil)
+		return a.vithRequest.Method(http.MethodGet).Path(fmt.Sprintf("%s?type=%s&to=%s", item.Pathname, itemType, outputName)).Send(ctx, nil)
 	}
 
 	return provider.SendLargeFile(ctx, a.storageApp, item, a.vithRequest.Method(http.MethodPost).Path(fmt.Sprintf("?type=%s", itemType)))
