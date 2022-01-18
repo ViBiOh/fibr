@@ -24,7 +24,6 @@ func (a *App) EventConsumer(event provider.Event) {
 		if !webhook.Match(event) {
 			continue
 		}
-
 		var statusCode int
 		var err error
 

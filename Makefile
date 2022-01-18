@@ -11,7 +11,7 @@ PACKAGES ?= ./...
 MAIN_SOURCE = cmd/fibr/fibr.go
 MAIN_RUNNER = go run $(MAIN_SOURCE)
 ifeq ($(DEBUG), true)
-	MAIN_RUNNER = gdlv -d $(shell dirname $(MAIN_SOURCE)) debug --
+	MAIN_RUNNER = dlv debug $(MAIN_SOURCE) --
 endif
 
 .DEFAULT_GOAL := app

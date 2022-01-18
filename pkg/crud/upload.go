@@ -8,7 +8,6 @@ import (
 	"mime/multipart"
 	"net/http"
 	"path"
-	"time"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -48,31 +47,28 @@ func (a App) saveUploadedFile(request provider.Request, part *multipart.Part) (f
 		}
 	}()
 
-	defer func() {
-		if closeErr := closer(); closeErr != nil {
-			err = model.WrapError(err, fmt.Errorf("unable to close: %s", closeErr))
-		}
-	}()
-
 	buffer := provider.BufferPool.Get().(*bytes.Buffer)
 	defer provider.BufferPool.Put(buffer)
 
 	if _, err = io.CopyBuffer(writer, part, buffer.Bytes()); err != nil {
-		return filename, fmt.Errorf("unable to copy: %s", err)
+		err = fmt.Errorf("unable to copy: %s", err)
 	}
 
-	go func() {
-		// Waiting two seconds for filesystem cache refresh (S3 notably)
-		time.Sleep(time.Second)
+	if closeErr := closer(); closeErr != nil {
+		err = model.WrapError(err, fmt.Errorf("unable to close: %s", closeErr))
+	}
 
-		if info, infoErr := a.storageApp.Info(filePath); infoErr != nil {
-			logger.Error("unable to get info for upload event: %s", infoErr)
-		} else {
-			a.notify(provider.NewUploadEvent(request, info, a.bestSharePath(request, filename), a.rendererApp))
-		}
-	}()
+	if err == nil {
+		go func() {
+			if info, infoErr := a.storageApp.Info(filePath); infoErr != nil {
+				logger.Error("unable to get info for upload event: %s", infoErr)
+			} else {
+				a.notify(provider.NewUploadEvent(request, info, a.bestSharePath(request, filename), a.rendererApp))
+			}
+		}()
+	}
 
-	return filename, nil
+	return filename, err
 }
 
 // Upload saves form files to filesystem

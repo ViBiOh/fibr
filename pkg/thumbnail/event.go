@@ -18,7 +18,7 @@ func (a App) EventConsumer(e provider.Event) {
 	case provider.StartEvent:
 		fallthrough
 	case provider.UploadEvent:
-		a.generateItem(e.Item)
+		a.generateItem(e)
 	case provider.RenameEvent:
 		a.rename(e.Item, *e.New)
 	case provider.DeleteEvent:
@@ -26,22 +26,22 @@ func (a App) EventConsumer(e provider.Event) {
 	}
 }
 
-func (a App) generateItem(item absto.Item) {
-	if !a.CanHaveThumbnail(item) {
+func (a App) generateItem(event provider.Event) {
+	if !a.CanHaveThumbnail(event.Item) {
 		return
 	}
 
-	if !a.HasThumbnail(item) {
-		if err := a.generate(item); err != nil {
-			logger.WithField("fn", "thumbnail.generate").WithField("item", item.Pathname).Error("unable to generate: %s", err)
+	if event.GetMetadata("force") == "true" || !a.HasThumbnail(event.Item) {
+		if err := a.generate(event.Item); err != nil {
+			logger.WithField("fn", "thumbnail.generate").WithField("item", event.Item.Pathname).Error("unable to generate: %s", err)
 		}
 	}
 
-	if item.IsVideo() && !a.HasStream(item) {
-		if needStream, err := a.shouldGenerateStream(context.Background(), item); err != nil {
+	if event.Item.IsVideo() && (event.GetMetadata("force") == "true" || !a.HasStream(event.Item)) {
+		if needStream, err := a.shouldGenerateStream(context.Background(), event.Item); err != nil {
 			logger.Error("unable to determine if stream generation is possible: %s", err)
 		} else if needStream {
-			if err := a.generateStream(context.Background(), item); err != nil {
+			if err := a.generateStream(context.Background(), event.Item); err != nil {
 				logger.Error("unable to generate stream: %s", err)
 			}
 		}

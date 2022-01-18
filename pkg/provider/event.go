@@ -92,6 +92,15 @@ type Event struct {
 	Type         EventType         `json:"type"`
 }
 
+// GetMetadata extracts metadata content
+func (e Event) GetMetadata(key string) string {
+	if e.Metadata == nil {
+		return ""
+	}
+
+	return e.Metadata[key]
+}
+
 // GetURL returns the appropriate URL for the event
 func (e Event) GetURL() string {
 	if len(e.ShareableURL) > 0 {
