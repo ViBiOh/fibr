@@ -68,7 +68,7 @@ func (a App) handleFile(w http.ResponseWriter, r *http.Request, request provider
 }
 
 func (a App) serveFile(w http.ResponseWriter, r *http.Request, item absto.Item) error {
-	file, err := a.storageApp.ReaderFrom(item.Pathname)
+	file, err := a.storageApp.ReadFrom(item.Pathname)
 	if err != nil {
 		return fmt.Errorf("unable to get reader for `%s`: %w", item.Pathname, err)
 	}

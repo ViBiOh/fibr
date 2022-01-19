@@ -163,7 +163,7 @@ func LoadJSON(storageApp absto.Storage, filename string, content interface{}) (e
 	}
 
 	var reader io.ReadCloser
-	reader, err = storageApp.ReaderFrom(filename)
+	reader, err = storageApp.ReadFrom(filename)
 	if err != nil {
 		return fmt.Errorf("unable to read: %w", err)
 	}
@@ -180,30 +180,37 @@ func LoadJSON(storageApp absto.Storage, filename string, content interface{}) (e
 }
 
 // SaveJSON saves JSON content
-func SaveJSON(storageApp absto.Storage, filename string, content interface{}) (err error) {
-	var writer io.Writer
-	var closer absto.Closer
-	writer, closer, err = storageApp.WriterTo(filename)
-	if err != nil {
-		return fmt.Errorf("unable to get writer: %w", err)
-	}
+func SaveJSON(storageApp absto.Storage, filename string, content interface{}) error {
+	reader, writer := io.Pipe()
 
-	defer func() {
-		if closeErr := closer(); closeErr != nil {
-			err = model.WrapError(err, fmt.Errorf("unable to close: %s", closeErr))
+	done := make(chan error)
+	go func() {
+		defer close(done)
+		var err error
+
+		if jsonErr := json.NewEncoder(writer).Encode(content); jsonErr != nil {
+			err = fmt.Errorf("unable to encode: %w", jsonErr)
 		}
+
+		if closeErr := writer.Close(); closeErr != nil {
+			err = model.WrapError(err, fmt.Errorf("unable to close encoder: %w", closeErr))
+		}
+
+		done <- err
 	}()
 
-	if err = json.NewEncoder(writer).Encode(content); err != nil {
-		err = fmt.Errorf("unable to encode: %w", err)
+	err := storageApp.WriteTo(filename, reader)
+
+	if jsonErr := <-done; jsonErr != nil {
+		err = model.WrapError(err, jsonErr)
 	}
 
-	return
+	return err
 }
 
 // SendLargeFile in a request with buffered copy
 func SendLargeFile(ctx context.Context, storageApp absto.Storage, item absto.Item, req request.Request) (*http.Response, error) {
-	file, err := storageApp.ReaderFrom(item.Pathname) // will be closed by `PipeWriter`
+	file, err := storageApp.ReadFrom(item.Pathname) // will be closed by `PipeWriter`
 	if err != nil {
 		return nil, fmt.Errorf("unable to get reader: %w", err)
 	}
@@ -255,22 +262,7 @@ func WriteToStorage(storageApp absto.Storage, output string, reader io.Reader) e
 		}
 	}
 
-	writer, closer, err := storageApp.WriterTo(output)
-	if err != nil {
-		return fmt.Errorf("unable to get writer: %w", err)
-	}
-
-	buffer := BufferPool.Get().(*bytes.Buffer)
-	defer BufferPool.Put(buffer)
-
-	if _, err = io.CopyBuffer(writer, reader, buffer.Bytes()); err != nil {
-		err = fmt.Errorf("unable to copy: %s", err)
-	}
-
-	if closeErr := closer(); closeErr != nil {
-		err = model.WrapError(err, fmt.Errorf("unable to close: %s", closeErr))
-	}
-
+	err := storageApp.WriteTo(output, reader)
 	if err != nil {
 		if removeErr := storageApp.Remove(output); removeErr != nil {
 			err = model.WrapError(err, fmt.Errorf("unable to remove: %s", removeErr))

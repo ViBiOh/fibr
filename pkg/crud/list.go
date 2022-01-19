@@ -165,7 +165,7 @@ func (a App) addFileToZip(zipWriter *zip.Writer, item absto.Item, pathname strin
 	}
 
 	var reader io.ReadCloser
-	reader, err = a.storageApp.ReaderFrom(item.Pathname)
+	reader, err = a.storageApp.ReadFrom(item.Pathname)
 	if err != nil {
 		return fmt.Errorf("unable to read: %w", err)
 	}

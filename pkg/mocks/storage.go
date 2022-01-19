@@ -122,19 +122,19 @@ func (mr *StorageMockRecorder) Path(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Path", reflect.TypeOf((*Storage)(nil).Path), arg0)
 }
 
-// ReaderFrom mocks base method.
-func (m *Storage) ReaderFrom(arg0 string) (io.ReadSeekCloser, error) {
+// ReadFrom mocks base method.
+func (m *Storage) ReadFrom(arg0 string) (io.ReadSeekCloser, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ReaderFrom", arg0)
+	ret := m.ctrl.Call(m, "ReadFrom", arg0)
 	ret0, _ := ret[0].(io.ReadSeekCloser)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ReaderFrom indicates an expected call of ReaderFrom.
-func (mr *StorageMockRecorder) ReaderFrom(arg0 interface{}) *gomock.Call {
+// ReadFrom indicates an expected call of ReadFrom.
+func (mr *StorageMockRecorder) ReadFrom(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReaderFrom", reflect.TypeOf((*Storage)(nil).ReaderFrom), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReadFrom", reflect.TypeOf((*Storage)(nil).ReadFrom), arg0)
 }
 
 // Remove mocks base method.
@@ -207,18 +207,16 @@ func (mr *StorageMockRecorder) WithIgnoreFn(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WithIgnoreFn", reflect.TypeOf((*Storage)(nil).WithIgnoreFn), arg0)
 }
 
-// WriterTo mocks base method.
-func (m *Storage) WriterTo(arg0 string) (io.Writer, model.Closer, error) {
+// WriteTo mocks base method.
+func (m *Storage) WriteTo(arg0 string, arg1 io.Reader) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "WriterTo", arg0)
-	ret0, _ := ret[0].(io.Writer)
-	ret1, _ := ret[1].(model.Closer)
-	ret2, _ := ret[2].(error)
-	return ret0, ret1, ret2
+	ret := m.ctrl.Call(m, "WriteTo", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
-// WriterTo indicates an expected call of WriterTo.
-func (mr *StorageMockRecorder) WriterTo(arg0 interface{}) *gomock.Call {
+// WriteTo indicates an expected call of WriteTo.
+func (mr *StorageMockRecorder) WriteTo(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriterTo", reflect.TypeOf((*Storage)(nil).WriterTo), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteTo", reflect.TypeOf((*Storage)(nil).WriteTo), arg0, arg1)
 }

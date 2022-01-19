@@ -119,7 +119,7 @@ func (a App) Stream(w http.ResponseWriter, r *http.Request, item absto.Item) {
 		return
 	}
 
-	reader, err := a.storageApp.ReaderFrom(getStreamPath(item))
+	reader, err := a.storageApp.ReadFrom(getStreamPath(item))
 	if err != nil {
 		httperror.InternalServerError(w, err)
 		return
@@ -143,7 +143,7 @@ func (a App) Serve(w http.ResponseWriter, r *http.Request, item absto.Item) {
 	}
 
 	thumbnailPath := getThumbnailPath(item)
-	reader, err := a.storageApp.ReaderFrom(thumbnailPath)
+	reader, err := a.storageApp.ReadFrom(thumbnailPath)
 	if err != nil {
 		httperror.InternalServerError(w, err)
 		return
@@ -199,7 +199,7 @@ func (a App) List(w http.ResponseWriter, r *http.Request, items []absto.Item) {
 }
 
 func (a App) encodeContent(encoder io.WriteCloser, item absto.Item) {
-	reader, err := a.storageApp.ReaderFrom(getThumbnailPath(item))
+	reader, err := a.storageApp.ReadFrom(getThumbnailPath(item))
 	if err != nil {
 		logEncodeContentError(item).Error("unable to open: %s", err)
 		return

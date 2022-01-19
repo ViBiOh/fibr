@@ -132,6 +132,9 @@ exclusive:
 
 // Start worker
 func (a *App) Start(_ <-chan struct{}) {
+	a.Lock()
+	defer a.Unlock()
+
 	if err := a.loadWebhooks(); err != nil {
 		logger.Error("unable to refresh webhooks: %s", err)
 		return

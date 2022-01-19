@@ -134,7 +134,7 @@ func (a *App) Get(requestPath string) provider.Share {
 
 // Start worker
 func (a *App) Start(done <-chan struct{}) {
-	if err := a.refresh(); err != nil {
+	if err := a.loadShares(); err != nil {
 		logger.Error("unable to refresh shares: %s", err)
 		return
 	}
@@ -148,6 +148,13 @@ func (a *App) Start(done <-chan struct{}) {
 	}
 
 	cron.Start(a.cleanShares, done)
+}
+
+func (a *App) loadShares() error {
+	a.Lock()
+	defer a.Unlock()
+
+	return a.refresh()
 }
 
 func (a *App) refresh() error {
