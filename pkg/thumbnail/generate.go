@@ -64,7 +64,7 @@ func (a App) requestVith(ctx context.Context, item absto.Item) (*http.Response, 
 	a.increaseMetric(itemType.String(), "request")
 
 	if a.directAccess {
-		return a.vithRequest.Method(http.MethodGet).Path(fmt.Sprintf("%s?type=%s&to=%s", item.Pathname, itemType, outputName)).Send(ctx, nil)
+		return a.vithRequest.Method(http.MethodGet).Path(fmt.Sprintf("%s?type=%s&output=%s", item.Pathname, itemType, outputName)).Send(ctx, nil)
 	}
 
 	return provider.SendLargeFile(ctx, a.storageApp, item, a.vithRequest.Method(http.MethodPost).Path(fmt.Sprintf("?type=%s", itemType)))
