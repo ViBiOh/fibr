@@ -245,3 +245,37 @@ func HandleClose(closer io.Closer, err error) error {
 
 	return err
 }
+
+// WriteToStorage writes given content to storage
+func WriteToStorage(storageApp absto.Storage, output string, reader io.Reader) error {
+	directory := path.Dir(output)
+	if _, err := storageApp.Info(directory); absto.IsNotExist(err) {
+		if err := storageApp.CreateDir(directory); err != nil {
+			return fmt.Errorf("unable to create directory: %s", err)
+		}
+	}
+
+	writer, closer, err := storageApp.WriterTo(output)
+	if err != nil {
+		return fmt.Errorf("unable to get writer: %w", err)
+	}
+
+	buffer := BufferPool.Get().(*bytes.Buffer)
+	defer BufferPool.Put(buffer)
+
+	if _, err = io.CopyBuffer(writer, reader, buffer.Bytes()); err != nil {
+		err = fmt.Errorf("unable to copy: %s", err)
+	}
+
+	if closeErr := closer(); closeErr != nil {
+		err = model.WrapError(err, fmt.Errorf("unable to close: %s", closeErr))
+	}
+
+	if err != nil {
+		if removeErr := storageApp.Remove(output); removeErr != nil {
+			err = model.WrapError(err, fmt.Errorf("unable to remove: %s", removeErr))
+		}
+	}
+
+	return err
+}

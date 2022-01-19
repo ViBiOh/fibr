@@ -1,15 +1,12 @@
 package crud
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
-	"io"
 	"mime/multipart"
 	"net/http"
 	"path"
 
-	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
@@ -30,33 +27,7 @@ func (a App) saveUploadedFile(request provider.Request, part *multipart.Part) (f
 		filePath = request.SubPath(filename)
 	}
 
-	var writer io.Writer
-	var closer absto.Closer
-	writer, closer, err = a.storageApp.WriterTo(filePath)
-	if err != nil {
-		return "", fmt.Errorf("unable to get writer: %w", err)
-	}
-
-	defer func() {
-		if err == nil {
-			return
-		}
-
-		if removeErr := a.storageApp.Remove(filePath); removeErr != nil {
-			err = fmt.Errorf("%s: %w", err, removeErr)
-		}
-	}()
-
-	buffer := provider.BufferPool.Get().(*bytes.Buffer)
-	defer provider.BufferPool.Put(buffer)
-
-	if _, err = io.CopyBuffer(writer, part, buffer.Bytes()); err != nil {
-		err = fmt.Errorf("unable to copy: %s", err)
-	}
-
-	if closeErr := closer(); closeErr != nil {
-		err = model.WrapError(err, fmt.Errorf("unable to close: %s", closeErr))
-	}
+	err = provider.WriteToStorage(a.storageApp, filePath, part)
 
 	if err == nil {
 		go func() {

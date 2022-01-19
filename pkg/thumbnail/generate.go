@@ -1,17 +1,13 @@
 package thumbnail
 
 import (
-	"bytes"
 	"context"
 	"fmt"
-	"io"
 	"net/http"
-	"path/filepath"
 	"time"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/v4/pkg/model"
 	httpModel "github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 	vith "github.com/ViBiOh/vith/pkg/model"
@@ -48,30 +44,10 @@ func (a App) generate(item absto.Item) (err error) {
 		return nil
 	}
 
-	thumbnailPath := getThumbnailPath(item)
-	if err = a.storageApp.CreateDir(filepath.Dir(thumbnailPath)); err != nil {
-		return fmt.Errorf("unable to create directory: %s", err)
+	err = provider.WriteToStorage(a.storageApp, getThumbnailPath(item), resp.Body)
+	if err == nil {
+		a.increaseMetric(itemType.String(), "save")
 	}
-
-	var writer io.Writer
-	var closer absto.Closer
-	writer, closer, err = a.storageApp.WriterTo(thumbnailPath)
-	if err != nil {
-		return fmt.Errorf("unable to get writer: %w", err)
-	}
-
-	buffer := provider.BufferPool.Get().(*bytes.Buffer)
-	defer provider.BufferPool.Put(buffer)
-
-	if _, err = io.CopyBuffer(writer, resp.Body, buffer.Bytes()); err != nil {
-		err = fmt.Errorf("unable to copy response: %s", err)
-	}
-
-	if closeErr := closer(); closeErr != nil {
-		err = model.WrapError(err, fmt.Errorf("unable to close: %s", closeErr))
-	}
-
-	a.increaseMetric(itemType.String(), "save")
 
 	return err
 }
