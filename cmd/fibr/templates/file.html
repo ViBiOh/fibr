@@ -53,7 +53,7 @@
         {{ if .HasStream }}
           <source src="{{ $url }}?stream" type="application/x-mpegURL"></source>
         {{ end }}
-        <source src="{{ $url }}" type="{{ .File.Mime }}"></source>
+        <source src="{{ $url }}"></source>
       </video>
     {{ else }}
       {{ if .File.IsImage }}
