@@ -70,6 +70,10 @@ func (r RenderItem) IsVideo() bool {
 
 // Mime gives Mime Type of item
 func (r RenderItem) Mime() string {
+	if mimeType, ok := VideoExtensions[r.Extension]; ok {
+		return mimeType
+	}
+
 	if mimeType := mime.TypeByExtension(r.Extension); mimeType != "" {
 		return mimeType
 	}

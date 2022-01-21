@@ -19,7 +19,7 @@ var (
 	// PdfExtensions contains extensions of Pdf
 	PdfExtensions = map[string]bool{".pdf": true}
 	// VideoExtensions contains extensions of Video
-	VideoExtensions = map[string]string{".mp4": "video/mp4", ".mov": "video/quicktime", ".avi": "video/x-msvideo"}
+	VideoExtensions = map[string]string{".mp4": "video/mp4", ".mov": "video/mp4", ".avi": "video/x-msvideo", ".ogg": "video/ogg"}
 	// StreamExtensions contains extensions of streamable content
 	StreamExtensions = map[string]bool{".ts": true}
 	// WordExtensions contains extensions of Word
