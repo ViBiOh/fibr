@@ -13,7 +13,7 @@ import (
 
 // CanHaveExif determine if exif can be extracted for given pathname
 func (a App) CanHaveExif(item absto.Item) bool {
-	return (item.IsImage() || item.IsVideo() || item.IsPdf()) && (a.maxSize == 0 || item.Size < a.maxSize || a.directAccess)
+	return provider.ThumbnailExtensions[item.Extension] && (a.maxSize == 0 || item.Size < a.maxSize || a.directAccess)
 }
 
 func getExifPath(item absto.Item) string {

@@ -104,9 +104,8 @@ func (s search) matchMimes(item absto.Item) bool {
 		return true
 	}
 
-	itemMime := item.Extension()
 	for _, mime := range s.mimes {
-		if strings.EqualFold(mime, itemMime) {
+		if strings.EqualFold(mime, item.Extension) {
 			return true
 		}
 	}

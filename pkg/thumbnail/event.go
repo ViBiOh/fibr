@@ -37,7 +37,7 @@ func (a App) generateItem(event provider.Event) {
 		}
 	}
 
-	if event.Item.IsVideo() && (event.GetMetadata("force") == "true" || !a.HasStream(event.Item)) {
+	if provider.VideoExtensions[event.Item.Extension] != "" && (event.GetMetadata("force") == "true" || !a.HasStream(event.Item)) {
 		if needStream, err := a.shouldGenerateStream(context.Background(), event.Item); err != nil {
 			logger.Error("unable to determine if stream generation is possible: %s", err)
 		} else if needStream {
@@ -58,7 +58,7 @@ func (a App) rename(old, new absto.Item) {
 		logger.Error("unable to rename thumbnail: %s", err)
 	}
 
-	if old.IsVideo() && a.HasStream(old) {
+	if provider.VideoExtensions[old.Extension] != "" && a.HasStream(old) {
 		if err := a.renameStream(context.Background(), old, new); err != nil {
 			logger.Error("unable to rename stream: %s", err)
 		}
@@ -70,7 +70,7 @@ func (a App) delete(item absto.Item) {
 		logger.Error("unable to delete thumbnail: %s", err)
 	}
 
-	if item.IsVideo() && a.HasStream(item) {
+	if provider.VideoExtensions[item.Extension] != "" && a.HasStream(item) {
 		if err := a.deleteStream(context.Background(), item); err != nil {
 			logger.Error("unable to delete stream: %s", err)
 		}

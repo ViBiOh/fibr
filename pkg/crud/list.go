@@ -22,10 +22,6 @@ const (
 
 func (a App) getCover(files []absto.Item) map[string]interface{} {
 	for _, file := range files {
-		if file.IsDir || file.IsVideo() {
-			continue
-		}
-
 		if a.thumbnailApp.HasThumbnail(file) {
 			return map[string]interface{}{
 				"Img":       file,

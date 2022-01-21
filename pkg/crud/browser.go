@@ -40,12 +40,14 @@ func (a App) Browser(w http.ResponseWriter, request provider.Request, item absto
 
 	wg.Wait()
 
+	renderItem := provider.StorageToRender(item, request)
+
 	return "file", http.StatusOK, map[string]interface{}{
 		"Paths":     getPathParts(request),
-		"File":      provider.StorageToRender(item, request),
+		"File":      renderItem,
 		"Exif":      exif,
 		"Cover":     a.getCover(files),
-		"HasStream": item.IsVideo() && a.thumbnailApp.HasStream(item),
+		"HasStream": renderItem.IsVideo() && a.thumbnailApp.HasStream(item),
 
 		"Previous": previous,
 		"Next":     next,

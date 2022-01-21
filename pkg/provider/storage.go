@@ -44,19 +44,7 @@ func (a ByHybridSort) Less(i, j int) bool {
 		return false
 	}
 
-	if (first.IsImage() || first.IsVideo()) && (second.IsImage() || second.IsVideo()) {
-		return greaterTime(first.Date, second.Date)
-	}
-
-	if first.IsImage() || first.IsVideo() {
-		return false
-	}
-
-	if second.IsImage() || first.IsVideo() {
-		return true
-	}
-
-	return lowerString(first.Name, second.Name)
+	return greaterTime(first.Date, second.Date)
 }
 
 // RenderItem is a storage item with an id
@@ -68,14 +56,25 @@ type RenderItem struct {
 	absto.Item
 }
 
+// IsImage check if item is an image
+func (r RenderItem) IsImage() bool {
+	_, ok := ImageExtensions[r.Extension]
+	return ok
+}
+
+// IsVideo check if item is an image
+func (r RenderItem) IsVideo() bool {
+	_, ok := VideoExtensions[r.Extension]
+	return ok
+}
+
 // Mime gives Mime Type of item
 func (r RenderItem) Mime() string {
-	extension := r.Extension()
-	if mimeType := mime.TypeByExtension(extension); mimeType != "" {
+	if mimeType := mime.TypeByExtension(r.Extension); mimeType != "" {
 		return mimeType
 	}
 
-	if CodeExtensions[extension] {
+	if CodeExtensions[r.Extension] {
 		return "text/plain; charset=utf-8"
 	}
 

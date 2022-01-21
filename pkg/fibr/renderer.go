@@ -40,24 +40,22 @@ func FuncMap(thumbnailApp thumbnail.App) template.FuncMap {
 			return false
 		},
 		"iconFromExtension": func(file provider.RenderItem) string {
-			extension := file.Extension()
-
 			switch {
-			case provider.ArchiveExtensions[extension]:
+			case provider.ArchiveExtensions[file.Extension]:
 				return "file-archive"
-			case provider.AudioExtensions[extension]:
+			case provider.AudioExtensions[file.Extension]:
 				return "file-audio"
-			case provider.CodeExtensions[extension]:
+			case provider.CodeExtensions[file.Extension]:
 				return "file-code"
-			case provider.ExcelExtensions[extension]:
+			case provider.ExcelExtensions[file.Extension]:
 				return "file-excel"
-			case provider.ImageExtensions[extension]:
+			case provider.ImageExtensions[file.Extension]:
 				return "file-image"
-			case provider.PdfExtensions[extension]:
+			case provider.PdfExtensions[file.Extension]:
 				return "file-pdf"
-			case provider.VideoExtensions[extension] != "":
+			case provider.VideoExtensions[file.Extension] != "":
 				return "file-video"
-			case provider.WordExtensions[extension]:
+			case provider.WordExtensions[file.Extension]:
 				return "file-word"
 			default:
 				return "file"

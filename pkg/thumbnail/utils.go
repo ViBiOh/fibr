@@ -13,7 +13,7 @@ import (
 
 // CanHaveThumbnail determine if thumbnail can be generated for given pathname
 func (a App) CanHaveThumbnail(item absto.Item) bool {
-	return !item.IsDir && (item.IsImage() || item.IsPdf() || item.IsVideo()) && (a.maxSize == 0 || item.Size < a.maxSize || a.directAccess)
+	return !item.IsDir && provider.ThumbnailExtensions[item.Extension] && (a.maxSize == 0 || item.Size < a.maxSize || a.directAccess)
 }
 
 // HasThumbnail determine if thumbnail exist for given pathname
@@ -45,9 +45,9 @@ func getPathWithExtension(item absto.Item, extension string) string {
 
 func typeOfItem(item absto.Item) model.ItemType {
 	itemType := model.TypeVideo
-	if item.IsImage() {
+	if _, ok := provider.ImageExtensions[item.Extension]; ok {
 		itemType = model.TypeImage
-	} else if item.IsPdf() {
+	} else if _, ok := provider.PdfExtensions[item.Extension]; ok {
 		itemType = model.TypePDF
 	}
 

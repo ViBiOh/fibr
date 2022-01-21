@@ -24,4 +24,7 @@ var (
 	StreamExtensions = map[string]bool{".ts": true}
 	// WordExtensions contains extensions of Word
 	WordExtensions = map[string]bool{".doc": true, ".docx": true, ".docm": true}
+
+	// ThumbnailExtensions contains extensions of file eligible to thumbnail
+	ThumbnailExtensions = map[string]bool{".jpg": true, ".jpeg": true, ".png": true, ".gif": true, ".tiff": true, ".pdf": true, ".mp4": true, ".mov": true, ".avi": true}
 )

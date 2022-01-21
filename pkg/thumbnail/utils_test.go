@@ -25,7 +25,8 @@ func TestCanHaveThumbnail(t *testing.T) {
 			"image",
 			App{},
 			absto.Item{
-				Name: "test.png",
+				Name:      "test.png",
+				Extension: ".png",
 			},
 			true,
 		},
@@ -33,7 +34,8 @@ func TestCanHaveThumbnail(t *testing.T) {
 			"pdf",
 			App{},
 			absto.Item{
-				Name: "test.pdf",
+				Name:      "test.pdf",
+				Extension: ".pdf",
 			},
 			true,
 		},
@@ -41,7 +43,8 @@ func TestCanHaveThumbnail(t *testing.T) {
 			"video",
 			App{},
 			absto.Item{
-				Name: "test.avi",
+				Name:      "test.avi",
+				Extension: ".avi",
 			},
 			true,
 		},
