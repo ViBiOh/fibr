@@ -26,6 +26,10 @@ func parseMultipart(r *http.Request) (map[string]string, *multipart.Part, error)
 			return values, filePart, nil
 		}
 
+		if err != nil {
+			return nil, nil, fmt.Errorf("error while reader multipart: %s", err)
+		}
+
 		formName := part.FormName()
 		switch formName {
 		case "file":
