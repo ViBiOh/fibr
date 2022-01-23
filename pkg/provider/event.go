@@ -10,7 +10,6 @@ import (
 	"time"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
-	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -231,7 +230,7 @@ func (e EventBus) Start(done <-chan struct{}, consumers ...EventConsumer) {
 
 	go func() {
 		for event := range e.bus {
-			for i, consumer := range consumers {
+			for _, consumer := range consumers {
 				consumer(event)
 			}
 			e.increaseMetric(event, "done")
