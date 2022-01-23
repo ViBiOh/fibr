@@ -232,9 +232,7 @@ func (e EventBus) Start(done <-chan struct{}, consumers ...EventConsumer) {
 	go func() {
 		for event := range e.bus {
 			for i, consumer := range consumers {
-				logger.Debug("Sending event `%+v` to consumer #%d...", event, i)
 				consumer(event)
-				logger.Debug("Event `%+v` from consumer #%d has been handled.", event, i)
 			}
 			e.increaseMetric(event, "done")
 		}
