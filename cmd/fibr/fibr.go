@@ -67,7 +67,7 @@ func main() {
 	alcotestConfig := alcotest.Flags(fs, "")
 	loggerConfig := logger.Flags(fs, "logger")
 	prometheusConfig := prometheus.Flags(fs, "prometheus", flags.NewOverride("Gzip", false))
-	owaspConfig := owasp.Flags(fs, "", flags.NewOverride("FrameOptions", "SAMEORIGIN"), flags.NewOverride("Csp", "default-src 'self'; base-uri 'self'; script-src 'nonce' unpkg.com/leaflet@1.7.1/dist/ unpkg.com/leaflet.markercluster@1.5.1/; style-src 'nonce' unpkg.com/leaflet@1.7.1/dist/ unpkg.com/leaflet.markercluster@1.5.1/; img-src 'self' data: a.tile.openstreetmap.org b.tile.openstreetmap.org c.tile.openstreetmap.org"))
+	owaspConfig := owasp.Flags(fs, "", flags.NewOverride("FrameOptions", "SAMEORIGIN"), flags.NewOverride("Csp", "default-src 'self'; base-uri 'self'; script-src 'httputils-nonce' unpkg.com/leaflet@1.7.1/dist/ unpkg.com/leaflet.markercluster@1.5.1/; style-src 'httputils-nonce' unpkg.com/leaflet@1.7.1/dist/ unpkg.com/leaflet.markercluster@1.5.1/; img-src 'self' data: a.tile.openstreetmap.org b.tile.openstreetmap.org c.tile.openstreetmap.org"))
 
 	basicConfig := basicMemory.Flags(fs, "auth")
 

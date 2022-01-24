@@ -257,7 +257,7 @@ Usage of fibr:
   -cert string
         [server] Certificate file {FIBR_CERT}
   -csp string
-        [owasp] Content-Security-Policy {FIBR_CSP} (default "default-src 'self'; base-uri 'self'; script-src 'nonce' unpkg.com/leaflet@1.7.1/dist/ unpkg.com/leaflet.markercluster@1.5.1/; style-src 'nonce' unpkg.com/leaflet@1.7.1/dist/ unpkg.com/leaflet.markercluster@1.5.1/; img-src 'self' data: a.tile.openstreetmap.org b.tile.openstreetmap.org c.tile.openstreetmap.org")
+        [owasp] Content-Security-Policy {FIBR_CSP} (default "default-src 'self'; base-uri 'self'; script-src 'httputils-nonce' unpkg.com/leaflet@1.7.1/dist/ unpkg.com/leaflet.markercluster@1.5.1/; style-src 'httputils-nonce' unpkg.com/leaflet@1.7.1/dist/ unpkg.com/leaflet.markercluster@1.5.1/; img-src 'self' data: a.tile.openstreetmap.org b.tile.openstreetmap.org c.tile.openstreetmap.org")
   -exifAmqpExchange string
         [exif] AMQP Exchange Name {FIBR_EXIF_AMQP_EXCHANGE} (default "fibr")
   -exifAmqpRoutingKey string
