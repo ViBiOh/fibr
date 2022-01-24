@@ -2,6 +2,7 @@ package crud
 
 import (
 	"net/http"
+	"sort"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	exas "github.com/ViBiOh/exas/pkg/model"
@@ -57,15 +58,17 @@ func (a App) Browser(w http.ResponseWriter, request provider.Request, item absto
 	}, nil
 }
 
-func (a App) getFilesPreviousAndNext(item absto.Item, request provider.Request) (files []absto.Item, previous *provider.RenderItem, next *provider.RenderItem) {
+func (a App) getFilesPreviousAndNext(item absto.Item, request provider.Request) (items []absto.Item, previous *provider.RenderItem, next *provider.RenderItem) {
 	var err error
-	files, err = a.storageApp.List(item.Dir())
+	items, err = a.storageApp.List(item.Dir())
 	if err != nil {
 		logger.WithField("item", item.Pathname).Error("unable to list neighbors files: %s", err)
 		return
 	}
 
-	previousItem, nextItem := getPreviousAndNext(item, files)
+	sort.Sort(provider.ByHybridSort(items))
+
+	previousItem, nextItem := getPreviousAndNext(item, items)
 
 	if previousItem != nil {
 		content := provider.StorageToRender(*previousItem, request)
