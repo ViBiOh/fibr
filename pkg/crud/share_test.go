@@ -68,6 +68,22 @@ func TestBestSharePath(t *testing.T) {
 			},
 			"/abcdef123456/folder/index.html",
 		},
+		{
+			"share with password",
+			App{},
+			args{
+				request: provider.Request{
+					Path: "/website/path/to/deep/folder",
+					Share: provider.Share{
+						ID:       "azerty",
+						Path:     "/website",
+						Password: "abcd",
+					},
+				},
+				name: "index.html",
+			},
+			"/abcdef123456/folder/index.html",
+		},
 	}
 
 	for _, tc := range cases {
@@ -89,7 +105,7 @@ func TestBestSharePath(t *testing.T) {
 						Path: "/website",
 					},
 				})
-			case "distance share":
+			case "distance share", "share with password":
 				mockShare.EXPECT().List().Return([]provider.Share{
 					{
 						ID:   "abcdef123456",

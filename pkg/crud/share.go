@@ -14,7 +14,7 @@ import (
 )
 
 func (a App) bestSharePath(request provider.Request, name string) string {
-	if !request.Share.IsZero() {
+	if !request.Share.IsZero() && len(request.Share.Password) == 0 {
 		return request.AbsoluteURL(name)
 	}
 
