@@ -21,8 +21,10 @@ func (a App) bestSharePath(request provider.Request, name string) string {
 	var remainingPath string
 	var bestShare provider.Share
 
+	pathname := request.SubPath(name)
+
 	for _, share := range a.shareApp.List() {
-		if !strings.HasPrefix(request.Path, share.Path) {
+		if !strings.HasPrefix(pathname, share.Path) {
 			continue
 		}
 
@@ -32,7 +34,7 @@ func (a App) bestSharePath(request provider.Request, name string) string {
 			continue
 		}
 
-		if len(share.Password) > 0 && len(bestShare.Password) == 0 {
+		if len(bestShare.Password) == 0 && len(share.Password) != 0 {
 			continue
 		}
 

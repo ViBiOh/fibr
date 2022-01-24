@@ -73,10 +73,10 @@ func TestBestSharePath(t *testing.T) {
 			App{},
 			args{
 				request: provider.Request{
-					Path: "/website/path/to/deep/folder",
+					Path: "/folder",
 					Share: provider.Share{
 						ID:       "azerty",
-						Path:     "/website",
+						Path:     "/website/path/to/deep",
 						Password: "abcd",
 					},
 				},
