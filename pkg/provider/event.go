@@ -122,12 +122,14 @@ func NewUploadEvent(request Request, item absto.Item, shareableURL string, rende
 }
 
 // NewRenameEvent creates a new rename event
-func NewRenameEvent(old, new absto.Item) Event {
+func NewRenameEvent(old, new absto.Item, shareableURL string, rendererApp renderer.App) Event {
 	return Event{
-		Time: time.Now(),
-		Type: RenameEvent,
-		Item: old,
-		New:  &new,
+		Time:         time.Now(),
+		Type:         RenameEvent,
+		Item:         old,
+		New:          &new,
+		URL:          rendererApp.PublicURL(new.Pathname),
+		ShareableURL: rendererApp.PublicURL(shareableURL),
 	}
 }
 

@@ -165,7 +165,7 @@ func (a *App) eventText(event provider.Event) string {
 	case provider.UploadEvent:
 		return fmt.Sprintf("💾 A file has been uploaded: %s?browser", event.GetURL())
 	case provider.RenameEvent:
-		return fmt.Sprintf("➡️ `%s` has been renamed to `%s`", event.Item.Pathname, event.New.Pathname)
+		return fmt.Sprintf("➡️ `%s` has been renamed to `%s`: %s", event.Item.Pathname, event.New.Pathname, event.GetURL())
 	case provider.DeleteEvent:
 		return fmt.Sprintf("❌ `%s` has been deleted : %s", event.Item.Name, event.GetURL())
 	case provider.StartEvent:

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"path"
 	"strings"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
@@ -22,7 +23,15 @@ func (a App) doRename(oldPath, newPath string, oldItem absto.Item) (absto.Item, 
 		return absto.Item{}, err
 	}
 
-	go a.notify(provider.NewRenameEvent(oldItem, newItem))
+	var itemName string
+	if !newItem.IsDir {
+		itemName = path.Base(newPath)
+	}
+
+	go a.notify(provider.NewRenameEvent(oldItem, newItem, a.bestSharePath(provider.Request{
+		Path: provider.Dirname(path.Dir(newPath)),
+		Item: itemName,
+	}, itemName), a.rendererApp))
 
 	return newItem, nil
 }
