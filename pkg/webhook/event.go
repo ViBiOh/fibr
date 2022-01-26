@@ -74,7 +74,7 @@ func (a *App) rawHandle(ctx context.Context, webhook provider.Webhook, event pro
 }
 
 func (a *App) discordHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
-	if event.Type != provider.UploadEvent {
+	if event.Type != provider.UploadEvent && event.Type != provider.RenameEvent {
 		return send(ctx, webhook.ID, request.Post(webhook.URL), discordPayload{
 			Content: a.eventText(event),
 		})
@@ -86,15 +86,30 @@ func (a *App) discordHandle(ctx context.Context, webhook provider.Webhook, event
 		title = "fibr"
 	}
 
+	var description string
+	fields := []discordField{{
+		Name:   "item",
+		Value:  event.Item.Name,
+		Inline: true,
+	}}
+
+	switch event.Type {
+	case provider.UploadEvent:
+		description = "💾 A file has been uploaded"
+	case provider.RenameEvent:
+		description = "➡️ A file has been renamed"
+		fields = append(fields, discordField{
+			Name:   "to",
+			Value:  event.GetTo(),
+			Inline: true,
+		})
+	}
+
 	embed := discordEmbed{
 		Title:       title,
-		Description: "💾 A file has been uploaded",
+		Description: description,
 		URL:         url + "?browser",
-		Fields: []discordField{{
-			Name:   "item",
-			Value:  event.Item.Name,
-			Inline: true,
-		}},
+		Fields:      fields,
 	}
 
 	if a.amqpClient != nil {
@@ -114,7 +129,7 @@ func (a *App) discordHandle(ctx context.Context, webhook provider.Webhook, event
 }
 
 func (a *App) slackHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
-	if event.Type != provider.UploadEvent {
+	if event.Type != provider.UploadEvent && event.Type != provider.RenameEvent {
 		return send(ctx, webhook.ID, request.Post(webhook.URL), slackPayload{
 			Text: a.eventText(event),
 		})
@@ -126,10 +141,21 @@ func (a *App) slackHandle(ctx context.Context, webhook provider.Webhook, event p
 		title = "fibr"
 	}
 
+	var description string
+	fields := []slackText{newText(fmt.Sprintf("*item*\n%s", event.Item.Name))}
+
+	switch event.Type {
+	case provider.UploadEvent:
+		description = "💾 A file has been uploaded"
+	case provider.RenameEvent:
+		description = "➡️ A file has been renamed"
+		fields = append(fields, newText(fmt.Sprintf("*to*\n%s", event.GetTo())))
+	}
+
 	section := slackSection{
 		Type:   "section",
-		Text:   newText("💾 A file has been uploaded"),
-		Fields: []slackText{newText(fmt.Sprintf("*item*\n%s", event.Item.Name))},
+		Text:   newText(description),
+		Fields: fields,
 	}
 
 	if a.thumbnailApp.CanHaveThumbnail(event.Item) {
@@ -165,7 +191,7 @@ func (a *App) eventText(event provider.Event) string {
 	case provider.UploadEvent:
 		return fmt.Sprintf("💾 A file has been uploaded: %s?browser", event.GetURL())
 	case provider.RenameEvent:
-		return fmt.Sprintf("➡️ `%s` has been renamed to `%s`: %s", event.Item.Pathname, event.New.Pathname, event.GetURL())
+		return fmt.Sprintf("➡️ `%s` has been renamed to `%s`: %s?browser", event.Item.Pathname, event.New.Pathname, event.GetURL())
 	case provider.DeleteEvent:
 		return fmt.Sprintf("❌ `%s` has been deleted : %s", event.Item.Name, event.GetURL())
 	case provider.StartEvent:

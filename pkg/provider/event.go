@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"path"
 	"strings"
 	"time"
 
@@ -108,6 +109,25 @@ func (e Event) GetURL() string {
 	}
 
 	return e.URL
+}
+
+// GetTo returns the appropriate to destination
+func (e Event) GetTo() string {
+	if e.New == nil {
+		return ""
+	}
+
+	var newName string
+
+	if e.Item.Pathname != e.New.Pathname {
+		newName = e.New.Pathname
+	}
+
+	if e.Item.Name != e.New.Name {
+		newName = path.Join(newName, e.New.Name)
+	}
+
+	return newName
 }
 
 // NewUploadEvent creates a new upload event
