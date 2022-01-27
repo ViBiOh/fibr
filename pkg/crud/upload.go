@@ -34,7 +34,7 @@ func (a App) saveUploadedFile(request provider.Request, part *multipart.Part) (f
 			if info, infoErr := a.storageApp.Info(filePath); infoErr != nil {
 				logger.Error("unable to get info for upload event: %s", infoErr)
 			} else {
-				a.notify(provider.NewUploadEvent(request, info, a.bestSharePath(request, filename), a.rendererApp))
+				a.notify(provider.NewUploadEvent(request, info, a.bestSharePath(filePath), a.rendererApp))
 			}
 		}()
 	}

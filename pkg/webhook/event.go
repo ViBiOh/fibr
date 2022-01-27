@@ -89,7 +89,7 @@ func (a *App) discordHandle(ctx context.Context, webhook provider.Webhook, event
 	var description string
 	fields := []discordField{{
 		Name:   "item",
-		Value:  event.Item.Name,
+		Value:  event.GetName(),
 		Inline: true,
 	}}
 
@@ -97,7 +97,7 @@ func (a *App) discordHandle(ctx context.Context, webhook provider.Webhook, event
 	case provider.UploadEvent:
 		description = "💾 A file has been uploaded"
 	case provider.RenameEvent:
-		description = "➡️ A file has been renamed"
+		description = "✏️ An item has been renamed"
 		fields = append(fields, discordField{
 			Name:   "to",
 			Value:  event.GetTo(),
@@ -142,13 +142,13 @@ func (a *App) slackHandle(ctx context.Context, webhook provider.Webhook, event p
 	}
 
 	var description string
-	fields := []slackText{newText(fmt.Sprintf("*item*\n%s", event.Item.Name))}
+	fields := []slackText{newText(fmt.Sprintf("*item*\n%s", event.GetName()))}
 
 	switch event.Type {
 	case provider.UploadEvent:
 		description = "💾 A file has been uploaded"
 	case provider.RenameEvent:
-		description = "➡️ A file has been renamed"
+		description = "✏️ An item has been renamed"
 		fields = append(fields, newText(fmt.Sprintf("*to*\n%s", event.GetTo())))
 	}
 
@@ -191,7 +191,7 @@ func (a *App) eventText(event provider.Event) string {
 	case provider.UploadEvent:
 		return fmt.Sprintf("💾 A file has been uploaded: %s?browser", event.GetURL())
 	case provider.RenameEvent:
-		return fmt.Sprintf("➡️ `%s` has been renamed to `%s`: %s?browser", event.Item.Pathname, event.New.Pathname, event.GetURL())
+		return fmt.Sprintf("✏️ `%s` has been renamed to `%s`: %s?browser", event.Item.Pathname, event.New.Pathname, event.GetURL())
 	case provider.DeleteEvent:
 		return fmt.Sprintf("❌ `%s` has been deleted : %s", event.Item.Name, event.GetURL())
 	case provider.StartEvent:

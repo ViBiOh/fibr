@@ -111,6 +111,35 @@ func (e Event) GetURL() string {
 	return e.URL
 }
 
+// GetName returns the name of the item
+func (e Event) GetName() string {
+	if e.New != nil {
+		return e.getFrom()
+	}
+
+	if e.Item.IsDir {
+		return Dirname(e.Item.Name)
+	}
+
+	return e.Item.Name
+}
+
+func (e Event) getFrom() string {
+	var fromName string
+
+	if previousDir := path.Dir(e.Item.Pathname); path.Dir(e.New.Pathname) != previousDir {
+		fromName = previousDir
+	}
+
+	fromName = path.Join(fromName, e.Item.Name)
+
+	if e.Item.IsDir {
+		fromName = Dirname(fromName)
+	}
+
+	return fromName
+}
+
 // GetTo returns the appropriate to destination
 func (e Event) GetTo() string {
 	if e.New == nil {
@@ -119,12 +148,14 @@ func (e Event) GetTo() string {
 
 	var newName string
 
-	if e.Item.Pathname != e.New.Pathname {
-		newName = e.New.Pathname
+	if newDir := path.Dir(e.New.Pathname); path.Dir(e.Item.Pathname) != newDir {
+		newName = newDir
 	}
 
-	if e.Item.Name != e.New.Name {
-		newName = path.Join(newName, e.New.Name)
+	newName = path.Join(newName, e.New.Name)
+
+	if e.New.IsDir {
+		newName = Dirname(newName)
 	}
 
 	return newName

@@ -10,8 +10,7 @@ import (
 
 func TestBestSharePath(t *testing.T) {
 	type args struct {
-		request provider.Request
-		name    string
+		pathname string
 	}
 
 	cases := []struct {
@@ -21,39 +20,18 @@ func TestBestSharePath(t *testing.T) {
 		want      string
 	}{
 		{
-			"already shared",
-			App{},
-			args{
-				request: provider.Request{
-					Path: "/",
-					Share: provider.Share{
-						ID:   "abcdef123456",
-						Path: "/website",
-					},
-				},
-				name: "index.html",
-			},
-			"/abcdef123456/index.html",
-		},
-		{
 			"no share",
 			App{},
 			args{
-				request: provider.Request{
-					Path: "/website",
-				},
-				name: "index.html",
+				pathname: "/website/index.html",
 			},
-			"/website/index.html",
+			"",
 		},
 		{
 			"matching share",
 			App{},
 			args{
-				request: provider.Request{
-					Path: "/website",
-				},
-				name: "index.html",
+				pathname: "/website/index.html",
 			},
 			"/abcdef123456/index.html",
 		},
@@ -61,26 +39,7 @@ func TestBestSharePath(t *testing.T) {
 			"distance share",
 			App{},
 			args{
-				request: provider.Request{
-					Path: "/website/path/to/deep/folder",
-				},
-				name: "index.html",
-			},
-			"/abcdef123456/folder/index.html",
-		},
-		{
-			"share with password",
-			App{},
-			args{
-				request: provider.Request{
-					Path: "/folder",
-					Share: provider.Share{
-						ID:       "azerty",
-						Path:     "/website/path/to/deep",
-						Password: "abcd",
-					},
-				},
-				name: "index.html",
+				pathname: "/website/path/to/deep/folder/index.html",
 			},
 			"/abcdef123456/folder/index.html",
 		},
@@ -105,7 +64,7 @@ func TestBestSharePath(t *testing.T) {
 						Path: "/website",
 					},
 				})
-			case "distance share", "share with password":
+			case "distance share":
 				mockShare.EXPECT().List().Return([]provider.Share{
 					{
 						ID:   "abcdef123456",
@@ -127,7 +86,7 @@ func TestBestSharePath(t *testing.T) {
 				})
 			}
 
-			if got := tc.instance.bestSharePath(tc.args.request, tc.args.name); got != tc.want {
+			if got := tc.instance.bestSharePath(tc.args.pathname); got != tc.want {
 				t.Errorf("bestSharePath() = `%s`, want `%s`", got, tc.want)
 			}
 		})

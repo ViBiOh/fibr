@@ -13,15 +13,9 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func (a App) bestSharePath(request provider.Request, name string) string {
-	if !request.Share.IsZero() && len(request.Share.Password) == 0 {
-		return request.AbsoluteURL(name)
-	}
-
+func (a App) bestSharePath(pathname string) string {
 	var remainingPath string
 	var bestShare provider.Share
-
-	pathname := request.SubPath(name)
 
 	for _, share := range a.shareApp.List() {
 		if !strings.HasPrefix(pathname, share.Path) {
@@ -30,7 +24,7 @@ func (a App) bestSharePath(request provider.Request, name string) string {
 
 		if bestShare.IsZero() {
 			bestShare = share
-			remainingPath = strings.TrimPrefix(request.Path, share.Path)
+			remainingPath = strings.TrimPrefix(pathname, share.Path)
 			continue
 		}
 
@@ -38,7 +32,7 @@ func (a App) bestSharePath(request provider.Request, name string) string {
 			continue
 		}
 
-		newRemainingPath := strings.TrimPrefix(request.Path, share.Path)
+		newRemainingPath := strings.TrimPrefix(pathname, share.Path)
 		if len(newRemainingPath) > len(remainingPath) {
 			continue
 		}
@@ -48,10 +42,10 @@ func (a App) bestSharePath(request provider.Request, name string) string {
 	}
 
 	if !bestShare.IsZero() {
-		return provider.URL(remainingPath, name, bestShare)
+		return provider.URL(remainingPath, "", bestShare)
 	}
 
-	return request.AbsoluteURL(name)
+	return ""
 }
 
 func (a App) createShare(w http.ResponseWriter, r *http.Request, request provider.Request) {
