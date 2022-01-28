@@ -238,6 +238,22 @@
     }
 
     /**
+     * Slice FileList from given index.
+     * @param  {String} name Name of the input file element
+     * @param  {Integer} index Index for the slice
+     */
+    function sliceFileList(name, index) {
+      const input = document.getElementById(name);
+      const newList = new DataTransfer();
+
+      for (; index < input.files.length; index++) {
+        newList.items.add(input.files[index]);
+      }
+
+      input.files = newList.files;
+    }
+
+    /**
      * Handle upload submit
      * @param  {Object} event Submit event
      */
@@ -267,7 +283,8 @@
       const shares = new Map();
 
       let success = true;
-      for (let i = 0; i < values.files.length; i++) {
+      let i = 0;
+      for (; i < values.files.length; i++) {
         const file = values.files[i];
 
         try {
@@ -302,7 +319,8 @@
 
         document.location.hash = '#upload-success';
       } else if (uploadButton) {
-        uploadButton.innerHTML = 'Upload';
+        sliceFileList('file', i);
+        uploadButton.innerHTML = 'Retry';
       }
 
       return false;
