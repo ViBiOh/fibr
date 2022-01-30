@@ -13,14 +13,20 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
-func (a App) saveUploadedFile(request provider.Request, part *multipart.Part) (filename string, err error) {
+func (a App) saveUploadedFile(request provider.Request, inputName string, part *multipart.Part) (filename string, err error) {
 	var filePath string
 
 	if !request.Share.IsZero() && request.Share.File {
 		filename = path.Base(request.Share.Path)
 		filePath = request.Share.Path
 	} else {
-		filename, err = provider.SanitizeName(part.FileName(), true)
+		if len(inputName) != 0 {
+			filename = inputName
+		} else {
+			filename = part.FileName()
+		}
+
+		filename, err = provider.SanitizeName(filename, true)
 		if err != nil {
 			return "", err
 		}
@@ -66,7 +72,7 @@ func (a App) Upload(w http.ResponseWriter, r *http.Request, request provider.Req
 		return
 	}
 
-	filename, err := a.saveUploadedFile(request, part)
+	filename, err := a.saveUploadedFile(request, values["filename"], part)
 	if err != nil {
 		a.error(w, r, request, model.WrapInternal(err))
 		return
