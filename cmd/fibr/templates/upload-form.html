@@ -53,7 +53,12 @@
      * @return {Promise<String>} Promise that will resolve the message id.
      */
     async function fileMessageId(file) {
-      const hash = await sha1(file.name);
+      const hash = await sha1(JSON.stringify({
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        lastModified: file.lastModified,
+      }));
       return `upload-file-${hash}`;
     }
 
