@@ -10,7 +10,7 @@ require (
 	github.com/ViBiOh/httputils/v4 v4.34.6
 	github.com/ViBiOh/vith v0.3.0
 	github.com/golang/mock v1.6.0
-	github.com/prometheus/client_golang v1.12.0
+	github.com/prometheus/client_golang v1.12.1
 	github.com/streadway/amqp v1.0.0
 	golang.org/x/crypto v0.0.0-20220112180741-5e0467b6c7ce
 	golang.org/x/text v0.3.7
