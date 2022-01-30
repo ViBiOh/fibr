@@ -383,6 +383,8 @@
           fileInput.multiple = true;
 
           fileInput.addEventListener('change', () => {
+            window.location.hash = '#upload-modal';
+
             const uploadList = document.getElementById('upload-list');
             replaceContent(uploadList);
 
@@ -391,16 +393,13 @@
             }
           });
 
-          if (event.target.readyState === 'complete') {
-            window.addEventListener(
-              'popstate',
-              () => {
-                if (document.location.hash == '#upload-modal') {
-                  fileInput.click();
-                }
-              },
-              { once: true },
-            );
+          const uploadButtonLink = document.getElementById('upload-button-link');
+          if (uploadButtonLink) {
+            uploadButtonLink.addEventListener('click', (e) => {
+              eventNoop(e);
+
+              fileInput.click();
+            });
           }
         }
 
