@@ -376,40 +376,48 @@
       return false;
     }
 
-    window.addEventListener('load', () => {
-      const fileInput = document.getElementById('file');
-      if (fileInput) {
-        fileInput.multiple = true;
-      }
+    document.addEventListener('readystatechange', async (event) => {
+      if (event.target.readyState === 'complete') {
+        const fileInput = document.getElementById('file');
+        if (fileInput) {
+          fileInput.multiple = true;
 
-      const shareLabel = document.getElementById('upload-share-label');
-      if (shareLabel) {
-        shareLabel.innerHTML = 'Create a public read-only share on each file for';
-      }
+          fileInput.addEventListener('change', () => {
+            const uploadList = document.getElementById('upload-list');
+            replaceContent(uploadList);
 
-      const cancelButton = document.getElementById('upload-cancel');
-      if (cancelButton) {
-        cancelButton.addEventListener('click', abort);
-      }
+            for (const file of fileInput.files) {
+              addUploadItem(uploadList, file);
+            }
+          });
 
-      const form = document.getElementById('upload-form');
-      if (form) {
-        form.addEventListener('submit', upload);
-      }
-
-      const fileLabel = document.getElementById('file-label');
-      if (fileInput && fileLabel) {
-        fileInput.style.opacity = 0;
-        fileLabel.classList.remove('hidden');
-
-        fileInput.addEventListener('change', () => {
-          const uploadList = document.getElementById('upload-list');
-          replaceContent(uploadList);
-
-          for (const file of fileInput.files) {
-            addUploadItem(uploadList, file);
+          if (event.target.readyState === 'complete') {
+            window.addEventListener(
+              'popstate',
+              () => {
+                if (document.location.hash == '#upload-modal') {
+                  fileInput.click();
+                }
+              },
+              { once: true },
+            );
           }
-        });
+        }
+
+        const shareLabel = document.getElementById('upload-share-label');
+        if (shareLabel) {
+          shareLabel.innerHTML = 'Create a public read-only share on each file for';
+        }
+
+        const cancelButton = document.getElementById('upload-cancel');
+        if (cancelButton) {
+          cancelButton.addEventListener('click', abort);
+        }
+
+        const form = document.getElementById('upload-form');
+        if (form) {
+          form.addEventListener('submit', upload);
+        }
       }
     });
   </script>
@@ -448,6 +456,10 @@
       text-align: left;
     }
 
+    .opacity {
+      opacity: 0;
+    }
+
     .upload-status {
       margin-left: 0.5rem;
       text-align: right;
@@ -478,8 +490,8 @@
         {{ end }}
 
         <p class="padding no-margin center upload-width">
-          <input id="file" class="full" type="file" name="file" />
-          <label id="file-label" for="file" class="hidden button bg-success">Choose files...</label>
+          <input id="file" class="full opacity" type="file" name="file" />
+          <label id="file-label" for="file" class="button bg-success">Choose files...</label>
         </p>
 
         <div id="upload-list" class="upload-width full"></div>
