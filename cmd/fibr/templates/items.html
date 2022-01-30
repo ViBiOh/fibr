@@ -57,11 +57,18 @@
         margin: .5rem;
       }
 
+      .tile::before {
+        content: "";
+        display: inline-block;
+        height: 0;
+        padding-bottom: calc(100%);
+        width: 1px;
+      }
+
       .tile {
         align-items: center;
         background-color: var(--grey);
         display: flex;
-        min-height: 15rem;
       }
 
       .file {
