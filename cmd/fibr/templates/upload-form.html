@@ -312,8 +312,7 @@
       const shares = new Map();
 
       let success = true;
-      let i = 0;
-      for (; i < values.files.length; i++) {
+      for (let i = 0; i < values.files.length; i++) {
         const file = values.files[i];
 
         try {
@@ -330,6 +329,10 @@
 
           await setUploadStatus(file, '✓', 'success');
         } catch (err) {
+          sliceFileList('file', i);
+          if (uploadButton) {
+            uploadButton.innerHTML = 'Retry';
+          }
           await setUploadStatus(file, 'X', 'danger');
           success = false;
 
@@ -347,9 +350,6 @@
         }
 
         document.location.hash = '#upload-success';
-      } else if (uploadButton) {
-        sliceFileList('file', i);
-        uploadButton.innerHTML = 'Retry';
       }
 
       return false;
@@ -407,7 +407,6 @@
         });
       }
     });
-
   </script>
 
   <style type="text/css" nonce="{{ .nonce }}">
