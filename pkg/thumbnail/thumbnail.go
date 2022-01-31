@@ -163,13 +163,23 @@ func (a App) Serve(w http.ResponseWriter, r *http.Request, item absto.Item) {
 
 // List return all thumbnail in a base64 form
 func (a App) List(w http.ResponseWriter, r *http.Request, items []absto.Item) {
-	if len(items) == 0 {
+	thumbnailItems := a.thumbnailsItems(items)
+
+	if len(thumbnailItems) == 0 {
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 
+	etag := sha.New(thumbnailItems)
+
+	if r.Header.Get("If-None-Match") == etag {
+		w.WriteHeader(http.StatusNotModified)
+		return
+	}
+
 	w.Header().Add("Content-Type", "text/plain; charset=utf-8")
-	w.Header().Add("Cache-Control", "no-cache")
+	w.Header().Add("Cache-Control", "max-age=60, must-revalidate")
+	w.Header().Add("Etag", etag)
 	w.WriteHeader(http.StatusOK)
 
 	done := r.Context().Done()
@@ -196,6 +206,22 @@ func (a App) List(w http.ResponseWriter, r *http.Request, items []absto.Item) {
 		a.encodeContent(base64.NewEncoder(base64.StdEncoding, w), item)
 		provider.DoneWriter(isDone, w, "\n")
 	}
+}
+
+func (a App) thumbnailsItems(items []absto.Item) []absto.Item {
+	var thumbnailItems []absto.Item
+
+	for _, item := range items {
+		if !a.HasThumbnail(item) {
+			continue
+		}
+
+		if info, err := a.storageApp.Info(getThumbnailPath(item)); err == nil {
+			thumbnailItems = append(thumbnailItems, info)
+		}
+	}
+
+	return thumbnailItems
 }
 
 func (a App) encodeContent(encoder io.WriteCloser, item absto.Item) {
