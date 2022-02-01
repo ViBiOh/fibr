@@ -170,7 +170,7 @@ func (a App) List(w http.ResponseWriter, r *http.Request, items []absto.Item) {
 		return
 	}
 
-	etag := sha.New(thumbnailItems)
+	etag := fmt.Sprintf(`W/"%s"`, sha.New(thumbnailItems))
 
 	if r.Header.Get("If-None-Match") == etag {
 		w.WriteHeader(http.StatusNotModified)
@@ -178,7 +178,6 @@ func (a App) List(w http.ResponseWriter, r *http.Request, items []absto.Item) {
 	}
 
 	w.Header().Add("Content-Type", "text/plain; charset=utf-8")
-	w.Header().Add("Cache-Control", "max-age=60, must-revalidate")
 	w.Header().Add("Etag", etag)
 	w.WriteHeader(http.StatusOK)
 
