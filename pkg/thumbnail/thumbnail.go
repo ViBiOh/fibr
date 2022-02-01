@@ -209,10 +209,6 @@ func (a App) thumbnailHash(items []absto.Item) string {
 	hasher := Stream()
 
 	for _, item := range items {
-		if !a.HasThumbnail(item) {
-			continue
-		}
-
 		if info, err := a.storageApp.Info(getThumbnailPath(item)); err == nil {
 			hasher.Write(info)
 		}
