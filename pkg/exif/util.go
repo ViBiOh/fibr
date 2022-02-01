@@ -7,7 +7,6 @@ import (
 	absto "github.com/ViBiOh/absto/pkg/model"
 	exas "github.com/ViBiOh/exas/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/v4/pkg/sha"
 )
 
 // CanHaveExif determine if exif can be extracted for given pathname
@@ -21,7 +20,7 @@ func getExifPath(item absto.Item) string {
 		return fullPath + "/aggregate.json"
 	}
 
-	return fmt.Sprintf("%s/%s.json", filepath.Dir(fullPath), sha.New(item.Name))
+	return fmt.Sprintf("%s/%s.json", filepath.Dir(fullPath), item.ID)
 }
 
 func (a App) hasMetadata(item absto.Item) bool {

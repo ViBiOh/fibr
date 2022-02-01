@@ -6,7 +6,6 @@ import (
 	"time"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
-	"github.com/ViBiOh/httputils/v4/pkg/sha"
 )
 
 func lowerString(first, second string) bool {
@@ -50,7 +49,6 @@ func (a ByHybridSort) Less(i, j int) bool {
 // RenderItem is a storage item with an id
 type RenderItem struct {
 	Aggregate
-	ID   string
 	URL  string
 	Path string
 	absto.Item
@@ -88,7 +86,6 @@ func (r RenderItem) Mime() string {
 // StorageToRender converts Item to RenderItem
 func StorageToRender(item absto.Item, request Request) RenderItem {
 	return RenderItem{
-		ID:   sha.New(item.Name),
 		URL:  request.RelativeURL(item),
 		Path: request.Path,
 		Item: item,

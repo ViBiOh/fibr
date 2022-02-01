@@ -6,7 +6,6 @@ import (
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/v4/pkg/sha"
 	"github.com/ViBiOh/vith/pkg/model"
 )
 
@@ -39,7 +38,7 @@ func getStreamPath(item absto.Item) string {
 }
 
 func getPathWithExtension(item absto.Item, extension string) string {
-	return fmt.Sprintf("%s/%s.%s", filepath.Dir(provider.MetadataDirectoryName+item.Pathname), sha.New(item.Name), extension)
+	return fmt.Sprintf("%s/%s.%s", filepath.Dir(provider.MetadataDirectoryName+item.Pathname), item.ID, extension)
 }
 
 func typeOfItem(item absto.Item) model.ItemType {

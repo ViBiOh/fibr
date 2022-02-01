@@ -20,6 +20,7 @@ func TestGetExifPath(t *testing.T) {
 			"simple",
 			args{
 				item: absto.Item{
+					ID:       "dd29ecf524b030a65261e3059c48ab9e1ecb2585",
 					Pathname: "/photos/image.jpeg",
 				},
 			},

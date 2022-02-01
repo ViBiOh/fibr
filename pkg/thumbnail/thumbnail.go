@@ -19,7 +19,6 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	prom "github.com/ViBiOh/httputils/v4/pkg/prometheus"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
-	"github.com/ViBiOh/httputils/v4/pkg/sha"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -198,7 +197,7 @@ func (a App) List(w http.ResponseWriter, r *http.Request, items []absto.Item) {
 			continue
 		}
 
-		provider.DoneWriter(isDone, w, sha.New(item.Name))
+		provider.DoneWriter(isDone, w, item.ID)
 		provider.DoneWriter(isDone, w, `,`)
 		a.encodeContent(base64.NewEncoder(base64.StdEncoding, w), item)
 		provider.DoneWriter(isDone, w, "\n")
