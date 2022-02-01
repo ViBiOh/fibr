@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: app
-      version: '0.0.78'
+      version: '0.0.79'
       sourceRef:
         kind: HelmRepository
         name: vibioh
@@ -57,6 +57,10 @@ spec:
                   operator: In
                   values:
                     - bob
+    tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/storage
+        operator: Exists
     resources:
       limits:
         memory: 256Mi
