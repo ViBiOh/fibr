@@ -2,7 +2,6 @@ package thumbnail
 
 import (
 	"fmt"
-	"path"
 	"path/filepath"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
@@ -28,7 +27,7 @@ func (a App) HasThumbnail(item absto.Item) bool {
 
 // GetChunk retrieve the storage item in the metadata
 func (a App) GetChunk(pathname string) (absto.Item, error) {
-	return a.storageApp.Info(path.Join(provider.MetadataDirectoryName, pathname))
+	return a.storageApp.Info(provider.MetadataDirectoryName + pathname)
 }
 
 func getThumbnailPath(item absto.Item) string {
@@ -40,7 +39,7 @@ func getStreamPath(item absto.Item) string {
 }
 
 func getPathWithExtension(item absto.Item, extension string) string {
-	return fmt.Sprintf("%s/%s.%s", filepath.Dir(path.Join(provider.MetadataDirectoryName, item.Pathname)), sha.New(item.Name), extension)
+	return fmt.Sprintf("%s/%s.%s", filepath.Dir(provider.MetadataDirectoryName+item.Pathname), sha.New(item.Name), extension)
 }
 
 func typeOfItem(item absto.Item) model.ItemType {

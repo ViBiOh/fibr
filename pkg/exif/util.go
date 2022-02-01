@@ -2,7 +2,6 @@ package exif
 
 import (
 	"fmt"
-	"path"
 	"path/filepath"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
@@ -17,9 +16,9 @@ func (a App) CanHaveExif(item absto.Item) bool {
 }
 
 func getExifPath(item absto.Item) string {
-	fullPath := path.Join(provider.MetadataDirectoryName, item.Pathname)
+	fullPath := provider.MetadataDirectoryName + item.Pathname
 	if item.IsDir {
-		return fmt.Sprintf("%s/%s.json", fullPath, "aggregate")
+		return fullPath + "/aggregate.json"
 	}
 
 	return fmt.Sprintf("%s/%s.json", filepath.Dir(fullPath), sha.New(item.Name))

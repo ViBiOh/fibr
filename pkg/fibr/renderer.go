@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
-	"path"
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -19,7 +18,7 @@ import (
 func FuncMap(thumbnailApp thumbnail.App) template.FuncMap {
 	return template.FuncMap{
 		"rebuildPaths": func(parts []string, index int) string {
-			return fmt.Sprintf("/%s/", path.Join(parts[:index+1]...))
+			return fmt.Sprintf("/%s/", strings.Join(parts[:index+1], "/"))
 		},
 		"js": func(content string) template.JS {
 			return template.JS(content)

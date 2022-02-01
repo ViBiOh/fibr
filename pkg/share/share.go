@@ -4,7 +4,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"path"
 	"strings"
 	"sync"
 	"syscall"
@@ -20,7 +19,7 @@ import (
 )
 
 var (
-	shareFilename     = path.Join(provider.MetadataDirectoryName, "shares.json")
+	shareFilename     = provider.MetadataDirectoryName + "/shares.json"
 	semaphoreDuration = time.Second * 10
 )
 

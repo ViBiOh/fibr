@@ -4,7 +4,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"path"
 	"strings"
 	"sync"
 	"time"
@@ -21,7 +20,7 @@ import (
 )
 
 var (
-	webhookFilename   = path.Join(provider.MetadataDirectoryName, "webhooks.json")
+	webhookFilename   = provider.MetadataDirectoryName + "/webhooks.json"
 	semaphoreDuration = time.Second * 10
 )
 

@@ -3,7 +3,6 @@ package crud
 import (
 	"fmt"
 	"net/http"
-	"path/filepath"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -54,7 +53,7 @@ func (a App) computeStats(pathname string) (map[string]uint64, error) {
 		return nil, fmt.Errorf("unable to browse files: %s", err)
 	}
 
-	metadataPath := filepath.Join(provider.MetadataDirectoryName, pathname)
+	metadataPath := provider.MetadataDirectoryName + pathname
 	if _, err = a.rawStorageApp.Info(metadataPath); err == nil {
 		err = a.rawStorageApp.Walk(metadataPath, func(item absto.Item) error {
 			if !item.IsDir {

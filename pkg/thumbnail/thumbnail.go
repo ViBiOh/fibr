@@ -163,14 +163,12 @@ func (a App) Serve(w http.ResponseWriter, r *http.Request, item absto.Item) {
 
 // List return all thumbnail in a base64 form
 func (a App) List(w http.ResponseWriter, r *http.Request, items []absto.Item) {
-	thumbnailItems := a.thumbnailsItems(items)
-
-	if len(thumbnailItems) == 0 {
+	if len(items) == 0 {
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 
-	etag := fmt.Sprintf(`W/"%s"`, sha.New(thumbnailItems))
+	etag := fmt.Sprintf(`W/"%s"`, a.thumbnailHash(items))
 
 	if r.Header.Get("If-None-Match") == etag {
 		w.WriteHeader(http.StatusNotModified)
@@ -207,8 +205,8 @@ func (a App) List(w http.ResponseWriter, r *http.Request, items []absto.Item) {
 	}
 }
 
-func (a App) thumbnailsItems(items []absto.Item) []absto.Item {
-	var thumbnailItems []absto.Item
+func (a App) thumbnailHash(items []absto.Item) string {
+	hasher := Stream()
 
 	for _, item := range items {
 		if !a.HasThumbnail(item) {
@@ -216,11 +214,11 @@ func (a App) thumbnailsItems(items []absto.Item) []absto.Item {
 		}
 
 		if info, err := a.storageApp.Info(getThumbnailPath(item)); err == nil {
-			thumbnailItems = append(thumbnailItems, info)
+			hasher.Write(info)
 		}
 	}
 
-	return thumbnailItems
+	return hasher.Sum()
 }
 
 func (a App) encodeContent(encoder io.WriteCloser, item absto.Item) {
