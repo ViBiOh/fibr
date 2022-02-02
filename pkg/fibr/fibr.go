@@ -124,6 +124,10 @@ func (a App) parseShare(request *provider.Request, authorizationHeader string) e
 	request.CanEdit = share.Edit
 	request.Path = strings.TrimPrefix(request.Path, fmt.Sprintf("/%s", share.ID))
 
+	if share.File {
+		request.Path = ""
+	}
+
 	return nil
 }
 
