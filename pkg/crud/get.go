@@ -24,9 +24,8 @@ func (a App) getWithMessage(w http.ResponseWriter, r *http.Request, request prov
 	item, err := a.storageApp.Info(pathname)
 
 	if err != nil && absto.IsNotExist(err) && provider.StreamExtensions[filepath.Ext(pathname)] {
-		logger.Info("share=`%+v`, pathname=`%s`, dir=`%s`, dir of dir=`%s`", request.Share, pathname, path.Dir(pathname), path.Dir(path.Dir(pathname)))
 		if request.Share.File {
-			// URL with /<share_id>/segment.ts witll be converted to `/path/of/shared/file/segment.ts`, so we need to remove two directories before appending segment
+			// URL with /<share_id>/segment.ts will be the pas `/path/of/shared/file/segment.ts`, so we need to remove two directories before appending segment
 			pathname = path.Dir(path.Dir(pathname)) + "/" + path.Base(pathname)
 		}
 

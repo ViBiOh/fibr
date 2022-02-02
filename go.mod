@@ -3,7 +3,7 @@ module github.com/ViBiOh/fibr
 go 1.17
 
 require (
-	github.com/ViBiOh/absto v0.1.2
+	github.com/ViBiOh/absto v0.1.3
 	github.com/ViBiOh/auth/v2 v2.11.36
 	github.com/ViBiOh/exas v0.2.4
 	github.com/ViBiOh/flags v0.0.1
