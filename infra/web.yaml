@@ -27,12 +27,12 @@ spec:
       name: vibioh/fibr
       tag: '202202021653' # {"$imagepolicy": "default:flux-fibr-web:tag"}
     volumes:
-    - name: data
-      persistentVolumeClaim:
-        claimName: fibr
+      - name: data
+        persistentVolumeClaim:
+          claimName: fibr
     volumeMounts:
-    - name: data
-      mountPath: /data
+      - name: data
+        mountPath: /data
     config:
       FIBR_AUTH_PROFILES: 1:admin
       FIBR_EXIF_DIRECT_ACCESS: 'true'
@@ -52,15 +52,15 @@ spec:
       nodeAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
           nodeSelectorTerms:
-          - matchExpressions:
-            - key: kubernetes.io/hostname
-              operator: In
-              values:
-              - delta
+            - matchExpressions:
+                - key: kubernetes.io/hostname
+                  operator: In
+                  values:
+                    - delta
     tolerations:
-    - effect: NoSchedule
-      key: node-role.kubernetes.io/storage
-      operator: Exists
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/storage
+        operator: Exists
     resources:
       limits:
         memory: 256Mi
@@ -68,8 +68,8 @@ spec:
         cpu: 400m
         memory: 64Mi
     securityContext:
-      runAsGroup: 995
-      runAsUser: 999
+      runAsGroup: 1000
+      runAsUser: 1000
       runAsNonRoot: true
       allowPrivilegeEscalation: false
     autoscaling:
@@ -78,4 +78,4 @@ spec:
       enabled: true
       compress: true
       hosts:
-      - fibr.vibioh.fr
+        - fibr.vibioh.fr
