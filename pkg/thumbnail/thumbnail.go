@@ -19,6 +19,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	prom "github.com/ViBiOh/httputils/v4/pkg/prometheus"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
+	"github.com/ViBiOh/httputils/v4/pkg/sha"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -205,7 +206,7 @@ func (a App) List(w http.ResponseWriter, r *http.Request, items []absto.Item) {
 }
 
 func (a App) thumbnailHash(items []absto.Item) string {
-	hasher := Stream()
+	hasher := sha.Stream()
 
 	for _, item := range items {
 		if info, err := a.storageApp.Info(getThumbnailPath(item)); err == nil {
