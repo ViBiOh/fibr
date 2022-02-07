@@ -403,6 +403,11 @@
           }
         }
 
+        const fileInputLabel = document.getElementById('file-label');
+        if (fileInputLabel) {
+          fileInputLabel.innerHTML = 'Choose files...';
+        }
+
         const shareLabel = document.getElementById('upload-share-label');
         if (shareLabel) {
           shareLabel.innerHTML = 'Create a public read-only share on each file for';
@@ -490,7 +495,7 @@
 
         <p class="padding no-margin center upload-width">
           <input id="file" class="full opacity" type="file" name="file" />
-          <label id="file-label" for="file" class="button bg-success">Choose files...</label>
+          <label id="file-label" for="file" class="button bg-success">Choose file...</label>
         </p>
 
         <div id="upload-list" class="upload-width full"></div>
