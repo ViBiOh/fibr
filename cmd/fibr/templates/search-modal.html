@@ -54,14 +54,14 @@
           <label for="size" class="block">Size</label>
 
           <span class="flex flex-center">
-            <select name="sizeOrder">
+            <select aria-label="Type of size comparison" name="sizeOrder">
               <option value="gt" {{ with .Search.sizeOrder }}{{ if eq (index . 0) "gt"}}selected{{ end }}{{ end }}>Greater than</option>
               <option value="lt" {{ with .Search.sizeOrder }}{{ if eq (index . 0) "lt"}}selected{{ end }}{{ end }}>Lower than</option>
             </select>
 
             <input id="size" name="size" type="number" min="0" value="{{ with .Search.size }}{{ index . 0 }}{{ end }}">
 
-            <select name="sizeUnit">
+            <select aria-label="Size unit" name="sizeUnit">
               <option value="kb" {{ with .Search.sizeUnit }}{{ if eq (index . 0) "kb" }}selected{{ end }}{{ end }}>Kilobytes</option>
               <option value="mb" {{ with .Search.sizeUnit }}{{ if eq (index . 0) "mb" }}selected{{ end }}{{ end }}>Megabytes</option>
               <option value="gb" {{ with .Search.sizeUnit }}{{ if eq (index . 0) "gb" }}selected{{ end }}{{ end }}>Gigabytes</option>
