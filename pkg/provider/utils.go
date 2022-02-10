@@ -217,11 +217,7 @@ func SendLargeFile(ctx context.Context, storageApp absto.Storage, item absto.Ite
 
 	reader, writer := io.Pipe()
 	go func() {
-		defer func() {
-			if closeErr := file.Close(); closeErr != nil {
-				logger.WithField("fn", "provider.SendLargeFile").WithField("item", item.Pathname).Error("unable to close: %s", closeErr)
-			}
-		}()
+		defer LogClose(file, "provider.SendLargeFile", item.Pathname)
 
 		buffer := BufferPool.Get().(*bytes.Buffer)
 		defer BufferPool.Put(buffer)
@@ -251,6 +247,13 @@ func HandleClose(closer io.Closer, err error) error {
 	}
 
 	return err
+}
+
+// LogClose closes given closer and logging in case of error
+func LogClose(closer io.Closer, fn, item string) {
+	if err := closer.Close(); err != nil {
+		logger.WithField("fn", "fn").WithField("item", item).Error("unable to close: %s", err)
+	}
 }
 
 // WriteToStorage writes given content to storage

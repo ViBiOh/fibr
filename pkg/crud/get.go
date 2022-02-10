@@ -79,11 +79,7 @@ func (a App) serveFile(w http.ResponseWriter, r *http.Request, item absto.Item) 
 		return fmt.Errorf("unable to get reader for `%s`: %w", item.Pathname, err)
 	}
 
-	defer func() {
-		if err = file.Close(); err != nil {
-			logger.WithField("fn", "crud.serveFile").WithField("item", item.Pathname).Error("unable to close: %s", err)
-		}
-	}()
+	defer provider.LogClose(file, "crud.serveFile", item.Pathname)
 
 	http.ServeContent(w, r, item.Name, item.Date, file)
 	return nil

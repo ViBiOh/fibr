@@ -125,11 +125,7 @@ func (a App) Stream(w http.ResponseWriter, r *http.Request, item absto.Item) {
 		return
 	}
 
-	defer func() {
-		if closeErr := reader.Close(); closeErr != nil {
-			logger.WithField("fn", "thumbnail.Stream").WithField("item", item.Pathname).Error("unable to close: %s", closeErr)
-		}
-	}()
+	defer provider.LogClose(reader, "thumbnail.Stream", item.Pathname)
 
 	w.Header().Add("Content-Type", "application/x-mpegURL")
 	http.ServeContent(w, r, item.Name, item.Date, reader)
@@ -149,11 +145,7 @@ func (a App) Serve(w http.ResponseWriter, r *http.Request, item absto.Item) {
 		return
 	}
 
-	defer func() {
-		if closeErr := reader.Close(); closeErr != nil {
-			logger.WithField("fn", "thumbnail.Serve").WithField("item", item.Pathname).WithField("item", item.Pathname).Error("unable to close: %s", closeErr)
-		}
-	}()
+	defer provider.LogClose(reader, "thumbnail.Serve", item.Pathname)
 
 	w.Header().Add("Cache-Control", cacheDuration)
 	w.Header().Add("Content-Disposition", fmt.Sprintf("inline; filename=%s", path.Base(thumbnailPath)))
@@ -218,25 +210,21 @@ func (a App) thumbnailHash(items []absto.Item) string {
 }
 
 func (a App) encodeContent(encoder io.WriteCloser, item absto.Item) {
+	defer provider.LogClose(encoder, "thumbnail.encodeContent", "encoder")
+
 	reader, err := a.storageApp.ReadFrom(getThumbnailPath(item))
 	if err != nil {
 		logEncodeContentError(item).Error("unable to open: %s", err)
 		return
 	}
 
+	defer provider.LogClose(reader, "thumbnail.encodeContent", item.Pathname)
+
 	buffer := provider.BufferPool.Get().(*bytes.Buffer)
 	defer provider.BufferPool.Put(buffer)
 
 	if _, err = io.CopyBuffer(encoder, reader, buffer.Bytes()); err != nil {
 		logEncodeContentError(item).Error("unable to copy: %s", err)
-	}
-
-	if err = reader.Close(); err != nil {
-		logEncodeContentError(item).Error("unable to close item: %s", err)
-	}
-
-	if err = encoder.Close(); err != nil {
-		logEncodeContentError(item).Error("unable to close encoder: %s", err)
 	}
 }
 
