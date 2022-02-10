@@ -99,10 +99,10 @@ func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheu
 
 // Exclusive does action on webhook with exclusive lock
 func (a *App) Exclusive(ctx context.Context, name string, duration time.Duration, action func(ctx context.Context) error) error {
-	a.Lock()
-	defer a.Unlock()
-
 	fn := func() error {
+		a.Lock()
+		defer a.Unlock()
+
 		if err := a.loadWebhooks(); err != nil {
 			return fmt.Errorf("unable to refresh webhooks: %s", err)
 		}

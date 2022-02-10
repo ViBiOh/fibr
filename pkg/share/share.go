@@ -85,10 +85,10 @@ func New(config Config, storageApp absto.Storage, amqpClient *amqp.Client) (*App
 
 // Exclusive does action on shares with exclusive lock
 func (a *App) Exclusive(ctx context.Context, name string, duration time.Duration, action func(ctx context.Context) error) (bool, error) {
-	a.Lock()
-	defer a.Unlock()
-
 	fn := func() error {
+		a.Lock()
+		defer a.Unlock()
+
 		if err := a.refresh(); err != nil {
 			return fmt.Errorf("unable to refresh shares: %s", err)
 		}
