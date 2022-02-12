@@ -4,15 +4,15 @@ go 1.17
 
 require (
 	github.com/ViBiOh/absto v0.1.3
-	github.com/ViBiOh/auth/v2 v2.11.37
+	github.com/ViBiOh/auth/v2 v2.11.38
 	github.com/ViBiOh/exas v0.2.4
 	github.com/ViBiOh/flags v0.0.1
-	github.com/ViBiOh/httputils/v4 v4.34.8
+	github.com/ViBiOh/httputils/v4 v4.35.0
 	github.com/ViBiOh/vith v0.3.0
 	github.com/golang/mock v1.6.0
 	github.com/prometheus/client_golang v1.12.1
 	github.com/streadway/amqp v1.0.0
-	golang.org/x/crypto v0.0.0-20220131195533-30dcbda58838
+	golang.org/x/crypto v0.0.0-20220210151621-f4118a5b28e2
 	golang.org/x/text v0.3.7
 )
 
@@ -24,7 +24,7 @@ require (
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.14.2 // indirect
-	github.com/klauspost/cpuid/v2 v2.0.10 // indirect
+	github.com/klauspost/cpuid/v2 v2.0.11 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
 	github.com/minio/minio-go/v7 v7.0.21 // indirect
@@ -40,7 +40,7 @@ require (
 	github.com/tdewolff/minify/v2 v2.10.0 // indirect
 	github.com/tdewolff/parse/v2 v2.5.27 // indirect
 	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
-	golang.org/x/sys v0.0.0-20220204135822-1c1b9b1eba6a // indirect
+	golang.org/x/sys v0.0.0-20220209214540-3681064d5158 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
-	gopkg.in/ini.v1 v1.66.3 // indirect
+	gopkg.in/ini.v1 v1.66.4 // indirect
 )
