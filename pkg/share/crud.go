@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"path"
+	"sort"
 	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -38,6 +39,8 @@ func (a *App) List() (shares []provider.Share) {
 	}
 
 	a.RUnlock()
+
+	sort.Sort(provider.ShareByID(shares))
 
 	return shares
 }

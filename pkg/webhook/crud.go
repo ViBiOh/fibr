@@ -3,6 +3,7 @@ package webhook
 import (
 	"context"
 	"fmt"
+	"sort"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/sha"
@@ -36,6 +37,8 @@ func (a *App) List() (webhooks []provider.Webhook) {
 	}
 
 	a.RUnlock()
+
+	sort.Sort(provider.WebhookByID(webhooks))
 
 	return webhooks
 }

@@ -35,7 +35,7 @@ func (a App) getCover(files []absto.Item) map[string]interface{} {
 }
 
 // List render directory web view of given dirPath
-func (a App) List(request provider.Request, message renderer.Message, item absto.Item, files []absto.Item) (string, int, map[string]interface{}, error) {
+func (a App) List(request provider.Request, message renderer.Message, item absto.Item, files []absto.Item) (renderer.Page, error) {
 	items := make([]provider.RenderItem, len(files))
 	wg := concurrent.NewLimited(4)
 
@@ -89,7 +89,7 @@ func (a App) List(request provider.Request, message renderer.Message, item absto
 		content["Webhooks"] = a.webhookApp.List()
 	}
 
-	return "files", http.StatusOK, content, nil
+	return renderer.NewPage("files", http.StatusOK, content), nil
 }
 
 // Download content of a directory into a streamed zip

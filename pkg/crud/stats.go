@@ -15,15 +15,15 @@ type entry struct {
 }
 
 // Stats render stats of the current
-func (a App) Stats(w http.ResponseWriter, request provider.Request, message renderer.Message) (string, int, map[string]interface{}, error) {
+func (a App) Stats(w http.ResponseWriter, request provider.Request, message renderer.Message) (renderer.Page, error) {
 	pathname := request.Filepath()
 
 	stats, err := a.computeStats(pathname)
 	if err != nil {
-		return "", http.StatusInternalServerError, nil, err
+		return renderer.NewPage("", http.StatusInternalServerError, nil), err
 	}
 
-	return "stats", http.StatusOK, map[string]interface{}{
+	return renderer.NewPage("stats", http.StatusOK, map[string]interface{}{
 		"Request": request,
 		"Message": message,
 		"Stats": []entry{
@@ -33,7 +33,7 @@ func (a App) Stats(w http.ResponseWriter, request provider.Request, message rend
 			{Key: "Size", Value: bytesHuman(stats["Size"])},
 			{Key: "Metadatas", Value: fmt.Sprintf("%s (%.1f%% of Size)", bytesHuman(stats["Metadatas"]), float64(stats["Metadatas"]*100)/float64(stats["Size"]))},
 		},
-	}, nil
+	}), nil
 }
 
 func (a App) computeStats(pathname string) (map[string]uint64, error) {

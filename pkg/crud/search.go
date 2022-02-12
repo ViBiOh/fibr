@@ -12,6 +12,7 @@ import (
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	httpModel "github.com/ViBiOh/httputils/v4/pkg/model"
+	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
 const (
@@ -134,7 +135,7 @@ func (a App) searchFiles(r *http.Request, request provider.Request) (items []abs
 	return
 }
 
-func (a App) search(r *http.Request, request provider.Request, files []absto.Item) (string, int, map[string]interface{}, error) {
+func (a App) search(r *http.Request, request provider.Request, files []absto.Item) (renderer.Page, error) {
 	items := make([]provider.RenderItem, len(files))
 	var hasMap bool
 
@@ -156,13 +157,13 @@ func (a App) search(r *http.Request, request provider.Request, files []absto.Ite
 		}
 	}
 
-	return "search", http.StatusOK, map[string]interface{}{
+	return renderer.NewPage("search", http.StatusOK, map[string]interface{}{
 		"Paths":   getPathParts(request),
 		"Files":   items,
 		"Search":  r.URL.Query(),
 		"Request": request,
 		"HasMap":  hasMap,
-	}, nil
+	}), nil
 }
 
 func computeSize(unit string, size int64) int64 {

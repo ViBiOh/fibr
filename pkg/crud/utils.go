@@ -10,6 +10,7 @@ import (
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
+	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
 func getPreviousAndNext(file absto.Item, files []absto.Item) (*absto.Item, *absto.Item) {
@@ -92,6 +93,6 @@ func getFormDuration(val string) (time.Duration, error) {
 	return time.ParseDuration(fmt.Sprintf("%sh", value))
 }
 
-func errorReturn(request provider.Request, err error) (string, int, map[string]interface{}, error) {
-	return "", 0, map[string]interface{}{"Request": request}, err
+func errorReturn(request provider.Request, err error) (renderer.Page, error) {
+	return renderer.NewPage("", 0, map[string]interface{}{"Request": request}), err
 }

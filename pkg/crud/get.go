@@ -19,7 +19,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
-func (a App) getWithMessage(w http.ResponseWriter, r *http.Request, request provider.Request, message renderer.Message) (string, int, map[string]interface{}, error) {
+func (a App) getWithMessage(w http.ResponseWriter, r *http.Request, request provider.Request, message renderer.Message) (renderer.Page, error) {
 	pathname := request.Filepath()
 	item, err := a.storageApp.Info(pathname)
 
@@ -42,7 +42,7 @@ func (a App) getWithMessage(w http.ResponseWriter, r *http.Request, request prov
 
 	if item.IsDir && !strings.HasSuffix(r.URL.Path, "/") {
 		a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/?d=%s", r.URL.Path, request.Display), renderer.Message{})
-		return "", 0, nil, nil
+		return renderer.Page{}, nil
 	}
 
 	if !item.IsDir {
@@ -51,15 +51,15 @@ func (a App) getWithMessage(w http.ResponseWriter, r *http.Request, request prov
 	return a.handleDir(w, r, request, item, message)
 }
 
-func (a App) handleFile(w http.ResponseWriter, r *http.Request, request provider.Request, item absto.Item, message renderer.Message) (string, int, map[string]interface{}, error) {
+func (a App) handleFile(w http.ResponseWriter, r *http.Request, request provider.Request, item absto.Item, message renderer.Message) (renderer.Page, error) {
 	if query.GetBool(r, "thumbnail") {
 		a.thumbnailApp.Serve(w, r, item)
-		return "", 0, nil, nil
+		return renderer.Page{}, nil
 	}
 
 	if query.GetBool(r, "stream") {
 		a.thumbnailApp.Stream(w, r, item)
-		return "", 0, nil, nil
+		return renderer.Page{}, nil
 	}
 
 	if query.GetBool(r, "browser") {
@@ -70,7 +70,7 @@ func (a App) handleFile(w http.ResponseWriter, r *http.Request, request provider
 		return a.Browser(w, request, item, message)
 	}
 
-	return "", 0, nil, a.serveFile(w, r, item)
+	return renderer.Page{}, a.serveFile(w, r, item)
 }
 
 func (a App) serveFile(w http.ResponseWriter, r *http.Request, item absto.Item) error {
@@ -85,7 +85,7 @@ func (a App) serveFile(w http.ResponseWriter, r *http.Request, item absto.Item) 
 	return nil
 }
 
-func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.Request, item absto.Item, message renderer.Message) (string, int, map[string]interface{}, error) {
+func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.Request, item absto.Item, message renderer.Message) (renderer.Page, error) {
 	if query.GetBool(r, "stats") {
 		return a.Stats(w, request, message)
 	}
@@ -97,12 +97,12 @@ func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.
 
 	if query.GetBool(r, "geojson") {
 		a.serveGeoJSON(w, r, request, items)
-		return "", 0, nil, nil
+		return renderer.Page{}, nil
 	}
 
 	if query.GetBool(r, "thumbnail") {
 		a.thumbnailApp.List(w, r, items)
-		return "", 0, nil, nil
+		return renderer.Page{}, nil
 	}
 
 	if query.GetBool(r, "download") {
@@ -190,6 +190,6 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 }
 
 // Get output content
-func (a App) Get(w http.ResponseWriter, r *http.Request, request provider.Request) (string, int, map[string]interface{}, error) {
+func (a App) Get(w http.ResponseWriter, r *http.Request, request provider.Request) (renderer.Page, error) {
 	return a.getWithMessage(w, r, request, renderer.ParseMessage(r))
 }

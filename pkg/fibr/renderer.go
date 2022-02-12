@@ -64,13 +64,13 @@ func FuncMap(thumbnailApp thumbnail.App) template.FuncMap {
 }
 
 // TemplateFunc for rendering GUI
-func (a App) TemplateFunc(w http.ResponseWriter, r *http.Request) (string, int, map[string]interface{}, error) {
+func (a App) TemplateFunc(w http.ResponseWriter, r *http.Request) (renderer.Page, error) {
 	if !isMethodAllowed(r) {
-		return "", 0, nil, model.WrapMethodNotAllowed(errors.New("you lack of method for calling me"))
+		return renderer.Page{}, model.WrapMethodNotAllowed(errors.New("you lack of method for calling me"))
 	}
 
 	if r.URL.Path == "/sitemap.xml" {
-		return "sitemap", http.StatusOK, nil, nil
+		return renderer.NewPage("sitemap", http.StatusOK, nil), nil
 	}
 
 	if query.GetBool(r, "redirect") {
@@ -78,7 +78,7 @@ func (a App) TemplateFunc(w http.ResponseWriter, r *http.Request) (string, int, 
 		params.Del("redirect")
 
 		a.rendererApp.Redirect(w, r, fmt.Sprintf("%s?%s", r.URL.Path, params.Encode()), renderer.ParseMessage(r))
-		return "", 0, nil, nil
+		return renderer.Page{}, nil
 	}
 
 	request, err := a.parseRequest(r)
@@ -86,7 +86,7 @@ func (a App) TemplateFunc(w http.ResponseWriter, r *http.Request) (string, int, 
 		if errors.Is(err, model.ErrUnauthorized) {
 			w.Header().Add("WWW-Authenticate", `Basic realm="fibr" charset="UTF-8"`)
 		}
-		return "", 0, map[string]interface{}{"Request": request}, err
+		return renderer.NewPage("", 0, map[string]interface{}{"Request": request}), err
 	}
 
 	switch r.Method {
@@ -102,5 +102,5 @@ func (a App) TemplateFunc(w http.ResponseWriter, r *http.Request) (string, int, 
 		a.crudApp.Delete(w, r, request)
 	}
 
-	return "", 0, nil, nil
+	return renderer.Page{}, nil
 }

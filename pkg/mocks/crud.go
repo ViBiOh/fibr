@@ -39,14 +39,12 @@ func (m *Crud) EXPECT() *CrudMockRecorder {
 }
 
 // Browser mocks base method.
-func (m *Crud) Browser(arg0 http.ResponseWriter, arg1 provider.Request, arg2 model.Item, arg3 renderer.Message) (string, int, map[string]interface{}, error) {
+func (m *Crud) Browser(arg0 http.ResponseWriter, arg1 provider.Request, arg2 model.Item, arg3 renderer.Message) (renderer.Page, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Browser", arg0, arg1, arg2, arg3)
-	ret0, _ := ret[0].(string)
-	ret1, _ := ret[1].(int)
-	ret2, _ := ret[2].(map[string]interface{})
-	ret3, _ := ret[3].(error)
-	return ret0, ret1, ret2, ret3
+	ret0, _ := ret[0].(renderer.Page)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // Browser indicates an expected call of Browser.
@@ -80,14 +78,12 @@ func (mr *CrudMockRecorder) Delete(arg0, arg1, arg2 interface{}) *gomock.Call {
 }
 
 // Get mocks base method.
-func (m *Crud) Get(arg0 http.ResponseWriter, arg1 *http.Request, arg2 provider.Request) (string, int, map[string]interface{}, error) {
+func (m *Crud) Get(arg0 http.ResponseWriter, arg1 *http.Request, arg2 provider.Request) (renderer.Page, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", arg0, arg1, arg2)
-	ret0, _ := ret[0].(string)
-	ret1, _ := ret[1].(int)
-	ret2, _ := ret[2].(map[string]interface{})
-	ret3, _ := ret[3].(error)
-	return ret0, ret1, ret2, ret3
+	ret0, _ := ret[0].(renderer.Page)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // Get indicates an expected call of Get.
@@ -97,14 +93,12 @@ func (mr *CrudMockRecorder) Get(arg0, arg1, arg2 interface{}) *gomock.Call {
 }
 
 // List mocks base method.
-func (m *Crud) List(arg0 provider.Request, arg1 renderer.Message, arg2 model.Item, arg3 []model.Item) (string, int, map[string]interface{}, error) {
+func (m *Crud) List(arg0 provider.Request, arg1 renderer.Message, arg2 model.Item, arg3 []model.Item) (renderer.Page, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", arg0, arg1, arg2, arg3)
-	ret0, _ := ret[0].(string)
-	ret1, _ := ret[1].(int)
-	ret2, _ := ret[2].(map[string]interface{})
-	ret3, _ := ret[3].(error)
-	return ret0, ret1, ret2, ret3
+	ret0, _ := ret[0].(renderer.Page)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // List indicates an expected call of List.

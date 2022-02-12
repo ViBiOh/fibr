@@ -60,3 +60,12 @@ func (s Share) CheckPassword(authorizationHeader string) error {
 func (s Share) IsExpired(now time.Time) bool {
 	return s.Duration != 0 && s.Creation.Add(s.Duration).Before(now)
 }
+
+// ShareByID sort Share by ID
+type ShareByID []Share
+
+func (a ShareByID) Len() int      { return len(a) }
+func (a ShareByID) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+func (a ShareByID) Less(i, j int) bool {
+	return a[i].ID < a[j].ID
+}

@@ -13,7 +13,7 @@ import (
 )
 
 // Browser render file web view
-func (a App) Browser(w http.ResponseWriter, request provider.Request, item absto.Item, message renderer.Message) (string, int, map[string]interface{}, error) {
+func (a App) Browser(w http.ResponseWriter, request provider.Request, item absto.Item, message renderer.Message) (renderer.Page, error) {
 	var (
 		previous *provider.RenderItem
 		next     *provider.RenderItem
@@ -46,7 +46,7 @@ func (a App) Browser(w http.ResponseWriter, request provider.Request, item absto
 		renderItem.HasThumbnail = true
 	}
 
-	return "file", http.StatusOK, map[string]interface{}{
+	return renderer.NewPage("file", http.StatusOK, map[string]interface{}{
 		"Paths":     getPathParts(request),
 		"File":      renderItem,
 		"Exif":      exif,
@@ -58,7 +58,7 @@ func (a App) Browser(w http.ResponseWriter, request provider.Request, item absto
 
 		"Request": request,
 		"Message": message,
-	}, nil
+	}), nil
 }
 
 func (a App) getFilesPreviousAndNext(item absto.Item, request provider.Request) (items []absto.Item, previous *provider.RenderItem, next *provider.RenderItem) {
