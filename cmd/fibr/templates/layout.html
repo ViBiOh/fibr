@@ -5,7 +5,7 @@
 
   <header class="header full-screen flex flex-center">
     <span class="flex-grow flex-ellipsis">
-      <h1 class="medium no-margin no-padding" itemscope itemtype="http://schema.org/BreadcrumbList">
+      <h1 class="medium no-margin no-padding breakable" itemscope itemtype="http://schema.org/BreadcrumbList">
         <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
           {{ template "root-link" . }}
         </span>
@@ -57,7 +57,7 @@
   </header>
 
   <style type="text/css" nonce="{{ .nonce }}">
-    .message {
+    .breakable {
       word-break: break-word;
     }
   </style>
