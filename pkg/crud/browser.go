@@ -42,6 +42,9 @@ func (a App) Browser(w http.ResponseWriter, request provider.Request, item absto
 	wg.Wait()
 
 	renderItem := provider.StorageToRender(item, request)
+	if a.thumbnailApp.CanHaveThumbnail(item) && a.thumbnailApp.HasThumbnail(item) {
+		renderItem.HasThumbnail = true
+	}
 
 	return "file", http.StatusOK, map[string]interface{}{
 		"Paths":     getPathParts(request),

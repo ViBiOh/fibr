@@ -60,9 +60,6 @@ func FuncMap(thumbnailApp thumbnail.App) template.FuncMap {
 				return "file"
 			}
 		},
-		"hasThumbnail": func(item provider.RenderItem) bool {
-			return thumbnailApp.CanHaveThumbnail(item.Item) && thumbnailApp.HasThumbnail(item.Item)
-		},
 	}
 }
 

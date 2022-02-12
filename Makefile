@@ -92,6 +92,4 @@ run:
 	$(MAIN_RUNNER) \
 		-ignorePattern ".git" \
 		-authProfiles "1:admin" \
-		-authUsers "1:`htpasswd -nBb admin admin`" \
-		-thumbnailURL "" \
-		-exifURL ""
+		-authUsers "1:`htpasswd -nBb admin admin`"

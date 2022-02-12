@@ -34,7 +34,7 @@
       <meta property="og:video:type" content="{{ .File.Mime }}">
     {{ end }}
 
-    {{ if hasThumbnail .File }}
+    {{ if .File.HasThumbnail }}
       <meta property="og:image" content="{{ publicURL (.Request.AbsoluteURL .Request.Item) }}?thumbnail">
       <meta property="og:image:alt" content="Thumbnail of {{ .File.Name }}">
       <meta property="og:image:type" content="image/webp">

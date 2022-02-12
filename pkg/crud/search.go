@@ -138,15 +138,22 @@ func (a App) search(r *http.Request, request provider.Request, files []absto.Ite
 	items := make([]provider.RenderItem, len(files))
 	var hasMap bool
 
+	renderWithThumbnail := request.Display == provider.GridDisplay
+
 	for i, item := range files {
-		items[i] = provider.StorageToRender(item, request)
+		renderItem := provider.StorageToRender(item, request)
+
+		if renderWithThumbnail && a.thumbnailApp.CanHaveThumbnail(item) && a.thumbnailApp.HasThumbnail(item) {
+			renderItem.HasThumbnail = true
+		}
+
+		items[i] = renderItem
 
 		if !hasMap {
 			if exif, err := a.exifApp.GetExifFor(item); err == nil && exif.Geocode.Longitude != 0 && exif.Geocode.Latitude != 0 {
 				hasMap = true
 			}
 		}
-
 	}
 
 	return "search", http.StatusOK, map[string]interface{}{

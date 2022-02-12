@@ -52,6 +52,7 @@ type RenderItem struct {
 	URL  string
 	Path string
 	absto.Item
+	HasThumbnail bool
 }
 
 // IsImage check if item is an image

@@ -39,6 +39,8 @@ func (a App) List(request provider.Request, message renderer.Message, item absto
 	items := make([]provider.RenderItem, len(files))
 	wg := concurrent.NewLimited(4)
 
+	renderWithThumbnail := request.Display == provider.GridDisplay
+
 	for index, item := range files {
 		func(item absto.Item, index int) {
 			wg.Go(func() {
@@ -47,9 +49,14 @@ func (a App) List(request provider.Request, message renderer.Message, item absto
 					logger.WithField("fn", "crud.List").WithField("item", item.Pathname).Error("unable to read: %s", err)
 				}
 
-				render := provider.StorageToRender(item, request)
-				render.Aggregate = aggregate
-				items[index] = render
+				renderItem := provider.StorageToRender(item, request)
+				renderItem.Aggregate = aggregate
+
+				if renderWithThumbnail && a.thumbnailApp.CanHaveThumbnail(item) && a.thumbnailApp.HasThumbnail(item) {
+					renderItem.HasThumbnail = true
+				}
+
+				items[index] = renderItem
 			})
 		}(item, index)
 	}
