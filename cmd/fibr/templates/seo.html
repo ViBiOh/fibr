@@ -51,6 +51,11 @@
       <meta property="og:image:type" content="image/webp">
       <meta property="og:image:width" content="{{ .Cover.ImgWidth }}">
       <meta property="og:image:width" content="{{ .Cover.ImgWidth }}">
+
+      {{ if .Cover.File.IsVideo }}
+        <meta property="og:video" content="{{ publicURL (.Request.AbsoluteURL .Cover.Img.Name) }}">
+        <meta property="og:video:type" content="{{ .Cover.File.Mime }}">
+      {{ end }}
     {{ else }}
       <meta property="og:image" content="{{ publicURL "/images/favicon/android-chrome-512x512.png" }}?v={{ .Version }}">
       <meta property="og:image:type" content="image/png">

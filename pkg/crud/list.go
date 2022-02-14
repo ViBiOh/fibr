@@ -20,11 +20,11 @@ const (
 	uint32max = (1 << 32) - 1
 )
 
-func (a App) getCover(files []absto.Item) map[string]interface{} {
+func (a App) getCover(request provider.Request, files []absto.Item) map[string]interface{} {
 	for _, file := range files {
 		if a.thumbnailApp.HasThumbnail(file) {
 			return map[string]interface{}{
-				"Img":       file,
+				"Img":       provider.StorageToRender(file, request),
 				"ImgHeight": thumbnail.Height,
 				"ImgWidth":  thumbnail.Width,
 			}
@@ -75,7 +75,7 @@ func (a App) List(request provider.Request, message renderer.Message, item absto
 	content := map[string]interface{}{
 		"Paths":   getPathParts(request),
 		"Files":   items,
-		"Cover":   a.getCover(files),
+		"Cover":   a.getCover(request, files),
 		"Request": request,
 		"Message": message,
 		"HasMap":  hasMap,

@@ -50,7 +50,7 @@ func (a App) Browser(w http.ResponseWriter, request provider.Request, item absto
 		"Paths":     getPathParts(request),
 		"File":      renderItem,
 		"Exif":      exif,
-		"Cover":     a.getCover(files),
+		"Cover":     a.getCover(request, files),
 		"HasStream": renderItem.IsVideo() && a.thumbnailApp.HasStream(item),
 
 		"Previous": previous,
