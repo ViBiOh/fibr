@@ -1,8 +1,9 @@
 {{ define "favicon" }}
-  <link rel="apple-touch-icon" sizes="180x180" href="{{ url "/images/favicon/apple-touch-icon.png" }}?v={{ .Version }}">
+  <link rel="apple-touch-icon" href="{{ url "/images/favicon/apple-touch-icon.png" }}?v={{ .Version }}">
   <link rel="icon" type="image/png" sizes="32x32" href="{{ url "/images/favicon/favicon-32x32.png" }}?v={{ .Version }}">
   <link rel="icon" type="image/png" sizes="16x16" href="{{ url "/images/favicon/favicon-16x16.png" }}?v={{ .Version }}">
   <link rel="manifest" href="{{ url "/images/favicon/manifest.json" }}?v={{ .Version }}">
   <link rel="mask-icon" href="{{ url "/images/favicon/safari-pinned-tab.svg" }}?v={{ .Version }}" color="#5bbad5">
-  <meta name="theme-color" content="#ffffff">
+  <meta name="theme-color" content="#3b3b3b">
+  <meta name="apple-mobile-web-app-status-bar-style" content="#3b3b3b">
 {{ end }}
