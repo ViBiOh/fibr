@@ -38,7 +38,7 @@
       <meta property="og:image" content="{{ publicURL (.Request.AbsoluteURL .Request.Item) }}?thumbnail">
       <meta property="og:image:alt" content="Thumbnail of {{ .File.Name }}">
       <meta property="og:image:type" content="image/webp">
-      <meta property="og:image:width" content="150">
+      <meta property="og:image:height" content="150">
       <meta property="og:image:width" content="150">
       {{ $needCover = false }}
     {{ end }}
@@ -49,12 +49,12 @@
       <meta property="og:image" content="{{ publicURL (.Request.AbsoluteURL .Cover.Img.Name) }}?thumbnail">
       <meta property="og:image:alt" content="Thumbnail of folder">
       <meta property="og:image:type" content="image/webp">
-      <meta property="og:image:width" content="{{ .Cover.ImgWidth }}">
+      <meta property="og:image:height" content="{{ .Cover.ImgHeight }}">
       <meta property="og:image:width" content="{{ .Cover.ImgWidth }}">
 
-      {{ if .Cover.File.IsVideo }}
+      {{ if .Cover.Img.IsVideo }}
         <meta property="og:video" content="{{ publicURL (.Request.AbsoluteURL .Cover.Img.Name) }}">
-        <meta property="og:video:type" content="{{ .Cover.File.Mime }}">
+        <meta property="og:video:type" content="{{ .Cover.Img.Mime }}">
       {{ end }}
     {{ else }}
       <meta property="og:image" content="{{ publicURL "/images/favicon/android-chrome-512x512.png" }}?v={{ .Version }}">
