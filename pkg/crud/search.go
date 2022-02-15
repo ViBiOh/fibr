@@ -160,6 +160,7 @@ func (a App) search(r *http.Request, request provider.Request, files []absto.Ite
 	return renderer.NewPage("search", http.StatusOK, map[string]interface{}{
 		"Paths":   getPathParts(request),
 		"Files":   items,
+		"Cover":   a.getCover(request, files),
 		"Search":  r.URL.Query(),
 		"Request": request,
 		"HasMap":  hasMap,
