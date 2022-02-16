@@ -274,3 +274,15 @@ func WriteToStorage(storageApp absto.Storage, output string, reader io.Reader) e
 
 	return err
 }
+
+// EtagMatch check that given hash match the existing etag
+func EtagMatch(w http.ResponseWriter, r *http.Request, hash string) (string, bool) {
+	etag := fmt.Sprintf(`W/"%s"`, hash)
+
+	if r.Header.Get("If-None-Match") == etag {
+		w.WriteHeader(http.StatusNotModified)
+		return etag, true
+	}
+
+	return etag, false
+}

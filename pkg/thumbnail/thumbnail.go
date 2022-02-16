@@ -160,10 +160,8 @@ func (a App) List(w http.ResponseWriter, r *http.Request, items []absto.Item) {
 		return
 	}
 
-	etag := fmt.Sprintf(`W/"%s"`, a.thumbnailHash(items))
-
-	if r.Header.Get("If-None-Match") == etag {
-		w.WriteHeader(http.StatusNotModified)
+	etag, ok := provider.EtagMatch(w, r, a.thumbnailHash(items))
+	if ok {
 		return
 	}
 

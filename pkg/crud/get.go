@@ -17,6 +17,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/query"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
+	"github.com/ViBiOh/httputils/v4/pkg/sha"
 )
 
 func (a App) getWithMessage(w http.ResponseWriter, r *http.Request, request provider.Request, message renderer.Message) (renderer.Page, error) {
@@ -74,12 +75,19 @@ func (a App) handleFile(w http.ResponseWriter, r *http.Request, request provider
 }
 
 func (a App) serveFile(w http.ResponseWriter, r *http.Request, item absto.Item) error {
+	etag, ok := provider.EtagMatch(w, r, sha.New(item))
+	if ok {
+		return nil
+	}
+
 	file, err := a.storageApp.ReadFrom(item.Pathname)
 	if err != nil {
 		return fmt.Errorf("unable to get reader for `%s`: %w", item.Pathname, err)
 	}
 
 	defer provider.LogClose(file, "crud.serveFile", item.Pathname)
+
+	w.Header().Add("Etag", etag)
 
 	http.ServeContent(w, r, item.Name, item.Date, file)
 	return nil
