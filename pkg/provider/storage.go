@@ -55,6 +55,11 @@ type RenderItem struct {
 	HasThumbnail bool
 }
 
+// IsZero checks if instance is valued or not
+func (r RenderItem) IsZero() bool {
+	return len(r.Item.Pathname) == 0
+}
+
 // IsImage check if item is an image
 func (r RenderItem) IsImage() bool {
 	_, ok := ImageExtensions[r.Extension]

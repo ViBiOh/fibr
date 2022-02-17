@@ -33,15 +33,15 @@
         {{ end }}
       </span>
 
-      {{ if or .Previous .Next }}
+      {{ if not (and .Previous.IsZero .Next.IsZero) }}
         <nav class="flex">
-          {{ if .Previous }}
+          {{ if not .Previous.IsZero }}
             <a class="button button-icon" href="{{ url (.Request.AbsoluteURL .Previous.URL) }}?browser">
               <img class="icon" src="{{ url "/svg/arrow-left?fill=silver" }}" alt="Previous file">
             </a>
           {{ end }}
 
-          {{ if .Next }}
+          {{ if not .Next.IsZero }}
             <a class="button button-icon" href="{{ url (.Request.AbsoluteURL .Next.URL) }}?browser">
               <img class="icon" src="{{ url "/svg/arrow-right?fill=silver" }}" alt="Next file">
             </a>

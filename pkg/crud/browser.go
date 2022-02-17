@@ -15,8 +15,8 @@ import (
 // Browser render file web view
 func (a App) Browser(w http.ResponseWriter, request provider.Request, item absto.Item, message renderer.Message) (renderer.Page, error) {
 	var (
-		previous *provider.RenderItem
-		next     *provider.RenderItem
+		previous provider.RenderItem
+		next     provider.RenderItem
 		files    []absto.Item
 		exif     exas.Exif
 	)
@@ -61,7 +61,7 @@ func (a App) Browser(w http.ResponseWriter, request provider.Request, item absto
 	}), nil
 }
 
-func (a App) getFilesPreviousAndNext(item absto.Item, request provider.Request) (items []absto.Item, previous *provider.RenderItem, next *provider.RenderItem) {
+func (a App) getFilesPreviousAndNext(item absto.Item, request provider.Request) (items []absto.Item, previous provider.RenderItem, next provider.RenderItem) {
 	var err error
 	items, err = a.storageApp.List(item.Dir())
 	if err != nil {
@@ -74,12 +74,10 @@ func (a App) getFilesPreviousAndNext(item absto.Item, request provider.Request) 
 	previousItem, nextItem := getPreviousAndNext(item, items)
 
 	if previousItem != nil {
-		content := provider.StorageToRender(*previousItem, request)
-		previous = &content
+		previous = provider.StorageToRender(*previousItem, request)
 	}
 	if nextItem != nil {
-		content := provider.StorageToRender(*nextItem, request)
-		next = &content
+		next = provider.StorageToRender(*previousItem, request)
 	}
 
 	return

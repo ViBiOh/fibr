@@ -22,7 +22,9 @@
      */
     function goToPrevious() {
       {{ if .Previous }}
-        window.location.href = '{{ url (.Request.AbsoluteURL .Previous.URL) }}?browser';
+        {{ if not .Previous.IsZero }}
+          window.location.href = '{{ url (.Request.AbsoluteURL .Previous.URL) }}?browser';
+        {{ end }}
       {{ end }}
     }
 
@@ -31,7 +33,9 @@
      */
     function goToNext() {
       {{ if .Next }}
-        window.location.href = '{{ url (.Request.AbsoluteURL .Next.URL) }}?browser';
+        {{ if not .Next.IsZero }}
+          window.location.href = '{{ url (.Request.AbsoluteURL .Next.URL) }}?browser';
+        {{ end }}
       {{ end }}
     }
 
