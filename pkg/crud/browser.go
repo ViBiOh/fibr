@@ -77,7 +77,7 @@ func (a App) getFilesPreviousAndNext(item absto.Item, request provider.Request) 
 		previous = provider.StorageToRender(*previousItem, request)
 	}
 	if nextItem != nil {
-		next = provider.StorageToRender(*previousItem, request)
+		next = provider.StorageToRender(*nextItem, request)
 	}
 
 	return
