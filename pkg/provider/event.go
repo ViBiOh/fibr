@@ -2,6 +2,7 @@ package provider
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -12,7 +13,10 @@ import (
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
+	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 	"github.com/prometheus/client_golang/prometheus"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // EventType is the enumeration of event that can happen
@@ -22,7 +26,7 @@ type EventType uint
 type EventProducer func(Event) error
 
 // EventConsumer is a func that consume an event
-type EventConsumer func(Event)
+type EventConsumer func(context.Context, Event)
 
 const (
 	// UploadEvent occurs when someone upload a file
@@ -228,13 +232,14 @@ func NewAccessEvent(item absto.Item, r *http.Request) Event {
 
 // EventBus describes a channel for exchanging Event
 type EventBus struct {
+	tracer  trace.Tracer
 	counter *prometheus.CounterVec
 	bus     chan Event
 	done    chan struct{}
 }
 
 // NewEventBus create an event exchange channel
-func NewEventBus(size uint, prometheusRegisterer prometheus.Registerer) (EventBus, error) {
+func NewEventBus(size uint, prometheusRegisterer prometheus.Registerer, tracerApp tracer.App) (EventBus, error) {
 	var counter *prometheus.CounterVec
 
 	if prometheusRegisterer != nil {
@@ -253,6 +258,7 @@ func NewEventBus(size uint, prometheusRegisterer prometheus.Registerer) (EventBu
 		done:    make(chan struct{}),
 		bus:     make(chan Event, size),
 		counter: counter,
+		tracer:  tracerApp.GetTracer("event"),
 	}, nil
 }
 
@@ -283,9 +289,19 @@ func (e EventBus) Start(done <-chan struct{}, consumers ...EventConsumer) {
 
 	go func() {
 		for event := range e.bus {
-			for _, consumer := range consumers {
-				consumer(event)
+			var span trace.Span
+			ctx := context.Background()
+
+			if e.tracer != nil {
+				ctx, span = e.tracer.Start(ctx, "event")
+				span.SetAttributes(attribute.String("type", event.Type.String()))
 			}
+
+			for _, consumer := range consumers {
+				consumer(ctx, event)
+			}
+
+			span.End()
 			e.increaseMetric(event, "done")
 		}
 	}()

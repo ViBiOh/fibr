@@ -89,7 +89,7 @@ func (a App) createShare(w http.ResponseWriter, r *http.Request, request provide
 		return
 	}
 
-	id, err := a.shareApp.Create(request.Filepath(), edit, password, info.IsDir, duration)
+	id, err := a.shareApp.Create(r.Context(), request.Filepath(), edit, password, info.IsDir, duration)
 	if err != nil {
 		a.error(w, r, request, model.WrapInternal(err))
 		return
@@ -118,7 +118,7 @@ func (a App) deleteShare(w http.ResponseWriter, r *http.Request, request provide
 
 	id := r.FormValue("id")
 
-	if err := a.shareApp.Delete(id); err != nil {
+	if err := a.shareApp.Delete(r.Context(), id); err != nil {
 		a.error(w, r, request, model.WrapInternal(err))
 		return
 	}

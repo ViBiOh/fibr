@@ -44,10 +44,10 @@ func (a *App) List() (webhooks []provider.Webhook) {
 }
 
 // Create a webhook
-func (a *App) Create(pathname string, recursive bool, kind provider.WebhookKind, url string, types []provider.EventType) (string, error) {
+func (a *App) Create(ctx context.Context, pathname string, recursive bool, kind provider.WebhookKind, url string, types []provider.EventType) (string, error) {
 	var id string
 
-	return id, a.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) (err error) {
+	return id, a.Exclusive(ctx, a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) (err error) {
 		id, err = a.generateID()
 		if err != nil {
 			return fmt.Errorf("unable to generate id: %s", err)
@@ -79,8 +79,8 @@ func (a *App) Create(pathname string, recursive bool, kind provider.WebhookKind,
 }
 
 // Delete a webhook
-func (a *App) Delete(id string) error {
-	return a.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
+func (a *App) Delete(ctx context.Context, id string) error {
+	return a.Exclusive(ctx, a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
 		return a.delete(id)
 	})
 }

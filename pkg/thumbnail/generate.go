@@ -17,8 +17,8 @@ const (
 	defaultTimeout = time.Minute * 2
 )
 
-func (a App) generate(item absto.Item) (err error) {
-	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
+func (a App) generate(ctx context.Context, item absto.Item) (err error) {
+	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
 	itemType := typeOfItem(item)

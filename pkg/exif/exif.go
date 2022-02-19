@@ -93,8 +93,8 @@ func (a App) enabled() bool {
 	return !a.exifRequest.IsZero()
 }
 
-func (a App) extractAndSaveExif(item absto.Item) (exif exas.Exif, err error) {
-	exif, err = a.extractExif(context.Background(), item)
+func (a App) extractAndSaveExif(ctx context.Context, item absto.Item) (exif exas.Exif, err error) {
+	exif, err = a.extractExif(ctx, item)
 	if err != nil {
 		err = fmt.Errorf("unable to extract exif: %s", err)
 		return

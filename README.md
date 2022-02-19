@@ -12,6 +12,7 @@ Web File Browser and Manager.
 - Can communicate with sidecars in pure HTTP or AMQP
 - Can send webhooks for different event types to various providers
 - Basic search for files on metadatas without indexation
+- OpenTelemetry and pprof already built-in
 
 ![](docs/fibr.png)
 
@@ -222,6 +223,8 @@ Usage of fibr:
         [amqpExif] Interval duration when send fails {FIBR_AMQP_EXIF_RETRY_INTERVAL} (default "1h")
   -amqpExifRoutingKey string
         [amqpExif] RoutingKey name {FIBR_AMQP_EXIF_ROUTING_KEY} (default "exif_output")
+  -amqpPrefetch int
+        [amqp] Prefetch count for QoS {FIBR_AMQP_PREFETCH} (default 1)
   -amqpShareExchange string
         [amqpShare] Exchange name {FIBR_AMQP_SHARE_EXCHANGE} (default "fibr.shares")
   -amqpShareExclusive
@@ -370,6 +373,10 @@ Usage of fibr:
         [thumbnail] Vith Thumbnail Basic Auth User {FIBR_THUMBNAIL_USER}
   -title string
         Application title {FIBR_TITLE} (default "fibr")
+  -tracerRate string
+        [tracer] Jaeger sample rate, 'always', 'never' or a float value {FIBR_TRACER_RATE} (default "always")
+  -tracerURL string
+        [tracer] Jaeger endpoint URL (e.g. http://jaeger:14268/api/traces) {FIBR_TRACER_URL}
   -url string
         [alcotest] URL to check {FIBR_URL}
   -userAgent string

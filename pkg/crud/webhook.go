@@ -50,7 +50,7 @@ func (a App) createWebhook(w http.ResponseWriter, r *http.Request, request provi
 		return
 	}
 
-	id, err := a.webhookApp.Create(info.Pathname, recursive, kind, webhookURL, eventTypes)
+	id, err := a.webhookApp.Create(r.Context(), info.Pathname, recursive, kind, webhookURL, eventTypes)
 	if err != nil {
 		a.error(w, r, request, model.WrapInternal(err))
 		return
@@ -128,7 +128,7 @@ func (a App) deleteWebhook(w http.ResponseWriter, r *http.Request, request provi
 
 	id := r.FormValue("id")
 
-	if err := a.webhookApp.Delete(id); err != nil {
+	if err := a.webhookApp.Delete(r.Context(), id); err != nil {
 		a.error(w, r, request, model.WrapInternal(err))
 		return
 	}

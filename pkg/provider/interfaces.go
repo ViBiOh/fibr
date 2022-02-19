@@ -39,15 +39,15 @@ type Auth interface {
 //go:generate mockgen -destination ../mocks/share.go -mock_names ShareManager=Share -package mocks github.com/ViBiOh/fibr/pkg/provider ShareManager
 type ShareManager interface {
 	Get(string) Share
-	Create(string, bool, string, bool, time.Duration) (string, error)
-	Delete(string) error
+	Create(context.Context, string, bool, string, bool, time.Duration) (string, error)
+	Delete(context.Context, string) error
 	List() []Share
 }
 
 // WebhookManager description
 //go:generate mockgen -destination ../mocks/webhook.go -mock_names WebhookManager=Webhook -package mocks github.com/ViBiOh/fibr/pkg/provider WebhookManager
 type WebhookManager interface {
-	Create(string, bool, WebhookKind, string, []EventType) (string, error)
-	Delete(string) error
+	Create(context.Context, string, bool, WebhookKind, string, []EventType) (string, error)
+	Delete(context.Context, string) error
 	List() []Webhook
 }

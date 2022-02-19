@@ -1,6 +1,7 @@
 package exif
 
 import (
+	"context"
 	"fmt"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
@@ -10,18 +11,18 @@ import (
 )
 
 // EventConsumer handle event pushed to the event bus
-func (a App) EventConsumer(e provider.Event) {
+func (a App) EventConsumer(ctx context.Context, e provider.Event) {
 	if !a.enabled() {
 		return
 	}
 
 	switch e.Type {
 	case provider.StartEvent:
-		if err := a.handleStartEvent(e.Item); err != nil {
+		if err := a.handleStartEvent(ctx, e.Item); err != nil {
 			getEventLogger(e.Item).Error("unable to start: %s", err)
 		}
 	case provider.UploadEvent:
-		if err := a.handleUploadEvent(e.Item); err != nil {
+		if err := a.handleUploadEvent(ctx, e.Item); err != nil {
 			getEventLogger(e.Item).Error("unable to upload: %s", err)
 		}
 	case provider.RenameEvent:
@@ -39,7 +40,7 @@ func getEventLogger(item absto.Item) logger.Provider {
 	return logger.WithField("fn", "exif.EventConsumer").WithField("item", item.Pathname)
 }
 
-func (a App) handleStartEvent(item absto.Item) error {
+func (a App) handleStartEvent(ctx context.Context, item absto.Item) error {
 	if a.hasMetadata(item) {
 		return nil
 	}
@@ -52,10 +53,10 @@ func (a App) handleStartEvent(item absto.Item) error {
 		return nil
 	}
 
-	return a.handleUploadEvent(item)
+	return a.handleUploadEvent(ctx, item)
 }
 
-func (a App) handleUploadEvent(item absto.Item) error {
+func (a App) handleUploadEvent(ctx context.Context, item absto.Item) error {
 	if !a.CanHaveExif(item) {
 		return nil
 	}
@@ -64,7 +65,7 @@ func (a App) handleUploadEvent(item absto.Item) error {
 		return a.publishExifRequest(item)
 	}
 
-	exif, err := a.extractAndSaveExif(item)
+	exif, err := a.extractAndSaveExif(ctx, item)
 	if err != nil {
 		return fmt.Errorf("unable to extract and save exif: %s", err)
 	}

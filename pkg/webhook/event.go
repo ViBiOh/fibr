@@ -16,7 +16,7 @@ import (
 )
 
 // EventConsumer handle event pushed to the event bus
-func (a *App) EventConsumer(event provider.Event) {
+func (a *App) EventConsumer(ctx context.Context, event provider.Event) {
 	a.RLock()
 	defer a.RUnlock()
 
@@ -29,13 +29,13 @@ func (a *App) EventConsumer(event provider.Event) {
 
 		switch webhook.Kind {
 		case provider.Raw:
-			statusCode, err = a.rawHandle(context.Background(), webhook, event)
+			statusCode, err = a.rawHandle(ctx, webhook, event)
 		case provider.Discord:
-			statusCode, err = a.discordHandle(context.Background(), webhook, event)
+			statusCode, err = a.discordHandle(ctx, webhook, event)
 		case provider.Slack:
-			statusCode, err = a.slackHandle(context.Background(), webhook, event)
+			statusCode, err = a.slackHandle(ctx, webhook, event)
 		case provider.Telegram:
-			statusCode, err = a.telegramHandle(context.Background(), webhook, event)
+			statusCode, err = a.telegramHandle(ctx, webhook, event)
 		default:
 			logger.Warn("unknown kind `%d` for webhook", webhook.Kind)
 		}
@@ -49,7 +49,7 @@ func (a *App) EventConsumer(event provider.Event) {
 
 	go func() {
 		if event.Type == provider.DeleteEvent {
-			if err := a.deleteItem(event.Item); err != nil {
+			if err := a.deleteItem(ctx, event.Item); err != nil {
 				logger.Error("unable to delete webhooks for item: %s", err)
 			}
 		}
@@ -218,8 +218,8 @@ func (a *App) accessEvent(event provider.Event) string {
 	return content.String()
 }
 
-func (a *App) deleteItem(item absto.Item) error {
-	return a.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
+func (a *App) deleteItem(ctx context.Context, item absto.Item) error {
+	return a.Exclusive(ctx, a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
 		for id, webhook := range a.webhooks {
 			if webhook.Pathname == item.Pathname {
 				if err := a.delete(id); err != nil {

@@ -33,18 +33,20 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/prometheus"
 	"github.com/ViBiOh/httputils/v4/pkg/recoverer"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
+	"github.com/ViBiOh/httputils/v4/pkg/request"
 	"github.com/ViBiOh/httputils/v4/pkg/server"
+	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 )
 
 //go:embed templates static
 var content embed.FS
 
-func newLoginApp(basicConfig basicMemory.Config) provider.Auth {
+func newLoginApp(tracerApp tracer.App, basicConfig basicMemory.Config) provider.Auth {
 	basicApp, err := basicMemory.New(basicConfig)
 	logger.Fatal(err)
 
 	basicProviderProvider := basic.New(basicApp, "fibr")
-	return authMiddleware.New(basicApp, basicProviderProvider)
+	return authMiddleware.New(basicApp, tracerApp, basicProviderProvider)
 }
 
 func generateIdentityName() string {
@@ -66,6 +68,7 @@ func main() {
 
 	alcotestConfig := alcotest.Flags(fs, "")
 	loggerConfig := logger.Flags(fs, "logger")
+	tracerConfig := tracer.Flags(fs, "tracer")
 	prometheusConfig := prometheus.Flags(fs, "prometheus", flags.NewOverride("Gzip", false))
 	owaspConfig := owasp.Flags(fs, "", flags.NewOverride("FrameOptions", "SAMEORIGIN"), flags.NewOverride("Csp", "default-src 'self'; base-uri 'self'; script-src 'httputils-nonce' unpkg.com/leaflet@1.7.1/dist/ unpkg.com/leaflet.markercluster@1.5.1/; style-src 'httputils-nonce' unpkg.com/leaflet@1.7.1/dist/ unpkg.com/leaflet.markercluster@1.5.1/; img-src 'self' data: a.tile.openstreetmap.org b.tile.openstreetmap.org c.tile.openstreetmap.org"))
 
@@ -93,6 +96,11 @@ func main() {
 	logger.Global(logger.New(loggerConfig))
 	defer logger.Close()
 
+	tracerApp, err := tracer.New(tracerConfig)
+	logger.Fatal(err)
+	defer tracerApp.Close()
+	request.AddTracerToDefaultClient(tracerApp.GetProvider())
+
 	go func() {
 		fmt.Println(http.ListenAndServe("localhost:9999", http.DefaultServeMux))
 	}()
@@ -107,7 +115,7 @@ func main() {
 	storageProvider, err := absto.New(abstoConfig)
 	logger.Fatal(err)
 
-	eventBus, err := provider.NewEventBus(10, prometheusRegisterer)
+	eventBus, err := provider.NewEventBus(10, prometheusRegisterer, tracerApp)
 	logger.Fatal(err)
 
 	amqpClient, err := amqp.New(amqpConfig, prometheusApp.Registerer())
@@ -120,7 +128,7 @@ func main() {
 	thumbnailApp, err := thumbnail.New(thumbnailConfig, storageProvider, prometheusRegisterer, amqpClient)
 	logger.Fatal(err)
 
-	rendererApp, err := renderer.New(rendererConfig, content, fibr.FuncMap(thumbnailApp))
+	rendererApp, err := renderer.New(rendererConfig, content, fibr.FuncMap(thumbnailApp), tracerApp)
 	logger.Fatal(err)
 
 	exifApp, err := exif.New(exifConfig, storageProvider, prometheusRegisterer, amqpClient)
@@ -146,7 +154,7 @@ func main() {
 
 	var middlewareApp provider.Auth
 	if !*disableAuth {
-		middlewareApp = newLoginApp(basicConfig)
+		middlewareApp = newLoginApp(tracerApp, basicConfig)
 	}
 
 	fibrApp := fibr.New(&crudApp, rendererApp, shareApp, webhookApp, middlewareApp)
@@ -161,7 +169,7 @@ func main() {
 	go eventBus.Start(healthApp.Done(), shareApp.EventConsumer, thumbnailApp.EventConsumer, exifApp.EventConsumer, webhookApp.EventConsumer)
 
 	go promServer.Start("prometheus", healthApp.End(), prometheusApp.Handler())
-	go appServer.Start("http", healthApp.End(), httputils.Handler(handler, healthApp, recoverer.Middleware, prometheusApp.Middleware, owasp.New(owaspConfig).Middleware))
+	go appServer.Start("http", healthApp.End(), httputils.Handler(handler, healthApp, recoverer.Middleware, prometheusApp.Middleware, tracerApp.Middleware, owasp.New(owaspConfig).Middleware))
 
 	healthApp.WaitForTermination(appServer.Done())
 	server.GracefulWait(appServer.Done(), promServer.Done(), amqpExifApp.Done(), amqpShareApp.Done(), amqpWebhookApp.Done())

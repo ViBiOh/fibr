@@ -11,21 +11,21 @@ import (
 )
 
 // EventConsumer handle event pushed to the event bus
-func (a *App) EventConsumer(e provider.Event) {
+func (a *App) EventConsumer(ctx context.Context, e provider.Event) {
 	switch e.Type {
 	case provider.RenameEvent:
-		if err := a.renameItem(e.Item, *e.New); err != nil {
+		if err := a.renameItem(ctx, e.Item, *e.New); err != nil {
 			logger.Error("unable to rename share: %s", err)
 		}
 	case provider.DeleteEvent:
-		if err := a.deleteItem(e.Item); err != nil {
+		if err := a.deleteItem(ctx, e.Item); err != nil {
 			logger.Error("unable to rename share: %s", err)
 		}
 	}
 }
 
-func (a *App) renameItem(old, new absto.Item) error {
-	_, err := a.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
+func (a *App) renameItem(ctx context.Context, old, new absto.Item) error {
+	_, err := a.Exclusive(ctx, a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
 		for id, share := range a.shares {
 			if strings.HasPrefix(share.Path, old.Pathname) {
 				share.Path = strings.Replace(share.Path, old.Pathname, new.Pathname, 1)
@@ -45,8 +45,8 @@ func (a *App) renameItem(old, new absto.Item) error {
 	return err
 }
 
-func (a *App) deleteItem(item absto.Item) error {
-	_, err := a.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
+func (a *App) deleteItem(ctx context.Context, item absto.Item) error {
+	_, err := a.Exclusive(ctx, a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
 		for id, share := range a.shares {
 			if strings.HasPrefix(share.Path, item.Pathname) {
 				if err := a.delete(id); err != nil {

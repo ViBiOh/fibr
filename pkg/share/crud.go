@@ -46,10 +46,10 @@ func (a *App) List() (shares []provider.Share) {
 }
 
 // Create a share
-func (a *App) Create(filepath string, edit bool, password string, isDir bool, duration time.Duration) (string, error) {
+func (a *App) Create(ctx context.Context, filepath string, edit bool, password string, isDir bool, duration time.Duration) (string, error) {
 	var id string
 
-	_, err := a.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
+	_, err := a.Exclusive(ctx, a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
 		var err error
 		id, err = a.generateID()
 		if err != nil {
@@ -86,8 +86,8 @@ func (a *App) Create(filepath string, edit bool, password string, isDir bool, du
 }
 
 // Delete a share
-func (a *App) Delete(id string) error {
-	_, err := a.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
+func (a *App) Delete(ctx context.Context, id string) error {
+	_, err := a.Exclusive(ctx, a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
 		return a.delete(id)
 	})
 
