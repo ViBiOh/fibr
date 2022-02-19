@@ -15,11 +15,14 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/httpjson"
 	prom "github.com/ViBiOh/httputils/v4/pkg/prometheus"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
+	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 	"github.com/prometheus/client_golang/prometheus"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // App of package
 type App struct {
+	tracer          trace.Tracer
 	storageApp      absto.Storage
 	exifMetric      *prometheus.CounterVec
 	aggregateMetric *prometheus.CounterVec
@@ -63,7 +66,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 }
 
 // New creates new App from Config
-func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheus.Registerer, amqpClient *amqpclient.Client) (App, error) {
+func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheus.Registerer, tracerApp tracer.App, amqpClient *amqpclient.Client) (App, error) {
 	var amqpExchange string
 	if amqpClient != nil {
 		amqpExchange = strings.TrimSpace(*config.amqpExchange)
@@ -82,6 +85,7 @@ func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheu
 		amqpExchange:   amqpExchange,
 		amqpRoutingKey: strings.TrimSpace(*config.amqpRoutingKey),
 
+		tracer:     tracerApp.GetTracer("exif"),
 		storageApp: storageApp,
 
 		exifMetric:      prom.CounterVec(prometheusRegisterer, "fibr", "exif", "item", "state"),

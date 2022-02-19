@@ -18,8 +18,8 @@ import (
 //go:generate mockgen -destination ../mocks/crud.go -mock_names Crud=Crud -package mocks github.com/ViBiOh/fibr/pkg/provider Crud
 type Crud interface {
 	Start(done <-chan struct{})
-	Browser(http.ResponseWriter, Request, absto.Item, renderer.Message) (renderer.Page, error)
-	List(Request, renderer.Message, absto.Item, []absto.Item) (renderer.Page, error)
+	Browser(context.Context, http.ResponseWriter, Request, absto.Item, renderer.Message) (renderer.Page, error)
+	List(context.Context, Request, renderer.Message, absto.Item, []absto.Item) (renderer.Page, error)
 	Get(http.ResponseWriter, *http.Request, Request) (renderer.Page, error)
 	Post(http.ResponseWriter, *http.Request, Request)
 	Create(http.ResponseWriter, *http.Request, Request)

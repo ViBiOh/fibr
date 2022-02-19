@@ -131,7 +131,7 @@ func main() {
 	rendererApp, err := renderer.New(rendererConfig, content, fibr.FuncMap(thumbnailApp), tracerApp)
 	logger.Fatal(err)
 
-	exifApp, err := exif.New(exifConfig, storageProvider, prometheusRegisterer, amqpClient)
+	exifApp, err := exif.New(exifConfig, storageProvider, prometheusRegisterer, tracerApp, amqpClient)
 	logger.Fatal(err)
 
 	webhookApp, err := webhook.New(webhookConfig, storageProvider, prometheusRegisterer, amqpClient, rendererApp, thumbnailApp)

@@ -1,6 +1,7 @@
 package exif
 
 import (
+	"context"
 	"fmt"
 	"path/filepath"
 	"time"
@@ -17,9 +18,14 @@ var (
 )
 
 // GetExifFor return exif value for a given item
-func (a App) GetExifFor(item absto.Item) (exas.Exif, error) {
+func (a App) GetExifFor(ctx context.Context, item absto.Item) (exas.Exif, error) {
 	if item.IsDir {
 		return exas.Exif{}, nil
+	}
+
+	if a.tracer != nil {
+		_, span := a.tracer.Start(ctx, "aggregate")
+		defer span.End()
 	}
 
 	exif, err := a.loadExif(item)
@@ -31,9 +37,14 @@ func (a App) GetExifFor(item absto.Item) (exas.Exif, error) {
 }
 
 // GetAggregateFor return aggregated value for a given directory
-func (a App) GetAggregateFor(item absto.Item) (provider.Aggregate, error) {
+func (a App) GetAggregateFor(ctx context.Context, item absto.Item) (provider.Aggregate, error) {
 	if !item.IsDir {
 		return provider.Aggregate{}, nil
+	}
+
+	if a.tracer != nil {
+		_, span := a.tracer.Start(ctx, "aggregate")
+		defer span.End()
 	}
 
 	aggregate, err := a.loadAggregate(item)

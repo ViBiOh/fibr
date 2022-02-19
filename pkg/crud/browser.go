@@ -1,6 +1,7 @@
 package crud
 
 import (
+	"context"
 	"net/http"
 	"sort"
 
@@ -13,7 +14,7 @@ import (
 )
 
 // Browser render file web view
-func (a App) Browser(w http.ResponseWriter, request provider.Request, item absto.Item, message renderer.Message) (renderer.Page, error) {
+func (a App) Browser(ctx context.Context, w http.ResponseWriter, request provider.Request, item absto.Item, message renderer.Message) (renderer.Page, error) {
 	var (
 		previous provider.RenderItem
 		next     provider.RenderItem
@@ -33,7 +34,7 @@ func (a App) Browser(w http.ResponseWriter, request provider.Request, item absto
 
 	wg.Go(func() {
 		var err error
-		exif, err = a.exifApp.GetExifFor(item)
+		exif, err = a.exifApp.GetExifFor(ctx, item)
 		if err != nil {
 			logger.WithField("item", item.Pathname).Error("unable to load exif: %s", err)
 		}

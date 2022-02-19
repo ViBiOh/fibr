@@ -5,6 +5,7 @@
 package mocks
 
 import (
+	context "context"
 	multipart "mime/multipart"
 	http "net/http"
 	reflect "reflect"
@@ -39,18 +40,18 @@ func (m *Crud) EXPECT() *CrudMockRecorder {
 }
 
 // Browser mocks base method.
-func (m *Crud) Browser(arg0 http.ResponseWriter, arg1 provider.Request, arg2 model.Item, arg3 renderer.Message) (renderer.Page, error) {
+func (m *Crud) Browser(arg0 context.Context, arg1 http.ResponseWriter, arg2 provider.Request, arg3 model.Item, arg4 renderer.Message) (renderer.Page, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Browser", arg0, arg1, arg2, arg3)
+	ret := m.ctrl.Call(m, "Browser", arg0, arg1, arg2, arg3, arg4)
 	ret0, _ := ret[0].(renderer.Page)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Browser indicates an expected call of Browser.
-func (mr *CrudMockRecorder) Browser(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+func (mr *CrudMockRecorder) Browser(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Browser", reflect.TypeOf((*Crud)(nil).Browser), arg0, arg1, arg2, arg3)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Browser", reflect.TypeOf((*Crud)(nil).Browser), arg0, arg1, arg2, arg3, arg4)
 }
 
 // Create mocks base method.
@@ -93,18 +94,18 @@ func (mr *CrudMockRecorder) Get(arg0, arg1, arg2 interface{}) *gomock.Call {
 }
 
 // List mocks base method.
-func (m *Crud) List(arg0 provider.Request, arg1 renderer.Message, arg2 model.Item, arg3 []model.Item) (renderer.Page, error) {
+func (m *Crud) List(arg0 context.Context, arg1 provider.Request, arg2 renderer.Message, arg3 model.Item, arg4 []model.Item) (renderer.Page, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "List", arg0, arg1, arg2, arg3)
+	ret := m.ctrl.Call(m, "List", arg0, arg1, arg2, arg3, arg4)
 	ret0, _ := ret[0].(renderer.Page)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // List indicates an expected call of List.
-func (mr *CrudMockRecorder) List(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+func (mr *CrudMockRecorder) List(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*Crud)(nil).List), arg0, arg1, arg2, arg3)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*Crud)(nil).List), arg0, arg1, arg2, arg3, arg4)
 }
 
 // Post mocks base method.

@@ -3,6 +3,7 @@ package crud
 import (
 	"archive/zip"
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -35,7 +36,12 @@ func (a App) getCover(request provider.Request, files []absto.Item) map[string]i
 }
 
 // List render directory web view of given dirPath
-func (a App) List(request provider.Request, message renderer.Message, item absto.Item, files []absto.Item) (renderer.Page, error) {
+func (a App) List(ctx context.Context, request provider.Request, message renderer.Message, item absto.Item, files []absto.Item) (renderer.Page, error) {
+	if a.tracer != nil {
+		_, span := a.tracer.Start(ctx, "list")
+		defer span.End()
+	}
+
 	items := make([]provider.RenderItem, len(files))
 	wg := concurrent.NewLimited(4)
 
@@ -44,7 +50,7 @@ func (a App) List(request provider.Request, message renderer.Message, item absto
 	for index, item := range files {
 		func(item absto.Item, index int) {
 			wg.Go(func() {
-				aggregate, err := a.exifApp.GetAggregateFor(item)
+				aggregate, err := a.exifApp.GetAggregateFor(ctx, item)
 				if err != nil {
 					logger.WithField("fn", "crud.List").WithField("item", item.Pathname).Error("unable to read: %s", err)
 				}
@@ -63,7 +69,7 @@ func (a App) List(request provider.Request, message renderer.Message, item absto
 
 	var hasMap bool
 	wg.Go(func() {
-		if aggregate, err := a.exifApp.GetAggregateFor(item); err != nil {
+		if aggregate, err := a.exifApp.GetAggregateFor(ctx, item); err != nil {
 			logger.WithField("fn", "crud.List").WithField("item", request.Path).Error("unable to get aggregate: %s", err)
 		} else if len(aggregate.Location) != 0 {
 			hasMap = true

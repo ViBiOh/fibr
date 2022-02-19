@@ -68,7 +68,7 @@ func (a App) handleFile(w http.ResponseWriter, r *http.Request, request provider
 
 		go a.notify(provider.NewAccessEvent(item, r))
 
-		return a.Browser(w, request, item, message)
+		return a.Browser(r.Context(), w, request, item, message)
 	}
 
 	return renderer.Page{}, a.serveFile(w, r, item)
@@ -125,7 +125,7 @@ func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.
 	}
 
 	provider.SetPrefsCookie(w, request)
-	return a.List(request, message, item, items)
+	return a.List(r.Context(), request, message, item, items)
 }
 
 func (a App) listFiles(r *http.Request, request provider.Request) (items []absto.Item, err error) {
@@ -175,7 +175,7 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 			return
 		}
 
-		exif, err := a.exifApp.GetExifFor(item)
+		exif, err := a.exifApp.GetExifFor(r.Context(), item)
 		if err != nil {
 			logger.WithField("item", item.Pathname).Error("unable to get exif: %s", err)
 		}
