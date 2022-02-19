@@ -129,6 +129,11 @@ func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.
 }
 
 func (a App) listFiles(r *http.Request, request provider.Request) (items []absto.Item, err error) {
+	if a.tracer != nil {
+		_, span := a.tracer.Start(r.Context(), "files")
+		defer span.End()
+	}
+
 	if query.GetBool(r, "search") {
 		items, err = a.searchFiles(r, request)
 	} else {
