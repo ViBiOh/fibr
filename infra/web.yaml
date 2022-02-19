@@ -25,14 +25,14 @@ spec:
     nameOverride: fibr
     image:
       name: vibioh/fibr
-      tag: '202202181114' # {"$imagepolicy": "default:flux-fibr-web:tag"}
+      tag: '202202191513' # {"$imagepolicy": "default:flux-fibr-web:tag"}
     volumes:
-      - name: data
-        persistentVolumeClaim:
-          claimName: fibr
+    - name: data
+      persistentVolumeClaim:
+        claimName: fibr
     volumeMounts:
-      - name: data
-        mountPath: /data
+    - name: data
+      mountPath: /data
     config:
       FIBR_AUTH_PROFILES: 1:admin
       FIBR_EXIF_DIRECT_ACCESS: 'true'
@@ -51,9 +51,9 @@ spec:
       FIBR_WEBHOOK_SECRET: AgDidDHZ5oA4g5OJAMNJhLBnPBnw45BA4oydJ9nJLJZ2TMitkJhKbGLQxcuyHaqJPVZVSrR+ioL6dlZdj9W5U5vzU/qqlIAUX4+wtAVSx4nutLRz46nOoQmBw//TtoH8txdLHn6+i/OyA9xNt2UWA5ht1ho6pf0I3eXt2TeU64f0ppt3QV4DIN/qVrjDYvgd/tF1wT5bA9R10oIVUYzc+/bSrlkBBK/h+jxPK6dm3q4NR6F7f0Ac/4OI+6okIoQaEGcIKzSgLu/Z0PMg5fV7rT8UrFI1JYGBD3mSWVKc2zegkkRLSVSvceeJuPuWwpcNLjGJyt3TE3Ma6/OcQY609nCcu00s9fyn8YrY6VLqJgbN+JNOa+dvE6CeaC1r7tuM6cQalYPntTXUnoDQD8mPATbjcF++mSe86ZxnmS4+Vs9MlIqerCETeaFfkD0H+9pt32XZdwyir/LR8pAkKKBgcaT9LE0BzyelbUsUw7DYx+yOWC4E0g6tA6RdClTzdSuuXEm2qDCjILQoex1mpzDqHzaoJlTIEhUoPFmnxNKEV+kbOCF2QEHpE/HMm9cnorJPKOgR+36L7MJmV5oSXr6UMRZBcq4KH6RuPYwQL/HI1Tbj34QmhVkmS+JXDJwdLGqkb0u0tfab7ZekTY6YYCXrhIWjD+bCGLVoecHWKcxC5/M9o6FkPdSHvKQOqQk44aDq1c8Ky6UDURm4MvccKU86xnUDtt+2wUMMlv07Hkv0hWoXalCmwaT1JRboVAPU/Ni5LadmYBTN8uv3BGH7Y0S+Qo5y8cZuED9IqxakF8u0P9/pPq6qLHQn9fTfALBk4I7W
       FIBR_AMQP_URI: AgDdfrolM6obLX26aEPVfebLPwcf5Quo0dZR7CByG9DgrSrmqgnyf9kyyPxoB6LBh3swTy4/pTlraMUupv+uwU6q0Cn/Fex1T0DRUratsM2Dfl7nNqqAAjW7hDlJYm6RGPEryLYzuaxEdepgCM0iMUEQA2oHe58/Ug7obEiR52J6ujanaSi7b6FGKB+OaFwIbw0DQI7jaZ/9AMlUftgMdJQnNiRoYAt6UUaYAse1CceoEC/YT6qHAcEcLj1AI8EfiG+fe6AXsKqTU7olQ64ttcLUgy8XTlrFjMi+DHSwYw8zYRc3OfGiIQ125FMlF+BA6obspShpwuWRWiN7+VH4cogYPw5kkhLJAvrsQqVngW5WhQ0gXHyMn6AL4FGu4b8Ylp104rwVNbueL0w0bzJBw53p760ixKXhYkCrp1slfewq079T0CGe/+PnmCTdYRGSzRrNPeYFnLl4O6tnW0ickRfxxk8T+wBKav1a7pW82K/cIlKukggXsq+ZnevuijvKxKTAJ5wpGZAFb6/GV1axAX/tcor525+1Z8P79f04oMn0V7O0+GlcMbXvRnEqHyKB9fCQLB8vINLOWKff1W0WZWBHGboh18yLKlayM28eWg2OvO/m2ve0zna6yzJGz5TWqfwbvi1NDQdAJb47Ck6hufoZSDUz8FiGPWNG78f4ziVQlEHPFYjnQYGu0r7hBmgYqrQ7GfJ6Jfp0uP+Z3jksFgpZ6qhFI425oS9CkR9dI7iX3BTH3q6XTdonddzSP7iw9DiDJE4=
     tolerations:
-      - effect: NoSchedule
-        key: node-role.kubernetes.io/storage
-        operator: Exists
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/storage
+      operator: Exists
     resources:
       limits:
         memory: 256Mi
@@ -71,4 +71,4 @@ spec:
       enabled: true
       compress: true
       hosts:
-        - fibr.vibioh.fr
+      - fibr.vibioh.fr
