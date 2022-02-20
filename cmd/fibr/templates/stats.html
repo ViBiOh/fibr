@@ -24,12 +24,14 @@
     {{ end }}
   </section>
 
-  <form method="post" action="#">
-    <input type="hidden" name="method" value="TRACE" />
-    <p class="padding no-margin center">
-      <button type="submit" class="button bg-primary">Regenerate</button>
-    </p>
-  </form>
+  {{ if .Request.CanEdit }}
+    <form method="post" action="#">
+      <input type="hidden" name="method" value="TRACE" />
+      <p class="padding no-margin center">
+        <button type="submit" class="button bg-primary">Regenerate</button>
+      </p>
+    </form>
+  {{ end }}
 
   {{ template "footer" . }}
 {{ end }}

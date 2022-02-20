@@ -13,6 +13,11 @@ import (
 
 // Regenerate regenerate start of the folder
 func (a App) Regenerate(w http.ResponseWriter, r *http.Request, request provider.Request) {
+	if !request.CanEdit {
+		a.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
+		return
+	}
+
 	pathname := request.Filepath()
 
 	info, err := a.storageApp.Info(pathname)
