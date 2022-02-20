@@ -18,7 +18,7 @@ func (a App) EventConsumer(ctx context.Context, e provider.Event) {
 
 	switch e.Type {
 	case provider.StartEvent:
-		if err := a.handleStartEvent(ctx, e.Item); err != nil {
+		if err := a.handleStartEvent(ctx, e); err != nil {
 			getEventLogger(e.Item).Error("unable to start: %s", err)
 		}
 	case provider.UploadEvent:
@@ -40,8 +40,9 @@ func getEventLogger(item absto.Item) logger.Provider {
 	return logger.WithField("fn", "exif.EventConsumer").WithField("item", item.Pathname)
 }
 
-func (a App) handleStartEvent(ctx context.Context, item absto.Item) error {
-	if a.hasMetadata(item) {
+func (a App) handleStartEvent(ctx context.Context, event provider.Event) error {
+	item := event.Item
+	if a.hasMetadata(item) && event.GetMetadata("force") != "true" {
 		return nil
 	}
 

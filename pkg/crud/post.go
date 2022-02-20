@@ -114,6 +114,8 @@ func (a App) handlePost(w http.ResponseWriter, r *http.Request, request provider
 		a.Create(w, r, request)
 	case http.MethodDelete:
 		a.Delete(w, r, request)
+	case http.MethodTrace:
+		a.Regenerate(w, r, request)
 	default:
 		a.error(w, r, request, model.WrapMethodNotAllowed(fmt.Errorf("unknown method `%s` for %s", method, r.URL.Path)))
 	}

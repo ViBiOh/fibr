@@ -24,6 +24,7 @@ func (a App) Stats(w http.ResponseWriter, request provider.Request, message rend
 	}
 
 	return renderer.NewPage("stats", http.StatusOK, map[string]interface{}{
+		"Paths":   getPathParts(request),
 		"Request": request,
 		"Message": message,
 		"Stats": []entry{

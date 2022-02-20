@@ -207,6 +207,18 @@ func NewStartEvent(item absto.Item) Event {
 	}
 }
 
+// NewRestartEvent creates a new restart event
+func NewRestartEvent(item absto.Item) Event {
+	return Event{
+		Time: time.Now(),
+		Type: StartEvent,
+		Item: item,
+		Metadata: map[string]string{
+			"force": "true",
+		},
+	}
+}
+
 // NewAccessEvent creates a new access event
 func NewAccessEvent(item absto.Item, r *http.Request) Event {
 	metadata := make(map[string]string)
@@ -301,7 +313,9 @@ func (e EventBus) Start(done <-chan struct{}, consumers ...EventConsumer) {
 				consumer(ctx, event)
 			}
 
-			span.End()
+			if span != nil {
+				span.End()
+			}
 			e.increaseMetric(event, "done")
 		}
 	}()
