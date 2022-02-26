@@ -44,13 +44,13 @@ type App struct {
 	storageApp    absto.Storage
 	shareApp      provider.ShareManager
 	webhookApp    provider.WebhookManager
+	exifApp       provider.ExifManager
 	pushEvent     provider.EventProducer
 
 	amqpClient              *amqp.Client
 	amqpExclusiveRoutingKey string
 
 	rendererApp  renderer.App
-	exifApp      exif.App
 	thumbnailApp thumbnail.App
 
 	bcryptCost      int

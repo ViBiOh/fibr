@@ -9,6 +9,7 @@ import (
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/auth/v2/pkg/ident"
 	"github.com/ViBiOh/auth/v2/pkg/model"
+	exas "github.com/ViBiOh/exas/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
@@ -50,4 +51,11 @@ type WebhookManager interface {
 	Create(context.Context, string, bool, WebhookKind, string, []EventType) (string, error)
 	Delete(context.Context, string) error
 	List() []Webhook
+}
+
+// ExifManager description
+//go:generate mockgen -destination ../mocks/exif.go -mock_names ExifManager=Exif -package mocks github.com/ViBiOh/fibr/pkg/provider ExifManager
+type ExifManager interface {
+	GetAggregateFor(ctx context.Context, item absto.Item) (Aggregate, error)
+	GetExifFor(ctx context.Context, item absto.Item) (exas.Exif, error)
 }

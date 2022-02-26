@@ -170,6 +170,9 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 
 	provider.SafeWrite(w, `{"type":"FeatureCollection","features":[`)
 
+	point := geo.NewPoint(geo.NewPosition(0, 0))
+	feature := geo.NewFeature(&point, map[string]interface{}{})
+
 	for _, item := range items {
 		if isDone() {
 			return
@@ -188,11 +191,13 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 			provider.DoneWriter(isDone, w, ",")
 		}
 
-		point := geo.NewPoint(geo.NewPosition(exif.Geocode.Longitude, exif.Geocode.Latitude))
-		if err := encoder.Encode(geo.NewFeature(&point, map[string]interface{}{
-			"url":  request.RelativeURL(item),
-			"date": exif.Date.Format(time.RFC850),
-		})); err != nil {
+		point.Coordinates.Latitude = exif.Geocode.Latitude
+		point.Coordinates.Longitude = exif.Geocode.Longitude
+
+		feature.Properties["url"] = request.RelativeURL(item)
+		feature.Properties["date"] = exif.Date.Format(time.RFC850)
+
+		if err := encoder.Encode(feature); err != nil {
 			logger.WithField("item", item.Pathname).Error("unable to encode feature: %s", err)
 		}
 
