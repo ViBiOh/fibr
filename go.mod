@@ -3,7 +3,7 @@ module github.com/ViBiOh/fibr
 go 1.17
 
 require (
-	github.com/ViBiOh/absto v0.1.4
+	github.com/ViBiOh/absto v0.1.5
 	github.com/ViBiOh/auth/v2 v2.11.42
 	github.com/ViBiOh/exas v0.2.4
 	github.com/ViBiOh/flags v0.0.1
@@ -32,7 +32,7 @@ require (
 	github.com/klauspost/cpuid/v2 v2.0.11 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
-	github.com/minio/minio-go/v7 v7.0.22 // indirect
+	github.com/minio/minio-go/v7 v7.0.23 // indirect
 	github.com/minio/sha256-simd v1.0.0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
