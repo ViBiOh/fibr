@@ -17,14 +17,14 @@ const (
 	defaultTimeout = time.Minute * 2
 )
 
-func (a App) generate(ctx context.Context, item absto.Item) (err error) {
+func (a App) generate(ctx context.Context, item absto.Item, scale uint64) (err error) {
 	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
 	itemType := typeOfItem(item)
 
 	var resp *http.Response
-	resp, err = a.requestVith(ctx, item)
+	resp, err = a.requestVith(ctx, item, scale)
 	if err != nil {
 		a.increaseMetric(itemType.String(), "error")
 		return fmt.Errorf("unable to request thumbnailer: %s", err)
@@ -52,20 +52,20 @@ func (a App) generate(ctx context.Context, item absto.Item) (err error) {
 	return err
 }
 
-func (a App) requestVith(ctx context.Context, item absto.Item) (*http.Response, error) {
+func (a App) requestVith(ctx context.Context, item absto.Item, scale uint64) (*http.Response, error) {
 	itemType := typeOfItem(item)
 	outputName := getThumbnailPath(item)
 
 	if a.amqpClient != nil {
 		a.increaseMetric(itemType.String(), "publish")
-		return nil, a.amqpClient.PublishJSON(vith.NewRequest(item.Pathname, outputName, itemType), a.amqpExchange, a.amqpThumbnailRoutingKey)
+		return nil, a.amqpClient.PublishJSON(vith.NewRequest(item.Pathname, outputName, itemType, scale), a.amqpExchange, a.amqpThumbnailRoutingKey)
 	}
 
 	a.increaseMetric(itemType.String(), "request")
 
 	if a.directAccess {
-		return a.vithRequest.Method(http.MethodGet).Path(fmt.Sprintf("%s?type=%s&output=%s", item.Pathname, itemType, outputName)).Send(ctx, nil)
+		return a.vithRequest.Method(http.MethodGet).Path(fmt.Sprintf("%s?type=%s&scale=%d&output=%s", item.Pathname, itemType, scale, outputName)).Send(ctx, nil)
 	}
 
-	return provider.SendLargeFile(ctx, a.storageApp, item, a.vithRequest.Method(http.MethodPost).Path(fmt.Sprintf("?type=%s", itemType)))
+	return provider.SendLargeFile(ctx, a.storageApp, item, a.vithRequest.Method(http.MethodPost).Path(fmt.Sprintf("?type=%s&scale=%d", itemType, scale)))
 }

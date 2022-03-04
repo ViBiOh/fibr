@@ -42,7 +42,7 @@ func (a App) shouldGenerateStream(ctx context.Context, item absto.Item) (bool, e
 
 	resp, err := a.vithRequest.Method(http.MethodHead).Path(fmt.Sprintf("%s?type=%s", item.Pathname, typeOfItem(item))).Send(ctx, nil)
 	if err != nil {
-		a.increaseMetric("stream", "errror")
+		a.increaseMetric("stream", "error")
 		return false, fmt.Errorf("unable to retrieve metadata: %s", err)
 	}
 
@@ -53,7 +53,7 @@ func (a App) shouldGenerateStream(ctx context.Context, item absto.Item) (bool, e
 
 	bitrate, err := strconv.ParseUint(rawBitrate, 10, 64)
 	if err != nil {
-		a.increaseMetric("stream", "errror")
+		a.increaseMetric("stream", "error")
 		return false, fmt.Errorf("unable to parse bitrate: %s", err)
 	}
 
@@ -70,14 +70,14 @@ func (a App) generateStream(ctx context.Context, item absto.Item) error {
 	input := item.Pathname
 	output := getStreamPath(item)
 
-	req := model.NewRequest(input, getStreamPath(item), typeOfItem(item))
+	req := model.NewRequest(input, getStreamPath(item), typeOfItem(item), SmallSize)
 
 	if a.amqpClient != nil {
 		a.increaseMetric("stream", "publish")
 
 		err := a.amqpClient.PublishJSON(req, a.amqpExchange, a.amqpStreamRoutingKey)
 		if err != nil {
-			a.increaseMetric("stream", "errror")
+			a.increaseMetric("stream", "error")
 		}
 
 		return err

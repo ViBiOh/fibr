@@ -1,0 +1,115 @@
+{{ define "story" }}
+  {{ template "header" . }}
+  {{ template "layout" . }}
+
+  {{ $root := . }}
+
+  <link rel="preload" as="image" href="{{ url "/svg/list?fill=silver" }}">
+  <link rel="preload" as="image" href="{{ url "/svg/th?fill=silver" }}">
+
+  {{ template "search-modal" . }}
+  {{ template "items-style" . }}
+
+  {{ if .HasMap }}
+    {{ template "map-modal" . }}
+  {{ end }}
+
+  <style type="text/css" nonce="{{ .nonce }}">
+    #menu {
+      padding-left: 0.5rem;
+      padding-top: 0.5rem;
+      overflow: auto;
+    }
+
+    #story-display {
+      background-color: var(--primary);
+    }
+
+    .file {
+      align-items: center;
+      background-color: var(--grey);
+      display: flex;
+      flex-wrap: wrap;
+      margin: 0 auto 3rem;
+      max-width: 100rem;
+    }
+
+    .filelink {
+      width: 100%;
+    }
+
+    .description {
+      background-color: var(--white);
+      color: var(--dark);
+      width: 100%;
+    }
+
+    .file-download {
+      display: none;
+      position: absolute;
+      right: 0.5rem;
+      top: 0.5rem;
+    }
+
+    .file:hover .file-download {
+      display: inline-block;
+    }
+  </style>
+
+  <div class="content">
+    <div id="menu" class="flex flex-center">
+      <a id="list-display" class="button button-icon" href="?d=list">
+        <img class="icon" src="{{ url "/svg/list?fill=silver" }}" alt="List">
+      </a>
+      <a id="grid-display" class="button button-icon" href="?d=grid">
+        <img class="icon" src="{{ url "/svg/th?fill=silver" }}" alt="Grid">
+      </a>
+      <a id="story-display" class="button button-icon" href="?story">
+        <img class="icon" src="{{ url "/svg/image?fill=silver" }}" alt="Image story">
+      </a>
+
+      <span class="padding-left {{ if .Request.CanEdit }}hide-s{{ end }}">{{ len .Files }}<span {{ if .Request.CanEdit }}class="hide-xs"{{ end }}> element{{ if gt (len .Files) 1 }}s{{ end }}</span></span>
+      <span class="flex-grow"></span>
+
+      {{ if gt (len .Files) 0 }}
+        <a class="padding" href="?download" download>
+          <img class="icon" src="{{ url "/svg/download?fill=silver" }}" alt="Download">
+        </a>
+      {{ end }}
+    </div>
+
+    <ul id="files" class="no-margin no-padding">
+      {{ range .Files }}
+        <li class="file relative">
+          <a class="filelink center" href="{{ .URL }}?browser" title="{{ .Name }}">
+            <img class="thumbnail full" src="{{ .URL }}?thumbnail" alt="Thumbnail of {{ .URL }}" loading="lazy">
+
+            {{ if .IsVideo }}
+              <img class="icon icon-overlay" src="{{ url "/svg/play?fill=rgba(192,192,192,0.8)" }}" alt="Play video">
+            {{ end }}
+
+            <a href="{{ .URL }}?download" class="button button-icon file-download" alt="Download" download="{{ .Name }}">
+              <img class="icon" src="{{ url "/svg/download?fill=silver" }}" alt="Download">
+            </a>
+          </a>
+          <div class="description padding">
+            <p>
+              <img class="icon" src="{{ url "/svg/location?fill=#272727" }}" alt="Location">
+              {{ if .Exif.Geocode.IsZero }}
+                Unknown
+              {{ else }}
+                {{ index .Exif.Geocode.Address "city_district" }}, {{ index .Exif.Geocode.Address "country" }}
+              {{ end }}
+
+              {{ if not .Exif.Date.IsZero }}
+                , {{ .Exif.Date.Format "Mon Jan _2 15:04:05 2006" }}
+              {{ end }}
+            </p>
+          </div>
+        </li>
+      {{ end }}
+    </ul>
+  </div>
+
+  {{ template "footer" . }}
+{{ end }}

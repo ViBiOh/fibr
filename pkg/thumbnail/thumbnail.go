@@ -24,11 +24,8 @@ import (
 )
 
 const (
-	// Width is the width of each thumbnail generated
-	Width = 150
-
-	// Height is the width of each thumbnail generated
-	Height = 150
+	// SmallSize is the square size of each thumbnail generated
+	SmallSize = 150
 )
 
 var cacheDuration string = fmt.Sprintf("private, max-age=%.0f", time.Duration(time.Minute*5).Seconds())

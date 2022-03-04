@@ -26,8 +26,8 @@ func (a App) getCover(request provider.Request, files []absto.Item) map[string]i
 		if a.thumbnailApp.HasThumbnail(file) {
 			return map[string]interface{}{
 				"Img":       provider.StorageToRender(file, request),
-				"ImgHeight": thumbnail.Height,
-				"ImgWidth":  thumbnail.Width,
+				"ImgHeight": thumbnail.SmallSize,
+				"ImgWidth":  thumbnail.SmallSize,
 			}
 		}
 	}
@@ -47,6 +47,7 @@ func (a App) List(ctx context.Context, request provider.Request, message rendere
 
 	renderWithThumbnail := request.Display == provider.GridDisplay
 
+	var hasThumbnail bool
 	for index, item := range files {
 		func(item absto.Item, index int) {
 			wg.Go(func() {
@@ -58,8 +59,14 @@ func (a App) List(ctx context.Context, request provider.Request, message rendere
 				renderItem := provider.StorageToRender(item, request)
 				renderItem.Aggregate = aggregate
 
-				if renderWithThumbnail && a.thumbnailApp.CanHaveThumbnail(item) && a.thumbnailApp.HasThumbnail(item) {
-					renderItem.HasThumbnail = true
+				if (!hasThumbnail || renderWithThumbnail) && a.thumbnailApp.CanHaveThumbnail(item) && a.thumbnailApp.HasThumbnail(item) {
+					if renderWithThumbnail {
+						renderItem.HasThumbnail = true
+					}
+
+					if !hasThumbnail {
+						hasThumbnail = true
+					}
 				}
 
 				items[index] = renderItem
@@ -79,12 +86,13 @@ func (a App) List(ctx context.Context, request provider.Request, message rendere
 	wg.Wait()
 
 	content := map[string]interface{}{
-		"Paths":   getPathParts(request),
-		"Files":   items,
-		"Cover":   a.getCover(request, files),
-		"Request": request,
-		"Message": message,
-		"HasMap":  hasMap,
+		"Paths":        getPathParts(request),
+		"Files":        items,
+		"Cover":        a.getCover(request, files),
+		"Request":      request,
+		"Message":      message,
+		"HasMap":       hasMap,
+		"HasThumbnail": hasThumbnail,
 	}
 
 	if request.CanShare {
