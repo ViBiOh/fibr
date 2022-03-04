@@ -43,17 +43,6 @@
       color: var(--dark);
       width: 100%;
     }
-
-    .file-download {
-      display: none;
-      position: absolute;
-      right: 0.5rem;
-      top: 0.5rem;
-    }
-
-    .file:hover .file-download {
-      display: inline-block;
-    }
   </style>
 
   <div class="content">
@@ -68,14 +57,7 @@
         <img class="icon" src="{{ url "/svg/image?fill=silver" }}" alt="Image story">
       </a>
 
-      <span class="padding-left {{ if .Request.CanEdit }}hide-s{{ end }}">{{ len .Files }}<span {{ if .Request.CanEdit }}class="hide-xs"{{ end }}> element{{ if gt (len .Files) 1 }}s{{ end }}</span></span>
       <span class="flex-grow"></span>
-
-      {{ if gt (len .Files) 0 }}
-        <a class="padding" href="?download" download>
-          <img class="icon" src="{{ url "/svg/download?fill=silver" }}" alt="Download">
-        </a>
-      {{ end }}
     </div>
 
     <ul id="files" class="no-margin no-padding">
@@ -87,11 +69,8 @@
             {{ if .IsVideo }}
               <img class="icon icon-overlay" src="{{ url "/svg/play?fill=rgba(192,192,192,0.8)" }}" alt="Play video">
             {{ end }}
-
-            <a href="{{ .URL }}?download" class="button button-icon file-download" alt="Download" download="{{ .Name }}">
-              <img class="icon" src="{{ url "/svg/download?fill=silver" }}" alt="Download">
-            </a>
           </a>
+
           <div class="description padding">
             <p>
               <img class="icon" src="{{ url "/svg/location?fill=#272727" }}" alt="Location">
@@ -105,6 +84,17 @@
                 , {{ .Exif.Date.Format "Mon Jan _2 15:04:05 2006" }}
               {{ end }}
             </p>
+
+            {{ if index .Exif.Data "Model" }}
+              <p>
+                <img class="icon" src="{{ url "/svg/camera?fill=#272727" }}" alt="Camera model">
+                {{ index .Exif.Data "Model" }}
+              </p>
+            {{ end }}
+
+            {{ if .Exif.Description }}
+              <p>{{ .Exif.Description }}</p>
+            {{ end }}
           </div>
         </li>
       {{ end }}
