@@ -32,8 +32,8 @@ func (a App) generateItem(ctx context.Context, event provider.Event) {
 	}
 
 	if event.GetMetadata("force") == "true" || !a.HasThumbnail(event.Item) {
-		if err := a.generate(ctx, event.Item); err != nil {
-			logger.WithField("fn", "thumbnail.generate").WithField("item", event.Item.Pathname).Error("unable to generate: %s", err)
+		if err := a.generate(ctx, event.Item, SmallSize); err != nil {
+			logger.WithField("fn", "thumbnail.generate").WithField("item", event.Item.Pathname).Error("unable to generate for scale %d: %s", SmallSize, err)
 		}
 	}
 

@@ -13,6 +13,9 @@ var (
 	GridDisplay = "grid"
 	// ListDisplay format
 	ListDisplay = "list"
+	// StoryDisplay format
+	StoryDisplay = "story"
+
 	// DefaultDisplay format
 	DefaultDisplay = GridDisplay
 

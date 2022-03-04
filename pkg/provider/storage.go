@@ -6,6 +6,7 @@ import (
 	"time"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
+	"github.com/ViBiOh/exas/pkg/model"
 )
 
 func lowerString(first, second string) bool {
@@ -46,7 +47,7 @@ func (a ByHybridSort) Less(i, j int) bool {
 	return greaterTime(first.Date, second.Date)
 }
 
-// RenderItem is a storage item with an id
+// RenderItem is a storage item with some metadatas
 type RenderItem struct {
 	Aggregate
 	URL  string
@@ -95,5 +96,19 @@ func StorageToRender(item absto.Item, request Request) RenderItem {
 		URL:  request.RelativeURL(item),
 		Path: request.Path,
 		Item: item,
+	}
+}
+
+// StoryItem is a render item with
+type StoryItem struct {
+	RenderItem
+	Exif model.Exif
+}
+
+// StorageToStory converts Item to RenderItem
+func StorageToStory(item absto.Item, request Request, exif model.Exif) StoryItem {
+	return StoryItem{
+		RenderItem: StorageToRender(item, request),
+		Exif:       exif,
 	}
 }

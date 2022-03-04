@@ -182,6 +182,11 @@
       <a id="grid-display" class="button button-icon" href="?d=grid">
         <img class="icon" src="{{ url "/svg/th?fill=silver" }}" alt="Grid">
       </a>
+      {{ if .HasThumbnail }}
+        <a id="story-display" class="button button-icon" href="?story">
+          <img class="icon" src="{{ url "/svg/image?fill=silver" }}" alt="Image story">
+        </a>
+      {{ end }}
 
       <span class="padding-left {{ if .Request.CanEdit }}hide-s{{ end }}">{{ len .Files }}<span {{ if .Request.CanEdit }}class="hide-xs"{{ end }}> element{{ if gt (len .Files) 1 }}s{{ end }}</span></span>
       <span class="flex-grow"></span>
@@ -220,17 +225,11 @@
       {{ end }}
     </div>
 
-    {{ $hasThumbnail := false }}
-
     <ul id="files" class="no-margin no-padding">
       {{ range .Files }}
-        <li class="tile relative {{ if not .HasThumbnail }}file{{ end }}">
+        <li class="file relative {{ if not .HasThumbnail }}padding-half{{ end }}">
           <a class="filelink center ellipsis" href="{{ .URL }}{{ if .IsDir }}?d={{ $root.Request.LayoutPath ($root.Request.AbsoluteURL .URL) }}{{ else }}?browser{{ end }}" title="{{ .Name }}">
             {{ if .HasThumbnail }}
-              {{ if not $hasThumbnail }}
-                {{ $hasThumbnail = true }}
-              {{ end }}
-
               {{ template "async-image-item" . }}
 
               {{ if .IsVideo }}
@@ -315,7 +314,7 @@
         </li>
       {{ end }}
 
-      {{ if $hasThumbnail }}
+      {{ if and (eq .Request.Display "grid") .HasThumbnail }}
         {{ template "async-image" . }}
       {{ end }}
     </ul>
