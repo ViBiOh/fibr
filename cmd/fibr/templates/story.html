@@ -24,6 +24,7 @@
     #menu {
       padding-left: 0.5rem;
       padding-top: 0.5rem;
+      margin-bottom: 0.5rem;
       overflow: auto;
     }
 
@@ -123,14 +124,10 @@
                       {{ index .Exif.Geocode.Address "county" }},
                     {{- end }}
                   {{- end }}
-                {{- end }}
-
-                {{- index .Exif.Geocode.Address "country" }}
+                {{- end }} {{ index .Exif.Geocode.Address "country" }}
               {{- end }}
 
-              {{- if not .Exif.Date.IsZero }}
-                , {{ .Exif.Date.Format "Monday _2 Jan at 15:04:05 2006" }}
-              {{- end }}
+              {{- if not .Exif.Date.IsZero }}, {{ .Exif.Date.Format "Monday _2 January at 15:04:05 2006 MST" }}{{- end }}
             </p>
 
             {{ if index .Exif.Data "Model" }}
