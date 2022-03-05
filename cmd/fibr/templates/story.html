@@ -6,6 +6,8 @@
 
   <link rel="preload" as="image" href="{{ url "/svg/list?fill=silver" }}">
   <link rel="preload" as="image" href="{{ url "/svg/th?fill=silver" }}">
+  <link rel="preload" as="image" href="{{ url "/svg/image?fill=silver" }}">
+  <link rel="preload" as="image" href="{{ url "/svg/link?fill=#272727" }}">
 
   {{ template "search-modal" . }}
   {{ template "items-style" . }}
@@ -77,6 +79,12 @@
 
     .desc-edit {
       position: absolute;
+      right: 5rem;
+      top: 0.5rem;
+    }
+
+    .permalink {
+      position: absolute;
       right: 0.5rem;
       top: 0.5rem;
     }
@@ -99,9 +107,9 @@
 
     <ul id="files" class="no-margin no-padding">
       {{ range .Files }}
-        <li class="file relative">
+        <li id="{{ .ID }}" class="file relative">
           <a class="filelink" href="{{ .URL }}?browser" title="{{ .Name }}">
-            <img class="thumbnail full block" src="{{ .URL }}?thumbnail&scale=1000" alt="Thumbnail of {{ .URL }}" loading="lazy" border="0">
+            <img class="thumbnail full block" src="{{ .URL }}?thumbnail&scale=1000" alt="Thumbnail of {{ .URL }}" loading="lazy">
 
             {{ if .IsVideo }}
               <img class="icon icon-overlay" src="{{ url "/svg/play?fill=rgba(192,192,192,0.8)" }}" alt="Play video">
@@ -144,6 +152,9 @@
             {{ if $root.Request.CanEdit }}
               <a href="#desc-modal-{{ .ID }}" class="button button-icon desc-edit" alt="Edit description">
                 <img class="icon" src="{{ url "/svg/pencil-alt?fill=#272727" }}" alt="Edit description">
+              </a>
+              <a href="#{{ .ID }}" class="button button-icon permalink" alt="Link to image">
+                <img class="icon" src="{{ url "/svg/link?fill=#272727" }}" alt="Link">
               </a>
             {{ end }}
           </div>
