@@ -1,0 +1,19 @@
+{{ define "desc-modal" }}
+  <div id="desc-modal-{{ .ID }}" class="modal">
+    <div class="modal-content">
+      <h2 class="header">Description</h2>
+
+      <form method="post" action="#">
+        <input type="hidden" name="type" value="description" />
+        <input type="hidden" name="method" value="PUT" />
+        <input type="hidden" name="name" value="{{ .URL }}" />
+
+        <p class="padding no-margin">
+          <textarea class="desc-input" name="description">{{ .Exif.Description }}</textarea>
+        </p>
+
+        {{ template "form_buttons" "Update" }}
+      </form>
+    </div>
+  </div>
+{{ end }}

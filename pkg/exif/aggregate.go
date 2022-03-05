@@ -36,6 +36,11 @@ func (a App) GetExifFor(ctx context.Context, item absto.Item) (exas.Exif, error)
 	return exif, nil
 }
 
+// SaveExifFor saves given exif for given item
+func (a App) SaveExifFor(_ context.Context, item absto.Item, exif exas.Exif) error {
+	return a.saveMetadata(item, exif)
+}
+
 // GetAggregateFor return aggregated value for a given directory
 func (a App) GetAggregateFor(ctx context.Context, item absto.Item) (provider.Aggregate, error) {
 	if !item.IsDir {

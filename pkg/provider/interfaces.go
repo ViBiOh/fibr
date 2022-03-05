@@ -58,4 +58,5 @@ type WebhookManager interface {
 type ExifManager interface {
 	GetAggregateFor(ctx context.Context, item absto.Item) (Aggregate, error)
 	GetExifFor(ctx context.Context, item absto.Item) (exas.Exif, error)
+	SaveExifFor(ctx context.Context, item absto.Item, exif exas.Exif) error
 }

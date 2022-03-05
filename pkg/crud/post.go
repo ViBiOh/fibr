@@ -1,6 +1,7 @@
 package crud
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
+	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
 func parseMultipart(r *http.Request) (map[string]string, *multipart.Part, error) {
@@ -58,6 +60,8 @@ func (a App) Post(w http.ResponseWriter, r *http.Request, request provider.Reque
 			a.handlePostShare(w, r, request, method)
 		case "webhook":
 			a.handlePostWebhook(w, r, request, method)
+		case "description":
+			a.handlePostDescription(w, r, request, method)
 		default:
 			a.handlePost(w, r, request, method)
 		}
@@ -104,6 +108,35 @@ func (a App) handlePostWebhook(w http.ResponseWriter, r *http.Request, request p
 	default:
 		a.error(w, r, request, model.WrapMethodNotAllowed(fmt.Errorf("unknown webhook method `%s` for %s", method, r.URL.Path)))
 	}
+}
+
+func (a App) handlePostDescription(w http.ResponseWriter, r *http.Request, request provider.Request, method string) {
+	name, err := checkFormName(r, "name")
+	if err != nil && !errors.Is(err, ErrEmptyName) {
+		a.error(w, r, request, err)
+		return
+	}
+
+	item, err := a.storageApp.Info(request.SubPath(name))
+	if err != nil {
+		a.error(w, r, request, err)
+		return
+	}
+
+	exif, err := a.exifApp.GetExifFor(r.Context(), item)
+	if err != nil {
+		a.error(w, r, request, err)
+		return
+	}
+
+	exif.Description = r.FormValue("description")
+
+	if err = a.exifApp.SaveExifFor(r.Context(), item, exif); err != nil {
+		a.error(w, r, request, err)
+		return
+	}
+
+	a.rendererApp.Redirect(w, r, "?story", renderer.NewSuccessMessage("Description successfully edited"))
 }
 
 func (a App) handlePost(w http.ResponseWriter, r *http.Request, request provider.Request, method string) {

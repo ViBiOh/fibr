@@ -14,6 +14,12 @@
     {{ template "map-modal" . }}
   {{ end }}
 
+  {{ if .Request.CanEdit }}
+    {{ range .Files }}
+      {{ template "desc-modal" . }}
+    {{ end }}
+  {{ end }}
+
   <style type="text/css" nonce="{{ .nonce }}">
     #menu {
       padding-left: 0.5rem;
@@ -37,8 +43,41 @@
       width: 100%;
     }
 
+    .no-margin-bottom {
+      margin-bottom: 0;
+    }
+
     .margin-right-half {
       margin-right: 0.5rem;
+    }
+
+    {{ if .Request.CanEdit }}
+      {{ range .Files }}
+        #desc-modal-{{ .ID }}:target,
+      {{ end }}
+      #desc-modal:target {
+        display: flex;
+        z-index: 5;
+      }
+
+      {{ range .Files }}
+        #desc-modal-{{ .ID }}:target ~ .content,
+      {{ end }}
+      #desc-modal:target ~ .content {
+        pointer-events: none;
+      }
+    {{ end }}
+
+    .desc-input {
+      resize: vertical;
+      width: 30rem;
+      min-height: 15rem;
+    }
+
+    .desc-edit {
+      position: absolute;
+      right: 0.5rem;
+      top: 0.5rem;
     }
   </style>
 
@@ -68,7 +107,7 @@
             {{ end }}
           </a>
 
-          <div class="description padding">
+          <div class="description relative padding">
             <p>
               <img class="icon icon-bottom margin-right-half" src="{{ url "/svg/location?fill=#272727" }}" alt="Location">
               {{- if .Exif.Geocode.IsZero }}
@@ -90,7 +129,13 @@
             {{ end }}
 
             {{ if .Exif.Description }}
-              <p>{{ .Exif.Description }}</p>
+              <p class="no-margin-bottom">{{ .Exif.Description }}</p>
+            {{ end }}
+
+            {{ if $root.Request.CanEdit }}
+              <a href="#desc-modal-{{ .ID }}" class="button button-icon desc-edit" alt="Edit description">
+                <img class="icon" src="{{ url "/svg/pencil-alt?fill=#272727" }}" alt="Edit description">
+              </a>
             {{ end }}
           </div>
         </li>
