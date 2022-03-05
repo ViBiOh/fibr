@@ -80,13 +80,13 @@
     .desc-edit {
       position: absolute;
       right: 5rem;
-      top: 0.5rem;
+      bottom: 0.5rem;
     }
 
     .permalink {
       position: absolute;
       right: 0.5rem;
-      top: 0.5rem;
+      bottom: 0.5rem;
     }
   </style>
 
@@ -146,7 +146,7 @@
             {{ end }}
 
             {{ if .Exif.Description }}
-              <p class="no-margin-bottom">{{ .Exif.Description }}</p>
+              <p>{{ .Exif.Description }}</p>
             {{ end }}
 
             {{ if $root.Request.CanEdit }}
