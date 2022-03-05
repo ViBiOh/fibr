@@ -66,3 +66,17 @@ func (mr *ExifMockRecorder) GetExifFor(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetExifFor", reflect.TypeOf((*Exif)(nil).GetExifFor), arg0, arg1)
 }
+
+// SaveExifFor mocks base method.
+func (m *Exif) SaveExifFor(arg0 context.Context, arg1 model.Item, arg2 model0.Exif) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SaveExifFor", arg0, arg1, arg2)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SaveExifFor indicates an expected call of SaveExifFor.
+func (mr *ExifMockRecorder) SaveExifFor(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveExifFor", reflect.TypeOf((*Exif)(nil).SaveExifFor), arg0, arg1, arg2)
+}
