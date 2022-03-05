@@ -107,8 +107,8 @@
 
     <ul id="files" class="no-margin no-padding">
       {{ range .Files }}
-        <li id="{{ .ID }}" class="file relative">
-          <a class="filelink" href="{{ .URL }}?browser" title="{{ .Name }}">
+        <li id="{{ .ID }}" class="file">
+          <a class="filelink block relative" href="{{ .URL }}?browser" title="{{ .Name }}">
             <img class="thumbnail full block" src="{{ .URL }}?thumbnail&scale=1000" alt="Thumbnail of {{ .URL }}" loading="lazy">
 
             {{ if .IsVideo }}
