@@ -23,7 +23,7 @@ const (
 
 func (a App) getCover(request provider.Request, files []absto.Item) map[string]interface{} {
 	for _, file := range files {
-		if a.thumbnailApp.HasThumbnail(file) {
+		if a.thumbnailApp.HasThumbnail(file, thumbnail.SmallSize) {
 			return map[string]interface{}{
 				"Img":       provider.StorageToRender(file, request),
 				"ImgHeight": thumbnail.SmallSize,
@@ -59,7 +59,7 @@ func (a App) List(ctx context.Context, request provider.Request, message rendere
 				renderItem := provider.StorageToRender(item, request)
 				renderItem.Aggregate = aggregate
 
-				if (!hasThumbnail || renderWithThumbnail) && a.thumbnailApp.CanHaveThumbnail(item) && a.thumbnailApp.HasThumbnail(item) {
+				if (!hasThumbnail || renderWithThumbnail) && a.thumbnailApp.CanHaveThumbnail(item) && a.thumbnailApp.HasThumbnail(item, thumbnail.SmallSize) {
 					if renderWithThumbnail {
 						renderItem.HasThumbnail = true
 					}

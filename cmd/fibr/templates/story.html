@@ -26,22 +26,19 @@
     }
 
     .file {
-      align-items: center;
       background-color: var(--grey);
-      display: flex;
-      flex-wrap: wrap;
       margin: 0 auto 3rem;
       max-width: 100rem;
-    }
-
-    .filelink {
-      width: 100%;
     }
 
     .description {
       background-color: var(--white);
       color: var(--dark);
       width: 100%;
+    }
+
+    .margin-right-half {
+      margin-right: 0.5rem;
     }
   </style>
 
@@ -63,8 +60,8 @@
     <ul id="files" class="no-margin no-padding">
       {{ range .Files }}
         <li class="file relative">
-          <a class="filelink center" href="{{ .URL }}?browser" title="{{ .Name }}">
-            <img class="thumbnail full" src="{{ .URL }}?thumbnail" alt="Thumbnail of {{ .URL }}" loading="lazy">
+          <a class="filelink" href="{{ .URL }}?browser" title="{{ .Name }}">
+            <img class="thumbnail full block" src="{{ .URL }}?thumbnail&scale=1000" alt="Thumbnail of {{ .URL }}" loading="lazy" border="0">
 
             {{ if .IsVideo }}
               <img class="icon icon-overlay" src="{{ url "/svg/play?fill=rgba(192,192,192,0.8)" }}" alt="Play video">
@@ -73,21 +70,21 @@
 
           <div class="description padding">
             <p>
-              <img class="icon" src="{{ url "/svg/location?fill=#272727" }}" alt="Location">
-              {{ if .Exif.Geocode.IsZero }}
+              <img class="icon icon-bottom margin-right-half" src="{{ url "/svg/location?fill=#272727" }}" alt="Location">
+              {{- if .Exif.Geocode.IsZero }}
                 Unknown
-              {{ else }}
+              {{- else }}
                 {{ index .Exif.Geocode.Address "city_district" }}, {{ index .Exif.Geocode.Address "country" }}
-              {{ end }}
+              {{- end }}
 
-              {{ if not .Exif.Date.IsZero }}
-                , {{ .Exif.Date.Format "Mon Jan _2 15:04:05 2006" }}
-              {{ end }}
+              {{- if not .Exif.Date.IsZero }}
+                , {{ .Exif.Date.Format "Monday _2 Jan at 15:04:05 2006" }}
+              {{- end }}
             </p>
 
             {{ if index .Exif.Data "Model" }}
               <p>
-                <img class="icon" src="{{ url "/svg/camera?fill=#272727" }}" alt="Camera model">
+                <img class="icon icon-bottom margin-right-half" src="{{ url "/svg/camera?fill=#272727" }}" alt="Camera model">
                 {{ index .Exif.Data "Model" }}
               </p>
             {{ end }}

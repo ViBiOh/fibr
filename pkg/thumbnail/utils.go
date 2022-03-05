@@ -15,12 +15,12 @@ func (a App) CanHaveThumbnail(item absto.Item) bool {
 }
 
 // HasThumbnail determine if thumbnail exist for given pathname
-func (a App) HasThumbnail(item absto.Item) bool {
+func (a App) HasThumbnail(item absto.Item, scale uint64) bool {
 	if item.IsDir {
 		return false
 	}
 
-	_, err := a.storageApp.Info(getThumbnailPath(item))
+	_, err := a.storageApp.Info(getThumbnailPath(item, scale))
 	return err == nil
 }
 
@@ -29,7 +29,12 @@ func (a App) GetChunk(pathname string) (absto.Item, error) {
 	return a.storageApp.Info(provider.MetadataDirectoryName + pathname)
 }
 
-func getThumbnailPath(item absto.Item) string {
+func getThumbnailPath(item absto.Item, scale uint64) string {
+	switch scale {
+	case LargeSize:
+		item.ID = item.ID + "_large"
+	}
+
 	return getPathWithExtension(item, "webp")
 }
 

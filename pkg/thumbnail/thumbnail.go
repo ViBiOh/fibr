@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"path"
+	"strconv"
 	"strings"
 	"time"
 
@@ -25,10 +26,17 @@ import (
 
 const (
 	// SmallSize is the square size of each thumbnail generated
-	SmallSize = 150
+	SmallSize uint64 = 150
+
+	// LargeSize is the square size of each thumbnail generated for the story
+	LargeSize = 1000
 )
 
-var cacheDuration string = fmt.Sprintf("private, max-age=%.0f", time.Duration(time.Minute*5).Seconds())
+var (
+	sizes = []uint64{SmallSize, LargeSize}
+
+	cacheDuration string = fmt.Sprintf("private, max-age=%.0f", time.Duration(time.Minute*5).Seconds())
+)
 
 // App of package
 type App struct {
@@ -130,12 +138,22 @@ func (a App) Stream(w http.ResponseWriter, r *http.Request, item absto.Item) {
 
 // Serve check if thumbnail is present and serve it
 func (a App) Serve(w http.ResponseWriter, r *http.Request, item absto.Item) {
-	if !a.CanHaveThumbnail(item) || !a.HasThumbnail(item) {
+	if !a.CanHaveThumbnail(item) || !a.HasThumbnail(item, SmallSize) {
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 
-	thumbnailPath := getThumbnailPath(item)
+	scale := SmallSize
+	if rawScale := r.URL.Query().Get("scale"); len(rawScale) > 0 {
+		var err error
+		scale, err = strconv.ParseUint(rawScale, 10, 64)
+		if err != nil {
+			httperror.BadRequest(w, fmt.Errorf("unable to parse scale: %s", err))
+			return
+		}
+	}
+
+	thumbnailPath := getThumbnailPath(item, scale)
 	reader, err := a.storageApp.ReadFrom(thumbnailPath)
 	if err != nil {
 		httperror.InternalServerError(w, err)
@@ -181,7 +199,7 @@ func (a App) List(w http.ResponseWriter, r *http.Request, items []absto.Item) {
 			return
 		}
 
-		if !a.HasThumbnail(item) {
+		if !a.HasThumbnail(item, SmallSize) {
 			continue
 		}
 
@@ -196,7 +214,7 @@ func (a App) thumbnailHash(items []absto.Item) string {
 	hasher := sha.Stream()
 
 	for _, item := range items {
-		if info, err := a.storageApp.Info(getThumbnailPath(item)); err == nil {
+		if info, err := a.storageApp.Info(getThumbnailPath(item, SmallSize)); err == nil {
 			hasher.Write(info)
 		}
 	}
@@ -207,7 +225,7 @@ func (a App) thumbnailHash(items []absto.Item) string {
 func (a App) encodeContent(encoder io.WriteCloser, item absto.Item) {
 	defer provider.LogClose(encoder, "thumbnail.encodeContent", "encoder")
 
-	reader, err := a.storageApp.ReadFrom(getThumbnailPath(item))
+	reader, err := a.storageApp.ReadFrom(getThumbnailPath(item, SmallSize))
 	if err != nil {
 		logEncodeContentError(item).Error("unable to open: %s", err)
 		return

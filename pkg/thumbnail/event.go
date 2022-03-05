@@ -31,9 +31,15 @@ func (a App) generateItem(ctx context.Context, event provider.Event) {
 		return
 	}
 
-	if event.GetMetadata("force") == "true" || !a.HasThumbnail(event.Item) {
+	if event.GetMetadata("force") == "true" || !a.HasThumbnail(event.Item, SmallSize) {
 		if err := a.generate(ctx, event.Item, SmallSize); err != nil {
 			logger.WithField("fn", "thumbnail.generate").WithField("item", event.Item.Pathname).Error("unable to generate for scale %d: %s", SmallSize, err)
+		}
+	}
+
+	if event.GetMetadata("force") == "true" || !a.HasThumbnail(event.Item, LargeSize) {
+		if err := a.generate(ctx, event.Item, LargeSize); err != nil {
+			logger.WithField("fn", "thumbnail.generate").WithField("item", event.Item.Pathname).Error("unable to generate for scale %d: %s", LargeSize, err)
 		}
 	}
 
@@ -49,30 +55,34 @@ func (a App) generateItem(ctx context.Context, event provider.Event) {
 }
 
 func (a App) rename(ctx context.Context, old, new absto.Item) {
-	oldPath := getThumbnailPath(old)
-	if _, err := a.storageApp.Info(oldPath); absto.IsNotExist(err) {
-		return
-	}
+	for _, size := range sizes {
+		oldPath := getThumbnailPath(old, size)
+		if _, err := a.storageApp.Info(oldPath); absto.IsNotExist(err) {
+			return
+		}
 
-	if err := a.storageApp.Rename(oldPath, getThumbnailPath(new)); err != nil {
-		logger.Error("unable to rename thumbnail: %s", err)
-	}
+		if err := a.storageApp.Rename(oldPath, getThumbnailPath(new, size)); err != nil {
+			logger.Error("unable to rename thumbnail: %s", err)
+		}
 
-	if provider.VideoExtensions[old.Extension] != "" && a.HasStream(old) {
-		if err := a.renameStream(ctx, old, new); err != nil {
-			logger.Error("unable to rename stream: %s", err)
+		if provider.VideoExtensions[old.Extension] != "" && a.HasStream(old) {
+			if err := a.renameStream(ctx, old, new); err != nil {
+				logger.Error("unable to rename stream: %s", err)
+			}
 		}
 	}
 }
 
 func (a App) delete(ctx context.Context, item absto.Item) {
-	if err := a.storageApp.Remove(getThumbnailPath(item)); err != nil {
-		logger.Error("unable to delete thumbnail: %s", err)
-	}
+	for _, size := range sizes {
+		if err := a.storageApp.Remove(getThumbnailPath(item, size)); err != nil {
+			logger.Error("unable to delete thumbnail: %s", err)
+		}
 
-	if provider.VideoExtensions[item.Extension] != "" && a.HasStream(item) {
-		if err := a.deleteStream(ctx, item); err != nil {
-			logger.Error("unable to delete stream: %s", err)
+		if provider.VideoExtensions[item.Extension] != "" && a.HasStream(item) {
+			if err := a.deleteStream(ctx, item); err != nil {
+				logger.Error("unable to delete stream: %s", err)
+			}
 		}
 	}
 }
