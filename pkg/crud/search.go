@@ -11,6 +11,7 @@ import (
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	httpModel "github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 	"go.opentelemetry.io/otel/trace"
@@ -152,7 +153,7 @@ func (a App) search(r *http.Request, request provider.Request, files []absto.Ite
 	for i, item := range files {
 		renderItem := provider.StorageToRender(item, request)
 
-		if renderWithThumbnail && a.thumbnailApp.CanHaveThumbnail(item) && a.thumbnailApp.HasThumbnail(item) {
+		if renderWithThumbnail && a.thumbnailApp.CanHaveThumbnail(item) && a.thumbnailApp.HasThumbnail(item, thumbnail.SmallSize) {
 			renderItem.HasThumbnail = true
 		}
 

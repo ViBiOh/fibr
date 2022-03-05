@@ -11,6 +11,7 @@ import (
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 )
@@ -117,7 +118,7 @@ func (a *App) discordHandle(ctx context.Context, webhook provider.Webhook, event
 		time.Sleep(time.Second * 15)
 	}
 
-	if a.thumbnailApp.HasThumbnail(event.Item) {
+	if a.thumbnailApp.HasThumbnail(event.Item, thumbnail.SmallSize) {
 		embed.Thumbnail = &discordContent{
 			URL: url + "?thumbnail",
 		}

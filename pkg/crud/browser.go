@@ -8,6 +8,7 @@ import (
 	absto "github.com/ViBiOh/absto/pkg/model"
 	exas "github.com/ViBiOh/exas/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v4/pkg/concurrent"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
@@ -43,7 +44,7 @@ func (a App) Browser(ctx context.Context, w http.ResponseWriter, request provide
 	wg.Wait()
 
 	renderItem := provider.StorageToRender(item, request)
-	if a.thumbnailApp.CanHaveThumbnail(item) && a.thumbnailApp.HasThumbnail(item) {
+	if a.thumbnailApp.CanHaveThumbnail(item) && a.thumbnailApp.HasThumbnail(item, thumbnail.SmallSize) {
 		renderItem.HasThumbnail = true
 	}
 
