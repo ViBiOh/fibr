@@ -48,6 +48,8 @@ func (a App) List(ctx context.Context, request provider.Request, message rendere
 	renderWithThumbnail := request.Display == provider.GridDisplay
 
 	var hasThumbnail bool
+	var hasStory bool
+
 	for index, item := range files {
 		func(item absto.Item, index int) {
 			wg.Go(func() {
@@ -66,6 +68,10 @@ func (a App) List(ctx context.Context, request provider.Request, message rendere
 
 					if !hasThumbnail {
 						hasThumbnail = true
+					}
+
+					if !hasStory {
+						hasStory = a.thumbnailApp.HasThumbnail(item, thumbnail.LargeSize)
 					}
 				}
 
@@ -93,6 +99,7 @@ func (a App) List(ctx context.Context, request provider.Request, message rendere
 		"Message":      message,
 		"HasMap":       hasMap,
 		"HasThumbnail": hasThumbnail,
+		"HasStory":     hasStory,
 	}
 
 	if request.CanShare {

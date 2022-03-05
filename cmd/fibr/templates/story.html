@@ -113,7 +113,19 @@
               {{- if .Exif.Geocode.IsZero }}
                 Unknown
               {{- else }}
-                {{ index .Exif.Geocode.Address "city_district" }}, {{ index .Exif.Geocode.Address "country" }}
+                {{ if index .Exif.Geocode.Address "city_district" }}
+                  {{ index .Exif.Geocode.Address "city_district" }},
+                {{ else }}
+                  {{ if index .Exif.Geocode.Address "village" }}
+                    {{ index .Exif.Geocode.Address "village" }},
+                  {{ else }}
+                    {{ if index .Exif.Geocode.Address "county" }}
+                      {{ index .Exif.Geocode.Address "county" }},
+                    {{- end }}
+                  {{- end }}
+                {{- end }}
+
+                {{- index .Exif.Geocode.Address "country" }}
               {{- end }}
 
               {{- if not .Exif.Date.IsZero }}

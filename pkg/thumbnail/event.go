@@ -10,7 +10,7 @@ import (
 
 // EventConsumer handle event pushed to the event bus
 func (a App) EventConsumer(ctx context.Context, e provider.Event) {
-	if a.vithRequest.IsZero() {
+	if a.vithRequest.IsZero() && a.amqpClient == nil {
 		return
 	}
 
