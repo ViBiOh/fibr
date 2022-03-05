@@ -31,15 +31,11 @@ func (a App) generateItem(ctx context.Context, event provider.Event) {
 		return
 	}
 
-	if event.GetMetadata("force") == "true" || !a.HasThumbnail(event.Item, SmallSize) {
-		if err := a.generate(ctx, event.Item, SmallSize); err != nil {
-			logger.WithField("fn", "thumbnail.generate").WithField("item", event.Item.Pathname).Error("unable to generate for scale %d: %s", SmallSize, err)
-		}
-	}
-
-	if event.GetMetadata("force") == "true" || !a.HasThumbnail(event.Item, LargeSize) {
-		if err := a.generate(ctx, event.Item, LargeSize); err != nil {
-			logger.WithField("fn", "thumbnail.generate").WithField("item", event.Item.Pathname).Error("unable to generate for scale %d: %s", LargeSize, err)
+	for _, size := range sizes {
+		if event.GetMetadata("force") == "true" || !a.HasThumbnail(event.Item, size) {
+			if err := a.generate(ctx, event.Item, size); err != nil {
+				logger.WithField("fn", "thumbnail.generate").WithField("item", event.Item.Pathname).Error("unable to generate for scale %d: %s", size, err)
+			}
 		}
 	}
 
