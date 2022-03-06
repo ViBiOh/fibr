@@ -1,6 +1,7 @@
 {{ define "story" }}
   {{ template "header" . }}
   {{ template "layout" . }}
+  {{ template "throbber" . }}
 
   {{ $root := . }}
 
@@ -39,9 +40,20 @@
     }
 
     .file {
+      align-items: center;
       background-color: var(--grey);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
       margin: 0 auto 3rem;
       max-width: 100rem;
+    }
+
+    .file::before {
+      content: "";
+      display: inline-block;
+      height: 0;
+      padding-bottom: calc(100%);
     }
 
     .description {
@@ -113,7 +125,7 @@
       {{ range .Files }}
         <li id="{{ .ID }}" class="file">
           <a class="filelink block relative" href="{{ .URL }}?browser" title="{{ .Name }}">
-            <img class="thumbnail full block" src="{{ .URL }}?thumbnail&scale=1000" alt="Thumbnail of {{ .URL }}" loading="lazy">
+            {{ template "async-image-item" .RenderItem }}
 
             {{ if .IsVideo }}
               <img class="icon icon-overlay" src="{{ url "/svg/play?fill=rgba(192,192,192,0.8)" }}" alt="Play video">
@@ -164,8 +176,32 @@
           </div>
         </li>
       {{ end }}
+
+      {{ template "async-image" . }}
     </ul>
   </div>
+
+  <script type="text/javascript" nonce="{{ .nonce }}">
+    window.addEventListener(
+      'thumbnail-done', () => {
+
+        const lazyImageObserver = new IntersectionObserver((entries, observer) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) {
+              return
+            }
+
+            const lazyImage = entry.target;
+            lazyImage.src = lazyImage.dataset.src + "&scale=1000";
+            lazyImage.classList.remove("lazy");
+            lazyImageObserver.unobserve(lazyImage);
+          });
+        });
+
+        document.querySelectorAll("img.thumbnail").forEach((lazyImage) => lazyImageObserver.observe(lazyImage));
+      }
+    );
+  </script>
 
   {{ template "footer" . }}
 {{ end }}

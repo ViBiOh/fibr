@@ -1,7 +1,7 @@
 {{ define "async-image-item" }}
-  <picture id="picture-{{ .ID }}" class="no-margin" data-thumbnail data-alt="Thumbnail of {{ .URL }}" data-icon="{{ iconFromExtension . }}">
+  <picture id="picture-{{ .ID }}" class="no-margin" data-thumbnail data-alt="Thumbnail of {{ .URL }}" data-src="{{ .URL }}?thumbnail" data-icon="{{ iconFromExtension . }}">
     <noscript>
-      <img class="thumbnail full" src="{{ .URL }}?thumbnail" alt="Thumbnail of {{ .URL }}" loading="lazy">
+      <img class="thumbnail full block" src="{{ .URL }}?thumbnail" alt="Thumbnail of {{ .URL }}" loading="lazy">
     </noscript>
   </picture>
 {{ end }}
@@ -114,7 +114,8 @@
         const img = new Image();
         img.src = `data:image/webp;base64,${parts[1]}`;
         img.alt = picture.dataset.alt;
-        img.classList.add('thumbnail');
+        img.dataset.src = picture.dataset.src;
+        img.classList.add('thumbnail', 'full', 'block');
 
         replaceContent(picture, img);
       }
@@ -142,6 +143,7 @@
 
         try {
           await fetchThumbnail();
+          window.dispatchEvent(new Event('thumbnail-done'))
         } catch (e) {
           console.error(e);
         }
