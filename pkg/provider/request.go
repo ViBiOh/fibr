@@ -56,20 +56,23 @@ func ParsePreferences(value string) Preferences {
 }
 
 // AddLayout display for given path
-func (p Preferences) AddLayout(path, display string) {
+func (p Preferences) AddLayout(path, display string) Preferences {
 	if p.LayoutPaths == nil {
 		p.LayoutPaths = map[string]string{
 			path: display,
 		}
-		return
+		return p
 	}
 
 	p.LayoutPaths[path] = display
+	return p
 }
 
 // RemoveLayout display for given path
-func (p Preferences) RemoveLayout(path string) {
+func (p Preferences) RemoveLayout(path string) Preferences {
 	delete(p.LayoutPaths, path)
+
+	return p
 }
 
 // Request from user
@@ -87,9 +90,9 @@ type Request struct {
 // UpdatePreferences based on current request
 func (r Request) UpdatePreferences() Request {
 	if r.Display == DefaultDisplay {
-		r.Preferences.RemoveLayout(r.Path)
+		r.Preferences = r.Preferences.RemoveLayout(r.Path)
 	} else {
-		r.Preferences.AddLayout(r.Path, r.Display)
+		r.Preferences = r.Preferences.AddLayout(r.Path, r.Display)
 	}
 
 	return r
