@@ -61,7 +61,7 @@ func (a App) parseRequest(r *http.Request) (provider.Request, error) {
 		return request, model.WrapUnauthorized(err)
 	}
 
-	request.UpdatePreferences()
+	request = request.UpdatePreferences()
 
 	if !request.Share.IsZero() {
 		if request.Share.IsExpired(time.Now()) {
