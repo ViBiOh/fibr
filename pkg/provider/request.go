@@ -19,6 +19,9 @@ var (
 	// DefaultDisplay format
 	DefaultDisplay = GridDisplay
 
+	// LayoutPathsCookieName for saving preferences
+	LayoutPathsCookieName = "layout_paths"
+
 	preferencesPathSeparator = "|"
 	ipHeaders                = []string{
 		"Cf-Connecting-Ip",
@@ -29,7 +32,44 @@ var (
 
 // Preferences holds preferences of the user
 type Preferences struct {
-	LayoutPaths []string
+	LayoutPaths map[string]string
+}
+
+// ParsePreferences for a given string value
+func ParsePreferences(value string) Preferences {
+	var output Preferences
+
+	if len(value) == 0 {
+		return output
+	}
+
+	output.LayoutPaths = make(map[string]string)
+
+	for _, part := range strings.Split(value, ",") {
+		parts := strings.SplitN(part, preferencesPathSeparator, 2)
+		if len(parts) == 2 {
+			output.LayoutPaths[parts[0]] = parts[1]
+		}
+	}
+
+	return output
+}
+
+// AddLayout display for given path
+func (p Preferences) AddLayout(path, display string) {
+	if p.LayoutPaths == nil {
+		p.LayoutPaths = map[string]string{
+			path: display,
+		}
+		return
+	}
+
+	p.LayoutPaths[path] = display
+}
+
+// RemoveLayout display for given path
+func (p Preferences) RemoveLayout(path string) {
+	delete(p.LayoutPaths, path)
 }
 
 // Request from user
@@ -42,6 +82,23 @@ type Request struct {
 	CanEdit     bool
 	CanShare    bool
 	CanWebhook  bool
+}
+
+// UpdatePreferences based on current request
+func (r Request) UpdatePreferences() Request {
+	if r.Display == DefaultDisplay {
+		r.Preferences.RemoveLayout(r.Path)
+	} else {
+		r.Preferences.AddLayout(r.Path, r.Display)
+	}
+
+	return r
+}
+
+// DeletePreference remove given path from preferences
+func (r Request) DeletePreference(path string) Request {
+	r.Preferences.RemoveLayout(path)
+	return r
 }
 
 // RelativeURL compute relative URL of item for that request
@@ -76,11 +133,8 @@ func (r Request) SubPath(name string) string {
 
 // LayoutPath returns layout of given path based on preferences
 func (r Request) LayoutPath(path string) string {
-	if index := FindPath(r.Preferences.LayoutPaths, path); index != -1 {
-		parts := strings.SplitN(r.Preferences.LayoutPaths[index], preferencesPathSeparator, 2)
-		if len(parts) == 2 {
-			return parts[1]
-		}
+	if layout, ok := r.Preferences.LayoutPaths[path]; ok {
+		return layout
 	}
 	return DefaultDisplay
 }
@@ -128,29 +182,25 @@ func (r Request) contentParts() []string {
 }
 
 func computeLayoutPaths(request Request) string {
-	layoutPaths := request.Preferences.LayoutPaths
-	path := request.Path
+	var builder strings.Builder
 
-	switch request.Display {
-	case ListDisplay:
-		if index := FindPath(layoutPaths, path); index == -1 {
-			layoutPaths = append(layoutPaths, fmt.Sprintf("%s%s%s", path, preferencesPathSeparator, ListDisplay))
+	for key, value := range request.Preferences.LayoutPaths {
+		if builder.Len() > 0 {
+			builder.WriteString(",")
 		}
-	case StoryDisplay:
-		if index := FindPath(layoutPaths, path); index == -1 {
-			layoutPaths = append(layoutPaths, fmt.Sprintf("%s%s%s", path, preferencesPathSeparator, StoryDisplay))
-		}
-	case DefaultDisplay:
-		layoutPaths = RemoveIndex(layoutPaths, FindPath(layoutPaths, path))
+
+		builder.WriteString(key)
+		builder.WriteString("|")
+		builder.WriteString(value)
 	}
 
-	return strings.Join(layoutPaths, ",")
+	return builder.String()
 }
 
 // SetPrefsCookie set preferences cookie for given request
 func SetPrefsCookie(w http.ResponseWriter, request Request) {
 	http.SetCookie(w, &http.Cookie{
-		Name:     "layout_paths",
+		Name:     LayoutPathsCookieName,
 		Value:    computeLayoutPaths(request),
 		Path:     "/",
 		HttpOnly: true,

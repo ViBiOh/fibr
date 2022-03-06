@@ -36,23 +36,11 @@ func (a App) Delete(w http.ResponseWriter, r *http.Request, request provider.Req
 	}
 
 	if info.IsDir {
-		provider.SetPrefsCookie(w, deletePreferences(request, pathname))
+		request = request.DeletePreference(pathname)
+		provider.SetPrefsCookie(w, request)
 	}
 
 	go a.notify(provider.NewDeleteEvent(request, info, a.rendererApp))
 
 	a.rendererApp.Redirect(w, r, fmt.Sprintf("?d=%s", request.Display), renderer.NewSuccessMessage("%s successfully deleted", info.Name))
-}
-
-func deletePreferences(request provider.Request, oldPath string) provider.Request {
-	var paths []string
-
-	for _, layoutPath := range request.Preferences.LayoutPaths {
-		if layoutPath != oldPath {
-			paths = append(paths, layoutPath)
-		}
-	}
-
-	request.Preferences.LayoutPaths = paths
-	return request
 }

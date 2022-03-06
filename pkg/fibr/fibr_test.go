@@ -223,14 +223,14 @@ func TestConvertAuthenticationError(t *testing.T) {
 func TestParseRequest(t *testing.T) {
 	adminRequestWithEmptyCookie := httptest.NewRequest(http.MethodGet, adminPath, nil)
 	adminRequestWithEmptyCookie.AddCookie(&http.Cookie{
-		Name:  "list_layout_paths",
+		Name:  provider.LayoutPathsCookieName,
 		Value: "",
 	})
 
 	adminRequestWithCookie := httptest.NewRequest(http.MethodGet, adminPath, nil)
 	adminRequestWithCookie.AddCookie(&http.Cookie{
-		Name:  "list_layout_paths",
-		Value: "assets,documents/monthly",
+		Name:  provider.LayoutPathsCookieName,
+		Value: "assets|list,documents/monthly|story",
 	})
 
 	type args struct {
@@ -365,7 +365,10 @@ func TestParseRequest(t *testing.T) {
 				CanShare:   true,
 				CanWebhook: true,
 				Preferences: provider.Preferences{
-					LayoutPaths: []string{"assets", "documents/monthly"},
+					LayoutPaths: map[string]string{
+						"assets":            "list",
+						"documents/monthly": "story",
+					},
 				},
 			},
 			nil,

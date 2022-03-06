@@ -263,7 +263,10 @@ func TestLayoutPath(t *testing.T) {
 			"story",
 			Request{
 				Preferences: Preferences{
-					LayoutPaths: []string{"/sheets|list", "/reports|story"},
+					LayoutPaths: map[string]string{
+						"/sheets":  "list",
+						"/reports": "story",
+					},
 				},
 			},
 			args{

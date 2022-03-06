@@ -61,6 +61,8 @@ func (a App) parseRequest(r *http.Request) (provider.Request, error) {
 		return request, model.WrapUnauthorized(err)
 	}
 
+	request.UpdatePreferences()
+
 	if !request.Share.IsZero() {
 		if request.Share.IsExpired(time.Now()) {
 			return request, model.WrapNotFound(errors.New("link has expired"))
@@ -102,14 +104,13 @@ func parseDisplay(r *http.Request) string {
 	}
 }
 
-func parsePreferences(r *http.Request) (preferences provider.Preferences) {
-	if cookie, err := r.Cookie("list_layout_paths"); err == nil {
-		if value := cookie.Value; len(value) > 0 {
-			preferences.LayoutPaths = strings.Split(value, ",")
-		}
+func parsePreferences(r *http.Request) provider.Preferences {
+	var cookieValue string
+	if cookie, err := r.Cookie(provider.LayoutPathsCookieName); err == nil {
+		cookieValue = cookie.Value
 	}
 
-	return
+	return provider.ParsePreferences(cookieValue)
 }
 
 func (a App) parseShare(request *provider.Request, authorizationHeader string) error {
