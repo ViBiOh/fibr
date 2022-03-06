@@ -4,16 +4,20 @@
      * Go back from state.
      */
     function goBack() {
-      {{ if .File }}
-        {{ $url := .Request.AbsoluteURL "/" }}
-        window.location.href = '{{ url $url }}?d={{ .Request.LayoutPath $url }}';
-      {{ else }}
-        const previousHash = document.location.hash;
+      const previousHash = document.location.hash;
+      if (previousHash) {
         document.location.hash = '';
 
         if (/success$/gim.test(previousHash)) {
           window.location.reload(true);
         }
+
+        return;
+      }
+
+      {{ if .File }}
+        {{ $url := .Request.AbsoluteURL "/" }}
+        window.location.href = '{{ url $url }}?d={{ .Request.LayoutPath $url }}';
       {{ end }}
     }
 
