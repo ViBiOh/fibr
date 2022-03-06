@@ -95,6 +95,8 @@ func parseDisplay(r *http.Request) string {
 	switch r.URL.Query().Get("d") {
 	case provider.ListDisplay:
 		return provider.ListDisplay
+	case provider.StoryDisplay:
+		return provider.StoryDisplay
 	default:
 		return provider.DefaultDisplay
 	}
@@ -103,7 +105,7 @@ func parseDisplay(r *http.Request) string {
 func parsePreferences(r *http.Request) (preferences provider.Preferences) {
 	if cookie, err := r.Cookie("list_layout_paths"); err == nil {
 		if value := cookie.Value; len(value) > 0 {
-			preferences.ListLayoutPath = strings.Split(value, ",")
+			preferences.LayoutPaths = strings.Split(value, ",")
 		}
 	}
 

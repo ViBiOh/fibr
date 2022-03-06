@@ -183,7 +183,7 @@
         <img class="icon" src="{{ url "/svg/th?fill=silver" }}" alt="Grid">
       </a>
       {{ if .HasStory }}
-        <a id="story-display" class="button button-icon" href="?story">
+        <a id="story-display" class="button button-icon" href="?d=story">
           <img class="icon" src="{{ url "/svg/image?fill=silver" }}" alt="Image story">
         </a>
       {{ end }}
@@ -240,21 +240,21 @@
               <span class="filename ellipsis {{ if eq $root.Request.Display "list" }}padding-left{{ end }}">{{ .Name }}</span>
             {{ end }}
 
-            <a href="{{ .URL }}?download" class="button button-icon file-download" alt="Download" download="{{ .Name }}">
+            <a href="{{ .URL }}?download" class="button button-icon file-download" title="Download" download="{{ .Name }}">
               <img class="icon" src="{{ url "/svg/download?fill=silver" }}" alt="Download">
             </a>
 
             {{ if $root.Request.CanEdit }}
-              <a href="#delete-modal-{{ .ID }}" class="button button-icon file-delete" alt="Delete">
+              <a href="#delete-modal-{{ .ID }}" class="button button-icon file-delete" title="Delete">
                 <img class="icon" src="{{ url "/svg/times?fill=silver" }}" alt="Delete">
               </a>
-              <a href="#edit-modal-{{ .ID }}" class="button button-icon file-edit" alt="Edit">
+              <a href="#edit-modal-{{ .ID }}" class="button button-icon file-edit" title="Edit">
                 <img class="icon" src="{{ url "/svg/pencil-alt?fill=silver" }}" alt="Edit">
               </a>
             {{ end }}
 
             {{ if $root.Request.CanShare }}
-              <a href="#share-form-{{ .ID }}" class="button button-icon file-share" alt="Share">
+              <a href="#share-form-{{ .ID }}" class="button button-icon file-share" title="Share">
                 <img class="icon" src="{{ url "/svg/share-alt-square?fill=silver" }}" alt="Share {{ .Name }}">
               </a>
             {{ end }}

@@ -120,7 +120,7 @@ func getNewName(r *http.Request) (string, error) {
 }
 
 func updatePreferences(request provider.Request, oldPath, newPath string) {
-	paths := request.Preferences.ListLayoutPath
+	paths := request.Preferences.LayoutPaths
 
 	for index, layoutPath := range paths {
 		if layoutPath != oldPath {

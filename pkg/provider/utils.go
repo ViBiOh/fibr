@@ -136,10 +136,10 @@ func DoneWriter(isDone func() bool, w io.Writer, content string) {
 	SafeWrite(w, content)
 }
 
-// FindIndex finds index of given value into array, or -1 if not found
-func FindIndex(arr []string, value string) int {
+// FindPath finds index of given value into array, or -1 if not found
+func FindPath(arr []string, value string) int {
 	for index, item := range arr {
-		if item == value {
+		if strings.HasPrefix(item, value) {
 			return index
 		}
 	}

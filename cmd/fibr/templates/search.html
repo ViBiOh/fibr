@@ -105,7 +105,7 @@
               <span class="filename ellipsis {{ if eq $root.Request.Display "list" }}padding-left{{ end }}">{{ .URL }}</span>
             {{ end }}
 
-            <a href="{{ .URL }}?download" class="button button-icon file-download" alt="Download" download="{{ .Name }}">
+            <a href="{{ .URL }}?download" class="button button-icon file-download" title="Download" download="{{ .Name }}">
               <img class="icon" src="{{ url "/svg/download?fill=silver" }}" alt="Download">
             </a>
           </a>

@@ -34,6 +34,10 @@
       background-color: var(--primary);
     }
 
+    #files {
+      padding-bottom: 1rem;
+    }
+
     .file {
       background-color: var(--grey);
       margin: 0 auto 3rem;
@@ -98,7 +102,7 @@
       <a id="grid-display" class="button button-icon" href="?d=grid">
         <img class="icon" src="{{ url "/svg/th?fill=silver" }}" alt="Grid">
       </a>
-      <a id="story-display" class="button button-icon" href="?story">
+      <a id="story-display" class="button button-icon" href="?d=story">
         <img class="icon" src="{{ url "/svg/image?fill=silver" }}" alt="Image story">
       </a>
 
@@ -150,11 +154,11 @@
             {{ end }}
 
             {{ if $root.Request.CanEdit }}
-              <a href="#desc-modal-{{ .ID }}" class="button button-icon desc-edit" alt="Edit description">
+              <a href="#desc-modal-{{ .ID }}" class="button button-icon desc-edit" title="Edit description">
                 <img class="icon" src="{{ url "/svg/pencil-alt?fill=#272727" }}" alt="Edit description">
               </a>
             {{ end }}
-            <a href="#{{ .ID }}" class="button button-icon permalink" alt="Link to image">
+            <a href="#{{ .ID }}" class="button button-icon permalink" title="Link to image">
               <img class="icon" src="{{ url "/svg/link?fill=#272727" }}" alt="Link">
             </a>
           </div>

@@ -260,16 +260,16 @@ func TestLayoutPath(t *testing.T) {
 			GridDisplay,
 		},
 		{
-			"empty list",
+			"story",
 			Request{
 				Preferences: Preferences{
-					ListLayoutPath: []string{"/sheets", "/reports"},
+					LayoutPaths: []string{"/sheets|list", "/reports|story"},
 				},
 			},
 			args{
 				path: "/reports",
 			},
-			ListDisplay,
+			StoryDisplay,
 		},
 	}
 

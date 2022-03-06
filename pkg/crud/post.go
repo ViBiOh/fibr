@@ -136,7 +136,7 @@ func (a App) handlePostDescription(w http.ResponseWriter, r *http.Request, reque
 		return
 	}
 
-	a.rendererApp.Redirect(w, r, fmt.Sprintf("?story#%s", item.ID), renderer.NewSuccessMessage("Description successfully edited"))
+	a.rendererApp.Redirect(w, r, fmt.Sprintf("?d=%s#%s", request.Display, item.ID), renderer.NewSuccessMessage("Description successfully edited"))
 }
 
 func (a App) handlePost(w http.ResponseWriter, r *http.Request, request provider.Request, method string) {

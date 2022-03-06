@@ -19,7 +19,8 @@ var (
 	// DefaultDisplay format
 	DefaultDisplay = GridDisplay
 
-	ipHeaders = []string{
+	preferencesPathSeparator = "|"
+	ipHeaders                = []string{
 		"Cf-Connecting-Ip",
 		"X-Forwarded-For",
 		"X-Real-Ip",
@@ -28,7 +29,7 @@ var (
 
 // Preferences holds preferences of the user
 type Preferences struct {
-	ListLayoutPath []string
+	LayoutPaths []string
 }
 
 // Request from user
@@ -75,8 +76,11 @@ func (r Request) SubPath(name string) string {
 
 // LayoutPath returns layout of given path based on preferences
 func (r Request) LayoutPath(path string) string {
-	if FindIndex(r.Preferences.ListLayoutPath, path) != -1 {
-		return ListDisplay
+	if index := FindPath(r.Preferences.LayoutPaths, path); index != -1 {
+		parts := strings.SplitN(r.Preferences.LayoutPaths[index], preferencesPathSeparator, 2)
+		if len(parts) == 2 {
+			return parts[1]
+		}
 	}
 	return DefaultDisplay
 }
@@ -123,27 +127,31 @@ func (r Request) contentParts() []string {
 	return parts
 }
 
-func computeListLayoutPaths(request Request) string {
-	listLayoutPaths := request.Preferences.ListLayoutPath
+func computeLayoutPaths(request Request) string {
+	layoutPaths := request.Preferences.LayoutPaths
 	path := request.Path
 
 	switch request.Display {
 	case ListDisplay:
-		if index := FindIndex(listLayoutPaths, path); index == -1 {
-			listLayoutPaths = append(listLayoutPaths, path)
+		if index := FindPath(layoutPaths, path); index == -1 {
+			layoutPaths = append(layoutPaths, fmt.Sprintf("%s%s%s", path, preferencesPathSeparator, ListDisplay))
+		}
+	case StoryDisplay:
+		if index := FindPath(layoutPaths, path); index == -1 {
+			layoutPaths = append(layoutPaths, fmt.Sprintf("%s%s%s", path, preferencesPathSeparator, StoryDisplay))
 		}
 	case DefaultDisplay:
-		listLayoutPaths = RemoveIndex(listLayoutPaths, FindIndex(listLayoutPaths, path))
+		layoutPaths = RemoveIndex(layoutPaths, FindPath(layoutPaths, path))
 	}
 
-	return strings.Join(listLayoutPaths, ",")
+	return strings.Join(layoutPaths, ",")
 }
 
 // SetPrefsCookie set preferences cookie for given request
 func SetPrefsCookie(w http.ResponseWriter, request Request) {
 	http.SetCookie(w, &http.Cookie{
-		Name:     "list_layout_paths",
-		Value:    computeListLayoutPaths(request),
+		Name:     "layout_paths",
+		Value:    computeLayoutPaths(request),
 		Path:     "/",
 		HttpOnly: true,
 		Secure:   true,

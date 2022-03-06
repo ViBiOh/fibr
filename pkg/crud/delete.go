@@ -47,12 +47,12 @@ func (a App) Delete(w http.ResponseWriter, r *http.Request, request provider.Req
 func deletePreferences(request provider.Request, oldPath string) provider.Request {
 	var paths []string
 
-	for _, layoutPath := range request.Preferences.ListLayoutPath {
+	for _, layoutPath := range request.Preferences.LayoutPaths {
 		if layoutPath != oldPath {
 			paths = append(paths, layoutPath)
 		}
 	}
 
-	request.Preferences.ListLayoutPath = paths
+	request.Preferences.LayoutPaths = paths
 	return request
 }

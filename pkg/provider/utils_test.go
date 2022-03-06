@@ -136,7 +136,7 @@ func TestFindIndex(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.intention, func(t *testing.T) {
-			if got := FindIndex(tc.args.arr, tc.args.value); got != tc.want {
+			if got := FindPath(tc.args.arr, tc.args.value); got != tc.want {
 				t.Errorf("FindIndex() = %d, want %d", got, tc.want)
 			}
 		})
