@@ -24,6 +24,19 @@ func (a App) HasThumbnail(item absto.Item, scale uint64) bool {
 	return err == nil
 }
 
+// ThumbnailInfo determine if thumbnail exist for given pathname and provide detail about it
+func (a App) ThumbnailInfo(item absto.Item, scale uint64) (thumbnailItem absto.Item, ok bool) {
+	if item.IsDir {
+		ok = false
+		return
+	}
+
+	var err error
+	thumbnailItem, err = a.storageApp.Info(getThumbnailPath(item, scale))
+	ok = err == nil
+	return
+}
+
 // GetChunk retrieve the storage item in the metadata
 func (a App) GetChunk(pathname string) (absto.Item, error) {
 	return a.storageApp.Info(provider.MetadataDirectoryName + pathname)

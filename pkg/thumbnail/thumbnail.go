@@ -138,7 +138,7 @@ func (a App) Stream(w http.ResponseWriter, r *http.Request, item absto.Item) {
 
 // Serve check if thumbnail is present and serve it
 func (a App) Serve(w http.ResponseWriter, r *http.Request, item absto.Item) {
-	if !a.CanHaveThumbnail(item) || !a.HasThumbnail(item, SmallSize) {
+	if !a.CanHaveThumbnail(item) {
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
@@ -153,8 +153,13 @@ func (a App) Serve(w http.ResponseWriter, r *http.Request, item absto.Item) {
 		}
 	}
 
-	thumbnailPath := getThumbnailPath(item, scale)
-	reader, err := a.storageApp.ReadFrom(thumbnailPath)
+	thumbnailInfo, ok := a.ThumbnailInfo(item, scale)
+	if !ok {
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
+
+	reader, err := a.storageApp.ReadFrom(thumbnailInfo.Pathname)
 	if err != nil {
 		httperror.InternalServerError(w, err)
 		return
@@ -163,9 +168,9 @@ func (a App) Serve(w http.ResponseWriter, r *http.Request, item absto.Item) {
 	defer provider.LogClose(reader, "thumbnail.Serve", item.Pathname)
 
 	w.Header().Add("Cache-Control", cacheDuration)
-	w.Header().Add("Content-Disposition", fmt.Sprintf("inline; filename=%s", path.Base(thumbnailPath)))
+	w.Header().Add("Content-Disposition", fmt.Sprintf("inline; filename=%s", path.Base(thumbnailInfo.Pathname)))
 
-	http.ServeContent(w, r, path.Base(thumbnailPath), item.Date, reader)
+	http.ServeContent(w, r, path.Base(thumbnailInfo.Pathname), item.Date, reader)
 }
 
 // List return all thumbnail in a base64 form
@@ -199,13 +204,14 @@ func (a App) List(w http.ResponseWriter, r *http.Request, items []absto.Item) {
 			return
 		}
 
-		if !a.HasThumbnail(item, SmallSize) {
+		thumbnailInfo, ok := a.ThumbnailInfo(item, SmallSize)
+		if !ok {
 			continue
 		}
 
 		provider.DoneWriter(isDone, w, item.ID)
 		provider.DoneWriter(isDone, w, `,`)
-		a.encodeContent(base64.NewEncoder(base64.StdEncoding, w), item)
+		a.encodeContent(base64.NewEncoder(base64.StdEncoding, w), thumbnailInfo)
 		provider.DoneWriter(isDone, w, "\n")
 	}
 }
@@ -225,7 +231,7 @@ func (a App) thumbnailHash(items []absto.Item) string {
 func (a App) encodeContent(encoder io.WriteCloser, item absto.Item) {
 	defer provider.LogClose(encoder, "thumbnail.encodeContent", "encoder")
 
-	reader, err := a.storageApp.ReadFrom(getThumbnailPath(item, SmallSize))
+	reader, err := a.storageApp.ReadFrom(item.Pathname)
 	if err != nil {
 		logEncodeContentError(item).Error("unable to open: %s", err)
 		return
