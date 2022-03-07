@@ -90,9 +90,9 @@ type Request struct {
 // UpdatePreferences based on current request
 func (r Request) UpdatePreferences() Request {
 	if r.Display == DefaultDisplay {
-		r.Preferences = r.Preferences.RemoveLayout(r.Path)
+		r.Preferences = r.Preferences.RemoveLayout(r.AbsoluteURL(""))
 	} else {
-		r.Preferences = r.Preferences.AddLayout(r.Path, r.Display)
+		r.Preferences = r.Preferences.AddLayout(r.AbsoluteURL(""), r.Display)
 	}
 
 	return r

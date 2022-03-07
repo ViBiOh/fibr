@@ -47,7 +47,7 @@ func (a App) handleStartEvent(ctx context.Context, event provider.Event) error {
 	}
 
 	item := event.Item
-	if a.hasMetadata(item) && !forced {
+	if !forced && a.hasMetadata(item) {
 		return nil
 	}
 
