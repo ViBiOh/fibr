@@ -33,7 +33,7 @@ func (a App) Regenerate(w http.ResponseWriter, r *http.Request, request provider
 
 	subset := r.FormValue("subset")
 
-	if len(subset) != 0 {
+	if len(subset) == 0 {
 		a.error(w, r, request, model.WrapInvalid(errors.New("regenerate need a subset")))
 		return
 	}
