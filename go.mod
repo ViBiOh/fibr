@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/ViBiOh/absto v0.1.5
 	github.com/ViBiOh/auth/v2 v2.11.42
-	github.com/ViBiOh/exas v0.3.2
+	github.com/ViBiOh/exas v0.3.3
 	github.com/ViBiOh/flags v0.0.1
 	github.com/ViBiOh/httputils/v4 v4.37.1
 	github.com/ViBiOh/vith v0.4.2

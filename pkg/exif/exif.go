@@ -13,6 +13,7 @@ import (
 	"github.com/ViBiOh/flags"
 	amqpclient "github.com/ViBiOh/httputils/v4/pkg/amqp"
 	"github.com/ViBiOh/httputils/v4/pkg/httpjson"
+	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	prom "github.com/ViBiOh/httputils/v4/pkg/prometheus"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 	"github.com/ViBiOh/httputils/v4/pkg/tracer"
@@ -103,6 +104,13 @@ func (a App) extractAndSaveExif(ctx context.Context, item absto.Item) (exif exas
 		err = fmt.Errorf("unable to extract exif: %s", err)
 		return
 	}
+
+	previousExif, err := a.loadExif(item)
+	if err != nil && !absto.IsNotExist(err) {
+		logger.WithField("item", item.Pathname).Error("unable to load exif: %s", err)
+	}
+
+	exif.Description = previousExif.Description
 
 	if exif.IsZero() {
 		return
