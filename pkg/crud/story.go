@@ -5,7 +5,6 @@ import (
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 	"go.opentelemetry.io/otel/trace"
@@ -22,7 +21,7 @@ func (a App) story(r *http.Request, request provider.Request, files []absto.Item
 	items := make([]provider.StoryItem, 0, len(files))
 
 	for _, item := range files {
-		if a.thumbnailApp.CanHaveThumbnail(item) && a.thumbnailApp.HasThumbnail(item, thumbnail.LargeSize) {
+		if a.thumbnailApp.CanHaveThumbnail(item) && a.thumbnailApp.HasLargeThumbnail(item) {
 			exif, err := a.exifApp.GetExifFor(ctx, item)
 			if err != nil {
 				logger.WithField("item", item.Pathname).Error("unable to get exif: %s", err)
@@ -35,9 +34,10 @@ func (a App) story(r *http.Request, request provider.Request, files []absto.Item
 	request.Display = provider.StoryDisplay
 
 	return renderer.NewPage("story", http.StatusOK, map[string]interface{}{
-		"Paths":   getPathParts(request),
-		"Files":   items,
-		"Cover":   a.getCover(request, files),
-		"Request": request,
+		"Paths":              getPathParts(request),
+		"Files":              items,
+		"Cover":              a.getCover(request, files),
+		"Request":            request,
+		"ThumbnailLargeSize": a.thumbnailApp.LargeThumbnailSize(),
 	}), nil
 }

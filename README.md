@@ -361,6 +361,8 @@ Usage of fibr:
         [thumbnail] AMQP Routing Key for thumbnail {FIBR_THUMBNAIL_AMQP_THUMBNAIL_ROUTING_KEY} (default "thumbnail")
   -thumbnailDirectAccess
         [thumbnail] Use Vith with direct access to filesystem (no large file upload, send a GET request, Basic Auth recommended) {FIBR_THUMBNAIL_DIRECT_ACCESS}
+  -thumbnailLargeSize uint
+        [thumbnail] Size of large thumbnail for story display (thumbnail are always squared). 0 to disable {FIBR_THUMBNAIL_LARGE_SIZE} (default 800)
   -thumbnailMaxSize int
         [thumbnail] Maximum file size (in bytes) for generating thumbnail (0 to no limit). Not used if DirectAccess enabled. {FIBR_THUMBNAIL_MAX_SIZE} (default 209715200)
   -thumbnailMinBitrate uint

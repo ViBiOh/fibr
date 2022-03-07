@@ -101,8 +101,8 @@ func StorageToRender(item absto.Item, request Request) RenderItem {
 
 // StoryItem is a render item with
 type StoryItem struct {
-	RenderItem
 	Exif model.Exif
+	RenderItem
 }
 
 // StorageToStory converts Item to RenderItem

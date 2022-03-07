@@ -71,7 +71,7 @@ func (a App) List(ctx context.Context, request provider.Request, message rendere
 					}
 
 					if !hasStory {
-						hasStory = a.thumbnailApp.HasThumbnail(item, thumbnail.LargeSize)
+						hasStory = a.thumbnailApp.HasLargeThumbnail(item)
 					}
 				}
 

@@ -8,7 +8,6 @@ import (
 	"io"
 	"net/http"
 	"path"
-	"strconv"
 	"strings"
 	"time"
 
@@ -27,16 +26,9 @@ import (
 const (
 	// SmallSize is the square size of each thumbnail generated
 	SmallSize uint64 = 150
-
-	// LargeSize is the square size of each thumbnail generated for the story
-	LargeSize = 1000
 )
 
-var (
-	sizes = []uint64{SmallSize, LargeSize}
-
-	cacheDuration string = fmt.Sprintf("private, max-age=%.0f", time.Duration(time.Minute*5).Seconds())
-)
+var cacheDuration string = fmt.Sprintf("private, max-age=%.0f", time.Duration(time.Minute*5).Seconds())
 
 // App of package
 type App struct {
@@ -50,6 +42,9 @@ type App struct {
 	amqpThumbnailRoutingKey string
 
 	vithRequest request.Request
+
+	sizes     []uint64
+	largeSize uint64
 
 	maxSize      int64
 	minBitrate   uint64
@@ -69,6 +64,8 @@ type Config struct {
 	maxSize      *int64
 	minBitrate   *uint64
 	directAccess *bool
+
+	largeSize *uint64
 }
 
 // Flags adds flags for configuring package
@@ -85,6 +82,8 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 		amqpExchange:            flags.New(prefix, "thumbnail", "AmqpExchange").Default("fibr", nil).Label("AMQP Exchange Name").ToString(fs),
 		amqpStreamRoutingKey:    flags.New(prefix, "thumbnail", "AmqpStreamRoutingKey").Default("stream", nil).Label("AMQP Routing Key for stream").ToString(fs),
 		amqpThumbnailRoutingKey: flags.New(prefix, "thumbnail", "AmqpThumbnailRoutingKey").Default("thumbnail", nil).Label("AMQP Routing Key for thumbnail").ToString(fs),
+
+		largeSize: flags.New(prefix, "thumbnail", "LargeSize").Default(800, nil).Label("Size of large thumbnail for story display (thumbnail are always squared). 0 to disable").ToUint64(fs),
 	}
 }
 
@@ -97,6 +96,14 @@ func New(config Config, storage absto.Storage, prometheusRegisterer prometheus.R
 		if err := amqpClient.Publisher(amqpExchange, "direct", nil); err != nil {
 			return App{}, fmt.Errorf("unable to configure amqp: %s", err)
 		}
+	}
+
+	largeSize := *config.largeSize
+	var sizes []uint64
+	if largeSize > 0 {
+		sizes = []uint64{SmallSize, largeSize}
+	} else {
+		sizes = []uint64{SmallSize}
 	}
 
 	return App{
@@ -114,7 +121,15 @@ func New(config Config, storage absto.Storage, prometheusRegisterer prometheus.R
 		amqpClient:    amqpClient,
 		metric:        prom.CounterVec(prometheusRegisterer, "fibr", "thumbnail", "item", "type", "state"),
 		pathnameInput: make(chan absto.Item, 10),
+
+		largeSize: largeSize,
+		sizes:     sizes,
 	}, nil
+}
+
+// LargeThumbnailSize give large thumbnail size
+func (a App) LargeThumbnailSize() uint64 {
+	return a.largeSize
 }
 
 // Stream check if stream is present and serve it
@@ -145,11 +160,8 @@ func (a App) Serve(w http.ResponseWriter, r *http.Request, item absto.Item) {
 
 	scale := SmallSize
 	if rawScale := r.URL.Query().Get("scale"); len(rawScale) > 0 {
-		var err error
-		scale, err = strconv.ParseUint(rawScale, 10, 64)
-		if err != nil {
-			httperror.BadRequest(w, fmt.Errorf("unable to parse scale: %s", err))
-			return
+		if rawScale == "large" && a.largeSize > 0 {
+			scale = a.largeSize
 		}
 	}
 
@@ -220,7 +232,7 @@ func (a App) thumbnailHash(items []absto.Item) string {
 	hasher := sha.Stream()
 
 	for _, item := range items {
-		if info, err := a.storageApp.Info(getThumbnailPath(item, SmallSize)); err == nil {
+		if info, err := a.storageApp.Info(a.getThumbnailPath(item, SmallSize)); err == nil {
 			hasher.Write(info)
 		}
 	}

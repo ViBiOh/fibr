@@ -98,7 +98,7 @@ func TestHasThumbnail(t *testing.T) {
 				storageMock.EXPECT().Info(gomock.Any()).Return(absto.Item{}, nil)
 			}
 
-			if result := tc.instance.HasThumbnail(tc.input, LargeSize); result != tc.want {
+			if result := tc.instance.HasThumbnail(tc.input, SmallSize); result != tc.want {
 				t.Errorf("HasThumbnail() = %t, want %t", result, tc.want)
 			}
 		})
@@ -108,11 +108,13 @@ func TestHasThumbnail(t *testing.T) {
 func TestGetThumbnailPath(t *testing.T) {
 	cases := []struct {
 		intention string
+		instance  App
 		input     absto.Item
 		want      string
 	}{
 		{
 			"simple",
+			App{},
 			absto.Item{
 				ID:       "dd29ecf524b030a65261e3059c48ab9e1ecb2585",
 				Pathname: "/path/to/file.png",
@@ -123,7 +125,7 @@ func TestGetThumbnailPath(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.intention, func(t *testing.T) {
-			if result := getThumbnailPath(tc.input, SmallSize); result != tc.want {
+			if result := tc.instance.getThumbnailPath(tc.input, SmallSize); result != tc.want {
 				t.Errorf("getThumbnailPath() = %s, want %s", result, tc.want)
 			}
 		})

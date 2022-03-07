@@ -14,13 +14,22 @@ func (a App) CanHaveThumbnail(item absto.Item) bool {
 	return !item.IsDir && provider.ThumbnailExtensions[item.Extension] && (a.maxSize == 0 || item.Size < a.maxSize || a.directAccess)
 }
 
+// HasLargeThumbnail determine if large thumbnail exist for given pathname
+func (a App) HasLargeThumbnail(item absto.Item) bool {
+	if a.largeSize == 0 {
+		return false
+	}
+
+	return a.HasThumbnail(item, a.largeSize)
+}
+
 // HasThumbnail determine if thumbnail exist for given pathname
 func (a App) HasThumbnail(item absto.Item, scale uint64) bool {
 	if item.IsDir {
 		return false
 	}
 
-	_, err := a.storageApp.Info(getThumbnailPath(item, scale))
+	_, err := a.storageApp.Info(a.getThumbnailPath(item, scale))
 	return err == nil
 }
 
@@ -32,7 +41,7 @@ func (a App) ThumbnailInfo(item absto.Item, scale uint64) (thumbnailItem absto.I
 	}
 
 	var err error
-	thumbnailItem, err = a.storageApp.Info(getThumbnailPath(item, scale))
+	thumbnailItem, err = a.storageApp.Info(a.getThumbnailPath(item, scale))
 	ok = err == nil
 	return
 }
@@ -42,9 +51,9 @@ func (a App) GetChunk(pathname string) (absto.Item, error) {
 	return a.storageApp.Info(provider.MetadataDirectoryName + pathname)
 }
 
-func getThumbnailPath(item absto.Item, scale uint64) string {
+func (a App) getThumbnailPath(item absto.Item, scale uint64) string {
 	switch scale {
-	case LargeSize:
+	case a.largeSize:
 		item.ID = item.ID + "_large"
 	}
 

@@ -31,7 +31,7 @@ func (a App) generateItem(ctx context.Context, event provider.Event) {
 		return
 	}
 
-	for _, size := range sizes {
+	for _, size := range a.sizes {
 		if event.GetMetadata("force") == "true" || !a.HasThumbnail(event.Item, size) {
 			if err := a.generate(ctx, event.Item, size); err != nil {
 				logger.WithField("fn", "thumbnail.generate").WithField("item", event.Item.Pathname).Error("unable to generate for scale %d: %s", size, err)
@@ -51,13 +51,13 @@ func (a App) generateItem(ctx context.Context, event provider.Event) {
 }
 
 func (a App) rename(ctx context.Context, old, new absto.Item) {
-	for _, size := range sizes {
-		oldPath := getThumbnailPath(old, size)
+	for _, size := range a.sizes {
+		oldPath := a.getThumbnailPath(old, size)
 		if _, err := a.storageApp.Info(oldPath); absto.IsNotExist(err) {
 			return
 		}
 
-		if err := a.storageApp.Rename(oldPath, getThumbnailPath(new, size)); err != nil {
+		if err := a.storageApp.Rename(oldPath, a.getThumbnailPath(new, size)); err != nil {
 			logger.Error("unable to rename thumbnail: %s", err)
 		}
 
@@ -70,8 +70,8 @@ func (a App) rename(ctx context.Context, old, new absto.Item) {
 }
 
 func (a App) delete(ctx context.Context, item absto.Item) {
-	for _, size := range sizes {
-		if err := a.storageApp.Remove(getThumbnailPath(item, size)); err != nil {
+	for _, size := range a.sizes {
+		if err := a.storageApp.Remove(a.getThumbnailPath(item, size)); err != nil {
 			logger.Error("unable to delete thumbnail: %s", err)
 		}
 

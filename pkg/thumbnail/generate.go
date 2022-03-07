@@ -44,7 +44,7 @@ func (a App) generate(ctx context.Context, item absto.Item, scale uint64) (err e
 		return nil
 	}
 
-	err = provider.WriteToStorage(a.storageApp, getThumbnailPath(item, scale), resp.Body)
+	err = provider.WriteToStorage(a.storageApp, a.getThumbnailPath(item, scale), resp.Body)
 	if err == nil {
 		a.increaseMetric(itemType.String(), "save")
 	}
@@ -54,7 +54,7 @@ func (a App) generate(ctx context.Context, item absto.Item, scale uint64) (err e
 
 func (a App) requestVith(ctx context.Context, item absto.Item, scale uint64) (*http.Response, error) {
 	itemType := typeOfItem(item)
-	outputName := getThumbnailPath(item, scale)
+	outputName := a.getThumbnailPath(item, scale)
 
 	if a.amqpClient != nil {
 		a.increaseMetric(itemType.String(), "publish")
