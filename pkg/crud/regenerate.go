@@ -28,19 +28,25 @@ func (a App) Regenerate(w http.ResponseWriter, r *http.Request, request provider
 
 	if !info.IsDir {
 		a.error(w, r, request, model.WrapInvalid(errors.New("regenerate is only available for folder")))
+		return
 	}
 
-	if subset := r.FormValue("subset"); len(subset) != 0 {
-		go func() {
-			err := a.storageApp.Walk(pathname, func(item absto.Item) error {
-				a.notify(provider.NewRestartEvent(item, subset))
-				return nil
-			})
-			if err != nil {
-				logger.Error("error during regenerate of `%s`: %s", pathname, err)
-			}
-		}()
+	subset := r.FormValue("subset")
+
+	if len(subset) != 0 {
+		a.error(w, r, request, model.WrapInvalid(errors.New("regenerate need a subset")))
+		return
 	}
 
-	a.rendererApp.Redirect(w, r, "?stats", renderer.NewSuccessMessage("Regeneration in progress..."))
+	go func() {
+		err := a.storageApp.Walk(pathname, func(item absto.Item) error {
+			a.notify(provider.NewRestartEvent(item, subset))
+			return nil
+		})
+		if err != nil {
+			logger.Error("error during regenerate of `%s`: %s", pathname, err)
+		}
+	}()
+
+	a.rendererApp.Redirect(w, r, "?stats", renderer.NewSuccessMessage("Regeneration of %s in progress...", subset))
 }

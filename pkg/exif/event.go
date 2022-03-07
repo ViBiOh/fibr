@@ -46,7 +46,7 @@ func (a App) handleStartEvent(ctx context.Context, event provider.Event) error {
 		return nil
 	}
 
-	if force := event.GetMetadata("force"); force != "all" && force != "exif" {
+	if force := event.GetMetadata("force"); len(force) > 0 && force != "all" && force != "exif" {
 		return nil
 	}
 
