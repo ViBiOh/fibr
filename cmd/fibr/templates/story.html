@@ -151,7 +151,7 @@
                 {{- end }} {{ index .Exif.Geocode.Address "country" }}
               {{- end }}
 
-              {{- if not .Exif.Date.IsZero }}, {{ .Exif.Date.Format "Monday _2 January at 15:04:05 2006 MST" }}{{- end }}
+              {{- if not .Exif.Date.IsZero }}, <span class="date">{{ .Exif.Date.Format "Monday _2 January 15:04:05 2006 MST" }}</span>{{- end }}
             </p>
 
             {{ if index .Exif.Data "Model" }}
