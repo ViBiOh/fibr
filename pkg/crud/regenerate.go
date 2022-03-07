@@ -30,15 +30,17 @@ func (a App) Regenerate(w http.ResponseWriter, r *http.Request, request provider
 		a.error(w, r, request, model.WrapInvalid(errors.New("regenerate is only available for folder")))
 	}
 
-	go func() {
-		err := a.storageApp.Walk(pathname, func(item absto.Item) error {
-			a.notify(provider.NewRestartEvent(item))
-			return nil
-		})
-		if err != nil {
-			logger.Error("error during regenerate of `%s`: %s", pathname, err)
-		}
-	}()
+	if subset := r.FormValue("subset"); len(subset) != 0 {
+		go func() {
+			err := a.storageApp.Walk(pathname, func(item absto.Item) error {
+				a.notify(provider.NewRestartEvent(item, subset))
+				return nil
+			})
+			if err != nil {
+				logger.Error("error during regenerate of `%s`: %s", pathname, err)
+			}
+		}()
+	}
 
 	a.rendererApp.Redirect(w, r, "?stats", renderer.NewSuccessMessage("Regeneration in progress..."))
 }

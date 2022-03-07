@@ -27,8 +27,25 @@
   {{ if .Request.CanEdit }}
     <form method="post" action="#">
       <input type="hidden" name="method" value="TRACE" />
+      <input type="hidden" name="subset" value="thumbnail" />
       <p class="padding no-margin center">
-        <button type="submit" class="button bg-primary">Regenerate</button>
+        <button type="submit" class="button bg-primary">Regenerate Thumbnail</button>
+      </p>
+    </form>
+
+    <form method="post" action="#">
+      <input type="hidden" name="method" value="TRACE" />
+      <input type="hidden" name="subset" value="exif" />
+      <p class="padding no-margin center">
+        <button type="submit" class="button bg-primary">Regenerate Exif</button>
+      </p>
+    </form>
+
+    <form method="post" action="#">
+      <input type="hidden" name="method" value="TRACE" />
+      <input type="hidden" name="subset" value="all" />
+      <p class="padding no-margin center">
+        <button type="submit" class="button bg-danger">Regenerate all metadatas</button>
       </p>
     </form>
   {{ end }}

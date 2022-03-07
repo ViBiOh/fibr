@@ -31,15 +31,20 @@ func (a App) generateItem(ctx context.Context, event provider.Event) {
 		return
 	}
 
+	var forced bool
+	if force := event.GetMetadata("force"); force == "all" || force == "thumbnail" {
+		forced = true
+	}
+
 	for _, size := range a.sizes {
-		if event.GetMetadata("force") == "true" || !a.HasThumbnail(event.Item, size) {
+		if forced || !a.HasThumbnail(event.Item, size) {
 			if err := a.generate(ctx, event.Item, size); err != nil {
 				logger.WithField("fn", "thumbnail.generate").WithField("item", event.Item.Pathname).Error("unable to generate for scale %d: %s", size, err)
 			}
 		}
 	}
 
-	if provider.VideoExtensions[event.Item.Extension] != "" && (event.GetMetadata("force") == "true" || !a.HasStream(event.Item)) {
+	if provider.VideoExtensions[event.Item.Extension] != "" && (forced || !a.HasStream(event.Item)) {
 		if needStream, err := a.shouldGenerateStream(ctx, event.Item); err != nil {
 			logger.Error("unable to determine if stream generation is possible: %s", err)
 		} else if needStream {

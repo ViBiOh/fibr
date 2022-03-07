@@ -208,13 +208,13 @@ func NewStartEvent(item absto.Item) Event {
 }
 
 // NewRestartEvent creates a new restart event
-func NewRestartEvent(item absto.Item) Event {
+func NewRestartEvent(item absto.Item, subset string) Event {
 	return Event{
 		Time: time.Now(),
 		Type: StartEvent,
 		Item: item,
 		Metadata: map[string]string{
-			"force": "true",
+			"force": subset,
 		},
 	}
 }

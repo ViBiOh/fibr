@@ -42,7 +42,11 @@ func getEventLogger(item absto.Item) logger.Provider {
 
 func (a App) handleStartEvent(ctx context.Context, event provider.Event) error {
 	item := event.Item
-	if a.hasMetadata(item) && event.GetMetadata("force") != "true" {
+	if a.hasMetadata(item) {
+		return nil
+	}
+
+	if force := event.GetMetadata("force"); force != "all" && force != "exif" {
 		return nil
 	}
 
