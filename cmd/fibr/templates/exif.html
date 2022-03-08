@@ -35,7 +35,7 @@
 
         {{ if not .Exif.Date.IsZero }}
           <p class="padding no-margin code">
-            <strong>Date:</strong> {{ .Exif.Date }}<br>
+            <strong>Date:</strong> {{ .Exif.Date.Format "2006-01-02T15:04:05Z07:00" }}<br>
           </p>
         {{ end }}
 
