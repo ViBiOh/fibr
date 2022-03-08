@@ -71,6 +71,10 @@
       margin-right: 0.5rem;
     }
 
+    .margin-left-half {
+      margin-left: 0.5rem;
+    }
+
     {{ if .Request.CanEdit }}
       {{ range .Files }}
         #desc-modal-{{ .ID }}:target,
@@ -138,22 +142,24 @@
               <p>
                 {{ if not .Exif.Geocode.IsZero }}
                   <img class="icon icon-bottom margin-right-half" src="{{ url "/svg/location?fill=#272727" }}" alt="Location">
-
-                  {{ if index .Exif.Geocode.Address "city_district" }}
-                    {{ index .Exif.Geocode.Address "city_district" }},
-                  {{ else }}
-                    {{ if index .Exif.Geocode.Address "village" }}
-                      {{ index .Exif.Geocode.Address "village" }},
+                  <span class="location">
+                    {{ if index .Exif.Geocode.Address "city_district" }}
+                      {{ index .Exif.Geocode.Address "city_district" }},
                     {{ else }}
-                      {{ if index .Exif.Geocode.Address "county" }}
-                        {{ index .Exif.Geocode.Address "county" }},
+                      {{ if index .Exif.Geocode.Address "village" }}
+                        {{ index .Exif.Geocode.Address "village" }},
+                      {{ else }}
+                        {{ if index .Exif.Geocode.Address "county" }}
+                          {{ index .Exif.Geocode.Address "county" }},
+                        {{- end }}
                       {{- end }}
-                    {{- end }}
-                  {{- end }} {{ index .Exif.Geocode.Address "country" }}
-                {{ end }}
+                    {{- end }} {{ index .Exif.Geocode.Address "country" }}
+                  {{ end }}
+                </span>
 
                 {{ if not .Exif.Date.IsZero }}
-                  <img class="icon icon-bottom margin-right-half" src="{{ url "/svg/calendar?fill=#272727" }}" alt="Location"> <span class="date">{{ .Exif.Date.Format "Monday _2 January 15:04:05 2006 MST" }}</span>
+                  <img class="icon icon-bottom margin-right-half{{ if not .Exif.Geocode.IsZero }} margin-left-half{{ end }}" src="{{ url "/svg/calendar?fill=#272727" }}" alt="Location">
+                  <span class="date">{{ .Exif.Date.Format "Monday _2 January 15:04:05 2006 MST" }}</span>
                 {{ end }}
               </p>
             {{ end }}
