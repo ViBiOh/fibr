@@ -59,7 +59,8 @@
     .description {
       background-color: var(--white);
       color: var(--dark);
-      min-height: 5.5rem;
+      min-height: 5rem;
+      padding: 0 1rem;
       width: 100%;
     }
 
@@ -100,14 +101,14 @@
 
     .desc-edit {
       position: absolute;
-      right: 5rem;
-      bottom: 0.5rem;
+      right: 4.75rem;
+      bottom: 0.25rem;
     }
 
     .permalink {
       position: absolute;
-      right: 0.5rem;
-      bottom: 0.5rem;
+      right: 0.25rem;
+      bottom: 0.25rem;
     }
   </style>
 
@@ -137,7 +138,7 @@
             {{ end }}
           </a>
 
-          <div class="description relative padding">
+          <div class="description relative">
             {{ if or (not .Exif.Geocode.IsZero) (not .Exif.Date.IsZero) }}
               <p>
                 {{ if not .Exif.Geocode.IsZero }}
