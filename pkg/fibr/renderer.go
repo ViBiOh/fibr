@@ -29,6 +29,12 @@ func FuncMap(thumbnailApp thumbnail.App) template.FuncMap {
 		"join": func(arr []string) string {
 			return strings.Join(arr, ",")
 		},
+		"splitLines": func(value string) []string {
+			return strings.Split(value, "\n")
+		},
+		"add": func(a, b int) int {
+			return a + b
+		},
 		"contains": func(arr []string, value string) bool {
 			for _, item := range arr {
 				if item == value {

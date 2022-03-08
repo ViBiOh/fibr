@@ -64,8 +64,17 @@
       width: 100%;
     }
 
-    .no-margin-bottom {
+    .description-content {
       margin-bottom: 0;
+      margin-top: 0;
+    }
+
+    .margin-top {
+      margin-top: 1.6rem;
+    }
+
+    .margin-bottom {
+      margin-bottom: 1.6rem;
     }
 
     .margin-right-half {
@@ -173,7 +182,12 @@
             {{ end }}
 
             {{ if .Exif.Description }}
-              <p>{{ .Exif.Description }}</p>
+              {{ $lines := splitLines .Exif.Description }}
+              {{ $linesLen := add (len $lines) -1 }}
+
+              {{ range $i, $value := $lines }}
+                <p class="description-content {{ if eq $i 0 }}margin-top{{ end }}{{ if eq $linesLen $i }} margin-bottom{{ end }}">{{ . }}</p>
+              {{ end }}
             {{ end }}
 
             {{ if $root.Request.CanEdit }}
