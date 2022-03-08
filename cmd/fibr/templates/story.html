@@ -59,6 +59,7 @@
     .description {
       background-color: var(--white);
       color: var(--dark);
+      min-height: 5.5rem;
       width: 100%;
     }
 
@@ -133,26 +134,29 @@
           </a>
 
           <div class="description relative padding">
-            <p>
-              <img class="icon icon-bottom margin-right-half" src="{{ url "/svg/location?fill=#272727" }}" alt="Location">
-              {{- if .Exif.Geocode.IsZero }}
-                Unknown
-              {{- else }}
-                {{ if index .Exif.Geocode.Address "city_district" }}
-                  {{ index .Exif.Geocode.Address "city_district" }},
-                {{ else }}
-                  {{ if index .Exif.Geocode.Address "village" }}
-                    {{ index .Exif.Geocode.Address "village" }},
-                  {{ else }}
-                    {{ if index .Exif.Geocode.Address "county" }}
-                      {{ index .Exif.Geocode.Address "county" }},
-                    {{- end }}
-                  {{- end }}
-                {{- end }} {{ index .Exif.Geocode.Address "country" }}
-              {{- end }}
+            {{ if or (not .Exif.Geocode.IsZero) (not .Exif.Date.IsZero) }}
+              <p>
+                {{ if not .Exif.Geocode.IsZero }}
+                  <img class="icon icon-bottom margin-right-half" src="{{ url "/svg/location?fill=#272727" }}" alt="Location">
 
-              {{- if not .Exif.Date.IsZero }}, <span class="date">{{ .Exif.Date.Format "Monday _2 January 15:04:05 2006 MST" }}</span>{{- end }}
-            </p>
+                  {{ if index .Exif.Geocode.Address "city_district" }}
+                    {{ index .Exif.Geocode.Address "city_district" }},
+                  {{ else }}
+                    {{ if index .Exif.Geocode.Address "village" }}
+                      {{ index .Exif.Geocode.Address "village" }},
+                    {{ else }}
+                      {{ if index .Exif.Geocode.Address "county" }}
+                        {{ index .Exif.Geocode.Address "county" }},
+                      {{- end }}
+                    {{- end }}
+                  {{- end }} {{ index .Exif.Geocode.Address "country" }}
+                {{ end }}
+
+                {{ if not .Exif.Date.IsZero }}
+                  <img class="icon icon-bottom margin-right-half" src="{{ url "/svg/calendar?fill=#272727" }}" alt="Location"> <span class="date">{{ .Exif.Date.Format "Monday _2 January 15:04:05 2006 MST" }}</span>
+                {{ end }}
+              </p>
+            {{ end }}
 
             {{ if index .Exif.Data "Model" }}
               <p>
