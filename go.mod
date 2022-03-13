@@ -4,17 +4,17 @@ go 1.17
 
 require (
 	github.com/ViBiOh/absto v0.1.5
-	github.com/ViBiOh/auth/v2 v2.11.42
+	github.com/ViBiOh/auth/v2 v2.11.43
 	github.com/ViBiOh/exas v0.3.3
 	github.com/ViBiOh/flags v0.0.1
-	github.com/ViBiOh/httputils/v4 v4.37.1
+	github.com/ViBiOh/httputils/v4 v4.37.2
 	github.com/ViBiOh/vith v0.4.2
 	github.com/golang/mock v1.6.0
 	github.com/prometheus/client_golang v1.12.1
 	github.com/streadway/amqp v1.0.0
 	go.opentelemetry.io/otel v1.4.1
 	go.opentelemetry.io/otel/trace v1.4.1
-	golang.org/x/crypto v0.0.0-20220214200702-86341886e292
+	golang.org/x/crypto v0.0.0-20220307211146-efcb8507fb70
 	golang.org/x/text v0.3.7
 )
 
@@ -50,7 +50,7 @@ require (
 	go.opentelemetry.io/otel/metric v0.27.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.4.1 // indirect
 	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
-	golang.org/x/sys v0.0.0-20220209214540-3681064d5158 // indirect
+	golang.org/x/sys v0.0.0-20220310020820-b874c991c1a5 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
 	gopkg.in/ini.v1 v1.66.4 // indirect
 )
