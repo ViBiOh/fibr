@@ -114,7 +114,7 @@ func New(config Config, storage absto.Storage, rendererApp renderer.App, shareAp
 	}
 
 	app.storageApp = storage.WithIgnoreFn(func(item absto.Item) bool {
-		if item.IsDir && item.Name == provider.MetadataDirectoryName {
+		if strings.HasPrefix(item.Pathname, provider.MetadataDirectoryName) {
 			return true
 		}
 
