@@ -33,8 +33,8 @@ cloud.google.com/go/storage v1.10.0/go.mod h1:FLPqc6j+Ki4BU591ie1oL6qBQGu2Bl/tZ9
 dmitri.shuralyov.com/gpu/mtl v0.0.0-20190408044501-666a987793e9/go.mod h1:H6x//7gZCb22OMCxBHrMx7a5I7Hp++hsVxbQ4BYO7hU=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
-github.com/ViBiOh/absto v0.1.5 h1:oSOgLZIoaXFLs27AXf4VllomIswoQMRlHfy0fT0Iork=
-github.com/ViBiOh/absto v0.1.5/go.mod h1:is8PR00CnpvlFlkAVXcItbbDwtsWO8qC9iuSLmDgJTE=
+github.com/ViBiOh/absto v0.2.0 h1:kmknAw6YOFhDW5M9LokQusWYJkZzEPsbiaGgwUaZenU=
+github.com/ViBiOh/absto v0.2.0/go.mod h1:PGrWjMx1mBMr/xSQiCl4JbpWEIa+g1DHkrZ4emDKRTQ=
 github.com/ViBiOh/auth/v2 v2.11.44 h1:MHI4fOdNoQATmBQgP6nQ2c5q+Sa7kK+5bt8+8mAyIKM=
 github.com/ViBiOh/auth/v2 v2.11.44/go.mod h1:7i3R41YhonhvGHY19RQatMx5U2MgzKxlQ19+1yFz0cY=
 github.com/ViBiOh/exas v0.3.3 h1:xGLY6MOu4N3de2N6/LKwTDLwffNDqwjsLDnAfi6DfIU=
@@ -412,6 +412,8 @@ golang.org/x/sys v0.0.0-20220114195835-da31bd327af9/go.mod h1:oPkhp1MJrh7nUepCBc
 golang.org/x/sys v0.0.0-20220310020820-b874c991c1a5 h1:y/woIyUBFbpQGKS0u1aHF/40WUDnek3fPOyD08H5Vng=
 golang.org/x/sys v0.0.0-20220310020820-b874c991c1a5/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1/go.mod h1:bj7SfCRtBDWHUb9snDiAeCFNEtKQo2Wmx5Cou7ajbmo=
+golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 h1:JGgROgKl9N8DuW20oFS5gxc+lE67/N3FcwmBPMe7ArY=
+golang.org/x/term v0.0.0-20210927222741-03fcf44c2211/go.mod h1:jbD1KX2456YbFQfuXm/mYQcufACuNUgVhRMnK/tPxf8=
 golang.org/x/text v0.0.0-20170915032832-14c0d48ead0c/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
 golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
 golang.org/x/text v0.3.1-0.20180807135948-17ff2d5776d2/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=

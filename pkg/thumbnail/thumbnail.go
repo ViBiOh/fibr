@@ -2,6 +2,7 @@ package thumbnail
 
 import (
 	"bytes"
+	"context"
 	"encoding/base64"
 	"flag"
 	"fmt"
@@ -134,12 +135,14 @@ func (a App) LargeThumbnailSize() uint64 {
 
 // Stream check if stream is present and serve it
 func (a App) Stream(w http.ResponseWriter, r *http.Request, item absto.Item) {
-	if !a.HasStream(item) {
+	ctx := r.Context()
+
+	if !a.HasStream(ctx, item) {
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 
-	reader, err := a.storageApp.ReadFrom(getStreamPath(item))
+	reader, err := a.storageApp.ReadFrom(ctx, getStreamPath(item))
 	if err != nil {
 		httperror.InternalServerError(w, err)
 		return
@@ -165,13 +168,15 @@ func (a App) Serve(w http.ResponseWriter, r *http.Request, item absto.Item) {
 		}
 	}
 
-	thumbnailInfo, ok := a.ThumbnailInfo(item, scale)
+	ctx := r.Context()
+
+	thumbnailInfo, ok := a.ThumbnailInfo(ctx, item, scale)
 	if !ok {
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 
-	reader, err := a.storageApp.ReadFrom(thumbnailInfo.Pathname)
+	reader, err := a.storageApp.ReadFrom(ctx, thumbnailInfo.Pathname)
 	if err != nil {
 		httperror.InternalServerError(w, err)
 		return
@@ -192,7 +197,9 @@ func (a App) List(w http.ResponseWriter, r *http.Request, items []absto.Item) {
 		return
 	}
 
-	etag, ok := provider.EtagMatch(w, r, a.thumbnailHash(items))
+	ctx := r.Context()
+
+	etag, ok := provider.EtagMatch(w, r, a.thumbnailHash(ctx, items))
 	if ok {
 		return
 	}
@@ -201,7 +208,7 @@ func (a App) List(w http.ResponseWriter, r *http.Request, items []absto.Item) {
 	w.Header().Add("Etag", etag)
 	w.WriteHeader(http.StatusOK)
 
-	done := r.Context().Done()
+	done := ctx.Done()
 	isDone := func() bool {
 		select {
 		case <-done:
@@ -216,23 +223,23 @@ func (a App) List(w http.ResponseWriter, r *http.Request, items []absto.Item) {
 			return
 		}
 
-		thumbnailInfo, ok := a.ThumbnailInfo(item, SmallSize)
+		thumbnailInfo, ok := a.ThumbnailInfo(ctx, item, SmallSize)
 		if !ok {
 			continue
 		}
 
 		provider.DoneWriter(isDone, w, item.ID)
 		provider.DoneWriter(isDone, w, `,`)
-		a.encodeContent(base64.NewEncoder(base64.StdEncoding, w), thumbnailInfo)
+		a.encodeContent(ctx, base64.NewEncoder(base64.StdEncoding, w), thumbnailInfo)
 		provider.DoneWriter(isDone, w, "\n")
 	}
 }
 
-func (a App) thumbnailHash(items []absto.Item) string {
+func (a App) thumbnailHash(ctx context.Context, items []absto.Item) string {
 	hasher := sha.Stream()
 
 	for _, item := range items {
-		if info, err := a.storageApp.Info(a.getThumbnailPath(item, SmallSize)); err == nil {
+		if info, err := a.storageApp.Info(ctx, a.getThumbnailPath(item, SmallSize)); err == nil {
 			hasher.Write(info)
 		}
 	}
@@ -240,10 +247,10 @@ func (a App) thumbnailHash(items []absto.Item) string {
 	return hasher.Sum()
 }
 
-func (a App) encodeContent(encoder io.WriteCloser, item absto.Item) {
+func (a App) encodeContent(ctx context.Context, encoder io.WriteCloser, item absto.Item) {
 	defer provider.LogClose(encoder, "thumbnail.encodeContent", "encoder")
 
-	reader, err := a.storageApp.ReadFrom(item.Pathname)
+	reader, err := a.storageApp.ReadFrom(ctx, item.Pathname)
 	if err != nil {
 		logEncodeContentError(item).Error("unable to open: %s", err)
 		return

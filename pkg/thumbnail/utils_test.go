@@ -1,6 +1,7 @@
 package thumbnail
 
 import (
+	"context"
 	"testing"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
@@ -95,10 +96,10 @@ func TestHasThumbnail(t *testing.T) {
 			tc.instance.storageApp = storageMock
 
 			if tc.intention == "found" {
-				storageMock.EXPECT().Info(gomock.Any()).Return(absto.Item{}, nil)
+				storageMock.EXPECT().Info(gomock.Any(), gomock.Any()).Return(absto.Item{}, nil)
 			}
 
-			if result := tc.instance.HasThumbnail(tc.input, SmallSize); result != tc.want {
+			if result := tc.instance.HasThumbnail(context.Background(), tc.input, SmallSize); result != tc.want {
 				t.Errorf("HasThumbnail() = %t, want %t", result, tc.want)
 			}
 		})

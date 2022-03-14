@@ -1,6 +1,7 @@
 package thumbnail
 
 import (
+	"context"
 	"fmt"
 	"path/filepath"
 
@@ -15,40 +16,40 @@ func (a App) CanHaveThumbnail(item absto.Item) bool {
 }
 
 // HasLargeThumbnail determine if large thumbnail exist for given pathname
-func (a App) HasLargeThumbnail(item absto.Item) bool {
+func (a App) HasLargeThumbnail(ctx context.Context, item absto.Item) bool {
 	if a.largeSize == 0 {
 		return false
 	}
 
-	return a.HasThumbnail(item, a.largeSize)
+	return a.HasThumbnail(ctx, item, a.largeSize)
 }
 
 // HasThumbnail determine if thumbnail exist for given pathname
-func (a App) HasThumbnail(item absto.Item, scale uint64) bool {
+func (a App) HasThumbnail(ctx context.Context, item absto.Item, scale uint64) bool {
 	if item.IsDir {
 		return false
 	}
 
-	_, err := a.storageApp.Info(a.getThumbnailPath(item, scale))
+	_, err := a.storageApp.Info(ctx, a.getThumbnailPath(item, scale))
 	return err == nil
 }
 
 // ThumbnailInfo determine if thumbnail exist for given pathname and provide detail about it
-func (a App) ThumbnailInfo(item absto.Item, scale uint64) (thumbnailItem absto.Item, ok bool) {
+func (a App) ThumbnailInfo(ctx context.Context, item absto.Item, scale uint64) (thumbnailItem absto.Item, ok bool) {
 	if item.IsDir {
 		ok = false
 		return
 	}
 
 	var err error
-	thumbnailItem, err = a.storageApp.Info(a.getThumbnailPath(item, scale))
+	thumbnailItem, err = a.storageApp.Info(ctx, a.getThumbnailPath(item, scale))
 	ok = err == nil
 	return
 }
 
 // GetChunk retrieve the storage item in the metadata
-func (a App) GetChunk(pathname string) (absto.Item, error) {
-	return a.storageApp.Info(provider.MetadataDirectoryName + pathname)
+func (a App) GetChunk(ctx context.Context, pathname string) (absto.Item, error) {
+	return a.storageApp.Info(ctx, provider.MetadataDirectoryName+pathname)
 }
 
 func (a App) getThumbnailPath(item absto.Item, scale uint64) string {

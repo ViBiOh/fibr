@@ -47,7 +47,7 @@ func (a *App) List() (webhooks []provider.Webhook) {
 func (a *App) Create(ctx context.Context, pathname string, recursive bool, kind provider.WebhookKind, url string, types []provider.EventType) (string, error) {
 	var id string
 
-	return id, a.Exclusive(ctx, a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) (err error) {
+	return id, a.Exclusive(ctx, a.amqpExclusiveRoutingKey, semaphoreDuration, func(ctx context.Context) (err error) {
 		id, err = a.generateID()
 		if err != nil {
 			return fmt.Errorf("unable to generate id: %s", err)
@@ -64,7 +64,7 @@ func (a *App) Create(ctx context.Context, pathname string, recursive bool, kind 
 
 		a.webhooks[id] = webhook
 
-		if err = provider.SaveJSON(a.storageApp, webhookFilename, a.webhooks); err != nil {
+		if err = provider.SaveJSON(ctx, a.storageApp, webhookFilename, a.webhooks); err != nil {
 			return fmt.Errorf("unable to save webhooks: %s", err)
 		}
 
@@ -81,14 +81,14 @@ func (a *App) Create(ctx context.Context, pathname string, recursive bool, kind 
 // Delete a webhook
 func (a *App) Delete(ctx context.Context, id string) error {
 	return a.Exclusive(ctx, a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
-		return a.delete(id)
+		return a.delete(ctx, id)
 	})
 }
 
-func (a *App) delete(id string) error {
+func (a *App) delete(ctx context.Context, id string) error {
 	delete(a.webhooks, id)
 
-	if err := provider.SaveJSON(a.storageApp, webhookFilename, a.webhooks); err != nil {
+	if err := provider.SaveJSON(ctx, a.storageApp, webhookFilename, a.webhooks); err != nil {
 		return fmt.Errorf("unable to save webhooks: %s", err)
 	}
 

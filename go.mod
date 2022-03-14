@@ -3,7 +3,7 @@ module github.com/ViBiOh/fibr
 go 1.17
 
 require (
-	github.com/ViBiOh/absto v0.1.5
+	github.com/ViBiOh/absto v0.2.0
 	github.com/ViBiOh/auth/v2 v2.11.44
 	github.com/ViBiOh/exas v0.3.3
 	github.com/ViBiOh/flags v0.0.1
@@ -51,6 +51,7 @@ require (
 	go.opentelemetry.io/otel/sdk v1.4.1 // indirect
 	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
 	golang.org/x/sys v0.0.0-20220310020820-b874c991c1a5 // indirect
+	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
 	gopkg.in/ini.v1 v1.66.4 // indirect
 )

@@ -1,6 +1,7 @@
 package crud
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"mime/multipart"
@@ -13,7 +14,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
-func (a App) saveUploadedFile(request provider.Request, inputName string, part *multipart.Part) (filename string, err error) {
+func (a App) saveUploadedFile(ctx context.Context, request provider.Request, inputName string, part *multipart.Part) (filename string, err error) {
 	var filePath string
 
 	if !request.Share.IsZero() && request.Share.File {
@@ -33,11 +34,11 @@ func (a App) saveUploadedFile(request provider.Request, inputName string, part *
 		filePath = request.SubPath(filename)
 	}
 
-	err = provider.WriteToStorage(a.storageApp, filePath, part)
+	err = provider.WriteToStorage(ctx, a.storageApp, filePath, part)
 
 	if err == nil {
 		go func() {
-			if info, infoErr := a.storageApp.Info(filePath); infoErr != nil {
+			if info, infoErr := a.storageApp.Info(context.Background(), filePath); infoErr != nil {
 				logger.Error("unable to get info for upload event: %s", infoErr)
 			} else {
 				a.notify(provider.NewUploadEvent(request, info, a.bestSharePath(filePath), a.rendererApp))
@@ -72,7 +73,9 @@ func (a App) Upload(w http.ResponseWriter, r *http.Request, request provider.Req
 		return
 	}
 
-	filename, err := a.saveUploadedFile(request, values["filename"], part)
+	ctx := r.Context()
+
+	filename, err := a.saveUploadedFile(ctx, request, values["filename"], part)
 	if err != nil {
 		a.error(w, r, request, model.WrapInternal(err))
 		return
@@ -80,7 +83,7 @@ func (a App) Upload(w http.ResponseWriter, r *http.Request, request provider.Req
 
 	var shareID string
 	if shared {
-		id, err := a.shareApp.Create(r.Context(), path.Join(request.Path, filename), false, "", false, duration)
+		id, err := a.shareApp.Create(ctx, path.Join(request.Path, filename), false, "", false, duration)
 		if err != nil {
 			a.error(w, r, request, model.WrapInternal(err))
 			return

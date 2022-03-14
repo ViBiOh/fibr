@@ -124,7 +124,7 @@ func (a App) searchFiles(r *http.Request, request provider.Request) (items []abs
 		return nil, httpModel.WrapInvalid(err)
 	}
 
-	err = a.storageApp.Walk(request.Filepath(), func(item absto.Item) error {
+	err = a.storageApp.Walk(r.Context(), request.Filepath(), func(item absto.Item) error {
 		if item.IsDir || !criterions.match(item) {
 			return nil
 		}
@@ -153,7 +153,7 @@ func (a App) search(r *http.Request, request provider.Request, files []absto.Ite
 	for i, item := range files {
 		renderItem := provider.StorageToRender(item, request)
 
-		if renderWithThumbnail && a.thumbnailApp.CanHaveThumbnail(item) && a.thumbnailApp.HasThumbnail(item, thumbnail.SmallSize) {
+		if renderWithThumbnail && a.thumbnailApp.CanHaveThumbnail(item) && a.thumbnailApp.HasThumbnail(ctx, item, thumbnail.SmallSize) {
 			renderItem.HasThumbnail = true
 		}
 
@@ -169,7 +169,7 @@ func (a App) search(r *http.Request, request provider.Request, files []absto.Ite
 	return renderer.NewPage("search", http.StatusOK, map[string]interface{}{
 		"Paths":   getPathParts(request),
 		"Files":   items,
-		"Cover":   a.getCover(request, files),
+		"Cover":   a.getCover(ctx, request, files),
 		"Search":  r.URL.Query(),
 		"Request": request,
 		"HasMap":  hasMap,

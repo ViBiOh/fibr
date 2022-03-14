@@ -27,7 +27,7 @@ func (a App) Browser(ctx context.Context, w http.ResponseWriter, request provide
 
 	if request.Share.IsZero() || !request.Share.File {
 		wg.Go(func() {
-			files, previous, next = a.getFilesPreviousAndNext(item, request)
+			files, previous, next = a.getFilesPreviousAndNext(ctx, item, request)
 		})
 	} else {
 		files = []absto.Item{item}
@@ -44,7 +44,7 @@ func (a App) Browser(ctx context.Context, w http.ResponseWriter, request provide
 	wg.Wait()
 
 	renderItem := provider.StorageToRender(item, request)
-	if a.thumbnailApp.CanHaveThumbnail(item) && a.thumbnailApp.HasThumbnail(item, thumbnail.SmallSize) {
+	if a.thumbnailApp.CanHaveThumbnail(item) && a.thumbnailApp.HasThumbnail(ctx, item, thumbnail.SmallSize) {
 		renderItem.HasThumbnail = true
 	}
 
@@ -52,8 +52,8 @@ func (a App) Browser(ctx context.Context, w http.ResponseWriter, request provide
 		"Paths":     getPathParts(request),
 		"File":      renderItem,
 		"Exif":      exif,
-		"Cover":     a.getCover(request, files),
-		"HasStream": renderItem.IsVideo() && a.thumbnailApp.HasStream(item),
+		"Cover":     a.getCover(ctx, request, files),
+		"HasStream": renderItem.IsVideo() && a.thumbnailApp.HasStream(ctx, item),
 
 		"Previous": previous,
 		"Next":     next,
@@ -63,9 +63,9 @@ func (a App) Browser(ctx context.Context, w http.ResponseWriter, request provide
 	}), nil
 }
 
-func (a App) getFilesPreviousAndNext(item absto.Item, request provider.Request) (items []absto.Item, previous provider.RenderItem, next provider.RenderItem) {
+func (a App) getFilesPreviousAndNext(ctx context.Context, item absto.Item, request provider.Request) (items []absto.Item, previous provider.RenderItem, next provider.RenderItem) {
 	var err error
-	items, err = a.storageApp.List(item.Dir())
+	items, err = a.storageApp.List(ctx, item.Dir())
 	if err != nil {
 		logger.WithField("item", item.Pathname).Error("unable to list neighbors files: %s", err)
 		return

@@ -37,14 +37,14 @@ func (a App) generateItem(ctx context.Context, event provider.Event) {
 	}
 
 	for _, size := range a.sizes {
-		if forced || !a.HasThumbnail(event.Item, size) {
+		if forced || !a.HasThumbnail(ctx, event.Item, size) {
 			if err := a.generate(ctx, event.Item, size); err != nil {
 				logger.WithField("fn", "thumbnail.generate").WithField("item", event.Item.Pathname).Error("unable to generate for scale %d: %s", size, err)
 			}
 		}
 	}
 
-	if provider.VideoExtensions[event.Item.Extension] != "" && (forced || !a.HasStream(event.Item)) {
+	if provider.VideoExtensions[event.Item.Extension] != "" && (forced || !a.HasStream(ctx, event.Item)) {
 		if needStream, err := a.shouldGenerateStream(ctx, event.Item); err != nil {
 			logger.Error("unable to determine if stream generation is possible: %s", err)
 		} else if needStream {
@@ -58,15 +58,15 @@ func (a App) generateItem(ctx context.Context, event provider.Event) {
 func (a App) rename(ctx context.Context, old, new absto.Item) {
 	for _, size := range a.sizes {
 		oldPath := a.getThumbnailPath(old, size)
-		if _, err := a.storageApp.Info(oldPath); absto.IsNotExist(err) {
+		if _, err := a.storageApp.Info(ctx, oldPath); absto.IsNotExist(err) {
 			return
 		}
 
-		if err := a.storageApp.Rename(oldPath, a.getThumbnailPath(new, size)); err != nil {
+		if err := a.storageApp.Rename(ctx, oldPath, a.getThumbnailPath(new, size)); err != nil {
 			logger.Error("unable to rename thumbnail: %s", err)
 		}
 
-		if provider.VideoExtensions[old.Extension] != "" && a.HasStream(old) {
+		if provider.VideoExtensions[old.Extension] != "" && a.HasStream(ctx, old) {
 			if err := a.renameStream(ctx, old, new); err != nil {
 				logger.Error("unable to rename stream: %s", err)
 			}
@@ -76,11 +76,11 @@ func (a App) rename(ctx context.Context, old, new absto.Item) {
 
 func (a App) delete(ctx context.Context, item absto.Item) {
 	for _, size := range a.sizes {
-		if err := a.storageApp.Remove(a.getThumbnailPath(item, size)); err != nil {
+		if err := a.storageApp.Remove(ctx, a.getThumbnailPath(item, size)); err != nil {
 			logger.Error("unable to delete thumbnail: %s", err)
 		}
 
-		if provider.VideoExtensions[item.Extension] != "" && a.HasStream(item) {
+		if provider.VideoExtensions[item.Extension] != "" && a.HasStream(ctx, item) {
 			if err := a.deleteStream(ctx, item); err != nil {
 				logger.Error("unable to delete stream: %s", err)
 			}

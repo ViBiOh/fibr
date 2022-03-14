@@ -21,7 +21,7 @@ func (a App) story(r *http.Request, request provider.Request, files []absto.Item
 	items := make([]provider.StoryItem, 0, len(files))
 
 	for _, item := range files {
-		if a.thumbnailApp.CanHaveThumbnail(item) && a.thumbnailApp.HasLargeThumbnail(item) {
+		if a.thumbnailApp.CanHaveThumbnail(item) && a.thumbnailApp.HasLargeThumbnail(ctx, item) {
 			exif, err := a.exifApp.GetExifFor(ctx, item)
 			if err != nil {
 				logger.WithField("item", item.Pathname).Error("unable to get exif: %s", err)
@@ -36,7 +36,7 @@ func (a App) story(r *http.Request, request provider.Request, files []absto.Item
 	return renderer.NewPage("story", http.StatusOK, map[string]interface{}{
 		"Paths":              getPathParts(request),
 		"Files":              items,
-		"Cover":              a.getCover(request, files),
+		"Cover":              a.getCover(ctx, request, files),
 		"Request":            request,
 		"ThumbnailLargeSize": a.thumbnailApp.LargeThumbnailSize(),
 	}), nil

@@ -157,13 +157,13 @@ func RemoveIndex(arr []string, index int) []string {
 }
 
 // LoadJSON loads JSON content
-func LoadJSON(storageApp absto.Storage, filename string, content interface{}) (err error) {
-	if _, err = storageApp.Info(filename); err != nil {
+func LoadJSON(ctx context.Context, storageApp absto.Storage, filename string, content interface{}) (err error) {
+	if _, err = storageApp.Info(ctx, filename); err != nil {
 		return fmt.Errorf("unable to get info: %w", err)
 	}
 
 	var reader io.ReadCloser
-	reader, err = storageApp.ReadFrom(filename)
+	reader, err = storageApp.ReadFrom(ctx, filename)
 	if err != nil {
 		return fmt.Errorf("unable to read: %w", err)
 	}
@@ -180,7 +180,7 @@ func LoadJSON(storageApp absto.Storage, filename string, content interface{}) (e
 }
 
 // SaveJSON saves JSON content
-func SaveJSON(storageApp absto.Storage, filename string, content interface{}) error {
+func SaveJSON(ctx context.Context, storageApp absto.Storage, filename string, content interface{}) error {
 	reader, writer := io.Pipe()
 
 	done := make(chan error)
@@ -199,7 +199,7 @@ func SaveJSON(storageApp absto.Storage, filename string, content interface{}) er
 		done <- err
 	}()
 
-	err := storageApp.WriteTo(filename, reader)
+	err := storageApp.WriteTo(ctx, filename, reader)
 
 	if jsonErr := <-done; jsonErr != nil {
 		err = model.WrapError(err, jsonErr)
@@ -210,7 +210,7 @@ func SaveJSON(storageApp absto.Storage, filename string, content interface{}) er
 
 // SendLargeFile in a request with buffered copy
 func SendLargeFile(ctx context.Context, storageApp absto.Storage, item absto.Item, req request.Request) (*http.Response, error) {
-	file, err := storageApp.ReadFrom(item.Pathname) // will be closed by `PipeWriter`
+	file, err := storageApp.ReadFrom(ctx, item.Pathname) // will be closed by `PipeWriter`
 	if err != nil {
 		return nil, fmt.Errorf("unable to get reader: %w", err)
 	}
@@ -257,17 +257,17 @@ func LogClose(closer io.Closer, fn, item string) {
 }
 
 // WriteToStorage writes given content to storage
-func WriteToStorage(storageApp absto.Storage, output string, reader io.Reader) error {
+func WriteToStorage(ctx context.Context, storageApp absto.Storage, output string, reader io.Reader) error {
 	directory := path.Dir(output)
-	if _, err := storageApp.Info(directory); absto.IsNotExist(err) {
-		if err := storageApp.CreateDir(directory); err != nil {
+	if _, err := storageApp.Info(ctx, directory); absto.IsNotExist(err) {
+		if err := storageApp.CreateDir(ctx, directory); err != nil {
 			return fmt.Errorf("unable to create directory: %s", err)
 		}
 	}
 
-	err := storageApp.WriteTo(output, reader)
+	err := storageApp.WriteTo(ctx, output, reader)
 	if err != nil {
-		if removeErr := storageApp.Remove(output); removeErr != nil {
+		if removeErr := storageApp.Remove(ctx, output); removeErr != nil {
 			err = model.WrapError(err, fmt.Errorf("unable to remove: %s", removeErr))
 		}
 	}

@@ -26,11 +26,11 @@ func (a App) EventConsumer(ctx context.Context, e provider.Event) {
 			getEventLogger(e.Item).Error("unable to upload: %s", err)
 		}
 	case provider.RenameEvent:
-		if err := a.rename(e.Item, *e.New); err != nil {
+		if err := a.rename(ctx, e.Item, *e.New); err != nil {
 			getEventLogger(e.Item).Error("unable to rename: %s", err)
 		}
 	case provider.DeleteEvent:
-		if err := a.delete(e.Item); err != nil {
+		if err := a.delete(ctx, e.Item); err != nil {
 			getEventLogger(e.Item).Error("unable to delete: %s", err)
 		}
 	}
@@ -47,13 +47,13 @@ func (a App) handleStartEvent(ctx context.Context, event provider.Event) error {
 	}
 
 	item := event.Item
-	if !forced && a.hasMetadata(item) {
+	if !forced && a.hasMetadata(ctx, item) {
 		return nil
 	}
 
 	if item.IsDir {
 		if len(item.Pathname) != 0 {
-			return a.aggregate(item)
+			return a.aggregate(ctx, item)
 		}
 
 		return nil
@@ -80,33 +80,33 @@ func (a App) handleUploadEvent(ctx context.Context, item absto.Item) error {
 		return nil
 	}
 
-	return a.processExif(item, exif)
+	return a.processExif(ctx, item, exif)
 }
 
-func (a App) processExif(item absto.Item, exif exas.Exif) error {
-	if err := a.updateDate(item, exif); err != nil {
+func (a App) processExif(ctx context.Context, item absto.Item, exif exas.Exif) error {
+	if err := a.updateDate(ctx, item, exif); err != nil {
 		return fmt.Errorf("unable to update date: %s", err)
 	}
 
-	if err := a.aggregate(item); err != nil {
+	if err := a.aggregate(ctx, item); err != nil {
 		return fmt.Errorf("unable to aggregate folder: %s", err)
 	}
 
 	return nil
 }
 
-func (a App) rename(old, new absto.Item) error {
+func (a App) rename(ctx context.Context, old, new absto.Item) error {
 	oldPath := getExifPath(old)
-	if _, err := a.storageApp.Info(oldPath); absto.IsNotExist(err) {
+	if _, err := a.storageApp.Info(ctx, oldPath); absto.IsNotExist(err) {
 		return nil
 	}
 
-	if err := a.storageApp.Rename(oldPath, getExifPath(new)); err != nil {
+	if err := a.storageApp.Rename(ctx, oldPath, getExifPath(new)); err != nil {
 		return fmt.Errorf("unable to rename exif: %s", err)
 	}
 
 	if !old.IsDir {
-		if err := a.aggregateOnRename(old, new); err != nil {
+		if err := a.aggregateOnRename(ctx, old, new); err != nil {
 			return fmt.Errorf("unable to aggregate on rename: %s", err)
 		}
 	}
@@ -114,13 +114,13 @@ func (a App) rename(old, new absto.Item) error {
 	return nil
 }
 
-func (a App) aggregateOnRename(old, new absto.Item) error {
-	oldDir, err := a.getDirOf(old)
+func (a App) aggregateOnRename(ctx context.Context, old, new absto.Item) error {
+	oldDir, err := a.getDirOf(ctx, old)
 	if err != nil {
 		return fmt.Errorf("unable to get old directory: %s", err)
 	}
 
-	newDir, err := a.getDirOf(new)
+	newDir, err := a.getDirOf(ctx, new)
 	if err != nil {
 		return fmt.Errorf("unable to get new directory: %s", err)
 	}
@@ -129,24 +129,24 @@ func (a App) aggregateOnRename(old, new absto.Item) error {
 		return nil
 	}
 
-	if err = a.aggregate(oldDir); err != nil {
+	if err = a.aggregate(ctx, oldDir); err != nil {
 		return fmt.Errorf("unable to aggregate old directory: %s", err)
 	}
 
-	if err = a.aggregate(newDir); err != nil {
+	if err = a.aggregate(ctx, newDir); err != nil {
 		return fmt.Errorf("unable to aggregate new directory: %s", err)
 	}
 
 	return nil
 }
 
-func (a App) delete(item absto.Item) error {
-	if err := a.storageApp.Remove(getExifPath(item)); err != nil {
+func (a App) delete(ctx context.Context, item absto.Item) error {
+	if err := a.storageApp.Remove(ctx, getExifPath(item)); err != nil {
 		return fmt.Errorf("unable to delete: %s", err)
 	}
 
 	if !item.IsDir {
-		if err := a.aggregate(item); err != nil {
+		if err := a.aggregate(ctx, item); err != nil {
 			return fmt.Errorf("unable to aggregate directory: %s", err)
 		}
 	}

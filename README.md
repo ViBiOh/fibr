@@ -340,18 +340,18 @@ Usage of fibr:
         [share] AMQP Routing Key for share {FIBR_SHARE_AMQP_ROUTING_KEY} (default "share")
   -shutdownTimeout string
         [server] Shutdown Timeout {FIBR_SHUTDOWN_TIMEOUT} (default "10s")
-  -storageAccessKey string
-        [storage] Storage Object Access Key {FIBR_STORAGE_ACCESS_KEY}
-  -storageBucket string
-        [storage] Storage Object Bucket {FIBR_STORAGE_BUCKET}
-  -storageDirectory string
-        [storage] Path to directory {FIBR_STORAGE_DIRECTORY} (default "/data")
-  -storageEndpoint string
-        [storage] Storage Object endpoint {FIBR_STORAGE_ENDPOINT}
-  -storageSSL
-        [storage] Use SSL {FIBR_STORAGE_SSL} (default true)
-  -storageSecretAccess string
-        [storage] Storage Object Secret Access {FIBR_STORAGE_SECRET_ACCESS}
+  -storageFileSystemDirectory /data
+        [storage] Path to directory. Default is dynamic. /data on a server and Current Working Directory in a terminal. {FIBR_STORAGE_FILE_SYSTEM_DIRECTORY} (default "/Users/macbook/code/fibr")
+  -storageObjectAccessKey string
+        [storage] Storage Object Access Key {FIBR_STORAGE_OBJECT_ACCESS_KEY}
+  -storageObjectBucket string
+        [storage] Storage Object Bucket {FIBR_STORAGE_OBJECT_BUCKET}
+  -storageObjectEndpoint string
+        [storage] Storage Object endpoint {FIBR_STORAGE_OBJECT_ENDPOINT}
+  -storageObjectSSL
+        [storage] Use SSL {FIBR_STORAGE_OBJECT_SSL} (default true)
+  -storageObjectSecretAccess string
+        [storage] Storage Object Secret Access {FIBR_STORAGE_OBJECT_SECRET_ACCESS}
   -thumbnailAmqpExchange string
         [thumbnail] AMQP Exchange Name {FIBR_THUMBNAIL_AMQP_EXCHANGE} (default "fibr")
   -thumbnailAmqpStreamRoutingKey string

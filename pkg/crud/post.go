@@ -117,13 +117,15 @@ func (a App) handlePostDescription(w http.ResponseWriter, r *http.Request, reque
 		return
 	}
 
-	item, err := a.storageApp.Info(request.SubPath(name))
+	ctx := r.Context()
+
+	item, err := a.storageApp.Info(ctx, request.SubPath(name))
 	if err != nil {
 		a.error(w, r, request, err)
 		return
 	}
 
-	exif, err := a.exifApp.GetExifFor(r.Context(), item)
+	exif, err := a.exifApp.GetExifFor(ctx, item)
 	if err != nil {
 		a.error(w, r, request, err)
 		return
@@ -131,7 +133,7 @@ func (a App) handlePostDescription(w http.ResponseWriter, r *http.Request, reque
 
 	exif.Description = r.FormValue("description")
 
-	if err = a.exifApp.SaveExifFor(r.Context(), item, exif); err != nil {
+	if err = a.exifApp.SaveExifFor(ctx, item, exif); err != nil {
 		a.error(w, r, request, err)
 		return
 	}

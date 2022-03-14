@@ -1,6 +1,7 @@
 package crud
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -15,10 +16,10 @@ type entry struct {
 }
 
 // Stats render stats of the current
-func (a App) Stats(w http.ResponseWriter, request provider.Request, message renderer.Message) (renderer.Page, error) {
+func (a App) Stats(w http.ResponseWriter, r *http.Request, request provider.Request, message renderer.Message) (renderer.Page, error) {
 	pathname := request.Filepath()
 
-	stats, err := a.computeStats(pathname)
+	stats, err := a.computeStats(r.Context(), pathname)
 	if err != nil {
 		return renderer.NewPage("", http.StatusInternalServerError, nil), err
 	}
@@ -37,10 +38,10 @@ func (a App) Stats(w http.ResponseWriter, request provider.Request, message rend
 	}), nil
 }
 
-func (a App) computeStats(pathname string) (map[string]uint64, error) {
+func (a App) computeStats(ctx context.Context, pathname string) (map[string]uint64, error) {
 	var filesCount, directoriesCount, filesSize, metadataSize uint64
 
-	err := a.storageApp.Walk(pathname, func(item absto.Item) error {
+	err := a.storageApp.Walk(ctx, pathname, func(item absto.Item) error {
 		if item.IsDir {
 			directoriesCount++
 		} else {
@@ -55,8 +56,8 @@ func (a App) computeStats(pathname string) (map[string]uint64, error) {
 	}
 
 	metadataPath := provider.MetadataDirectoryName + pathname
-	if _, err = a.rawStorageApp.Info(metadataPath); err == nil {
-		err = a.rawStorageApp.Walk(metadataPath, func(item absto.Item) error {
+	if _, err = a.rawStorageApp.Info(ctx, metadataPath); err == nil {
+		err = a.rawStorageApp.Walk(ctx, metadataPath, func(item absto.Item) error {
 			if !item.IsDir {
 				metadataSize += uint64(item.Size)
 			}

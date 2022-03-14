@@ -79,7 +79,9 @@ func (a App) createShare(w http.ResponseWriter, r *http.Request, request provide
 		password = string(hash)
 	}
 
-	info, err := a.storageApp.Info(request.Filepath())
+	ctx := r.Context()
+
+	info, err := a.storageApp.Info(ctx, request.Filepath())
 	if err != nil {
 		if absto.IsNotExist(err) {
 			a.error(w, r, request, model.WrapNotFound(err))
@@ -89,7 +91,7 @@ func (a App) createShare(w http.ResponseWriter, r *http.Request, request provide
 		return
 	}
 
-	id, err := a.shareApp.Create(r.Context(), request.Filepath(), edit, password, info.IsDir, duration)
+	id, err := a.shareApp.Create(ctx, request.Filepath(), edit, password, info.IsDir, duration)
 	if err != nil {
 		a.error(w, r, request, model.WrapInternal(err))
 		return

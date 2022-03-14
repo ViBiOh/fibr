@@ -118,7 +118,7 @@ func (a *App) discordHandle(ctx context.Context, webhook provider.Webhook, event
 		time.Sleep(time.Second * 15)
 	}
 
-	if a.thumbnailApp.HasThumbnail(event.Item, thumbnail.SmallSize) {
+	if a.thumbnailApp.HasThumbnail(ctx, event.Item, thumbnail.SmallSize) {
 		embed.Thumbnail = &discordContent{
 			URL: url + "?thumbnail",
 		}
@@ -223,7 +223,7 @@ func (a *App) deleteItem(ctx context.Context, item absto.Item) error {
 	return a.Exclusive(ctx, a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
 		for id, webhook := range a.webhooks {
 			if webhook.Pathname == item.Pathname {
-				if err := a.delete(id); err != nil {
+				if err := a.delete(ctx, id); err != nil {
 					return fmt.Errorf("unable to delete webhook `%s`: %s", id, err)
 				}
 			}

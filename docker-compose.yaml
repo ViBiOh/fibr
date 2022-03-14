@@ -23,7 +23,7 @@ services:
   vith:
     image: vibioh/vith
     environment:
-      VITH_STORAGE_DIRECTORY: '/data'
+      VITH_STORAGE_FILE_SYSTEM_DIRECTORY: '/data'
     volumes:
       - ${DATA_DIR}:/data
     user: '${DATA_USER_ID}'
@@ -37,7 +37,7 @@ services:
   exas:
     image: vibioh/exas
     environment:
-      EXAS_STORAGE_DIRECTORY: '/data'
+      EXAS_STORAGE_FILE_SYSTEM_DIRECTORY: '/data'
     volumes:
       - ${DATA_DIR}:/data
     user: '${DATA_USER_ID}'

@@ -39,7 +39,7 @@ func (a *App) renameItem(ctx context.Context, old, new absto.Item) error {
 			}
 		}
 
-		return provider.SaveJSON(a.storageApp, shareFilename, a.shares)
+		return provider.SaveJSON(ctx, a.storageApp, shareFilename, a.shares)
 	})
 
 	return err
@@ -49,7 +49,7 @@ func (a *App) deleteItem(ctx context.Context, item absto.Item) error {
 	_, err := a.Exclusive(ctx, a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
 		for id, share := range a.shares {
 			if strings.HasPrefix(share.Path, item.Pathname) {
-				if err := a.delete(id); err != nil {
+				if err := a.delete(ctx, id); err != nil {
 					return fmt.Errorf("unable to delete share `%s`: %s", id, err)
 				}
 			}

@@ -15,8 +15,8 @@ import (
 )
 
 // HasStream checks if given item has a streamable version
-func (a App) HasStream(item absto.Item) bool {
-	_, err := a.storageApp.Info(getStreamPath(item))
+func (a App) HasStream(ctx context.Context, item absto.Item) bool {
+	_, err := a.storageApp.Info(ctx, getStreamPath(item))
 	return err == nil
 }
 

@@ -23,14 +23,16 @@ func (a App) Delete(w http.ResponseWriter, r *http.Request, request provider.Req
 		return
 	}
 
+	ctx := r.Context()
+
 	pathname := request.SubPath(name)
-	info, err := a.storageApp.Info(pathname)
+	info, err := a.storageApp.Info(ctx, pathname)
 	if err != nil {
 		a.error(w, r, request, model.WrapNotFound(err))
 		return
 	}
 
-	if err = a.storageApp.Remove(info.Pathname); err != nil {
+	if err = a.storageApp.Remove(ctx, info.Pathname); err != nil {
 		a.error(w, r, request, model.WrapInternal(err))
 		return
 	}

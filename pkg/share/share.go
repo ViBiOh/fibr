@@ -89,7 +89,7 @@ func (a *App) Exclusive(ctx context.Context, name string, duration time.Duration
 		a.Lock()
 		defer a.Unlock()
 
-		if err := a.refresh(); err != nil {
+		if err := a.refresh(ctx); err != nil {
 			return fmt.Errorf("unable to refresh shares: %s", err)
 		}
 
@@ -133,7 +133,7 @@ func (a *App) Get(requestPath string) provider.Share {
 
 // Start worker
 func (a *App) Start(done <-chan struct{}) {
-	if err := a.loadShares(); err != nil {
+	if err := a.loadShares(context.Background()); err != nil {
 		logger.Error("unable to refresh shares: %s", err)
 		return
 	}
@@ -149,24 +149,24 @@ func (a *App) Start(done <-chan struct{}) {
 	cron.Start(a.cleanShares, done)
 }
 
-func (a *App) loadShares() error {
+func (a *App) loadShares(ctx context.Context) error {
 	a.Lock()
 	defer a.Unlock()
 
-	return a.refresh()
+	return a.refresh(ctx)
 }
 
-func (a *App) refresh() error {
-	if err := provider.LoadJSON(a.storageApp, shareFilename, &a.shares); err != nil {
+func (a *App) refresh(ctx context.Context) error {
+	if err := provider.LoadJSON(ctx, a.storageApp, shareFilename, &a.shares); err != nil {
 		if !absto.IsNotExist(err) {
 			return err
 		}
 
-		if err := a.storageApp.CreateDir(provider.MetadataDirectoryName); err != nil {
+		if err := a.storageApp.CreateDir(ctx, provider.MetadataDirectoryName); err != nil {
 			return fmt.Errorf("unable to create dir: %s", err)
 		}
 
-		return provider.SaveJSON(a.storageApp, shareFilename, &a.shares)
+		return provider.SaveJSON(ctx, a.storageApp, shareFilename, &a.shares)
 	}
 
 	return nil
@@ -193,10 +193,10 @@ func (a *App) purgeExpiredShares() bool {
 	return changed
 }
 
-func (a *App) cleanShares(_ context.Context) error {
+func (a *App) cleanShares(ctx context.Context) error {
 	if !a.purgeExpiredShares() {
 		return nil
 	}
 
-	return provider.SaveJSON(a.storageApp, shareFilename, &a.shares)
+	return provider.SaveJSON(ctx, a.storageApp, shareFilename, &a.shares)
 }

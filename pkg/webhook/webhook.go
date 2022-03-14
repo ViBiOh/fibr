@@ -103,7 +103,7 @@ func (a *App) Exclusive(ctx context.Context, name string, duration time.Duration
 		a.Lock()
 		defer a.Unlock()
 
-		if err := a.loadWebhooks(); err != nil {
+		if err := a.loadWebhooks(ctx); err != nil {
 			return fmt.Errorf("unable to refresh webhooks: %s", err)
 		}
 
@@ -134,23 +134,23 @@ func (a *App) Start(_ <-chan struct{}) {
 	a.Lock()
 	defer a.Unlock()
 
-	if err := a.loadWebhooks(); err != nil {
+	if err := a.loadWebhooks(context.Background()); err != nil {
 		logger.Error("unable to refresh webhooks: %s", err)
 		return
 	}
 }
 
-func (a *App) loadWebhooks() error {
-	if err := provider.LoadJSON(a.storageApp, webhookFilename, &a.webhooks); err != nil {
+func (a *App) loadWebhooks(ctx context.Context) error {
+	if err := provider.LoadJSON(ctx, a.storageApp, webhookFilename, &a.webhooks); err != nil {
 		if !absto.IsNotExist(err) {
 			return err
 		}
 
-		if err := a.storageApp.CreateDir(provider.MetadataDirectoryName); err != nil {
+		if err := a.storageApp.CreateDir(ctx, provider.MetadataDirectoryName); err != nil {
 			return fmt.Errorf("unable to create dir: %s", err)
 		}
 
-		return provider.SaveJSON(a.storageApp, webhookFilename, &a.webhooks)
+		return provider.SaveJSON(ctx, a.storageApp, webhookFilename, &a.webhooks)
 	}
 
 	return nil

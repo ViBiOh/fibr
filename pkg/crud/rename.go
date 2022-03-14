@@ -1,6 +1,7 @@
 package crud
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -12,12 +13,12 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
-func (a App) doRename(oldPath, newPath string, oldItem absto.Item) (absto.Item, error) {
-	if err := a.storageApp.Rename(oldPath, newPath); err != nil {
+func (a App) doRename(ctx context.Context, oldPath, newPath string, oldItem absto.Item) (absto.Item, error) {
+	if err := a.storageApp.Rename(ctx, oldPath, newPath); err != nil {
 		return absto.Item{}, err
 	}
 
-	newItem, err := a.storageApp.Info(newPath)
+	newItem, err := a.storageApp.Info(ctx, newPath)
 	if err != nil {
 		return absto.Item{}, err
 	}
@@ -58,8 +59,9 @@ func (a App) Rename(w http.ResponseWriter, r *http.Request, request provider.Req
 
 	oldPath := request.SubPath(oldName)
 	newPath := provider.GetPathname(newFolder, newName, request.Share)
+	ctx := r.Context()
 
-	if _, err = a.storageApp.Info(newPath); err == nil {
+	if _, err = a.storageApp.Info(ctx, newPath); err == nil {
 		a.error(w, r, request, model.WrapInvalid(errors.New("new name already exist")))
 		return
 	} else if !absto.IsNotExist(err) {
@@ -67,7 +69,7 @@ func (a App) Rename(w http.ResponseWriter, r *http.Request, request provider.Req
 		return
 	}
 
-	oldItem, err := a.storageApp.Info(oldPath)
+	oldItem, err := a.storageApp.Info(ctx, oldPath)
 	if err != nil {
 		if !absto.IsNotExist(err) {
 			err = model.WrapInternal(err)
@@ -79,7 +81,7 @@ func (a App) Rename(w http.ResponseWriter, r *http.Request, request provider.Req
 		return
 	}
 
-	newItem, err := a.doRename(oldPath, newPath, oldItem)
+	newItem, err := a.doRename(ctx, oldPath, newPath, oldItem)
 	if err != nil {
 		a.error(w, r, request, model.WrapInternal(err))
 		return

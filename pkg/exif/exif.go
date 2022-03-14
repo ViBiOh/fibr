@@ -105,7 +105,7 @@ func (a App) extractAndSaveExif(ctx context.Context, item absto.Item) (exif exas
 		return
 	}
 
-	previousExif, err := a.loadExif(item)
+	previousExif, err := a.loadExif(ctx, item)
 	if err != nil && !absto.IsNotExist(err) {
 		logger.WithField("item", item.Pathname).Error("unable to load exif: %s", err)
 	}
@@ -116,7 +116,7 @@ func (a App) extractAndSaveExif(ctx context.Context, item absto.Item) (exif exas
 		return
 	}
 
-	if err = a.saveMetadata(item, exif); err != nil {
+	if err = a.saveMetadata(ctx, item, exif); err != nil {
 		err = fmt.Errorf("unable to save exif: %s", err)
 	}
 

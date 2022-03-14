@@ -19,8 +19,9 @@ func (a App) Regenerate(w http.ResponseWriter, r *http.Request, request provider
 	}
 
 	pathname := request.Filepath()
+	ctx := r.Context()
 
-	info, err := a.storageApp.Info(pathname)
+	info, err := a.storageApp.Info(ctx, pathname)
 	if err != nil {
 		a.error(w, r, request, model.WrapInternal(err))
 		return
@@ -39,7 +40,7 @@ func (a App) Regenerate(w http.ResponseWriter, r *http.Request, request provider
 	}
 
 	go func() {
-		err := a.storageApp.Walk(pathname, func(item absto.Item) error {
+		err := a.storageApp.Walk(ctx, pathname, func(item absto.Item) error {
 			a.notify(provider.NewRestartEvent(item, subset))
 			return nil
 		})

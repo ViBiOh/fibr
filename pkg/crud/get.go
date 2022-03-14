@@ -18,11 +18,14 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/query"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 	"github.com/ViBiOh/httputils/v4/pkg/sha"
+	"go.opentelemetry.io/otel/trace"
 )
 
 func (a App) getWithMessage(w http.ResponseWriter, r *http.Request, request provider.Request, message renderer.Message) (renderer.Page, error) {
+	ctx := r.Context()
+
 	pathname := request.Filepath()
-	item, err := a.storageApp.Info(pathname)
+	item, err := a.storageApp.Info(ctx, pathname)
 
 	if err != nil && absto.IsNotExist(err) && provider.StreamExtensions[filepath.Ext(pathname)] {
 		if request.Share.File {
@@ -30,7 +33,7 @@ func (a App) getWithMessage(w http.ResponseWriter, r *http.Request, request prov
 			pathname = path.Dir(path.Dir(pathname)) + "/" + path.Base(pathname)
 		}
 
-		item, err = a.thumbnailApp.GetChunk(pathname)
+		item, err = a.thumbnailApp.GetChunk(ctx, pathname)
 	}
 
 	if err != nil {
@@ -80,7 +83,7 @@ func (a App) serveFile(w http.ResponseWriter, r *http.Request, item absto.Item) 
 		return nil
 	}
 
-	file, err := a.storageApp.ReadFrom(item.Pathname)
+	file, err := a.storageApp.ReadFrom(r.Context(), item.Pathname)
 	if err != nil {
 		return fmt.Errorf("unable to get reader for `%s`: %w", item.Pathname, err)
 	}
@@ -95,7 +98,7 @@ func (a App) serveFile(w http.ResponseWriter, r *http.Request, item absto.Item) 
 
 func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.Request, item absto.Item, message renderer.Message) (renderer.Page, error) {
 	if query.GetBool(r, "stats") {
-		return a.Stats(w, request, message)
+		return a.Stats(w, r, request, message)
 	}
 
 	items, err := a.listFiles(r, request)
@@ -134,15 +137,17 @@ func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.
 }
 
 func (a App) listFiles(r *http.Request, request provider.Request) (items []absto.Item, err error) {
+	ctx := r.Context()
 	if a.tracer != nil {
-		_, span := a.tracer.Start(r.Context(), "files")
+		var span trace.Span
+		ctx, span = a.tracer.Start(r.Context(), "files")
 		defer span.End()
 	}
 
 	if query.GetBool(r, "search") {
 		items, err = a.searchFiles(r, request)
 	} else {
-		items, err = a.storageApp.List(request.Filepath())
+		items, err = a.storageApp.List(ctx, request.Filepath())
 	}
 
 	sort.Sort(provider.ByHybridSort(items))

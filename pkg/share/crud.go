@@ -49,7 +49,7 @@ func (a *App) List() (shares []provider.Share) {
 func (a *App) Create(ctx context.Context, filepath string, edit bool, password string, isDir bool, duration time.Duration) (string, error) {
 	var id string
 
-	_, err := a.Exclusive(ctx, a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
+	_, err := a.Exclusive(ctx, a.amqpExclusiveRoutingKey, semaphoreDuration, func(ctx context.Context) error {
 		var err error
 		id, err = a.generateID()
 		if err != nil {
@@ -69,7 +69,7 @@ func (a *App) Create(ctx context.Context, filepath string, edit bool, password s
 
 		a.shares[id] = share
 
-		if err = provider.SaveJSON(a.storageApp, shareFilename, a.shares); err != nil {
+		if err = provider.SaveJSON(ctx, a.storageApp, shareFilename, a.shares); err != nil {
 			return fmt.Errorf("unable to save shares: %s", err)
 		}
 
@@ -88,16 +88,16 @@ func (a *App) Create(ctx context.Context, filepath string, edit bool, password s
 // Delete a share
 func (a *App) Delete(ctx context.Context, id string) error {
 	_, err := a.Exclusive(ctx, a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
-		return a.delete(id)
+		return a.delete(ctx, id)
 	})
 
 	return err
 }
 
-func (a *App) delete(id string) error {
+func (a *App) delete(ctx context.Context, id string) error {
 	delete(a.shares, id)
 
-	if err := provider.SaveJSON(a.storageApp, shareFilename, a.shares); err != nil {
+	if err := provider.SaveJSON(ctx, a.storageApp, shareFilename, a.shares); err != nil {
 		return fmt.Errorf("unable to save shares: %s", err)
 	}
 

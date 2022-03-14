@@ -1,6 +1,7 @@
 package exif
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -22,16 +23,18 @@ func (a App) AmqpHandler(message amqp.Delivery) error {
 		return nil
 	}
 
-	exif, err := a.loadExif(resp.Item)
+	ctx := context.Background()
+
+	exif, err := a.loadExif(ctx, resp.Item)
 	if err != nil && !absto.IsNotExist(err) {
 		logger.WithField("item", resp.Item.Pathname).Error("unable to load exif: %s", err)
 	}
 
 	resp.Exif.Description = exif.Description
 
-	if err := a.saveMetadata(resp.Item, resp.Exif); err != nil {
+	if err := a.saveMetadata(ctx, resp.Item, resp.Exif); err != nil {
 		return fmt.Errorf("unable to save: %s", err)
 	}
 
-	return a.processExif(resp.Item, resp.Exif)
+	return a.processExif(ctx, resp.Item, resp.Exif)
 }

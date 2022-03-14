@@ -35,7 +35,9 @@ func (a App) createWebhook(w http.ResponseWriter, r *http.Request, request provi
 		return
 	}
 
-	info, err := a.storageApp.Info(request.Path)
+	ctx := r.Context()
+
+	info, err := a.storageApp.Info(ctx, request.Path)
 	if err != nil {
 		if absto.IsNotExist(err) {
 			a.error(w, r, request, model.WrapNotFound(err))
@@ -50,7 +52,7 @@ func (a App) createWebhook(w http.ResponseWriter, r *http.Request, request provi
 		return
 	}
 
-	id, err := a.webhookApp.Create(r.Context(), info.Pathname, recursive, kind, webhookURL, eventTypes)
+	id, err := a.webhookApp.Create(ctx, info.Pathname, recursive, kind, webhookURL, eventTypes)
 	if err != nil {
 		a.error(w, r, request, model.WrapInternal(err))
 		return

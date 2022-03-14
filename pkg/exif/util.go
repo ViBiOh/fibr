@@ -1,6 +1,7 @@
 package exif
 
 import (
+	"context"
 	"fmt"
 	"path/filepath"
 
@@ -23,40 +24,40 @@ func getExifPath(item absto.Item) string {
 	return fmt.Sprintf("%s/%s.json", filepath.Dir(fullPath), item.ID)
 }
 
-func (a App) hasMetadata(item absto.Item) bool {
-	_, err := a.storageApp.Info(getExifPath(item))
+func (a App) hasMetadata(ctx context.Context, item absto.Item) bool {
+	_, err := a.storageApp.Info(ctx, getExifPath(item))
 	return err == nil
 }
 
-func (a App) loadExif(item absto.Item) (exas.Exif, error) {
+func (a App) loadExif(ctx context.Context, item absto.Item) (exas.Exif, error) {
 	var data exas.Exif
-	return data, a.loadMetadata(item, &data)
+	return data, a.loadMetadata(ctx, item, &data)
 }
 
-func (a App) loadAggregate(item absto.Item) (provider.Aggregate, error) {
+func (a App) loadAggregate(ctx context.Context, item absto.Item) (provider.Aggregate, error) {
 	var data provider.Aggregate
-	return data, a.loadMetadata(item, &data)
+	return data, a.loadMetadata(ctx, item, &data)
 }
 
-func (a App) loadMetadata(item absto.Item, content interface{}) error {
-	return provider.LoadJSON(a.storageApp, getExifPath(item), content)
+func (a App) loadMetadata(ctx context.Context, item absto.Item, content interface{}) error {
+	return provider.LoadJSON(ctx, a.storageApp, getExifPath(item), content)
 }
 
-func (a App) saveMetadata(item absto.Item, data interface{}) error {
+func (a App) saveMetadata(ctx context.Context, item absto.Item, data interface{}) error {
 	filename := getExifPath(item)
 	dirname := filepath.Dir(filename)
 
-	if _, err := a.storageApp.Info(dirname); err != nil {
+	if _, err := a.storageApp.Info(ctx, dirname); err != nil {
 		if !absto.IsNotExist(err) {
 			return fmt.Errorf("unable to check directory existence: %s", err)
 		}
 
-		if err = a.storageApp.CreateDir(dirname); err != nil {
+		if err = a.storageApp.CreateDir(ctx, dirname); err != nil {
 			return fmt.Errorf("unable to create directory: %s", err)
 		}
 	}
 
-	if err := provider.SaveJSON(a.storageApp, filename, data); err != nil {
+	if err := provider.SaveJSON(ctx, a.storageApp, filename, data); err != nil {
 		return fmt.Errorf("unable to save: %s", err)
 	}
 

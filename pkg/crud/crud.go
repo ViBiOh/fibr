@@ -161,14 +161,16 @@ func (a App) start(done <-chan struct{}) {
 	logger.Info("Starting startup check...")
 	defer logger.Info("Ending startup check.")
 
-	err := a.storageApp.Walk("", func(item absto.Item) error {
+	ctx := context.Background()
+
+	err := a.storageApp.Walk(ctx, "", func(item absto.Item) error {
 		select {
 		case <-done:
 			return errors.New("server is shutting down")
 		default:
 		}
 
-		item = a.sanitizeName(item)
+		item = a.sanitizeName(ctx, item)
 		a.notify(provider.NewStartEvent(item))
 
 		return nil
@@ -178,7 +180,7 @@ func (a App) start(done <-chan struct{}) {
 	}
 }
 
-func (a App) sanitizeName(item absto.Item) absto.Item {
+func (a App) sanitizeName(ctx context.Context, item absto.Item) absto.Item {
 	name, err := provider.SanitizeName(item.Pathname, false)
 	if err != nil {
 		logger.WithField("item", item.Pathname).Error("unable to sanitize name: %s", err)
@@ -194,13 +196,13 @@ func (a App) sanitizeName(item absto.Item) absto.Item {
 		return item
 	}
 
-	return a.rename(item, name)
+	return a.rename(ctx, item, name)
 }
 
-func (a App) rename(item absto.Item, name string) absto.Item {
+func (a App) rename(ctx context.Context, item absto.Item, name string) absto.Item {
 	logger.Info("Renaming `%s` to `%s`", item.Pathname, name)
 
-	renamedItem, err := a.doRename(item.Pathname, name, item)
+	renamedItem, err := a.doRename(ctx, item.Pathname, name, item)
 	if err != nil {
 		logger.Error("%s", err)
 		return item

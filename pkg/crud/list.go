@@ -15,15 +15,16 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/concurrent"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
+	"go.opentelemetry.io/otel/trace"
 )
 
 const (
 	uint32max = (1 << 32) - 1
 )
 
-func (a App) getCover(request provider.Request, files []absto.Item) map[string]interface{} {
+func (a App) getCover(ctx context.Context, request provider.Request, files []absto.Item) map[string]interface{} {
 	for _, file := range files {
-		if a.thumbnailApp.HasThumbnail(file, thumbnail.SmallSize) {
+		if a.thumbnailApp.HasThumbnail(ctx, file, thumbnail.SmallSize) {
 			return map[string]interface{}{
 				"Img":       provider.StorageToRender(file, request),
 				"ImgHeight": thumbnail.SmallSize,
@@ -38,7 +39,8 @@ func (a App) getCover(request provider.Request, files []absto.Item) map[string]i
 // List render directory web view of given dirPath
 func (a App) List(ctx context.Context, request provider.Request, message renderer.Message, item absto.Item, files []absto.Item) (renderer.Page, error) {
 	if a.tracer != nil {
-		_, span := a.tracer.Start(ctx, "list")
+		var span trace.Span
+		ctx, span = a.tracer.Start(ctx, "list")
 		defer span.End()
 	}
 
@@ -61,7 +63,7 @@ func (a App) List(ctx context.Context, request provider.Request, message rendere
 				renderItem := provider.StorageToRender(item, request)
 				renderItem.Aggregate = aggregate
 
-				if (!hasThumbnail || renderWithThumbnail) && a.thumbnailApp.CanHaveThumbnail(item) && a.thumbnailApp.HasThumbnail(item, thumbnail.SmallSize) {
+				if (!hasThumbnail || renderWithThumbnail) && a.thumbnailApp.CanHaveThumbnail(item) && a.thumbnailApp.HasThumbnail(ctx, item, thumbnail.SmallSize) {
 					if renderWithThumbnail {
 						renderItem.HasThumbnail = true
 					}
@@ -71,7 +73,7 @@ func (a App) List(ctx context.Context, request provider.Request, message rendere
 					}
 
 					if !hasStory {
-						hasStory = a.thumbnailApp.HasLargeThumbnail(item)
+						hasStory = a.thumbnailApp.HasLargeThumbnail(ctx, item)
 					}
 				}
 
@@ -94,7 +96,7 @@ func (a App) List(ctx context.Context, request provider.Request, message rendere
 	content := map[string]interface{}{
 		"Paths":        getPathParts(request),
 		"Files":        items,
-		"Cover":        a.getCover(request, files),
+		"Cover":        a.getCover(ctx, request, files),
 		"Request":      request,
 		"Message":      message,
 		"HasMap":       hasMap,
@@ -129,12 +131,14 @@ func (a App) Download(w http.ResponseWriter, r *http.Request, request provider.R
 
 	w.Header().Add("Content-Disposition", fmt.Sprintf("attachment; filename=%s.zip", filename))
 
-	if err := a.zipItems(r.Context().Done(), request, zipWriter, items); err != nil {
+	ctx := r.Context()
+
+	if err := a.zipItems(ctx, ctx.Done(), request, zipWriter, items); err != nil {
 		a.error(w, r, request, err)
 	}
 }
 
-func (a App) zipItems(done <-chan struct{}, request provider.Request, zipWriter *zip.Writer, items []absto.Item) (err error) {
+func (a App) zipItems(ctx context.Context, done <-chan struct{}, request provider.Request, zipWriter *zip.Writer, items []absto.Item) (err error) {
 	for _, item := range items {
 		select {
 		case <-done:
@@ -144,20 +148,20 @@ func (a App) zipItems(done <-chan struct{}, request provider.Request, zipWriter 
 			relativeURL := request.RelativeURL(item)
 
 			if !item.IsDir {
-				if err = a.addFileToZip(zipWriter, item, relativeURL); err != nil {
+				if err = a.addFileToZip(ctx, zipWriter, item, relativeURL); err != nil {
 					return
 				}
 				continue
 			}
 
 			var nestedItems []absto.Item
-			nestedItems, err = a.storageApp.List(request.SubPath(relativeURL))
+			nestedItems, err = a.storageApp.List(ctx, request.SubPath(relativeURL))
 			if err != nil {
 				err = fmt.Errorf("unable to zip nested folder `%s`: %s", relativeURL, err)
 				return
 			}
 
-			if err = a.zipItems(done, request, zipWriter, nestedItems); err != nil {
+			if err = a.zipItems(ctx, done, request, zipWriter, nestedItems); err != nil {
 				return err
 			}
 		}
@@ -166,7 +170,7 @@ func (a App) zipItems(done <-chan struct{}, request provider.Request, zipWriter 
 	return nil
 }
 
-func (a App) addFileToZip(zipWriter *zip.Writer, item absto.Item, pathname string) (err error) {
+func (a App) addFileToZip(ctx context.Context, zipWriter *zip.Writer, item absto.Item, pathname string) (err error) {
 	header := &zip.FileHeader{
 		Name:               pathname,
 		UncompressedSize64: uint64(item.Size),
@@ -189,7 +193,7 @@ func (a App) addFileToZip(zipWriter *zip.Writer, item absto.Item, pathname strin
 	}
 
 	var reader io.ReadCloser
-	reader, err = a.storageApp.ReadFrom(item.Pathname)
+	reader, err = a.storageApp.ReadFrom(ctx, item.Pathname)
 	if err != nil {
 		return fmt.Errorf("unable to read: %w", err)
 	}
