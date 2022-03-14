@@ -15,7 +15,7 @@ var (
 	// ExcelExtensions contains extensions of Excel
 	ExcelExtensions = map[string]bool{".xls": true, ".xlsx": true, ".xlsm": true}
 	// ImageExtensions contains extensions of Image
-	ImageExtensions = map[string]bool{".jpg": true, ".jpeg": true, ".png": true, ".gif": true, ".svg": true, ".tiff": true}
+	ImageExtensions = map[string]bool{".jpg": true, ".jpeg": true, ".png": true, ".gif": true, ".svg": true, ".tiff": true, ".webp": true}
 	// PdfExtensions contains extensions of Pdf
 	PdfExtensions = map[string]bool{".pdf": true}
 	// VideoExtensions contains extensions of Video
@@ -26,5 +26,5 @@ var (
 	WordExtensions = map[string]bool{".doc": true, ".docx": true, ".docm": true}
 
 	// ThumbnailExtensions contains extensions of file eligible to thumbnail
-	ThumbnailExtensions = map[string]bool{".jpg": true, ".jpeg": true, ".png": true, ".gif": true, ".tiff": true, ".pdf": true, ".mp4": true, ".mov": true, ".avi": true}
+	ThumbnailExtensions = map[string]bool{".jpg": true, ".jpeg": true, ".png": true, ".gif": true, ".tiff": true, ".pdf": true, ".mp4": true, ".mov": true, ".avi": true, ".webp": true}
 )
