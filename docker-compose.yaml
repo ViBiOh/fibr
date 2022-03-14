@@ -5,7 +5,6 @@ services:
   site:
     image: vibioh/fibr
     environment:
-      FIBR_AUTH_PROFILES: 1:admin
       FIBR_AUTH_USERS: '${BASIC_USERS}'
       FIBR_EXIF_DIRECT_ACCESS: 'true'
       FIBR_THUMBNAIL_DIRECT_ACCESS: 'true'

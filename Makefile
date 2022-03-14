@@ -48,7 +48,6 @@ init:
 	go install "golang.org/x/lint/golint@latest"
 	go install "golang.org/x/tools/cmd/goimports@latest"
 	go install "mvdan.cc/gofumpt@latest"
-	$(MAKE) mocks
 	go mod tidy -compat=1.17
 
 ## format: Format code. e.g Prettier (js), format (golang)
@@ -91,5 +90,4 @@ build:
 run:
 	$(MAIN_RUNNER) \
 		-ignorePattern ".git" \
-		-authProfiles "1:admin" \
 		-authUsers "1:`htpasswd -nBb admin admin`"

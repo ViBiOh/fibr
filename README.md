@@ -173,7 +173,6 @@ docker run -d \
   -p 1080:1080/tcp \
   --name fibr \
   -v ${PWD}:/data/ \
-  -e FIBR_AUTH_PROFILES="1:admin" \
   -e FIBR_AUTH_USERS="1:$(htpasswd -nBb login password)" \
   -e FIBR_THUMBNAIL_URL="" \
   -e FIBR_EXIF_URL="" \
@@ -252,7 +251,7 @@ Usage of fibr:
   -amqpWebhookRoutingKey string
         [amqpWebhook] RoutingKey name {FIBR_AMQP_WEBHOOK_ROUTING_KEY} (default "webhook")
   -authProfiles string
-        [auth] Users profiles in the form 'id:profile1|profile2,id2:profile1' {FIBR_AUTH_PROFILES}
+        [auth] Users profiles in the form 'id:profile1|profile2,id2:profile1' {FIBR_AUTH_PROFILES} (default "1:admin")
   -authUsers string
         [auth] Users credentials in the form 'id:login:password,id2:login2:password2' {FIBR_AUTH_USERS}
   -bcryptDuration string
