@@ -135,15 +135,13 @@ func (a App) LargeThumbnailSize() uint64 {
 
 // Stream check if stream is present and serve it
 func (a App) Stream(w http.ResponseWriter, r *http.Request, item absto.Item) {
-	ctx := r.Context()
-
-	if !a.HasStream(ctx, item) {
-		w.WriteHeader(http.StatusNoContent)
-		return
-	}
-
-	reader, err := a.storageApp.ReadFrom(ctx, getStreamPath(item))
+	reader, err := a.storageApp.ReadFrom(r.Context(), getStreamPath(item))
 	if err != nil {
+		if absto.IsNotExist(err) {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+
 		httperror.InternalServerError(w, err)
 		return
 	}

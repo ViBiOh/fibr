@@ -158,10 +158,6 @@ func RemoveIndex(arr []string, index int) []string {
 
 // LoadJSON loads JSON content
 func LoadJSON(ctx context.Context, storageApp absto.Storage, filename string, content interface{}) (err error) {
-	if _, err = storageApp.Info(ctx, filename); err != nil {
-		return fmt.Errorf("unable to get info: %w", err)
-	}
-
 	var reader io.ReadCloser
 	reader, err = storageApp.ReadFrom(ctx, filename)
 	if err != nil {
