@@ -108,7 +108,7 @@ func New(config Config, storage absto.Storage, prometheusRegisterer prometheus.R
 	}
 
 	return App{
-		vithRequest: request.New().URL(*config.vithURL).BasicAuth(*config.vithUser, *config.vithPass),
+		vithRequest: request.New().URL(*config.vithURL).BasicAuth(*config.vithUser, *config.vithPass).WithClient(provider.SlowClient),
 
 		maxSize:      *config.maxSize,
 		minBitrate:   *config.minBitrate,

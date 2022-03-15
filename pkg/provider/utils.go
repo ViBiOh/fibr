@@ -53,8 +53,8 @@ var (
 		},
 	}
 
-	// SlowClient allows 2 minutes timeout
-	SlowClient = request.CreateClient(2*time.Minute, request.NoRedirection)
+	// SlowClient allows 5 minutes timeout
+	SlowClient = request.CreateClient(5*time.Minute, request.NoRedirection)
 )
 
 // Join concatenates strings respecting terminal slashes
