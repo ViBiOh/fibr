@@ -112,7 +112,7 @@ func main() {
 
 	prometheusRegisterer := prometheusApp.Registerer()
 
-	storageProvider, err := absto.New(abstoConfig)
+	storageProvider, err := absto.New(abstoConfig, tracerApp.GetTracer("storage"))
 	logger.Fatal(err)
 
 	eventBus, err := provider.NewEventBus(10, prometheusRegisterer, tracerApp)
