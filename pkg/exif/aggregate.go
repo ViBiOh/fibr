@@ -30,7 +30,7 @@ func (a App) GetExifFor(ctx context.Context, item absto.Item) (exas.Exif, error)
 
 	exif, err := a.loadExif(ctx, item)
 	if err != nil && !absto.IsNotExist(err) {
-		return exif, fmt.Errorf("unable to load exif: %s", err)
+		return exif, fmt.Errorf("unable to load exif: %w", err)
 	}
 
 	return exif, nil
@@ -54,7 +54,7 @@ func (a App) GetAggregateFor(ctx context.Context, item absto.Item) (provider.Agg
 
 	aggregate, err := a.loadAggregate(ctx, item)
 	if err != nil && !absto.IsNotExist(err) {
-		return aggregate, fmt.Errorf("unable to load aggregate: %s", err)
+		return aggregate, fmt.Errorf("unable to load aggregate: %w", err)
 	}
 
 	return aggregate, nil
@@ -64,14 +64,14 @@ func (a App) aggregate(ctx context.Context, item absto.Item) error {
 	if !item.IsDir {
 		file, err := a.getDirOf(ctx, item)
 		if err != nil {
-			return fmt.Errorf("unable to get directory: %s", err)
+			return fmt.Errorf("unable to get directory: %w", err)
 		}
 
 		item = file
 	}
 
 	if err := a.computeAndSaveAggregate(ctx, item); err != nil {
-		return fmt.Errorf("unable to compute aggregate: %s", err)
+		return fmt.Errorf("unable to compute aggregate: %w", err)
 	}
 
 	return nil
@@ -95,7 +95,7 @@ func (a App) computeAndSaveAggregate(ctx context.Context, dir absto.Item) error 
 			if absto.IsNotExist(err) {
 				return nil
 			}
-			return fmt.Errorf("unable load exif data: %s", err)
+			return fmt.Errorf("unable load exif data: %w", err)
 		}
 
 		if !exifData.Date.IsZero() {
@@ -109,7 +109,7 @@ func (a App) computeAndSaveAggregate(ctx context.Context, dir absto.Item) error 
 		return nil
 	})
 	if err != nil {
-		return fmt.Errorf("unable to aggregate: %s", err)
+		return fmt.Errorf("unable to aggregate: %w", err)
 	}
 
 	if len(directoryAggregate) == 0 {

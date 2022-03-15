@@ -277,7 +277,6 @@
 
                     {{- if not .Aggregate.Start.IsZero }}
                       {{- if and .Aggregate.Location }}
-        }
 {{ end }}
                       {{- $startDate }}
                     {{- end }}
@@ -287,7 +286,7 @@
                   "
                 >
               {{ else }}
-                <em class="exif ellipsis {{ if eq $root.Request.Display "list" }}padding-left{{ end }}">
+                <em class="exif ellipsis padding-left">
                   (
 
                   {{- if .Aggregate.Location }}
@@ -309,6 +308,14 @@
                   )
                 </em>
               {{ end}}
+            {{ else }}
+              {{- if eq $root.Request.Display "list" -}}
+                <em class="exif padding-left"></em>
+              {{ end }}
+            {{ end }}
+          {{ else }}
+            {{- if eq $root.Request.Display "list" -}}
+              <em class="exif padding-left"></em>
             {{ end }}
           {{ end }}
         </li>

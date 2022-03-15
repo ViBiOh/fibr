@@ -169,7 +169,7 @@ func LoadJSON(ctx context.Context, storageApp absto.Storage, filename string, co
 	}()
 
 	if err = json.NewDecoder(reader).Decode(content); err != nil {
-		err = fmt.Errorf("unable to decode: %w", err)
+		err = fmt.Errorf("unable to decode: %w", storageApp.ConvertError(err))
 	}
 
 	return

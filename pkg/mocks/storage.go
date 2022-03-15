@@ -37,6 +37,20 @@ func (m *Storage) EXPECT() *StorageMockRecorder {
 	return m.recorder
 }
 
+// ConvertError mocks base method.
+func (m *Storage) ConvertError(arg0 error) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ConvertError", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ConvertError indicates an expected call of ConvertError.
+func (mr *StorageMockRecorder) ConvertError(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ConvertError", reflect.TypeOf((*Storage)(nil).ConvertError), arg0)
+}
+
 // CreateDir mocks base method.
 func (m *Storage) CreateDir(arg0 context.Context, arg1 string) error {
 	m.ctrl.T.Helper()
