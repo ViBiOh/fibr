@@ -21,6 +21,10 @@
       padding: 1rem;
     }
 
+    .share-link {
+      color: var(--primary);
+    }
+
     .share-content:hover {
       background-color: var(--grey);
     }
@@ -99,7 +103,7 @@
             {{ range .Shares }}
               <tr class="share-content">
                 <td>
-                  <a href="{{ url "/" }}{{ .ID }}/">
+                  <a class="share-link" href="{{ url "/" }}{{ .ID }}/">
                     <code>{{ .ID }}</code>
                   </a>
                 </td>

@@ -2,6 +2,7 @@ package thumbnail
 
 import (
 	"context"
+	"path"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -75,6 +76,13 @@ func (a App) rename(ctx context.Context, old, new absto.Item) {
 }
 
 func (a App) delete(ctx context.Context, item absto.Item) {
+	if item.IsDir {
+		if err := a.storageApp.Remove(ctx, path.Join(provider.MetadataDirectoryName+item.Pathname)+"/"); err != nil {
+			logger.Error("unable to delete thumbnail folder: %s", err)
+		}
+		return
+	}
+
 	for _, size := range a.sizes {
 		if err := a.storageApp.Remove(ctx, a.getThumbnailPath(item, size)); err != nil {
 			logger.Error("unable to delete thumbnail: %s", err)

@@ -32,7 +32,12 @@ func (a App) Delete(w http.ResponseWriter, r *http.Request, request provider.Req
 		return
 	}
 
-	if err = a.storageApp.Remove(ctx, info.Pathname); err != nil {
+	deletePath := info.Pathname
+	if info.IsDir {
+		deletePath += "/"
+	}
+
+	if err = a.storageApp.Remove(ctx, deletePath); err != nil {
 		a.error(w, r, request, model.WrapInternal(err))
 		return
 	}
