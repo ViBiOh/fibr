@@ -217,19 +217,7 @@ func (a App) List(w http.ResponseWriter, r *http.Request, items []absto.Item) {
 	}
 
 	for _, item := range items {
-		if isDone() {
-			return
-		}
-
-		thumbnailInfo, ok := a.ThumbnailInfo(ctx, item, SmallSize)
-		if !ok {
-			continue
-		}
-
-		provider.DoneWriter(isDone, w, item.ID)
-		provider.DoneWriter(isDone, w, `,`)
-		a.encodeContent(ctx, base64.NewEncoder(base64.StdEncoding, w), thumbnailInfo)
-		provider.DoneWriter(isDone, w, "\n")
+		a.encodeContent(ctx, w, isDone, item)
 	}
 }
 
@@ -245,23 +233,31 @@ func (a App) thumbnailHash(ctx context.Context, items []absto.Item) string {
 	return hasher.Sum()
 }
 
-func (a App) encodeContent(ctx context.Context, encoder io.WriteCloser, item absto.Item) {
-	defer provider.LogClose(encoder, "thumbnail.encodeContent", "encoder")
-
-	reader, err := a.storageApp.ReadFrom(ctx, item.Pathname)
+func (a App) encodeContent(ctx context.Context, w io.Writer, isDone func() bool, item absto.Item) {
+	reader, err := a.storageApp.ReadFrom(ctx, a.PathForScale(item, SmallSize))
 	if err != nil {
 		logEncodeContentError(item).Error("unable to open: %s", err)
 		return
 	}
-
 	defer provider.LogClose(reader, "thumbnail.encodeContent", item.Pathname)
+
+	provider.DoneWriter(isDone, w, item.ID)
+	provider.DoneWriter(isDone, w, `,`)
 
 	buffer := provider.BufferPool.Get().(*bytes.Buffer)
 	defer provider.BufferPool.Put(buffer)
 
+	encoder := base64.NewEncoder(base64.StdEncoding, w)
+
 	if _, err = io.CopyBuffer(encoder, reader, buffer.Bytes()); err != nil {
 		logEncodeContentError(item).Error("unable to copy: %s", err)
 	}
+
+	if err := encoder.Close(); err != nil {
+		logger.Error("unable to close thumbnail encoder: %s", err)
+	}
+
+	provider.DoneWriter(isDone, w, "\n")
 }
 
 func logEncodeContentError(item absto.Item) logger.Provider {
