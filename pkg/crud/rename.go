@@ -15,12 +15,12 @@ import (
 
 func (a App) doRename(ctx context.Context, oldPath, newPath string, oldItem absto.Item) (absto.Item, error) {
 	if err := a.storageApp.Rename(ctx, oldPath, newPath); err != nil {
-		return absto.Item{}, err
+		return absto.Item{}, fmt.Errorf("unable to rename: %w", err)
 	}
 
 	newItem, err := a.storageApp.Info(ctx, newPath)
 	if err != nil {
-		return absto.Item{}, err
+		return absto.Item{}, fmt.Errorf("unable to get info of new item: %w", err)
 	}
 
 	go a.notify(provider.NewRenameEvent(oldItem, newItem, a.bestSharePath(newPath), a.rendererApp))
