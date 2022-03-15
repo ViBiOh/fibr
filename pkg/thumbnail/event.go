@@ -58,12 +58,12 @@ func (a App) generateItem(ctx context.Context, event provider.Event) {
 
 func (a App) rename(ctx context.Context, old, new absto.Item) {
 	for _, size := range a.sizes {
-		oldPath := a.getThumbnailPath(old, size)
+		oldPath := a.PathForScale(old, size)
 		if _, err := a.storageApp.Info(ctx, oldPath); absto.IsNotExist(err) {
 			return
 		}
 
-		if err := a.storageApp.Rename(ctx, oldPath, a.getThumbnailPath(new, size)); err != nil {
+		if err := a.storageApp.Rename(ctx, oldPath, a.PathForScale(new, size)); err != nil {
 			logger.Error("unable to rename thumbnail: %s", err)
 		}
 
@@ -84,7 +84,7 @@ func (a App) delete(ctx context.Context, item absto.Item) {
 	}
 
 	for _, size := range a.sizes {
-		if err := a.storageApp.Remove(ctx, a.getThumbnailPath(item, size)); err != nil {
+		if err := a.storageApp.Remove(ctx, a.PathForScale(item, size)); err != nil {
 			logger.Error("unable to delete thumbnail: %s", err)
 		}
 

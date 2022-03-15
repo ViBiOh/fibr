@@ -10,7 +10,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-func (a App) story(r *http.Request, request provider.Request, files []absto.Item) (renderer.Page, error) {
+func (a App) story(r *http.Request, request provider.Request, item absto.Item, files []absto.Item) (renderer.Page, error) {
 	ctx := r.Context()
 	if a.tracer != nil {
 		var span trace.Span
@@ -18,17 +18,40 @@ func (a App) story(r *http.Request, request provider.Request, files []absto.Item
 		defer span.End()
 	}
 
+	thumbnails, err := a.rawStorageApp.List(ctx, a.thumbnailApp.Path(item))
+	if err != nil {
+		logger.WithField("item", item.Pathname).Error("unable to list thumbnail: %s", err)
+	}
+
 	items := make([]provider.StoryItem, 0, len(files))
 
 	for _, item := range files {
-		if a.thumbnailApp.CanHaveThumbnail(item) && a.thumbnailApp.HasLargeThumbnail(ctx, item) {
-			exif, err := a.exifApp.GetExifFor(ctx, item)
-			if err != nil {
-				logger.WithField("item", item.Pathname).Error("unable to get exif: %s", err)
+		if !a.thumbnailApp.CanHaveThumbnail(item) {
+			continue
+		}
+
+		thumbnailPath := a.thumbnailApp.PathForLarge(item)
+		var found bool
+
+		for _, thumbnailInfo := range thumbnails {
+			if thumbnailInfo.Pathname != thumbnailPath {
+				continue
 			}
 
-			items = append(items, provider.StorageToStory(item, request, exif))
+			found = true
+			break
 		}
+
+		if !found {
+			continue
+		}
+
+		exif, err := a.exifApp.GetExifFor(ctx, item)
+		if err != nil {
+			logger.WithField("item", item.Pathname).Error("unable to get exif: %s", err)
+		}
+
+		items = append(items, provider.StorageToStory(item, request, exif))
 	}
 
 	request.Display = provider.StoryDisplay

@@ -237,7 +237,7 @@ func (a App) thumbnailHash(ctx context.Context, items []absto.Item) string {
 	hasher := sha.Stream()
 
 	for _, item := range items {
-		if info, err := a.storageApp.Info(ctx, a.getThumbnailPath(item, SmallSize)); err == nil {
+		if info, err := a.storageApp.Info(ctx, a.PathForScale(item, SmallSize)); err == nil {
 			hasher.Write(info)
 		}
 	}

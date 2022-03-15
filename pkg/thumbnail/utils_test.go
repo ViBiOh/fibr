@@ -106,7 +106,7 @@ func TestHasThumbnail(t *testing.T) {
 	}
 }
 
-func TestGetThumbnailPath(t *testing.T) {
+func TestPathForScale(t *testing.T) {
 	cases := []struct {
 		intention string
 		instance  App
@@ -126,8 +126,8 @@ func TestGetThumbnailPath(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.intention, func(t *testing.T) {
-			if result := tc.instance.getThumbnailPath(tc.input, SmallSize); result != tc.want {
-				t.Errorf("getThumbnailPath() = %s, want %s", result, tc.want)
+			if result := tc.instance.PathForScale(tc.input, SmallSize); result != tc.want {
+				t.Errorf("PathForScale() = %s, want %s", result, tc.want)
 			}
 		})
 	}

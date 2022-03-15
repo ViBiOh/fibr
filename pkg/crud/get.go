@@ -130,7 +130,7 @@ func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.
 	provider.SetPrefsCookie(w, request)
 
 	if request.Display == provider.StoryDisplay {
-		return a.story(r, request, items)
+		return a.story(r, request, item, items)
 	}
 
 	return a.List(r.Context(), request, message, item, items)

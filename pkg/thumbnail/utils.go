@@ -30,7 +30,7 @@ func (a App) HasThumbnail(ctx context.Context, item absto.Item, scale uint64) bo
 		return false
 	}
 
-	_, err := a.storageApp.Info(ctx, a.getThumbnailPath(item, scale))
+	_, err := a.storageApp.Info(ctx, a.PathForScale(item, scale))
 	return err == nil
 }
 
@@ -42,9 +42,33 @@ func (a App) ThumbnailInfo(ctx context.Context, item absto.Item, scale uint64) (
 	}
 
 	var err error
-	thumbnailItem, err = a.storageApp.Info(ctx, a.getThumbnailPath(item, scale))
+	thumbnailItem, err = a.storageApp.Info(ctx, a.PathForScale(item, scale))
 	ok = err == nil
 	return
+}
+
+// Path computes thumbnail path for a a given item
+func (a App) Path(item absto.Item) string {
+	return a.PathForScale(item, SmallSize)
+}
+
+// PathForLarge computes thumbnail path for a a given item and large size
+func (a App) PathForLarge(item absto.Item) string {
+	return a.PathForScale(item, a.largeSize)
+}
+
+// PathForScale computes thumbnail path for a a given item and scale
+func (a App) PathForScale(item absto.Item, scale uint64) string {
+	if item.IsDir {
+		return getThumbnailDirectoryPath(item)
+	}
+
+	switch scale {
+	case a.largeSize:
+		item.ID = item.ID + "_large"
+	}
+
+	return getThumbnailPathForExtension(item, "webp")
 }
 
 // GetChunk retrieve the storage item in the metadata
@@ -52,21 +76,18 @@ func (a App) GetChunk(ctx context.Context, pathname string) (absto.Item, error) 
 	return a.storageApp.Info(ctx, provider.MetadataDirectoryName+pathname)
 }
 
-func (a App) getThumbnailPath(item absto.Item, scale uint64) string {
-	switch scale {
-	case a.largeSize:
-		item.ID = item.ID + "_large"
-	}
-
-	return getPathWithExtension(item, "webp")
-}
-
 func getStreamPath(item absto.Item) string {
-	return getPathWithExtension(item, "m3u8")
+	return getThumbnailPathForExtension(item, "m3u8")
 }
 
-func getPathWithExtension(item absto.Item, extension string) string {
-	return fmt.Sprintf("%s/%s.%s", filepath.Dir(provider.MetadataDirectoryName+item.Pathname), item.ID, extension)
+// PathWithExtension computes thumbnail path with given extension
+func getThumbnailDirectoryPath(item absto.Item) string {
+	return filepath.Dir(provider.MetadataDirectoryName+item.Pathname) + "/"
+}
+
+// PathWithExtension computes thumbnail path with given extension
+func getThumbnailPathForExtension(item absto.Item, extension string) string {
+	return fmt.Sprintf("%s%s.%s", getThumbnailDirectoryPath(item), item.ID, extension)
 }
 
 func typeOfItem(item absto.Item) model.ItemType {

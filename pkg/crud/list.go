@@ -45,12 +45,25 @@ func (a App) List(ctx context.Context, request provider.Request, message rendere
 	}
 
 	items := make([]provider.RenderItem, len(files))
-	wg := concurrent.NewLimited(4)
+	wg := concurrent.NewLimited(6)
 
-	renderWithThumbnail := request.Display == provider.GridDisplay
+	var thumbnails []absto.Item
+	wg.Go(func() {
+		var err error
+		thumbnails, err = a.rawStorageApp.List(ctx, a.thumbnailApp.Path(item))
+		if err != nil {
+			logger.WithField("item", item.Pathname).Error("unable to list thumbnail: %s", err)
+		}
+	})
 
-	var hasThumbnail bool
-	var hasStory bool
+	var hasMap bool
+	wg.Go(func() {
+		if aggregate, err := a.exifApp.GetAggregateFor(ctx, item); err != nil {
+			logger.WithField("fn", "crud.List").WithField("item", request.Path).Error("unable to get aggregate: %s", err)
+		} else if len(aggregate.Location) != 0 {
+			hasMap = true
+		}
+	})
 
 	for index, item := range files {
 		func(item absto.Item, index int) {
@@ -63,35 +76,42 @@ func (a App) List(ctx context.Context, request provider.Request, message rendere
 				renderItem := provider.StorageToRender(item, request)
 				renderItem.Aggregate = aggregate
 
-				if (!hasThumbnail || renderWithThumbnail) && a.thumbnailApp.CanHaveThumbnail(item) && a.thumbnailApp.HasThumbnail(ctx, item, thumbnail.SmallSize) {
-					if renderWithThumbnail {
-						renderItem.HasThumbnail = true
-					}
-
-					if !hasThumbnail {
-						hasThumbnail = true
-					}
-
-					if !hasStory {
-						hasStory = a.thumbnailApp.HasLargeThumbnail(ctx, item)
-					}
-				}
-
 				items[index] = renderItem
 			})
 		}(item, index)
 	}
 
-	var hasMap bool
-	wg.Go(func() {
-		if aggregate, err := a.exifApp.GetAggregateFor(ctx, item); err != nil {
-			logger.WithField("fn", "crud.List").WithField("item", request.Path).Error("unable to get aggregate: %s", err)
-		} else if len(aggregate.Location) != 0 {
-			hasMap = true
-		}
-	})
-
 	wg.Wait()
+
+	renderWithThumbnail := request.Display == provider.GridDisplay
+	var hasThumbnail bool
+	var hasStory bool
+
+	for index, item := range items {
+		if !a.thumbnailApp.CanHaveThumbnail(item.Item) {
+			continue
+		}
+
+		thumbnailPath := a.thumbnailApp.Path(item.Item)
+
+		for _, thumbnailInfo := range thumbnails {
+			if thumbnailInfo.Pathname != thumbnailPath {
+				continue
+			}
+
+			hasThumbnail = true
+
+			if !hasStory {
+				hasStory = a.thumbnailApp.HasLargeThumbnail(ctx, item.Item)
+			}
+
+			if renderWithThumbnail {
+				items[index].HasThumbnail = true
+			} else {
+				break
+			}
+		}
+	}
 
 	content := map[string]interface{}{
 		"Paths":        getPathParts(request),
