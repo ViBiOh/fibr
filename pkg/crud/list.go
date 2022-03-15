@@ -50,7 +50,7 @@ func (a App) List(ctx context.Context, request provider.Request, message rendere
 	var thumbnails []absto.Item
 	wg.Go(func() {
 		var err error
-		thumbnails, err = a.rawStorageApp.List(ctx, a.thumbnailApp.Path(item))
+		thumbnails, err = a.thumbnailApp.ListDir(ctx, item)
 		if err != nil {
 			logger.WithField("item", item.Pathname).Error("unable to list thumbnail: %s", err)
 		}

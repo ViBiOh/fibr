@@ -18,7 +18,7 @@ func (a App) story(r *http.Request, request provider.Request, item absto.Item, f
 		defer span.End()
 	}
 
-	thumbnails, err := a.rawStorageApp.List(ctx, a.thumbnailApp.Path(item))
+	thumbnails, err := a.thumbnailApp.ListDirLarge(ctx, item)
 	if err != nil {
 		logger.WithField("item", item.Pathname).Error("unable to list thumbnail: %s", err)
 	}

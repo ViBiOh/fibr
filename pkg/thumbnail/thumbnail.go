@@ -34,9 +34,11 @@ var cacheDuration string = fmt.Sprintf("private, max-age=%.0f", time.Duration(ti
 
 // App of package
 type App struct {
-	storageApp    absto.Storage
-	pathnameInput chan absto.Item
-	metric        *prometheus.CounterVec
+	storageApp      absto.Storage
+	smallStorageApp absto.Storage
+	largeStorageApp absto.Storage
+	pathnameInput   chan absto.Item
+	metric          *prometheus.CounterVec
 
 	amqpClient              *amqp.Client
 	amqpExchange            string
@@ -119,7 +121,13 @@ func New(config Config, storage absto.Storage, prometheusRegisterer prometheus.R
 		amqpStreamRoutingKey:    strings.TrimSpace(*config.amqpStreamRoutingKey),
 		amqpThumbnailRoutingKey: strings.TrimSpace(*config.amqpThumbnailRoutingKey),
 
-		storageApp:    storage,
+		storageApp: storage,
+		smallStorageApp: storage.WithIgnoreFn(func(item absto.Item) bool {
+			return !strings.HasSuffix(item.Name, ".webp") || strings.HasSuffix(item.Name, "_large.webp")
+		}),
+		largeStorageApp: storage.WithIgnoreFn(func(item absto.Item) bool {
+			return !strings.HasSuffix(item.Name, "_large.webp")
+		}),
 		amqpClient:    amqpClient,
 		metric:        prom.CounterVec(prometheusRegisterer, "fibr", "thumbnail", "item", "type", "state"),
 		pathnameInput: make(chan absto.Item, 10),
@@ -201,7 +209,7 @@ func (a App) List(w http.ResponseWriter, r *http.Request, item absto.Item, items
 	var hash string
 	if query.GetBool(r, "search") {
 		hash = a.thumbnailHash(ctx, items)
-	} else if thumbnails, err := a.storageApp.List(ctx, a.Path(item)); err == nil {
+	} else if thumbnails, err := a.ListDir(ctx, item); err == nil {
 		hash = sha.New(thumbnails)
 	}
 
