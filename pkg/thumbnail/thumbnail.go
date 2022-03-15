@@ -19,6 +19,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/httperror"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	prom "github.com/ViBiOh/httputils/v4/pkg/prometheus"
+	"github.com/ViBiOh/httputils/v4/pkg/query"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 	"github.com/ViBiOh/httputils/v4/pkg/sha"
 	"github.com/prometheus/client_golang/prometheus"
@@ -189,7 +190,7 @@ func (a App) Serve(w http.ResponseWriter, r *http.Request, item absto.Item) {
 }
 
 // List return all thumbnail in a base64 form
-func (a App) List(w http.ResponseWriter, r *http.Request, items []absto.Item) {
+func (a App) List(w http.ResponseWriter, r *http.Request, item absto.Item, items []absto.Item) {
 	if len(items) == 0 {
 		w.WriteHeader(http.StatusNoContent)
 		return
@@ -197,7 +198,14 @@ func (a App) List(w http.ResponseWriter, r *http.Request, items []absto.Item) {
 
 	ctx := r.Context()
 
-	etag, ok := provider.EtagMatch(w, r, a.thumbnailHash(ctx, items))
+	var hash string
+	if query.GetBool(r, "search") {
+		hash = a.thumbnailHash(ctx, items)
+	} else if thumbnails, err := a.storageApp.List(ctx, a.Path(item)); err == nil {
+		hash = sha.New(thumbnails)
+	}
+
+	etag, ok := provider.EtagMatch(w, r, hash)
 	if ok {
 		return
 	}
@@ -236,7 +244,10 @@ func (a App) thumbnailHash(ctx context.Context, items []absto.Item) string {
 func (a App) encodeContent(ctx context.Context, w io.Writer, isDone func() bool, item absto.Item) {
 	reader, err := a.storageApp.ReadFrom(ctx, a.PathForScale(item, SmallSize))
 	if err != nil {
-		logEncodeContentError(item).Error("unable to open: %s", err)
+		if !absto.IsNotExist(err) {
+			logEncodeContentError(item).Error("unable to open: %s", err)
+		}
+
 		return
 	}
 	defer provider.LogClose(reader, "thumbnail.encodeContent", item.Pathname)

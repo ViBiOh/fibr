@@ -112,7 +112,7 @@ func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.
 	}
 
 	if query.GetBool(r, "thumbnail") {
-		a.thumbnailApp.List(w, r, items)
+		a.thumbnailApp.List(w, r, item, items)
 		return renderer.Page{}, nil
 	}
 
