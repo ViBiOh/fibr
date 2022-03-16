@@ -55,19 +55,16 @@ func (a App) computeStats(ctx context.Context, pathname string) (map[string]uint
 		return nil, fmt.Errorf("unable to browse files: %s", err)
 	}
 
-	metadataPath := provider.MetadataDirectoryName + pathname
-	if _, err = a.rawStorageApp.Info(ctx, metadataPath); err == nil {
-		err = a.rawStorageApp.Walk(ctx, metadataPath, func(item absto.Item) error {
-			if !item.IsDir {
-				metadataSize += uint64(item.Size)
-			}
-
-			return nil
-		})
-
-		if err != nil {
-			return nil, fmt.Errorf("unable to browse metadatas: %s", err)
+	err = a.rawStorageApp.Walk(ctx, provider.MetadataDirectoryName+pathname, func(item absto.Item) error {
+		if !item.IsDir {
+			metadataSize += uint64(item.Size)
 		}
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, fmt.Errorf("unable to browse metadatas: %s", err)
 	}
 
 	return map[string]uint64{

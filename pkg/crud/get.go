@@ -30,7 +30,7 @@ func (a App) getWithMessage(w http.ResponseWriter, r *http.Request, request prov
 	if err != nil && absto.IsNotExist(err) && provider.StreamExtensions[filepath.Ext(pathname)] {
 		if request.Share.File {
 			// URL with /<share_id>/segment.ts will be the pas `/path/of/shared/file/segment.ts`, so we need to remove two directories before appending segment
-			pathname = path.Dir(path.Dir(pathname)) + "/" + path.Base(pathname)
+			pathname = provider.Dirname(path.Dir(path.Dir(pathname))) + path.Base(pathname)
 		}
 
 		item, err = a.thumbnailApp.GetChunk(ctx, pathname)

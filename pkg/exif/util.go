@@ -16,12 +16,11 @@ func (a App) CanHaveExif(item absto.Item) bool {
 }
 
 func getExifPath(item absto.Item) string {
-	fullPath := provider.MetadataDirectoryName + item.Pathname
 	if item.IsDir {
-		return fullPath + "/aggregate.json"
+		return provider.MetadataDirectory(item) + "aggregate.json"
 	}
 
-	return fmt.Sprintf("%s/%s.json", filepath.Dir(fullPath), item.ID)
+	return fmt.Sprintf("%s%s.json", provider.MetadataDirectory(item), item.ID)
 }
 
 func (a App) hasMetadata(ctx context.Context, item absto.Item) bool {

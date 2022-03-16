@@ -15,7 +15,7 @@
 
         <p class="padding no-margin">
           <label for="name-{{ .ID }}" class="block">Name</label>
-          <input id="name-{{ .ID }}" type="text" name="newName" value="{{ .URL }}" />
+          <input id="name-{{ .ID }}" type="text" name="newName" value="{{ .Name }}" />
         </p>
 
         {{ template "form_buttons" "Update" }}

@@ -3,7 +3,6 @@ package thumbnail
 import (
 	"context"
 	"fmt"
-	"path/filepath"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -60,7 +59,7 @@ func (a App) PathForLarge(item absto.Item) string {
 // PathForScale computes thumbnail path for a a given item and scale
 func (a App) PathForScale(item absto.Item, scale uint64) string {
 	if item.IsDir {
-		return getThumbnailDirectoryPath(item)
+		return provider.MetadataDirectory(item)
 	}
 
 	switch scale {
@@ -81,13 +80,8 @@ func getStreamPath(item absto.Item) string {
 }
 
 // PathWithExtension computes thumbnail path with given extension
-func getThumbnailDirectoryPath(item absto.Item) string {
-	return filepath.Dir(provider.MetadataDirectoryName+item.Pathname) + "/"
-}
-
-// PathWithExtension computes thumbnail path with given extension
 func getThumbnailPathForExtension(item absto.Item, extension string) string {
-	return fmt.Sprintf("%s%s.%s", getThumbnailDirectoryPath(item), item.ID, extension)
+	return fmt.Sprintf("%s%s.%s", provider.MetadataDirectory(item), item.ID, extension)
 }
 
 func typeOfItem(item absto.Item) model.ItemType {

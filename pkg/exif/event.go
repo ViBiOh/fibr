@@ -16,17 +16,25 @@ func (a App) EventConsumer(ctx context.Context, e provider.Event) {
 		return
 	}
 
+	var err error
+
 	switch e.Type {
 	case provider.StartEvent:
-		if err := a.handleStartEvent(ctx, e); err != nil {
+		if err = a.handleStartEvent(ctx, e); err != nil {
 			getEventLogger(e.Item).Error("unable to start: %s", err)
 		}
 	case provider.UploadEvent:
-		if err := a.handleUploadEvent(ctx, e.Item); err != nil {
+		if err = a.handleUploadEvent(ctx, e.Item); err != nil {
 			getEventLogger(e.Item).Error("unable to upload: %s", err)
 		}
 	case provider.RenameEvent:
-		if err := a.rename(ctx, e.Item, *e.New); err != nil {
+		if e.Item.IsDir {
+			err = a.renameDirectory(ctx, e.Item, *e.New)
+		} else {
+			err = a.rename(ctx, e.Item, *e.New, true)
+		}
+
+		if err != nil {
 			getEventLogger(e.Item).Error("unable to rename: %s", err)
 		}
 	case provider.DeleteEvent:
@@ -95,23 +103,48 @@ func (a App) processExif(ctx context.Context, item absto.Item, exif exas.Exif) e
 	return nil
 }
 
-func (a App) rename(ctx context.Context, old, new absto.Item) error {
-	oldPath := getExifPath(old)
-	if _, err := a.storageApp.Info(ctx, oldPath); absto.IsNotExist(err) {
-		return nil
-	}
-
-	if err := a.storageApp.Rename(ctx, oldPath, getExifPath(new)); err != nil {
+func (a App) rename(ctx context.Context, old, new absto.Item, recompute bool) error {
+	if err := a.storageApp.Rename(ctx, getExifPath(old), getExifPath(new)); err != nil && !absto.IsNotExist(err) {
 		return fmt.Errorf("unable to rename exif: %s", err)
 	}
 
-	if !old.IsDir {
+	if recompute {
 		if err := a.aggregateOnRename(ctx, old, new); err != nil {
 			return fmt.Errorf("unable to aggregate on rename: %s", err)
 		}
 	}
 
 	return nil
+}
+
+func (a App) renameDirectory(ctx context.Context, old, new absto.Item) error {
+	if err := a.storageApp.CreateDir(ctx, provider.MetadataDirectory(new)); err != nil {
+		return fmt.Errorf("unable to create new exif directory: %s", err)
+	}
+
+	if err := a.storageApp.Rename(ctx, getExifPath(old), getExifPath(new)); err != nil && !absto.IsNotExist(err) {
+		logger.Error("unable to rename exif directory: %s", err)
+	}
+
+	return a.storageApp.Walk(ctx, new.Pathname, func(item absto.Item) error {
+		if item.Pathname == new.Pathname {
+			return nil
+		}
+
+		oldItem := item
+		oldItem.Pathname = provider.Join(old.Pathname, item.Name)
+		oldItem.ID = absto.ID(oldItem.Pathname)
+
+		if item.IsDir {
+			if err := a.renameDirectory(ctx, oldItem, item); err != nil {
+				logger.Error("unable to rename exif sub directory: %s", err)
+			}
+		} else if err := a.rename(ctx, oldItem, item, false); err != nil {
+			logger.Error("unable to rename exif item: %s", err)
+		}
+
+		return nil
+	})
 }
 
 func (a App) aggregateOnRename(ctx context.Context, old, new absto.Item) error {

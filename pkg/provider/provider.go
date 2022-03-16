@@ -1,5 +1,11 @@
 package provider
 
+import (
+	"path/filepath"
+
+	absto "github.com/ViBiOh/absto/pkg/model"
+)
+
 const (
 	// MetadataDirectoryName directory where metadata are stored
 	MetadataDirectoryName = "/.fibr"
@@ -28,3 +34,13 @@ var (
 	// ThumbnailExtensions contains extensions of file eligible to thumbnail
 	ThumbnailExtensions = map[string]bool{".jpg": true, ".jpeg": true, ".png": true, ".gif": true, ".tiff": true, ".pdf": true, ".mp4": true, ".mov": true, ".avi": true, ".webp": true}
 )
+
+// MetadataDirectory computes metadata directory for given item
+func MetadataDirectory(item absto.Item) string {
+	pathname := item.Pathname
+	if !item.IsDir {
+		pathname = filepath.Dir(pathname)
+	}
+
+	return Dirname(MetadataDirectoryName + pathname)
+}

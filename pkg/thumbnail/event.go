@@ -2,7 +2,6 @@ package thumbnail
 
 import (
 	"context"
-	"path"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -21,7 +20,11 @@ func (a App) EventConsumer(ctx context.Context, e provider.Event) {
 	case provider.UploadEvent:
 		a.generateItem(ctx, e)
 	case provider.RenameEvent:
-		a.rename(ctx, e.Item, *e.New)
+		if e.Item.IsDir {
+			a.renameDirectory(ctx, e.Item, *e.New)
+		} else {
+			a.rename(ctx, e.Item, *e.New)
+		}
 	case provider.DeleteEvent:
 		a.delete(ctx, e.Item)
 	}
@@ -58,12 +61,7 @@ func (a App) generateItem(ctx context.Context, event provider.Event) {
 
 func (a App) rename(ctx context.Context, old, new absto.Item) {
 	for _, size := range a.sizes {
-		oldPath := a.PathForScale(old, size)
-		if _, err := a.storageApp.Info(ctx, oldPath); absto.IsNotExist(err) {
-			return
-		}
-
-		if err := a.storageApp.Rename(ctx, oldPath, a.PathForScale(new, size)); err != nil {
+		if err := a.storageApp.Rename(ctx, a.PathForScale(old, size), a.PathForScale(new, size)); err != nil && !absto.IsNotExist(err) {
 			logger.Error("unable to rename thumbnail: %s", err)
 		}
 
@@ -75,9 +73,36 @@ func (a App) rename(ctx context.Context, old, new absto.Item) {
 	}
 }
 
+func (a App) renameDirectory(ctx context.Context, old, new absto.Item) {
+	if err := a.storageApp.CreateDir(ctx, provider.MetadataDirectory(new)); err != nil {
+		logger.Error("unable to create new thumbnail directory: %s", err)
+		return
+	}
+
+	if err := a.storageApp.Walk(ctx, new.Pathname, func(item absto.Item) error {
+		if item.Pathname == new.Pathname {
+			return nil
+		}
+
+		oldItem := item
+		oldItem.Pathname = provider.Join(old.Pathname, item.Name)
+		oldItem.ID = absto.ID(oldItem.Pathname)
+
+		if item.IsDir {
+			a.renameDirectory(ctx, oldItem, item)
+		} else {
+			a.rename(ctx, oldItem, item)
+		}
+
+		return nil
+	}); err != nil {
+		logger.Error("unable to walk new thumbnail directory: %s", err)
+	}
+}
+
 func (a App) delete(ctx context.Context, item absto.Item) {
 	if item.IsDir {
-		if err := a.storageApp.Remove(ctx, path.Join(provider.MetadataDirectoryName+item.Pathname)+"/"); err != nil {
+		if err := a.storageApp.Remove(ctx, provider.MetadataDirectory(item)); err != nil {
 			logger.Error("unable to delete thumbnail folder: %s", err)
 		}
 		return
