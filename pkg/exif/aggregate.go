@@ -3,7 +3,6 @@ package exif
 import (
 	"context"
 	"fmt"
-	"path/filepath"
 	"time"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
@@ -84,13 +83,9 @@ func (a App) computeAndSaveAggregate(ctx context.Context, dir absto.Item) error 
 	directoryAggregate := newAggregate()
 	var minDate, maxDate time.Time
 
-	err := a.storageApp.Walk(ctx, dir.Pathname, func(item absto.Item) error {
+	err := a.fileOnlyStorageApp.Walk(ctx, dir.Pathname, func(item absto.Item) error {
 		if item.Pathname == dir.Pathname {
 			return nil
-		}
-
-		if item.IsDir {
-			return filepath.SkipDir
 		}
 
 		exifData, err := a.loadExif(ctx, item)
