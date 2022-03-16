@@ -87,6 +87,8 @@ func (a App) List(ctx context.Context, request provider.Request, message rendere
 	var hasThumbnail bool
 	var hasStory bool
 
+	var cover map[string]interface{}
+
 	for index, item := range items {
 		if !a.thumbnailApp.CanHaveThumbnail(item.Item) {
 			continue
@@ -100,6 +102,14 @@ func (a App) List(ctx context.Context, request provider.Request, message rendere
 			}
 
 			hasThumbnail = true
+
+			if cover == nil {
+				cover = map[string]interface{}{
+					"Img":       item,
+					"ImgHeight": thumbnail.SmallSize,
+					"ImgWidth":  thumbnail.SmallSize,
+				}
+			}
 
 			if !hasStory {
 				hasStory = a.thumbnailApp.HasLargeThumbnail(ctx, item.Item)
@@ -116,7 +126,7 @@ func (a App) List(ctx context.Context, request provider.Request, message rendere
 	content := map[string]interface{}{
 		"Paths":        getPathParts(request),
 		"Files":        items,
-		"Cover":        a.getCover(ctx, request, files),
+		"Cover":        cover,
 		"Request":      request,
 		"Message":      message,
 		"HasMap":       hasMap,
