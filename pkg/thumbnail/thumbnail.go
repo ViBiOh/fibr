@@ -269,7 +269,9 @@ func (a App) encodeContent(ctx context.Context, w io.Writer, isDone func() bool,
 	encoder := base64.NewEncoder(base64.StdEncoding, w)
 
 	if _, err = io.CopyBuffer(encoder, reader, buffer.Bytes()); err != nil {
-		logEncodeContentError(item).Error("unable to copy: %s", err)
+		if !absto.IsNotExist(a.storageApp.ConvertError(err)) {
+			logEncodeContentError(item).Error("unable to copy: %s", err)
+		}
 	}
 
 	if err := encoder.Close(); err != nil {
