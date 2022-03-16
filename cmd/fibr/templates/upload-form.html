@@ -20,7 +20,11 @@
       eventNoop(e);
 
       window.location.hash = '#upload-modal';
-      document.getElementById('file').files = e.dataTransfer.files;
+      const fileInput = document.getElementById('file');
+      if (fileInput) {
+        fileInput.files = e.dataTransfer.files;
+        fileInput.dispatchEvent(new Event('change'));
+      }
     });
 
     /**

@@ -35,6 +35,8 @@ github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/ViBiOh/absto v0.4.1 h1:1sggdMNzmy/v9hZ/DS2sK7f2689wpdEEcVEL9tZrOmw=
 github.com/ViBiOh/absto v0.4.1/go.mod h1:cD9EhM/9f+FiNkXVGn41qrxQXGyJJ+LlpSKcHW+p/PY=
+github.com/ViBiOh/absto v0.4.2 h1:1KSmkWmMlnjVQwmS+5DHfjzUOMmn164C7bzyPJ2RLnQ=
+github.com/ViBiOh/absto v0.4.2/go.mod h1:cD9EhM/9f+FiNkXVGn41qrxQXGyJJ+LlpSKcHW+p/PY=
 github.com/ViBiOh/auth/v2 v2.11.44 h1:MHI4fOdNoQATmBQgP6nQ2c5q+Sa7kK+5bt8+8mAyIKM=
 github.com/ViBiOh/auth/v2 v2.11.44/go.mod h1:7i3R41YhonhvGHY19RQatMx5U2MgzKxlQ19+1yFz0cY=
 github.com/ViBiOh/exas v0.3.3 h1:xGLY6MOu4N3de2N6/LKwTDLwffNDqwjsLDnAfi6DfIU=
