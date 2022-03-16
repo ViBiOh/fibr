@@ -113,7 +113,7 @@ func (r Request) RelativeURL(item absto.Item) string {
 	}
 
 	if item.IsDir {
-		pathname += "/"
+		pathname = Dirname(pathname)
 	}
 
 	return strings.TrimPrefix(pathname, r.Path)

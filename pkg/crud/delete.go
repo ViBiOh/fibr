@@ -34,7 +34,7 @@ func (a App) Delete(w http.ResponseWriter, r *http.Request, request provider.Req
 
 	deletePath := info.Pathname
 	if info.IsDir {
-		deletePath += "/"
+		deletePath = provider.Dirname(deletePath)
 	}
 
 	if err = a.storageApp.Remove(ctx, deletePath); err != nil {
