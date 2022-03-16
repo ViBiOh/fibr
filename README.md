@@ -341,7 +341,7 @@ Usage of fibr:
   -shutdownTimeout string
         [server] Shutdown Timeout {FIBR_SHUTDOWN_TIMEOUT} (default "10s")
   -storageFileSystemDirectory /data
-        [storage] Path to directory. Default is dynamic. /data on a server and Current Working Directory in a terminal. {FIBR_STORAGE_FILE_SYSTEM_DIRECTORY} (default "/Users/macbook/code/fibr")
+        [storage] Path to directory. Default is dynamic. /data on a server and Current Working Directory in a terminal. {FIBR_STORAGE_FILE_SYSTEM_DIRECTORY} (default "/data")
   -storageObjectAccessKey string
         [storage] Storage Object Access Key {FIBR_STORAGE_OBJECT_ACCESS_KEY}
   -storageObjectBucket string
@@ -352,6 +352,8 @@ Usage of fibr:
         [storage] Use SSL {FIBR_STORAGE_OBJECT_SSL} (default true)
   -storageObjectSecretAccess string
         [storage] Storage Object Secret Access {FIBR_STORAGE_OBJECT_SECRET_ACCESS}
+  -storagePartSize uint
+        [storage] PartSize configuration {FIBR_STORAGE_PART_SIZE} (default 5242880)
   -thumbnailAmqpExchange string
         [thumbnail] AMQP Exchange Name {FIBR_THUMBNAIL_AMQP_EXCHANGE} (default "fibr")
   -thumbnailAmqpStreamRoutingKey string
