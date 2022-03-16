@@ -37,7 +37,7 @@ func (a App) Browser(ctx context.Context, w http.ResponseWriter, request provide
 		var err error
 		exif, err = a.exifApp.GetExifFor(ctx, item)
 		if err != nil {
-			logger.WithField("item", item.Pathname).Error("unable to load exif: %w", err)
+			logger.WithField("item", item.Pathname).Error("unable to load exif: %s", err)
 		}
 	})
 

@@ -59,7 +59,7 @@ func (a App) List(ctx context.Context, request provider.Request, message rendere
 	var hasMap bool
 	wg.Go(func() {
 		if aggregate, err := a.exifApp.GetAggregateFor(ctx, item); err != nil && !absto.IsNotExist(err) {
-			logger.WithField("fn", "crud.List").WithField("item", request.Path).Error("unable to get aggregate: %w", err)
+			logger.WithField("fn", "crud.List").WithField("item", request.Path).Error("unable to get aggregate: %s", err)
 		} else if len(aggregate.Location) != 0 {
 			hasMap = true
 		}
