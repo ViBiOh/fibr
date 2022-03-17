@@ -11,8 +11,10 @@ import (
 	"time"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
+	exas "github.com/ViBiOh/exas/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/geo"
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/v4/pkg/concurrent"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/query"
@@ -155,6 +157,11 @@ func (a App) listFiles(r *http.Request, request provider.Request) (items []absto
 	return items, err
 }
 
+type exifOutput struct {
+	Exif exas.Exif
+	Item absto.Item
+}
+
 func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provider.Request, items []absto.Item) {
 	if len(items) == 0 {
 		w.WriteHeader(http.StatusNoContent)
@@ -175,6 +182,40 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 		}
 	}
 
+	wg := concurrent.NewLimited(4)
+	output := make(chan exifOutput, 4)
+
+	go func() {
+		defer close(output)
+
+		for _, item := range items {
+			if isDone() {
+				return
+			}
+
+			func(item absto.Item) {
+				wg.Go(func() {
+					exif, err := a.exifApp.GetExifFor(r.Context(), item)
+					if err != nil {
+						logger.WithField("item", item.Pathname).Error("unable to get exif: %s", err)
+						return
+					}
+
+					if exif.Geocode.Longitude == 0 && exif.Geocode.Latitude == 0 {
+						return
+					}
+
+					output <- exifOutput{
+						Exif: exif,
+						Item: item,
+					}
+				})
+			}(item)
+		}
+
+		wg.Wait()
+	}()
+
 	var commaNeeded bool
 	encoder := json.NewEncoder(w)
 
@@ -183,32 +224,23 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 	point := geo.NewPoint(geo.NewPosition(0, 0))
 	feature := geo.NewFeature(&point, map[string]interface{}{})
 
-	for _, item := range items {
+	for exifContent := range output {
 		if isDone() {
 			return
-		}
-
-		exif, err := a.exifApp.GetExifFor(r.Context(), item)
-		if err != nil {
-			logger.WithField("item", item.Pathname).Error("unable to get exif: %s", err)
-		}
-
-		if exif.Geocode.Longitude == 0 && exif.Geocode.Latitude == 0 {
-			continue
 		}
 
 		if commaNeeded {
 			provider.DoneWriter(isDone, w, ",")
 		}
 
-		point.Coordinates.Latitude = exif.Geocode.Latitude
-		point.Coordinates.Longitude = exif.Geocode.Longitude
+		point.Coordinates.Latitude = exifContent.Exif.Geocode.Latitude
+		point.Coordinates.Longitude = exifContent.Exif.Geocode.Longitude
 
-		feature.Properties["url"] = request.RelativeURL(item)
-		feature.Properties["date"] = exif.Date.Format(time.RFC850)
+		feature.Properties["url"] = request.RelativeURL(exifContent.Item)
+		feature.Properties["date"] = exifContent.Exif.Date.Format(time.RFC850)
 
 		if err := encoder.Encode(feature); err != nil {
-			logger.WithField("item", item.Pathname).Error("unable to encode feature: %s", err)
+			logger.WithField("item", exifContent.Item.Pathname).Error("unable to encode feature: %s", err)
 		}
 
 		commaNeeded = true
