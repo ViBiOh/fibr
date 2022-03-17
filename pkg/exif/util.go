@@ -15,7 +15,8 @@ func (a App) CanHaveExif(item absto.Item) bool {
 	return provider.ThumbnailExtensions[item.Extension] && (a.maxSize == 0 || item.Size < a.maxSize || a.directAccess)
 }
 
-func getExifPath(item absto.Item) string {
+// Path computes exif path for a a given item
+func Path(item absto.Item) string {
 	if item.IsDir {
 		return provider.MetadataDirectory(item) + "aggregate.json"
 	}
@@ -24,7 +25,7 @@ func getExifPath(item absto.Item) string {
 }
 
 func (a App) hasMetadata(ctx context.Context, item absto.Item) bool {
-	_, err := a.storageApp.Info(ctx, getExifPath(item))
+	_, err := a.storageApp.Info(ctx, Path(item))
 	return err == nil
 }
 
@@ -39,11 +40,11 @@ func (a App) loadAggregate(ctx context.Context, item absto.Item) (provider.Aggre
 }
 
 func (a App) loadMetadata(ctx context.Context, item absto.Item, content interface{}) error {
-	return provider.LoadJSON(ctx, a.storageApp, getExifPath(item), content)
+	return provider.LoadJSON(ctx, a.storageApp, Path(item), content)
 }
 
 func (a App) saveMetadata(ctx context.Context, item absto.Item, data interface{}) error {
-	filename := getExifPath(item)
+	filename := Path(item)
 	dirname := filepath.Dir(filename)
 
 	if _, err := a.storageApp.Info(ctx, dirname); err != nil {

@@ -1,6 +1,7 @@
 package crud
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -12,9 +13,9 @@ import (
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	exas "github.com/ViBiOh/exas/pkg/model"
+	"github.com/ViBiOh/fibr/pkg/exif"
 	"github.com/ViBiOh/fibr/pkg/geo"
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/v4/pkg/concurrent"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/query"
@@ -109,7 +110,7 @@ func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.
 	}
 
 	if query.GetBool(r, "geojson") {
-		a.serveGeoJSON(w, r, request, items)
+		a.serveGeoJSON(w, r, request, item, items)
 		return renderer.Page{}, nil
 	}
 
@@ -162,14 +163,28 @@ type exifOutput struct {
 	Item absto.Item
 }
 
-func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provider.Request, items []absto.Item) {
+func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provider.Request, item absto.Item, items []absto.Item) {
 	if len(items) == 0 {
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 
+	ctx := r.Context()
+
+	var hash string
+	if query.GetBool(r, "search") {
+		hash = a.exifHash(ctx, items)
+	} else if exifs, err := a.exifApp.ListDir(ctx, item); err == nil {
+		hash = sha.New(exifs)
+	}
+
+	etag, ok := provider.EtagMatch(w, r, hash)
+	if ok {
+		return
+	}
+
 	w.Header().Add("Content-Type", "application/json; charset=utf-8")
-	w.Header().Add("Cache-Control", "no-cache")
+	w.Header().Add("Etag", etag)
 	w.WriteHeader(http.StatusOK)
 
 	done := r.Context().Done()
@@ -182,40 +197,6 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 		}
 	}
 
-	wg := concurrent.NewLimited(4)
-	output := make(chan exifOutput, 4)
-
-	go func() {
-		defer close(output)
-
-		for _, item := range items {
-			if isDone() {
-				return
-			}
-
-			func(item absto.Item) {
-				wg.Go(func() {
-					exif, err := a.exifApp.GetExifFor(r.Context(), item)
-					if err != nil {
-						logger.WithField("item", item.Pathname).Error("unable to get exif: %s", err)
-						return
-					}
-
-					if exif.Geocode.Longitude == 0 && exif.Geocode.Latitude == 0 {
-						return
-					}
-
-					output <- exifOutput{
-						Exif: exif,
-						Item: item,
-					}
-				})
-			}(item)
-		}
-
-		wg.Wait()
-	}()
-
 	var commaNeeded bool
 	encoder := json.NewEncoder(w)
 
@@ -224,29 +205,51 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 	point := geo.NewPoint(geo.NewPosition(0, 0))
 	feature := geo.NewFeature(&point, map[string]interface{}{})
 
-	for exifContent := range output {
+	for _, item := range items {
 		if isDone() {
 			return
 		}
 
+		exif, err := a.exifApp.GetExifFor(r.Context(), item)
+		if err != nil {
+			logger.WithField("item", item.Pathname).Error("unable to get exif: %s", err)
+			continue
+		}
+
+		if exif.Geocode.Longitude == 0 && exif.Geocode.Latitude == 0 {
+			continue
+		}
+
 		if commaNeeded {
 			provider.DoneWriter(isDone, w, ",")
+		} else {
+			commaNeeded = true
 		}
 
-		point.Coordinates.Latitude = exifContent.Exif.Geocode.Latitude
-		point.Coordinates.Longitude = exifContent.Exif.Geocode.Longitude
+		point.Coordinates.Latitude = exif.Geocode.Latitude
+		point.Coordinates.Longitude = exif.Geocode.Longitude
 
-		feature.Properties["url"] = request.RelativeURL(exifContent.Item)
-		feature.Properties["date"] = exifContent.Exif.Date.Format(time.RFC850)
+		feature.Properties["url"] = request.RelativeURL(item)
+		feature.Properties["date"] = exif.Date.Format(time.RFC850)
 
 		if err := encoder.Encode(feature); err != nil {
-			logger.WithField("item", exifContent.Item.Pathname).Error("unable to encode feature: %s", err)
+			logger.WithField("item", item.Pathname).Error("unable to encode feature: %s", err)
 		}
-
-		commaNeeded = true
 	}
 
 	provider.SafeWrite(w, "]}")
+}
+
+func (a App) exifHash(ctx context.Context, items []absto.Item) string {
+	hasher := sha.Stream()
+
+	for _, item := range items {
+		if info, err := a.storageApp.Info(ctx, exif.Path(item)); err == nil {
+			hasher.Write(info)
+		}
+	}
+
+	return hasher.Sum()
 }
 
 // Get output content

@@ -40,7 +40,7 @@ func TestGetExifPath(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.intention, func(t *testing.T) {
-			if got := getExifPath(tc.args.item); got != tc.want {
+			if got := Path(tc.args.item); got != tc.want {
 				t.Errorf("getExifPath() = `%s`, want `%s`", got, tc.want)
 			}
 		})

@@ -83,11 +83,32 @@ func (a App) List(ctx context.Context, request provider.Request, message rendere
 
 	wg.Wait()
 
-	renderWithThumbnail := request.Display == provider.GridDisplay
-	var hasThumbnail bool
-	var hasStory bool
+	hasThumbnail, hasStory, cover := a.enrichThumbnail(ctx, request, items, thumbnails)
 
-	var cover map[string]interface{}
+	content := map[string]interface{}{
+		"Paths":        getPathParts(request),
+		"Files":        items,
+		"Cover":        cover,
+		"Request":      request,
+		"Message":      message,
+		"HasMap":       hasMap,
+		"HasThumbnail": hasThumbnail,
+		"HasStory":     hasStory,
+	}
+
+	if request.CanShare {
+		content["Shares"] = a.shareApp.List()
+	}
+
+	if request.CanWebhook {
+		content["Webhooks"] = a.webhookApp.List()
+	}
+
+	return renderer.NewPage("files", http.StatusOK, content), nil
+}
+
+func (a App) enrichThumbnail(ctx context.Context, request provider.Request, items []provider.RenderItem, thumbnails []absto.Item) (hasThumbnail bool, hasStory bool, cover map[string]interface{}) {
+	renderWithThumbnail := request.Display == provider.GridDisplay
 
 	for index, item := range items {
 		if !a.thumbnailApp.CanHaveThumbnail(item.Item) {
@@ -123,26 +144,7 @@ func (a App) List(ctx context.Context, request provider.Request, message rendere
 		}
 	}
 
-	content := map[string]interface{}{
-		"Paths":        getPathParts(request),
-		"Files":        items,
-		"Cover":        cover,
-		"Request":      request,
-		"Message":      message,
-		"HasMap":       hasMap,
-		"HasThumbnail": hasThumbnail,
-		"HasStory":     hasStory,
-	}
-
-	if request.CanShare {
-		content["Shares"] = a.shareApp.List()
-	}
-
-	if request.CanWebhook {
-		content["Webhooks"] = a.webhookApp.List()
-	}
-
-	return renderer.NewPage("files", http.StatusOK, content), nil
+	return
 }
 
 // Download content of a directory into a streamed zip

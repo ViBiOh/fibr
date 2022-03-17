@@ -25,6 +25,7 @@ import (
 type App struct {
 	tracer             trace.Tracer
 	storageApp         absto.Storage
+	listStorageApp     absto.Storage
 	fileOnlyStorageApp absto.Storage
 	exifMetric         *prometheus.CounterVec
 	aggregateMetric    *prometheus.CounterVec
@@ -92,10 +93,26 @@ func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheu
 		fileOnlyStorageApp: storageApp.WithIgnoreFn(func(item absto.Item) bool {
 			return item.IsDir
 		}),
+		listStorageApp: storageApp.WithIgnoreFn(func(item absto.Item) bool {
+			return !strings.HasSuffix(item.Name, ".json")
+		}),
 
 		exifMetric:      prom.CounterVec(prometheusRegisterer, "fibr", "exif", "item", "state"),
 		aggregateMetric: prom.CounterVec(prometheusRegisterer, "fibr", "aggregate", "item", "state"),
 	}, nil
+}
+
+// ListDir return all exifs for a given directory
+func (a App) ListDir(ctx context.Context, item absto.Item) ([]absto.Item, error) {
+	if !item.IsDir {
+		return nil, nil
+	}
+
+	exifs, err := a.listStorageApp.List(ctx, Path(item))
+	if err != nil && !absto.IsNotExist(err) {
+		return exifs, err
+	}
+	return exifs, nil
 }
 
 func (a App) enabled() bool {

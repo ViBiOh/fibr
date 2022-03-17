@@ -47,7 +47,7 @@ func (a App) EventConsumer(ctx context.Context, e provider.Event) {
 
 // Rename exif of an item
 func (a App) Rename(ctx context.Context, old, new absto.Item) error {
-	if err := a.storageApp.Rename(ctx, getExifPath(old), getExifPath(new)); err != nil && !absto.IsNotExist(err) {
+	if err := a.storageApp.Rename(ctx, Path(old), Path(new)); err != nil && !absto.IsNotExist(err) {
 		return fmt.Errorf("unable to rename exif: %s", err)
 	}
 
@@ -140,7 +140,7 @@ func (a App) aggregateOnRename(ctx context.Context, old, new absto.Item) error {
 }
 
 func (a App) delete(ctx context.Context, item absto.Item) error {
-	if err := a.storageApp.Remove(ctx, getExifPath(item)); err != nil {
+	if err := a.storageApp.Remove(ctx, Path(item)); err != nil {
 		return fmt.Errorf("unable to delete: %s", err)
 	}
 
