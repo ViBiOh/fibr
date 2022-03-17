@@ -2,6 +2,7 @@ package thumbnail
 
 import (
 	"context"
+	"fmt"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -20,14 +21,35 @@ func (a App) EventConsumer(ctx context.Context, e provider.Event) {
 	case provider.UploadEvent:
 		a.generateItem(ctx, e)
 	case provider.RenameEvent:
-		if e.Item.IsDir {
-			a.renameDirectory(ctx, e.Item, *e.New)
-		} else {
-			a.rename(ctx, e.Item, *e.New)
+		if !e.Item.IsDir {
+			if err := a.Rename(ctx, e.Item, *e.New); err != nil {
+				logger.Error("unable to rename item: %s", err)
+			}
 		}
 	case provider.DeleteEvent:
 		a.delete(ctx, e.Item)
 	}
+}
+
+// Rename thumbnail of an item
+func (a App) Rename(ctx context.Context, old, new absto.Item) error {
+	if old.IsDir {
+		return nil
+	}
+
+	for _, size := range a.sizes {
+		if err := a.storageApp.Rename(ctx, a.PathForScale(old, size), a.PathForScale(new, size)); err != nil && !absto.IsNotExist(err) {
+			return fmt.Errorf("unable to rename thumbnail: %s", err)
+		}
+
+		if provider.VideoExtensions[old.Extension] != "" && a.HasStream(ctx, old) {
+			if err := a.renameStream(ctx, old, new); err != nil {
+				return fmt.Errorf("unable to rename stream: %s", err)
+			}
+		}
+	}
+
+	return nil
 }
 
 func (a App) generateItem(ctx context.Context, event provider.Event) {
@@ -56,47 +78,6 @@ func (a App) generateItem(ctx context.Context, event provider.Event) {
 				logger.Error("unable to generate stream: %s", err)
 			}
 		}
-	}
-}
-
-func (a App) rename(ctx context.Context, old, new absto.Item) {
-	for _, size := range a.sizes {
-		if err := a.storageApp.Rename(ctx, a.PathForScale(old, size), a.PathForScale(new, size)); err != nil && !absto.IsNotExist(err) {
-			logger.Error("unable to rename thumbnail: %s", err)
-		}
-
-		if provider.VideoExtensions[old.Extension] != "" && a.HasStream(ctx, old) {
-			if err := a.renameStream(ctx, old, new); err != nil {
-				logger.Error("unable to rename stream: %s", err)
-			}
-		}
-	}
-}
-
-func (a App) renameDirectory(ctx context.Context, old, new absto.Item) {
-	if err := a.storageApp.CreateDir(ctx, provider.MetadataDirectory(new)); err != nil {
-		logger.Error("unable to create new thumbnail directory: %s", err)
-		return
-	}
-
-	if err := a.storageApp.Walk(ctx, new.Pathname, func(item absto.Item) error {
-		if item.Pathname == new.Pathname {
-			return nil
-		}
-
-		oldItem := item
-		oldItem.Pathname = provider.Join(old.Pathname, item.Name)
-		oldItem.ID = absto.ID(oldItem.Pathname)
-
-		if item.IsDir {
-			a.renameDirectory(ctx, oldItem, item)
-		} else {
-			a.rename(ctx, oldItem, item)
-		}
-
-		return nil
-	}); err != nil {
-		logger.Error("unable to walk new thumbnail directory: %s", err)
 	}
 }
 

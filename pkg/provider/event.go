@@ -12,6 +12,7 @@ import (
 	"time"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
+	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 	"github.com/prometheus/client_golang/prometheus"
@@ -27,6 +28,9 @@ type EventProducer func(Event) error
 
 // EventConsumer is a func that consume an event
 type EventConsumer func(context.Context, Event)
+
+// Renamer is a func that rename an item
+type Renamer func(context.Context, absto.Item, absto.Item) error
 
 const (
 	// UploadEvent occurs when someone upload a file
@@ -295,7 +299,7 @@ func (e EventBus) Push(event Event) error {
 }
 
 // Start the distibution of Event
-func (e EventBus) Start(done <-chan struct{}, consumers ...EventConsumer) {
+func (e EventBus) Start(done <-chan struct{}, storageApp absto.Storage, renamers []Renamer, consumers ...EventConsumer) {
 	defer close(e.bus)
 	defer close(e.done)
 
@@ -307,6 +311,10 @@ func (e EventBus) Start(done <-chan struct{}, consumers ...EventConsumer) {
 			if e.tracer != nil {
 				ctx, span = e.tracer.Start(ctx, "event")
 				span.SetAttributes(attribute.String("type", event.Type.String()))
+			}
+
+			if event.Type == RenameEvent && event.Item.IsDir {
+				RenameDirectory(ctx, storageApp, renamers, event.Item, *event.New)
 			}
 
 			for _, consumer := range consumers {
@@ -321,4 +329,41 @@ func (e EventBus) Start(done <-chan struct{}, consumers ...EventConsumer) {
 	}()
 
 	<-done
+}
+
+// RenameDirectory for metadata
+func RenameDirectory(ctx context.Context, storageApp absto.Storage, renamers []Renamer, old, new absto.Item) {
+	if err := storageApp.CreateDir(ctx, MetadataDirectory(new)); err != nil {
+		logger.Error("unable to create new metadata directory: %s", err)
+		return
+	}
+
+	if err := storageApp.Walk(ctx, new.Pathname, func(item absto.Item) error {
+		if item.Pathname == new.Pathname {
+			return nil
+		}
+
+		oldItem := item
+		oldItem.Pathname = Join(old.Pathname, item.Name)
+		oldItem.ID = absto.ID(oldItem.Pathname)
+
+		if item.IsDir {
+			RenameDirectory(ctx, storageApp, renamers, oldItem, item)
+		} else {
+			for _, renamer := range renamers {
+				if err := renamer(ctx, oldItem, item); err != nil {
+					logger.Error("unable to rename metadata item for `%s`: %s", oldItem.Pathname, err)
+				}
+			}
+		}
+
+		return nil
+	}); err != nil {
+		logger.Error("unable to walk new thumbnail directory: %s", err)
+	}
+
+	if err := storageApp.Remove(ctx, MetadataDirectory(old)); err != nil {
+		logger.Error("unable to delete old metadata directory: %s", err)
+		return
+	}
 }
