@@ -180,7 +180,7 @@ func (a *App) slackHandle(ctx context.Context, webhook provider.Webhook, event p
 }
 
 func (a *App) telegramHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
-	return send(ctx, webhook.ID, request.Post(fmt.Sprintf("%s&message=%s", webhook.URL, url.QueryEscape(a.eventText(event)))), nil)
+	return send(ctx, webhook.ID, request.Post(fmt.Sprintf("%s&text=%s", webhook.URL, url.QueryEscape(a.eventText(event)))), nil)
 }
 
 func (a *App) eventText(event provider.Event) string {
