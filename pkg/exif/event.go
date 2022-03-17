@@ -113,32 +113,6 @@ func (a App) processExif(ctx context.Context, item absto.Item, exif exas.Exif) e
 	return nil
 }
 
-func (a App) renameDirectory(ctx context.Context, old, new absto.Item) error {
-	if err := a.storageApp.CreateDir(ctx, provider.MetadataDirectory(new)); err != nil {
-		return fmt.Errorf("unable to create new exif directory: %s", err)
-	}
-
-	return a.storageApp.Walk(ctx, new.Pathname, func(item absto.Item) error {
-		if item.Pathname == new.Pathname {
-			return nil
-		}
-
-		oldItem := item
-		oldItem.Pathname = provider.Join(old.Pathname, item.Name)
-		oldItem.ID = absto.ID(oldItem.Pathname)
-
-		if item.IsDir {
-			if err := a.renameDirectory(ctx, oldItem, item); err != nil {
-				logger.Error("unable to rename exif sub directory: %s", err)
-			}
-		} else if err := a.Rename(ctx, oldItem, item); err != nil {
-			logger.Error("unable to rename exif item: %s", err)
-		}
-
-		return nil
-	})
-}
-
 func (a App) aggregateOnRename(ctx context.Context, old, new absto.Item) error {
 	oldDir, err := a.getDirOf(ctx, old)
 	if err != nil {
