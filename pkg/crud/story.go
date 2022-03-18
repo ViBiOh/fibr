@@ -49,7 +49,7 @@ func (a App) story(r *http.Request, request provider.Request, item absto.Item, f
 
 		if cover == nil {
 			cover = map[string]interface{}{
-				"Img":       item,
+				"Img":       provider.StorageToRender(item, request),
 				"ImgHeight": a.thumbnailApp.LargeThumbnailSize(),
 				"ImgWidth":  a.thumbnailApp.LargeThumbnailSize(),
 			}
