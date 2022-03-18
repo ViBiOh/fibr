@@ -11,7 +11,7 @@ import (
 )
 
 type entry struct {
-	Value interface{}
+	Value any
 	Key   string
 }
 
@@ -24,7 +24,7 @@ func (a App) Stats(w http.ResponseWriter, r *http.Request, request provider.Requ
 		return renderer.NewPage("", http.StatusInternalServerError, nil), err
 	}
 
-	return renderer.NewPage("stats", http.StatusOK, map[string]interface{}{
+	return renderer.NewPage("stats", http.StatusOK, map[string]any{
 		"Paths":   getPathParts(request),
 		"Request": request,
 		"Message": message,

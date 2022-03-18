@@ -57,7 +57,7 @@ func (a *App) EventConsumer(ctx context.Context, event provider.Event) {
 	}()
 }
 
-func send(ctx context.Context, id string, req request.Request, payload interface{}) (int, error) {
+func send(ctx context.Context, id string, req request.Request, payload any) (int, error) {
 	resp, err := req.JSON(ctx, payload)
 	if err != nil {
 		return 0, fmt.Errorf("unable to send webhook with id `%s`: %s", id, err)

@@ -197,7 +197,7 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 	provider.SafeWrite(w, `{"type":"FeatureCollection","features":[`)
 
 	point := geo.NewPoint(geo.NewPosition(0, 0))
-	feature := geo.NewFeature(&point, map[string]interface{}{})
+	feature := geo.NewFeature(&point, map[string]any{})
 
 	for _, item := range items {
 		if isDone() {

@@ -49,7 +49,7 @@ func (m *Crud) Browser(arg0 context.Context, arg1 http.ResponseWriter, arg2 prov
 }
 
 // Browser indicates an expected call of Browser.
-func (mr *CrudMockRecorder) Browser(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
+func (mr *CrudMockRecorder) Browser(arg0, arg1, arg2, arg3, arg4 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Browser", reflect.TypeOf((*Crud)(nil).Browser), arg0, arg1, arg2, arg3, arg4)
 }
@@ -61,7 +61,7 @@ func (m *Crud) Create(arg0 http.ResponseWriter, arg1 *http.Request, arg2 provide
 }
 
 // Create indicates an expected call of Create.
-func (mr *CrudMockRecorder) Create(arg0, arg1, arg2 interface{}) *gomock.Call {
+func (mr *CrudMockRecorder) Create(arg0, arg1, arg2 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*Crud)(nil).Create), arg0, arg1, arg2)
 }
@@ -73,7 +73,7 @@ func (m *Crud) Delete(arg0 http.ResponseWriter, arg1 *http.Request, arg2 provide
 }
 
 // Delete indicates an expected call of Delete.
-func (mr *CrudMockRecorder) Delete(arg0, arg1, arg2 interface{}) *gomock.Call {
+func (mr *CrudMockRecorder) Delete(arg0, arg1, arg2 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*Crud)(nil).Delete), arg0, arg1, arg2)
 }
@@ -88,7 +88,7 @@ func (m *Crud) Get(arg0 http.ResponseWriter, arg1 *http.Request, arg2 provider.R
 }
 
 // Get indicates an expected call of Get.
-func (mr *CrudMockRecorder) Get(arg0, arg1, arg2 interface{}) *gomock.Call {
+func (mr *CrudMockRecorder) Get(arg0, arg1, arg2 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*Crud)(nil).Get), arg0, arg1, arg2)
 }
@@ -103,7 +103,7 @@ func (m *Crud) List(arg0 context.Context, arg1 provider.Request, arg2 renderer.M
 }
 
 // List indicates an expected call of List.
-func (mr *CrudMockRecorder) List(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
+func (mr *CrudMockRecorder) List(arg0, arg1, arg2, arg3, arg4 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*Crud)(nil).List), arg0, arg1, arg2, arg3, arg4)
 }
@@ -115,7 +115,7 @@ func (m *Crud) Post(arg0 http.ResponseWriter, arg1 *http.Request, arg2 provider.
 }
 
 // Post indicates an expected call of Post.
-func (mr *CrudMockRecorder) Post(arg0, arg1, arg2 interface{}) *gomock.Call {
+func (mr *CrudMockRecorder) Post(arg0, arg1, arg2 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Post", reflect.TypeOf((*Crud)(nil).Post), arg0, arg1, arg2)
 }
@@ -127,7 +127,7 @@ func (m *Crud) Rename(arg0 http.ResponseWriter, arg1 *http.Request, arg2 provide
 }
 
 // Rename indicates an expected call of Rename.
-func (mr *CrudMockRecorder) Rename(arg0, arg1, arg2 interface{}) *gomock.Call {
+func (mr *CrudMockRecorder) Rename(arg0, arg1, arg2 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Rename", reflect.TypeOf((*Crud)(nil).Rename), arg0, arg1, arg2)
 }
@@ -139,7 +139,7 @@ func (m *Crud) Start(arg0 <-chan struct{}) {
 }
 
 // Start indicates an expected call of Start.
-func (mr *CrudMockRecorder) Start(arg0 interface{}) *gomock.Call {
+func (mr *CrudMockRecorder) Start(arg0 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Start", reflect.TypeOf((*Crud)(nil).Start), arg0)
 }
@@ -151,7 +151,7 @@ func (m *Crud) Upload(arg0 http.ResponseWriter, arg1 *http.Request, arg2 provide
 }
 
 // Upload indicates an expected call of Upload.
-func (mr *CrudMockRecorder) Upload(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
+func (mr *CrudMockRecorder) Upload(arg0, arg1, arg2, arg3, arg4 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Upload", reflect.TypeOf((*Crud)(nil).Upload), arg0, arg1, arg2, arg3, arg4)
 }

@@ -48,7 +48,7 @@ func (m *Auth) IsAuthenticated(arg0 *http.Request) (ident.Provider, model.User, 
 }
 
 // IsAuthenticated indicates an expected call of IsAuthenticated.
-func (mr *AuthMockRecorder) IsAuthenticated(arg0 interface{}) *gomock.Call {
+func (mr *AuthMockRecorder) IsAuthenticated(arg0 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsAuthenticated", reflect.TypeOf((*Auth)(nil).IsAuthenticated), arg0)
 }
@@ -62,7 +62,7 @@ func (m *Auth) IsAuthorized(arg0 context.Context, arg1 string) bool {
 }
 
 // IsAuthorized indicates an expected call of IsAuthorized.
-func (mr *AuthMockRecorder) IsAuthorized(arg0, arg1 interface{}) *gomock.Call {
+func (mr *AuthMockRecorder) IsAuthorized(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsAuthorized", reflect.TypeOf((*Auth)(nil).IsAuthorized), arg0, arg1)
 }

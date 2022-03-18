@@ -42,13 +42,13 @@ var (
 
 	// BufferPool for io.CopyBuffer
 	BufferPool = sync.Pool{
-		New: func() interface{} {
+		New: func() any {
 			return bytes.NewBuffer(make([]byte, 4*1024))
 		},
 	}
 
 	transformerPool = sync.Pool{
-		New: func() interface{} {
+		New: func() any {
 			return transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
 		},
 	}
@@ -157,7 +157,7 @@ func RemoveIndex(arr []string, index int) []string {
 }
 
 // LoadJSON loads JSON content
-func LoadJSON(ctx context.Context, storageApp absto.Storage, filename string, content interface{}) (err error) {
+func LoadJSON(ctx context.Context, storageApp absto.Storage, filename string, content any) (err error) {
 	var reader io.ReadCloser
 	reader, err = storageApp.ReadFrom(ctx, filename)
 	if err != nil {
@@ -176,7 +176,7 @@ func LoadJSON(ctx context.Context, storageApp absto.Storage, filename string, co
 }
 
 // SaveJSON saves JSON content
-func SaveJSON(ctx context.Context, storageApp absto.Storage, filename string, content interface{}) error {
+func SaveJSON(ctx context.Context, storageApp absto.Storage, filename string, content any) error {
 	reader, writer := io.Pipe()
 
 	done := make(chan error)

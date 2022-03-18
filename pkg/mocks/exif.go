@@ -47,7 +47,7 @@ func (m *Exif) GetAggregateFor(arg0 context.Context, arg1 model.Item) (provider.
 }
 
 // GetAggregateFor indicates an expected call of GetAggregateFor.
-func (mr *ExifMockRecorder) GetAggregateFor(arg0, arg1 interface{}) *gomock.Call {
+func (mr *ExifMockRecorder) GetAggregateFor(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAggregateFor", reflect.TypeOf((*Exif)(nil).GetAggregateFor), arg0, arg1)
 }
@@ -62,7 +62,7 @@ func (m *Exif) GetExifFor(arg0 context.Context, arg1 model.Item) (model0.Exif, e
 }
 
 // GetExifFor indicates an expected call of GetExifFor.
-func (mr *ExifMockRecorder) GetExifFor(arg0, arg1 interface{}) *gomock.Call {
+func (mr *ExifMockRecorder) GetExifFor(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetExifFor", reflect.TypeOf((*Exif)(nil).GetExifFor), arg0, arg1)
 }
@@ -77,7 +77,7 @@ func (m *Exif) ListDir(arg0 context.Context, arg1 model.Item) ([]model.Item, err
 }
 
 // ListDir indicates an expected call of ListDir.
-func (mr *ExifMockRecorder) ListDir(arg0, arg1 interface{}) *gomock.Call {
+func (mr *ExifMockRecorder) ListDir(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListDir", reflect.TypeOf((*Exif)(nil).ListDir), arg0, arg1)
 }
@@ -91,7 +91,7 @@ func (m *Exif) SaveExifFor(arg0 context.Context, arg1 model.Item, arg2 model0.Ex
 }
 
 // SaveExifFor indicates an expected call of SaveExifFor.
-func (mr *ExifMockRecorder) SaveExifFor(arg0, arg1, arg2 interface{}) *gomock.Call {
+func (mr *ExifMockRecorder) SaveExifFor(arg0, arg1, arg2 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveExifFor", reflect.TypeOf((*Exif)(nil).SaveExifFor), arg0, arg1, arg2)
 }

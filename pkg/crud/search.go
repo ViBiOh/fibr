@@ -166,7 +166,7 @@ func (a App) search(r *http.Request, request provider.Request, files []absto.Ite
 		}
 	}
 
-	return renderer.NewPage("search", http.StatusOK, map[string]interface{}{
+	return renderer.NewPage("search", http.StatusOK, map[string]any{
 		"Paths":   getPathParts(request),
 		"Files":   items,
 		"Cover":   a.getCover(ctx, request, files),

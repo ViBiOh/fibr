@@ -94,5 +94,5 @@ func getFormDuration(val string) (time.Duration, error) {
 }
 
 func errorReturn(request provider.Request, err error) (renderer.Page, error) {
-	return renderer.NewPage("", 0, map[string]interface{}{"Request": request}), err
+	return renderer.NewPage("", 0, map[string]any{"Request": request}), err
 }

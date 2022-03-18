@@ -48,7 +48,7 @@ func (a App) Browser(ctx context.Context, w http.ResponseWriter, request provide
 		renderItem.HasThumbnail = true
 	}
 
-	return renderer.NewPage("file", http.StatusOK, map[string]interface{}{
+	return renderer.NewPage("file", http.StatusOK, map[string]any{
 		"Paths":     getPathParts(request),
 		"File":      renderItem,
 		"Exif":      exif,

@@ -16,13 +16,13 @@ const (
 
 // Feature description
 type Feature struct {
-	Properties map[string]interface{} `json:"properties"`
-	Geometry   interface{}            `json:"geometry"`
-	Type       Type                   `json:"type"`
+	Properties map[string]any `json:"properties"`
+	Geometry   any            `json:"geometry"`
+	Type       Type           `json:"type"`
 }
 
 // NewFeature creates a Feature from given geometry and properties
-func NewFeature(geometry interface{}, properties map[string]interface{}) Feature {
+func NewFeature(geometry any, properties map[string]any) Feature {
 	return Feature{
 		Type:       TypeFeature,
 		Geometry:   geometry,

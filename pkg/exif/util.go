@@ -39,11 +39,11 @@ func (a App) loadAggregate(ctx context.Context, item absto.Item) (provider.Aggre
 	return data, a.loadMetadata(ctx, item, &data)
 }
 
-func (a App) loadMetadata(ctx context.Context, item absto.Item, content interface{}) error {
+func (a App) loadMetadata(ctx context.Context, item absto.Item, content any) error {
 	return provider.LoadJSON(ctx, a.storageApp, Path(item), content)
 }
 
-func (a App) saveMetadata(ctx context.Context, item absto.Item, data interface{}) error {
+func (a App) saveMetadata(ctx context.Context, item absto.Item, data any) error {
 	filename := Path(item)
 	dirname := filepath.Dir(filename)
 

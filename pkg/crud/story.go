@@ -25,7 +25,7 @@ func (a App) story(r *http.Request, request provider.Request, item absto.Item, f
 	}
 
 	items := make([]provider.StoryItem, 0, len(files))
-	var cover map[string]interface{}
+	var cover map[string]any
 
 	for _, item := range files {
 		if !a.thumbnailApp.CanHaveThumbnail(item) {
@@ -49,7 +49,7 @@ func (a App) story(r *http.Request, request provider.Request, item absto.Item, f
 		}
 
 		if cover == nil {
-			cover = map[string]interface{}{
+			cover = map[string]any{
 				"Img":       provider.StorageToRender(item, request),
 				"ImgHeight": thumbnail.SmallSize,
 				"ImgWidth":  thumbnail.SmallSize,
@@ -66,7 +66,7 @@ func (a App) story(r *http.Request, request provider.Request, item absto.Item, f
 
 	request.Display = provider.StoryDisplay
 
-	return renderer.NewPage("story", http.StatusOK, map[string]interface{}{
+	return renderer.NewPage("story", http.StatusOK, map[string]any{
 		"Paths":              getPathParts(request),
 		"Files":              items,
 		"Cover":              cover,

@@ -22,10 +22,10 @@ const (
 	uint32max = (1 << 32) - 1
 )
 
-func (a App) getCover(ctx context.Context, request provider.Request, files []absto.Item) map[string]interface{} {
+func (a App) getCover(ctx context.Context, request provider.Request, files []absto.Item) map[string]any {
 	for _, file := range files {
 		if a.thumbnailApp.HasThumbnail(ctx, file, thumbnail.SmallSize) {
-			return map[string]interface{}{
+			return map[string]any{
 				"Img":       provider.StorageToRender(file, request),
 				"ImgHeight": thumbnail.SmallSize,
 				"ImgWidth":  thumbnail.SmallSize,
@@ -85,7 +85,7 @@ func (a App) List(ctx context.Context, request provider.Request, message rendere
 
 	hasThumbnail, hasStory, cover := a.enrichThumbnail(ctx, request, items, thumbnails)
 
-	content := map[string]interface{}{
+	content := map[string]any{
 		"Paths":        getPathParts(request),
 		"Files":        items,
 		"Cover":        cover,
@@ -107,7 +107,7 @@ func (a App) List(ctx context.Context, request provider.Request, message rendere
 	return renderer.NewPage("files", http.StatusOK, content), nil
 }
 
-func (a App) enrichThumbnail(ctx context.Context, request provider.Request, items []provider.RenderItem, thumbnails []absto.Item) (hasThumbnail bool, hasStory bool, cover map[string]interface{}) {
+func (a App) enrichThumbnail(ctx context.Context, request provider.Request, items []provider.RenderItem, thumbnails []absto.Item) (hasThumbnail bool, hasStory bool, cover map[string]any) {
 	renderWithThumbnail := request.Display == provider.GridDisplay
 
 	for index, item := range items {
@@ -125,7 +125,7 @@ func (a App) enrichThumbnail(ctx context.Context, request provider.Request, item
 			hasThumbnail = true
 
 			if cover == nil {
-				cover = map[string]interface{}{
+				cover = map[string]any{
 					"Img":       item,
 					"ImgHeight": thumbnail.SmallSize,
 					"ImgWidth":  thumbnail.SmallSize,

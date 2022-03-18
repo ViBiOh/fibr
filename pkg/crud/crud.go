@@ -212,5 +212,5 @@ func (a App) rename(ctx context.Context, item absto.Item, name string) absto.Ite
 }
 
 func (a App) error(w http.ResponseWriter, r *http.Request, request provider.Request, err error) {
-	a.rendererApp.Error(w, r, map[string]interface{}{"Request": request}, err)
+	a.rendererApp.Error(w, r, map[string]any{"Request": request}, err)
 }
