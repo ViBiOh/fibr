@@ -1,8 +1,8 @@
-User-agent: *
-Disallow: /
-
 User-agent: Twitterbot
-Allow: /
+Disallow:
 
 User-agent: facebookexternalhit
-Allow: /
+Disallow:
+
+User-agent: *
+Disallow: /
