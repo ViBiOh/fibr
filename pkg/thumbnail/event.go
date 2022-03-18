@@ -57,10 +57,7 @@ func (a App) generateItem(ctx context.Context, event provider.Event) {
 		return
 	}
 
-	var forced bool
-	if force := event.GetMetadata("force"); force == "all" || force == "thumbnail" {
-		forced = true
-	}
+	forced := event.IsForcedFor("thumbnail")
 
 	for _, size := range a.sizes {
 		if forced || !a.HasThumbnail(ctx, event.Item, size) {

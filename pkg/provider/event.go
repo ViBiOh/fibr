@@ -101,6 +101,13 @@ type Event struct {
 	Type         EventType         `json:"type"`
 }
 
+// IsForcedFor check if event is forced for given key
+func (e Event) IsForcedFor(key string) bool {
+	force := e.GetMetadata("force")
+
+	return force == "all" || force == key
+}
+
 // GetMetadata extracts metadata content
 func (e Event) GetMetadata(key string) string {
 	if e.Metadata == nil {
@@ -339,27 +346,24 @@ func RenameDirectory(ctx context.Context, storageApp absto.Storage, renamers []R
 	}
 
 	if err := storageApp.Walk(ctx, new.Pathname, func(item absto.Item) error {
-		if item.Pathname == new.Pathname {
-			return nil
-		}
-
 		oldItem := item
 		oldItem.Pathname = Join(old.Pathname, item.Name)
 		oldItem.ID = absto.ID(oldItem.Pathname)
 
-		if item.IsDir {
+		if item.IsDir && item.Pathname != new.Pathname {
 			RenameDirectory(ctx, storageApp, renamers, oldItem, item)
-		} else {
-			for _, renamer := range renamers {
-				if err := renamer(ctx, oldItem, item); err != nil {
-					logger.Error("unable to rename metadata item for `%s`: %s", oldItem.Pathname, err)
-				}
+			return nil
+		}
+
+		for _, renamer := range renamers {
+			if err := renamer(ctx, oldItem, item); err != nil {
+				logger.Error("unable to rename metadata from `%s` to `%s`: %s", oldItem.Pathname, item.Pathname, err)
 			}
 		}
 
 		return nil
 	}); err != nil {
-		logger.Error("unable to walk new thumbnail directory: %s", err)
+		logger.Error("unable to walk new metadata directory: %s", err)
 	}
 
 	if err := storageApp.Remove(ctx, MetadataDirectory(old)); err != nil {

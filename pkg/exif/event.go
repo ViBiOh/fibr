@@ -59,10 +59,7 @@ func getEventLogger(item absto.Item) logger.Provider {
 }
 
 func (a App) handleStartEvent(ctx context.Context, event provider.Event) error {
-	var forced bool
-	if force := event.GetMetadata("force"); force == "all" || force == "exif" {
-		forced = true
-	}
+	forced := event.IsForcedFor("exif")
 
 	item := event.Item
 	if !forced && a.hasMetadata(ctx, item) {
