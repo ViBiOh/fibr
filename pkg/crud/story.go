@@ -5,6 +5,7 @@ import (
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 	"go.opentelemetry.io/otel/trace"
@@ -50,8 +51,8 @@ func (a App) story(r *http.Request, request provider.Request, item absto.Item, f
 		if cover == nil {
 			cover = map[string]interface{}{
 				"Img":       provider.StorageToRender(item, request),
-				"ImgHeight": a.thumbnailApp.LargeThumbnailSize(),
-				"ImgWidth":  a.thumbnailApp.LargeThumbnailSize(),
+				"ImgHeight": thumbnail.SmallSize,
+				"ImgWidth":  thumbnail.SmallSize,
 			}
 		}
 
