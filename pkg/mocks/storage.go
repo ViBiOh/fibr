@@ -46,7 +46,7 @@ func (m *Storage) ConvertError(arg0 error) error {
 }
 
 // ConvertError indicates an expected call of ConvertError.
-func (mr *StorageMockRecorder) ConvertError(arg0 any) *gomock.Call {
+func (mr *StorageMockRecorder) ConvertError(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ConvertError", reflect.TypeOf((*Storage)(nil).ConvertError), arg0)
 }
@@ -60,7 +60,7 @@ func (m *Storage) CreateDir(arg0 context.Context, arg1 string) error {
 }
 
 // CreateDir indicates an expected call of CreateDir.
-func (mr *StorageMockRecorder) CreateDir(arg0, arg1 any) *gomock.Call {
+func (mr *StorageMockRecorder) CreateDir(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateDir", reflect.TypeOf((*Storage)(nil).CreateDir), arg0, arg1)
 }
@@ -89,7 +89,7 @@ func (m *Storage) Info(arg0 context.Context, arg1 string) (model.Item, error) {
 }
 
 // Info indicates an expected call of Info.
-func (mr *StorageMockRecorder) Info(arg0, arg1 any) *gomock.Call {
+func (mr *StorageMockRecorder) Info(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Info", reflect.TypeOf((*Storage)(nil).Info), arg0, arg1)
 }
@@ -104,7 +104,7 @@ func (m *Storage) List(arg0 context.Context, arg1 string) ([]model.Item, error) 
 }
 
 // List indicates an expected call of List.
-func (mr *StorageMockRecorder) List(arg0, arg1 any) *gomock.Call {
+func (mr *StorageMockRecorder) List(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*Storage)(nil).List), arg0, arg1)
 }
@@ -132,7 +132,7 @@ func (m *Storage) Path(arg0 string) string {
 }
 
 // Path indicates an expected call of Path.
-func (mr *StorageMockRecorder) Path(arg0 any) *gomock.Call {
+func (mr *StorageMockRecorder) Path(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Path", reflect.TypeOf((*Storage)(nil).Path), arg0)
 }
@@ -147,7 +147,7 @@ func (m *Storage) ReadFrom(arg0 context.Context, arg1 string) (io.ReadSeekCloser
 }
 
 // ReadFrom indicates an expected call of ReadFrom.
-func (mr *StorageMockRecorder) ReadFrom(arg0, arg1 any) *gomock.Call {
+func (mr *StorageMockRecorder) ReadFrom(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReadFrom", reflect.TypeOf((*Storage)(nil).ReadFrom), arg0, arg1)
 }
@@ -161,7 +161,7 @@ func (m *Storage) Remove(arg0 context.Context, arg1 string) error {
 }
 
 // Remove indicates an expected call of Remove.
-func (mr *StorageMockRecorder) Remove(arg0, arg1 any) *gomock.Call {
+func (mr *StorageMockRecorder) Remove(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Remove", reflect.TypeOf((*Storage)(nil).Remove), arg0, arg1)
 }
@@ -175,7 +175,7 @@ func (m *Storage) Rename(arg0 context.Context, arg1, arg2 string) error {
 }
 
 // Rename indicates an expected call of Rename.
-func (mr *StorageMockRecorder) Rename(arg0, arg1, arg2 any) *gomock.Call {
+func (mr *StorageMockRecorder) Rename(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Rename", reflect.TypeOf((*Storage)(nil).Rename), arg0, arg1, arg2)
 }
@@ -189,7 +189,7 @@ func (m *Storage) UpdateDate(arg0 context.Context, arg1 string, arg2 time.Time) 
 }
 
 // UpdateDate indicates an expected call of UpdateDate.
-func (mr *StorageMockRecorder) UpdateDate(arg0, arg1, arg2 any) *gomock.Call {
+func (mr *StorageMockRecorder) UpdateDate(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDate", reflect.TypeOf((*Storage)(nil).UpdateDate), arg0, arg1, arg2)
 }
@@ -203,7 +203,7 @@ func (m *Storage) Walk(arg0 context.Context, arg1 string, arg2 func(model.Item) 
 }
 
 // Walk indicates an expected call of Walk.
-func (mr *StorageMockRecorder) Walk(arg0, arg1, arg2 any) *gomock.Call {
+func (mr *StorageMockRecorder) Walk(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Walk", reflect.TypeOf((*Storage)(nil).Walk), arg0, arg1, arg2)
 }
@@ -217,9 +217,23 @@ func (m *Storage) WithIgnoreFn(arg0 func(model.Item) bool) model.Storage {
 }
 
 // WithIgnoreFn indicates an expected call of WithIgnoreFn.
-func (mr *StorageMockRecorder) WithIgnoreFn(arg0 any) *gomock.Call {
+func (mr *StorageMockRecorder) WithIgnoreFn(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WithIgnoreFn", reflect.TypeOf((*Storage)(nil).WithIgnoreFn), arg0)
+}
+
+// WriteSizedTo mocks base method.
+func (m *Storage) WriteSizedTo(arg0 context.Context, arg1 string, arg2 int64, arg3 io.Reader) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WriteSizedTo", arg0, arg1, arg2, arg3)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// WriteSizedTo indicates an expected call of WriteSizedTo.
+func (mr *StorageMockRecorder) WriteSizedTo(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteSizedTo", reflect.TypeOf((*Storage)(nil).WriteSizedTo), arg0, arg1, arg2, arg3)
 }
 
 // WriteTo mocks base method.
@@ -231,7 +245,7 @@ func (m *Storage) WriteTo(arg0 context.Context, arg1 string, arg2 io.Reader) err
 }
 
 // WriteTo indicates an expected call of WriteTo.
-func (mr *StorageMockRecorder) WriteTo(arg0, arg1, arg2 any) *gomock.Call {
+func (mr *StorageMockRecorder) WriteTo(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteTo", reflect.TypeOf((*Storage)(nil).WriteTo), arg0, arg1, arg2)
 }

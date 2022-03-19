@@ -46,7 +46,7 @@ func (m *Share) Create(arg0 context.Context, arg1 string, arg2 bool, arg3 string
 }
 
 // Create indicates an expected call of Create.
-func (mr *ShareMockRecorder) Create(arg0, arg1, arg2, arg3, arg4, arg5 any) *gomock.Call {
+func (mr *ShareMockRecorder) Create(arg0, arg1, arg2, arg3, arg4, arg5 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*Share)(nil).Create), arg0, arg1, arg2, arg3, arg4, arg5)
 }
@@ -60,7 +60,7 @@ func (m *Share) Delete(arg0 context.Context, arg1 string) error {
 }
 
 // Delete indicates an expected call of Delete.
-func (mr *ShareMockRecorder) Delete(arg0, arg1 any) *gomock.Call {
+func (mr *ShareMockRecorder) Delete(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*Share)(nil).Delete), arg0, arg1)
 }
@@ -74,7 +74,7 @@ func (m *Share) Get(arg0 string) provider.Share {
 }
 
 // Get indicates an expected call of Get.
-func (mr *ShareMockRecorder) Get(arg0 any) *gomock.Call {
+func (mr *ShareMockRecorder) Get(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*Share)(nil).Get), arg0)
 }

@@ -233,6 +233,7 @@
       if (filenameInput && filenameInput.value) {
         formData.append('filename', filenameInput.value);
       }
+      formData.append('size', file.size);
       formData.append('file', file);
 
       return new Promise((resolve, reject) => {

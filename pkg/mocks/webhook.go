@@ -45,7 +45,7 @@ func (m *Webhook) Create(arg0 context.Context, arg1 string, arg2 bool, arg3 prov
 }
 
 // Create indicates an expected call of Create.
-func (mr *WebhookMockRecorder) Create(arg0, arg1, arg2, arg3, arg4, arg5 any) *gomock.Call {
+func (mr *WebhookMockRecorder) Create(arg0, arg1, arg2, arg3, arg4, arg5 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*Webhook)(nil).Create), arg0, arg1, arg2, arg3, arg4, arg5)
 }
@@ -59,7 +59,7 @@ func (m *Webhook) Delete(arg0 context.Context, arg1 string) error {
 }
 
 // Delete indicates an expected call of Delete.
-func (mr *WebhookMockRecorder) Delete(arg0, arg1 any) *gomock.Call {
+func (mr *WebhookMockRecorder) Delete(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*Webhook)(nil).Delete), arg0, arg1)
 }

@@ -44,7 +44,7 @@ func (a App) generate(ctx context.Context, item absto.Item, scale uint64) (err e
 		return nil
 	}
 
-	err = provider.WriteToStorage(ctx, a.storageApp, a.PathForScale(item, scale), resp.Body)
+	err = provider.WriteToStorage(ctx, a.storageApp, a.PathForScale(item, scale), resp.ContentLength, resp.Body)
 	if err == nil {
 		a.increaseMetric(itemType.String(), "save")
 	}

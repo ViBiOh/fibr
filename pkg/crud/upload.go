@@ -7,6 +7,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"path"
+	"strconv"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
@@ -14,7 +15,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
-func (a App) saveUploadedFile(ctx context.Context, request provider.Request, inputName string, part *multipart.Part) (filename string, err error) {
+func (a App) saveUploadedFile(ctx context.Context, request provider.Request, inputName, rawSize string, part *multipart.Part) (filename string, err error) {
 	var filePath string
 
 	if !request.Share.IsZero() && request.Share.File {
@@ -34,7 +35,14 @@ func (a App) saveUploadedFile(ctx context.Context, request provider.Request, inp
 		filePath = request.SubPath(filename)
 	}
 
-	err = provider.WriteToStorage(ctx, a.storageApp, filePath, part)
+	var size int64 = -1
+	if len(rawSize) > 0 {
+		if size, err = strconv.ParseInt(rawSize, 10, 64); err != nil {
+			return "", fmt.Errorf("unable to parse filesize: %s", err)
+		}
+	}
+
+	err = provider.WriteToStorage(ctx, a.storageApp, filePath, size, part)
 
 	if err == nil {
 		go func() {
@@ -75,7 +83,7 @@ func (a App) Upload(w http.ResponseWriter, r *http.Request, request provider.Req
 
 	ctx := r.Context()
 
-	filename, err := a.saveUploadedFile(ctx, request, values["filename"], part)
+	filename, err := a.saveUploadedFile(ctx, request, values["filename"], values["size"], part)
 	if err != nil {
 		a.error(w, r, request, model.WrapInternal(err))
 		return
