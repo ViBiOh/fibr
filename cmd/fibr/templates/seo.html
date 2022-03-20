@@ -27,11 +27,6 @@
   <meta property="og:site_name" content="fibr">
   <meta property="og:description" content="{{ $description }}">
 
-  <meta property="twitter:card" content="summary">
-  <meta property="twitter:site" content="fibr">
-  <meta property="twitter:title" content="{{ $title }}">
-  <meta property="twitter:description" content="{{ $description }}">
-
   {{ $needCover := true }}
 
   {{ if .File }}
@@ -46,24 +41,17 @@
       <meta property="og:image:type" content="image/webp">
       <meta property="og:image:height" content="150">
       <meta property="og:image:width" content="150">
-
-      <meta property="twitter:image" content="{{ publicURL (.Request.AbsoluteURL .Request.Item) }}?thumbnail">
-      <meta property="twitter:image:alt" content="Thumbnail of {{ .File.Name }}">
       {{ $needCover = false }}
     {{ end }}
   {{ end }}
 
   {{ if $needCover }}
     {{ if .Cover.Img }}
-      <meta property="og:image" content="{{ publicURL (.Request.AbsoluteURL .Cover.Img.Name) }}?thumbnail">
+      <meta property="og:image" content="{{ publicURL (.Request.AbsoluteURL .Cover.Img.Name) }}?thumbnail{{ if .Cover.Scale }}&scale={{ .Cover.Scale }}{{ end }}">
       <meta property="og:image:alt" content="Thumbnail of folder">
       <meta property="og:image:type" content="image/webp">
       <meta property="og:image:height" content="{{ .Cover.ImgHeight }}">
       <meta property="og:image:width" content="{{ .Cover.ImgWidth }}">
-
-      <meta property="twitter:image" content="{{ publicURL (.Request.AbsoluteURL .Cover.Img.Name) }}?thumbnail">
-      <meta property="twitter:image:alt" content="Thumbnail of folder">
-
       {{ if .Cover.Img.IsVideo }}
         <meta property="og:video" content="{{ publicURL (.Request.AbsoluteURL .Cover.Img.Name) }}">
         <meta property="og:video:type" content="{{ .Cover.Img.Mime }}">
@@ -74,9 +62,6 @@
       <meta property="og:image:height" content="512">
       <meta property="og:image:width" content="512">
       <meta property="og:image:alt" content="Website logo">
-
-      <meta property="twitter:image" content="{{ publicURL "/images/favicon/android-chrome-512x512.png" }}?v={{ .Version }}">
-      <meta property="twitter:image:alt" content="Website logo">
     {{ end }}
   {{ end }}
 {{ end }}
