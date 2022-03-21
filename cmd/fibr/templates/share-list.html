@@ -22,7 +22,7 @@
     }
 
     .share-link {
-      color: var(--primary);
+      color: var(--success);
     }
 
     .share-content:hover {
@@ -112,13 +112,13 @@
                 </th>
                 <td class="center">
                   {{ if .Edit }}
-                    <img class="icon" src="{{ url "/svg/edit?fill=silver" }}" alt="Editable">
+                    <img class="icon" src="{{ url "/svg/edit?fill=aliceblue" }}" alt="Editable">
                   {{ end }}
                   {{ if .Password }}
-                    <img class="icon" src="{{ url "/svg/lock?fill=silver" }}" alt="Password protected">
+                    <img class="icon" src="{{ url "/svg/lock?fill=aliceblue" }}" alt="Password protected">
                   {{ end }}
                   {{ if .Duration }}
-                    <img class="icon" src="{{ url "/svg/hourglass?fill=silver" }}" alt="Duration">
+                    <img class="icon" src="{{ url "/svg/hourglass?fill=aliceblue" }}" alt="Duration">
                     {{ .Duration.Hours }}h
                   {{ end }}
                 </td>
@@ -128,7 +128,7 @@
                     <input type="hidden" name="method" value="DELETE" />
                     <input type="hidden" name="id" value="{{ .ID }}" />
                     <button id="share-delete-{{ .ID }}" type="submit" class="button button-icon" alt="Delete">
-                      <img class="icon" src="{{ url "/svg/times?fill=silver" }}" alt="Delete">
+                      <img class="icon" src="{{ url "/svg/times?fill=crimson" }}" alt="Delete">
                     </button>
                   </form>
                 </td>

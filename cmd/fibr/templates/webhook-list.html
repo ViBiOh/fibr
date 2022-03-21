@@ -110,22 +110,22 @@
                   {{ else }}
                     {{ range .Types }}
                       {{ if eq .String "upload" }}
-                        <img class="icon" src="{{ url "/svg/cloud-upload-alt?fill=silver" }}" alt="upload icon" title="upload">
+                        <img class="icon" src="{{ url "/svg/cloud-upload-alt?fill=aliceblue" }}" alt="upload icon" title="upload">
                       {{ end }}
                       {{ if eq .String "create" }}
-                        <img class="icon" src="{{ url "/svg/folder?fill=silver" }}" alt="folder icon" title="create">
+                        <img class="icon" src="{{ url "/svg/folder?fill=aliceblue" }}" alt="folder icon" title="create">
                       {{ end }}
                       {{ if eq .String "rename" }}
-                        <img class="icon" src="{{ url "/svg/edit?fill=silver" }}" alt="edit icon" title="rename">
+                        <img class="icon" src="{{ url "/svg/edit?fill=aliceblue" }}" alt="edit icon" title="rename">
                       {{ end }}
                       {{ if eq .String "delete" }}
-                        <img class="icon" src="{{ url "/svg/times?fill=silver" }}" alt="delete icon" title="delete">
+                        <img class="icon" src="{{ url "/svg/times?fill=crimson" }}" alt="delete icon" title="delete">
                       {{ end }}
                       {{ if eq .String "start" }}
-                        <img class="icon" src="{{ url "/svg/play?fill=silver" }}" alt="delete icon" title="start">
+                        <img class="icon" src="{{ url "/svg/play?fill=aliceblue" }}" alt="delete icon" title="start">
                       {{ end }}
                       {{ if eq .String "access" }}
-                        <img class="icon" src="{{ url "/svg/info?fill=silver" }}" alt="access icon" title="access">
+                        <img class="icon" src="{{ url "/svg/info?fill=aliceblue" }}" alt="access icon" title="access">
                       {{ end }}
                     {{ end }}
                   {{ end }}
@@ -137,7 +137,7 @@
                     <input type="hidden" name="method" value="DELETE" />
                     <input type="hidden" name="id" value="{{ .ID }}" />
                     <button id="webhook-delete-{{ .ID }}" type="submit" class="button button-icon" tile="Delete">
-                      <img class="icon" src="{{ url "/svg/times?fill=silver" }}" alt="Delete">
+                      <img class="icon" src="{{ url "/svg/times?fill=crimson" }}" alt="Delete">
                     </button>
                   </form>
                 </td>

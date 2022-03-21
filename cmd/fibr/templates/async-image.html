@@ -52,7 +52,7 @@
       span.innerHTML = picture.alt.replace("Thumbnail of ", "");
       picture.after(span)
 
-      picture.src = `{{ url "/svg/" }}${picture.dataset.icon}?fill=silver`;
+      picture.src = `{{ url "/svg/" }}${picture.dataset.icon}?fill=aliceblue`;
       picture.classList.add('icon', 'icon-large');
       picture.alt = 'Image file';
     }

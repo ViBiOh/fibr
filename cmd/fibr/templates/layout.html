@@ -37,13 +37,13 @@
         <nav class="flex">
           {{ if not .Previous.IsZero }}
             <a class="button button-icon" href="{{ url (.Request.AbsoluteURL .Previous.URL) }}?browser">
-              <img class="icon" src="{{ url "/svg/arrow-left?fill=silver" }}" alt="Previous file">
+              <img class="icon" src="{{ url "/svg/arrow-left?fill=aliceblue" }}" alt="Previous file">
             </a>
           {{ end }}
 
           {{ if not .Next.IsZero }}
             <a class="button button-icon" href="{{ url (.Request.AbsoluteURL .Next.URL) }}?browser">
-              <img class="icon" src="{{ url "/svg/arrow-right?fill=silver" }}" alt="Next file">
+              <img class="icon" src="{{ url "/svg/arrow-right?fill=aliceblue" }}" alt="Next file">
             </a>
           {{ end }}
         </nav>
@@ -51,7 +51,7 @@
     {{ else }}
       </span>
       <a class="padding" href="#search" download>
-        <img class="icon" src="{{ url "/svg/search?fill=" }}{{ if .Search }}limegreen{{ else }}silver{{ end }}" alt="Search files">
+        <img class="icon" src="{{ url "/svg/search?fill=" }}{{ if .Search }}limegreen{{ else }}aliceblue{{ end }}" alt="Search files">
       </a>
     {{ end }}
   </header>
