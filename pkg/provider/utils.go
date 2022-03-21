@@ -254,14 +254,19 @@ func LogClose(closer io.Closer, fn, item string) {
 
 // WriteToStorage writes given content to storage
 func WriteToStorage(ctx context.Context, storageApp absto.Storage, output string, size int64, reader io.Reader) error {
+	var err error
 	directory := path.Dir(output)
-	if _, err := storageApp.Info(ctx, directory); absto.IsNotExist(err) {
-		if err := storageApp.CreateDir(ctx, directory); err != nil {
-			return fmt.Errorf("unable to create directory: %s", err)
-		}
+
+	if err = storageApp.CreateDir(ctx, directory); err != nil {
+		return fmt.Errorf("unable to create directory: %s", err)
 	}
 
-	err := storageApp.WriteSizedTo(ctx, output, size, reader)
+	if size == -1 {
+		err = storageApp.WriteTo(ctx, output, reader)
+	} else {
+		err = storageApp.WriteSizedTo(ctx, output, size, reader)
+	}
+
 	if err != nil {
 		if removeErr := storageApp.Remove(ctx, output); removeErr != nil {
 			err = model.WrapError(err, fmt.Errorf("unable to remove: %s", removeErr))
