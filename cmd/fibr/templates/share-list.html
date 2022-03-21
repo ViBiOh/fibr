@@ -35,6 +35,11 @@
     }
 
     @media screen and (max-width: 485px) {
+      #shares th,
+      #shares td {
+        padding: 0.5rem;
+      }
+
       .path {
         max-width: 20rem;
       }
@@ -86,7 +91,7 @@
 
       {{ if len .Shares }}
         <table id="shares" class="full padding">
-          <caption>List of existing shares</caption>
+          <caption class="padding">List of existing shares</caption>
 
           <thead>
             <tr>
