@@ -195,42 +195,30 @@ func computeMimes(aliases []string) []string {
 	for _, alias := range aliases {
 		switch alias {
 		case "archive":
-			output = append(output, getKeysOfMapBool(provider.ArchiveExtensions)...)
+			return append(output, getKeysOfMap(provider.ArchiveExtensions)...)
 		case "audio":
-			output = append(output, getKeysOfMapBool(provider.AudioExtensions)...)
+			return append(output, getKeysOfMap(provider.AudioExtensions)...)
 		case "code":
-			output = append(output, getKeysOfMapBool(provider.CodeExtensions)...)
+			return append(output, getKeysOfMap(provider.CodeExtensions)...)
 		case "excel":
-			output = append(output, getKeysOfMapBool(provider.ExcelExtensions)...)
+			return append(output, getKeysOfMap(provider.ExcelExtensions)...)
 		case "image":
-			output = append(output, getKeysOfMapBool(provider.ImageExtensions)...)
+			return append(output, getKeysOfMap(provider.ImageExtensions)...)
 		case "pdf":
-			output = append(output, getKeysOfMapBool(provider.PdfExtensions)...)
+			return append(output, getKeysOfMap(provider.PdfExtensions)...)
 		case "video":
-			output = append(output, getKeysOfMapString(provider.VideoExtensions)...)
+			return append(output, getKeysOfMap(provider.VideoExtensions)...)
 		case "stream":
-			output = append(output, getKeysOfMapBool(provider.StreamExtensions)...)
+			return append(output, getKeysOfMap(provider.StreamExtensions)...)
 		case "word":
-			output = append(output, getKeysOfMapBool(provider.WordExtensions)...)
+			return append(output, getKeysOfMap(provider.WordExtensions)...)
 		}
 	}
 
 	return output
 }
 
-func getKeysOfMapBool(input map[string]bool) []string {
-	output := make([]string, len(input))
-	var i int64
-
-	for key := range input {
-		output[i] = key
-		i++
-	}
-
-	return output
-}
-
-func getKeysOfMapString(input map[string]string) []string {
+func getKeysOfMap[T any](input map[string]T) []string {
 	output := make([]string, len(input))
 	var i int64
 
