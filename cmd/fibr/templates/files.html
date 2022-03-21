@@ -151,8 +151,8 @@
       }
 
       .file-share {
-        bottom: 0.5rem;
         left: 0.5rem;
+        top: 4.5rem;
       }
 
       .file-edit {
@@ -161,8 +161,8 @@
       }
 
       .file-delete {
-        bottom: 0.5rem;
         right: 0.5rem;
+        top: 4.5rem;
       }
 
       #files > *:hover .file-edit,
@@ -241,21 +241,21 @@
             {{ end }}
 
             <a href="{{ .URL }}?download" class="button button-icon file-download" title="Download" download="{{ .Name }}">
-              <img class="icon" src="{{ url "/svg/download?fill=aliceblue" }}" alt="Download">
+              <img class="icon icon-square" src="{{ url "/svg/download?fill=aliceblue" }}" alt="Download">
             </a>
-
-            {{ if $root.Request.CanEdit }}
-              <a href="#delete-modal-{{ .ID }}" class="button button-icon file-delete" title="Delete">
-                <img class="icon" src="{{ url "/svg/times?fill=crimson" }}" alt="Delete">
-              </a>
-              <a href="#edit-modal-{{ .ID }}" class="button button-icon file-edit" title="Edit">
-                <img class="icon" src="{{ url "/svg/pencil-alt?fill=aliceblue" }}" alt="Edit">
-              </a>
-            {{ end }}
 
             {{ if $root.Request.CanShare }}
               <a href="#share-form-{{ .ID }}" class="button button-icon file-share" title="Share">
-                <img class="icon" src="{{ url "/svg/share-alt-square?fill=aliceblue" }}" alt="Share {{ .Name }}">
+                <img class="icon icon-square" src="{{ url "/svg/share-alt-square?fill=aliceblue" }}" alt="Share {{ .Name }}">
+              </a>
+            {{ end }}
+
+            {{ if $root.Request.CanEdit }}
+              <a href="#edit-modal-{{ .ID }}" class="button button-icon file-edit" title="Edit">
+                <img class="icon icon-square" src="{{ url "/svg/pencil-alt?fill=aliceblue" }}" alt="Edit">
+              </a>
+              <a href="#delete-modal-{{ .ID }}" class="button button-icon file-delete" title="Delete">
+                <img class="icon icon-square" src="{{ url "/svg/times?fill=crimson" }}" alt="Delete">
               </a>
             {{ end }}
           </a>
