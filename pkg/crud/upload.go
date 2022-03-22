@@ -16,45 +16,64 @@ import (
 )
 
 func (a App) saveUploadedFile(ctx context.Context, request provider.Request, inputName, rawSize string, part *multipart.Part) (filename string, err error) {
-	var filePath string
+	var filepath string
 
-	if !request.Share.IsZero() && request.Share.File {
-		filename = path.Base(request.Share.Path)
-		filePath = request.Share.Path
-	} else {
-		if len(inputName) != 0 {
-			filename = inputName
-		} else {
-			filename = part.FileName()
-		}
-
-		filename, err = provider.SanitizeName(filename, true)
-		if err != nil {
-			return "", err
-		}
-		filePath = request.SubPath(filename)
+	filename, filepath, err = getUploadNameAndPath(request, inputName, part)
+	if err != nil {
+		return "", fmt.Errorf("unable to get upload name: %s", err)
 	}
 
-	var size int64 = -1
-	if len(rawSize) > 0 {
-		if size, err = strconv.ParseInt(rawSize, 10, 64); err != nil {
-			return "", fmt.Errorf("unable to parse filesize: %s", err)
-		}
+	var size int64
+	size, err = getUploadSize(rawSize)
+	if err != nil {
+		return "", fmt.Errorf("unable to get upload size: %s", err)
 	}
 
-	err = provider.WriteToStorage(ctx, a.storageApp, filePath, size, part)
+	err = provider.WriteToStorage(ctx, a.storageApp, filepath, size, part)
 
 	if err == nil {
 		go func() {
-			if info, infoErr := a.storageApp.Info(context.Background(), filePath); infoErr != nil {
+			if info, infoErr := a.storageApp.Info(context.Background(), filepath); infoErr != nil {
 				logger.Error("unable to get info for upload event: %s", infoErr)
 			} else {
-				a.notify(provider.NewUploadEvent(request, info, a.bestSharePath(filePath), a.rendererApp))
+				a.notify(provider.NewUploadEvent(request, info, a.bestSharePath(filepath), a.rendererApp))
 			}
 		}()
 	}
 
 	return filename, err
+}
+
+func getUploadNameAndPath(request provider.Request, inputName string, part *multipart.Part) (filename string, filepath string, err error) {
+	if !request.Share.IsZero() && request.Share.File {
+		return path.Base(request.Share.Path), request.Share.Path, nil
+	}
+
+	if len(inputName) != 0 {
+		filename = inputName
+	} else {
+		filename = part.FileName()
+	}
+
+	filename, err = provider.SanitizeName(filename, true)
+	if err != nil {
+		return
+	}
+	filepath = request.SubPath(filename)
+
+	return
+}
+
+func getUploadSize(rawSize string) (int64, error) {
+	var size int64 = -1
+
+	if len(rawSize) > 0 {
+		if size, err := strconv.ParseInt(rawSize, 10, 64); err != nil {
+			return size, fmt.Errorf("unable to parse filesize: %s", err)
+		}
+	}
+
+	return size, nil
 }
 
 // Upload saves form files to filesystem
