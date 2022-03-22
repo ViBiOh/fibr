@@ -70,12 +70,16 @@ func (a App) generateItem(ctx context.Context, event provider.Event) {
 	}
 
 	if provider.VideoExtensions[event.Item.Extension] != "" && (forced || !a.HasStream(ctx, event.Item)) {
-		if needStream, err := a.shouldGenerateStream(ctx, event.Item); err != nil {
-			logger.Error("unable to determine if stream generation is possible: %s", err)
-		} else if needStream {
-			if err = a.generateStream(ctx, event.Item); err != nil {
-				logger.Error("unable to generate stream: %s", err)
-			}
+		a.generateStreamIfNeeded(ctx, event)
+	}
+}
+
+func (a App) generateStreamIfNeeded(ctx context.Context, event provider.Event) {
+	if needStream, err := a.shouldGenerateStream(ctx, event.Item); err != nil {
+		logger.Error("unable to determine if stream generation is possible: %s", err)
+	} else if needStream {
+		if err = a.generateStream(ctx, event.Item); err != nil {
+			logger.Error("unable to generate stream: %s", err)
 		}
 	}
 }
