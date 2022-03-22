@@ -61,22 +61,13 @@ func (a App) Rename(w http.ResponseWriter, r *http.Request, request provider.Req
 	newPath := provider.GetPathname(newFolder, newName, request.Share)
 	ctx := r.Context()
 
-	if _, err = a.storageApp.Info(ctx, newPath); err == nil {
-		a.error(w, r, request, model.WrapInvalid(errors.New("new name already exist")))
-		return
-	} else if !absto.IsNotExist(err) {
-		a.error(w, r, request, model.WrapInternal(err))
+	if _, err := a.checkFile(ctx, newPath, false); err != nil {
+		a.error(w, r, request, err)
 		return
 	}
 
-	oldItem, err := a.storageApp.Info(ctx, oldPath)
+	oldItem, err := a.checkFile(ctx, oldPath, true)
 	if err != nil {
-		if !absto.IsNotExist(err) {
-			err = model.WrapInternal(err)
-		} else {
-			err = model.WrapNotFound(err)
-		}
-
 		a.error(w, r, request, err)
 		return
 	}
@@ -119,6 +110,24 @@ func getNewName(r *http.Request) (string, error) {
 	}
 
 	return provider.SanitizeName(newName, true)
+}
+
+func (a App) checkFile(ctx context.Context, pathname string, shouldExist bool) (info absto.Item, err error) {
+	info, err = a.storageApp.Info(ctx, pathname)
+
+	if err == nil {
+		if !shouldExist {
+			err = model.WrapInvalid(fmt.Errorf("`%s` already exist", pathname))
+		}
+	} else {
+		if absto.IsNotExist(err) && shouldExist {
+			err = model.WrapNotFound(fmt.Errorf("`%s` not found", pathname))
+		} else {
+			err = model.WrapInternal(err)
+		}
+	}
+
+	return
 }
 
 func updatePreferences(request provider.Request, oldPath, newPath string) {
