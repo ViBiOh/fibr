@@ -60,10 +60,12 @@ func (a App) generateItem(ctx context.Context, event provider.Event) {
 	forced := event.IsForcedFor("thumbnail")
 
 	for _, size := range a.sizes {
-		if forced || !a.HasThumbnail(ctx, event.Item, size) {
-			if err := a.generate(ctx, event.Item, size); err != nil {
-				logger.WithField("fn", "thumbnail.generate").WithField("item", event.Item.Pathname).Error("unable to generate for scale %d: %s", size, err)
-			}
+		if !forced && a.HasThumbnail(ctx, event.Item, size) {
+			continue
+		}
+
+		if err := a.generate(ctx, event.Item, size); err != nil {
+			logger.WithField("fn", "thumbnail.generate").WithField("item", event.Item.Pathname).Error("unable to generate for scale %d: %s", size, err)
 		}
 	}
 
@@ -71,7 +73,7 @@ func (a App) generateItem(ctx context.Context, event provider.Event) {
 		if needStream, err := a.shouldGenerateStream(ctx, event.Item); err != nil {
 			logger.Error("unable to determine if stream generation is possible: %s", err)
 		} else if needStream {
-			if err := a.generateStream(ctx, event.Item); err != nil {
+			if err = a.generateStream(ctx, event.Item); err != nil {
 				logger.Error("unable to generate stream: %s", err)
 			}
 		}
