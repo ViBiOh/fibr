@@ -13,30 +13,26 @@ func TestBestSharePath(t *testing.T) {
 		pathname string
 	}
 
-	cases := []struct {
-		intention string
-		instance  App
-		args      args
-		want      string
+	cases := map[string]struct {
+		instance App
+		args     args
+		want     string
 	}{
-		{
-			"no share",
+		"no share": {
 			App{},
 			args{
 				pathname: "/website/index.html",
 			},
 			"",
 		},
-		{
-			"matching share",
+		"matching share": {
 			App{},
 			args{
 				pathname: "/website/index.html",
 			},
 			"/abcdef123456/index.html",
 		},
-		{
-			"distance share",
+		"distance share": {
 			App{},
 			args{
 				pathname: "/website/path/to/deep/folder/index.html",
@@ -45,8 +41,8 @@ func TestBestSharePath(t *testing.T) {
 		},
 	}
 
-	for _, tc := range cases {
-		t.Run(tc.intention, func(t *testing.T) {
+	for intention, tc := range cases {
+		t.Run(intention, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
@@ -54,7 +50,7 @@ func TestBestSharePath(t *testing.T) {
 
 			tc.instance.shareApp = mockShare
 
-			switch tc.intention {
+			switch intention {
 			case "no share":
 				mockShare.EXPECT().List().Return(nil)
 			case "matching share":

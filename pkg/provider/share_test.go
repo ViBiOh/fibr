@@ -15,22 +15,19 @@ func TestCheckPassword(t *testing.T) {
 		t.Errorf("unable to create bcrypted password: %s", err)
 	}
 
-	cases := []struct {
-		intention string
-		share     Share
-		header    string
-		want      error
+	cases := map[string]struct {
+		share  Share
+		header string
+		want   error
 	}{
-		{
-			"no password",
+		"no password": {
 			Share{
 				ID: "a1b2c3d4",
 			},
 			"",
 			nil,
 		},
-		{
-			"password no auth",
+		"password no auth": {
 			Share{
 				ID:       "a1b2c3d4",
 				Password: string(password),
@@ -38,8 +35,7 @@ func TestCheckPassword(t *testing.T) {
 			"",
 			errors.New("empty authorization header"),
 		},
-		{
-			"invalid authorization",
+		"invalid authorization": {
 			Share{
 				ID:       "a1b2c3d4",
 				Password: string(password),
@@ -47,8 +43,7 @@ func TestCheckPassword(t *testing.T) {
 			"invalid",
 			errors.New("illegal base64 data at input byte 4"),
 		},
-		{
-			"invalid format",
+		"invalid format": {
 			Share{
 				ID:       "a1b2c3d4",
 				Password: string(password),
@@ -56,8 +51,7 @@ func TestCheckPassword(t *testing.T) {
 			fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte("test"))),
 			errors.New("invalid format for basic auth"),
 		},
-		{
-			"invalid password",
+		"invalid password": {
 			Share{
 				ID:       "a1b2c3d4",
 				Password: string(password),
@@ -65,8 +59,7 @@ func TestCheckPassword(t *testing.T) {
 			fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte("test:password"))),
 			errors.New("invalid credentials"),
 		},
-		{
-			"valid",
+		"valid": {
 			Share{
 				ID:       "a1b2c3d4",
 				Password: string(password),
@@ -76,22 +69,22 @@ func TestCheckPassword(t *testing.T) {
 		},
 	}
 
-	for _, testCase := range cases {
-		t.Run(testCase.intention, func(t *testing.T) {
-			err := testCase.share.CheckPassword(testCase.header)
+	for intention, tc := range cases {
+		t.Run(intention, func(t *testing.T) {
+			err := tc.share.CheckPassword(tc.header)
 
 			failed := false
 
-			if err == nil && testCase.want != nil {
+			if err == nil && tc.want != nil {
 				failed = true
-			} else if err != nil && testCase.want == nil {
+			} else if err != nil && tc.want == nil {
 				failed = true
-			} else if err != nil && err.Error() != testCase.want.Error() {
+			} else if err != nil && err.Error() != tc.want.Error() {
 				failed = true
 			}
 
 			if failed {
-				t.Errorf("CheckPassword() = `%s`, want `%s`", err, testCase.want)
+				t.Errorf("CheckPassword() = `%s`, want `%s`", err, tc.want)
 			}
 		})
 	}

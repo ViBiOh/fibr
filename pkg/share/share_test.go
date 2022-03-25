@@ -10,21 +10,18 @@ import (
 )
 
 func TestPurgeExpiredShares(t *testing.T) {
-	cases := []struct {
-		intention string
-		instance  *App
-		want      map[string]provider.Share
+	cases := map[string]struct {
+		instance *App
+		want     map[string]provider.Share
 	}{
-		{
-			"empty",
+		"empty": {
 			&App{
 				clock:  clock.New(time.Date(2021, 0o5, 0o1, 14, 0o0, 0o0, 0, time.UTC)),
 				shares: make(map[string]provider.Share),
 			},
 			make(map[string]provider.Share),
 		},
-		{
-			"purge at boundaries",
+		"purge at boundaries": {
 			&App{
 				clock: clock.New(time.Date(2021, 0o5, 0o1, 14, 0o0, 0o0, 0, time.UTC)),
 				shares: map[string]provider.Share{
@@ -65,8 +62,8 @@ func TestPurgeExpiredShares(t *testing.T) {
 		},
 	}
 
-	for _, tc := range cases {
-		t.Run(tc.intention, func(t *testing.T) {
+	for intention, tc := range cases {
+		t.Run(intention, func(t *testing.T) {
 			tc.instance.purgeExpiredShares()
 			got := tc.instance.shares
 

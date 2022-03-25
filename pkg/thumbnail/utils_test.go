@@ -10,20 +10,17 @@ import (
 )
 
 func TestCanHaveThumbnail(t *testing.T) {
-	cases := []struct {
-		intention string
-		instance  App
-		input     absto.Item
-		want      bool
+	cases := map[string]struct {
+		instance App
+		input    absto.Item
+		want     bool
 	}{
-		{
-			"empty",
+		"empty": {
 			App{},
 			absto.Item{},
 			false,
 		},
-		{
-			"image",
+		"image": {
 			App{},
 			absto.Item{
 				Name:      "test.png",
@@ -31,8 +28,7 @@ func TestCanHaveThumbnail(t *testing.T) {
 			},
 			true,
 		},
-		{
-			"pdf",
+		"pdf": {
 			App{},
 			absto.Item{
 				Name:      "test.pdf",
@@ -40,8 +36,7 @@ func TestCanHaveThumbnail(t *testing.T) {
 			},
 			true,
 		},
-		{
-			"video",
+		"video": {
 			App{},
 			absto.Item{
 				Name:      "test.avi",
@@ -51,8 +46,8 @@ func TestCanHaveThumbnail(t *testing.T) {
 		},
 	}
 
-	for _, tc := range cases {
-		t.Run(tc.intention, func(t *testing.T) {
+	for intention, tc := range cases {
+		t.Run(intention, func(t *testing.T) {
 			if result := tc.instance.CanHaveThumbnail(tc.input); result != tc.want {
 				t.Errorf("CanHaveThumbnail() = %t, want %t", result, tc.want)
 			}
@@ -61,14 +56,12 @@ func TestCanHaveThumbnail(t *testing.T) {
 }
 
 func TestHasThumbnail(t *testing.T) {
-	cases := []struct {
-		intention string
-		instance  App
-		input     absto.Item
-		want      bool
+	cases := map[string]struct {
+		instance App
+		input    absto.Item
+		want     bool
 	}{
-		{
-			"not found",
+		"not found": {
 			App{},
 			absto.Item{
 				Pathname: "path/to/error",
@@ -76,8 +69,7 @@ func TestHasThumbnail(t *testing.T) {
 			},
 			false,
 		},
-		{
-			"found",
+		"found": {
 			App{},
 			absto.Item{
 				Pathname: "path/to/valid",
@@ -86,8 +78,8 @@ func TestHasThumbnail(t *testing.T) {
 		},
 	}
 
-	for _, tc := range cases {
-		t.Run(tc.intention, func(t *testing.T) {
+	for intention, tc := range cases {
+		t.Run(intention, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
@@ -95,7 +87,7 @@ func TestHasThumbnail(t *testing.T) {
 
 			tc.instance.storageApp = storageMock
 
-			if tc.intention == "found" {
+			if intention == "found" {
 				storageMock.EXPECT().Info(gomock.Any(), gomock.Any()).Return(absto.Item{}, nil)
 			}
 
@@ -107,14 +99,12 @@ func TestHasThumbnail(t *testing.T) {
 }
 
 func TestPathForScale(t *testing.T) {
-	cases := []struct {
-		intention string
-		instance  App
-		input     absto.Item
-		want      string
+	cases := map[string]struct {
+		instance App
+		input    absto.Item
+		want     string
 	}{
-		{
-			"simple",
+		"simple": {
 			App{},
 			absto.Item{
 				ID:       "dd29ecf524b030a65261e3059c48ab9e1ecb2585",
@@ -124,8 +114,8 @@ func TestPathForScale(t *testing.T) {
 		},
 	}
 
-	for _, tc := range cases {
-		t.Run(tc.intention, func(t *testing.T) {
+	for intention, tc := range cases {
+		t.Run(intention, func(t *testing.T) {
 			if result := tc.instance.PathForScale(tc.input, SmallSize); result != tc.want {
 				t.Errorf("PathForScale() = %s, want %s", result, tc.want)
 			}
@@ -134,13 +124,11 @@ func TestPathForScale(t *testing.T) {
 }
 
 func TestGetStreamPath(t *testing.T) {
-	cases := []struct {
-		intention string
-		input     absto.Item
-		want      string
+	cases := map[string]struct {
+		input absto.Item
+		want  string
 	}{
-		{
-			"simple",
+		"simple": {
 			absto.Item{
 				ID:       "dd29ecf524b030a65261e3059c48ab9e1ecb2585",
 				Pathname: "/path/to/file.mov",
@@ -149,8 +137,8 @@ func TestGetStreamPath(t *testing.T) {
 		},
 	}
 
-	for _, tc := range cases {
-		t.Run(tc.intention, func(t *testing.T) {
+	for intention, tc := range cases {
+		t.Run(intention, func(t *testing.T) {
 			if result := getStreamPath(tc.input); result != tc.want {
 				t.Errorf("getStreamPath() = %s, want %s", result, tc.want)
 			}

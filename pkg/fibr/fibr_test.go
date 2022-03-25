@@ -50,15 +50,13 @@ func TestParseShare(t *testing.T) {
 		authorizationHeader string
 	}
 
-	cases := []struct {
-		intention string
-		instance  App
-		args      args
-		want      *provider.Request
-		wantErr   error
+	cases := map[string]struct {
+		instance App
+		args     args
+		want     *provider.Request
+		wantErr  error
 	}{
-		{
-			"no share",
+		"no share": {
 			App{},
 			args{
 				request: &provider.Request{
@@ -76,8 +74,7 @@ func TestParseShare(t *testing.T) {
 			},
 			nil,
 		},
-		{
-			"passwordless",
+		"passwordless": {
 			App{},
 			args{
 				request: &provider.Request{
@@ -96,8 +93,7 @@ func TestParseShare(t *testing.T) {
 			},
 			nil,
 		},
-		{
-			"empty password",
+		"empty password": {
 			App{},
 			args{
 				request: &provider.Request{
@@ -115,8 +111,7 @@ func TestParseShare(t *testing.T) {
 			},
 			errors.New("empty authorization header"),
 		},
-		{
-			"valid",
+		"valid": {
 			App{},
 			args{
 				request: &provider.Request{
@@ -138,15 +133,15 @@ func TestParseShare(t *testing.T) {
 		},
 	}
 
-	for _, tc := range cases {
-		t.Run(tc.intention, func(t *testing.T) {
+	for intention, tc := range cases {
+		t.Run(intention, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
 			shareMock := mocks.NewShare(ctrl)
 			tc.instance.shareApp = shareMock
 
-			switch tc.intention {
+			switch intention {
 			case "passwordless":
 				shareMock.EXPECT().Get(gomock.Any()).Return(passwordLessShare)
 			case "empty password":
@@ -183,27 +178,23 @@ func TestConvertAuthenticationError(t *testing.T) {
 		err error
 	}
 
-	cases := []struct {
-		intention string
-		args      args
-		want      error
+	cases := map[string]struct {
+		args args
+		want error
 	}{
-		{
-			"forbidden",
+		"forbidden": {
 			args{
 				err: fmt.Errorf("no secret defense: %w", auth.ErrForbidden),
 			},
 			httpModel.ErrForbidden,
 		},
-		{
-			"malformed",
+		"malformed": {
 			args{
 				err: fmt.Errorf("invalid access: %w", ident.ErrMalformedAuth),
 			},
 			httpModel.ErrInvalid,
 		},
-		{
-			"unauthorized",
+		"unauthorized": {
 			args{
 				err: fmt.Errorf("invalid: %w", ident.ErrInvalidCredentials),
 			},
@@ -211,8 +202,8 @@ func TestConvertAuthenticationError(t *testing.T) {
 		},
 	}
 
-	for _, tc := range cases {
-		t.Run(tc.intention, func(t *testing.T) {
+	for intention, tc := range cases {
+		t.Run(intention, func(t *testing.T) {
 			if got := convertAuthenticationError(tc.args.err); !errors.Is(got, tc.want) {
 				t.Errorf("convertAuthenticationError() = `%s`, want `%s`", got, tc.want)
 			}
@@ -237,15 +228,13 @@ func TestParseRequest(t *testing.T) {
 		r *http.Request
 	}
 
-	cases := []struct {
-		intention string
-		instance  App
-		args      args
-		want      provider.Request
-		wantErr   error
+	cases := map[string]struct {
+		instance App
+		args     args
+		want     provider.Request
+		wantErr  error
 	}{
-		{
-			"error",
+		"error": {
 			App{},
 			args{
 				r: httptest.NewRequest(http.MethodGet, "/f5d4c3b2a1/", nil),
@@ -258,8 +247,7 @@ func TestParseRequest(t *testing.T) {
 			},
 			httpModel.ErrUnauthorized,
 		},
-		{
-			"share",
+		"share": {
 			App{},
 			args{
 				r: httptest.NewRequest(http.MethodGet, "/a1b2c3d4f5/", nil),
@@ -273,8 +261,7 @@ func TestParseRequest(t *testing.T) {
 			},
 			nil,
 		},
-		{
-			"no auth",
+		"no auth": {
 			App{},
 			args{
 				r: httptest.NewRequest(http.MethodGet, "/", nil),
@@ -288,8 +275,7 @@ func TestParseRequest(t *testing.T) {
 			},
 			nil,
 		},
-		{
-			"invalid auth",
+		"invalid auth": {
 			App{},
 			args{
 				r: httptest.NewRequest(http.MethodGet, invalidPath, nil),
@@ -303,8 +289,7 @@ func TestParseRequest(t *testing.T) {
 			},
 			httpModel.ErrUnauthorized,
 		},
-		{
-			"non admin user",
+		"non admin user": {
 			App{},
 			args{
 				r: httptest.NewRequest(http.MethodGet, "/guest", nil),
@@ -319,8 +304,7 @@ func TestParseRequest(t *testing.T) {
 			},
 			nil,
 		},
-		{
-			"admin user",
+		"admin user": {
 			App{},
 			args{
 				r: httptest.NewRequest(http.MethodGet, adminPath, nil),
@@ -335,8 +319,7 @@ func TestParseRequest(t *testing.T) {
 			},
 			nil,
 		},
-		{
-			"empty cookie",
+		"empty cookie": {
 			App{},
 			args{
 				r: adminRequestWithEmptyCookie,
@@ -351,8 +334,7 @@ func TestParseRequest(t *testing.T) {
 			},
 			nil,
 		},
-		{
-			"cookie value",
+		"cookie value": {
 			App{},
 			args{
 				r: adminRequestWithCookie,
@@ -375,8 +357,8 @@ func TestParseRequest(t *testing.T) {
 		},
 	}
 
-	for _, tc := range cases {
-		t.Run(tc.intention, func(t *testing.T) {
+	for intention, tc := range cases {
+		t.Run(intention, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
@@ -389,7 +371,7 @@ func TestParseRequest(t *testing.T) {
 			tc.instance.shareApp = shareMock
 			tc.instance.webhookApp = webhookMock
 
-			switch tc.intention {
+			switch intention {
 			case "no auth":
 				shareMock.EXPECT().Get(gomock.Any()).Return(provider.Share{})
 			case "admin user":
@@ -404,7 +386,7 @@ func TestParseRequest(t *testing.T) {
 				shareMock.EXPECT().Get(gomock.Any()).Return(passwordLessShare)
 			}
 
-			switch tc.intention {
+			switch intention {
 			case "invalid auth":
 				tc.instance.loginApp = loginMock
 				loginMock.EXPECT().IsAuthenticated(gomock.Any()).Return(nil, authModel.User{}, errors.New("invalid auth"))

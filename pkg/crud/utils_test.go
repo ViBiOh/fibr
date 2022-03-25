@@ -25,14 +25,12 @@ func TestGetPreviousAndNext(t *testing.T) {
 		files []absto.Item
 	}
 
-	cases := []struct {
-		intention    string
+	cases := map[string]struct {
 		args         args
 		wantPrevious *absto.Item
 		wantNext     *absto.Item
 	}{
-		{
-			"one item",
+		"one item": {
 			args{
 				file: absto.Item{Name: filename},
 				files: []absto.Item{
@@ -42,8 +40,7 @@ func TestGetPreviousAndNext(t *testing.T) {
 			nil,
 			nil,
 		},
-		{
-			"no next item",
+		"no next item": {
 			args{
 				file: absto.Item{Name: filename},
 				files: []absto.Item{
@@ -55,8 +52,7 @@ func TestGetPreviousAndNext(t *testing.T) {
 			&absto.Item{Name: otherFilename},
 			nil,
 		},
-		{
-			"full items",
+		"full items": {
 			args{
 				file: absto.Item{Name: filename},
 				files: []absto.Item{
@@ -71,8 +67,8 @@ func TestGetPreviousAndNext(t *testing.T) {
 		},
 	}
 
-	for _, tc := range cases {
-		t.Run(tc.intention, func(t *testing.T) {
+	for intention, tc := range cases {
+		t.Run(intention, func(t *testing.T) {
 			if gotPrevious, gotNext := getPreviousAndNext(tc.args.file, tc.args.files); !reflect.DeepEqual(gotPrevious, tc.wantPrevious) || !reflect.DeepEqual(gotNext, tc.wantNext) {
 				t.Errorf("getPreviousAndNext() = (%v, %v), want (%v, %v)", gotPrevious, gotNext, tc.wantPrevious, tc.wantNext)
 			}
@@ -98,14 +94,12 @@ func TestCheckFormName(t *testing.T) {
 	validRequest := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(validValues.Encode()))
 	validRequest.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
-	cases := []struct {
-		intention string
-		args      args
-		want      string
-		wantErr   error
+	cases := map[string]struct {
+		args    args
+		want    string
+		wantErr error
 	}{
-		{
-			"empty",
+		"empty": {
 			args{
 				r:        httptest.NewRequest(http.MethodPost, "/", nil),
 				formName: "filename",
@@ -113,8 +107,7 @@ func TestCheckFormName(t *testing.T) {
 			"",
 			model.WrapInvalid(ErrEmptyName),
 		},
-		{
-			"root",
+		"root": {
 			args{
 				r:        rootRequest,
 				formName: "filename",
@@ -122,8 +115,7 @@ func TestCheckFormName(t *testing.T) {
 			"",
 			model.WrapForbidden(ErrNotAuthorized),
 		},
-		{
-			"valid",
+		"valid": {
 			args{
 				r:        validRequest,
 				formName: "filename",
@@ -133,8 +125,8 @@ func TestCheckFormName(t *testing.T) {
 		},
 	}
 
-	for _, tc := range cases {
-		t.Run(tc.intention, func(t *testing.T) {
+	for intention, tc := range cases {
+		t.Run(intention, func(t *testing.T) {
 			got, gotErr := checkFormName(tc.args.r, tc.args.formName)
 
 			failed := false
@@ -162,30 +154,26 @@ func TestCheckFolderName(t *testing.T) {
 		request    provider.Request
 	}
 
-	cases := []struct {
-		intention string
-		args      args
-		want      string
-		wantErr   error
+	cases := map[string]struct {
+		args    args
+		want    string
+		wantErr error
 	}{
-		{
-			"empty value",
+		"empty value": {
 			args{
 				folderName: "",
 			},
 			"",
 			model.WrapInvalid(ErrEmptyFolder),
 		},
-		{
-			"no prefix",
+		"no prefix": {
 			args{
 				folderName: "templates/",
 			},
 			"",
 			model.WrapInvalid(ErrAbsoluteFolder),
 		},
-		{
-			"valid",
+		"valid": {
 			args{
 				folderName: templatesPath,
 			},
@@ -194,8 +182,8 @@ func TestCheckFolderName(t *testing.T) {
 		},
 	}
 
-	for _, tc := range cases {
-		t.Run(tc.intention, func(t *testing.T) {
+	for intention, tc := range cases {
+		t.Run(intention, func(t *testing.T) {
 			got, gotErr := checkFolderName(tc.args.folderName, tc.args.request)
 
 			failed := false
@@ -222,13 +210,11 @@ func TestGetPathParts(t *testing.T) {
 		request provider.Request
 	}
 
-	cases := []struct {
-		intention string
-		args      args
-		want      []string
+	cases := map[string]struct {
+		args args
+		want []string
 	}{
-		{
-			"root",
+		"root": {
 			args{
 				request: provider.Request{
 					Path: "/",
@@ -236,8 +222,7 @@ func TestGetPathParts(t *testing.T) {
 			},
 			nil,
 		},
-		{
-			"simple",
+		"simple": {
 			args{
 				request: provider.Request{
 					Path: "/hello/world/",
@@ -247,8 +232,8 @@ func TestGetPathParts(t *testing.T) {
 		},
 	}
 
-	for _, tc := range cases {
-		t.Run(tc.intention, func(t *testing.T) {
+	for intention, tc := range cases {
+		t.Run(intention, func(t *testing.T) {
 			if got := getPathParts(tc.args.request); !reflect.DeepEqual(got, tc.want) {
 				t.Errorf("getPathParts() = %v, want %v", got, tc.want)
 			}

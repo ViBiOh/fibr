@@ -11,14 +11,12 @@ func TestAbsoluteURL(t *testing.T) {
 		name string
 	}
 
-	cases := []struct {
-		intention string
-		instance  Request
-		args      args
-		want      string
+	cases := map[string]struct {
+		instance Request
+		args     args
+		want     string
 	}{
-		{
-			"simple",
+		"simple": {
 			Request{
 				Path: "/",
 			},
@@ -27,8 +25,7 @@ func TestAbsoluteURL(t *testing.T) {
 			},
 			"/index.html",
 		},
-		{
-			"dir",
+		"dir": {
 			Request{
 				Path: "/",
 			},
@@ -37,8 +34,7 @@ func TestAbsoluteURL(t *testing.T) {
 			},
 			"/folder/",
 		},
-		{
-			"share",
+		"share": {
 			Request{
 				Path: "/",
 				Share: Share{
@@ -52,8 +48,8 @@ func TestAbsoluteURL(t *testing.T) {
 			"/abcdef123456/index.html",
 		},
 	}
-	for _, tc := range cases {
-		t.Run(tc.intention, func(t *testing.T) {
+	for intention, tc := range cases {
+		t.Run(intention, func(t *testing.T) {
 			if got := tc.instance.AbsoluteURL(tc.args.name); got != tc.want {
 				t.Errorf("AbsoluteURL() = `%s`, want `%s`", got, tc.want)
 			}
@@ -66,14 +62,12 @@ func TestRelativeURL(t *testing.T) {
 		item absto.Item
 	}
 
-	cases := []struct {
-		intention string
-		instance  Request
-		args      args
-		want      string
+	cases := map[string]struct {
+		instance Request
+		args     args
+		want     string
 	}{
-		{
-			"simple",
+		"simple": {
 			Request{
 				Path: "/",
 			},
@@ -84,8 +78,7 @@ func TestRelativeURL(t *testing.T) {
 			},
 			"index.html",
 		},
-		{
-			"dir",
+		"dir": {
 			Request{
 				Path: "/",
 			},
@@ -97,8 +90,7 @@ func TestRelativeURL(t *testing.T) {
 			},
 			"folder/",
 		},
-		{
-			"share",
+		"share": {
 			Request{
 				Path: "/subpath/",
 				Share: Share{
@@ -113,8 +105,7 @@ func TestRelativeURL(t *testing.T) {
 			},
 			"index.html",
 		},
-		{
-			"nested folder",
+		"nested folder": {
 			Request{
 				Path: "/sub/folder/",
 			},
@@ -127,8 +118,8 @@ func TestRelativeURL(t *testing.T) {
 		},
 	}
 
-	for _, tc := range cases {
-		t.Run(tc.intention, func(t *testing.T) {
+	for intention, tc := range cases {
+		t.Run(intention, func(t *testing.T) {
 			if got := tc.instance.RelativeURL(tc.args.item); got != tc.want {
 				t.Errorf("RelativeURL() = `%s`, want `%s`", got, tc.want)
 			}
@@ -141,14 +132,12 @@ func TestFilepath(t *testing.T) {
 		name string
 	}
 
-	cases := []struct {
-		intention string
-		request   Request
-		args      args
-		want      string
+	cases := map[string]struct {
+		request Request
+		args    args
+		want    string
 	}{
-		{
-			"simple",
+		"simple": {
 			Request{
 				Path: "/index.html",
 			},
@@ -157,8 +146,7 @@ func TestFilepath(t *testing.T) {
 			},
 			"/index.html",
 		},
-		{
-			"directory",
+		"directory": {
 			Request{
 				Path: "/www/",
 			},
@@ -167,8 +155,7 @@ func TestFilepath(t *testing.T) {
 			},
 			"/www/",
 		},
-		{
-			"sub directory",
+		"sub directory": {
 			Request{
 				Path: "/",
 			},
@@ -177,8 +164,7 @@ func TestFilepath(t *testing.T) {
 			},
 			"/www/",
 		},
-		{
-			"directory file",
+		"directory file": {
 			Request{
 				Path: "/www/",
 			},
@@ -187,8 +173,7 @@ func TestFilepath(t *testing.T) {
 			},
 			"/www/index.html",
 		},
-		{
-			"with share",
+		"with share": {
 			Request{
 				Path: "/folder/",
 				Share: Share{
@@ -201,8 +186,7 @@ func TestFilepath(t *testing.T) {
 			},
 			"/shared/folder/root.html",
 		},
-		{
-			"root share",
+		"root share": {
 			Request{
 				Path: "/",
 				Share: Share{
@@ -215,8 +199,7 @@ func TestFilepath(t *testing.T) {
 			},
 			"/shared/",
 		},
-		{
-			"shared folder",
+		"shared folder": {
 			Request{
 				Path: "/",
 				Share: Share{
@@ -231,8 +214,8 @@ func TestFilepath(t *testing.T) {
 		},
 	}
 
-	for _, tc := range cases {
-		t.Run(tc.intention, func(t *testing.T) {
+	for intention, tc := range cases {
+		t.Run(intention, func(t *testing.T) {
 			if result := tc.request.SubPath(tc.args.name); result != tc.want {
 				t.Errorf("Filepath() = `%s`, want `%s`", result, tc.want)
 			}
@@ -245,22 +228,19 @@ func TestLayoutPath(t *testing.T) {
 		path string
 	}
 
-	cases := []struct {
-		intention string
-		instance  Request
-		args      args
-		want      string
+	cases := map[string]struct {
+		instance Request
+		args     args
+		want     string
 	}{
-		{
-			"empty list",
+		"empty list": {
 			Request{},
 			args{
 				path: "/reports",
 			},
 			GridDisplay,
 		},
-		{
-			"story",
+		"story": {
 			Request{
 				Preferences: Preferences{
 					LayoutPaths: map[string]string{
@@ -276,8 +256,8 @@ func TestLayoutPath(t *testing.T) {
 		},
 	}
 
-	for _, tc := range cases {
-		t.Run(tc.intention, func(t *testing.T) {
+	for intention, tc := range cases {
+		t.Run(intention, func(t *testing.T) {
 			if got := tc.instance.LayoutPath(tc.args.path); got != tc.want {
 				t.Errorf("LayoutPath() = `%s`, want `%s`", got, tc.want)
 			}
@@ -286,25 +266,21 @@ func TestLayoutPath(t *testing.T) {
 }
 
 func TestTitle(t *testing.T) {
-	cases := []struct {
-		intention string
-		instance  Request
-		want      string
+	cases := map[string]struct {
+		instance Request
+		want     string
 	}{
-		{
-			"simple",
+		"simple": {
 			Request{},
 			"fibr",
 		},
-		{
-			"without share",
+		"without share": {
 			Request{
 				Path: "/subDir/",
 			},
 			"fibr - subDir",
 		},
-		{
-			"with share",
+		"with share": {
 			Request{
 				Path: "/",
 				Share: Share{
@@ -316,8 +292,8 @@ func TestTitle(t *testing.T) {
 		},
 	}
 
-	for _, tc := range cases {
-		t.Run(tc.intention, func(t *testing.T) {
+	for intention, tc := range cases {
+		t.Run(intention, func(t *testing.T) {
 			if result := tc.instance.Title(); result != tc.want {
 				t.Errorf("Title() = `%s`, want `%s`", result, tc.want)
 			}
@@ -326,25 +302,21 @@ func TestTitle(t *testing.T) {
 }
 
 func TestDescription(t *testing.T) {
-	cases := []struct {
-		intention string
-		instance  Request
-		want      string
+	cases := map[string]struct {
+		instance Request
+		want     string
 	}{
-		{
-			"simple",
+		"simple": {
 			Request{},
 			"FIle BRowser",
 		},
-		{
-			"without share",
+		"without share": {
 			Request{
 				Path: "/subDir/",
 			},
 			"FIle BRowser - subDir",
 		},
-		{
-			"with share",
+		"with share": {
 			Request{
 				Path: "/",
 				Share: Share{
@@ -356,8 +328,8 @@ func TestDescription(t *testing.T) {
 		},
 	}
 
-	for _, tc := range cases {
-		t.Run(tc.intention, func(t *testing.T) {
+	for intention, tc := range cases {
+		t.Run(intention, func(t *testing.T) {
 			if result := tc.instance.Description(); result != tc.want {
 				t.Errorf("Description() = `%s`, want `%s`", result, tc.want)
 			}

@@ -11,13 +11,11 @@ func TestGetExifPath(t *testing.T) {
 		item absto.Item
 	}
 
-	cases := []struct {
-		intention string
-		args      args
-		want      string
+	cases := map[string]struct {
+		args args
+		want string
 	}{
-		{
-			"simple",
+		"simple": {
 			args{
 				item: absto.Item{
 					ID:       "dd29ecf524b030a65261e3059c48ab9e1ecb2585",
@@ -26,8 +24,7 @@ func TestGetExifPath(t *testing.T) {
 			},
 			"/.fibr/photos/dd29ecf524b030a65261e3059c48ab9e1ecb2585.json",
 		},
-		{
-			"simple",
+		"dir": {
 			args{
 				item: absto.Item{
 					Pathname: "/photos",
@@ -38,8 +35,8 @@ func TestGetExifPath(t *testing.T) {
 		},
 	}
 
-	for _, tc := range cases {
-		t.Run(tc.intention, func(t *testing.T) {
+	for intention, tc := range cases {
+		t.Run(intention, func(t *testing.T) {
 			if got := Path(tc.args.item); got != tc.want {
 				t.Errorf("getExifPath() = `%s`, want `%s`", got, tc.want)
 			}

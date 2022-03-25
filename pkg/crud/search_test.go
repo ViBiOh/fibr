@@ -11,14 +11,12 @@ func TestMatchSize(t *testing.T) {
 		item absto.Item
 	}
 
-	cases := []struct {
-		intention string
-		instance  search
-		args      args
-		want      bool
+	cases := map[string]struct {
+		instance search
+		args     args
+		want     bool
 	}{
-		{
-			"no size",
+		"no size": {
 			search{
 				size:        0,
 				greaterThan: true,
@@ -28,8 +26,7 @@ func TestMatchSize(t *testing.T) {
 			},
 			true,
 		},
-		{
-			"greater for greater",
+		"greater for greater": {
 			search{
 				size:        900,
 				greaterThan: true,
@@ -39,8 +36,7 @@ func TestMatchSize(t *testing.T) {
 			},
 			true,
 		},
-		{
-			"greater for lower",
+		"greater for lower": {
 			search{
 				size:        900,
 				greaterThan: false,
@@ -50,8 +46,7 @@ func TestMatchSize(t *testing.T) {
 			},
 			false,
 		},
-		{
-			"lower for lower",
+		"lower for lower": {
 			search{
 				size:        900,
 				greaterThan: false,
@@ -63,8 +58,8 @@ func TestMatchSize(t *testing.T) {
 		},
 	}
 
-	for _, tc := range cases {
-		t.Run(tc.intention, func(t *testing.T) {
+	for intention, tc := range cases {
+		t.Run(intention, func(t *testing.T) {
 			if got := tc.instance.matchSize(tc.args.item); got != tc.want {
 				t.Errorf("MatchSize() = %t, want %t", got, tc.want)
 			}

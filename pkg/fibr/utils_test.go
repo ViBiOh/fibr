@@ -7,27 +7,24 @@ import (
 )
 
 func TestIsMethodAllowed(t *testing.T) {
-	cases := []struct {
-		intention string
-		input     *http.Request
-		want      bool
+	cases := map[string]struct {
+		input *http.Request
+		want  bool
 	}{
-		{
-			"valid",
+		"valid": {
 			httptest.NewRequest(http.MethodGet, "/", nil),
 			true,
 		},
-		{
-			"invalid",
+		"invalid": {
 			httptest.NewRequest(http.MethodOptions, "/", nil),
 			false,
 		},
 	}
 
-	for _, testCase := range cases {
-		t.Run(testCase.intention, func(t *testing.T) {
-			if result := isMethodAllowed(testCase.input); result != testCase.want {
-				t.Errorf("isMethodAllowed(%#v) = %#v, want %#v", testCase.input, result, testCase.want)
+	for intention, tc := range cases {
+		t.Run(intention, func(t *testing.T) {
+			if result := isMethodAllowed(tc.input); result != tc.want {
+				t.Errorf("isMethodAllowed(%#v) = %#v, want %#v", tc.input, result, tc.want)
 			}
 		})
 	}
