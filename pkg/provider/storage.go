@@ -17,7 +17,7 @@ func greaterTime(first, second time.Time) bool {
 	return first.After(second)
 }
 
-// ByHybridSort implements Sorter by type, name then modification time
+// ByHybridSort implements Sorter by type then modification time
 type ByHybridSort []absto.Item
 
 func (a ByHybridSort) Len() int {

@@ -88,7 +88,7 @@ func main() {
 	amqpShareConfig := amqphandler.Flags(fs, "amqpShare", flags.NewOverride("Exchange", "fibr.shares"), flags.NewOverride("Queue", "fibr.share-"+generateIdentityName()), flags.NewOverride("RoutingKey", "share"), flags.NewOverride("Exclusive", true), flags.NewOverride("RetryInterval", "0"))
 	amqpWebhookConfig := amqphandler.Flags(fs, "amqpWebhook", flags.NewOverride("Exchange", "fibr.webhooks"), flags.NewOverride("Queue", "fibr.webhook-"+generateIdentityName()), flags.NewOverride("RoutingKey", "webhook"), flags.NewOverride("Exclusive", true), flags.NewOverride("RetryInterval", "0"))
 
-	disableAuth := flags.New("", "auth", "NoAuth").Default(false, nil).Label("Disable basic authentification").ToBool(fs)
+	disableAuth := flags.Bool(fs, "", "auth", "NoAuth", "Disable basic authentification", false, nil)
 
 	logger.Fatal(fs.Parse(os.Args[1:]))
 

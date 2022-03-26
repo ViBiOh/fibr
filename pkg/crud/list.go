@@ -47,12 +47,17 @@ func (a App) List(ctx context.Context, request provider.Request, message rendere
 	items := make([]provider.RenderItem, len(files))
 	wg := concurrent.NewLimited(6)
 
-	var thumbnails []absto.Item
+	var thumbnails map[string]bool
 	wg.Go(func() {
-		var err error
-		thumbnails, err = a.thumbnailApp.ListDir(ctx, item)
+		thumbnailsList, err := a.thumbnailApp.ListDir(ctx, item)
 		if err != nil {
 			logger.WithField("item", item.Pathname).Error("unable to list thumbnail: %s", err)
+			return
+		}
+
+		thumbnails = make(map[string]bool, len(thumbnailsList))
+		for _, thumbnail := range thumbnailsList {
+			thumbnails[thumbnail.Pathname] = true
 		}
 	})
 
@@ -107,40 +112,32 @@ func (a App) List(ctx context.Context, request provider.Request, message rendere
 	return renderer.NewPage("files", http.StatusOK, content), nil
 }
 
-func (a App) enrichThumbnail(ctx context.Context, request provider.Request, items []provider.RenderItem, thumbnails []absto.Item) (hasThumbnail bool, hasStory bool, cover map[string]any) {
+func (a App) enrichThumbnail(ctx context.Context, request provider.Request, items []provider.RenderItem, thumbnails map[string]bool) (hasThumbnail bool, hasStory bool, cover map[string]any) {
 	renderWithThumbnail := request.Display == provider.GridDisplay
 
 	for index, item := range items {
-		if !a.thumbnailApp.CanHaveThumbnail(item.Item) {
+		if !a.thumbnailApp.CanHaveThumbnail(item.Item) || !thumbnails[a.thumbnailApp.Path(item.Item)] {
 			continue
 		}
 
-		thumbnailPath := a.thumbnailApp.Path(item.Item)
+		hasThumbnail = true
 
-		for _, thumbnailInfo := range thumbnails {
-			if thumbnailInfo.Pathname != thumbnailPath {
-				continue
+		if cover == nil {
+			cover = map[string]any{
+				"Img":       item,
+				"ImgHeight": thumbnail.SmallSize,
+				"ImgWidth":  thumbnail.SmallSize,
 			}
+		}
 
-			hasThumbnail = true
+		if !hasStory {
+			hasStory = a.thumbnailApp.HasLargeThumbnail(ctx, item.Item)
+		}
 
-			if cover == nil {
-				cover = map[string]any{
-					"Img":       item,
-					"ImgHeight": thumbnail.SmallSize,
-					"ImgWidth":  thumbnail.SmallSize,
-				}
-			}
-
-			if !hasStory {
-				hasStory = a.thumbnailApp.HasLargeThumbnail(ctx, item.Item)
-			}
-
-			if renderWithThumbnail {
-				items[index].HasThumbnail = true
-			} else {
-				break
-			}
+		if renderWithThumbnail {
+			items[index].HasThumbnail = true
+		} else {
+			break
 		}
 	}
 

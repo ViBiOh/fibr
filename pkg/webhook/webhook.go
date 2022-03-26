@@ -55,11 +55,11 @@ type Config struct {
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		hmacSecret: flags.New(prefix, "webhook", "Secret").Default("", nil).Label("Secret for HMAC Signature").ToString(fs),
+		hmacSecret: flags.String(fs, prefix, "webhook", "Secret", "Secret for HMAC Signature", "", nil),
 
-		amqpExchange:            flags.New(prefix, "webhook", "AmqpExchange").Default("fibr.webhooks", nil).Label("AMQP Exchange Name").ToString(fs),
-		amqpRoutingKey:          flags.New(prefix, "webhook", "AmqpRoutingKey").Default("webhook", nil).Label("AMQP Routing Key for webhook").ToString(fs),
-		amqpExclusiveRoutingKey: flags.New(prefix, "webhook", "AmqpExclusiveRoutingKey").Default("fibr.semaphore.webhooks", nil).Label("AMQP Routing Key for exclusive lock on default exchange").ToString(fs),
+		amqpExchange:            flags.String(fs, prefix, "webhook", "AmqpExchange", "AMQP Exchange Name", "fibr.webhooks", nil),
+		amqpRoutingKey:          flags.String(fs, prefix, "webhook", "AmqpRoutingKey", "AMQP Routing Key for webhook", "webhook", nil),
+		amqpExclusiveRoutingKey: flags.String(fs, prefix, "webhook", "AmqpExclusiveRoutingKey", "AMQP Routing Key for exclusive lock on default exchange", "fibr.semaphore.webhooks", nil),
 	}
 }
 

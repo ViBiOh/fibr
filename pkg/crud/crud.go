@@ -68,11 +68,11 @@ type Config struct {
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		ignore:          flags.New(prefix, "crud", "IgnorePattern").Default("", nil).Label("Ignore pattern when listing files or directory").ToString(fs),
-		sanitizeOnStart: flags.New(prefix, "crud", "SanitizeOnStart").Default(false, nil).Label("Sanitize name on start").ToBool(fs),
-		bcryptDuration:  flags.New(prefix, "crud", "BcryptDuration").Default("0.25s", nil).Label("Wanted bcrypt duration for calculating effective cost").ToString(fs),
+		ignore:          flags.String(fs, prefix, "crud", "IgnorePattern", "Ignore pattern when listing files or directory", "", nil),
+		sanitizeOnStart: flags.Bool(fs, prefix, "crud", "SanitizeOnStart", "Sanitize name on start", false, nil),
+		bcryptDuration:  flags.String(fs, prefix, "crud", "BcryptDuration", "Wanted bcrypt duration for calculating effective cost", "0.25s", nil),
 
-		amqpExclusiveRoutingKey: flags.New(prefix, "crud", "AmqpExclusiveRoutingKey").Default("fibr.semaphore.start", nil).Label("AMQP Routing Key for exclusive lock on default exchange").ToString(fs),
+		amqpExclusiveRoutingKey: flags.String(fs, prefix, "crud", "AmqpExclusiveRoutingKey", "AMQP Routing Key for exclusive lock on default exchange", "fibr.semaphore.start", nil),
 	}
 }
 

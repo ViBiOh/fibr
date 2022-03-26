@@ -47,9 +47,9 @@ type Config struct {
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		amqpExchange:            flags.New(prefix, "share", "AmqpExchange").Default("fibr.shares", nil).Label("AMQP Exchange Name").ToString(fs),
-		amqpRoutingKey:          flags.New(prefix, "share", "AmqpRoutingKey").Default("share", nil).Label("AMQP Routing Key for share").ToString(fs),
-		amqpExclusiveRoutingKey: flags.New(prefix, "share", "AmqpExclusiveRoutingKey").Default("fibr.semaphore.shares", nil).Label("AMQP Routing Key for exclusive lock on default exchange").ToString(fs),
+		amqpExchange:            flags.String(fs, prefix, "share", "AmqpExchange", "AMQP Exchange Name", "fibr.shares", nil),
+		amqpRoutingKey:          flags.String(fs, prefix, "share", "AmqpRoutingKey", "AMQP Routing Key for share", "share", nil),
+		amqpExclusiveRoutingKey: flags.String(fs, prefix, "share", "AmqpExclusiveRoutingKey", "AMQP Routing Key for exclusive lock on default exchange", "fibr.semaphore.shares", nil),
 	}
 }
 
