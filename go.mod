@@ -4,10 +4,10 @@ go 1.18
 
 require (
 	github.com/ViBiOh/absto v0.5.3
-	github.com/ViBiOh/auth/v2 v2.12.1
+	github.com/ViBiOh/auth/v2 v2.12.2
 	github.com/ViBiOh/exas v0.3.3
 	github.com/ViBiOh/flags v1.0.0
-	github.com/ViBiOh/httputils/v4 v4.39.1
+	github.com/ViBiOh/httputils/v4 v4.39.2
 	github.com/ViBiOh/vith v0.4.2
 	github.com/golang/mock v1.6.0
 	github.com/prometheus/client_golang v1.12.1
