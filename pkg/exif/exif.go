@@ -23,12 +23,11 @@ import (
 
 // App of package
 type App struct {
-	tracer             trace.Tracer
-	storageApp         absto.Storage
-	listStorageApp     absto.Storage
-	fileOnlyStorageApp absto.Storage
-	exifMetric         *prometheus.CounterVec
-	aggregateMetric    *prometheus.CounterVec
+	tracer          trace.Tracer
+	storageApp      absto.Storage
+	listStorageApp  absto.Storage
+	exifMetric      *prometheus.CounterVec
+	aggregateMetric *prometheus.CounterVec
 
 	amqpClient     *amqpclient.Client
 	amqpExchange   string
@@ -90,9 +89,6 @@ func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheu
 
 		tracer:     tracerApp.GetTracer("exif"),
 		storageApp: storageApp,
-		fileOnlyStorageApp: storageApp.WithIgnoreFn(func(item absto.Item) bool {
-			return item.IsDir
-		}),
 		listStorageApp: storageApp.WithIgnoreFn(func(item absto.Item) bool {
 			return !strings.HasSuffix(item.Name, ".json")
 		}),
