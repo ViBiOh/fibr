@@ -210,7 +210,7 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 			continue
 		}
 
-		if exif.Geocode.Longitude == 0 && exif.Geocode.Latitude == 0 {
+		if !exif.Geocode.HasCoordinates() {
 			continue
 		}
 

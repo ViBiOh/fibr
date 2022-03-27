@@ -250,6 +250,10 @@ func (a App) thumbnailHash(ctx context.Context, items []absto.Item) string {
 }
 
 func (a App) encodeContent(ctx context.Context, w io.Writer, isDone func() bool, item absto.Item) {
+	if item.IsDir {
+		return
+	}
+
 	reader, err := a.storageApp.ReadFrom(ctx, a.PathForScale(item, SmallSize))
 	if err != nil {
 		if !absto.IsNotExist(err) {
