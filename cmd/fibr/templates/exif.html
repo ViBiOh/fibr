@@ -41,13 +41,11 @@
 
         {{ if or .Exif.Geocode.HasAddress .Exif.Geocode.HasCoordinates }}
           <p class="padding no-margin code">
-            <strong>Location</strong><br>
-
             {{ if .Exif.Geocode.HasCoordinates }}
-              <strong>Latitude:</strong> {{ .Exif.Geocode.Latitude }}<br>
-              <strong>Longitude:</strong> {{ .Exif.Geocode.Longitude }}<br>
+              <strong>Coordinates:</strong> <a href="http://www.openstreetmap.org/?mlat={{ .Exif.Geocode.Latitude }}&mlon={{ .Exif.Geocode.Longitude }}&zoom=16">{{ .Exif.Geocode.Latitude }},{{ .Exif.Geocode.Longitude }}</a><br>
             {{ end }}
 
+            <strong>Location</strong><br>
             {{ range $key, $value := .Exif.Geocode.Address }}
                 <em>{{ $key }}:</em> {{ $value }}<br>
             {{ end }}
