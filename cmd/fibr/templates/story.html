@@ -148,9 +148,9 @@
           </a>
 
           <div class="description relative">
-            {{ if or (not .Exif.Geocode.IsZero) (not .Exif.Date.IsZero) }}
+            {{ if or (.Exif.Geocode.HasAddress) (not .Exif.Date.IsZero) }}
               <p>
-                {{ if not .Exif.Geocode.IsZero }}
+                {{ if .Exif.Geocode.HasAddress }}
                   <img class="icon icon-bottom margin-right-half" src="{{ url "/svg/location?fill=#272727" }}" alt="Location">
                   <span class="location">
                     {{ if index .Exif.Geocode.Address "city_district" }}
@@ -168,7 +168,7 @@
                 </span>
 
                 {{ if not .Exif.Date.IsZero }}
-                  <img class="icon icon-bottom margin-right-half{{ if not .Exif.Geocode.IsZero }} margin-left-half{{ end }}" src="{{ url "/svg/calendar?fill=#272727" }}" alt="Location">
+                  <img class="icon icon-bottom margin-right-half{{ if .Exif.Geocode.HasAddress }} margin-left-half{{ end }}" src="{{ url "/svg/calendar?fill=#272727" }}" alt="Location">
                   <span class="date">{{ .Exif.Date.Format "Monday _2 January 15:04:05 2006 MST" }}</span>
                 {{ end }}
               </p>

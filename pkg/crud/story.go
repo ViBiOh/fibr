@@ -28,23 +28,7 @@ func (a App) story(r *http.Request, request provider.Request, item absto.Item, f
 	var cover map[string]any
 
 	for _, item := range files {
-		if !a.thumbnailApp.CanHaveThumbnail(item) {
-			continue
-		}
-
-		thumbnailPath := a.thumbnailApp.PathForLarge(item)
-		var found bool
-
-		for _, thumbnailInfo := range thumbnails {
-			if thumbnailInfo.Pathname != thumbnailPath {
-				continue
-			}
-
-			found = true
-			break
-		}
-
-		if !found {
+		if _, ok := thumbnails[a.thumbnailApp.PathForLarge(item)]; !ok {
 			continue
 		}
 

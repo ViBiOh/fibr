@@ -47,17 +47,13 @@ func (a App) List(ctx context.Context, request provider.Request, message rendere
 	items := make([]provider.RenderItem, len(files))
 	wg := concurrent.NewLimited(6)
 
-	var thumbnails map[string]bool
+	var thumbnails map[string]absto.Item
 	wg.Go(func() {
-		thumbnailsList, err := a.thumbnailApp.ListDir(ctx, item)
+		var err error
+		thumbnails, err = a.thumbnailApp.ListDir(ctx, item)
 		if err != nil {
 			logger.WithField("item", item.Pathname).Error("unable to list thumbnail: %s", err)
 			return
-		}
-
-		thumbnails = make(map[string]bool, len(thumbnailsList))
-		for _, thumbnail := range thumbnailsList {
-			thumbnails[thumbnail.Pathname] = true
 		}
 	})
 
@@ -112,11 +108,11 @@ func (a App) List(ctx context.Context, request provider.Request, message rendere
 	return renderer.NewPage("files", http.StatusOK, content), nil
 }
 
-func (a App) enrichThumbnail(ctx context.Context, request provider.Request, items []provider.RenderItem, thumbnails map[string]bool) (hasThumbnail bool, hasStory bool, cover map[string]any) {
+func (a App) enrichThumbnail(ctx context.Context, request provider.Request, items []provider.RenderItem, thumbnails map[string]absto.Item) (hasThumbnail bool, hasStory bool, cover map[string]any) {
 	renderWithThumbnail := request.Display == provider.GridDisplay
 
 	for index, item := range items {
-		if !a.thumbnailApp.CanHaveThumbnail(item.Item) || !thumbnails[a.thumbnailApp.Path(item.Item)] {
+		if _, ok := thumbnails[a.thumbnailApp.Path(item.Item)]; !ok {
 			continue
 		}
 

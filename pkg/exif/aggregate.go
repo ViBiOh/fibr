@@ -84,7 +84,6 @@ func (a App) computeAndSaveAggregate(ctx context.Context, dir absto.Item) error 
 	var minDate, maxDate time.Time
 
 	err := a.storageApp.Walk(ctx, dir.Pathname, func(item absto.Item) error {
-		fmt.Println(item)
 		if item.Pathname == dir.Pathname {
 			return nil
 		}
@@ -98,12 +97,10 @@ func (a App) computeAndSaveAggregate(ctx context.Context, dir absto.Item) error 
 		}
 
 		if !exifData.Date.IsZero() {
-			fmt.Println("add date")
 			minDate, maxDate = aggregateDate(minDate, maxDate, exifData.Date)
 		}
 
 		if !exifData.Geocode.HasAddress() {
-			fmt.Println("add address")
 			directoryAggregate.ingest(exifData.Geocode)
 		}
 

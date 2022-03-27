@@ -7,23 +7,29 @@ import (
 )
 
 // ListDirLarge return all thumbnails for large size for a given directory
-func (a App) ListDirLarge(ctx context.Context, item absto.Item) ([]absto.Item, error) {
+func (a App) ListDirLarge(ctx context.Context, item absto.Item) (map[string]absto.Item, error) {
 	return a.listDirectoryForScale(ctx, item, a.largeStorageApp)
 }
 
 // ListDir return all thumbnails for a given directory
-func (a App) ListDir(ctx context.Context, item absto.Item) ([]absto.Item, error) {
+func (a App) ListDir(ctx context.Context, item absto.Item) (map[string]absto.Item, error) {
 	return a.listDirectoryForScale(ctx, item, a.smallStorageApp)
 }
 
-func (a App) listDirectoryForScale(ctx context.Context, item absto.Item, storageApp absto.Storage) ([]absto.Item, error) {
+func (a App) listDirectoryForScale(ctx context.Context, item absto.Item, storageApp absto.Storage) (map[string]absto.Item, error) {
 	if !item.IsDir {
 		return nil, nil
 	}
 
-	thumbnails, err := storageApp.List(ctx, a.Path(item))
+	list, err := storageApp.List(ctx, a.Path(item))
 	if err != nil && !absto.IsNotExist(err) {
-		return thumbnails, err
+		return nil, err
 	}
+
+	thumbnails := make(map[string]absto.Item, len(list))
+	for _, thumbnail := range list {
+		thumbnails[thumbnail.Pathname] = thumbnail
+	}
+
 	return thumbnails, nil
 }
