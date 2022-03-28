@@ -42,7 +42,7 @@
         {{ if or .Exif.Geocode.HasAddress .Exif.Geocode.HasCoordinates }}
           <p class="padding no-margin code">
             {{ if .Exif.Geocode.HasCoordinates }}
-              <strong>Coordinates:</strong> <a href="http://www.openstreetmap.org/?mlat={{ .Exif.Geocode.Latitude }}&mlon={{ .Exif.Geocode.Longitude }}&zoom=16">{{ .Exif.Geocode.Latitude }},{{ .Exif.Geocode.Longitude }}</a><br>
+              <strong>Coordinates:</strong> <a class="primary" href="http://www.openstreetmap.org/?mlat={{ .Exif.Geocode.Latitude }}&mlon={{ .Exif.Geocode.Longitude }}&zoom=16">{{ .Exif.Geocode.Latitude }},{{ .Exif.Geocode.Longitude }}</a><br>
             {{ end }}
 
             <strong>Location</strong><br>
