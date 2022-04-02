@@ -120,10 +120,10 @@ func (a App) checkFile(ctx context.Context, pathname string, shouldExist bool) (
 			err = model.WrapInvalid(fmt.Errorf("`%s` already exist", pathname))
 		}
 	} else {
-		if absto.IsNotExist(err) && shouldExist {
-			err = model.WrapNotFound(fmt.Errorf("`%s` not found", pathname))
-		} else {
+		if !absto.IsNotExist(err) {
 			err = model.WrapInternal(err)
+		} else if shouldExist {
+			err = model.WrapNotFound(fmt.Errorf("`%s` not found", pathname))
 		}
 	}
 
