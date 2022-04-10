@@ -3,7 +3,7 @@ module github.com/ViBiOh/fibr
 go 1.18
 
 require (
-	github.com/ViBiOh/absto v0.5.4
+	github.com/ViBiOh/absto v0.5.5
 	github.com/ViBiOh/auth/v2 v2.12.4
 	github.com/ViBiOh/exas v0.4.1
 	github.com/ViBiOh/flags v1.0.0
@@ -14,7 +14,7 @@ require (
 	github.com/streadway/amqp v1.0.0
 	go.opentelemetry.io/otel v1.6.3
 	go.opentelemetry.io/otel/trace v1.6.3
-	golang.org/x/crypto v0.0.0-20220321153916-2c7772ba3064
+	golang.org/x/crypto v0.0.0-20220408190544-5352b0902921
 	golang.org/x/text v0.3.7
 )
 
