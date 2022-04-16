@@ -3,18 +3,19 @@ module github.com/ViBiOh/fibr
 go 1.18
 
 require (
+	github.com/ViBiOh/ChatPotte v0.0.3
 	github.com/ViBiOh/absto v0.5.5
-	github.com/ViBiOh/auth/v2 v2.12.4
+	github.com/ViBiOh/auth/v2 v2.12.5
 	github.com/ViBiOh/exas v0.4.1
 	github.com/ViBiOh/flags v1.0.0
-	github.com/ViBiOh/httputils/v4 v4.39.4
+	github.com/ViBiOh/httputils/v4 v4.41.0
 	github.com/ViBiOh/vith v0.4.2
 	github.com/golang/mock v1.6.0
 	github.com/prometheus/client_golang v1.12.1
 	github.com/streadway/amqp v1.0.0
 	go.opentelemetry.io/otel v1.6.3
 	go.opentelemetry.io/otel/trace v1.6.3
-	golang.org/x/crypto v0.0.0-20220408190544-5352b0902921
+	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4
 	golang.org/x/text v0.3.7
 )
 
@@ -42,8 +43,8 @@ require (
 	github.com/prometheus/procfs v0.7.3 // indirect
 	github.com/rs/xid v1.3.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
-	github.com/tdewolff/minify/v2 v2.10.0 // indirect
-	github.com/tdewolff/parse/v2 v2.5.27 // indirect
+	github.com/tdewolff/minify/v2 v2.11.1 // indirect
+	github.com/tdewolff/parse/v2 v2.5.28 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.31.0 // indirect
 	go.opentelemetry.io/otel/exporters/jaeger v1.6.3 // indirect
 	go.opentelemetry.io/otel/metric v0.28.0 // indirect

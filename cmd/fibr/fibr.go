@@ -128,7 +128,7 @@ func main() {
 	thumbnailApp, err := thumbnail.New(thumbnailConfig, storageProvider, prometheusRegisterer, amqpClient)
 	logger.Fatal(err)
 
-	rendererApp, err := renderer.New(rendererConfig, content, fibr.FuncMap(thumbnailApp), tracerApp)
+	rendererApp, err := renderer.New(rendererConfig, content, fibr.FuncMap(thumbnailApp), tracerApp.GetTracer("renderer"))
 	logger.Fatal(err)
 
 	exifApp, err := exif.New(exifConfig, storageProvider, prometheusRegisterer, tracerApp, amqpClient)

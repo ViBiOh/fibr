@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ViBiOh/ChatPotte/discord"
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
@@ -76,9 +77,7 @@ func (a *App) rawHandle(ctx context.Context, webhook provider.Webhook, event pro
 
 func (a *App) discordHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
 	if event.Type != provider.UploadEvent && event.Type != provider.RenameEvent {
-		return send(ctx, webhook.ID, request.Post(webhook.URL), discordPayload{
-			Content: a.eventText(event),
-		})
+		return send(ctx, webhook.ID, request.Post(webhook.URL), discord.NewDataResponse(a.eventText(event)))
 	}
 
 	url := event.GetURL()
@@ -88,25 +87,17 @@ func (a *App) discordHandle(ctx context.Context, webhook provider.Webhook, event
 	}
 
 	var description string
-	fields := []discordField{{
-		Name:   "item",
-		Value:  event.GetName(),
-		Inline: true,
-	}}
+	fields := []discord.Field{discord.NewField("item", event.GetName())}
 
 	switch event.Type {
 	case provider.UploadEvent:
 		description = "💾 A file has been uploaded"
 	case provider.RenameEvent:
 		description = "✏️ An item has been renamed"
-		fields = append(fields, discordField{
-			Name:   "to",
-			Value:  event.GetTo(),
-			Inline: true,
-		})
+		fields = append(fields, discord.NewField("to", event.GetTo()))
 	}
 
-	embed := discordEmbed{
+	embed := discord.Embed{
 		Title:       title,
 		Description: description,
 		URL:         url + "?browser",
@@ -119,14 +110,10 @@ func (a *App) discordHandle(ctx context.Context, webhook provider.Webhook, event
 	}
 
 	if a.thumbnailApp.HasThumbnail(ctx, event.Item, thumbnail.SmallSize) {
-		embed.Thumbnail = &discordContent{
-			URL: url + "?thumbnail",
-		}
+		embed.Thumbnail = discord.NewImage(url + "?thumbnail")
 	}
 
-	return send(ctx, webhook.ID, request.Post(webhook.URL), discordPayload{
-		Embeds: []discordEmbed{embed},
-	})
+	return send(ctx, webhook.ID, request.Post(webhook.URL), discord.NewDataResponse("").AddEmbed(embed))
 }
 
 func (a *App) slackHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
