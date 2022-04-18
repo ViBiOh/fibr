@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/ViBiOh/ChatPotte/discord"
+	"github.com/ViBiOh/ChatPotte/slack"
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
@@ -118,9 +119,7 @@ func (a *App) discordHandle(ctx context.Context, webhook provider.Webhook, event
 
 func (a *App) slackHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
 	if event.Type != provider.UploadEvent && event.Type != provider.RenameEvent {
-		return send(ctx, webhook.ID, request.Post(webhook.URL), slackPayload{
-			Text: a.eventText(event),
-		})
+		return send(ctx, webhook.ID, request.Post(webhook.URL), slack.NewResponse(a.eventText(event)))
 	}
 
 	url := event.GetURL()
@@ -130,40 +129,26 @@ func (a *App) slackHandle(ctx context.Context, webhook provider.Webhook, event p
 	}
 
 	var description string
-	fields := []slackText{newText(fmt.Sprintf("*item*\n%s", event.GetName()))}
+	var extraField slack.Text
 
 	switch event.Type {
 	case provider.UploadEvent:
 		description = "💾 A file has been uploaded"
 	case provider.RenameEvent:
 		description = "✏️ An item has been renamed"
-		fields = append(fields, newText(fmt.Sprintf("*to*\n%s", event.GetTo())))
+		extraField = slack.NewText(fmt.Sprintf("*to*\n%s", event.GetTo()))
 	}
 
-	section := slackSection{
-		Type:   "section",
-		Text:   newText(description),
-		Fields: fields,
+	section := slack.NewSection(slack.NewText(description)).AddField(slack.NewText(fmt.Sprintf("*item*\n%s", event.GetName())))
+	if len(extraField.Text) != 0 {
+		section = section.AddField(extraField)
 	}
 
 	if a.thumbnailApp.CanHaveThumbnail(event.Item) {
-		section.Accessory = &slackImage{
-			Type: "image",
-			URL:  url + "?thumbnail",
-			Alt:  fmt.Sprintf("Thumbnail of %s", event.Item.Name),
-		}
+		section.Accessory = slack.NewAccessory(url+"?thumbnail", fmt.Sprintf("Thumbnail of %s", event.Item.Name))
 	}
 
-	return send(ctx, webhook.ID, request.Post(webhook.URL), slackPayload{
-		Text: a.eventText(event),
-		Blocks: []slackSection{
-			{
-				Type: "section",
-				Text: newText(fmt.Sprintf("*<%s?browser|%s>*", url, title)),
-			},
-			section,
-		},
-	})
+	return send(ctx, webhook.ID, request.Post(webhook.URL), slack.NewResponse(a.eventText(event)).AddBlock(slack.NewSection(slack.NewText(fmt.Sprintf("*<%s?browser|%s>*", url, title)))).AddBlock(section))
 }
 
 func (a *App) telegramHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
