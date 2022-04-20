@@ -41,15 +41,13 @@ type App struct {
 	metric          *prometheus.CounterVec
 
 	amqpClient              *amqp.Client
+	amqpThumbnailRoutingKey string
 	amqpExchange            string
 	amqpStreamRoutingKey    string
-	amqpThumbnailRoutingKey string
 
-	vithRequest request.Request
-
-	sizes     []uint64
-	largeSize uint64
-
+	sizes        []uint64
+	vithRequest  request.Request
+	largeSize    uint64
 	maxSize      int64
 	minBitrate   uint64
 	directAccess bool
