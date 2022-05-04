@@ -67,19 +67,20 @@ func (a App) List(ctx context.Context, request provider.Request, message rendere
 	})
 
 	for index, item := range files {
-		func(item absto.Item, index int) {
-			wg.Go(func() {
-				aggregate, err := a.exifApp.GetAggregateFor(ctx, item)
-				if err != nil {
-					logger.WithField("fn", "crud.List").WithField("item", item.Pathname).Error("unable to read: %s", err)
-				}
+		index := index
+		item := item
 
-				renderItem := provider.StorageToRender(item, request)
-				renderItem.Aggregate = aggregate
+		wg.Go(func() {
+			aggregate, err := a.exifApp.GetAggregateFor(ctx, item)
+			if err != nil {
+				logger.WithField("fn", "crud.List").WithField("item", item.Pathname).Error("unable to read: %s", err)
+			}
 
-				items[index] = renderItem
-			})
-		}(item, index)
+			renderItem := provider.StorageToRender(item, request)
+			renderItem.Aggregate = aggregate
+
+			items[index] = renderItem
+		})
 	}
 
 	wg.Wait()
