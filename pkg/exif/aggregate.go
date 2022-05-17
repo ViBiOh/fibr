@@ -100,7 +100,7 @@ func (a App) computeAndSaveAggregate(ctx context.Context, dir absto.Item) error 
 			minDate, maxDate = aggregateDate(minDate, maxDate, exifData.Date)
 		}
 
-		if !exifData.Geocode.HasAddress() {
+		if exifData.Geocode.HasAddress() {
 			directoryAggregate.ingest(exifData.Geocode)
 		}
 

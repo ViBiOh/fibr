@@ -38,6 +38,7 @@ services:
     image: vibioh/exas
     environment:
       EXAS_STORAGE_FILE_SYSTEM_DIRECTORY: '/data'
+      EXAS_GEOCODE_URL: 'https://nominatim.openstreetmap.org'
     volumes:
       - ${DATA_DIR}:/data
     user: '${DATA_USER_ID}'

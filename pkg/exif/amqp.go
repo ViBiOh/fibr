@@ -36,5 +36,5 @@ func (a App) AmqpHandler(message amqp.Delivery) error {
 		return fmt.Errorf("unable to save: %s", err)
 	}
 
-	return a.processExif(ctx, resp.Item, resp.Exif)
+	return a.processExif(ctx, resp.Item, resp.Exif, true)
 }

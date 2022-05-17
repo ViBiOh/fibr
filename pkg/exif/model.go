@@ -12,7 +12,7 @@ func newAggregate() locationAggregate {
 	return make(map[string]map[string]int64)
 }
 
-func (a *locationAggregate) ingest(geocoding model.Geocode) {
+func (a locationAggregate) ingest(geocoding model.Geocode) {
 	for _, level := range levels {
 		a.inc(level, geocoding.Address[level])
 	}

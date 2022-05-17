@@ -24,7 +24,7 @@ func (a App) EventConsumer(ctx context.Context, e provider.Event) {
 			getEventLogger(e.Item).Error("unable to start: %s", err)
 		}
 	case provider.UploadEvent:
-		if err = a.handleUploadEvent(ctx, e.Item); err != nil {
+		if err = a.handleUploadEvent(ctx, e.Item, true); err != nil {
 			getEventLogger(e.Item).Error("unable to upload: %s", err)
 		}
 	case provider.RenameEvent:
@@ -74,10 +74,10 @@ func (a App) handleStartEvent(ctx context.Context, event provider.Event) error {
 		return nil
 	}
 
-	return a.handleUploadEvent(ctx, item)
+	return a.handleUploadEvent(ctx, item, !forced)
 }
 
-func (a App) handleUploadEvent(ctx context.Context, item absto.Item) error {
+func (a App) handleUploadEvent(ctx context.Context, item absto.Item, aggregate bool) error {
 	if !a.CanHaveExif(item) {
 		return nil
 	}
@@ -95,12 +95,16 @@ func (a App) handleUploadEvent(ctx context.Context, item absto.Item) error {
 		return nil
 	}
 
-	return a.processExif(ctx, item, exif)
+	return a.processExif(ctx, item, exif, aggregate)
 }
 
-func (a App) processExif(ctx context.Context, item absto.Item, exif exas.Exif) error {
+func (a App) processExif(ctx context.Context, item absto.Item, exif exas.Exif, aggregate bool) error {
 	if err := a.updateDate(ctx, item, exif); err != nil {
 		return fmt.Errorf("unable to update date: %s", err)
+	}
+
+	if !aggregate {
+		return nil
 	}
 
 	if err := a.aggregate(ctx, item); err != nil {
