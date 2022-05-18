@@ -217,6 +217,7 @@ func (a App) List(w http.ResponseWriter, r *http.Request, item absto.Item, items
 	}
 
 	w.Header().Add("Content-Type", "text/plain; charset=utf-8")
+	w.Header().Add("Cache-Control", "max-age=60, must-revalidate")
 	w.Header().Add("Etag", etag)
 	w.WriteHeader(http.StatusOK)
 

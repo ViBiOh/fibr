@@ -170,6 +170,8 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 		hash = a.exifHash(ctx, items)
 	} else if exifs, err := a.exifApp.ListDir(ctx, item); err == nil {
 		hash = sha.New(exifs)
+	} else if err != nil {
+		logger.Error("unable to list geojson directory: %s", err)
 	}
 
 	etag, ok := provider.EtagMatch(w, r, hash)
@@ -178,6 +180,7 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 	}
 
 	w.Header().Add("Content-Type", "application/json; charset=utf-8")
+	w.Header().Add("Cache-Control", "max-age=60, must-revalidate")
 	w.Header().Add("Etag", etag)
 	w.WriteHeader(http.StatusOK)
 
