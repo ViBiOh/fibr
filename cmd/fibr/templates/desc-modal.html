@@ -12,7 +12,10 @@
           <textarea class="desc-input" name="description">{{ .Exif.Description }}</textarea>
         </p>
 
-        {{ template "form_buttons" "Update" }}
+        <p class="padding no-margin center">
+          <a href="#{{ .ID }}" class="button white">Cancel</a>
+          <button type="submit" class="button bg-primary">Update</button>
+        </p>
       </form>
     </div>
   </div>
