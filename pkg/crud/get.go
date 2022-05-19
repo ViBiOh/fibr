@@ -180,7 +180,7 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 	}
 
 	w.Header().Add("Content-Type", "application/json; charset=utf-8")
-	w.Header().Add("Cache-Control", "max-age=60, must-revalidate")
+	w.Header().Add("Cache-Control", "no-cache")
 	w.Header().Add("Etag", etag)
 	w.WriteHeader(http.StatusOK)
 
