@@ -119,6 +119,11 @@ func (r Request) RelativeURL(item absto.Item) string {
 	return strings.TrimPrefix(pathname, r.Path)
 }
 
+// IsStory returns true if request is story mode
+func (r Request) IsStory() bool {
+	return r.Display == StoryDisplay
+}
+
 // AbsoluteURL compute absolute URL for the given name
 func (r Request) AbsoluteURL(name string) string {
 	return Join("/", r.Share.ID, r.Path, name)

@@ -103,7 +103,7 @@ func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.
 		return a.Stats(w, r, request, message)
 	}
 
-	items, err := a.listFiles(r, request)
+	items, err := a.listFiles(r, request, item)
 	if err != nil {
 		return errorReturn(request, err)
 	}
@@ -131,14 +131,14 @@ func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.
 
 	provider.SetPrefsCookie(w, request)
 
-	if request.Display == provider.StoryDisplay {
+	if request.IsStory() {
 		return a.story(r, request, item, items)
 	}
 
 	return a.List(r.Context(), request, message, item, items)
 }
 
-func (a App) listFiles(r *http.Request, request provider.Request) (items []absto.Item, err error) {
+func (a App) listFiles(r *http.Request, request provider.Request, item absto.Item) (items []absto.Item, err error) {
 	ctx := r.Context()
 	if a.tracer != nil {
 		var span trace.Span
@@ -150,6 +150,21 @@ func (a App) listFiles(r *http.Request, request provider.Request) (items []absto
 		items, err = a.searchFiles(r, request)
 	} else {
 		items, err = a.storageApp.List(ctx, request.Filepath())
+	}
+
+	if request.IsStory() {
+		thumbnails, err := a.thumbnailApp.ListDirLarge(ctx, item)
+		if err != nil {
+			logger.WithField("item", item.Pathname).Error("unable to list large thumbnails: %s", err)
+		}
+
+		storyItems := items[:0]
+		for _, item := range items {
+			if _, ok := thumbnails[a.thumbnailApp.PathForLarge(item)]; ok {
+				storyItems = append(storyItems, item)
+			}
+		}
+		items = storyItems
 	}
 
 	sort.Sort(provider.ByHybridSort(items))
@@ -166,7 +181,7 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 	ctx := r.Context()
 
 	var hash string
-	if query.GetBool(r, "search") {
+	if query.GetBool(r, "search") || request.IsStory() {
 		hash = a.exifHash(ctx, items)
 	} else if exifs, err := a.exifApp.ListDir(ctx, item); err == nil {
 		hash = sha.New(exifs)

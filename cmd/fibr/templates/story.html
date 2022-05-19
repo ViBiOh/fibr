@@ -134,6 +134,12 @@
       </a>
 
       <span class="flex-grow"></span>
+
+      {{ if .HasMap }}
+        <a class="padding" href="#map" download>
+          <img class="icon" src="{{ url "/svg/map?fill=aliceblue" }}" alt="View on map">
+        </a>
+      {{ end }}
     </div>
 
     <ul id="files" class="no-margin no-padding">

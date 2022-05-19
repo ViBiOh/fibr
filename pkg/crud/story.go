@@ -19,19 +19,11 @@ func (a App) story(r *http.Request, request provider.Request, item absto.Item, f
 		defer span.End()
 	}
 
-	thumbnails, err := a.thumbnailApp.ListDirLarge(ctx, item)
-	if err != nil {
-		logger.WithField("item", item.Pathname).Error("unable to list thumbnail: %s", err)
-	}
-
 	items := make([]provider.StoryItem, 0, len(files))
 	var cover map[string]any
+	var hasMap bool
 
 	for _, item := range files {
-		if _, ok := thumbnails[a.thumbnailApp.PathForLarge(item)]; !ok {
-			continue
-		}
-
 		if cover == nil {
 			cover = map[string]any{
 				"Img":       provider.StorageToRender(item, request),
@@ -45,6 +37,10 @@ func (a App) story(r *http.Request, request provider.Request, item absto.Item, f
 			logger.WithField("item", item.Pathname).Error("unable to get exif: %s", err)
 		}
 
+		if !hasMap && exif.Geocode.HasCoordinates() {
+			hasMap = true
+		}
+
 		items = append(items, provider.StorageToStory(item, request, exif))
 	}
 
@@ -55,6 +51,7 @@ func (a App) story(r *http.Request, request provider.Request, item absto.Item, f
 		"Files":              items,
 		"Cover":              cover,
 		"Request":            request,
+		"HasMap":             hasMap,
 		"ThumbnailLargeSize": a.thumbnailApp.LargeThumbnailSize(),
 	}), nil
 }
