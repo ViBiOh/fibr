@@ -19,6 +19,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/httperror"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	prom "github.com/ViBiOh/httputils/v4/pkg/prometheus"
+	"github.com/ViBiOh/httputils/v4/pkg/query"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 	"github.com/ViBiOh/httputils/v4/pkg/sha"
 	"github.com/prometheus/client_golang/prometheus"
@@ -194,16 +195,25 @@ func (a App) Serve(w http.ResponseWriter, r *http.Request, item absto.Item) {
 	http.ServeContent(w, r, path.Base(thumbnailInfo.Pathname), item.Date, reader)
 }
 
-// List return all thumbnail in a base64 form
-func (a App) List(w http.ResponseWriter, r *http.Request, items []absto.Item) {
+// List return all thumbnails in a base64 form
+func (a App) List(w http.ResponseWriter, r *http.Request, request provider.Request, item absto.Item, items []absto.Item) {
 	if len(items) == 0 {
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 
 	ctx := r.Context()
+	var hash string
 
-	etag, ok := provider.EtagMatch(w, r, a.thumbnailHash(ctx, items))
+	if query.GetBool(r, "search") {
+		hash = a.thumbnailHash(ctx, items)
+	} else if thumbnails, err := a.ListDir(ctx, item); err != nil {
+		logger.WithField("item", item.Pathname).Error("unable to list thumbnails: %s", err)
+	} else {
+		hash = sha.New(thumbnails)
+	}
+
+	etag, ok := provider.EtagMatch(w, r, hash)
 	if ok {
 		return
 	}

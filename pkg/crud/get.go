@@ -109,12 +109,12 @@ func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.
 	}
 
 	if query.GetBool(r, "geojson") {
-		a.serveGeoJSON(w, r, request, items)
+		a.serveGeoJSON(w, r, request, item, items)
 		return renderer.Page{}, nil
 	}
 
 	if query.GetBool(r, "thumbnail") {
-		a.thumbnailApp.List(w, r, items)
+		a.thumbnailApp.List(w, r, request, item, items)
 		return renderer.Page{}, nil
 	}
 
@@ -172,13 +172,24 @@ func (a App) listFiles(r *http.Request, request provider.Request, item absto.Ite
 	return items, err
 }
 
-func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provider.Request, items []absto.Item) {
+func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provider.Request, item absto.Item, items []absto.Item) {
 	if len(items) == 0 {
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 
-	etag, ok := provider.EtagMatch(w, r, a.exifHash(r.Context(), items))
+	ctx := r.Context()
+
+	var hash string
+	if query.GetBool(r, "search") {
+		hash = a.exifHash(ctx, items)
+	} else if exifs, err := a.exifApp.ListDir(ctx, item); err != nil {
+		logger.WithField("item", item.Pathname).Error("unable to list exifs: %s", err)
+	} else {
+		hash = sha.New(exifs)
+	}
+
+	etag, ok := provider.EtagMatch(w, r, hash)
 	if ok {
 		return
 	}

@@ -56,6 +56,7 @@ type WebhookManager interface {
 // ExifManager description
 //go:generate mockgen -destination ../mocks/exif.go -mock_names ExifManager=Exif -package mocks github.com/ViBiOh/fibr/pkg/provider ExifManager
 type ExifManager interface {
+	ListDir(ctx context.Context, item absto.Item) ([]absto.Item, error)
 	GetAggregateFor(ctx context.Context, item absto.Item) (Aggregate, error)
 	GetExifFor(ctx context.Context, item absto.Item) (exas.Exif, error)
 	SaveExifFor(ctx context.Context, item absto.Item, exif exas.Exif) error

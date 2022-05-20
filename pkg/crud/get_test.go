@@ -14,30 +14,6 @@ import (
 )
 
 func BenchmarkServeGeoJSON(b *testing.B) {
-	ctrl := gomock.NewController(b)
-	defer ctrl.Finish()
-
-	mockExif := mocks.NewExif(ctrl)
-
-	mockExif.EXPECT().GetExifFor(gomock.Any(), gomock.Any()).Return(exas.Exif{
-		Geocode: exas.Geocode{
-			Latitude:  1.0,
-			Longitude: 1.0,
-		},
-		Date: time.Date(2022, 0o2, 22, 22, 0o2, 22, 0, time.UTC),
-	}, nil).AnyTimes()
-
-	mockeStorage := mocks.NewStorage(ctrl)
-
-	mockeStorage.EXPECT().Info(gomock.Any(), gomock.Any()).Return(absto.Item{}, nil).AnyTimes()
-
-	instance := App{
-		exifApp:    mockExif,
-		storageApp: mockeStorage,
-	}
-
-	r := httptest.NewRequest(http.MethodGet, "/", nil)
-	request := provider.Request{}
 	items := []absto.Item{
 		{
 			ID:        "1234",
@@ -62,7 +38,36 @@ func BenchmarkServeGeoJSON(b *testing.B) {
 		},
 	}
 
+	ctrl := gomock.NewController(b)
+	defer ctrl.Finish()
+
+	mockExif := mocks.NewExif(ctrl)
+
+	mockExif.EXPECT().GetExifFor(gomock.Any(), gomock.Any()).Return(exas.Exif{
+		Geocode: exas.Geocode{
+			Latitude:  1.0,
+			Longitude: 1.0,
+		},
+		Date: time.Date(2022, 0o2, 22, 22, 0o2, 22, 0, time.UTC),
+	}, nil).AnyTimes()
+
+	mockExif.EXPECT().ListDir(gomock.Any(), gomock.Any()).Return(items, nil).AnyTimes()
+
+	instance := App{
+		exifApp: mockExif,
+	}
+
+	r := httptest.NewRequest(http.MethodGet, "/", nil)
+	request := provider.Request{}
+	item := absto.Item{
+		ID:        "1234",
+		Name:      "first.jpeg",
+		Pathname:  "/first.jpeg",
+		Extension: ".jpeg",
+		IsDir:     false,
+	}
+
 	for i := 0; i < b.N; i++ {
-		instance.serveGeoJSON(httptest.NewRecorder(), r, request, items)
+		instance.serveGeoJSON(httptest.NewRecorder(), r, request, item, items)
 	}
 }
