@@ -196,7 +196,7 @@ func (a App) Serve(w http.ResponseWriter, r *http.Request, item absto.Item) {
 }
 
 // List return all thumbnail in a base64 form
-func (a App) List(w http.ResponseWriter, r *http.Request, item absto.Item, items []absto.Item) {
+func (a App) List(w http.ResponseWriter, r *http.Request, request provider.Request, item absto.Item, items []absto.Item) {
 	if len(items) == 0 {
 		w.WriteHeader(http.StatusNoContent)
 		return
@@ -205,7 +205,7 @@ func (a App) List(w http.ResponseWriter, r *http.Request, item absto.Item, items
 	ctx := r.Context()
 
 	var hash string
-	if query.GetBool(r, "search") {
+	if query.GetBool(r, "search") || request.IsStory() {
 		hash = a.thumbnailHash(ctx, items)
 	} else if thumbnails, err := a.ListDir(ctx, item); err == nil {
 		hash = sha.New(thumbnails)
