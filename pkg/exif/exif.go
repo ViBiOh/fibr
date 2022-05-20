@@ -104,7 +104,7 @@ func (a App) ListDir(ctx context.Context, item absto.Item) ([]absto.Item, error)
 		return nil, nil
 	}
 
-	exifs, err := a.listStorageApp.List(ctx, Path(item))
+	exifs, err := a.listStorageApp.List(ctx, provider.MetadataDirectory(item))
 	if err != nil && !absto.IsNotExist(err) {
 		return exifs, err
 	}

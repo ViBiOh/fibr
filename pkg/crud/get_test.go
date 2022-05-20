@@ -27,10 +27,13 @@ func BenchmarkServeGeoJSON(b *testing.B) {
 		Date: time.Date(2022, 0o2, 22, 22, 0o2, 22, 0, time.UTC),
 	}, nil).AnyTimes()
 
-	mockExif.EXPECT().ListDir(gomock.Any(), gomock.Any()).Return(nil, nil).AnyTimes()
+	mockeStorage := mocks.NewStorage(ctrl)
+
+	mockeStorage.EXPECT().Info(gomock.Any(), gomock.Any()).Return(absto.Item{}, nil).AnyTimes()
 
 	instance := App{
-		exifApp: mockExif,
+		exifApp:    mockExif,
+		storageApp: mockeStorage,
 	}
 
 	r := httptest.NewRequest(http.MethodGet, "/", nil)
@@ -59,15 +62,7 @@ func BenchmarkServeGeoJSON(b *testing.B) {
 		},
 	}
 
-	item := absto.Item{
-		ID:        "1234",
-		Name:      "/",
-		Pathname:  "/",
-		Extension: "",
-		IsDir:     true,
-	}
-
 	for i := 0; i < b.N; i++ {
-		instance.serveGeoJSON(httptest.NewRecorder(), r, request, item, items)
+		instance.serveGeoJSON(httptest.NewRecorder(), r, request, items)
 	}
 }

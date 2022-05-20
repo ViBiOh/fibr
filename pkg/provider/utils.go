@@ -285,7 +285,5 @@ func EtagMatch(w http.ResponseWriter, r *http.Request, hash string) (etag string
 		match = true
 	}
 
-	logger.Info("Request is `%s`, Hash is `%s`, `If-None-Match` is `%s`, Match ? %t", r.URL.String(), hash, r.Header.Get("If-None-Match"), match)
-
 	return
 }

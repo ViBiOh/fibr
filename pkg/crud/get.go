@@ -109,7 +109,7 @@ func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.
 	}
 
 	if query.GetBool(r, "geojson") {
-		a.serveGeoJSON(w, r, request, item, items)
+		a.serveGeoJSON(w, r, request, items)
 		return renderer.Page{}, nil
 	}
 
@@ -172,23 +172,13 @@ func (a App) listFiles(r *http.Request, request provider.Request, item absto.Ite
 	return items, err
 }
 
-func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provider.Request, item absto.Item, items []absto.Item) {
+func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provider.Request, items []absto.Item) {
 	if len(items) == 0 {
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 
-	ctx := r.Context()
-
-	var hash string
-	if query.GetBool(r, "search") || request.IsStory() {
-		hash = a.exifHash(ctx, items)
-	} else if exifs, err := a.exifApp.ListDir(ctx, item); err == nil {
-		hash = sha.New(exifs)
-	} else if err != nil {
-		logger.Error("unable to list geojson directory: %s", err)
-	}
-
+	hash := a.exifHash(r.Context(), items)
 	etag, ok := provider.EtagMatch(w, r, hash)
 	if ok {
 		return
