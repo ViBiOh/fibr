@@ -114,7 +114,7 @@ func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.
 	}
 
 	if query.GetBool(r, "thumbnail") {
-		a.thumbnailApp.List(w, r, request, item, items)
+		a.thumbnailApp.List(w, r, items)
 		return renderer.Page{}, nil
 	}
 
@@ -178,8 +178,7 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 		return
 	}
 
-	hash := a.exifHash(r.Context(), items)
-	etag, ok := provider.EtagMatch(w, r, hash)
+	etag, ok := provider.EtagMatch(w, r, a.exifHash(r.Context(), items))
 	if ok {
 		return
 	}

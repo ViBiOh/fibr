@@ -19,7 +19,6 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/httperror"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	prom "github.com/ViBiOh/httputils/v4/pkg/prometheus"
-	"github.com/ViBiOh/httputils/v4/pkg/query"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 	"github.com/ViBiOh/httputils/v4/pkg/sha"
 	"github.com/prometheus/client_golang/prometheus"
@@ -196,7 +195,7 @@ func (a App) Serve(w http.ResponseWriter, r *http.Request, item absto.Item) {
 }
 
 // List return all thumbnail in a base64 form
-func (a App) List(w http.ResponseWriter, r *http.Request, request provider.Request, item absto.Item, items []absto.Item) {
+func (a App) List(w http.ResponseWriter, r *http.Request, items []absto.Item) {
 	if len(items) == 0 {
 		w.WriteHeader(http.StatusNoContent)
 		return
@@ -204,14 +203,7 @@ func (a App) List(w http.ResponseWriter, r *http.Request, request provider.Reque
 
 	ctx := r.Context()
 
-	var hash string
-	if query.GetBool(r, "search") || request.IsStory() {
-		hash = a.thumbnailHash(ctx, items)
-	} else if thumbnails, err := a.ListDir(ctx, item); err == nil {
-		hash = sha.New(thumbnails)
-	}
-
-	etag, ok := provider.EtagMatch(w, r, hash)
+	etag, ok := provider.EtagMatch(w, r, a.thumbnailHash(ctx, items))
 	if ok {
 		return
 	}
