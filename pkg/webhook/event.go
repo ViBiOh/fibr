@@ -116,7 +116,7 @@ func (a *App) discordHandle(ctx context.Context, webhook provider.Webhook, event
 	}
 
 	if a.thumbnailApp.HasThumbnail(ctx, event.Item, thumbnail.SmallSize) {
-		embed.Thumbnail = discord.NewImage(url + "?thumbnail")
+		embed.Thumbnail = discord.NewImage(event.GetURL() + "?thumbnail&scale=large")
 	}
 
 	return send(ctx, webhook.ID, request.Post(webhook.URL), discord.NewDataResponse("").AddEmbed(embed))
@@ -155,7 +155,7 @@ func (a *App) slackHandle(ctx context.Context, webhook provider.Webhook, event p
 	}
 
 	if a.thumbnailApp.CanHaveThumbnail(event.Item) {
-		section.Accessory = slack.NewAccessory(url+"?thumbnail", fmt.Sprintf("Thumbnail of %s", event.Item.Name))
+		section.Accessory = slack.NewAccessory(event.GetURL()+"?thumbnail", fmt.Sprintf("Thumbnail of %s", event.Item.Name))
 	}
 
 	return send(ctx, webhook.ID, request.Post(webhook.URL), slack.NewResponse(a.eventText(event)).AddBlock(slack.NewSection(slack.NewText(fmt.Sprintf("*<%s|%s>*", url, title)))).AddBlock(section))
