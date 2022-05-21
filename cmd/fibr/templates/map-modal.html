@@ -18,14 +18,26 @@
         <a href="#" class="button white small">Close</a>
       </h2>
 
-      <div id="map-container" class="flex flex-center"></div>
+      {{ $geoURL := "?geojson" }}
+      {{ if .Search }}
+        {{ $geoURL = printf "%s&%s" $geoURL .Search.Encode }}
+      {{ end }}
+
+      <div id="map-container" class="flex flex-center">
+        <noscript class="white">
+          <h2>You must enable Javascript to have interactive map with pictures.</h2>
+          <p>
+            GeoJSON data are available on <a class="primary" href="{{ $geoURL }}">this link</a>
+          </p>
+        </noscript>
+      </div>
 
       <style type="text/css" nonce="{{ .nonce }}">
         #map-container {
           background-color: var(--grey);
           color: var(--dark);
           height: 80vh;
-          width: 90vw;
+          width: 80vw;
         }
 
         .thumbnail-img {
@@ -50,14 +62,7 @@
 
       <script type="text/javascript" nonce="{{ .nonce }}">
         async function fetchGeoJSON() {
-          fetchURL = document.location.search
-          if (fetchURL.includes('?')) {
-            fetchURL += "&geojson"
-          } else {
-            fetchURL += "?geojson"
-          }
-
-          const response = await fetch(fetchURL, { credentials: 'same-origin' });
+          const response = await fetch('{{ $geoURL }}', { credentials: 'same-origin' });
 
           if (response.status >= 400) {
             throw new Error('unable to load geojson');

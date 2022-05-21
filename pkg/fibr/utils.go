@@ -6,15 +6,7 @@ import (
 
 func isMethodAllowed(r *http.Request) bool {
 	switch r.Method {
-	case http.MethodGet:
-		fallthrough
-	case http.MethodPost:
-		fallthrough
-	case http.MethodPut:
-		fallthrough
-	case http.MethodPatch:
-		fallthrough
-	case http.MethodDelete:
+	case http.MethodGet, http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete:
 		return true
 	default:
 		return false
