@@ -77,7 +77,7 @@ func (a *App) rawHandle(ctx context.Context, webhook provider.Webhook, event pro
 }
 
 func (a *App) discordHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
-	if event.Type != provider.UploadEvent && event.Type != provider.RenameEvent {
+	if event.Type != provider.UploadEvent && event.Type != provider.RenameEvent && event.Type != provider.DescriptionEvent {
 		return send(ctx, webhook.ID, request.Post(webhook.URL), discord.NewDataResponse(a.eventText(event)))
 	}
 
@@ -93,15 +93,20 @@ func (a *App) discordHandle(ctx context.Context, webhook provider.Webhook, event
 	switch event.Type {
 	case provider.UploadEvent:
 		description = "💾 A file has been uploaded"
+		url += "?browser"
 	case provider.RenameEvent:
 		description = "✏️ An item has been renamed"
 		fields = append(fields, discord.NewField("to", event.GetTo()))
+		url += "?browser"
+	case provider.DescriptionEvent:
+		description = "💬 " + event.Metadata["description"]
+		url = fmt.Sprintf("%s/?d=story#%s", url[:strings.LastIndex(url, "/")], event.Item.ID)
 	}
 
 	embed := discord.Embed{
 		Title:       title,
 		Description: description,
-		URL:         url + "?browser",
+		URL:         url,
 		Fields:      fields,
 	}
 
@@ -118,7 +123,7 @@ func (a *App) discordHandle(ctx context.Context, webhook provider.Webhook, event
 }
 
 func (a *App) slackHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
-	if event.Type != provider.UploadEvent && event.Type != provider.RenameEvent {
+	if event.Type != provider.UploadEvent && event.Type != provider.RenameEvent && event.Type != provider.DescriptionEvent {
 		return send(ctx, webhook.ID, request.Post(webhook.URL), slack.NewResponse(a.eventText(event)))
 	}
 
@@ -134,9 +139,14 @@ func (a *App) slackHandle(ctx context.Context, webhook provider.Webhook, event p
 	switch event.Type {
 	case provider.UploadEvent:
 		description = "💾 A file has been uploaded"
+		url += "?browser"
 	case provider.RenameEvent:
 		description = "✏️ An item has been renamed"
 		extraField = slack.NewText(fmt.Sprintf("*to*\n%s", event.GetTo()))
+		url += "?browser"
+	case provider.DescriptionEvent:
+		description = "💬 " + event.Metadata["description"]
+		url = fmt.Sprintf("%s/?d=story#%s", url[:strings.LastIndex(url, "/")], event.Item.ID)
 	}
 
 	section := slack.NewSection(slack.NewText(description)).AddField(slack.NewText(fmt.Sprintf("*item*\n%s", event.GetName())))
@@ -148,7 +158,7 @@ func (a *App) slackHandle(ctx context.Context, webhook provider.Webhook, event p
 		section.Accessory = slack.NewAccessory(url+"?thumbnail", fmt.Sprintf("Thumbnail of %s", event.Item.Name))
 	}
 
-	return send(ctx, webhook.ID, request.Post(webhook.URL), slack.NewResponse(a.eventText(event)).AddBlock(slack.NewSection(slack.NewText(fmt.Sprintf("*<%s?browser|%s>*", url, title)))).AddBlock(section))
+	return send(ctx, webhook.ID, request.Post(webhook.URL), slack.NewResponse(a.eventText(event)).AddBlock(slack.NewSection(slack.NewText(fmt.Sprintf("*<%s|%s>*", url, title)))).AddBlock(section))
 }
 
 func (a *App) telegramHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
@@ -167,6 +177,9 @@ func (a *App) eventText(event provider.Event) string {
 		return fmt.Sprintf("✏️ `%s` has been renamed to `%s`: %s?browser", event.Item.Pathname, event.New.Pathname, event.GetURL())
 	case provider.DeleteEvent:
 		return fmt.Sprintf("❌ `%s` has been deleted : %s", event.Item.Name, event.GetURL())
+	case provider.DescriptionEvent:
+		url := event.GetURL()
+		return fmt.Sprintf("💬 %s %s", event.Metadata["description"], fmt.Sprintf("%s/?d=story#%s", url[:strings.LastIndex(url, "/")], event.Item.ID))
 	case provider.StartEvent:
 		return fmt.Sprintf("🚀 Fibr starts routine for path `%s`", event.Item.Pathname)
 	default:

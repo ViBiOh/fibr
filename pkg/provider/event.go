@@ -45,9 +45,11 @@ const (
 	StartEvent
 	// AccessEvent occurs when content is accessed
 	AccessEvent
+	// DescriptionEvent occurs when a description is added
+	DescriptionEvent
 )
 
-var eventTypeValues = []string{"upload", "create", "rename", "delete", "start", "access"}
+var eventTypeValues = []string{"upload", "create", "rename", "delete", "start", "access", "description"}
 
 // ParseEventType parse raw string into an EventType
 func ParseEventType(value string) (EventType, error) {
@@ -196,6 +198,20 @@ func NewRenameEvent(old, new absto.Item, shareableURL string, rendererApp render
 		New:          &new,
 		URL:          rendererApp.PublicURL(new.Pathname),
 		ShareableURL: rendererApp.PublicURL(shareableURL),
+	}
+}
+
+// NewDescriptionEvent creates a new description event
+func NewDescriptionEvent(item absto.Item, shareableURL string, description string, rendererApp renderer.App) Event {
+	return Event{
+		Time:         time.Now(),
+		Type:         DescriptionEvent,
+		Item:         item,
+		URL:          rendererApp.PublicURL(item.Pathname),
+		ShareableURL: rendererApp.PublicURL(shareableURL),
+		Metadata: map[string]string{
+			"description": description,
+		},
 	}
 }
 

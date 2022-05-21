@@ -127,6 +127,9 @@
                       {{ if eq .String "access" }}
                         <img class="icon" src="{{ url "/svg/info?fill=aliceblue" }}" alt="access icon" title="access">
                       {{ end }}
+                      {{ if eq .String "description" }}
+                        <img class="icon" src="{{ url "/svg/comment?fill=aliceblue" }}" alt="description icon" title="description">
+                      {{ end }}
                     {{ end }}
                   {{ end }}
                 </th>
