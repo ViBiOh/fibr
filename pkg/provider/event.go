@@ -328,13 +328,7 @@ func (e EventBus) Start(done <-chan struct{}, storageApp absto.Storage, renamers
 
 	go func() {
 		for event := range e.bus {
-			var span trace.Span
-			ctx := context.Background()
-
-			if e.tracer != nil {
-				ctx, span = e.tracer.Start(ctx, "event")
-				span.SetAttributes(attribute.String("type", event.Type.String()))
-			}
+			ctx, end := tracer.StartSpan(context.Background(), e.tracer, "event", trace.WithAttributes(attribute.String("type", event.Type.String())))
 
 			if event.Type == RenameEvent && event.Item.IsDir {
 				RenameDirectory(ctx, storageApp, renamers, event.Item, *event.New)
@@ -344,9 +338,7 @@ func (e EventBus) Start(done <-chan struct{}, storageApp absto.Storage, renamers
 				consumer(ctx, event)
 			}
 
-			if span != nil {
-				span.End()
-			}
+			end()
 			e.increaseMetric(event, "done")
 		}
 	}()

@@ -15,7 +15,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/concurrent"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
-	"go.opentelemetry.io/otel/trace"
+	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 )
 
 const (
@@ -38,11 +38,8 @@ func (a App) getCover(ctx context.Context, request provider.Request, files []abs
 
 // List render directory web view of given dirPath
 func (a App) List(ctx context.Context, request provider.Request, message renderer.Message, item absto.Item, files []absto.Item) (renderer.Page, error) {
-	if a.tracer != nil {
-		var span trace.Span
-		ctx, span = a.tracer.Start(ctx, "list")
-		defer span.End()
-	}
+	ctx, end := tracer.StartSpan(ctx, a.tracer, "list")
+	defer end()
 
 	items := make([]provider.RenderItem, len(files))
 	wg := concurrent.NewLimited(6)

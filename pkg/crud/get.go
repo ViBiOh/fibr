@@ -20,7 +20,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/query"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 	"github.com/ViBiOh/httputils/v4/pkg/sha"
-	"go.opentelemetry.io/otel/trace"
+	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 )
 
 func (a App) getWithMessage(w http.ResponseWriter, r *http.Request, request provider.Request, message renderer.Message) (renderer.Page, error) {
@@ -139,12 +139,8 @@ func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.
 }
 
 func (a App) listFiles(r *http.Request, request provider.Request, item absto.Item) (items []absto.Item, err error) {
-	ctx := r.Context()
-	if a.tracer != nil {
-		var span trace.Span
-		ctx, span = a.tracer.Start(r.Context(), "files")
-		defer span.End()
-	}
+	ctx, end := tracer.StartSpan(r.Context(), a.tracer, "files")
+	defer end()
 
 	if query.GetBool(r, "search") {
 		items, err = a.searchFiles(r, request)
@@ -178,7 +174,8 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 		return
 	}
 
-	ctx := r.Context()
+	ctx, end := tracer.StartSpan(r.Context(), a.tracer, "geojson")
+	defer end()
 
 	var hash string
 	if query.GetBool(r, "search") {
@@ -199,7 +196,7 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 	w.Header().Add("Etag", etag)
 	w.WriteHeader(http.StatusOK)
 
-	done := r.Context().Done()
+	done := ctx.Done()
 	isDone := func() bool {
 		select {
 		case <-done:
@@ -222,7 +219,7 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 			return
 		}
 
-		exif, err := a.exifApp.GetExifFor(r.Context(), item)
+		exif, err := a.exifApp.GetExifFor(ctx, item)
 		if err != nil {
 			logger.WithField("item", item.Pathname).Error("unable to get exif: %s", err)
 			continue

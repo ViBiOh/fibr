@@ -8,16 +8,12 @@ import (
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
-	"go.opentelemetry.io/otel/trace"
+	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 )
 
 func (a App) story(r *http.Request, request provider.Request, item absto.Item, files []absto.Item) (renderer.Page, error) {
-	ctx := r.Context()
-	if a.tracer != nil {
-		var span trace.Span
-		ctx, span = a.tracer.Start(ctx, "story")
-		defer span.End()
-	}
+	ctx, end := tracer.StartSpan(r.Context(), a.tracer, "story")
+	defer end()
 
 	items := make([]provider.StoryItem, 0, len(files))
 	var cover map[string]any

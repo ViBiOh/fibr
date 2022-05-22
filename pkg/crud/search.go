@@ -14,7 +14,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	httpModel "github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
-	"go.opentelemetry.io/otel/trace"
+	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 )
 
 const (
@@ -138,12 +138,8 @@ func (a App) searchFiles(r *http.Request, request provider.Request) (items []abs
 }
 
 func (a App) search(r *http.Request, request provider.Request, files []absto.Item) (renderer.Page, error) {
-	ctx := r.Context()
-	if a.tracer != nil {
-		var span trace.Span
-		ctx, span = a.tracer.Start(ctx, "search")
-		defer span.End()
-	}
+	ctx, end := tracer.StartSpan(r.Context(), a.tracer, "search")
+	defer end()
 
 	items := make([]provider.RenderItem, len(files))
 	var hasMap bool

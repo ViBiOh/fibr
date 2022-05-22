@@ -8,7 +8,7 @@ import (
 	absto "github.com/ViBiOh/absto/pkg/model"
 	exas "github.com/ViBiOh/exas/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"go.opentelemetry.io/otel/trace"
+	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 )
 
 var (
@@ -23,11 +23,8 @@ func (a App) GetExifFor(ctx context.Context, item absto.Item) (exas.Exif, error)
 		return exas.Exif{}, nil
 	}
 
-	if a.tracer != nil {
-		var span trace.Span
-		ctx, span = a.tracer.Start(ctx, "aggregate")
-		defer span.End()
-	}
+	ctx, end := tracer.StartSpan(ctx, a.tracer, "get_exif")
+	defer end()
 
 	exif, err := a.loadExif(ctx, item)
 	if err != nil && !absto.IsNotExist(err) {
@@ -48,11 +45,8 @@ func (a App) GetAggregateFor(ctx context.Context, item absto.Item) (provider.Agg
 		return provider.Aggregate{}, nil
 	}
 
-	if a.tracer != nil {
-		var span trace.Span
-		ctx, span = a.tracer.Start(ctx, "aggregate")
-		defer span.End()
-	}
+	ctx, end := tracer.StartSpan(ctx, a.tracer, "aggregate")
+	defer end()
 
 	aggregate, err := a.loadAggregate(ctx, item)
 	if err != nil && !absto.IsNotExist(err) {
