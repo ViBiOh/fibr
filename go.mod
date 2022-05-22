@@ -5,10 +5,10 @@ go 1.18
 require (
 	github.com/ViBiOh/ChatPotte v0.0.18
 	github.com/ViBiOh/absto v0.5.7
-	github.com/ViBiOh/auth/v2 v2.12.8
+	github.com/ViBiOh/auth/v2 v2.12.9
 	github.com/ViBiOh/exas v0.4.1
 	github.com/ViBiOh/flags v1.0.0
-	github.com/ViBiOh/httputils/v4 v4.41.5
+	github.com/ViBiOh/httputils/v4 v4.42.0
 	github.com/ViBiOh/vith v0.4.2
 	github.com/golang/mock v1.6.0
 	github.com/prometheus/client_golang v1.12.2
