@@ -18,6 +18,8 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 )
 
+const amqpThumbnailDiscordDelay = 10 * time.Second
+
 // EventConsumer handle event pushed to the event bus
 func (a *App) EventConsumer(ctx context.Context, event provider.Event) {
 	a.RLock()
@@ -112,11 +114,17 @@ func (a *App) discordHandle(ctx context.Context, webhook provider.Webhook, event
 
 	if a.amqpClient != nil {
 		// Waiting a couple of seconds before checking for thumbnail
-		time.Sleep(time.Second * 15)
+		time.Sleep(amqpThumbnailDiscordDelay)
 	}
 
 	if a.thumbnailApp.HasThumbnail(ctx, event.Item, thumbnail.SmallSize) {
-		embed.Thumbnail = discord.NewImage(event.GetURL() + "?thumbnail&scale=large")
+		thumbnailURL := event.GetURL() + "?thumbnail"
+
+		if _, ok := provider.VideoExtensions[event.Item.Extension]; ok {
+			thumbnailURL += "&scale=large"
+		}
+
+		embed.Thumbnail = discord.NewImage(thumbnailURL)
 	}
 
 	return send(ctx, webhook.ID, request.Post(webhook.URL), discord.NewDataResponse("").AddEmbed(embed))
