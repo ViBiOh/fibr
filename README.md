@@ -87,6 +87,7 @@ You can register webhook listeners on folders and receive an HTTP notification w
 - `delete` occurs when an item is deleted
 - `start` occurs when fibr start and do something on an item
 - `access` occurs when content is accessed (directory browsing or just one file)
+- `description` occurs when a description is written on the story mode
 
 The request sent is a POST with 15s timeout with the given payload structure:
 
@@ -100,6 +101,9 @@ The request sent is a POST with 15s timeout with the given payload structure:
     "pathname": "/path/to/payload.json",
     "isDir": false,
     "size": 177
+  },
+  "metadata": {
+    "description": "content"
   },
   "type": "upload"
 }
