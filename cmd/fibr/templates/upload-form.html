@@ -452,13 +452,8 @@
       pointer-events: none;
     }
 
-    #upload-form {
-      overflow-y: auto;
-    }
-
     #upload-list {
       margin: 1rem auto;
-      overflow-y: auto;
     }
 
     #upload-duration {
@@ -500,7 +495,7 @@
 
       <form
         id="upload-form"
-        class="flex flex-column flex-grow flex-center"
+        class="flex flex-column flex-grow flex-center scrollable"
         method="post"
         enctype="multipart/form-data"
         action="#"
@@ -521,7 +516,7 @@
           <label id="file-label" for="file" tabindex="0" class="hidden button bg-success">Choose file...</label>
         </p>
 
-        <div id="upload-list" class="hidden upload-width full"></div>
+        <div id="upload-list" class="hidden upload-width full scrollable"></div>
 
         <p class="padding no-margin center">
           <button id="upload-button" type="submit" class="button bg-primary">Upload</button>

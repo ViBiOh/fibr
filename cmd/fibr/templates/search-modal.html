@@ -12,17 +12,13 @@
     #size {
       width: 7rem;
     }
-
-    #search-form {
-      overflow-y: auto;
-    }
   </style>
 
   <div id="search" class="modal">
     <div class="modal-content">
       <h2 class="flex flex-center header no-margin">Search files</h2>
 
-      <form method="GET" id="search-form" action="#">
+      <form method="GET" id="search-form" class="scrollable" action="#">
         <input type="hidden" name="search">
 
         <p class="padding no-margin">

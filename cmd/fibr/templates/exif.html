@@ -33,30 +33,32 @@
           <a href="#" class="button white small">Close</a>
         </h2>
 
-        {{ if not .Exif.Date.IsZero }}
-          <p class="padding no-margin code">
-            <strong>Date:</strong> {{ .Exif.Date.Format "2006-01-02T15:04:05Z07:00" }}<br>
-          </p>
-        {{ end }}
-
-        {{ if or .Exif.Geocode.HasAddress .Exif.Geocode.HasCoordinates }}
-          <p class="padding no-margin code">
-            {{ if .Exif.Geocode.HasCoordinates }}
-              <strong>Coordinates:</strong> <a class="primary" href="http://www.openstreetmap.org/?mlat={{ .Exif.Geocode.Latitude }}&mlon={{ .Exif.Geocode.Longitude }}&zoom=16">{{ .Exif.Geocode.Latitude }},{{ .Exif.Geocode.Longitude }}</a><br>
-            {{ end }}
-
-            <strong>Location</strong><br>
-            {{ range $key, $value := .Exif.Geocode.Address }}
-                <em>{{ $key }}:</em> {{ $value }}<br>
-            {{ end }}
-          </p>
-        {{ end }}
-
-        <p class="padding no-margin code">
-          {{ range $key, $value := .Exif.Data }}
-            <strong>{{ $key }}:</strong> {{ $value }}<br>
+        <div class="scrollable">
+          {{ if not .Exif.Date.IsZero }}
+            <p class="padding no-margin code">
+              <strong>Date:</strong> {{ .Exif.Date.Format "2006-01-02T15:04:05Z07:00" }}<br>
+            </p>
           {{ end }}
-        </p>
+
+          {{ if or .Exif.Geocode.HasAddress .Exif.Geocode.HasCoordinates }}
+            <p class="padding no-margin code">
+              {{ if .Exif.Geocode.HasCoordinates }}
+                <strong>Coordinates:</strong> <a class="primary" href="http://www.openstreetmap.org/?mlat={{ .Exif.Geocode.Latitude }}&mlon={{ .Exif.Geocode.Longitude }}&zoom=16">{{ .Exif.Geocode.Latitude }},{{ .Exif.Geocode.Longitude }}</a><br>
+              {{ end }}
+
+              <strong>Location</strong><br>
+              {{ range $key, $value := .Exif.Geocode.Address }}
+                  <em>{{ $key }}:</em> {{ $value }}<br>
+              {{ end }}
+            </p>
+          {{ end }}
+
+          <p class="padding no-margin code">
+            {{ range $key, $value := .Exif.Data }}
+              <strong>{{ $key }}:</strong> {{ $value }}<br>
+            {{ end }}
+          </p>
+        </div>
       </div>
     </div>
   {{ end }}
