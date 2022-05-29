@@ -458,6 +458,7 @@
 
     #upload-list {
       margin: 1rem auto;
+      overflow-y: auto;
     }
 
     #upload-duration {
@@ -478,6 +479,7 @@
     }
 
     .opacity {
+      flex: 0 0;
       opacity: 0;
     }
 
@@ -514,9 +516,9 @@
           </p>
         {{ end }}
 
-        <p class="padding no-margin center upload-width">
+        <p class="padding no-margin center upload-width flex flex-center">
           <input id="file" class="full" type="file" name="file" />
-          <label id="file-label" for="file" class="hidden button bg-success">Choose file...</label>
+          <label id="file-label" for="file" tabindex="0" class="hidden button bg-success">Choose file...</label>
         </p>
 
         <div id="upload-list" class="hidden upload-width full"></div>
