@@ -3,7 +3,7 @@ module github.com/ViBiOh/fibr
 go 1.18
 
 require (
-	github.com/ViBiOh/ChatPotte v0.0.19
+	github.com/ViBiOh/ChatPotte v0.0.20
 	github.com/ViBiOh/absto v0.5.7
 	github.com/ViBiOh/auth/v2 v2.12.10
 	github.com/ViBiOh/exas v0.4.1
