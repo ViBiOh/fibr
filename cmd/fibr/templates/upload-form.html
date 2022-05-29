@@ -452,9 +452,12 @@
       pointer-events: none;
     }
 
+    #upload-form {
+      overflow-y: auto;
+    }
+
     #upload-list {
       margin: 1rem auto;
-      overflow-y: auto;
     }
 
     #upload-duration {
@@ -487,7 +490,11 @@
 
   <div id="upload-modal" class="modal">
     <div class="modal-content">
-      <h2 class="header">Upload files</h2>
+      <h2 class="flex flex-center header no-margin">
+        <span>Upload files</span>
+        <span class="flex-grow"></span>
+        <a id="upload-cancel" href="#" class="button white small">Close</a>
+      </h2>
 
       <form
         id="upload-form"
@@ -515,7 +522,6 @@
         <div id="upload-list" class="hidden upload-width full"></div>
 
         <p class="padding no-margin center">
-          <a id="upload-cancel" href="#" class="button white">Cancel</a>
           <button id="upload-button" type="submit" class="button bg-primary">Upload</button>
         </p>
       </form>
