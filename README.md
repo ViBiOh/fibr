@@ -224,8 +224,8 @@ Usage of fibr:
         [amqpExif] Max send retries {FIBR_AMQP_EXIF_MAX_RETRY} (default 3)
   -amqpExifQueue string
         [amqpExif] Queue name {FIBR_AMQP_EXIF_QUEUE} (default "fibr.exif")
-  -amqpExifRetryInterval string
-        [amqpExif] Interval duration when send fails {FIBR_AMQP_EXIF_RETRY_INTERVAL} (default "1h")
+  -amqpExifRetryInterval duration
+        [amqpExif] Interval duration when send fails {FIBR_AMQP_EXIF_RETRY_INTERVAL} (default 1h0m0s)
   -amqpExifRoutingKey string
         [amqpExif] RoutingKey name {FIBR_AMQP_EXIF_ROUTING_KEY} (default "exif_output")
   -amqpPrefetch int
@@ -237,9 +237,9 @@ Usage of fibr:
   -amqpShareMaxRetry uint
         [amqpShare] Max send retries {FIBR_AMQP_SHARE_MAX_RETRY} (default 3)
   -amqpShareQueue string
-        [amqpShare] Queue name {FIBR_AMQP_SHARE_QUEUE} (default "fibr.share-<random>")
-  -amqpShareRetryInterval string
-        [amqpShare] Interval duration when send fails {FIBR_AMQP_SHARE_RETRY_INTERVAL} (default "0")
+        [amqpShare] Queue name {FIBR_AMQP_SHARE_QUEUE} (default "fibr.share-6db91c9c")
+  -amqpShareRetryInterval duration
+        [amqpShare] Interval duration when send fails {FIBR_AMQP_SHARE_RETRY_INTERVAL}
   -amqpShareRoutingKey string
         [amqpShare] RoutingKey name {FIBR_AMQP_SHARE_ROUTING_KEY} (default "share")
   -amqpURI string
@@ -251,9 +251,9 @@ Usage of fibr:
   -amqpWebhookMaxRetry uint
         [amqpWebhook] Max send retries {FIBR_AMQP_WEBHOOK_MAX_RETRY} (default 3)
   -amqpWebhookQueue string
-        [amqpWebhook] Queue name {FIBR_AMQP_WEBHOOK_QUEUE} (default "fibr.webhook-<random>")
-  -amqpWebhookRetryInterval string
-        [amqpWebhook] Interval duration when send fails {FIBR_AMQP_WEBHOOK_RETRY_INTERVAL} (default "0")
+        [amqpWebhook] Queue name {FIBR_AMQP_WEBHOOK_QUEUE} (default "fibr.webhook-94e48846")
+  -amqpWebhookRetryInterval duration
+        [amqpWebhook] Interval duration when send fails {FIBR_AMQP_WEBHOOK_RETRY_INTERVAL}
   -amqpWebhookRoutingKey string
         [amqpWebhook] RoutingKey name {FIBR_AMQP_WEBHOOK_ROUTING_KEY} (default "webhook")
   -authProfiles string
@@ -282,12 +282,12 @@ Usage of fibr:
         [exif] Exif Tool URL Basic User {FIBR_EXIF_USER}
   -frameOptions string
         [owasp] X-Frame-Options {FIBR_FRAME_OPTIONS} (default "SAMEORIGIN")
-  -graceDuration string
-        [http] Grace duration when SIGTERM received {FIBR_GRACE_DURATION} (default "30s")
+  -graceDuration duration
+        [http] Grace duration when SIGTERM received {FIBR_GRACE_DURATION} (default 30s)
   -hsts
         [owasp] Indicate Strict Transport Security {FIBR_HSTS} (default true)
-  -idleTimeout string
-        [server] Idle Timeout {FIBR_IDLE_TIMEOUT} (default "2m")
+  -idleTimeout duration
+        [server] Idle Timeout {FIBR_IDLE_TIMEOUT} (default 2m0s)
   -ignorePattern string
         [crud] Ignore pattern when listing files or directory {FIBR_IGNORE_PATTERN}
   -key string
@@ -318,24 +318,24 @@ Usage of fibr:
         [prometheus] Certificate file {FIBR_PROMETHEUS_CERT}
   -prometheusGzip
         [prometheus] Enable gzip compression of metrics output {FIBR_PROMETHEUS_GZIP}
-  -prometheusIdleTimeout string
-        [prometheus] Idle Timeout {FIBR_PROMETHEUS_IDLE_TIMEOUT} (default "10s")
+  -prometheusIdleTimeout duration
+        [prometheus] Idle Timeout {FIBR_PROMETHEUS_IDLE_TIMEOUT} (default 10s)
   -prometheusIgnore string
         [prometheus] Ignored path prefixes for metrics, comma separated {FIBR_PROMETHEUS_IGNORE}
   -prometheusKey string
         [prometheus] Key file {FIBR_PROMETHEUS_KEY}
   -prometheusPort uint
         [prometheus] Listen port (0 to disable) {FIBR_PROMETHEUS_PORT} (default 9090)
-  -prometheusReadTimeout string
-        [prometheus] Read Timeout {FIBR_PROMETHEUS_READ_TIMEOUT} (default "5s")
-  -prometheusShutdownTimeout string
-        [prometheus] Shutdown Timeout {FIBR_PROMETHEUS_SHUTDOWN_TIMEOUT} (default "5s")
-  -prometheusWriteTimeout string
-        [prometheus] Write Timeout {FIBR_PROMETHEUS_WRITE_TIMEOUT} (default "10s")
+  -prometheusReadTimeout duration
+        [prometheus] Read Timeout {FIBR_PROMETHEUS_READ_TIMEOUT} (default 5s)
+  -prometheusShutdownTimeout duration
+        [prometheus] Shutdown Timeout {FIBR_PROMETHEUS_SHUTDOWN_TIMEOUT} (default 5s)
+  -prometheusWriteTimeout duration
+        [prometheus] Write Timeout {FIBR_PROMETHEUS_WRITE_TIMEOUT} (default 10s)
   -publicURL string
         Public URL {FIBR_PUBLIC_URL} (default "http://localhost:1080")
-  -readTimeout string
-        [server] Read Timeout {FIBR_READ_TIMEOUT} (default "2m")
+  -readTimeout duration
+        [server] Read Timeout {FIBR_READ_TIMEOUT} (default 2m0s)
   -sanitizeOnStart
         [crud] Sanitize name on start {FIBR_SANITIZE_ON_START}
   -shareAmqpExchange string
@@ -344,10 +344,10 @@ Usage of fibr:
         [share] AMQP Routing Key for exclusive lock on default exchange {FIBR_SHARE_AMQP_EXCLUSIVE_ROUTING_KEY} (default "fibr.semaphore.shares")
   -shareAmqpRoutingKey string
         [share] AMQP Routing Key for share {FIBR_SHARE_AMQP_ROUTING_KEY} (default "share")
-  -shutdownTimeout string
-        [server] Shutdown Timeout {FIBR_SHUTDOWN_TIMEOUT} (default "10s")
+  -shutdownTimeout duration
+        [server] Shutdown Timeout {FIBR_SHUTDOWN_TIMEOUT} (default 10s)
   -storageFileSystemDirectory /data
-        [storage] Path to directory. Default is dynamic. /data on a server and Current Working Directory in a terminal. {FIBR_STORAGE_FILE_SYSTEM_DIRECTORY} (default "/data")
+        [storage] Path to directory. Default is dynamic. /data on a server and Current Working Directory in a terminal. {FIBR_STORAGE_FILE_SYSTEM_DIRECTORY} (default "/Users/macbook/code/fibr")
   -storageObjectAccessKey string
         [storage] Storage Object Access Key {FIBR_STORAGE_OBJECT_ACCESS_KEY}
   -storageObjectBucket string
@@ -398,8 +398,8 @@ Usage of fibr:
         [webhook] AMQP Routing Key for webhook {FIBR_WEBHOOK_AMQP_ROUTING_KEY} (default "webhook")
   -webhookSecret string
         [webhook] Secret for HMAC Signature {FIBR_WEBHOOK_SECRET}
-  -writeTimeout string
-        [server] Write Timeout {FIBR_WRITE_TIMEOUT} (default "2m")
+  -writeTimeout duration
+        [server] Write Timeout {FIBR_WRITE_TIMEOUT} (default 2m0s)
 ```
 
 # Caveats
