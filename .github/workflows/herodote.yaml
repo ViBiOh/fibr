@@ -1,6 +1,18 @@
 ---
 name: Herodote
 
+permissions:
+  actions: none
+  checks: none
+  contents: none
+  deployments: none
+  issues: none
+  packages: none
+  pages: none
+  pull-requests: none
+  repository-projects: none
+  security-events: none
+
 on:
   push:
     branches:
@@ -24,4 +36,4 @@ jobs:
           HERODOTE_SECRET: ${{ secrets.HERODOTE_SECRET }}
           GIT_HOST: github.com
           GIT_REPOSITORY: ${{ github.repository }}
-          SCRIPTS_NO_INTERACTIVE: '1'
+          SCRIPTS_NO_INTERACTIVE: "1"

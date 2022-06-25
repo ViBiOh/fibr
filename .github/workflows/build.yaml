@@ -1,6 +1,18 @@
 ---
 name: Build
 
+permissions:
+  actions: none
+  checks: none
+  contents: none
+  deployments: none
+  issues: none
+  packages: none
+  pages: none
+  pull-requests: none
+  repository-projects: none
+  security-events: none
+
 on:
   push:
     branches:
@@ -10,7 +22,7 @@ on:
       - main
 
 env:
-  SCRIPTS_NO_INTERACTIVE: 'true'
+  SCRIPTS_NO_INTERACTIVE: "true"
 
 defaults:
   run:
@@ -24,9 +36,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Setup Golang
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
-          go-version: '^1.18'
+          go-version: "^1.18"
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v2
       - name: Build
@@ -58,22 +70,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Setup Golang
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
-          go-version: '^1.18'
+          go-version: "^1.18"
       - name: Build
         run: |
           curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap" | bash -s -- "-c" "release"
           curl --disable --silent --show-error --location --max-time 30 -o mime.types "https://svn.apache.org/viewvc/httpd/httpd/trunk/docs/conf/mime.types?view=co"
           DOCKER_IMAGE="${{ secrets.DOCKER_USER }}/$(make name)" IMAGE_VERSION="$(make version)" ./scripts/release build
       - name: Setup Docker
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v2
       - name: Setup DockerHub
         if: env.DOCKER_USER && env.DOCKER_PASS
         env:
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
           DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASS }}
