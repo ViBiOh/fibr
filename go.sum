@@ -35,8 +35,8 @@ github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/ViBiOh/ChatPotte v0.0.24 h1:EujUB8Z+TkZrHLIQ2X64gwThEQA1sF4mJmeqEMz42dY=
 github.com/ViBiOh/ChatPotte v0.0.24/go.mod h1:06Zn9nNjxH7dRaoqNjUjc7DQdAozK38VxKSsWJPXvzM=
-github.com/ViBiOh/absto v0.5.9 h1:dRbiqFOAKJRlBcZgWmNk48/ErXegycyejdt8lkFybO0=
-github.com/ViBiOh/absto v0.5.9/go.mod h1:Gl26qDjqDuj4bbQEbozdQUa+r9/smvjqPYh/zgX3zzk=
+github.com/ViBiOh/absto v0.5.10 h1:v9UBcuMjlnNXmV++J1Pu06/IzpTGCBaXJvTghkI8Fr0=
+github.com/ViBiOh/absto v0.5.10/go.mod h1:FZwpLFOEP75VxAis4l+yDotJz9fIxPMr5tMo3LEqDA8=
 github.com/ViBiOh/auth/v2 v2.12.13 h1:FkPMSIg9azX7tFgp8ROQdlbKjp1Wdigh1VSf6yHP03o=
 github.com/ViBiOh/auth/v2 v2.12.13/go.mod h1:ru/ErLrEAhpYiDG8wxJ2eVr1QRsj8H9Vr1hajlcNJTo=
 github.com/ViBiOh/exas v0.4.2 h1:W84et5rOaeG0n0kl60QJHoa6RmP4614vD8DTPL3BvyU=
@@ -195,8 +195,8 @@ github.com/matttproud/golang_protobuf_extensions v1.0.1 h1:4hp9jkHxhMHkqkrB3Ix0j
 github.com/matttproud/golang_protobuf_extensions v1.0.1/go.mod h1:D8He9yQNgCq6Z5Ld7szi9bcBfOoFv/3dc6xSMkL2PC0=
 github.com/minio/md5-simd v1.1.2 h1:Gdi1DZK69+ZVMoNHRXJyNcxrMA4dSxoYHZSQbirFg34=
 github.com/minio/md5-simd v1.1.2/go.mod h1:MzdKDxYpY2BT9XQFocsiZf/NKVtR7nkE4RoEpN+20RM=
-github.com/minio/minio-go/v7 v7.0.28 h1:VMr3K5qGIEt+/KW3poopRh8mzi5RwuCjmrmstK196Fg=
-github.com/minio/minio-go/v7 v7.0.28/go.mod h1:x81+AX5gHSfCSqw7jxRKHvxUXMlE5uKX0Vb75Xk5yYg=
+github.com/minio/minio-go/v7 v7.0.29 h1:7md6lIq1s6zPzUiDRX1BVLHolA4pDM8RMQqIszaJbY0=
+github.com/minio/minio-go/v7 v7.0.29/go.mod h1:x81+AX5gHSfCSqw7jxRKHvxUXMlE5uKX0Vb75Xk5yYg=
 github.com/minio/sha256-simd v1.0.0 h1:v1ta+49hkWZyvaKwrQB8elexRqm6Y0aMLjCNsrYxo6g=
 github.com/minio/sha256-simd v1.0.0/go.mod h1:OuYzVNI5vcoYIAmbIvHPl3N3jUzVedXbKy5RFepssQM=
 github.com/mitchellh/go-homedir v1.1.0 h1:lukF9ziXFxDFPkA1vsr5zpc1XuPDn/wFntq5mG+4E0Y=
