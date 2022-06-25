@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/ViBiOh/ChatPotte v0.0.24
-	github.com/ViBiOh/absto v0.5.9
+	github.com/ViBiOh/absto v0.5.10
 	github.com/ViBiOh/auth/v2 v2.12.13
 	github.com/ViBiOh/exas v0.4.2
 	github.com/ViBiOh/flags v1.1.0
@@ -33,7 +33,7 @@ require (
 	github.com/klauspost/cpuid/v2 v2.0.9 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
-	github.com/minio/minio-go/v7 v7.0.28 // indirect
+	github.com/minio/minio-go/v7 v7.0.29 // indirect
 	github.com/minio/sha256-simd v1.0.0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
