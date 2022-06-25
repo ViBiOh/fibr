@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
@@ -36,4 +36,4 @@ jobs:
           HERODOTE_SECRET: ${{ secrets.HERODOTE_SECRET }}
           GIT_HOST: github.com
           GIT_REPOSITORY: ${{ github.repository }}
-          SCRIPTS_NO_INTERACTIVE: '1'
+          SCRIPTS_NO_INTERACTIVE: "1"

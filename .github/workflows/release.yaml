@@ -19,7 +19,7 @@ on:
       - released
 
 env:
-  SCRIPTS_NO_INTERACTIVE: 'true'
+  SCRIPTS_NO_INTERACTIVE: "true"
 
 defaults:
   run:
@@ -31,11 +31,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup Golang
         uses: actions/setup-go@v3
         with:
-          go-version: '^1.18'
+          go-version: "^1.18"
       - name: Build
         run: make init
       - name: Assets

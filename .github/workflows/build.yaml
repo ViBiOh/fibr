@@ -22,7 +22,7 @@ on:
       - main
 
 env:
-  SCRIPTS_NO_INTERACTIVE: 'true'
+  SCRIPTS_NO_INTERACTIVE: "true"
 
 defaults:
   run:
@@ -34,26 +34,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup Golang
         uses: actions/setup-go@v3
         with:
-          go-version: '^1.18'
+          go-version: "^1.18"
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v2
+        uses: golangci/golangci-lint-action@v3
       - name: Build
         run: |
           make
           git --no-pager diff -- ':(exclude)go.sum' && git diff --quiet -- ':(exclude)go.sum'
       - name: Codecov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v3
 
   sonarcloud:
     name: SonarCloud
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: SonarCloud
@@ -68,11 +68,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup Golang
         uses: actions/setup-go@v3
         with:
-          go-version: '^1.18'
+          go-version: "^1.18"
       - name: Build
         run: |
           curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap" | bash -s -- "-c" "release"
@@ -104,7 +104,7 @@ jobs:
     needs: package
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Publish
         env:
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
