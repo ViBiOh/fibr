@@ -46,7 +46,7 @@ jobs:
           make
           git --no-pager diff -- ':(exclude)go.sum' && git diff --quiet -- ':(exclude)go.sum'
       - name: Codecov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v3
 
   sonarcloud:
     name: SonarCloud
