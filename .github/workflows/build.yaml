@@ -22,7 +22,7 @@ on:
       - main
 
 env:
-  SCRIPTS_NO_INTERACTIVE: "true"
+  SCRIPTS_NO_INTERACTIVE: 'true'
 
 defaults:
   run:
@@ -38,7 +38,7 @@ jobs:
       - name: Setup Golang
         uses: actions/setup-go@v3
         with:
-          go-version: "^1.18"
+          go-version: '^1.18'
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v2
       - name: Build
@@ -72,7 +72,7 @@ jobs:
       - name: Setup Golang
         uses: actions/setup-go@v3
         with:
-          go-version: "^1.18"
+          go-version: '^1.18'
       - name: Build
         run: |
           curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap" | bash -s -- "-c" "release"

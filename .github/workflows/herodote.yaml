@@ -36,4 +36,4 @@ jobs:
           HERODOTE_SECRET: ${{ secrets.HERODOTE_SECRET }}
           GIT_HOST: github.com
           GIT_REPOSITORY: ${{ github.repository }}
-          SCRIPTS_NO_INTERACTIVE: "1"
+          SCRIPTS_NO_INTERACTIVE: '1'
