@@ -163,7 +163,7 @@
 
           <div class="description relative">
             {{ if or (.Exif.Geocode.HasAddress) (not .Exif.Date.IsZero) }}
-              <p>
+              <p class="flex flex-center">
                 {{ if .Exif.Geocode.HasAddress }}
                   <img class="icon icon-bottom margin-right-half" src="{{ url "/svg/location?fill=#272727" }}" alt="Location">
                   <span class="location">
