@@ -18,6 +18,7 @@ type Share struct {
 	Password string        `json:"password"`
 	Duration time.Duration `json:"duration"`
 	Edit     bool          `json:"edit"`
+	Story    bool          `json:"story"`
 	File     bool          `json:"file"`
 }
 

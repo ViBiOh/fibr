@@ -33,14 +33,12 @@ func (a App) story(r *http.Request, request provider.Request, item absto.Item, f
 			logger.WithField("item", item.Pathname).Error("unable to get exif: %s", err)
 		}
 
-		if !hasMap && exif.Geocode.HasCoordinates() {
+		if !request.Share.Story && !hasMap && exif.Geocode.HasCoordinates() {
 			hasMap = true
 		}
 
 		items = append(items, provider.StorageToStory(item, request, exif))
 	}
-
-	request.Display = provider.StoryDisplay
 
 	return renderer.NewPage("story", http.StatusOK, map[string]any{
 		"Paths":              getPathParts(request),

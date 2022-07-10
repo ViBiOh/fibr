@@ -50,9 +50,11 @@
       {{ end }}
     {{ else }}
       </span>
-      <a class="padding" href="#search" download>
-        <img class="icon" src="{{ url "/svg/search?fill=" }}{{ if .Search }}limegreen{{ else }}aliceblue{{ end }}" alt="Search files">
-      </a>
+      {{ if not .Request.Share.Story }}
+        <a class="padding" href="#search" download>
+          <img class="icon" src="{{ url "/svg/search?fill=" }}{{ if .Search }}limegreen{{ else }}aliceblue{{ end }}" alt="Search files">
+        </a>
+      {{ end }}
     {{ end }}
   </header>
 

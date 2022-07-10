@@ -46,7 +46,7 @@ func (a *App) List() (shares []provider.Share) {
 }
 
 // Create a share
-func (a *App) Create(ctx context.Context, filepath string, edit bool, password string, isDir bool, duration time.Duration) (string, error) {
+func (a *App) Create(ctx context.Context, filepath string, edit, story bool, password string, isDir bool, duration time.Duration) (string, error) {
 	var id string
 
 	_, err := a.Exclusive(ctx, a.amqpExclusiveRoutingKey, semaphoreDuration, func(ctx context.Context) error {
@@ -61,6 +61,7 @@ func (a *App) Create(ctx context.Context, filepath string, edit bool, password s
 			Path:     filepath,
 			RootName: path.Base(filepath),
 			Edit:     edit,
+			Story:    story,
 			Password: password,
 			File:     !isDir,
 			Creation: a.clock.Now(),

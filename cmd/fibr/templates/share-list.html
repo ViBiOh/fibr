@@ -119,6 +119,9 @@
                   {{ if .Edit }}
                     <img class="icon" src="{{ url "/svg/edit?fill=aliceblue" }}" alt="Editable">
                   {{ end }}
+                  {{ if .Story }}
+                    <img class="icon" src="{{ url "/svg/image?fill=aliceblue" }}" alt="Story mode">
+                  {{ end }}
                   {{ if .Password }}
                     <img class="icon" src="{{ url "/svg/lock?fill=aliceblue" }}" alt="Password protected">
                   {{ end }}

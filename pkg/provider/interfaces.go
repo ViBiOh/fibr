@@ -40,7 +40,7 @@ type Auth interface {
 //go:generate mockgen -destination ../mocks/share.go -mock_names ShareManager=Share -package mocks github.com/ViBiOh/fibr/pkg/provider ShareManager
 type ShareManager interface {
 	Get(string) Share
-	Create(context.Context, string, bool, string, bool, time.Duration) (string, error)
+	Create(context.Context, string, bool, bool, string, bool, time.Duration) (string, error)
 	Delete(context.Context, string) error
 	List() []Share
 }

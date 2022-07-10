@@ -110,7 +110,7 @@ func (a App) Upload(w http.ResponseWriter, r *http.Request, request provider.Req
 
 	var shareID string
 	if shared {
-		id, err := a.shareApp.Create(ctx, path.Join(request.Path, filename), false, "", false, duration)
+		id, err := a.shareApp.Create(ctx, path.Join(request.Path, filename), false, false, "", false, duration)
 		if err != nil {
 			a.error(w, r, request, model.WrapInternal(err))
 			return

@@ -5,12 +5,18 @@
 
   {{ $root := . }}
 
-  <link rel="preload" as="image" href="{{ url "/svg/list?fill=aliceblue" }}">
-  <link rel="preload" as="image" href="{{ url "/svg/th?fill=aliceblue" }}">
-  <link rel="preload" as="image" href="{{ url "/svg/image?fill=aliceblue" }}">
   <link rel="preload" as="image" href="{{ url "/svg/link?fill=#272727" }}">
 
-  {{ template "search-modal" . }}
+  {{ if not .Request.Share.Story }}
+    <link rel="preload" as="image" href="{{ url "/svg/list?fill=aliceblue" }}">
+    <link rel="preload" as="image" href="{{ url "/svg/th?fill=aliceblue" }}">
+    <link rel="preload" as="image" href="{{ url "/svg/image?fill=aliceblue" }}">
+  {{ end }}
+
+  {{ if not .Request.Share.Story }}
+    {{ template "search-modal" . }}
+  {{ end }}
+
   {{ template "items-style" . }}
 
   {{ if .HasMap }}
@@ -122,25 +128,27 @@
   </style>
 
   <div class="content">
-    <div id="menu" class="flex flex-center">
-      <a id="list-display" class="button button-icon" href="?d=list">
-        <img class="icon" src="{{ url "/svg/list?fill=aliceblue" }}" alt="List">
-      </a>
-      <a id="grid-display" class="button button-icon" href="?d=grid">
-        <img class="icon" src="{{ url "/svg/th?fill=aliceblue" }}" alt="Grid">
-      </a>
-      <a id="story-display" class="button button-icon" href="?d=story">
-        <img class="icon" src="{{ url "/svg/image?fill=aliceblue" }}" alt="Image story">
-      </a>
-
-      <span class="flex-grow"></span>
-
-      {{ if .HasMap }}
-        <a class="padding" href="#map" download>
-          <img class="icon" src="{{ url "/svg/map?fill=aliceblue" }}" alt="View on map">
+    {{ if not .Request.Share.Story }}
+      <div id="menu" class="flex flex-center">
+        <a id="list-display" class="button button-icon" href="?d=list">
+          <img class="icon" src="{{ url "/svg/list?fill=aliceblue" }}" alt="List">
         </a>
-      {{ end }}
-    </div>
+        <a id="grid-display" class="button button-icon" href="?d=grid">
+          <img class="icon" src="{{ url "/svg/th?fill=aliceblue" }}" alt="Grid">
+        </a>
+        <a id="story-display" class="button button-icon" href="?d=story">
+          <img class="icon" src="{{ url "/svg/image?fill=aliceblue" }}" alt="Image story">
+        </a>
+
+        <span class="flex-grow"></span>
+
+        {{ if .HasMap }}
+          <a class="padding" href="#map" download>
+            <img class="icon" src="{{ url "/svg/map?fill=aliceblue" }}" alt="View on map">
+          </a>
+        {{ end }}
+      </div>
+    {{ end }}
 
     <ul id="files" class="no-margin no-padding">
       {{ range .Files }}

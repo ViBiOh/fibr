@@ -38,8 +38,12 @@
   <input type="hidden" name="method" value="POST" />
 
   <p class="padding no-margin center">
-    <input id="edit" type="checkbox" name="edit" value="true" />
-    <label for="edit">Edit right</label>
+    <label for="rights">Rights</label>
+    <select id="rights" aria-label="Share's rights" name="rights">
+      <option value="edit">Edit</option>
+      <option value="read">Read only</option>
+      <option value="story">Story only</option>
+    </select>
   </p>
 
   <p class="padding no-margin">

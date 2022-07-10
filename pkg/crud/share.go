@@ -1,6 +1,7 @@
 package crud
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"path"
@@ -48,6 +49,19 @@ func (a App) bestSharePath(pathname string) string {
 	return ""
 }
 
+func parseRights(value string) (edit, story bool, err error) {
+	switch value {
+	case "edit":
+		return true, false, nil
+	case "read":
+		return false, false, nil
+	case "story":
+		return false, true, nil
+	default:
+		return false, false, errors.New("invalid rights: edit, read or story allowed")
+	}
+}
+
 func (a App) createShare(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !request.CanShare {
 		a.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
@@ -56,7 +70,7 @@ func (a App) createShare(w http.ResponseWriter, r *http.Request, request provide
 
 	var err error
 
-	edit, err := getFormBool(r.FormValue("edit"))
+	edit, story, err := parseRights(strings.TrimSpace(r.FormValue("rights")))
 	if err != nil {
 		a.error(w, r, request, model.WrapInvalid(err))
 		return
@@ -91,7 +105,7 @@ func (a App) createShare(w http.ResponseWriter, r *http.Request, request provide
 		return
 	}
 
-	id, err := a.shareApp.Create(ctx, request.Filepath(), edit, password, info.IsDir, duration)
+	id, err := a.shareApp.Create(ctx, request.Filepath(), edit, story, password, info.IsDir, duration)
 	if err != nil {
 		a.error(w, r, request, model.WrapInternal(err))
 		return
