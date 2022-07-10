@@ -108,6 +108,11 @@
       }
     {{ end }}
 
+    .context {
+      display: flex;
+      align-items: center;
+    }
+
     .desc-input {
       resize: vertical;
       width: 30rem;
@@ -163,7 +168,7 @@
 
           <div class="description relative">
             {{ if or (.Exif.Geocode.HasAddress) (not .Exif.Date.IsZero) }}
-              <p class="flex flex-center">
+              <p class="context">
                 {{ if .Exif.Geocode.HasAddress }}
                   <img class="icon icon-bottom margin-right-half" src="{{ url "/svg/location?fill=#272727" }}" alt="Location">
                   <span class="location">
