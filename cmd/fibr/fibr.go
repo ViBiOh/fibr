@@ -121,7 +121,7 @@ func main() {
 
 	amqpClient, err := amqp.New(amqpConfig, prometheusApp.Registerer())
 	if err != nil && !errors.Is(err, amqp.ErrNoConfig) {
-		logger.Error("unable to create amqp client: %s", err)
+		logger.Fatal(err)
 	} else if amqpClient != nil {
 		defer amqpClient.Close()
 	}
