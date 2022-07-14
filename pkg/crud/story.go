@@ -20,8 +20,9 @@ func (a App) story(r *http.Request, request provider.Request, item absto.Item, f
 	var hasMap bool
 
 	for _, item := range files {
-		if cover == nil {
+		if cover == nil || (len(r.URL.Fragment) != 0 && cover["ID"] != item.ID) {
 			cover = map[string]any{
+				"ID":        item.ID,
 				"Img":       provider.StorageToRender(item, request),
 				"ImgHeight": thumbnail.SmallSize,
 				"ImgWidth":  thumbnail.SmallSize,
