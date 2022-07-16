@@ -50,10 +50,9 @@ type App struct {
 	amqpClient              *amqp.Client
 	amqpExclusiveRoutingKey string
 
-	rendererApp  renderer.App
-	thumbnailApp thumbnail.App
-
 	temporaryFolder string
+	rendererApp     renderer.App
+	thumbnailApp    thumbnail.App
 	bcryptCost      int
 	sanitizeOnStart bool
 	chunkUpload     bool

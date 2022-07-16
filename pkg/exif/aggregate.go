@@ -8,14 +8,20 @@ import (
 	absto "github.com/ViBiOh/absto/pkg/model"
 	exas "github.com/ViBiOh/exas/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/v4/pkg/cache"
 	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 )
 
 var (
+	cacheDuration  = time.Hour * 96
 	aggregateRatio = 0.4
 
 	levels = []string{"city", "state", "country"}
 )
+
+func redisKey(itemID string) string {
+	return "fibr:exif:" + itemID
+}
 
 // GetExifFor return exif value for a given item
 func (a App) GetExifFor(ctx context.Context, item absto.Item) (exas.Exif, error) {
@@ -26,17 +32,14 @@ func (a App) GetExifFor(ctx context.Context, item absto.Item) (exas.Exif, error)
 	ctx, end := tracer.StartSpan(ctx, a.tracer, "get_exif")
 	defer end()
 
-	exif, err := a.loadExif(ctx, item)
-	if err != nil && !absto.IsNotExist(err) {
-		return exif, fmt.Errorf("unable to load exif: %w", err)
-	}
+	return cache.Retrieve(ctx, a.redisClient, redisKey(item.ID), func(ctx context.Context) (exas.Exif, error) {
+		exif, err := a.loadExif(ctx, item)
+		if err != nil && !absto.IsNotExist(err) {
+			return exif, fmt.Errorf("unable to load exif: %w", err)
+		}
 
-	return exif, nil
-}
-
-// SaveExifFor saves given exif for given item
-func (a App) SaveExifFor(ctx context.Context, item absto.Item, exif exas.Exif) error {
-	return a.saveMetadata(ctx, item, exif)
+		return exif, nil
+	}, cacheDuration)
 }
 
 // GetAggregateFor return aggregated value for a given directory
@@ -48,12 +51,19 @@ func (a App) GetAggregateFor(ctx context.Context, item absto.Item) (provider.Agg
 	ctx, end := tracer.StartSpan(ctx, a.tracer, "aggregate")
 	defer end()
 
-	aggregate, err := a.loadAggregate(ctx, item)
-	if err != nil && !absto.IsNotExist(err) {
-		return aggregate, fmt.Errorf("unable to load aggregate: %w", err)
-	}
+	return cache.Retrieve(ctx, a.redisClient, redisKey(item.ID), func(ctx context.Context) (provider.Aggregate, error) {
+		aggregate, err := a.loadAggregate(ctx, item)
+		if err != nil && !absto.IsNotExist(err) {
+			return aggregate, fmt.Errorf("unable to load aggregate: %w", err)
+		}
 
-	return aggregate, nil
+		return aggregate, nil
+	}, cacheDuration)
+}
+
+// SaveExifFor saves given exif for given item
+func (a App) SaveExifFor(ctx context.Context, item absto.Item, exif exas.Exif) error {
+	return cache.EvictOnSuccess(ctx, a.redisClient, redisKey(item.ID), a.saveMetadata(ctx, item, exif))
 }
 
 func (a App) aggregate(ctx context.Context, item absto.Item) error {

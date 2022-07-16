@@ -344,6 +344,16 @@ Usage of fibr:
         Public URL {FIBR_PUBLIC_URL} (default "http://localhost:1080")
   -readTimeout duration
         [server] Read Timeout {FIBR_READ_TIMEOUT} (default 2m0s)
+  -redisAddress string
+        [redis] Redis Address (blank to disable) {FIBR_REDIS_ADDRESS}
+  -redisAlias string
+        [redis] Connection alias, for metric {FIBR_REDIS_ALIAS}
+  -redisDatabase int
+        [redis] Redis Database {FIBR_REDIS_DATABASE}
+  -redisPassword string
+        [redis] Redis Password, if any {FIBR_REDIS_PASSWORD}
+  -redisUsername string
+        [redis] Redis Username, if any {FIBR_REDIS_USERNAME}
   -sanitizeOnStart
         [crud] Sanitize name on start {FIBR_SANITIZE_ON_START}
   -shareAmqpExchange string

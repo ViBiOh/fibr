@@ -15,6 +15,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/httpjson"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	prom "github.com/ViBiOh/httputils/v4/pkg/prometheus"
+	"github.com/ViBiOh/httputils/v4/pkg/redis"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 	"github.com/prometheus/client_golang/prometheus"
@@ -28,6 +29,8 @@ type App struct {
 	listStorageApp  absto.Storage
 	exifMetric      *prometheus.CounterVec
 	aggregateMetric *prometheus.CounterVec
+
+	redisClient redis.App
 
 	amqpClient     *amqpclient.Client
 	amqpExchange   string
@@ -68,7 +71,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 }
 
 // New creates new App from Config
-func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheus.Registerer, tracerApp tracer.App, amqpClient *amqpclient.Client) (App, error) {
+func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheus.Registerer, tracerApp tracer.App, amqpClient *amqpclient.Client, redisClient redis.App) (App, error) {
 	var amqpExchange string
 	if amqpClient != nil {
 		amqpExchange = strings.TrimSpace(*config.amqpExchange)
@@ -82,6 +85,8 @@ func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheu
 		exifRequest:  request.New().URL(strings.TrimSpace(*config.exifURL)).BasicAuth(strings.TrimSpace(*config.exifUser), *config.exifPass),
 		directAccess: *config.directAccess,
 		maxSize:      int64(*config.maxSize),
+
+		redisClient: redisClient,
 
 		amqpClient:     amqpClient,
 		amqpExchange:   amqpExchange,
