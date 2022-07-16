@@ -99,12 +99,12 @@ func (a App) handleMultipart(w http.ResponseWriter, r *http.Request, request pro
 
 	if len(r.Header.Get("X-Chunk-Upload")) != 0 {
 		if chunkNumber := r.Header.Get("X-Chunk-Number"); len(chunkNumber) != 0 {
-			a.UploadChunk(w, r, request, values["filename"], chunkNumber, file)
+			a.uploadChunk(w, r, request, values["filename"], chunkNumber, file)
 		} else {
-			a.MergeChunk(w, r, request, values)
+			a.mergeChunk(w, r, request, values)
 		}
 	} else {
-		a.Upload(w, r, request, values, file)
+		a.upload(w, r, request, values, file)
 	}
 }
 
@@ -172,7 +172,7 @@ func (a App) handlePost(w http.ResponseWriter, r *http.Request, request provider
 	case http.MethodDelete:
 		a.Delete(w, r, request)
 	case http.MethodTrace:
-		a.Regenerate(w, r, request)
+		a.regenerate(w, r, request)
 	default:
 		a.error(w, r, request, model.WrapMethodNotAllowed(fmt.Errorf("unknown method `%s` for %s", method, r.URL.Path)))
 	}

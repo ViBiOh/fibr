@@ -14,10 +14,10 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/sha"
+	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 )
 
-// UploadChunk save chunk file to a temp file
-func (a App) UploadChunk(w http.ResponseWriter, r *http.Request, request provider.Request, fileName, chunkNumber string, file io.Reader) {
+func (a App) uploadChunk(w http.ResponseWriter, r *http.Request, request provider.Request, fileName, chunkNumber string, file io.Reader) {
 	if file == nil {
 		a.error(w, r, request, model.WrapInvalid(errors.New("no file provided for save")))
 		return
@@ -61,8 +61,10 @@ func (a App) UploadChunk(w http.ResponseWriter, r *http.Request, request provide
 	w.WriteHeader(http.StatusAccepted)
 }
 
-// MergeChunk merges previously uploaded chunks into one file and move it to final destination
-func (a App) MergeChunk(w http.ResponseWriter, r *http.Request, request provider.Request, values map[string]string) {
+func (a App) mergeChunk(w http.ResponseWriter, r *http.Request, request provider.Request, values map[string]string) {
+	ctx, end := tracer.StartSpan(r.Context(), a.tracer, "mergeChunk")
+	defer end()
+
 	var err error
 
 	fileName := values["filename"]
@@ -104,7 +106,7 @@ func (a App) MergeChunk(w http.ResponseWriter, r *http.Request, request provider
 		logger.Error("unable to delete chunk folder `%s`: %s", tempFolder, err)
 	}
 
-	a.postUpload(r.Context(), w, r, request, fileName, values)
+	a.postUpload(ctx, w, r, request, fileName, values)
 }
 
 func (a App) mergeChunkFiles(directory, destination string) error {
@@ -127,7 +129,15 @@ func (a App) mergeChunkFiles(directory, destination string) error {
 		}
 	}()
 
-	if err = filepath.WalkDir(directory, func(path string, info fs.DirEntry, err error) error {
+	if err = browseChunkFiles(directory, destination, writer); err != nil {
+		return fmt.Errorf("unable to walk chunks in `%s`: %s", directory, err)
+	}
+
+	return nil
+}
+
+func browseChunkFiles(directory, destination string, writer io.Writer) error {
+	return filepath.WalkDir(directory, func(path string, info fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
@@ -152,9 +162,5 @@ func (a App) mergeChunkFiles(directory, destination string) error {
 		}
 
 		return nil
-	}); err != nil {
-		return fmt.Errorf("unable to walk chunks in `%s`: %s", directory, err)
-	}
-
-	return nil
+	})
 }

@@ -11,8 +11,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
-// Regenerate regenerate start of the folder
-func (a App) Regenerate(w http.ResponseWriter, r *http.Request, request provider.Request) {
+func (a App) regenerate(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !request.CanEdit {
 		a.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
 		return

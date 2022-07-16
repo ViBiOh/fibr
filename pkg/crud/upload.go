@@ -13,6 +13,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
+	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 )
 
 func (a App) saveUploadedFile(ctx context.Context, request provider.Request, inputName, rawSize string, file *multipart.Part) (fileName string, err error) {
@@ -76,14 +77,14 @@ func getUploadSize(rawSize string) (int64, error) {
 	return size, nil
 }
 
-// Upload saves form files to filesystem
-func (a App) Upload(w http.ResponseWriter, r *http.Request, request provider.Request, values map[string]string, file *multipart.Part) {
+func (a App) upload(w http.ResponseWriter, r *http.Request, request provider.Request, values map[string]string, file *multipart.Part) {
 	if file == nil {
 		a.error(w, r, request, model.WrapInvalid(errors.New("no file provided for save")))
 		return
 	}
 
-	ctx := r.Context()
+	ctx, end := tracer.StartSpan(r.Context(), a.tracer, "upload")
+	defer end()
 
 	filename, err := a.saveUploadedFile(ctx, request, values["filename"], values["size"], file)
 	if err != nil {

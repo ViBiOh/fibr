@@ -8,13 +8,13 @@ ENTRYPOINT [ "/fibr" ]
 ARG VERSION
 ENV VERSION ${VERSION}
 
-VOLUME /tmp
-
 ARG TARGETOS
 ARG TARGETARCH
 
 COPY passwd /etc/passwd
 USER 995
+
+VOLUME /tmp
 
 COPY mime.types /etc/mime.types
 COPY ca-certificates.crt /etc/ssl/certs/ca-certificates.crt

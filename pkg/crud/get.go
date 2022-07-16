@@ -73,7 +73,7 @@ func (a App) handleFile(w http.ResponseWriter, r *http.Request, request provider
 
 		go a.notify(provider.NewAccessEvent(item, r))
 
-		return a.Browser(r.Context(), w, request, item, message)
+		return a.browse(r.Context(), w, request, item, message)
 	}
 
 	return renderer.Page{}, a.serveFile(w, r, item)
@@ -100,7 +100,7 @@ func (a App) serveFile(w http.ResponseWriter, r *http.Request, item absto.Item) 
 
 func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.Request, item absto.Item, message renderer.Message) (renderer.Page, error) {
 	if query.GetBool(r, "stats") {
-		return a.Stats(w, r, request, message)
+		return a.stats(w, r, request, message)
 	}
 
 	items, err := a.listFiles(r, request, item)
@@ -135,7 +135,7 @@ func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.
 		return a.story(r, request, item, items)
 	}
 
-	return a.List(r.Context(), request, message, item, items)
+	return a.list(r.Context(), request, message, item, items)
 }
 
 func (a App) listFiles(r *http.Request, request provider.Request, item absto.Item) (items []absto.Item, err error) {

@@ -36,8 +36,7 @@ func (a App) getCover(ctx context.Context, request provider.Request, files []abs
 	return nil
 }
 
-// List render directory web view of given dirPath
-func (a App) List(ctx context.Context, request provider.Request, message renderer.Message, item absto.Item, files []absto.Item) (renderer.Page, error) {
+func (a App) list(ctx context.Context, request provider.Request, message renderer.Message, item absto.Item, files []absto.Item) (renderer.Page, error) {
 	ctx, end := tracer.StartSpan(ctx, a.tracer, "list")
 	defer end()
 
