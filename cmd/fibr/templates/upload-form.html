@@ -207,7 +207,108 @@
       statusContainer.classList.add(style);
     }
 
-    let xhr;
+    let aborter;
+
+    const chunkSize = 1024 * 1024;
+    let currentUpload = {};
+
+    /**
+     * Upload file by chunks.
+     * @param  {String} method   Method for uploading
+     * @param  {File} file       File to upload
+     * @param  {Boolean} shared  Shared option
+     * @param  {Number} duration Duration of share
+     * @return {Promise}         Promise of upload
+     */
+    async function uploadFileByChunks(method, file, shared, duration) {
+      const messageId = await fileMessageId(file);
+
+      const container = document.getElementById(messageId);
+      let progress;
+      if (container) {
+        progress = container.querySelector('progress');
+      }
+
+      if (file.name !== currentUpload.filename) {
+        currentUpload.filename = file.name;
+        currentUpload.chunks = [];
+
+        for (let cur = 0; cur < file.size; cur += chunkSize) {
+          currentUpload.chunks.push({
+            content: file.slice(cur, cur + chunkSize),
+            done: false,
+          });
+        }
+      }
+
+      const filenameInput = document.getElementById(`${messageId}-filename`);
+      let fileName;
+      if (filenameInput && filenameInput.value) {
+        fileName = filenameInput.value;
+      }
+
+      if (typeof AbortController !== 'undefined') {
+        aborter = new AbortController();
+      }
+
+      for (var i = 0; i < currentUpload.chunks.length; i++) {
+        if (currentUpload.chunks[i].done) {
+          continue;
+        }
+
+        const formData = new FormData();
+        formData.append('method', method);
+        formData.append('filename', fileName);
+        formData.append('file', currentUpload.chunks[i].content);
+
+        const response = await fetch('', {
+          method: 'POST',
+          credentials: 'same-origin',
+          signal: aborter.signal,
+          headers: {
+            'X-Chunk-Upload': true,
+            'X-Chunk-Number': i + 1,
+            Accept: 'text/plain',
+          },
+          body: formData,
+        });
+
+        if (response.status >= 400) {
+          const error = await response.text();
+          return Promise.reject(error);
+        }
+
+        currentUpload.chunks[i].done = true;
+        if (progress) {
+          progress.value = ((chunkSize * (i + 1)) / file.size) * 100;
+        }
+      }
+
+      const formData = new FormData();
+      formData.append('method', method);
+      formData.append('filename', fileName);
+      formData.append('share', shared);
+      formData.append('duration', duration);
+      formData.append('size', file.size);
+
+      const response = await fetch('', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+          'X-Chunk-Upload': true,
+          Accept: 'text/plain',
+        },
+        body: formData,
+      });
+
+      const error = await response.text();
+      if (response.status >= 400) {
+        return Promise.reject(error);
+      } else {
+        currentUpload = {};
+        return Promise.resolve(error);
+      }
+    }
 
     /**
      * Upload file with updating progress indicator.
@@ -217,7 +318,7 @@
      * @param  {Number} duration Duration of share
      * @return {Promise}       Promise of upload
      */
-    async function uploadFile(method, file, shared, duration) {
+    async function uploadFileByXHR(method, file, shared, duration) {
       const messageId = await fileMessageId(file);
 
       const container = document.getElementById(messageId);
@@ -239,7 +340,8 @@
       formData.append('file', file);
 
       return new Promise((resolve, reject) => {
-        xhr = new XMLHttpRequest();
+        let xhr = new XMLHttpRequest();
+        aborter = xhr;
 
         if (progress) {
           xhr.upload.addEventListener(
@@ -277,6 +379,12 @@
         xhr.send(formData);
       });
     }
+
+    {{- if .ChunkUpload }}
+    const uploadFile = uploadFileByChunks
+    {{- else }}
+    const uploadFile = uploadFileByXHR
+    {{- end }}
 
     /**
      * Slice FileList from given index.
@@ -373,9 +481,9 @@
     function abort(e) {
       e.preventDefault();
 
-      if (xhr) {
-        xhr.abort();
-        xhr = undefined;
+      if (aborter) {
+        aborter.abort();
+        aborter = undefined;
       } else {
         window.location.hash = '';
       }

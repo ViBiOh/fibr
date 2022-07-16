@@ -34,6 +34,7 @@ spec:
       - name: data
         mountPath: /data
     config:
+      FIBR_CHUNK_UPLOAD: 'true'
       FIBR_EXIF_DIRECT_ACCESS: 'true'
       FIBR_EXIF_URL: http://exas
       FIBR_IGNORE_PATTERN: '.st(folder|ignore)'

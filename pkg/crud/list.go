@@ -93,6 +93,7 @@ func (a App) List(ctx context.Context, request provider.Request, message rendere
 		"HasMap":       hasMap,
 		"HasThumbnail": hasThumbnail,
 		"HasStory":     hasStory,
+		"ChunkUpload":  a.chunkUpload,
 	}
 
 	if request.CanShare {

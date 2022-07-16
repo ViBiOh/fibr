@@ -2,10 +2,10 @@ package crud
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"io/fs"
-	"mime/multipart"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -17,11 +17,16 @@ import (
 )
 
 // UploadChunk save chunk file to a temp file
-func (a App) UploadChunk(w http.ResponseWriter, r *http.Request, request provider.Request, values map[string]string, file *multipart.Part) {
+func (a App) UploadChunk(w http.ResponseWriter, r *http.Request, request provider.Request, fileName, chunkNumber string, file io.Reader) {
+	if file == nil {
+		a.error(w, r, request, model.WrapInvalid(errors.New("no file provided for save")))
+		return
+	}
+
 	var err error
 
-	tempDestination := filepath.Join(temporaryFolder, sha.New(values["filename"]))
-	tempFile := filepath.Join(tempDestination, values["chunkNumber"])
+	tempDestination := filepath.Join(a.temporaryFolder, sha.New(fileName))
+	tempFile := filepath.Join(tempDestination, chunkNumber)
 
 	if err = os.MkdirAll(tempDestination, 0o700); err != nil {
 		a.error(w, r, request, model.WrapInternal(err))
@@ -60,8 +65,9 @@ func (a App) UploadChunk(w http.ResponseWriter, r *http.Request, request provide
 func (a App) MergeChunk(w http.ResponseWriter, r *http.Request, request provider.Request, values map[string]string) {
 	var err error
 
-	tempFolder := filepath.Join(temporaryFolder, sha.New(values["filename"]))
-	tempFile := filepath.Join(tempFolder, values["filename"])
+	fileName := values["filename"]
+	tempFolder := filepath.Join(a.temporaryFolder, sha.New(fileName))
+	tempFile := filepath.Join(tempFolder, fileName)
 
 	if err := a.mergeChunkFiles(tempFolder, tempFile); err != nil {
 		a.error(w, r, request, model.WrapInternal(err))
@@ -81,7 +87,7 @@ func (a App) MergeChunk(w http.ResponseWriter, r *http.Request, request provider
 		return
 	}
 
-	filePath := request.SubPath(values["filename"])
+	filePath := request.SubPath(fileName)
 	err = provider.WriteToStorage(r.Context(), a.storageApp, filePath, size, file)
 
 	if err == nil {
@@ -94,7 +100,11 @@ func (a App) MergeChunk(w http.ResponseWriter, r *http.Request, request provider
 		}()
 	}
 
-	w.WriteHeader(http.StatusCreated)
+	if err = os.RemoveAll(tempFolder); err != nil {
+		logger.Error("unable to delete chunk folder `%s`: %s", tempFolder, err)
+	}
+
+	a.postUpload(r.Context(), w, r, request, fileName, values)
 }
 
 func (a App) mergeChunkFiles(directory, destination string) error {
@@ -117,9 +127,13 @@ func (a App) mergeChunkFiles(directory, destination string) error {
 		}
 	}()
 
-	if err = filepath.WalkDir(directory, func(path string, _ fs.DirEntry, err error) error {
+	if err = filepath.WalkDir(directory, func(path string, info fs.DirEntry, err error) error {
 		if err != nil {
 			return err
+		}
+
+		if info.IsDir() || path == destination {
+			return nil
 		}
 
 		reader, err := os.Open(path)

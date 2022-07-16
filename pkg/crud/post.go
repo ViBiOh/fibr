@@ -53,39 +53,59 @@ func (a App) Post(w http.ResponseWriter, r *http.Request, request provider.Reque
 	contentType := r.Header.Get("Content-Type")
 
 	if contentType == "application/x-www-form-urlencoded" {
-		method := r.FormValue("method")
-
-		switch r.FormValue("type") {
-		case "share":
-			a.handlePostShare(w, r, request, method)
-		case "webhook":
-			a.handlePostWebhook(w, r, request, method)
-		case "description":
-			a.handlePostDescription(w, r, request, method)
-		default:
-			a.handlePost(w, r, request, method)
-		}
-
+		a.handleFormURLEncoded(w, r, request)
 		return
 	}
 
 	if strings.HasPrefix(contentType, "multipart/form-data") {
-		values, file, err := parseMultipart(r)
-		if err != nil {
-			a.error(w, r, request, model.WrapInternal(fmt.Errorf("unable to parse multipart request: %s", err)))
-			return
-		}
-
-		if values["method"] != http.MethodPost {
-			a.error(w, r, request, model.WrapMethodNotAllowed(fmt.Errorf("unknown method `%s` for multipart", values["method"])))
-			return
-		}
-
-		a.Upload(w, r, request, values, file)
+		a.handleMultipart(w, r, request)
 		return
 	}
 
 	a.error(w, r, request, model.WrapMethodNotAllowed(fmt.Errorf("unknown content-type %s", contentType)))
+}
+
+func (a App) handleFormURLEncoded(w http.ResponseWriter, r *http.Request, request provider.Request) {
+	method := r.FormValue("method")
+
+	switch r.FormValue("type") {
+	case "share":
+		a.handlePostShare(w, r, request, method)
+	case "webhook":
+		a.handlePostWebhook(w, r, request, method)
+	case "description":
+		a.handlePostDescription(w, r, request, method)
+	default:
+		a.handlePost(w, r, request, method)
+	}
+}
+
+func (a App) handleMultipart(w http.ResponseWriter, r *http.Request, request provider.Request) {
+	if !request.CanEdit {
+		a.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
+		return
+	}
+
+	values, file, err := parseMultipart(r)
+	if err != nil {
+		a.error(w, r, request, model.WrapInternal(fmt.Errorf("unable to parse multipart request: %s", err)))
+		return
+	}
+
+	if values["method"] != http.MethodPost {
+		a.error(w, r, request, model.WrapMethodNotAllowed(fmt.Errorf("unknown method `%s` for multipart", values["method"])))
+		return
+	}
+
+	if len(r.Header.Get("X-Chunk-Upload")) != 0 {
+		if chunkNumber := r.Header.Get("X-Chunk-Number"); len(chunkNumber) != 0 {
+			a.UploadChunk(w, r, request, values["filename"], chunkNumber, file)
+		} else {
+			a.MergeChunk(w, r, request, values)
+		}
+	} else {
+		a.Upload(w, r, request, values, file)
+	}
 }
 
 func (a App) handlePostShare(w http.ResponseWriter, r *http.Request, request provider.Request, method string) {

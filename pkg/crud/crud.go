@@ -53,8 +53,10 @@ type App struct {
 	rendererApp  renderer.App
 	thumbnailApp thumbnail.App
 
+	temporaryFolder string
 	bcryptCost      int
 	sanitizeOnStart bool
+	chunkUpload     bool
 }
 
 // Config of package
@@ -62,7 +64,9 @@ type Config struct {
 	ignore                  *string
 	amqpExclusiveRoutingKey *string
 	bcryptDuration          *string
+	temporaryFolder         *string
 	sanitizeOnStart         *bool
+	chunkUpload             *bool
 }
 
 // Flags adds flags for configuring package
@@ -72,6 +76,9 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 		sanitizeOnStart: flags.Bool(fs, prefix, "crud", "SanitizeOnStart", "Sanitize name on start", false, nil),
 		bcryptDuration:  flags.String(fs, prefix, "crud", "BcryptDuration", "Wanted bcrypt duration for calculating effective cost", "0.25s", nil),
 
+		chunkUpload:     flags.Bool(fs, prefix, "crud", "ChunkUpload", "Use chunk upload in browser", false, nil),
+		temporaryFolder: flags.String(fs, prefix, "crud", "TemporaryFolder", "Temporary folder for chunk upload", "/tmp", nil),
+
 		amqpExclusiveRoutingKey: flags.String(fs, prefix, "crud", "AmqpExclusiveRoutingKey", "AMQP Routing Key for exclusive lock on default exchange", "fibr.semaphore.start", nil),
 	}
 }
@@ -80,6 +87,9 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 func New(config Config, storage absto.Storage, rendererApp renderer.App, shareApp provider.ShareManager, webhookApp provider.WebhookManager, thumbnailApp thumbnail.App, exifApp exif.App, eventProducer provider.EventProducer, amqpClient *amqp.Client, tracerApp tracer.App) (App, error) {
 	app := App{
 		sanitizeOnStart: *config.sanitizeOnStart,
+
+		chunkUpload:     *config.chunkUpload,
+		temporaryFolder: strings.TrimSpace(*config.temporaryFolder),
 
 		tracer:    tracerApp.GetTracer("crud"),
 		pushEvent: eventProducer,

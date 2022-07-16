@@ -57,6 +57,12 @@ Fibr has a special treatment for videos, that can be very large sometimes. With 
 - `vith` is configured with direct access to the filesystem (see [`vith`documentation about configuring `WorkDir`](https://github.com/vibioh/vith#usage) and [`fibr` configuration](#usage) for enabling it). Direct access disable large file transfer in the network.
 - the video bitrate is above [`thumbnailMinBitrate (default 80000000)`](#usage)
 
+### Chunk upload
+
+Fibr supports uploading file by chunks or in one single request. This behavior is managed by the [`-chunkUpload`](#usage) option. In both cases, the file are written directly to the disk without buffering in memory. If you have a load-balancer in front of your Fibr instances, chunk upload requires that you enable sticky sessions because file are written locally to the `-temporaryFolder` before being written to the destination folder. On the other hand, when using one single request, you may need to tune the `-readTimeout` option to ensure that a slow connection with a big file can fullfil the request within the allowed timeout window.
+
+In case of failure, when using one single request, all the upload is started from the beginning. In case of a chunk upload, the upload restarts from the failed chunk.
+
 ### Security
 
 Authentication is made with [Basic Auth](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication), compatible with all browsers and CLI tools such as `curl`. I **strongly recommend configuring HTTPS** in order to avoid exposing your credentials in plain text.
@@ -237,7 +243,7 @@ Usage of fibr:
   -amqpShareMaxRetry uint
         [amqpShare] Max send retries {FIBR_AMQP_SHARE_MAX_RETRY} (default 3)
   -amqpShareQueue string
-        [amqpShare] Queue name {FIBR_AMQP_SHARE_QUEUE} (default "fibr.share-6db91c9c")
+        [amqpShare] Queue name {FIBR_AMQP_SHARE_QUEUE} (default "fibr.share-<random>")
   -amqpShareRetryInterval duration
         [amqpShare] Interval duration when send fails {FIBR_AMQP_SHARE_RETRY_INTERVAL}
   -amqpShareRoutingKey string
@@ -251,7 +257,7 @@ Usage of fibr:
   -amqpWebhookMaxRetry uint
         [amqpWebhook] Max send retries {FIBR_AMQP_WEBHOOK_MAX_RETRY} (default 3)
   -amqpWebhookQueue string
-        [amqpWebhook] Queue name {FIBR_AMQP_WEBHOOK_QUEUE} (default "fibr.webhook-94e48846")
+        [amqpWebhook] Queue name {FIBR_AMQP_WEBHOOK_QUEUE} (default "fibr.webhook-<random>")
   -amqpWebhookRetryInterval duration
         [amqpWebhook] Interval duration when send fails {FIBR_AMQP_WEBHOOK_RETRY_INTERVAL}
   -amqpWebhookRoutingKey string
@@ -264,6 +270,8 @@ Usage of fibr:
         [crud] Wanted bcrypt duration for calculating effective cost {FIBR_BCRYPT_DURATION} (default "0.25s")
   -cert string
         [server] Certificate file {FIBR_CERT}
+  -chunkUpload
+        [crud] Use chunk upload in browser {FIBR_CHUNK_UPLOAD}
   -csp string
         [owasp] Content-Security-Policy {FIBR_CSP} (default "default-src 'self'; base-uri 'self'; script-src 'httputils-nonce' unpkg.com/leaflet@1.8.0/dist/ unpkg.com/leaflet.markercluster@1.5.1/; style-src 'httputils-nonce' unpkg.com/leaflet@1.8.0/dist/ unpkg.com/leaflet.markercluster@1.5.1/; img-src 'self' data: a.tile.openstreetmap.org b.tile.openstreetmap.org c.tile.openstreetmap.org")
   -exifAmqpExchange string
@@ -360,6 +368,8 @@ Usage of fibr:
         [storage] Storage Object Secret Access {FIBR_STORAGE_OBJECT_SECRET_ACCESS}
   -storagePartSize uint
         [storage] PartSize configuration {FIBR_STORAGE_PART_SIZE} (default 5242880)
+  -temporaryFolder string
+        [crud] Temporary folder for chunk upload {FIBR_TEMPORARY_FOLDER} (default "/tmp")
   -thumbnailAmqpExchange string
         [thumbnail] AMQP Exchange Name {FIBR_THUMBNAIL_AMQP_EXCHANGE} (default "fibr")
   -thumbnailAmqpStreamRoutingKey string
