@@ -30,9 +30,13 @@ spec:
       - name: data
         persistentVolumeClaim:
           claimName: fibr
+      - name: tmp
+        emptyDir: {}
     volumeMounts:
       - name: data
         mountPath: /data
+      - name: tmp
+        mountPath: /tmp
     config:
       FIBR_CHUNK_UPLOAD: 'true'
       FIBR_EXIF_DIRECT_ACCESS: 'true'
