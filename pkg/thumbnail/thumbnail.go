@@ -251,7 +251,7 @@ func (a App) thumbnailHash(ctx context.Context, items []absto.Item) string {
 }
 
 func (a App) encodeContent(ctx context.Context, w io.Writer, isDone func() bool, item absto.Item) {
-	if item.IsDir {
+	if item.IsDir || isDone() {
 		return
 	}
 
