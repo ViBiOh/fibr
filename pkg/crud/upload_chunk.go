@@ -89,6 +89,11 @@ func (a App) mergeChunk(w http.ResponseWriter, r *http.Request, request provider
 		return
 	}
 
+	fileName, err = provider.SanitizeName(fileName, true)
+	if err != nil {
+		a.error(w, r, request, model.WrapInternal(err))
+		return
+	}
 	filePath := request.SubPath(fileName)
 	err = provider.WriteToStorage(r.Context(), a.storageApp, filePath, size, file)
 
