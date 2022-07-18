@@ -57,7 +57,11 @@
           break;
 
         case 'Escape':
-          goBack();
+          if (typeof abort === 'function') {
+            abort(e)
+          } else {
+            goBack();
+          }
           break;
       }
     };

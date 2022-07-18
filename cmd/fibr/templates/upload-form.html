@@ -5,6 +5,10 @@
      */
     const dropZone = document.getElementsByTagName('body')[0];
 
+    let fileInput;
+    let uploadList;
+    let cancelButton;
+
     /**
      * Noop function for event handler.
      * @param  {Object} e Event
@@ -20,7 +24,6 @@
       eventNoop(e);
 
       window.location.hash = '#upload-modal';
-      const fileInput = document.getElementById('file');
       if (fileInput) {
         fileInput.files = e.dataTransfer.files;
         fileInput.dispatchEvent(new Event('change'));
@@ -414,6 +417,10 @@
         replaceContent(uploadButton, generateThrobber(['throbber-white']));
       }
 
+      if (cancelButton) {
+        cancelButton.innerHTML = 'Cancel';
+      }
+
       let share = false;
       const uploadShare = document.getElementById('upload-share');
       if (uploadShare) {
@@ -454,7 +461,9 @@
             uploadButton.innerHTML = 'Retry';
           }
           await setUploadStatus(file, 'X', 'danger');
+
           success = false;
+          aborter = undefined;
 
           console.error(err);
           break;
@@ -470,6 +479,8 @@
         }
 
         document.location.hash = '#upload-success';
+      } else if (cancelButton) {
+        cancelButton.innerHTML = 'Close';
       }
 
       return false;
@@ -484,6 +495,10 @@
       if (aborter) {
         aborter.abort();
         aborter = undefined;
+
+        if (cancelButton) {
+          cancelButton.innerHTML = 'Close';
+        }
       } else {
         window.location.hash = '';
       }
@@ -493,7 +508,10 @@
 
     document.addEventListener('readystatechange', async (event) => {
       if (event.target.readyState === 'complete') {
-        const fileInput = document.getElementById('file');
+        fileInput = document.getElementById('file');
+        uploadList = document.getElementById('upload-list');
+        cancelButton = document.getElementById('upload-cancel');
+
         if (fileInput) {
           fileInput.classList.add('opacity');
           fileInput.multiple = true;
@@ -501,7 +519,6 @@
           fileInput.addEventListener('change', () => {
             window.location.hash = '#upload-modal';
 
-            const uploadList = document.getElementById('upload-list');
             replaceContent(uploadList);
 
             for (const file of fileInput.files) {
@@ -525,7 +542,6 @@
           fileInputLabel.innerHTML = 'Choose files...';
         }
 
-        const uploadList = document.getElementById('upload-list');
         if (uploadList) {
           uploadList.classList.remove('hidden');
         }
@@ -535,7 +551,6 @@
           shareLabel.innerHTML = 'Create a public read-only share on each file for';
         }
 
-        const cancelButton = document.getElementById('upload-cancel');
         if (cancelButton) {
           cancelButton.addEventListener('click', abort);
         }
