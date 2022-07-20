@@ -5,12 +5,9 @@
 package mocks
 
 import (
-	context "context"
-	multipart "mime/multipart"
 	http "net/http"
 	reflect "reflect"
 
-	model "github.com/ViBiOh/absto/pkg/model"
 	provider "github.com/ViBiOh/fibr/pkg/provider"
 	renderer "github.com/ViBiOh/httputils/v4/pkg/renderer"
 	gomock "github.com/golang/mock/gomock"
@@ -37,21 +34,6 @@ func NewCrud(ctrl *gomock.Controller) *Crud {
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *Crud) EXPECT() *CrudMockRecorder {
 	return m.recorder
-}
-
-// Browser mocks base method.
-func (m *Crud) Browser(arg0 context.Context, arg1 http.ResponseWriter, arg2 provider.Request, arg3 model.Item, arg4 renderer.Message) (renderer.Page, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Browser", arg0, arg1, arg2, arg3, arg4)
-	ret0, _ := ret[0].(renderer.Page)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Browser indicates an expected call of Browser.
-func (mr *CrudMockRecorder) Browser(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Browser", reflect.TypeOf((*Crud)(nil).Browser), arg0, arg1, arg2, arg3, arg4)
 }
 
 // Create mocks base method.
@@ -93,21 +75,6 @@ func (mr *CrudMockRecorder) Get(arg0, arg1, arg2 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*Crud)(nil).Get), arg0, arg1, arg2)
 }
 
-// List mocks base method.
-func (m *Crud) List(arg0 context.Context, arg1 provider.Request, arg2 renderer.Message, arg3 model.Item, arg4 []model.Item) (renderer.Page, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "List", arg0, arg1, arg2, arg3, arg4)
-	ret0, _ := ret[0].(renderer.Page)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// List indicates an expected call of List.
-func (mr *CrudMockRecorder) List(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*Crud)(nil).List), arg0, arg1, arg2, arg3, arg4)
-}
-
 // Post mocks base method.
 func (m *Crud) Post(arg0 http.ResponseWriter, arg1 *http.Request, arg2 provider.Request) {
 	m.ctrl.T.Helper()
@@ -130,28 +97,4 @@ func (m *Crud) Rename(arg0 http.ResponseWriter, arg1 *http.Request, arg2 provide
 func (mr *CrudMockRecorder) Rename(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Rename", reflect.TypeOf((*Crud)(nil).Rename), arg0, arg1, arg2)
-}
-
-// Start mocks base method.
-func (m *Crud) Start(arg0 <-chan struct{}) {
-	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "Start", arg0)
-}
-
-// Start indicates an expected call of Start.
-func (mr *CrudMockRecorder) Start(arg0 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Start", reflect.TypeOf((*Crud)(nil).Start), arg0)
-}
-
-// Upload mocks base method.
-func (m *Crud) Upload(arg0 http.ResponseWriter, arg1 *http.Request, arg2 provider.Request, arg3 map[string]string, arg4 *multipart.Part) {
-	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "Upload", arg0, arg1, arg2, arg3, arg4)
-}
-
-// Upload indicates an expected call of Upload.
-func (mr *CrudMockRecorder) Upload(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Upload", reflect.TypeOf((*Crud)(nil).Upload), arg0, arg1, arg2, arg3, arg4)
 }

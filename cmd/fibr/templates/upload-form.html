@@ -135,42 +135,6 @@
     }
 
     /**
-     * Add upload item content to container.
-     * @param  {Element} container Container to append item
-     * @param  {File}    file      File to generate an item
-     * @param  {File}    id        Share ID to generate an item
-     */
-    async function addShareItem(container, id, file) {
-      const item = document.createElement('div');
-      item.classList.add('flex', 'flex-center', 'margin');
-
-      const icon = document.createElement('img');
-      icon.classList.add('icon');
-      icon.src = '{{ url "/svg/share-alt-square?fill=aliceblue" }}';
-      icon.alt = `Share ${file.name}`;
-      item.appendChild(icon);
-
-      const filename = document.createElement('div');
-      filename.classList.add(
-        'upload-name',
-        'flex-grow',
-        'ellipsis',
-        'padding-left',
-      );
-
-      const prefix = "{{ url "/" }}";
-
-      const link = document.createElement('a');
-      link.href = `${prefix}${id}/`;
-      link.innerHTML = file.name;
-      filename.appendChild(link);
-
-      item.appendChild(filename);
-
-      container.appendChild(item);
-    }
-
-    /**
      * Get list of files to upload.
      */
     function getFiles(event) {
@@ -188,15 +152,44 @@
     }
 
     /**
-     * Add upload message for file
-     * @param {File}    file    File to generate message
-     * @param {Element} content Content of message
-     * @param {String}  style   Style of status
+     * Get filename to upload.
+     * @param  {String}  messageId Message identifier for file
+     * @param  {File}    file      File to upload
      */
-    async function setUploadStatus(file, content, style) {
-      const messageId = await fileMessageId(file);
+    function getFilename(messageId, file) {
+      const filenameInput = document.getElementById(`${messageId}-filename`);
+      if (filenameInput && filenameInput.value) {
+        return filenameInput.value;
+      }
 
-      const container = document.getElementById(messageId);
+      return file.name;
+    }
+
+    /**
+     * Clear upload status for a file
+     * @param {Element} container Container of file status
+     */
+    async function clearUploadStatus(container) {
+      if (!container) {
+        return;
+      }
+
+      const statusContainer = container.querySelector('.upload-status');
+      if (!statusContainer) {
+        return;
+      }
+
+      statusContainer.classList.remove('danger');
+      statusContainer.classList.remove('success');
+    }
+
+    /**
+     * Add upload message for file
+     * @param {Element} container Container of file status
+     * @param {Element} content   Content of message
+     * @param {String}  style     Style of status
+     */
+    async function setUploadStatus(container, content, style, title) {
       if (!container) {
         return;
       }
@@ -208,6 +201,10 @@
 
       statusContainer.innerHTML = content;
       statusContainer.classList.add(style);
+
+      if (title) {
+        statusContainer.title = title;
+      }
     }
 
     let aborter;
@@ -217,19 +214,17 @@
 
     /**
      * Upload file by chunks.
-     * @param  {String} method   Method for uploading
-     * @param  {File} file       File to upload
-     * @param  {Boolean} shared  Shared option
-     * @param  {Number} duration Duration of share
-     * @return {Promise}         Promise of upload
+     * @param  {Element} container Container of file status
+     * @param  {String}  method    Method for uploading
+     * @param  {String}  filename  Name of file uploaded
+     * @param  {File}    file      File to upload
+     * @return {Promise}           Promise of upload
      */
-    async function uploadFileByChunks(method, file, shared, duration) {
-      const messageId = await fileMessageId(file);
-
-      const container = document.getElementById(messageId);
+    async function uploadFileByChunks(container, method, filename, file) {
       let progress;
       if (container) {
         progress = container.querySelector('progress');
+        clearUploadStatus(container);
       }
 
       if (file.name !== currentUpload.filename) {
@@ -244,24 +239,18 @@
         }
       }
 
-      const filenameInput = document.getElementById(`${messageId}-filename`);
-      let fileName;
-      if (filenameInput && filenameInput.value) {
-        fileName = filenameInput.value;
-      }
-
-      if (typeof AbortController !== 'undefined') {
-        aborter = new AbortController();
-      }
-
       for (var i = 0; i < currentUpload.chunks.length; i++) {
         if (currentUpload.chunks[i].done) {
           continue;
         }
 
+        if (typeof AbortController !== 'undefined') {
+          aborter = new AbortController();
+        }
+
         const formData = new FormData();
         formData.append('method', method);
-        formData.append('filename', fileName);
+        formData.append('filename', filename);
         formData.append('file', currentUpload.chunks[i].content);
 
         const response = await fetch('', {
@@ -277,8 +266,7 @@
         });
 
         if (response.status >= 400) {
-          const error = await response.text();
-          return Promise.reject(error);
+          return Promise.reject(await response.text());
         }
 
         currentUpload.chunks[i].done = true;
@@ -289,9 +277,7 @@
 
       const formData = new FormData();
       formData.append('method', method);
-      formData.append('filename', fileName);
-      formData.append('share', shared);
-      formData.append('duration', duration);
+      formData.append('filename', filename);
       formData.append('size', file.size);
 
       const response = await fetch('', {
@@ -304,41 +290,33 @@
         body: formData,
       });
 
-      const error = await response.text();
+      const output = await response.text();
       if (response.status >= 400) {
-        return Promise.reject(error);
+        return Promise.reject(output);
       } else {
         currentUpload = {};
-        return Promise.resolve(error);
+        return Promise.resolve(output);
       }
     }
 
     /**
      * Upload file with updating progress indicator.
-     * @param  {String} method   Method for uploading
-     * @param  {File} file       File to upload
-     * @param  {Boolean} shared  Shared option
-     * @param  {Number} duration Duration of share
-     * @return {Promise}       Promise of upload
+     * @param  {Element} container Container of file status
+     * @param  {String}  method    Method for uploading
+     * @param  {String}  filename  Name of file uploaded
+     * @param  {File}    file      File to upload
+     * @return {Promise}           Promise of upload
      */
-    async function uploadFileByXHR(method, file, shared, duration) {
-      const messageId = await fileMessageId(file);
-
-      const container = document.getElementById(messageId);
+    async function uploadFileByXHR(container, method, filename, file) {
       let progress;
       if (container) {
         progress = container.querySelector('progress');
+        clearUploadStatus(container);
       }
 
       const formData = new FormData();
       formData.append('method', method);
-      formData.append('share', shared);
-      formData.append('duration', duration);
-
-      const filenameInput = document.getElementById(`${messageId}-filename`);
-      if (filenameInput && filenameInput.value) {
-        formData.append('filename', filenameInput.value);
-      }
+      formData.append('filename', filename);
       formData.append('size', file.size);
       formData.append('file', file);
 
@@ -421,63 +399,37 @@
         cancelButton.innerHTML = 'Cancel';
       }
 
-      let share = false;
-      const uploadShare = document.getElementById('upload-share');
-      if (uploadShare) {
-        share = uploadShare.checked;
-      }
-
-      let duration = 0;
-      if (share) {
-        const shareDuration = document.getElementById('upload-duration');
-        if (shareDuration) {
-          duration = shareDuration.value;
-        }
-      }
-
       const values = getFiles(event);
-      const shares = new Map();
 
       let success = true;
       for (let i = 0; i < values.files.length; i++) {
         const file = values.files[i];
 
-        try {
-          const uploadFilename = await uploadFile(
-            values.method,
-            file,
-            share,
-            duration,
-          );
-          const parts = uploadFilename.split('\n');
-          if (parts.length > 1) {
-            shares.set(parts[1], file);
-          }
+        const messageId = await fileMessageId(file);
+        const container = document.getElementById(messageId);
 
-          await setUploadStatus(file, '✓', 'success');
+        try {
+          const filename = getFilename(messageId, file);
+
+          await uploadFile(container, values.method, filename, file);
+          await setUploadStatus(container, '✓', 'success');
         } catch (err) {
           sliceFileList('file', i);
           if (uploadButton) {
             uploadButton.innerHTML = 'Retry';
           }
-          await setUploadStatus(file, 'X', 'danger');
+          await setUploadStatus(container, 'X', 'danger', err);
 
           success = false;
-          aborter = undefined;
-
           console.error(err);
+
           break;
+        } finally {
+          aborter = undefined;
         }
       }
 
       if (success) {
-        if (shares.size) {
-          const shareList = document.getElementById('upload-share-list');
-          if (shareList) {
-            shares.forEach((value, key) => addShareItem(shareList, key, value));
-          }
-        }
-
         document.location.hash = '#upload-success';
       } else if (cancelButton) {
         cancelButton.innerHTML = 'Close';
@@ -546,11 +498,6 @@
           uploadList.classList.remove('hidden');
         }
 
-        const shareLabel = document.getElementById('upload-share-label');
-        if (shareLabel) {
-          shareLabel.innerHTML = 'Create a public read-only share on each file for';
-        }
-
         if (cancelButton) {
           cancelButton.addEventListener('click', abort);
         }
@@ -573,14 +520,6 @@
     #upload-modal:target ~ .content,
     #upload-success:target ~ .content {
       pointer-events: none;
-    }
-
-    #upload-list {
-      margin: 1rem auto;
-    }
-
-    #upload-duration {
-      width: 5rem;
     }
 
     .upload-width {
@@ -625,16 +564,7 @@
       >
         <input type="hidden" name="method" value="POST" />
 
-        {{ if .Request.CanShare }}
-          <p class="padding no-margin center upload-width">
-            <input id="upload-share" type="checkbox" name="share" value="true" />
-            <label id="upload-share-label" for="upload-share">Create a public read-only share for</label>
-            <input id="upload-duration" type="number" name="duration" value="1" placeholder="Duration" />
-            <label for="upload-duration">hours</label>
-          </p>
-        {{ end }}
-
-        <p class="padding no-margin center upload-width flex flex-center">
+        <p class="center upload-width flex flex-center">
           <input id="file" class="full" type="file" name="file" />
           <label id="file-label" for="file" tabindex="0" class="hidden button bg-success">Choose file...</label>
         </p>
@@ -651,8 +581,6 @@
   <div id="upload-success" class="modal">
     <div class="modal-content">
       <h2 class="header success padding">Upload success ✓</h2>
-
-      <div id="upload-share-list" class="upload-width full"></div>
 
       <p class="padding no-margin center">
         <a href="?redirect&d={{ .Request.Display }}" class="button bg-grey">Close</a>
