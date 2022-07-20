@@ -29,6 +29,7 @@ func (a *App) generateID() (string, error) {
 // List shares
 func (a *App) List() (shares []provider.Share) {
 	a.RLock()
+	defer a.RUnlock()
 
 	var i int64
 	shares = make([]provider.Share, len(a.shares))
@@ -37,8 +38,6 @@ func (a *App) List() (shares []provider.Share) {
 		shares[i] = value
 		i++
 	}
-
-	a.RUnlock()
 
 	sort.Sort(provider.ShareByID(shares))
 

@@ -17,14 +17,13 @@ func (a *App) AmqpHandler(message amqp.Delivery) error {
 	}
 
 	a.Lock()
+	defer a.Unlock()
 
 	if share.Creation.IsZero() {
 		delete(a.shares, share.ID)
 	} else {
 		a.shares[share.ID] = share
 	}
-
-	a.Unlock()
 
 	return nil
 }

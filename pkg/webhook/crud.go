@@ -27,6 +27,7 @@ func (a *App) generateID() (string, error) {
 // List webhooks
 func (a *App) List() (webhooks []provider.Webhook) {
 	a.RLock()
+	defer a.RUnlock()
 
 	var i int64
 	webhooks = make([]provider.Webhook, len(a.webhooks))
@@ -35,8 +36,6 @@ func (a *App) List() (webhooks []provider.Webhook) {
 		webhooks[i] = value
 		i++
 	}
-
-	a.RUnlock()
 
 	sort.Sort(provider.WebhookByID(webhooks))
 
