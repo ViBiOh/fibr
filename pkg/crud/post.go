@@ -6,6 +6,7 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -99,6 +100,13 @@ func (a App) handleMultipart(w http.ResponseWriter, r *http.Request, request pro
 
 	if len(r.Header.Get("X-Chunk-Upload")) != 0 {
 		if chunkNumber := r.Header.Get("X-Chunk-Number"); len(chunkNumber) != 0 {
+			chunkNumberValue, err := strconv.ParseUint(chunkNumber, 10, 64)
+			if err != nil {
+				a.error(w, r, request, model.WrapInvalid(fmt.Errorf("unable to parse chunk number: %s", err)))
+			}
+
+			chunkNumber = fmt.Sprintf("%10d", chunkNumberValue)
+
 			a.uploadChunk(w, r, request, values["filename"], chunkNumber, file)
 		} else {
 			a.mergeChunk(w, r, request, values)
