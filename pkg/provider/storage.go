@@ -54,6 +54,7 @@ type RenderItem struct {
 	Path string
 	absto.Item
 	HasThumbnail bool
+	IsCover      bool
 }
 
 // IsZero checks if instance is valued or not

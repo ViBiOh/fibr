@@ -20,7 +20,7 @@
 
         {{ if .HasThumbnail }}
           <p class="padding no-margin center">
-            <input id="cover-{{ .ID }}" type="checkbox" name="cover" value="true" />
+            <input id="cover-{{ .ID }}" type="checkbox" name="cover" value="true" {{ if .IsCover }}checked{{ end }} />
             <label for="cover-{{ .ID }}">Define folder cover</label>
           </p>
         {{ end }}

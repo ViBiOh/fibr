@@ -150,10 +150,18 @@
     .icon-overlay {
       height: var(--icon-large);
       left: calc((100% - var(--icon-large)) / 2);
+      pointer-events: none;
       position: absolute;
       top: calc((100% - var(--icon-large)) / 2);
       width: var(--icon-large);
-      pointer-events: none;
+    }
+
+    .icon-overlay-small {
+      bottom: 1rem;
+      height: var(--icon-size);
+      position: absolute;
+      right: 1rem;
+      width: var(--icon-size);
     }
 
     .clickable {

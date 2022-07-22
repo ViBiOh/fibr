@@ -229,11 +229,15 @@
       {{ range .Files }}
         <li class="file relative {{ if not .HasThumbnail }}padding-half{{ end }}">
           <a class="filelink center ellipsis" href="{{ .URL }}{{ if .IsDir }}?d={{ $root.Request.LayoutPath ($root.Request.AbsoluteURL .URL) }}{{ else }}?browser{{ end }}" title="{{ .Name }}">
-            {{ if .HasThumbnail }}
+            {{ if and (eq $root.Request.Display "grid") .HasThumbnail }}
               {{ template "async-image-item" . }}
 
               {{ if .IsVideo }}
                 <img class="icon icon-overlay" src="{{ url "/svg/play?fill=rgba(192,192,192,0.8)" }}" alt="Play video">
+              {{ end }}
+
+              {{ if .IsCover }}
+                <img class="icon icon-overlay-small" src="{{ url "/svg/rss?fill=rgba(192,192,192,0.8)" }}" alt="Is cover image" title="Is cover image">
               {{ end }}
             {{ else }}
               <img class="icon {{ if eq $root.Request.Display "grid" }}icon-large{{ end }}" src="{{ url "/svg/" }}{{ if .IsDir }}folder{{ else }}{{ iconFromExtension . }}{{ end }}?fill=aliceblue" alt="{{ if .IsDir }}Folder{{ else }}File{{ end }}">
