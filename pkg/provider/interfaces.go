@@ -53,6 +53,7 @@ type WebhookManager interface {
 type ExifManager interface {
 	ListDir(ctx context.Context, item absto.Item) ([]absto.Item, error)
 	GetAggregateFor(ctx context.Context, item absto.Item) (Aggregate, error)
+	SaveAggregateFor(ctx context.Context, item absto.Item, aggregate Aggregate) error
 	GetExifFor(ctx context.Context, item absto.Item) (exas.Exif, error)
 	SaveExifFor(ctx context.Context, item absto.Item, exif exas.Exif) error
 }

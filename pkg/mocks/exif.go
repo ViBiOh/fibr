@@ -82,6 +82,20 @@ func (mr *ExifMockRecorder) ListDir(arg0, arg1 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListDir", reflect.TypeOf((*Exif)(nil).ListDir), arg0, arg1)
 }
 
+// SaveAggregateFor mocks base method.
+func (m *Exif) SaveAggregateFor(arg0 context.Context, arg1 model.Item, arg2 provider.Aggregate) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SaveAggregateFor", arg0, arg1, arg2)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SaveAggregateFor indicates an expected call of SaveAggregateFor.
+func (mr *ExifMockRecorder) SaveAggregateFor(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveAggregateFor", reflect.TypeOf((*Exif)(nil).SaveAggregateFor), arg0, arg1, arg2)
+}
+
 // SaveExifFor mocks base method.
 func (m *Exif) SaveExifFor(arg0 context.Context, arg1 model.Item, arg2 model0.Exif) error {
 	m.ctrl.T.Helper()

@@ -18,6 +18,13 @@
           <input id="name-{{ .ID }}" type="text" name="newName" value="{{ .Name }}" />
         </p>
 
+        {{ if .HasThumbnail }}
+          <p class="padding no-margin center">
+            <input id="cover-{{ .ID }}" type="checkbox" name="cover" value="true" />
+            <label for="cover-{{ .ID }}">Define folder cover</label>
+          </p>
+        {{ end }}
+
         {{ template "form_buttons" "Update" }}
       </form>
     </div>

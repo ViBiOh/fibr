@@ -66,6 +66,11 @@ func (a App) SaveExifFor(ctx context.Context, item absto.Item, exif exas.Exif) e
 	return cache.EvictOnSuccess(ctx, a.redisClient, redisKey(item.ID), a.saveMetadata(ctx, item, exif))
 }
 
+// SaveAggregateFor saves given aggregate for given item
+func (a App) SaveAggregateFor(ctx context.Context, item absto.Item, aggregate provider.Aggregate) error {
+	return cache.EvictOnSuccess(ctx, a.redisClient, redisKey(item.ID), a.saveMetadata(ctx, item, aggregate))
+}
+
 func (a App) aggregate(ctx context.Context, item absto.Item) error {
 	if !item.IsDir {
 		file, err := a.getDirOf(ctx, item)

@@ -57,38 +57,64 @@ func (a App) Rename(w http.ResponseWriter, r *http.Request, request provider.Req
 		newName = provider.Dirname(newName)
 	}
 
+	cover, err := getFormBool(r.Form.Get("cover"))
+	if err != nil {
+		a.error(w, r, request, err)
+		return
+	}
+
 	oldPath := request.SubPath(oldName)
 	newPath := provider.GetPathname(newFolder, newName, request.Share)
 	ctx := r.Context()
 
-	if _, err := a.checkFile(ctx, newPath, false); err != nil {
-		a.error(w, r, request, err)
-		return
+	var oldItem absto.Item
+	var newItem absto.Item
+
+	if oldPath != newPath {
+		if _, err := a.checkFile(ctx, newPath, false); err != nil {
+			a.error(w, r, request, err)
+			return
+		}
+
+		oldItem, err = a.checkFile(ctx, oldPath, true)
+		if err != nil {
+			a.error(w, r, request, err)
+			return
+		}
+
+		newItem, err = a.doRename(ctx, oldPath, newPath, oldItem)
+		if err != nil {
+			a.error(w, r, request, model.WrapInternal(err))
+			return
+		}
+
+		if oldItem.IsDir {
+			updatePreferences(request, oldPath, newPath)
+			provider.SetPrefsCookie(w, request)
+		}
+	} else {
+		newItem, err = a.checkFile(ctx, newPath, true)
+		if err != nil {
+			a.error(w, r, request, err)
+			return
+		}
 	}
 
-	oldItem, err := a.checkFile(ctx, oldPath, true)
-	if err != nil {
-		a.error(w, r, request, err)
-		return
-	}
-
-	newItem, err := a.doRename(ctx, oldPath, newPath, oldItem)
-	if err != nil {
-		a.error(w, r, request, model.WrapInternal(err))
-		return
-	}
-
-	if oldItem.IsDir {
-		updatePreferences(request, oldPath, newPath)
-		provider.SetPrefsCookie(w, request)
+	if !newItem.IsDir && cover {
+		if err := a.updateCover(ctx, newItem); err != nil {
+			a.error(w, r, request, model.WrapInternal(err))
+			return
+		}
 	}
 
 	var message string
 
 	if newFolder != request.Path {
 		message = fmt.Sprintf("%s successfully moved to %s", oldItem.Name, provider.URL(newFolder, newName, request.Share))
-	} else {
+	} else if oldPath != newPath {
 		message = fmt.Sprintf("%s successfully renamed to %s", oldItem.Name, newItem.Name)
+	} else {
+		message = fmt.Sprintf("%s successfully updated", newItem.Name)
 	}
 
 	a.rendererApp.Redirect(w, r, fmt.Sprintf("?d=%s", request.Display), renderer.NewSuccessMessage(message))
@@ -130,6 +156,26 @@ func (a App) checkFile(ctx context.Context, pathname string, shouldExist bool) (
 	}
 
 	return
+}
+
+func (a App) updateCover(ctx context.Context, item absto.Item) error {
+	directory, err := a.storageApp.Info(ctx, item.Dir())
+	if err != nil {
+		return fmt.Errorf("unable to get directory: %s", err)
+	}
+
+	aggregate, err := a.exifApp.GetAggregateFor(ctx, directory)
+	if err != nil && !absto.IsNotExist(err) {
+		return fmt.Errorf("unable to get aggregate: %s", err)
+	}
+
+	aggregate.Cover = item.Name
+
+	if err := a.exifApp.SaveAggregateFor(ctx, directory, aggregate); err != nil {
+		return fmt.Errorf("unable to save aggregate: %s", err)
+	}
+
+	return nil
 }
 
 func updatePreferences(request provider.Request, oldPath, newPath string) {
