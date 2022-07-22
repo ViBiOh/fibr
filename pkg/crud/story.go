@@ -16,28 +16,29 @@ func (a App) story(r *http.Request, request provider.Request, item absto.Item, f
 	defer end()
 
 	items := make([]provider.StoryItem, 0, len(files))
-	var cover map[string]any
+	var cover cover
 	var hasMap bool
 
-	for _, item := range files {
-		if cover == nil {
-			cover = map[string]any{
-				"Img":       provider.StorageToRender(item, request),
-				"ImgHeight": thumbnail.SmallSize,
-				"ImgWidth":  thumbnail.SmallSize,
-			}
+	directoryAggregate, err := a.exifApp.GetAggregateFor(ctx, item)
+	if err != nil && !absto.IsNotExist(err) {
+		logger.WithField("fn", "crud.story").WithField("item", request.Path).Error("unable to get aggregate: %s", err)
+	}
+
+	for _, file := range files {
+		if cover.IsZero() || (len(directoryAggregate.Cover) != 0 && cover.Img.Name != directoryAggregate.Cover) {
+			cover = newCover(provider.StorageToRender(file, request), thumbnail.SmallSize)
 		}
 
-		exif, err := a.exifApp.GetExifFor(ctx, item)
+		exif, err := a.exifApp.GetExifFor(ctx, file)
 		if err != nil {
-			logger.WithField("item", item.Pathname).Error("unable to get exif: %s", err)
+			logger.WithField("item", file.Pathname).Error("unable to get exif: %s", err)
 		}
 
 		if !request.Share.Story && !hasMap && exif.Geocode.HasCoordinates() {
 			hasMap = true
 		}
 
-		items = append(items, provider.StorageToStory(item, request, exif))
+		items = append(items, provider.StorageToStory(file, request, exif))
 	}
 
 	return renderer.NewPage("story", http.StatusOK, map[string]any{

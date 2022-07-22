@@ -47,7 +47,7 @@
 
   {{ if $needCover }}
     {{ if .Cover.Img }}
-      <meta property="og:image" content="{{ publicURL (.Request.AbsoluteURL .Cover.Img.Name) }}?thumbnail{{ if .Cover.Scale }}&scale={{ .Cover.Scale }}{{ end }}">
+      <meta property="og:image" content="{{ publicURL (.Request.AbsoluteURL .Cover.Img.Name) }}?thumbnail">
       <meta property="og:image:alt" content="Thumbnail of folder">
       <meta property="og:image:type" content="image/webp">
       <meta property="og:image:height" content="{{ .Cover.ImgHeight }}">

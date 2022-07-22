@@ -22,20 +22,6 @@ const (
 	uint32max = (1 << 32) - 1
 )
 
-func (a App) getCover(ctx context.Context, request provider.Request, files []absto.Item) map[string]any {
-	for _, file := range files {
-		if a.thumbnailApp.HasThumbnail(ctx, file, thumbnail.SmallSize) {
-			return map[string]any{
-				"Img":       provider.StorageToRender(file, request),
-				"ImgHeight": thumbnail.SmallSize,
-				"ImgWidth":  thumbnail.SmallSize,
-			}
-		}
-	}
-
-	return nil
-}
-
 func (a App) list(ctx context.Context, request provider.Request, message renderer.Message, item absto.Item, files []absto.Item) (renderer.Page, error) {
 	ctx, end := tracer.StartSpan(ctx, a.tracer, "list")
 	defer end()
@@ -53,12 +39,11 @@ func (a App) list(ctx context.Context, request provider.Request, message rendere
 		}
 	})
 
-	var hasMap bool
+	var directoryAggregate provider.Aggregate
 	wg.Go(func() {
-		if aggregate, err := a.exifApp.GetAggregateFor(ctx, item); err != nil && !absto.IsNotExist(err) {
+		var err error
+		if directoryAggregate, err = a.exifApp.GetAggregateFor(ctx, item); err != nil && !absto.IsNotExist(err) {
 			logger.WithField("fn", "crud.List").WithField("item", request.Path).Error("unable to get aggregate: %s", err)
-		} else if len(aggregate.Location) != 0 {
-			hasMap = true
 		}
 	})
 
@@ -81,7 +66,7 @@ func (a App) list(ctx context.Context, request provider.Request, message rendere
 
 	wg.Wait()
 
-	hasThumbnail, hasStory, cover := a.enrichThumbnail(ctx, request, items, thumbnails)
+	hasThumbnail, hasStory, cover := a.enrichThumbnail(ctx, request, directoryAggregate, items, thumbnails)
 
 	content := map[string]any{
 		"Paths":        getPathParts(request),
@@ -89,7 +74,7 @@ func (a App) list(ctx context.Context, request provider.Request, message rendere
 		"Cover":        cover,
 		"Request":      request,
 		"Message":      message,
-		"HasMap":       hasMap,
+		"HasMap":       len(directoryAggregate.Location),
 		"HasThumbnail": hasThumbnail,
 		"HasStory":     hasStory,
 		"ChunkUpload":  a.chunkUpload,
@@ -106,7 +91,7 @@ func (a App) list(ctx context.Context, request provider.Request, message rendere
 	return renderer.NewPage("files", http.StatusOK, content), nil
 }
 
-func (a App) enrichThumbnail(ctx context.Context, request provider.Request, items []provider.RenderItem, thumbnails map[string]absto.Item) (hasThumbnail bool, hasStory bool, cover map[string]any) {
+func (a App) enrichThumbnail(ctx context.Context, request provider.Request, directoryAggregate provider.Aggregate, items []provider.RenderItem, thumbnails map[string]absto.Item) (hasThumbnail bool, hasStory bool, cover cover) {
 	renderWithThumbnail := request.Display == provider.GridDisplay
 
 	for index, item := range items {
@@ -116,12 +101,8 @@ func (a App) enrichThumbnail(ctx context.Context, request provider.Request, item
 
 		hasThumbnail = true
 
-		if cover == nil {
-			cover = map[string]any{
-				"Img":       item,
-				"ImgHeight": thumbnail.SmallSize,
-				"ImgWidth":  thumbnail.SmallSize,
-			}
+		if cover.IsZero() || (len(directoryAggregate.Cover) != 0 && cover.Img.Name != directoryAggregate.Cover) {
+			cover = newCover(item, thumbnail.SmallSize)
 		}
 
 		if !hasStory {
