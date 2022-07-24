@@ -31,6 +31,11 @@ name:
 version:
 	@printf "$(shell git rev-parse --short HEAD)"
 
+## version-date: Output last commit date
+.PHONY: version-date
+version-date:
+	@printf "$(shell git log -n 1 "--date=format:%Y%m%d%H%M" "--pretty=format:%cd")"
+
 ## dev: Build app
 .PHONY: dev
 dev: format style test build

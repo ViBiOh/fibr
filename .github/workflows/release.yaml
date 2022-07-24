@@ -51,4 +51,4 @@ jobs:
           DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
         run: |
           curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap" | bash -s -- "-c" "docker_promote"
-          scripts/docker_promote "${{ secrets.DOCKER_USER }}/$(make name)" "$(make version)" "$(basename ${{ github.ref }})"
+          scripts/docker_promote "${{ secrets.DOCKER_USER }}/$(make name)" "$(make version-date)" "$(basename ${{ github.ref }})"
