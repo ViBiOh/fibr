@@ -5,10 +5,10 @@ go 1.18
 require (
 	github.com/ViBiOh/ChatPotte v0.0.27
 	github.com/ViBiOh/absto v0.5.14
-	github.com/ViBiOh/auth/v2 v2.12.16
+	github.com/ViBiOh/auth/v2 v2.12.17
 	github.com/ViBiOh/exas v0.4.2
 	github.com/ViBiOh/flags v1.1.0
-	github.com/ViBiOh/httputils/v4 v4.43.6
+	github.com/ViBiOh/httputils/v4 v4.44.0
 	github.com/ViBiOh/vith v0.5.0
 	github.com/golang/mock v1.6.0
 	github.com/prometheus/client_golang v1.12.2
@@ -51,7 +51,7 @@ require (
 	go.opentelemetry.io/otel/metric v0.31.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.8.0 // indirect
 	golang.org/x/net v0.0.0-20220708220712-1185a9018129 // indirect
-	golang.org/x/sys v0.0.0-20220712014510-0a85c31ab51e // indirect
+	golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8 // indirect
 	golang.org/x/term v0.0.0-20220526004731-065cf7ba2467 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
 	gopkg.in/ini.v1 v1.66.6 // indirect
