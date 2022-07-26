@@ -17,11 +17,6 @@ func generateTelegramURL(botToken, chatID string) string {
 }
 
 func (a App) createWebhook(w http.ResponseWriter, r *http.Request, request provider.Request) {
-	if !request.CanWebhook {
-		a.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
-		return
-	}
-
 	var err error
 	err = r.ParseForm()
 	if err != nil {
@@ -123,11 +118,6 @@ func checkWebhookForm(r *http.Request) (recursive bool, kind provider.WebhookKin
 }
 
 func (a App) deleteWebhook(w http.ResponseWriter, r *http.Request, request provider.Request) {
-	if !request.CanWebhook {
-		a.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
-		return
-	}
-
 	id := r.FormValue("id")
 
 	if err := a.webhookApp.Delete(r.Context(), id); err != nil {

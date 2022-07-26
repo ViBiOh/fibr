@@ -85,6 +85,12 @@ test:
 bench:
 	go test $(PACKAGES) -bench . -benchmem -run Benchmark.*
 
+## build: Build the javascript polyfill.
+.PHONY: build-js
+build-js:
+	npm install --no-save --ignore-scripts @swc/cli @swc/core regenerator-runtime
+	npx spack
+
 ## build: Build the application.
 .PHONY: build
 build:
@@ -94,5 +100,5 @@ build:
 .PHONY: run
 run:
 	$(MAIN_RUNNER) \
-		-ignorePattern ".git" \
+		-ignorePattern ".git|node_modules" \
 		-authUsers "1:`htpasswd -nBb admin admin`"

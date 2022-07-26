@@ -1,11 +1,14 @@
 # scripts
-scripts/
+/scripts/
 
 # Golang
 bin/
 release/
 coverage.*
 .env
+
+# NPM
+node_modules/
 
 # Fibr
 .fibr/

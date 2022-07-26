@@ -12,11 +12,6 @@ import (
 )
 
 func (a App) regenerate(w http.ResponseWriter, r *http.Request, request provider.Request) {
-	if !request.CanEdit {
-		a.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
-		return
-	}
-
 	pathname := request.Filepath()
 	ctx := r.Context()
 

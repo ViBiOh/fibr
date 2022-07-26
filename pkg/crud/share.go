@@ -63,11 +63,6 @@ func parseRights(value string) (edit, story bool, err error) {
 }
 
 func (a App) createShare(w http.ResponseWriter, r *http.Request, request provider.Request) {
-	if !request.CanShare {
-		a.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
-		return
-	}
-
 	var err error
 
 	edit, story, err := parseRights(strings.TrimSpace(r.FormValue("rights")))
@@ -127,11 +122,6 @@ func (a App) createShare(w http.ResponseWriter, r *http.Request, request provide
 }
 
 func (a App) deleteShare(w http.ResponseWriter, r *http.Request, request provider.Request) {
-	if !request.CanShare {
-		a.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
-		return
-	}
-
 	id := r.FormValue("id")
 
 	if err := a.shareApp.Delete(r.Context(), id); err != nil {

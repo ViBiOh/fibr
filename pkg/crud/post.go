@@ -117,6 +117,11 @@ func (a App) handleMultipart(w http.ResponseWriter, r *http.Request, request pro
 }
 
 func (a App) handlePostShare(w http.ResponseWriter, r *http.Request, request provider.Request, method string) {
+	if !request.CanShare {
+		a.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
+		return
+	}
+
 	switch method {
 	case http.MethodPost:
 		a.createShare(w, r, request)
@@ -128,6 +133,11 @@ func (a App) handlePostShare(w http.ResponseWriter, r *http.Request, request pro
 }
 
 func (a App) handlePostWebhook(w http.ResponseWriter, r *http.Request, request provider.Request, method string) {
+	if !request.CanWebhook {
+		a.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
+		return
+	}
+
 	switch method {
 	case http.MethodPost:
 		a.createWebhook(w, r, request)
@@ -139,6 +149,11 @@ func (a App) handlePostWebhook(w http.ResponseWriter, r *http.Request, request p
 }
 
 func (a App) handlePostDescription(w http.ResponseWriter, r *http.Request, request provider.Request, method string) {
+	if !request.CanEdit {
+		a.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
+		return
+	}
+
 	name, err := checkFormName(r, "name")
 	if err != nil && !errors.Is(err, ErrEmptyName) {
 		a.error(w, r, request, err)
@@ -172,6 +187,11 @@ func (a App) handlePostDescription(w http.ResponseWriter, r *http.Request, reque
 }
 
 func (a App) handlePost(w http.ResponseWriter, r *http.Request, request provider.Request, method string) {
+	if !request.CanEdit {
+		a.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
+		return
+	}
+
 	switch method {
 	case http.MethodPatch:
 		a.Rename(w, r, request)
