@@ -56,15 +56,15 @@
       });
     }
 
-    resolveScript('/scripts/modern_detection.js')
+    resolveScript('/scripts/modern_detection.js?v={{ .Version }}')
       .then(() => {
         if (window.modernBrowser) {
-          resolveScript('/scripts/thumbnail.js');
+          resolveScript('/scripts/thumbnail.js?v={{ .Version }}');
         } else {
-          resolveScript('/scripts/thumbnail/web.js')
+          resolveScript('/scripts/thumbnail/web.js?v={{ .Version }}')
         }
       })
-      .catch(() => resolveScript('/scripts/thumbnail.js'));
+      .catch(() => resolveScript('/scripts/thumbnail.js?v={{ .Version }}'));
   </script>
 
   </script>
