@@ -1,23 +1,3 @@
-// from https://developers.google.com/speed/webp/faq#how_can_i_detect_browser_support_for_webp
-async function isWebPCompatible() {
-  const animatedImage =
-    'UklGRlIAAABXRUJQVlA4WAoAAAASAAAAAAAAAAAAQU5JTQYAAAD/////AABBTk1GJgAAAAAAAAAAAAAAAAAAAGQAAABWUDhMDQAAAC8AAAAQBxAREYiI/gcA';
-
-  return new Promise((resolve, reject) => {
-    var image = new Image();
-    image.onload = () => {
-      if (image.width > 0 && image.height > 0) {
-        resolve();
-      } else {
-        reject();
-      }
-    };
-
-    image.onerror = reject;
-    image.src = `data:image/webp;base64,${animatedImage}`;
-  });
-}
-
 // From https://developer.mozilla.org/en-US/docs/Web/API/ReadableStreamDefaultReader/read#example_2_-_handling_text_line_by_line
 async function* readLineByLine(response) {
   const utf8Decoder = new TextDecoder('utf-8');
