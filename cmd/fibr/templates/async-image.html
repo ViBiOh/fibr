@@ -137,14 +137,19 @@
 
         try {
           await isWebPCompatible();
-          window.dispatchEvent(new Event('thumbnail-done'));
         } catch (e) {
-          resolveScript(
+          await resolveScript(
             'https://unpkg.com/webp-hero@0.0.2/dist-cjs/webp-hero.bundle.js',
             'sha512-DA6h9H5Sqn55/uVn4JI4aSPFnAWoCQYYDXUnvjOAMNVx11///hX4QaFbQt5yWsrIm9hSI5fLJYfRWt3KXneSXQ==',
             'anonymous',
-          ).then(() => new webpHero.WebpMachine().polyfillDocument());
+          );
+
+          const webpMachine = new webpHero.WebpMachine();
+          webpMachine.polyfillDocument();
+          webpMachine.clearCache();
         }
+
+        window.dispatchEvent(new Event('thumbnail-done'));
       },
       false,
     );

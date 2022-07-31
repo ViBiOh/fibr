@@ -238,17 +238,30 @@
     });
 
     window.addEventListener('thumbnail-done', () => {
-      const lazyImageObserver = new IntersectionObserver((entries, observer) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) {
-            return;
-          }
+      const lazyImageObserver = new IntersectionObserver(
+        async (entries, observer) => {
+          entries.forEach(async (entry) => {
+            if (!entry.isIntersecting) {
+              return;
+            }
 
-          const lazyImage = entry.target;
-          lazyImage.src = lazyImage.dataset.src;
-          lazyImageObserver.unobserve(lazyImage);
-        });
-      });
+            const lazyImage = entry.target;
+            if (window.webpHero) {
+              const content = await fetch(lazyImage.dataset.src, {
+                credentials: 'same-origin',
+              }).arrayBuffer();
+
+              const webpMachine = new webpHero.WebpMachine();
+              lazyImage.src = await webpMachine.decode(new Uint8Array(content));
+              webpMachine.clearCache();
+            } else {
+              lazyImage.src = lazyImage.dataset.src;
+            }
+
+            lazyImageObserver.unobserve(lazyImage);
+          });
+        },
+      );
 
       document
         .querySelectorAll('img.thumbnail')
