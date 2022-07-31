@@ -79,14 +79,6 @@ window.addEventListener(
       return;
     }
 
-    try {
-      await isWebPCompatible();
-    } catch (e) {
-      console.error('Your browser is not compatible with WebP format.', e);
-      thumbnailsElem.forEach(displayNoThumbnail);
-      return;
-    }
-
     thumbnailsElem.forEach((picture) => {
       replaceContent(picture, generateThrobber(['throbber-white']));
     });
@@ -96,6 +88,18 @@ window.addEventListener(
       window.dispatchEvent(new Event('thumbnail-done'));
     } catch (e) {
       console.error(e);
+    }
+
+    try {
+      await isWebPCompatible();
+    } catch (e) {
+      resolveScript(
+        'https://unpkg.com/webp-hero@0.0.2/dist-cjs/webp-hero.bundle.js',
+        'sha512-DA6h9H5Sqn55/uVn4JI4aSPFnAWoCQYYDXUnvjOAMNVx11///hX4QaFbQt5yWsrIm9hSI5fLJYfRWt3KXneSXQ==',
+        'anonymous',
+      ).then(() => {
+        new webpHero.WebpMachine().polyfillDocument();
+      });
     }
   },
   false,

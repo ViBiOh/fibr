@@ -92,10 +92,10 @@
         }
 
         async function loadLeaflet() {
-          await addStyle('https://unpkg.com/leaflet@1.8.0/dist/leaflet.css', 'sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ==', '');
-          await addStyle('https://unpkg.com/leaflet.markercluster@1.5.1/dist/MarkerCluster.Default.css', '', '');
-          await resolveScript('https://unpkg.com/leaflet@1.8.0/dist/leaflet.js', 'sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ==', '');
-          await resolveScript('https://unpkg.com/leaflet.markercluster@1.5.1/dist/leaflet.markercluster.js', '', '');
+          await addStyle('https://unpkg.com/leaflet@1.8.0/dist/leaflet.css', 'sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ==', 'anonymous');
+          await addStyle('https://unpkg.com/leaflet.markercluster@1.5.1/dist/MarkerCluster.Default.css', 'sha512-6ZCLMiYwTeli2rVh3XAPxy3YoR5fVxGdH/pz+KMCzRY2M65Emgkw00Yqmhh8qLGeYQ3LbVZGdmOX9KUjSKr0TA==', 'anonymous');
+          await resolveScript('https://unpkg.com/leaflet@1.8.0/dist/leaflet.js', 'sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ==', 'anonymous');
+          await resolveScript('https://unpkg.com/leaflet.markercluster@1.5.1/dist/leaflet.markercluster.js', 'sha512-+Zr0llcuE/Ho6wXRYtlWypMyWSEMxrWJxrYgeAMDRSf1FF46gQ3PAVOVp5RHdxdzikZXuHZ0soHpqRkkPkI3KA==', 'anonymous');
         }
 
         let map;
