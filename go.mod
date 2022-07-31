@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/ViBiOh/ChatPotte v0.0.28
-	github.com/ViBiOh/absto v0.5.15
+	github.com/ViBiOh/absto v0.5.16
 	github.com/ViBiOh/auth/v2 v2.12.17
 	github.com/ViBiOh/exas v0.4.2
 	github.com/ViBiOh/flags v1.1.0
@@ -15,7 +15,7 @@ require (
 	github.com/streadway/amqp v1.0.0
 	go.opentelemetry.io/otel v1.8.0
 	go.opentelemetry.io/otel/trace v1.8.0
-	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d
+	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa
 	golang.org/x/text v0.3.7
 )
 
@@ -35,7 +35,7 @@ require (
 	github.com/klauspost/cpuid/v2 v2.1.0 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
-	github.com/minio/minio-go/v7 v7.0.31 // indirect
+	github.com/minio/minio-go/v7 v7.0.32 // indirect
 	github.com/minio/sha256-simd v1.0.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
@@ -50,9 +50,9 @@ require (
 	go.opentelemetry.io/otel/exporters/jaeger v1.8.0 // indirect
 	go.opentelemetry.io/otel/metric v0.31.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.8.0 // indirect
-	golang.org/x/net v0.0.0-20220708220712-1185a9018129 // indirect
-	golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8 // indirect
-	golang.org/x/term v0.0.0-20220526004731-065cf7ba2467 // indirect
+	golang.org/x/net v0.0.0-20220728030405-41545e8bf201 // indirect
+	golang.org/x/sys v0.0.0-20220728004956-3c1f35247d10 // indirect
+	golang.org/x/term v0.0.0-20220722155259-a9ba230a4035 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
 	gopkg.in/ini.v1 v1.66.6 // indirect
 )
