@@ -247,9 +247,10 @@
 
             const lazyImage = entry.target;
             if (window.webpHero) {
-              const content = await fetch(lazyImage.dataset.src, {
+              const response = await fetch(lazyImage.dataset.src, {
                 credentials: 'same-origin',
-              }).arrayBuffer();
+              })
+              const content = await response.arrayBuffer();
 
               const webpMachine = new webpHero.WebpMachine();
               lazyImage.src = await webpMachine.decode(new Uint8Array(content));
