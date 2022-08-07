@@ -123,7 +123,7 @@ func SanitizeName(name string, removeSlash bool) (string, error) {
 // SafeWrite writes content to writer with error handling
 func SafeWrite(w io.Writer, content string) {
 	if _, err := io.WriteString(w, content); err != nil {
-		logger.Error("unable to write content: %s", err)
+		logger.Error("write content: %s", err)
 	}
 }
 
@@ -161,7 +161,7 @@ func LoadJSON(ctx context.Context, storageApp absto.Storage, filename string, co
 	var reader io.ReadCloser
 	reader, err = storageApp.ReadFrom(ctx, filename)
 	if err != nil {
-		return fmt.Errorf("unable to read: %w", err)
+		return fmt.Errorf("read: %w", err)
 	}
 
 	defer func() {
@@ -169,7 +169,7 @@ func LoadJSON(ctx context.Context, storageApp absto.Storage, filename string, co
 	}()
 
 	if err = json.NewDecoder(reader).Decode(content); err != nil {
-		err = fmt.Errorf("unable to decode: %w", storageApp.ConvertError(err))
+		err = fmt.Errorf("decode: %w", storageApp.ConvertError(err))
 	}
 
 	return
@@ -185,11 +185,11 @@ func SaveJSON(ctx context.Context, storageApp absto.Storage, filename string, co
 		var err error
 
 		if jsonErr := json.NewEncoder(writer).Encode(content); jsonErr != nil {
-			err = fmt.Errorf("unable to encode: %w", jsonErr)
+			err = fmt.Errorf("encode: %w", jsonErr)
 		}
 
 		if closeErr := writer.Close(); closeErr != nil {
-			err = model.WrapError(err, fmt.Errorf("unable to close encoder: %w", closeErr))
+			err = model.WrapError(err, fmt.Errorf("close encoder: %w", closeErr))
 		}
 
 		done <- err
@@ -208,7 +208,7 @@ func SaveJSON(ctx context.Context, storageApp absto.Storage, filename string, co
 func SendLargeFile(ctx context.Context, storageApp absto.Storage, item absto.Item, req request.Request) (*http.Response, error) {
 	file, err := storageApp.ReadFrom(ctx, item.Pathname) // will be closed by `PipeWriter`
 	if err != nil {
-		return nil, fmt.Errorf("unable to get reader: %w", err)
+		return nil, fmt.Errorf("get reader: %w", err)
 	}
 
 	reader, writer := io.Pipe()
@@ -220,7 +220,7 @@ func SendLargeFile(ctx context.Context, storageApp absto.Storage, item absto.Ite
 
 		var err error
 		if _, err = io.CopyBuffer(writer, file, buffer.Bytes()); err != nil {
-			err = fmt.Errorf("unable to copy: %w", err)
+			err = fmt.Errorf("copy: %w", err)
 		}
 
 		_ = writer.CloseWithError(err)
@@ -228,7 +228,7 @@ func SendLargeFile(ctx context.Context, storageApp absto.Storage, item absto.Ite
 
 	r, err := req.Build(ctx, reader)
 	if err != nil {
-		return nil, fmt.Errorf("unable to create request: %s", err)
+		return nil, fmt.Errorf("create request: %s", err)
 	}
 
 	r.ContentLength = item.Size
@@ -239,7 +239,7 @@ func SendLargeFile(ctx context.Context, storageApp absto.Storage, item absto.Ite
 // HandleClose closes given closer respecting given err
 func HandleClose(closer io.Closer, err error) error {
 	if closeErr := closer.Close(); closeErr != nil {
-		return model.WrapError(err, fmt.Errorf("unable to close: %s", closeErr))
+		return model.WrapError(err, fmt.Errorf("close: %s", closeErr))
 	}
 
 	return err
@@ -248,7 +248,7 @@ func HandleClose(closer io.Closer, err error) error {
 // LogClose closes given closer and logging in case of error
 func LogClose(closer io.Closer, fn, item string) {
 	if err := closer.Close(); err != nil {
-		logger.WithField("fn", "fn").WithField("item", item).Error("unable to close: %s", err)
+		logger.WithField("fn", "fn").WithField("item", item).Error("close: %s", err)
 	}
 }
 
@@ -258,7 +258,7 @@ func WriteToStorage(ctx context.Context, storageApp absto.Storage, output string
 	directory := path.Dir(output)
 
 	if err = storageApp.CreateDir(ctx, directory); err != nil {
-		return fmt.Errorf("unable to create directory: %s", err)
+		return fmt.Errorf("create directory: %s", err)
 	}
 
 	if size == -1 {
@@ -269,7 +269,7 @@ func WriteToStorage(ctx context.Context, storageApp absto.Storage, output string
 
 	if err != nil {
 		if removeErr := storageApp.Remove(ctx, output); removeErr != nil {
-			err = model.WrapError(err, fmt.Errorf("unable to remove: %s", removeErr))
+			err = model.WrapError(err, fmt.Errorf("remove: %s", removeErr))
 		}
 	}
 

@@ -21,7 +21,7 @@ func (a App) story(r *http.Request, request provider.Request, item absto.Item, f
 
 	directoryAggregate, err := a.exifApp.GetAggregateFor(ctx, item)
 	if err != nil && !absto.IsNotExist(err) {
-		logger.WithField("fn", "crud.story").WithField("item", request.Path).Error("unable to get aggregate: %s", err)
+		logger.WithField("fn", "crud.story").WithField("item", request.Path).Error("get aggregate: %s", err)
 	}
 
 	for _, file := range files {
@@ -31,7 +31,7 @@ func (a App) story(r *http.Request, request provider.Request, item absto.Item, f
 
 		exif, err := a.exifApp.GetExifFor(ctx, file)
 		if err != nil {
-			logger.WithField("item", file.Pathname).Error("unable to get exif: %s", err)
+			logger.WithField("item", file.Pathname).Error("get exif: %s", err)
 		}
 
 		if !request.Share.Story && !hasMap && exif.Geocode.HasCoordinates() {

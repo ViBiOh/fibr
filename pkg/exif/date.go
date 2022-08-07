@@ -14,7 +14,7 @@ func (a App) updateDate(ctx context.Context, item absto.Item, data exas.Exif) er
 	}
 
 	if err := a.storageApp.UpdateDate(ctx, item.Pathname, data.Date); err != nil {
-		return fmt.Errorf("unable to update date: %s", err)
+		return fmt.Errorf("update date: %s", err)
 	}
 
 	return nil

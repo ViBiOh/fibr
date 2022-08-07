@@ -54,12 +54,12 @@ func (r *WebhookKind) UnmarshalJSON(b []byte) error {
 	var strValue string
 	err := json.Unmarshal(b, &strValue)
 	if err != nil {
-		return fmt.Errorf("unable to unmarshal event type: %s", err)
+		return fmt.Errorf("unmarshal event type: %s", err)
 	}
 
 	value, err := ParseWebhookKind(strValue)
 	if err != nil {
-		return fmt.Errorf("unable to parse event type: %s", err)
+		return fmt.Errorf("parse event type: %s", err)
 	}
 
 	*r = value

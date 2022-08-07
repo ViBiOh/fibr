@@ -106,7 +106,7 @@ func New(config Config, storage absto.Storage, rendererApp renderer.App, shareAp
 
 	if amqpClient != nil {
 		if err := amqpClient.SetupExclusive(app.amqpExclusiveRoutingKey); err != nil {
-			return app, fmt.Errorf("unable to setup amqp exclusive: %s", err)
+			return app, fmt.Errorf("setup amqp exclusive: %s", err)
 		}
 	}
 
@@ -136,12 +136,12 @@ func New(config Config, storage absto.Storage, rendererApp renderer.App, shareAp
 
 	bcryptDuration, err := time.ParseDuration(strings.TrimSpace(*config.bcryptDuration))
 	if err != nil {
-		return app, fmt.Errorf("unable to parse bcrypt duration: %s", err)
+		return app, fmt.Errorf("parse bcrypt duration: %s", err)
 	}
 
 	bcryptCost, err := findBcryptBestCost(bcryptDuration)
 	if err != nil {
-		logger.Error("unable to find best bcrypt cost: %s", err)
+		logger.Error("find best bcrypt cost: %s", err)
 		bcryptCost = bcrypt.DefaultCost
 	}
 	logger.Info("Best bcrypt cost is %d", bcryptCost)
@@ -162,7 +162,7 @@ func (a App) Start(done <-chan struct{}) {
 		a.start(ctx, done)
 		return nil
 	}); err != nil {
-		logger.Error("unable to get exclusive semaphore: %s", err)
+		logger.Error("get exclusive semaphore: %s", err)
 	}
 }
 
@@ -190,7 +190,7 @@ func (a App) start(ctx context.Context, done <-chan struct{}) {
 func (a App) sanitizeName(ctx context.Context, item absto.Item) absto.Item {
 	name, err := provider.SanitizeName(item.Pathname, false)
 	if err != nil {
-		logger.WithField("item", item.Pathname).Error("unable to sanitize name: %s", err)
+		logger.WithField("item", item.Pathname).Error("sanitize name: %s", err)
 		return item
 	}
 

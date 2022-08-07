@@ -36,7 +36,7 @@ func (a App) browse(ctx context.Context, w http.ResponseWriter, request provider
 		var err error
 		exif, err = a.exifApp.GetExifFor(ctx, item)
 		if err != nil {
-			logger.WithField("item", item.Pathname).Error("unable to load exif: %s", err)
+			logger.WithField("item", item.Pathname).Error("load exif: %s", err)
 		}
 	})
 
@@ -66,7 +66,7 @@ func (a App) getFilesPreviousAndNext(ctx context.Context, item absto.Item, reque
 	var err error
 	items, err = a.storageApp.List(ctx, item.Dir())
 	if err != nil {
-		logger.WithField("item", item.Pathname).Error("unable to list neighbors files: %s", err)
+		logger.WithField("item", item.Pathname).Error("list neighbors files: %s", err)
 		return
 	}
 

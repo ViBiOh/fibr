@@ -11,6 +11,6 @@ func (a App) notify(event provider.Event) {
 	}
 
 	if err := a.pushEvent(event); err != nil {
-		logger.Error("unable to push event %+v: %s", event, err)
+		logger.Error("push event %+v: %s", event, err)
 	}
 }

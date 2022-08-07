@@ -15,12 +15,12 @@ import (
 
 func (a App) doRename(ctx context.Context, oldPath, newPath string, oldItem absto.Item) (absto.Item, error) {
 	if err := a.storageApp.Rename(ctx, oldPath, newPath); err != nil {
-		return absto.Item{}, fmt.Errorf("unable to rename: %w", err)
+		return absto.Item{}, fmt.Errorf("rename: %w", err)
 	}
 
 	newItem, err := a.storageApp.Info(ctx, newPath)
 	if err != nil {
-		return absto.Item{}, fmt.Errorf("unable to get info of new item: %w", err)
+		return absto.Item{}, fmt.Errorf("get info of new item: %w", err)
 	}
 
 	go a.notify(provider.NewRenameEvent(oldItem, newItem, a.bestSharePath(newPath), a.rendererApp))
@@ -161,18 +161,18 @@ func (a App) checkFile(ctx context.Context, pathname string, shouldExist bool) (
 func (a App) updateCover(ctx context.Context, item absto.Item) error {
 	directory, err := a.storageApp.Info(ctx, item.Dir())
 	if err != nil {
-		return fmt.Errorf("unable to get directory: %s", err)
+		return fmt.Errorf("get directory: %s", err)
 	}
 
 	aggregate, err := a.exifApp.GetAggregateFor(ctx, directory)
 	if err != nil && !absto.IsNotExist(err) {
-		return fmt.Errorf("unable to get aggregate: %s", err)
+		return fmt.Errorf("get aggregate: %s", err)
 	}
 
 	aggregate.Cover = item.Name
 
 	if err := a.exifApp.SaveAggregateFor(ctx, directory, aggregate); err != nil {
-		return fmt.Errorf("unable to save aggregate: %s", err)
+		return fmt.Errorf("save aggregate: %s", err)
 	}
 
 	return nil

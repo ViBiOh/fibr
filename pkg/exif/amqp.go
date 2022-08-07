@@ -16,7 +16,7 @@ func (a App) AmqpHandler(message amqp.Delivery) error {
 	var resp provider.ExifResponse
 
 	if err := json.Unmarshal(message.Body, &resp); err != nil {
-		return fmt.Errorf("unable to decode: %s", err)
+		return fmt.Errorf("decode: %s", err)
 	}
 
 	if resp.Exif.IsZero() {
@@ -27,13 +27,13 @@ func (a App) AmqpHandler(message amqp.Delivery) error {
 
 	exif, err := a.loadExif(ctx, resp.Item)
 	if err != nil && !absto.IsNotExist(err) {
-		logger.WithField("item", resp.Item.Pathname).Error("unable to load exif: %s", err)
+		logger.WithField("item", resp.Item.Pathname).Error("load exif: %s", err)
 	}
 
 	resp.Exif.Description = exif.Description
 
 	if err := a.saveMetadata(ctx, resp.Item, resp.Exif); err != nil {
-		return fmt.Errorf("unable to save: %s", err)
+		return fmt.Errorf("save: %s", err)
 	}
 
 	return a.processExif(ctx, resp.Item, resp.Exif, true)

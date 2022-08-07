@@ -41,7 +41,7 @@ func parseMultipart(r *http.Request) (map[string]string, *multipart.Part, error)
 		default:
 			value, err := io.ReadAll(part)
 			if err != nil {
-				return nil, nil, fmt.Errorf("unable to read form value `%s`: %s", formName, err)
+				return nil, nil, fmt.Errorf("read form value `%s`: %s", formName, err)
 			}
 
 			values[formName] = string(value)
@@ -89,7 +89,7 @@ func (a App) handleMultipart(w http.ResponseWriter, r *http.Request, request pro
 
 	values, file, err := parseMultipart(r)
 	if err != nil {
-		a.error(w, r, request, model.WrapInternal(fmt.Errorf("unable to parse multipart request: %s", err)))
+		a.error(w, r, request, model.WrapInternal(fmt.Errorf("parse multipart request: %s", err)))
 		return
 	}
 
@@ -102,7 +102,7 @@ func (a App) handleMultipart(w http.ResponseWriter, r *http.Request, request pro
 		if chunkNumber := r.Header.Get("X-Chunk-Number"); len(chunkNumber) != 0 {
 			chunkNumberValue, err := strconv.ParseUint(chunkNumber, 10, 64)
 			if err != nil {
-				a.error(w, r, request, model.WrapInvalid(fmt.Errorf("unable to parse chunk number: %s", err)))
+				a.error(w, r, request, model.WrapInvalid(fmt.Errorf("parse chunk number: %s", err)))
 			}
 
 			chunkNumber = fmt.Sprintf("%10d", chunkNumberValue)

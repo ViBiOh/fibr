@@ -15,6 +15,7 @@ import (
 //go:generate mockgen -destination ../mocks/storage.go -mock_names Storage=Storage -package mocks github.com/ViBiOh/absto/pkg/model Storage
 
 // Crud for user to interfact with filesystem
+//
 //go:generate mockgen -destination ../mocks/crud.go -mock_names Crud=Crud -package mocks github.com/ViBiOh/fibr/pkg/provider Crud
 type Crud interface {
 	Get(http.ResponseWriter, *http.Request, Request) (renderer.Page, error)
@@ -25,6 +26,7 @@ type Crud interface {
 }
 
 // Auth manager user authentication/authorization
+//
 //go:generate mockgen -destination ../mocks/auth.go -mock_names Auth=Auth -package mocks github.com/ViBiOh/fibr/pkg/provider Auth
 type Auth interface {
 	IsAuthenticated(*http.Request) (ident.Provider, model.User, error)
@@ -32,6 +34,7 @@ type Auth interface {
 }
 
 // ShareManager description
+//
 //go:generate mockgen -destination ../mocks/share.go -mock_names ShareManager=Share -package mocks github.com/ViBiOh/fibr/pkg/provider ShareManager
 type ShareManager interface {
 	Get(string) Share
@@ -41,6 +44,7 @@ type ShareManager interface {
 }
 
 // WebhookManager description
+//
 //go:generate mockgen -destination ../mocks/webhook.go -mock_names WebhookManager=Webhook -package mocks github.com/ViBiOh/fibr/pkg/provider WebhookManager
 type WebhookManager interface {
 	Create(context.Context, string, bool, WebhookKind, string, []EventType) (string, error)
@@ -49,6 +53,7 @@ type WebhookManager interface {
 }
 
 // ExifManager description
+//
 //go:generate mockgen -destination ../mocks/exif.go -mock_names ExifManager=Exif -package mocks github.com/ViBiOh/fibr/pkg/provider ExifManager
 type ExifManager interface {
 	ListDir(ctx context.Context, item absto.Item) ([]absto.Item, error)

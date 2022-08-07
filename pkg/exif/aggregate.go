@@ -35,7 +35,7 @@ func (a App) GetExifFor(ctx context.Context, item absto.Item) (exas.Exif, error)
 	return cache.Retrieve(ctx, a.redisClient, redisKey(item.ID), func(ctx context.Context) (exas.Exif, error) {
 		exif, err := a.loadExif(ctx, item)
 		if err != nil && !absto.IsNotExist(err) {
-			return exif, fmt.Errorf("unable to load exif: %w", err)
+			return exif, fmt.Errorf("load exif: %w", err)
 		}
 
 		return exif, nil
@@ -54,7 +54,7 @@ func (a App) GetAggregateFor(ctx context.Context, item absto.Item) (provider.Agg
 	return cache.Retrieve(ctx, a.redisClient, redisKey(item.ID), func(ctx context.Context) (provider.Aggregate, error) {
 		aggregate, err := a.loadAggregate(ctx, item)
 		if err != nil && !absto.IsNotExist(err) {
-			return aggregate, fmt.Errorf("unable to load aggregate: %w", err)
+			return aggregate, fmt.Errorf("load aggregate: %w", err)
 		}
 
 		return aggregate, nil
@@ -75,14 +75,14 @@ func (a App) aggregate(ctx context.Context, item absto.Item) error {
 	if !item.IsDir {
 		file, err := a.getDirOf(ctx, item)
 		if err != nil {
-			return fmt.Errorf("unable to get directory: %w", err)
+			return fmt.Errorf("get directory: %w", err)
 		}
 
 		item = file
 	}
 
 	if err := a.computeAndSaveAggregate(ctx, item); err != nil {
-		return fmt.Errorf("unable to compute aggregate: %w", err)
+		return fmt.Errorf("compute aggregate: %w", err)
 	}
 
 	return nil
@@ -116,7 +116,7 @@ func (a App) computeAndSaveAggregate(ctx context.Context, dir absto.Item) error 
 		return nil
 	})
 	if err != nil {
-		return fmt.Errorf("unable to aggregate: %w", err)
+		return fmt.Errorf("aggregate: %w", err)
 	}
 
 	if len(directoryAggregate) == 0 {

@@ -80,12 +80,12 @@ func (et *EventType) UnmarshalJSON(b []byte) error {
 	var strValue string
 	err := json.Unmarshal(b, &strValue)
 	if err != nil {
-		return fmt.Errorf("unable to unmarshal event type: %s", err)
+		return fmt.Errorf("unmarshal event type: %s", err)
 	}
 
 	value, err := ParseEventType(strValue)
 	if err != nil {
-		return fmt.Errorf("unable to parse event type: %s", err)
+		return fmt.Errorf("parse event type: %s", err)
 	}
 
 	*et = value
@@ -289,7 +289,7 @@ func NewEventBus(size uint, prometheusRegisterer prometheus.Registerer, tracerAp
 		}, []string{"type", "state"})
 
 		if err := prometheusRegisterer.Register(counter); err != nil {
-			return EventBus{}, fmt.Errorf("unable to register event metric: %s", err)
+			return EventBus{}, fmt.Errorf("register event metric: %s", err)
 		}
 	}
 
@@ -349,7 +349,7 @@ func (e EventBus) Start(done <-chan struct{}, storageApp absto.Storage, renamers
 // RenameDirectory for metadata
 func RenameDirectory(ctx context.Context, storageApp absto.Storage, renamers []Renamer, old, new absto.Item) {
 	if err := storageApp.CreateDir(ctx, MetadataDirectory(new)); err != nil {
-		logger.Error("unable to create new metadata directory: %s", err)
+		logger.Error("create new metadata directory: %s", err)
 		return
 	}
 
@@ -365,17 +365,17 @@ func RenameDirectory(ctx context.Context, storageApp absto.Storage, renamers []R
 
 		for _, renamer := range renamers {
 			if err := renamer(ctx, oldItem, item); err != nil {
-				logger.Error("unable to rename metadata from `%s` to `%s`: %s", oldItem.Pathname, item.Pathname, err)
+				logger.Error("rename metadata from `%s` to `%s`: %s", oldItem.Pathname, item.Pathname, err)
 			}
 		}
 
 		return nil
 	}); err != nil {
-		logger.Error("unable to walk new metadata directory: %s", err)
+		logger.Error("walk new metadata directory: %s", err)
 	}
 
 	if err := storageApp.Remove(ctx, MetadataDirectory(old)); err != nil {
-		logger.Error("unable to delete old metadata directory: %s", err)
+		logger.Error("delete old metadata directory: %s", err)
 		return
 	}
 }

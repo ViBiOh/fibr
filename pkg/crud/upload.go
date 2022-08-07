@@ -21,13 +21,13 @@ func (a App) saveUploadedFile(ctx context.Context, request provider.Request, inp
 
 	fileName, filePath, err = getUploadNameAndPath(request, inputName, file)
 	if err != nil {
-		return "", fmt.Errorf("unable to get upload name: %s", err)
+		return "", fmt.Errorf("get upload name: %s", err)
 	}
 
 	var size int64
 	size, err = getUploadSize(rawSize)
 	if err != nil {
-		return "", fmt.Errorf("unable to get upload size: %s", err)
+		return "", fmt.Errorf("get upload size: %s", err)
 	}
 
 	err = provider.WriteToStorage(ctx, a.storageApp, filePath, size, file)
@@ -35,7 +35,7 @@ func (a App) saveUploadedFile(ctx context.Context, request provider.Request, inp
 	if err == nil {
 		go func() {
 			if info, infoErr := a.storageApp.Info(context.Background(), filePath); infoErr != nil {
-				logger.Error("unable to get info for upload event: %s", infoErr)
+				logger.Error("get info for upload event: %s", infoErr)
 			} else {
 				a.notify(provider.NewUploadEvent(request, info, a.bestSharePath(filePath), a.rendererApp))
 			}
@@ -70,7 +70,7 @@ func getUploadSize(rawSize string) (int64, error) {
 
 	if len(rawSize) > 0 {
 		if size, err := strconv.ParseInt(rawSize, 10, 64); err != nil {
-			return size, fmt.Errorf("unable to parse filesize: %s", err)
+			return size, fmt.Errorf("parse filesize: %s", err)
 		}
 	}
 

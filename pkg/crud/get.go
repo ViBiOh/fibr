@@ -87,7 +87,7 @@ func (a App) serveFile(w http.ResponseWriter, r *http.Request, item absto.Item) 
 
 	file, err := a.storageApp.ReadFrom(r.Context(), item.Pathname)
 	if err != nil {
-		return fmt.Errorf("unable to get reader for `%s`: %w", item.Pathname, err)
+		return fmt.Errorf("get reader for `%s`: %w", item.Pathname, err)
 	}
 
 	defer provider.LogClose(file, "crud.serveFile", item.Pathname)
@@ -151,7 +151,7 @@ func (a App) listFiles(r *http.Request, request provider.Request, item absto.Ite
 	if request.IsStory() {
 		thumbnails, err := a.thumbnailApp.ListDirLarge(ctx, item)
 		if err != nil {
-			logger.WithField("item", item.Pathname).Error("unable to list large thumbnails: %s", err)
+			logger.WithField("item", item.Pathname).Error("list large thumbnails: %s", err)
 		}
 
 		storyItems := items[:0]
@@ -181,7 +181,7 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 	if query.GetBool(r, "search") {
 		hash = a.exifHash(ctx, items)
 	} else if exifs, err := a.exifApp.ListDir(ctx, item); err != nil {
-		logger.WithField("item", item.Pathname).Error("unable to list exifs: %s", err)
+		logger.WithField("item", item.Pathname).Error("list exifs: %s", err)
 	} else {
 		hash = sha.New(exifs)
 	}
@@ -221,7 +221,7 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 
 		exif, err := a.exifApp.GetExifFor(ctx, item)
 		if err != nil {
-			logger.WithField("item", item.Pathname).Error("unable to get exif: %s", err)
+			logger.WithField("item", item.Pathname).Error("get exif: %s", err)
 			continue
 		}
 
@@ -242,7 +242,7 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 		feature.Properties["date"] = exif.Date.Format(time.RFC850)
 
 		if err := encoder.Encode(feature); err != nil {
-			logger.WithField("item", item.Pathname).Error("unable to encode feature: %s", err)
+			logger.WithField("item", item.Pathname).Error("encode feature: %s", err)
 		}
 	}
 

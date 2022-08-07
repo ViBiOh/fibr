@@ -96,7 +96,7 @@ func New(config Config, storage absto.Storage, prometheusRegisterer prometheus.R
 		amqpExchange = strings.TrimSpace(*config.amqpExchange)
 
 		if err := amqpClient.Publisher(amqpExchange, "direct", nil); err != nil {
-			return App{}, fmt.Errorf("unable to configure amqp: %s", err)
+			return App{}, fmt.Errorf("configure amqp: %s", err)
 		}
 	}
 
@@ -208,7 +208,7 @@ func (a App) List(w http.ResponseWriter, r *http.Request, request provider.Reque
 	if query.GetBool(r, "search") {
 		hash = a.thumbnailHash(ctx, items)
 	} else if thumbnails, err := a.ListDir(ctx, item); err != nil {
-		logger.WithField("item", item.Pathname).Error("unable to list thumbnails: %s", err)
+		logger.WithField("item", item.Pathname).Error("list thumbnails: %s", err)
 	} else {
 		hash = sha.New(thumbnails)
 	}
@@ -258,7 +258,7 @@ func (a App) encodeContent(ctx context.Context, w io.Writer, isDone func() bool,
 	reader, err := a.storageApp.ReadFrom(ctx, a.PathForScale(item, SmallSize))
 	if err != nil {
 		if !absto.IsNotExist(err) {
-			logEncodeContentError(item).Error("unable to open: %s", err)
+			logEncodeContentError(item).Error("open: %s", err)
 		}
 
 		return
@@ -275,12 +275,12 @@ func (a App) encodeContent(ctx context.Context, w io.Writer, isDone func() bool,
 
 	if _, err = io.CopyBuffer(encoder, reader, buffer.Bytes()); err != nil {
 		if !absto.IsNotExist(a.storageApp.ConvertError(err)) {
-			logEncodeContentError(item).Error("unable to copy: %s", err)
+			logEncodeContentError(item).Error("copy: %s", err)
 		}
 	}
 
 	if err := encoder.Close(); err != nil {
-		logger.Error("unable to close thumbnail encoder: %s", err)
+		logger.Error("close thumbnail encoder: %s", err)
 	}
 
 	provider.DoneWriter(isDone, w, "\n")

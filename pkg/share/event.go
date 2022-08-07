@@ -15,11 +15,11 @@ func (a *App) EventConsumer(ctx context.Context, e provider.Event) {
 	switch e.Type {
 	case provider.RenameEvent:
 		if err := a.renameItem(ctx, e.Item, *e.New); err != nil {
-			logger.Error("unable to rename share: %s", err)
+			logger.Error("rename share: %s", err)
 		}
 	case provider.DeleteEvent:
 		if err := a.deleteItem(ctx, e.Item); err != nil {
-			logger.Error("unable to rename share: %s", err)
+			logger.Error("rename share: %s", err)
 		}
 	}
 }
@@ -33,7 +33,7 @@ func (a *App) renameItem(ctx context.Context, old, new absto.Item) error {
 
 				if a.amqpClient != nil {
 					if err := a.amqpClient.PublishJSON(share, a.amqpExchange, a.amqpRoutingKey); err != nil {
-						return fmt.Errorf("unable to publish share rename: %s", err)
+						return fmt.Errorf("publish share rename: %s", err)
 					}
 				}
 			}
@@ -50,7 +50,7 @@ func (a *App) deleteItem(ctx context.Context, item absto.Item) error {
 		for id, share := range a.shares {
 			if strings.HasPrefix(share.Path, item.Pathname) {
 				if err := a.delete(ctx, id); err != nil {
-					return fmt.Errorf("unable to delete share `%s`: %s", id, err)
+					return fmt.Errorf("delete share `%s`: %s", id, err)
 				}
 			}
 		}

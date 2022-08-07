@@ -49,7 +49,7 @@ func (a *App) Create(ctx context.Context, pathname string, recursive bool, kind 
 	return id, a.Exclusive(ctx, a.amqpExclusiveRoutingKey, semaphoreDuration, func(ctx context.Context) (err error) {
 		id, err = a.generateID()
 		if err != nil {
-			return fmt.Errorf("unable to generate id: %s", err)
+			return fmt.Errorf("generate id: %s", err)
 		}
 
 		webhook := provider.Webhook{
@@ -64,12 +64,12 @@ func (a *App) Create(ctx context.Context, pathname string, recursive bool, kind 
 		a.webhooks[id] = webhook
 
 		if err = provider.SaveJSON(ctx, a.storageApp, webhookFilename, a.webhooks); err != nil {
-			return fmt.Errorf("unable to save webhooks: %s", err)
+			return fmt.Errorf("save webhooks: %s", err)
 		}
 
 		if a.amqpClient != nil {
 			if err = a.amqpClient.PublishJSON(webhook, a.amqpExchange, a.amqpRoutingKey); err != nil {
-				return fmt.Errorf("unable to publish webhook creation: %s", err)
+				return fmt.Errorf("publish webhook creation: %s", err)
 			}
 		}
 
@@ -88,12 +88,12 @@ func (a *App) delete(ctx context.Context, id string) error {
 	delete(a.webhooks, id)
 
 	if err := provider.SaveJSON(ctx, a.storageApp, webhookFilename, a.webhooks); err != nil {
-		return fmt.Errorf("unable to save webhooks: %s", err)
+		return fmt.Errorf("save webhooks: %s", err)
 	}
 
 	if a.amqpClient != nil {
 		if err := a.amqpClient.PublishJSON(provider.Webhook{ID: id}, a.amqpExchange, a.amqpRoutingKey); err != nil {
-			return fmt.Errorf("unable to publish webhook deletion: %s", err)
+			return fmt.Errorf("publish webhook deletion: %s", err)
 		}
 	}
 

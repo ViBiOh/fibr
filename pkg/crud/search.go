@@ -233,7 +233,7 @@ func parseDate(raw string) (time.Time, error) {
 
 	value, err := time.Parse(isoDateLayout, raw)
 	if err != nil {
-		return time.Time{}, fmt.Errorf("unable to parse date: %s", err)
+		return time.Time{}, fmt.Errorf("parse date: %s", err)
 	}
 
 	return value, nil

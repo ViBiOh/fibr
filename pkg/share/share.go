@@ -63,12 +63,12 @@ func New(config Config, storageApp absto.Storage, amqpClient *amqp.Client) (*App
 		amqpExclusiveRoutingKey = strings.TrimSpace(*config.amqpExclusiveRoutingKey)
 
 		if err := amqpClient.Publisher(amqpExchange, "fanout", nil); err != nil {
-			return &App{}, fmt.Errorf("unable to configure amqp: %s", err)
+			return &App{}, fmt.Errorf("configure amqp: %s", err)
 		}
 
 		amqpExchange = strings.TrimSpace(*config.amqpExchange)
 		if err := amqpClient.SetupExclusive(amqpExclusiveRoutingKey); err != nil {
-			return &App{}, fmt.Errorf("unable to setup amqp exclusive: %s", err)
+			return &App{}, fmt.Errorf("setup amqp exclusive: %s", err)
 		}
 	}
 
@@ -90,7 +90,7 @@ func (a *App) Exclusive(ctx context.Context, name string, duration time.Duration
 		defer a.Unlock()
 
 		if err := a.refresh(ctx); err != nil {
-			return fmt.Errorf("unable to refresh shares: %s", err)
+			return fmt.Errorf("refresh shares: %s", err)
 		}
 
 		return action(ctx)
@@ -134,12 +134,12 @@ func (a *App) Get(requestPath string) provider.Share {
 // Start worker
 func (a *App) Start(done <-chan struct{}) {
 	if err := a.loadShares(context.Background()); err != nil {
-		logger.Error("unable to refresh shares: %s", err)
+		logger.Error("refresh shares: %s", err)
 		return
 	}
 
 	cron := cron.New().Each(time.Hour).OnError(func(err error) {
-		logger.Error("unable to purge shares: %s", err)
+		logger.Error("purge shares: %s", err)
 	}).OnSignal(syscall.SIGUSR1)
 
 	if a.amqpClient != nil {
@@ -163,7 +163,7 @@ func (a *App) refresh(ctx context.Context) error {
 		}
 
 		if err := a.storageApp.CreateDir(ctx, provider.MetadataDirectoryName); err != nil {
-			return fmt.Errorf("unable to create dir: %s", err)
+			return fmt.Errorf("create dir: %s", err)
 		}
 
 		return provider.SaveJSON(ctx, a.storageApp, shareFilename, &a.shares)
@@ -182,7 +182,7 @@ func (a *App) purgeExpiredShares() bool {
 
 			if a.amqpClient != nil {
 				if err := a.amqpClient.PublishJSON(provider.Share{ID: id}, a.amqpExchange, a.amqpRoutingKey); err != nil {
-					logger.WithField("fn", "share.purgeExpiredShares").WithField("item", id).Error("unable to publish share purge: %s", err)
+					logger.WithField("fn", "share.purgeExpiredShares").WithField("item", id).Error("publish share purge: %s", err)
 				}
 			}
 

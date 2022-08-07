@@ -52,7 +52,7 @@ func (a *App) Create(ctx context.Context, filepath string, edit, story bool, pas
 		var err error
 		id, err = a.generateID()
 		if err != nil {
-			return fmt.Errorf("unable to generate id: %s", err)
+			return fmt.Errorf("generate id: %s", err)
 		}
 
 		share := provider.Share{
@@ -70,12 +70,12 @@ func (a *App) Create(ctx context.Context, filepath string, edit, story bool, pas
 		a.shares[id] = share
 
 		if err = provider.SaveJSON(ctx, a.storageApp, shareFilename, a.shares); err != nil {
-			return fmt.Errorf("unable to save shares: %s", err)
+			return fmt.Errorf("save shares: %s", err)
 		}
 
 		if a.amqpClient != nil {
 			if err = a.amqpClient.PublishJSON(share, a.amqpExchange, a.amqpRoutingKey); err != nil {
-				return fmt.Errorf("unable to publish share creation: %s", err)
+				return fmt.Errorf("publish share creation: %s", err)
 			}
 		}
 
@@ -98,12 +98,12 @@ func (a *App) delete(ctx context.Context, id string) error {
 	delete(a.shares, id)
 
 	if err := provider.SaveJSON(ctx, a.storageApp, shareFilename, a.shares); err != nil {
-		return fmt.Errorf("unable to save shares: %s", err)
+		return fmt.Errorf("save shares: %s", err)
 	}
 
 	if a.amqpClient != nil {
 		if err := a.amqpClient.PublishJSON(provider.Share{ID: id}, a.amqpExchange, a.amqpRoutingKey); err != nil {
-			return fmt.Errorf("unable to publish share deletion: %s", err)
+			return fmt.Errorf("publish share deletion: %s", err)
 		}
 	}
 

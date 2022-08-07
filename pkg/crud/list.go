@@ -28,7 +28,7 @@ func (a App) list(ctx context.Context, request provider.Request, message rendere
 
 	directoryAggregate, err := a.exifApp.GetAggregateFor(ctx, item)
 	if err != nil && !absto.IsNotExist(err) {
-		logger.WithField("fn", "crud.List").WithField("item", request.Path).Error("unable to get aggregate: %s", err)
+		logger.WithField("fn", "crud.List").WithField("item", request.Path).Error("get aggregate: %s", err)
 	}
 
 	items := make([]provider.RenderItem, len(files))
@@ -39,7 +39,7 @@ func (a App) list(ctx context.Context, request provider.Request, message rendere
 		var err error
 		thumbnails, err = a.thumbnailApp.ListDir(ctx, item)
 		if err != nil {
-			logger.WithField("item", item.Pathname).Error("unable to list thumbnail: %s", err)
+			logger.WithField("item", item.Pathname).Error("list thumbnail: %s", err)
 			return
 		}
 	})
@@ -51,7 +51,7 @@ func (a App) list(ctx context.Context, request provider.Request, message rendere
 		wg.Go(func() {
 			aggregate, err := a.exifApp.GetAggregateFor(ctx, item)
 			if err != nil {
-				logger.WithField("fn", "crud.List").WithField("item", item.Pathname).Error("unable to read: %s", err)
+				logger.WithField("fn", "crud.List").WithField("item", item.Pathname).Error("read: %s", err)
 			}
 
 			renderItem := provider.StorageToRender(item, request)
@@ -116,7 +116,7 @@ func (a App) Download(w http.ResponseWriter, r *http.Request, request provider.R
 	zipWriter := zip.NewWriter(w)
 	defer func() {
 		if closeErr := zipWriter.Close(); closeErr != nil {
-			logger.Error("unable to close zip: %s", closeErr)
+			logger.Error("close zip: %s", closeErr)
 		}
 	}()
 
@@ -153,7 +153,7 @@ func (a App) zipItems(ctx context.Context, done <-chan struct{}, request provide
 			var nestedItems []absto.Item
 			nestedItems, err = a.storageApp.List(ctx, request.SubPath(relativeURL))
 			if err != nil {
-				err = fmt.Errorf("unable to zip nested folder `%s`: %s", relativeURL, err)
+				err = fmt.Errorf("zip nested folder `%s`: %s", relativeURL, err)
 				return
 			}
 
@@ -185,13 +185,13 @@ func (a App) addFileToZip(ctx context.Context, zipWriter *zip.Writer, item absto
 	var writer io.Writer
 	writer, err = zipWriter.CreateHeader(header)
 	if err != nil {
-		return fmt.Errorf("unable to create zip header: %s", err)
+		return fmt.Errorf("create zip header: %s", err)
 	}
 
 	var reader io.ReadCloser
 	reader, err = a.storageApp.ReadFrom(ctx, item.Pathname)
 	if err != nil {
-		return fmt.Errorf("unable to read: %w", err)
+		return fmt.Errorf("read: %w", err)
 	}
 
 	defer func() {

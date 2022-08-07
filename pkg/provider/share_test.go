@@ -12,7 +12,7 @@ import (
 func TestCheckPassword(t *testing.T) {
 	password, err := bcrypt.GenerateFromPassword([]byte("test"), bcrypt.DefaultCost)
 	if err != nil {
-		t.Errorf("unable to create bcrypted password: %s", err)
+		t.Errorf("create bcrypted password: %s", err)
 	}
 
 	cases := map[string]struct {

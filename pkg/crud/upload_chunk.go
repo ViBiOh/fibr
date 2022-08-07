@@ -41,7 +41,7 @@ func (a App) uploadChunk(w http.ResponseWriter, r *http.Request, request provide
 
 	defer func() {
 		if closeErr := writer.Close(); closeErr != nil {
-			logger.Error("unable to close chunk writer: %s", closeErr)
+			logger.Error("close chunk writer: %s", closeErr)
 		}
 
 		if err == nil {
@@ -49,7 +49,7 @@ func (a App) uploadChunk(w http.ResponseWriter, r *http.Request, request provide
 		}
 
 		if removeErr := os.Remove(tempFile); removeErr != nil {
-			logger.Error("unable to remove chunk file `%s`: %s", tempFile, removeErr)
+			logger.Error("remove chunk file `%s`: %s", tempFile, removeErr)
 		}
 	}()
 
@@ -100,7 +100,7 @@ func (a App) mergeChunk(w http.ResponseWriter, r *http.Request, request provider
 	if err == nil {
 		go func() {
 			if info, infoErr := a.storageApp.Info(context.Background(), filePath); infoErr != nil {
-				logger.Error("unable to get info for upload event: %s", infoErr)
+				logger.Error("get info for upload event: %s", infoErr)
 			} else {
 				a.notify(provider.NewUploadEvent(request, info, a.bestSharePath(filePath), a.rendererApp))
 			}
@@ -108,7 +108,7 @@ func (a App) mergeChunk(w http.ResponseWriter, r *http.Request, request provider
 	}
 
 	if err = os.RemoveAll(tempFolder); err != nil {
-		logger.Error("unable to delete chunk folder `%s`: %s", tempFolder, err)
+		logger.Error("delete chunk folder `%s`: %s", tempFolder, err)
 	}
 
 	a.postUpload(ctx, w, r, request, fileName, values)
@@ -117,12 +117,12 @@ func (a App) mergeChunk(w http.ResponseWriter, r *http.Request, request provider
 func (a App) mergeChunkFiles(directory, destination string) error {
 	writer, err := os.OpenFile(destination, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0o600)
 	if err != nil {
-		return fmt.Errorf("unable to open destination file `%s`: %s", destination, err)
+		return fmt.Errorf("open destination file `%s`: %s", destination, err)
 	}
 
 	defer func() {
 		if closeErr := writer.Close(); closeErr != nil {
-			logger.Error("unable to close chunk's destination: %s", closeErr)
+			logger.Error("close chunk's destination: %s", closeErr)
 		}
 
 		if err == nil {
@@ -130,12 +130,12 @@ func (a App) mergeChunkFiles(directory, destination string) error {
 		}
 
 		if removeErr := os.Remove(destination); removeErr != nil {
-			logger.Error("unable to remove chunk's destination `%s`: %s", destination, removeErr)
+			logger.Error("remove chunk's destination `%s`: %s", destination, removeErr)
 		}
 	}()
 
 	if err = browseChunkFiles(directory, destination, writer); err != nil {
-		return fmt.Errorf("unable to walk chunks in `%s`: %s", directory, err)
+		return fmt.Errorf("walk chunks in `%s`: %s", directory, err)
 	}
 
 	return nil
@@ -153,17 +153,17 @@ func browseChunkFiles(directory, destination string, writer io.Writer) error {
 
 		reader, err := os.Open(path)
 		if err != nil {
-			return fmt.Errorf("unable to open chunk `%s`: %s", path, err)
+			return fmt.Errorf("open chunk `%s`: %s", path, err)
 		}
 
 		defer func() {
 			if closeErr := reader.Close(); closeErr != nil {
-				logger.Error("unable to close chunk `%s`: %s", path, err)
+				logger.Error("close chunk `%s`: %s", path, err)
 			}
 		}()
 
 		if _, err = io.Copy(writer, reader); err != nil {
-			return fmt.Errorf("unable to copy chunk `%s`: %s", path, err)
+			return fmt.Errorf("copy chunk `%s`: %s", path, err)
 		}
 
 		return nil

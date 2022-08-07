@@ -23,11 +23,11 @@ func (a App) HasStream(ctx context.Context, item absto.Item) bool {
 func (a App) handleVithResponse(err error, body io.ReadCloser) error {
 	if err != nil {
 		a.increaseMetric("stream", "error")
-		return fmt.Errorf("unable to send request: %s", err)
+		return fmt.Errorf("send request: %s", err)
 	}
 
 	if err := request.DiscardBody(body); err != nil {
-		return fmt.Errorf("unable to discard body: %s", err)
+		return fmt.Errorf("discard body: %s", err)
 	}
 
 	return nil
@@ -43,7 +43,7 @@ func (a App) shouldGenerateStream(ctx context.Context, item absto.Item) (bool, e
 	resp, err := a.vithRequest.Method(http.MethodHead).Path(fmt.Sprintf("%s?type=%s", item.Pathname, typeOfItem(item))).Send(ctx, nil)
 	if err != nil {
 		a.increaseMetric("stream", "error")
-		return false, fmt.Errorf("unable to retrieve metadata: %s", err)
+		return false, fmt.Errorf("retrieve metadata: %s", err)
 	}
 
 	rawBitrate := resp.Header.Get("X-Vith-Bitrate")
@@ -54,11 +54,11 @@ func (a App) shouldGenerateStream(ctx context.Context, item absto.Item) (bool, e
 	bitrate, err := strconv.ParseUint(rawBitrate, 10, 64)
 	if err != nil {
 		a.increaseMetric("stream", "error")
-		return false, fmt.Errorf("unable to parse bitrate: %s", err)
+		return false, fmt.Errorf("parse bitrate: %s", err)
 	}
 
 	if err := request.DiscardBody(resp.Body); err != nil {
-		return false, fmt.Errorf("unable to discard body: %s", err)
+		return false, fmt.Errorf("discard body: %s", err)
 	}
 
 	logger.WithField("item", item.Pathname).Debug("Bitrate is %s", bitrate)

@@ -77,7 +77,7 @@ func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheu
 		amqpExchange = strings.TrimSpace(*config.amqpExchange)
 
 		if err := amqpClient.Publisher(amqpExchange, "direct", nil); err != nil {
-			return App{}, fmt.Errorf("unable to configure amqp: %s", err)
+			return App{}, fmt.Errorf("configure amqp: %s", err)
 		}
 	}
 
@@ -123,13 +123,13 @@ func (a App) enabled() bool {
 func (a App) extractAndSaveExif(ctx context.Context, item absto.Item) (exif exas.Exif, err error) {
 	exif, err = a.extractExif(ctx, item)
 	if err != nil {
-		err = fmt.Errorf("unable to extract exif: %s", err)
+		err = fmt.Errorf("extract exif: %s", err)
 		return
 	}
 
 	previousExif, err := a.loadExif(ctx, item)
 	if err != nil && !absto.IsNotExist(err) {
-		logger.WithField("item", item.Pathname).Error("unable to load exif: %s", err)
+		logger.WithField("item", item.Pathname).Error("load exif: %s", err)
 	}
 
 	exif.Description = previousExif.Description
@@ -139,7 +139,7 @@ func (a App) extractAndSaveExif(ctx context.Context, item absto.Item) (exif exas
 	}
 
 	if err = a.saveMetadata(ctx, item, exif); err != nil {
-		err = fmt.Errorf("unable to save exif: %s", err)
+		err = fmt.Errorf("save exif: %s", err)
 	}
 
 	return
@@ -158,12 +158,12 @@ func (a App) extractExif(ctx context.Context, item absto.Item) (exif exas.Exif, 
 
 	if err != nil {
 		a.increaseExif("error")
-		err = fmt.Errorf("unable to fetch exif: %s", err)
+		err = fmt.Errorf("fetch exif: %s", err)
 		return
 	}
 
 	if err = httpjson.Read(resp, &exif); err != nil {
-		err = fmt.Errorf("unable to read exif: %s", err)
+		err = fmt.Errorf("read exif: %s", err)
 	}
 
 	return

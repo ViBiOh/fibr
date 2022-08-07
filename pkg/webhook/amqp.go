@@ -13,7 +13,7 @@ func (a *App) AmqpHandler(message amqp.Delivery) error {
 	var webhook provider.Webhook
 
 	if err := json.Unmarshal(message.Body, &webhook); err != nil {
-		return fmt.Errorf("unable to decode: %s", err)
+		return fmt.Errorf("decode: %s", err)
 	}
 
 	a.Lock()

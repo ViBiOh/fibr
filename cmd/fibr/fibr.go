@@ -54,7 +54,7 @@ func newLoginApp(tracerApp tracer.App, basicConfig basicMemory.Config) provider.
 func generateIdentityName() string {
 	raw := make([]byte, 4)
 	if _, err := rand.Read(raw); err != nil {
-		logger.Error("unable to generate identity name: %s", err)
+		logger.Error("generate identity name: %s", err)
 		return "error"
 	}
 

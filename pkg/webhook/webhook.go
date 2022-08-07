@@ -73,12 +73,12 @@ func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheu
 		amqpExclusiveRoutingKey = strings.TrimSpace(*config.amqpExclusiveRoutingKey)
 
 		if err := amqpClient.Publisher(amqpExchange, "fanout", nil); err != nil {
-			return &App{}, fmt.Errorf("unable to configure amqp: %s", err)
+			return &App{}, fmt.Errorf("configure amqp: %s", err)
 		}
 
 		amqpExchange = strings.TrimSpace(*config.amqpExchange)
 		if err := amqpClient.SetupExclusive(amqpExclusiveRoutingKey); err != nil {
-			return &App{}, fmt.Errorf("unable to setup amqp exclusive: %s", err)
+			return &App{}, fmt.Errorf("setup amqp exclusive: %s", err)
 		}
 	}
 
@@ -104,7 +104,7 @@ func (a *App) Exclusive(ctx context.Context, name string, duration time.Duration
 		defer a.Unlock()
 
 		if err := a.loadWebhooks(ctx); err != nil {
-			return fmt.Errorf("unable to refresh webhooks: %s", err)
+			return fmt.Errorf("refresh webhooks: %s", err)
 		}
 
 		return action(ctx)
@@ -135,7 +135,7 @@ func (a *App) Start(_ <-chan struct{}) {
 	defer a.Unlock()
 
 	if err := a.loadWebhooks(context.Background()); err != nil {
-		logger.Error("unable to refresh webhooks: %s", err)
+		logger.Error("refresh webhooks: %s", err)
 		return
 	}
 }
@@ -147,7 +147,7 @@ func (a *App) loadWebhooks(ctx context.Context) error {
 		}
 
 		if err := a.storageApp.CreateDir(ctx, provider.MetadataDirectoryName); err != nil {
-			return fmt.Errorf("unable to create dir: %s", err)
+			return fmt.Errorf("create dir: %s", err)
 		}
 
 		return provider.SaveJSON(ctx, a.storageApp, webhookFilename, &a.webhooks)
