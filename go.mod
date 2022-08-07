@@ -13,8 +13,8 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/prometheus/client_golang v1.12.2
 	github.com/streadway/amqp v1.0.0
-	go.opentelemetry.io/otel v1.8.0
-	go.opentelemetry.io/otel/trace v1.8.0
+	go.opentelemetry.io/otel v1.9.0
+	go.opentelemetry.io/otel/trace v1.9.0
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa
 	golang.org/x/text v0.3.7
 )
