@@ -128,6 +128,15 @@ func (e Event) GetURL() string {
 	return e.URL
 }
 
+func (e Event) BrowserURL() string {
+	return e.GetURL() + "?browser"
+}
+
+func (e Event) StoryURL(id string) string {
+	url := e.GetURL()
+	return fmt.Sprintf("%s/?d=story#%s", url[:strings.LastIndex(url, "/")], id)
+}
+
 // GetName returns the name of the item
 func (e Event) GetName() string {
 	if e.New != nil {

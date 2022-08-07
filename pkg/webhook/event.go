@@ -83,26 +83,25 @@ func (a *App) discordHandle(ctx context.Context, webhook provider.Webhook, event
 		return send(ctx, webhook.ID, request.Post(webhook.URL), discord.NewDataResponse(a.eventText(event)))
 	}
 
-	url := event.GetURL()
 	title := path.Base(path.Dir(event.Item.Pathname))
 	if title == "/" {
 		title = "fibr"
 	}
 
-	var description string
+	var url, description string
 	fields := []discord.Field{discord.NewField("item", event.GetName())}
 
 	switch event.Type {
 	case provider.UploadEvent:
 		description = "💾 A file has been uploaded"
-		url += "?browser"
+		url = event.BrowserURL()
 	case provider.RenameEvent:
 		description = "✏️ An item has been renamed"
 		fields = append(fields, discord.NewField("to", event.GetTo()))
-		url += "?browser"
+		url = event.BrowserURL()
 	case provider.DescriptionEvent:
 		description = "💬 " + event.Metadata["description"]
-		url = fmt.Sprintf("%s/?d=story#%s", url[:strings.LastIndex(url, "/")], event.Item.ID)
+		url = event.StoryURL(event.Item.ID)
 	}
 
 	embed := discord.Embed{
@@ -135,26 +134,25 @@ func (a *App) slackHandle(ctx context.Context, webhook provider.Webhook, event p
 		return send(ctx, webhook.ID, request.Post(webhook.URL), slack.NewResponse(a.eventText(event)))
 	}
 
-	url := event.GetURL()
 	title := path.Base(path.Dir(event.Item.Pathname))
 	if title == "/" {
 		title = "fibr"
 	}
 
-	var description string
+	var url, description string
 	var extraField slack.Text
 
 	switch event.Type {
 	case provider.UploadEvent:
 		description = "💾 A file has been uploaded"
-		url += "?browser"
+		url = event.BrowserURL()
 	case provider.RenameEvent:
 		description = "✏️ An item has been renamed"
 		extraField = slack.NewText(fmt.Sprintf("*to*\n%s", event.GetTo()))
-		url += "?browser"
+		url = event.BrowserURL()
 	case provider.DescriptionEvent:
 		description = "💬 " + event.Metadata["description"]
-		url = fmt.Sprintf("%s/?d=story#%s", url[:strings.LastIndex(url, "/")], event.Item.ID)
+		url = event.StoryURL(event.Item.ID)
 	}
 
 	section := slack.NewSection(slack.NewText(description)).AddField(slack.NewText(fmt.Sprintf("*item*\n%s", event.GetName())))

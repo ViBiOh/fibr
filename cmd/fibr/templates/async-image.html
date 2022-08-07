@@ -82,7 +82,7 @@
      * Async image loading
      */
     async function fetchThumbnail() {
-      fetchURL = document.location.search;
+      let fetchURL = document.location.search;
       if (fetchURL.includes('?')) {
         fetchURL += '&thumbnail';
       } else {
@@ -153,7 +153,5 @@
       },
       false,
     );
-  </script>
-
   </script>
 {{ end }}
