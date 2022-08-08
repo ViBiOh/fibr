@@ -126,7 +126,7 @@ func (a App) computeAndSaveAggregate(ctx context.Context, dir absto.Item) error 
 		return nil
 	}
 
-	return a.saveMetadata(ctx, dir, provider.Aggregate{
+	return a.SaveAggregateFor(ctx, dir, provider.Aggregate{
 		Location: directoryAggregate.value(),
 		Start:    minDate,
 		End:      maxDate,

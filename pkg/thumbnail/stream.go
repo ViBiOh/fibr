@@ -61,7 +61,7 @@ func (a App) shouldGenerateStream(ctx context.Context, item absto.Item) (bool, e
 		return false, fmt.Errorf("discard body: %s", err)
 	}
 
-	logger.WithField("item", item.Pathname).Debug("Bitrate is %s", bitrate)
+	logger.WithField("item", item.Pathname).Debug("Bitrate is %d", bitrate)
 
 	return bitrate >= a.minBitrate, nil
 }

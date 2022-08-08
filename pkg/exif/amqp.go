@@ -20,7 +20,7 @@ func (a App) AmqpHandler(message amqp.Delivery) error {
 	}
 
 	if resp.Exif.IsZero() {
-		logger.Debug("[exif] [handler] %s: no exif", resp.Item.Pathname)
+		logger.WithField("item", resp.Item.Pathname).Debug("no exif")
 		return nil
 	}
 
@@ -33,7 +33,7 @@ func (a App) AmqpHandler(message amqp.Delivery) error {
 
 	resp.Exif.Description = exif.Description
 
-	if err := a.saveMetadata(ctx, resp.Item, resp.Exif); err != nil {
+	if err := a.SaveExifFor(ctx, resp.Item, resp.Exif); err != nil {
 		return fmt.Errorf("save: %s", err)
 	}
 
