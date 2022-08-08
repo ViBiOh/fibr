@@ -25,8 +25,17 @@ func Path(item absto.Item) string {
 }
 
 func (a App) hasMetadata(ctx context.Context, item absto.Item) bool {
-	_, err := a.storageApp.Info(ctx, Path(item))
-	return err == nil
+	if item.IsDir {
+		_, err := a.storageApp.Info(ctx, Path(item))
+		return err == nil
+	}
+
+	data, err := a.loadExif(ctx, item)
+	if err != nil {
+		return false
+	}
+
+	return len(data.Data) != 0
 }
 
 func (a App) loadExif(ctx context.Context, item absto.Item) (exas.Exif, error) {
