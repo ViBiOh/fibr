@@ -26,7 +26,7 @@ help: Makefile
 name:
 	@printf "$(APP_NAME)"
 
-## version: Output last commit sha1
+## version: Output last commit sha
 .PHONY: version
 version:
 	@printf "$(shell git rev-parse --short HEAD)"

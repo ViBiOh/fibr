@@ -42,11 +42,11 @@
     }
 
     /**
-     * Compute the sha1 on input.
+     * Compute the sha on input.
      * @param  {Object}          data Data to hash
-     * @return {Promise<String>}      Promise that will resolve the sha1 string
+     * @return {Promise<String>}      Promise that will resolve the sha string
      */
-    async function sha1(data) {
+    async function sha(data) {
       const buffer = await crypto.subtle.digest(
         'SHA-256',
         new TextEncoder('utf-8').encode(data),
@@ -60,7 +60,7 @@
      * @return {Promise<String>} Promise that will resolve the message id.
      */
     async function fileMessageId(file) {
-      const hash = await sha1(
+      const hash = await sha(
         JSON.stringify({
           name: file.name,
           size: file.size,
