@@ -35,7 +35,7 @@ func (a App) hasMetadata(ctx context.Context, item absto.Item) bool {
 		return false
 	}
 
-	return len(data.Data) != 0
+	return data.HasData()
 }
 
 func (a App) loadExif(ctx context.Context, item absto.Item) (exas.Exif, error) {

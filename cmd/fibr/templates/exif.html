@@ -1,5 +1,5 @@
 {{ define "exif-modal-btn" }}
-  {{ if not .Exif.IsZero }}
+  {{ if .Exif.HasData }}
     <a href="#exif-modal" class="button button-icon exif-button" title="Show exif">
       <img class="icon exif" src="{{ url "/svg/info" }}?fill=black" alt="Exif">
     </a>
@@ -7,7 +7,7 @@
 {{ end }}
 
 {{ define "exif-modal" }}
-  {{ if not .Exif.IsZero }}
+  {{ if .Exif.HasData }}
     <style type="text/css" nonce="{{ .nonce }}">
       .exif-button {
         bottom: 1rem;

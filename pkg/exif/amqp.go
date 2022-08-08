@@ -20,6 +20,7 @@ func (a App) AmqpHandler(message amqp.Delivery) error {
 	}
 
 	if resp.Exif.IsZero() {
+		logger.Debug("[exif] [handler] %s: no exif", resp.Item.Pathname)
 		return nil
 	}
 

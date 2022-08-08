@@ -63,6 +63,7 @@ func (a App) handleStartEvent(ctx context.Context, event provider.Event) error {
 
 	item := event.Item
 	if !forced && a.hasMetadata(ctx, item) {
+		logger.Debug("[exif] [start] %s: has metadata and not forced", item.Pathname)
 		return nil
 	}
 
@@ -79,6 +80,7 @@ func (a App) handleStartEvent(ctx context.Context, event provider.Event) error {
 
 func (a App) handleUploadEvent(ctx context.Context, item absto.Item, aggregate bool) error {
 	if !a.CanHaveExif(item) {
+		logger.Debug("[exif] [upload] %s: can't have exif", item.Pathname)
 		return nil
 	}
 

@@ -135,6 +135,7 @@ func (a App) extractAndSaveExif(ctx context.Context, item absto.Item) (exif exas
 	exif.Description = previousExif.Description
 
 	if exif.IsZero() {
+		logger.Debug("[exif] [save] %s: no exif", item.Pathname)
 		return
 	}
 
