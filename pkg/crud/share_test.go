@@ -46,7 +46,7 @@ func TestBestSharePath(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			mockShare := mocks.NewShare(ctrl)
+			mockShare := mocks.NewShareManager(ctrl)
 
 			tc.instance.shareApp = mockShare
 

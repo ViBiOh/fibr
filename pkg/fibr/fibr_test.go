@@ -138,7 +138,7 @@ func TestParseShare(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			shareMock := mocks.NewShare(ctrl)
+			shareMock := mocks.NewShareManager(ctrl)
 			tc.instance.shareApp = shareMock
 
 			switch intention {
@@ -363,8 +363,8 @@ func TestParseRequest(t *testing.T) {
 			defer ctrl.Finish()
 
 			crudMock := mocks.NewCrud(ctrl)
-			shareMock := mocks.NewShare(ctrl)
-			webhookMock := mocks.NewWebhook(ctrl)
+			shareMock := mocks.NewShareManager(ctrl)
+			webhookMock := mocks.NewWebhookManager(ctrl)
 			loginMock := mocks.NewAuth(ctrl)
 
 			tc.instance.crudApp = crudMock

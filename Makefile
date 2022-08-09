@@ -69,7 +69,7 @@ style:
 .PHONY: mocks
 mocks:
 	find . -name "mocks" -type d -exec rm -r "{}" \+
-	go generate $(PACKAGES)
+	go generate -run mockgen $(PACKAGES)
 
 ## test: Shortcut to launch all the test tasks (unit, functional and integration).
 .PHONY: test
