@@ -23,17 +23,22 @@ func (a App) stats(w http.ResponseWriter, r *http.Request, request provider.Requ
 		return renderer.NewPage("", http.StatusInternalServerError, nil), err
 	}
 
+	entries := []entry{
+		{Key: "Directories", Value: stats["Directories"]},
+		{Key: "Files", Value: stats["Files"]},
+		{Key: "Size", Value: bytesHuman(stats["Size"])},
+		{Key: "Metadatas", Value: fmt.Sprintf("%s (%.1f%% of Size)", bytesHuman(stats["Metadatas"]), float64(stats["Metadatas"]*100)/float64(stats["Size"]))},
+	}
+
+	if request.Share.IsZero() {
+		entries = append(entries, entry{Key: "Current path", Value: pathname})
+	}
+
 	return renderer.NewPage("stats", http.StatusOK, map[string]any{
 		"Paths":   getPathParts(request),
 		"Request": request,
 		"Message": message,
-		"Stats": []entry{
-			{Key: "Current path", Value: pathname},
-			{Key: "Directories", Value: stats["Directories"]},
-			{Key: "Files", Value: stats["Files"]},
-			{Key: "Size", Value: bytesHuman(stats["Size"])},
-			{Key: "Metadatas", Value: fmt.Sprintf("%s (%.1f%% of Size)", bytesHuman(stats["Metadatas"]), float64(stats["Metadatas"]*100)/float64(stats["Size"]))},
-		},
+		"Stats":   entries,
 	}), nil
 }
 
