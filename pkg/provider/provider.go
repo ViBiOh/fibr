@@ -1,10 +1,6 @@
 package provider
 
 import (
-	"context"
-	"crypto/sha1"
-	"encoding/hex"
-	"path"
 	"path/filepath"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
@@ -47,24 +43,4 @@ func MetadataDirectory(item absto.Item) string {
 	}
 
 	return Dirname(MetadataDirectoryName + pathname)
-}
-
-func itemPreviousID(item absto.Item) string {
-	hasher := sha1.New()
-	_, _ = hasher.Write([]byte(item.Pathname))
-	return hex.EncodeToString(hasher.Sum(nil))
-}
-
-func RenamePreviousID(ctx context.Context, storageApp absto.Storage, item absto.Item, suffix string, renameFunc func(context.Context, absto.Item, absto.Item) error) error {
-	if _, err := storageApp.Info(ctx, path.Join(MetadataDirectory(item), itemPreviousID(item)+suffix)); err != nil {
-		if absto.IsNotExist(err) {
-			return nil
-		}
-		return err
-	}
-
-	previous := item
-	previous.ID = itemPreviousID(previous)
-
-	return renameFunc(ctx, previous, item)
 }

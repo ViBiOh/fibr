@@ -17,9 +17,6 @@ func (a App) EventConsumer(ctx context.Context, e provider.Event) {
 
 	switch e.Type {
 	case provider.StartEvent:
-		if err := provider.RenamePreviousID(ctx, a.storageApp, e.Item, ".webp", a.Rename); err != nil {
-			logger.Error("rename from previous ID: %s", err)
-		}
 		fallthrough
 	case provider.UploadEvent:
 		a.generateItem(ctx, e)
