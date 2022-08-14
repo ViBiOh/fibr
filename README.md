@@ -201,7 +201,7 @@ You can inspire yourself from the [docker-compose.yaml](docker-compose.yaml) fil
 DATA_USER_ID="$(id -u)" DATA_DIR="$(pwd)" BASIC_USERS="1:$(htpasswd -nBb admin password)" docker compose up
 ```
 
-You'll find a Kubernetes exemple in the [`infra/`](infra/) folder, using my [`app chart`](https://github.com/ViBiOh/charts/tree/main/app). My personnal k8s runs on `arm64` and thumbnail converters are not yet ready for this architecture, so I use a mix of `helm` and `docker-compose.yaml`.
+You'll find a Kubernetes exemple in the [`infra/`](infra) folder, using my [`app chart`](https://github.com/ViBiOh/charts/tree/main/app). My personnal k8s runs on `arm64` and thumbnail converters are not yet ready for this architecture, so I use a mix of `helm` and `docker-compose.yaml`.
 
 ## Endpoints
 

@@ -17,7 +17,7 @@ services:
       - vith
       - exas
     user: '${DATA_USER_ID}'
-    restart: on-failure:5
+    restart: on-failure
     read_only: true
 
   vith:
@@ -27,11 +27,11 @@ services:
     volumes:
       - ${DATA_DIR}:/data
     user: '${DATA_USER_ID}'
-    restart: on-failure:5
+    restart: on-failure
 
   image:
     image: h2non/imaginary
-    restart: on-failure:5
+    restart: on-failure
     read_only: true
 
   exas:
@@ -42,4 +42,4 @@ services:
     volumes:
       - ${DATA_DIR}:/data
     user: '${DATA_USER_ID}'
-    restart: on-failure:5
+    restart: on-failure
