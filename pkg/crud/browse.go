@@ -14,7 +14,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
-func (a App) browse(ctx context.Context, w http.ResponseWriter, request provider.Request, item absto.Item, message renderer.Message) (renderer.Page, error) {
+func (a App) browse(ctx context.Context, request provider.Request, item absto.Item, message renderer.Message) (renderer.Page, error) {
 	var (
 		previous provider.RenderItem
 		next     provider.RenderItem

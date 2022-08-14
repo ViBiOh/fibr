@@ -54,7 +54,7 @@ func checkFormName(r *http.Request, formName string) (string, error) {
 	return name, nil
 }
 
-func checkFolderName(name string, request provider.Request) (string, error) {
+func checkFolderName(name string) (string, error) {
 	if len(name) == 0 {
 		return "", model.WrapInvalid(ErrEmptyFolder)
 	}

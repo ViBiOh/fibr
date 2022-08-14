@@ -248,7 +248,7 @@ func HandleClose(closer io.Closer, err error) error {
 // LogClose closes given closer and logging in case of error
 func LogClose(closer io.Closer, fn, item string) {
 	if err := closer.Close(); err != nil {
-		logger.WithField("fn", "fn").WithField("item", item).Error("close: %s", err)
+		logger.WithField("fn", fn).WithField("item", item).Error("close: %s", err)
 	}
 }
 

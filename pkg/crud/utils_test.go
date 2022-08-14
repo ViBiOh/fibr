@@ -151,7 +151,6 @@ func TestCheckFormName(t *testing.T) {
 func TestCheckFolderName(t *testing.T) {
 	type args struct {
 		folderName string
-		request    provider.Request
 	}
 
 	cases := map[string]struct {
@@ -184,7 +183,7 @@ func TestCheckFolderName(t *testing.T) {
 
 	for intention, tc := range cases {
 		t.Run(intention, func(t *testing.T) {
-			got, gotErr := checkFolderName(tc.args.folderName, tc.args.request)
+			got, gotErr := checkFolderName(tc.args.folderName)
 
 			failed := false
 

@@ -12,14 +12,14 @@ import (
 
 func (a *App) generateID() (string, error) {
 	for {
-		uuid, err := uuid.New()
+		id, err := uuid.New()
 		if err != nil {
 			return "", err
 		}
-		id := sha.New(uuid)[:8]
+		idSha := sha.New(id)[:8]
 
-		if _, ok := a.webhooks[id]; !ok {
-			return id, nil
+		if _, ok := a.webhooks[idSha]; !ok {
+			return idSha, nil
 		}
 	}
 }

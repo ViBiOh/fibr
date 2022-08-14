@@ -173,12 +173,12 @@
 
         document.addEventListener('readystatechange', async (event) => {
           if (event.target.readyState === 'complete') {
-            if (document.location.hash == '#map') {
-              renderMap();
+            if (document.location.hash === '#map') {
+              await renderMap();
             } else {
-              window.addEventListener('popstate', () => {
-                if (document.location.hash == '#map') {
-                  renderMap();
+              window.addEventListener('popstate', async () => {
+                if (document.location.hash === '#map') {
+                  await renderMap();
                 }
               });
             }

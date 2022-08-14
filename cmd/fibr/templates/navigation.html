@@ -55,7 +55,7 @@
         const script = document.createElement('script');
         script.type = 'text/javascript';
         script.src = src;
-        script.async = 'true';
+        script.async = true;
         script.onload = resolve.bind(null, true);
         script.onerror = reject.bind(null, true);
 

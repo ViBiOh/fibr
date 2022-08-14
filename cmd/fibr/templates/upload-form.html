@@ -169,7 +169,7 @@
      * Clear upload status for a file
      * @param {Element} container Container of file status
      */
-    async function clearUploadStatus(container) {
+    function clearUploadStatus(container) {
       if (!container) {
         return;
       }
@@ -188,6 +188,7 @@
      * @param {Element} container Container of file status
      * @param {Element} content   Content of message
      * @param {String}  style     Style of status
+     * @param {String}  title     Title of status
      */
     async function setUploadStatus(container, content, style, title) {
       if (!container) {
@@ -239,7 +240,7 @@
         }
       }
 
-      for (var i = 0; i < currentUpload.chunks.length; i++) {
+      for (let i = 0; i < currentUpload.chunks.length; i++) {
         if (currentUpload.chunks[i].done) {
           continue;
         }
@@ -369,8 +370,8 @@
 
     /**
      * Slice FileList from given index.
-     * @param  {String} name Name of the input file element
-     * @param  {Integer} index Index for the slice
+     * @param  {String} name  Name of the input file element
+     * @param  {Number} index Index for the slice
      */
     function sliceFileList(name, index) {
       const input = document.getElementById(name);

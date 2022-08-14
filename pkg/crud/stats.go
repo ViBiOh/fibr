@@ -15,7 +15,7 @@ type entry struct {
 	Key   string
 }
 
-func (a App) stats(w http.ResponseWriter, r *http.Request, request provider.Request, message renderer.Message) (renderer.Page, error) {
+func (a App) stats(r *http.Request, request provider.Request, message renderer.Message) (renderer.Page, error) {
 	pathname := request.Filepath()
 
 	stats, err := a.computeStats(r.Context(), pathname)

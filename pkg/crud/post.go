@@ -75,7 +75,7 @@ func (a App) handleFormURLEncoded(w http.ResponseWriter, r *http.Request, reques
 	case "webhook":
 		a.handlePostWebhook(w, r, request, method)
 	case "description":
-		a.handlePostDescription(w, r, request, method)
+		a.handlePostDescription(w, r, request)
 	default:
 		a.handlePost(w, r, request, method)
 	}
@@ -148,7 +148,7 @@ func (a App) handlePostWebhook(w http.ResponseWriter, r *http.Request, request p
 	}
 }
 
-func (a App) handlePostDescription(w http.ResponseWriter, r *http.Request, request provider.Request, method string) {
+func (a App) handlePostDescription(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !request.CanEdit {
 		a.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
 		return

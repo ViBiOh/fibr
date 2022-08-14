@@ -92,10 +92,10 @@ func (a App) upload(w http.ResponseWriter, r *http.Request, request provider.Req
 		return
 	}
 
-	a.postUpload(ctx, w, r, request, filename, values)
+	a.postUpload(w, r, request, filename)
 }
 
-func (a App) postUpload(ctx context.Context, w http.ResponseWriter, r *http.Request, request provider.Request, fileName string, values map[string]string) {
+func (a App) postUpload(w http.ResponseWriter, r *http.Request, request provider.Request, fileName string) {
 	if r.Header.Get("Accept") == "text/plain" {
 		w.WriteHeader(http.StatusCreated)
 		provider.SafeWrite(w, fileName)

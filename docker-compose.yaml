@@ -9,7 +9,7 @@ services:
       FIBR_EXIF_DIRECT_ACCESS: 'true'
       FIBR_THUMBNAIL_DIRECT_ACCESS: 'true'
     ports:
-      - 1080:1080/tcp
+      - '1080:1080/tcp'
     volumes:
       - ${DATA_DIR}:/data
     depends_on:

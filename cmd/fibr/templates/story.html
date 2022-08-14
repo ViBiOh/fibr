@@ -240,9 +240,9 @@
     window.addEventListener('thumbnail-done', () => {
       const lazyImageObserver = new IntersectionObserver(
         async (entries, observer) => {
-          entries.forEach(async (entry) => {
+          for (const entry of entries) {
             if (!entry.isIntersecting) {
-              return;
+              continue;
             }
 
             const lazyImage = entry.target;
@@ -260,7 +260,7 @@
             }
 
             lazyImageObserver.unobserve(lazyImage);
-          });
+          }
         },
       );
 

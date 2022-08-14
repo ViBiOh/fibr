@@ -95,7 +95,7 @@ func (a App) mergeChunk(w http.ResponseWriter, r *http.Request, request provider
 		return
 	}
 	filePath := request.SubPath(fileName)
-	err = provider.WriteToStorage(r.Context(), a.storageApp, filePath, size, file)
+	err = provider.WriteToStorage(ctx, a.storageApp, filePath, size, file)
 
 	if err == nil {
 		go func() {
@@ -111,7 +111,7 @@ func (a App) mergeChunk(w http.ResponseWriter, r *http.Request, request provider
 		logger.Error("delete chunk folder `%s`: %s", tempFolder, err)
 	}
 
-	a.postUpload(ctx, w, r, request, fileName, values)
+	a.postUpload(w, r, request, fileName)
 }
 
 func (a App) mergeChunkFiles(directory, destination string) error {

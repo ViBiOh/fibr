@@ -30,7 +30,7 @@ const (
 	SmallSize uint64 = 150
 )
 
-var cacheDuration string = fmt.Sprintf("private, max-age=%.0f", time.Duration(time.Minute*5).Seconds())
+var cacheDuration = fmt.Sprintf("private, max-age=%.0f", (time.Minute * 5).Seconds())
 
 // App of package
 type App struct {
@@ -196,7 +196,7 @@ func (a App) Serve(w http.ResponseWriter, r *http.Request, item absto.Item) {
 }
 
 // List return all thumbnails in a base64 form
-func (a App) List(w http.ResponseWriter, r *http.Request, request provider.Request, item absto.Item, items []absto.Item) {
+func (a App) List(w http.ResponseWriter, r *http.Request, item absto.Item, items []absto.Item) {
 	if len(items) == 0 {
 		w.WriteHeader(http.StatusNoContent)
 		return

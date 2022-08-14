@@ -138,15 +138,15 @@ func (a *App) Start(done <-chan struct{}) {
 		return
 	}
 
-	cron := cron.New().Each(time.Hour).OnError(func(err error) {
+	purgeCron := cron.New().Each(time.Hour).OnError(func(err error) {
 		logger.Error("purge shares: %s", err)
 	}).OnSignal(syscall.SIGUSR1)
 
 	if a.amqpClient != nil {
-		cron.Exclusive(a, a.amqpExclusiveRoutingKey, semaphoreDuration)
+		purgeCron.Exclusive(a, a.amqpExclusiveRoutingKey, semaphoreDuration)
 	}
 
-	cron.Start(a.cleanShares, done)
+	purgeCron.Start(a.cleanShares, done)
 }
 
 func (a *App) loadShares(ctx context.Context) error {

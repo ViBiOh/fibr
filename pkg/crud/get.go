@@ -73,7 +73,7 @@ func (a App) handleFile(w http.ResponseWriter, r *http.Request, request provider
 
 		go a.notify(provider.NewAccessEvent(item, r))
 
-		return a.browse(r.Context(), w, request, item, message)
+		return a.browse(r.Context(), request, item, message)
 	}
 
 	return renderer.Page{}, a.serveFile(w, r, item)
@@ -100,7 +100,7 @@ func (a App) serveFile(w http.ResponseWriter, r *http.Request, item absto.Item) 
 
 func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.Request, item absto.Item, message renderer.Message) (renderer.Page, error) {
 	if query.GetBool(r, "stats") {
-		return a.stats(w, r, request, message)
+		return a.stats(r, request, message)
 	}
 
 	items, err := a.listFiles(r, request, item)
@@ -114,7 +114,7 @@ func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.
 	}
 
 	if query.GetBool(r, "thumbnail") {
-		a.thumbnailApp.List(w, r, request, item, items)
+		a.thumbnailApp.List(w, r, item, items)
 		return renderer.Page{}, nil
 	}
 
@@ -219,13 +219,13 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 			return
 		}
 
-		exif, err := a.exifApp.GetExifFor(ctx, item)
+		exifContent, err := a.exifApp.GetExifFor(ctx, item)
 		if err != nil {
 			logger.WithField("item", item.Pathname).Error("get exif: %s", err)
 			continue
 		}
 
-		if !exif.Geocode.HasCoordinates() {
+		if !exifContent.Geocode.HasCoordinates() {
 			continue
 		}
 
@@ -235,11 +235,11 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 			commaNeeded = true
 		}
 
-		point.Coordinates.Latitude = exif.Geocode.Latitude
-		point.Coordinates.Longitude = exif.Geocode.Longitude
+		point.Coordinates.Latitude = exifContent.Geocode.Latitude
+		point.Coordinates.Longitude = exifContent.Geocode.Longitude
 
 		feature.Properties["url"] = request.RelativeURL(item)
-		feature.Properties["date"] = exif.Date.Format(time.RFC850)
+		feature.Properties["date"] = exifContent.Date.Format(time.RFC850)
 
 		if err := encoder.Encode(feature); err != nil {
 			logger.WithField("item", item.Pathname).Error("encode feature: %s", err)

@@ -41,7 +41,7 @@ func (a App) Rename(w http.ResponseWriter, r *http.Request, request provider.Req
 		return
 	}
 
-	newFolder, err := getNewFolder(r, request)
+	newFolder, err := getNewFolder(r)
 	if err != nil {
 		a.error(w, r, request, err)
 		return
@@ -120,8 +120,8 @@ func (a App) Rename(w http.ResponseWriter, r *http.Request, request provider.Req
 	a.rendererApp.Redirect(w, r, fmt.Sprintf("?d=%s", request.Display), renderer.NewSuccessMessage(message))
 }
 
-func getNewFolder(r *http.Request, request provider.Request) (string, error) {
-	newFolder, err := checkFolderName(r.FormValue("newFolder"), request)
+func getNewFolder(r *http.Request) (string, error) {
+	newFolder, err := checkFolderName(r.FormValue("newFolder"))
 	if err != nil {
 		return "", err
 	}

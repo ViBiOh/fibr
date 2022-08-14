@@ -8,65 +8,62 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/query"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
 // FuncMap is the map of function available in templates
-func FuncMap(thumbnailApp thumbnail.App) template.FuncMap {
-	return template.FuncMap{
-		"rebuildPaths": func(parts []string, index int) string {
-			return fmt.Sprintf("/%s/", strings.Join(parts[:index+1], "/"))
-		},
-		"js": func(content string) template.JS {
-			return template.JS(content)
-		},
-		"raw": func(content string) template.URL {
-			return template.URL(content)
-		},
-		"join": func(arr []string) string {
-			return strings.Join(arr, ",")
-		},
-		"splitLines": func(value string) []string {
-			return strings.Split(value, "\n")
-		},
-		"add": func(a, b int) int {
-			return a + b
-		},
-		"contains": func(arr []string, value string) bool {
-			for _, item := range arr {
-				if item == value {
-					return true
-				}
+var FuncMap = template.FuncMap{
+	"rebuildPaths": func(parts []string, index int) string {
+		return fmt.Sprintf("/%s/", strings.Join(parts[:index+1], "/"))
+	},
+	"js": func(content string) template.JS {
+		return template.JS(content)
+	},
+	"raw": func(content string) template.URL {
+		return template.URL(content)
+	},
+	"join": func(arr []string) string {
+		return strings.Join(arr, ",")
+	},
+	"splitLines": func(value string) []string {
+		return strings.Split(value, "\n")
+	},
+	"add": func(a, b int) int {
+		return a + b
+	},
+	"contains": func(arr []string, value string) bool {
+		for _, item := range arr {
+			if item == value {
+				return true
 			}
+		}
 
-			return false
-		},
-		"iconFromExtension": func(file provider.RenderItem) string {
-			switch {
-			case provider.ArchiveExtensions[file.Extension]:
-				return "file-archive"
-			case provider.AudioExtensions[file.Extension]:
-				return "file-audio"
-			case provider.CodeExtensions[file.Extension]:
-				return "file-code"
-			case provider.ExcelExtensions[file.Extension]:
-				return "file-excel"
-			case provider.ImageExtensions[file.Extension]:
-				return "file-image"
-			case provider.PdfExtensions[file.Extension]:
-				return "file-pdf"
-			case provider.VideoExtensions[file.Extension] != "":
-				return "file-video"
-			case provider.WordExtensions[file.Extension]:
-				return "file-word"
-			default:
-				return "file"
-			}
-		},
-	}
+		return false
+	},
+	"iconFromExtension": func(file provider.RenderItem) string {
+		switch {
+		case provider.ArchiveExtensions[file.Extension]:
+			return "file-archive"
+		case provider.AudioExtensions[file.Extension]:
+			return "file-audio"
+		case provider.CodeExtensions[file.Extension]:
+			return "file-code"
+		case provider.ExcelExtensions[file.Extension]:
+			return "file-excel"
+		case provider.ImageExtensions[file.Extension]:
+			return "file-image"
+		case provider.PdfExtensions[file.Extension]:
+			return "file-pdf"
+		case provider.VideoExtensions[file.Extension] != "":
+			return "file-video"
+		case provider.WordExtensions[file.Extension]:
+			return "file-word"
+		default:
+			return "file"
+		}
+	},
 }
 
 // TemplateFunc for rendering GUI

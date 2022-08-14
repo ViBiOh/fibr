@@ -18,10 +18,6 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 )
 
-const (
-	uint32max = (1 << 32) - 1
-)
-
 func (a App) list(ctx context.Context, request provider.Request, message renderer.Message, item absto.Item, files []absto.Item) (renderer.Page, error) {
 	ctx, end := tracer.StartSpan(ctx, a.tracer, "list")
 	defer end()
@@ -170,17 +166,10 @@ func (a App) addFileToZip(ctx context.Context, zipWriter *zip.Writer, item absto
 	header := &zip.FileHeader{
 		Name:               pathname,
 		UncompressedSize64: uint64(item.Size),
-		UncompressedSize:   uint32(item.Size),
 		Modified:           item.Date,
 		Method:             zip.Deflate,
 	}
 	header.SetMode(0o600)
-
-	if header.UncompressedSize64 > uint32max {
-		header.UncompressedSize = uint32max
-	} else {
-		header.UncompressedSize = uint32(header.UncompressedSize64)
-	}
 
 	var writer io.Writer
 	writer, err = zipWriter.CreateHeader(header)
