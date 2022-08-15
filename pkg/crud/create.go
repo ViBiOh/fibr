@@ -11,7 +11,6 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
-// Create creates given path directory to filesystem
 func (a App) Create(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !request.CanEdit {
 		a.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))

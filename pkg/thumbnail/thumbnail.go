@@ -32,7 +32,6 @@ const (
 
 var cacheDuration = fmt.Sprintf("private, max-age=%.0f", (time.Minute * 5).Seconds())
 
-// App of package
 type App struct {
 	storageApp      absto.Storage
 	smallStorageApp absto.Storage
@@ -53,7 +52,6 @@ type App struct {
 	directAccess bool
 }
 
-// Config of package
 type Config struct {
 	vithURL  *string
 	vithUser *string
@@ -70,7 +68,6 @@ type Config struct {
 	largeSize *uint64
 }
 
-// Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
 		vithURL:  flags.String(fs, prefix, "thumbnail", "URL", "Vith Thumbnail URL", "http://vith:1080", nil),
@@ -89,7 +86,6 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 	}
 }
 
-// New creates new App from Config
 func New(config Config, storage absto.Storage, prometheusRegisterer prometheus.Registerer, amqpClient *amqp.Client) (App, error) {
 	var amqpExchange string
 	if amqpClient != nil {

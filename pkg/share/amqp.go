@@ -8,8 +8,7 @@ import (
 	"github.com/streadway/amqp"
 )
 
-// AmqpHandler handle exif message
-func (a *App) AmqpHandler(message amqp.Delivery) error {
+func (a *App) AMQPHandler(message amqp.Delivery) error {
 	var share provider.Share
 
 	if err := json.Unmarshal(message.Body, &share); err != nil {

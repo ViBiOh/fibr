@@ -10,12 +10,10 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
-// CanHaveExif determine if exif can be extracted for given pathname
 func (a App) CanHaveExif(item absto.Item) bool {
 	return provider.ThumbnailExtensions[item.Extension] && (a.maxSize == 0 || item.Size < a.maxSize || a.directAccess)
 }
 
-// Path computes exif path for a a given item
 func Path(item absto.Item) string {
 	if item.IsDir {
 		return provider.MetadataDirectory(item) + "aggregate.json"

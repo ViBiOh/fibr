@@ -10,7 +10,6 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 )
 
-// EventConsumer handle event pushed to the event bus
 func (a App) EventConsumer(ctx context.Context, e provider.Event) {
 	if !a.enabled() {
 		return
@@ -45,7 +44,6 @@ func (a App) EventConsumer(ctx context.Context, e provider.Event) {
 	}
 }
 
-// Rename exif of an item
 func (a App) Rename(ctx context.Context, old, new absto.Item) error {
 	if err := a.storageApp.Rename(ctx, Path(old), Path(new)); err != nil && !absto.IsNotExist(err) {
 		return fmt.Errorf("rename exif: %s", err)

@@ -22,7 +22,6 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-// App of package
 type App struct {
 	tracer          trace.Tracer
 	storageApp      absto.Storage
@@ -42,7 +41,6 @@ type App struct {
 	directAccess bool
 }
 
-// Config of package
 type Config struct {
 	exifURL  *string
 	exifUser *string
@@ -55,7 +53,6 @@ type Config struct {
 	directAccess *bool
 }
 
-// Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
 		exifURL:  flags.String(fs, prefix, "exif", "URL", "Exif Tool URL (exas)", "http://exas:1080", nil),
@@ -70,7 +67,6 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 	}
 }
 
-// New creates new App from Config
 func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheus.Registerer, tracerApp tracer.App, amqpClient *amqpclient.Client, redisClient redis.App) (App, error) {
 	var amqpExchange string
 	if amqpClient != nil {
@@ -103,7 +99,6 @@ func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheu
 	}, nil
 }
 
-// ListDir return all exifs for a given directory
 func (a App) ListDir(ctx context.Context, item absto.Item) ([]absto.Item, error) {
 	if !item.IsDir {
 		return nil, nil

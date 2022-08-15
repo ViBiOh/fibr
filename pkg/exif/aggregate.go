@@ -26,7 +26,6 @@ func redisKey(itemID string) string {
 	return fmt.Sprintf("fibr:%s:exif:%s", cacheVersion, itemID)
 }
 
-// GetExifFor return exif value for a given item
 func (a App) GetExifFor(ctx context.Context, item absto.Item) (exas.Exif, error) {
 	if item.IsDir {
 		return exas.Exif{}, nil
@@ -45,7 +44,6 @@ func (a App) GetExifFor(ctx context.Context, item absto.Item) (exas.Exif, error)
 	}, cacheDuration)
 }
 
-// GetAggregateFor return aggregated value for a given directory
 func (a App) GetAggregateFor(ctx context.Context, item absto.Item) (provider.Aggregate, error) {
 	if !item.IsDir {
 		return provider.Aggregate{}, nil
@@ -64,12 +62,10 @@ func (a App) GetAggregateFor(ctx context.Context, item absto.Item) (provider.Agg
 	}, cacheDuration)
 }
 
-// SaveExifFor saves given exif for given item
 func (a App) SaveExifFor(ctx context.Context, item absto.Item, exif exas.Exif) error {
 	return cache.EvictOnSuccess(ctx, a.redisClient, redisKey(item.ID), a.saveMetadata(ctx, item, exif))
 }
 
-// SaveAggregateFor saves given aggregate for given item
 func (a App) SaveAggregateFor(ctx context.Context, item absto.Item, aggregate provider.Aggregate) error {
 	return cache.EvictOnSuccess(ctx, a.redisClient, redisKey(item.ID), a.saveMetadata(ctx, item, aggregate))
 }

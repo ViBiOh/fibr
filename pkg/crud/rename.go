@@ -28,7 +28,6 @@ func (a App) doRename(ctx context.Context, oldPath, newPath string, oldItem abst
 	return newItem, nil
 }
 
-// Rename rename given path to a new one
 func (a App) Rename(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !request.CanEdit {
 		a.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))

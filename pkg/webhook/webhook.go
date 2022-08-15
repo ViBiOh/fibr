@@ -24,7 +24,6 @@ var (
 	semaphoreDuration = time.Second * 10
 )
 
-// App of package
 type App struct {
 	storageApp absto.Storage
 	webhooks   map[string]provider.Webhook
@@ -43,7 +42,6 @@ type App struct {
 	sync.RWMutex
 }
 
-// Config of package
 type Config struct {
 	hmacSecret *string
 
@@ -52,7 +50,6 @@ type Config struct {
 	amqpExclusiveRoutingKey *string
 }
 
-// Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
 		hmacSecret: flags.String(fs, prefix, "webhook", "Secret", "Secret for HMAC Signature", "", nil),
@@ -63,7 +60,6 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 	}
 }
 
-// New creates new App from Config
 func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheus.Registerer, amqpClient *amqp.Client, rendererApp renderer.App, thumbnailApp thumbnail.App) (*App, error) {
 	var amqpExchange string
 	var amqpExclusiveRoutingKey string

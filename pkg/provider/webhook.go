@@ -66,7 +66,6 @@ func (r *WebhookKind) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// Webhook stores informations about webhook
 type Webhook struct {
 	ID        string      `json:"id"`
 	Pathname  string      `json:"pathname"`
@@ -76,7 +75,6 @@ type Webhook struct {
 	Recursive bool        `json:"recursive"`
 }
 
-// Match determine if storage item match webhook
 func (w Webhook) Match(e Event) bool {
 	if !w.hasType(e.Type) {
 		return false
@@ -85,7 +83,6 @@ func (w Webhook) Match(e Event) bool {
 	return w.matchItem(e.Item) || (e.New != nil && w.matchItem(*e.New))
 }
 
-// Match determine if storage item match webhook
 func (w Webhook) hasType(eventType EventType) bool {
 	for _, t := range w.Types {
 		if t == eventType {
@@ -96,7 +93,6 @@ func (w Webhook) hasType(eventType EventType) bool {
 	return false
 }
 
-// Match determine if storage item match webhook
 func (w Webhook) matchItem(item absto.Item) bool {
 	if len(item.Name) == 0 {
 		return false
@@ -115,7 +111,6 @@ func (w Webhook) matchItem(item absto.Item) bool {
 	return itemDir == w.Pathname
 }
 
-// WebhookByID sort Webhook by ID
 type WebhookByID []Webhook
 
 func (a WebhookByID) Len() int      { return len(a) }

@@ -51,7 +51,6 @@ const (
 
 var eventTypeValues = []string{"upload", "create", "rename", "delete", "start", "access", "description"}
 
-// ParseEventType parse raw string into an EventType
 func ParseEventType(value string) (EventType, error) {
 	for i, eType := range eventTypeValues {
 		if strings.EqualFold(eType, value) {
@@ -62,7 +61,6 @@ func ParseEventType(value string) (EventType, error) {
 	return 0, fmt.Errorf("invalid value `%s` for event type", value)
 }
 
-// String return string values
 func (et EventType) String() string {
 	return eventTypeValues[et]
 }
@@ -75,7 +73,6 @@ func (et EventType) MarshalJSON() ([]byte, error) {
 	return buffer.Bytes(), nil
 }
 
-// UnmarshalJSON unmarshal JSON
 func (et *EventType) UnmarshalJSON(b []byte) error {
 	var strValue string
 	err := json.Unmarshal(b, &strValue)
@@ -92,7 +89,6 @@ func (et *EventType) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// Event describes an event on fibr
 type Event struct {
 	Time         time.Time         `json:"time"`
 	New          *absto.Item       `json:"new,omitempty"`
@@ -110,7 +106,6 @@ func (e Event) IsForcedFor(key string) bool {
 	return force == "all" || force == key
 }
 
-// GetMetadata extracts metadata content
 func (e Event) GetMetadata(key string) string {
 	if e.Metadata == nil {
 		return ""
@@ -119,7 +114,6 @@ func (e Event) GetMetadata(key string) string {
 	return e.Metadata[key]
 }
 
-// GetURL returns the appropriate URL for the event
 func (e Event) GetURL() string {
 	if len(e.ShareableURL) > 0 {
 		return e.ShareableURL
@@ -137,7 +131,6 @@ func (e Event) StoryURL(id string) string {
 	return fmt.Sprintf("%s/?d=story#%s", url[:strings.LastIndex(url, "/")], id)
 }
 
-// GetName returns the name of the item
 func (e Event) GetName() string {
 	if e.New != nil {
 		return e.getFrom()
@@ -166,7 +159,6 @@ func (e Event) getFrom() string {
 	return fromName
 }
 
-// GetTo returns the appropriate to destination
 func (e Event) GetTo() string {
 	if e.New == nil {
 		return ""
@@ -187,7 +179,6 @@ func (e Event) GetTo() string {
 	return newName
 }
 
-// NewUploadEvent creates a new upload event
 func NewUploadEvent(request Request, item absto.Item, shareableURL string, rendererApp renderer.App) Event {
 	return Event{
 		Time:         time.Now(),
@@ -198,7 +189,6 @@ func NewUploadEvent(request Request, item absto.Item, shareableURL string, rende
 	}
 }
 
-// NewRenameEvent creates a new rename event
 func NewRenameEvent(old, new absto.Item, shareableURL string, rendererApp renderer.App) Event {
 	return Event{
 		Time:         time.Now(),
@@ -210,7 +200,6 @@ func NewRenameEvent(old, new absto.Item, shareableURL string, rendererApp render
 	}
 }
 
-// NewDescriptionEvent creates a new description event
 func NewDescriptionEvent(item absto.Item, shareableURL string, description string, rendererApp renderer.App) Event {
 	return Event{
 		Time:         time.Now(),
@@ -224,7 +213,6 @@ func NewDescriptionEvent(item absto.Item, shareableURL string, description strin
 	}
 }
 
-// NewDeleteEvent creates a new delete event
 func NewDeleteEvent(request Request, item absto.Item, rendererApp renderer.App) Event {
 	return Event{
 		Time: time.Now(),
@@ -234,7 +222,6 @@ func NewDeleteEvent(request Request, item absto.Item, rendererApp renderer.App) 
 	}
 }
 
-// NewStartEvent creates a new start event
 func NewStartEvent(item absto.Item) Event {
 	return Event{
 		Time: time.Now(),
@@ -243,7 +230,6 @@ func NewStartEvent(item absto.Item) Event {
 	}
 }
 
-// NewRestartEvent creates a new restart event
 func NewRestartEvent(item absto.Item, subset string) Event {
 	return Event{
 		Time: time.Now(),
@@ -255,7 +241,6 @@ func NewRestartEvent(item absto.Item, subset string) Event {
 	}
 }
 
-// NewAccessEvent creates a new access event
 func NewAccessEvent(item absto.Item, r *http.Request) Event {
 	metadata := make(map[string]string)
 	for key, values := range r.Header {
@@ -286,7 +271,6 @@ type EventBus struct {
 	done    chan struct{}
 }
 
-// NewEventBus create an event exchange channel
 func NewEventBus(size uint, prometheusRegisterer prometheus.Registerer, tracerApp tracer.App) (EventBus, error) {
 	var counter *prometheus.CounterVec
 
@@ -318,7 +302,6 @@ func (e EventBus) increaseMetric(event Event, state string) {
 	e.counter.WithLabelValues(event.Type.String(), state).Inc()
 }
 
-// Push an event in the bus
 func (e EventBus) Push(event Event) error {
 	select {
 	case <-e.done:
@@ -330,7 +313,6 @@ func (e EventBus) Push(event Event) error {
 	}
 }
 
-// Start the distibution of Event
 func (e EventBus) Start(done <-chan struct{}, storageApp absto.Storage, renamers []Renamer, consumers ...EventConsumer) {
 	defer close(e.bus)
 	defer close(e.done)
@@ -355,7 +337,6 @@ func (e EventBus) Start(done <-chan struct{}, storageApp absto.Storage, renamers
 	<-done
 }
 
-// RenameDirectory for metadata
 func RenameDirectory(ctx context.Context, storageApp absto.Storage, renamers []Renamer, old, new absto.Item) {
 	if err := storageApp.CreateDir(ctx, MetadataDirectory(new)); err != nil {
 		logger.Error("create new metadata directory: %s", err)

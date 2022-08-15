@@ -24,20 +24,12 @@ import (
 )
 
 var (
-	// ErrNotAuthorized error returned when user is not authorized
-	ErrNotAuthorized = errors.New("you're not authorized to do this ⛔")
-
-	// ErrEmptyName error returned when user does not provide a name
-	ErrEmptyName = errors.New("name is empty")
-
-	// ErrEmptyFolder error returned when user does not provide a folder
-	ErrEmptyFolder = errors.New("folder is empty")
-
-	// ErrAbsoluteFolder error returned when user provide a relative folder
+	ErrNotAuthorized  = errors.New("you're not authorized to do this ⛔")
+	ErrEmptyName      = errors.New("name is empty")
+	ErrEmptyFolder    = errors.New("folder is empty")
 	ErrAbsoluteFolder = errors.New("folder has to be absolute")
 )
 
-// App of package
 type App struct {
 	tracer        trace.Tracer
 	rawStorageApp absto.Storage
@@ -58,7 +50,6 @@ type App struct {
 	chunkUpload     bool
 }
 
-// Config of package
 type Config struct {
 	ignore                  *string
 	amqpExclusiveRoutingKey *string
@@ -68,7 +59,6 @@ type Config struct {
 	chunkUpload             *bool
 }
 
-// Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
 		ignore:          flags.String(fs, prefix, "crud", "IgnorePattern", "Ignore pattern when listing files or directory", "", nil),
@@ -82,7 +72,6 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 	}
 }
 
-// New creates new App from Config
 func New(config Config, storage absto.Storage, rendererApp renderer.App, shareApp provider.ShareManager, webhookApp provider.WebhookManager, thumbnailApp thumbnail.App, exifApp exif.App, eventProducer provider.EventProducer, amqpClient *amqp.Client, tracerApp tracer.App) (App, error) {
 	app := App{
 		sanitizeOnStart: *config.sanitizeOnStart,
@@ -151,7 +140,6 @@ func New(config Config, storage absto.Storage, rendererApp renderer.App, shareAp
 	return app, nil
 }
 
-// Start crud operations
 func (a App) Start(done <-chan struct{}) {
 	if a.amqpClient == nil {
 		a.start(context.Background(), done)

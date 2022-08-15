@@ -146,13 +146,13 @@ func main() {
 	shareApp, err := share.New(shareConfig, storageProvider, amqpClient)
 	logger.Fatal(err)
 
-	amqpExifApp, err := amqphandler.New(amqpExifConfig, amqpClient, exifApp.AmqpHandler)
+	amqpExifApp, err := amqphandler.New(amqpExifConfig, amqpClient, exifApp.AMQPHandler)
 	logger.Fatal(err)
 
-	amqpShareApp, err := amqphandler.New(amqpShareConfig, amqpClient, shareApp.AmqpHandler)
+	amqpShareApp, err := amqphandler.New(amqpShareConfig, amqpClient, shareApp.AMQPHandler)
 	logger.Fatal(err)
 
-	amqpWebhookApp, err := amqphandler.New(amqpWebhookConfig, amqpClient, webhookApp.AmqpHandler)
+	amqpWebhookApp, err := amqphandler.New(amqpWebhookConfig, amqpClient, webhookApp.AMQPHandler)
 	logger.Fatal(err)
 
 	crudApp, err := crud.New(crudConfig, storageProvider, rendererApp, shareApp, webhookApp, thumbnailApp, exifApp, eventBus.Push, amqpClient, tracerApp)

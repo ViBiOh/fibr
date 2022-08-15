@@ -11,8 +11,7 @@ import (
 	"github.com/streadway/amqp"
 )
 
-// AmqpHandler handle exif message
-func (a App) AmqpHandler(message amqp.Delivery) error {
+func (a App) AMQPHandler(message amqp.Delivery) error {
 	var resp provider.ExifResponse
 
 	if err := json.Unmarshal(message.Body, &resp); err != nil {

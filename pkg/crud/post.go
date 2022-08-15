@@ -49,7 +49,6 @@ func parseMultipart(r *http.Request) (map[string]string, *multipart.Part, error)
 	}
 }
 
-// Post handle post from form
 func (a App) Post(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	contentType := r.Header.Get("Content-Type")
 

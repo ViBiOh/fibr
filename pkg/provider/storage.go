@@ -47,7 +47,6 @@ func (a ByHybridSort) Less(i, j int) bool {
 	return greaterTime(first.Date, second.Date)
 }
 
-// RenderItem is a storage item with some metadatas
 type RenderItem struct {
 	Aggregate
 	URL  string
@@ -57,24 +56,20 @@ type RenderItem struct {
 	IsCover      bool
 }
 
-// IsZero checks if instance is valued or not
 func (r RenderItem) IsZero() bool {
 	return len(r.Item.Pathname) == 0
 }
 
-// IsImage check if item is an image
 func (r RenderItem) IsImage() bool {
 	_, ok := ImageExtensions[r.Extension]
 	return ok
 }
 
-// IsVideo check if item is an image
 func (r RenderItem) IsVideo() bool {
 	_, ok := VideoExtensions[r.Extension]
 	return ok
 }
 
-// Mime gives Mime Type of item
 func (r RenderItem) Mime() string {
 	if mimeType, ok := VideoExtensions[r.Extension]; ok {
 		return mimeType
@@ -91,7 +86,6 @@ func (r RenderItem) Mime() string {
 	return ""
 }
 
-// StorageToRender converts Item to RenderItem
 func StorageToRender(item absto.Item, request Request) RenderItem {
 	return RenderItem{
 		URL:  request.RelativeURL(item),
@@ -100,13 +94,11 @@ func StorageToRender(item absto.Item, request Request) RenderItem {
 	}
 }
 
-// StoryItem is a render item with
 type StoryItem struct {
 	Exif model.Exif
 	RenderItem
 }
 
-// StorageToStory converts Item to RenderItem
 func StorageToStory(item absto.Item, request Request, exif model.Exif) StoryItem {
 	return StoryItem{
 		RenderItem: StorageToRender(item, request),

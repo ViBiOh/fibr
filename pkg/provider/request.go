@@ -30,12 +30,10 @@ var (
 	}
 )
 
-// Preferences holds preferences of the user
 type Preferences struct {
 	LayoutPaths map[string]string
 }
 
-// ParsePreferences for a given string value
 func ParsePreferences(value string) Preferences {
 	var output Preferences
 
@@ -55,7 +53,6 @@ func ParsePreferences(value string) Preferences {
 	return output
 }
 
-// AddLayout display for given path
 func (p Preferences) AddLayout(path, display string) Preferences {
 	if p.LayoutPaths == nil {
 		p.LayoutPaths = map[string]string{
@@ -68,14 +65,12 @@ func (p Preferences) AddLayout(path, display string) Preferences {
 	return p
 }
 
-// RemoveLayout display for given path
 func (p Preferences) RemoveLayout(path string) Preferences {
 	delete(p.LayoutPaths, path)
 
 	return p
 }
 
-// Request from user
 type Request struct {
 	Path        string
 	Item        string
@@ -87,7 +82,6 @@ type Request struct {
 	CanWebhook  bool
 }
 
-// UpdatePreferences based on current request
 func (r Request) UpdatePreferences() Request {
 	if r.Display == DefaultDisplay {
 		r.Preferences = r.Preferences.RemoveLayout(r.AbsoluteURL(""))
@@ -98,13 +92,11 @@ func (r Request) UpdatePreferences() Request {
 	return r
 }
 
-// DeletePreference remove given path from preferences
 func (r Request) DeletePreference(path string) Request {
 	r.Preferences.RemoveLayout(path)
 	return r
 }
 
-// RelativeURL compute relative URL of item for that request
 func (r Request) RelativeURL(item absto.Item) string {
 	pathname := item.Pathname
 
@@ -119,27 +111,22 @@ func (r Request) RelativeURL(item absto.Item) string {
 	return strings.TrimPrefix(pathname, r.Path)
 }
 
-// IsStory returns true if request is story mode
 func (r Request) IsStory() bool {
 	return r.Display == StoryDisplay
 }
 
-// AbsoluteURL compute absolute URL for the given name
 func (r Request) AbsoluteURL(name string) string {
 	return Join("/", r.Share.ID, r.Path, name)
 }
 
-// Filepath returns the pathname of the request
 func (r Request) Filepath() string {
 	return r.SubPath(r.Item)
 }
 
-// SubPath returns the pathname of given name
 func (r Request) SubPath(name string) string {
 	return Join(r.Share.Path, r.Path, name)
 }
 
-// LayoutPath returns layout of given path based on preferences
 func (r Request) LayoutPath(path string) string {
 	if layout, ok := r.Preferences.LayoutPaths[path]; ok {
 		return layout
@@ -147,7 +134,6 @@ func (r Request) LayoutPath(path string) string {
 	return DefaultDisplay
 }
 
-// Title returns title of the page
 func (r Request) Title() string {
 	parts := []string{"fibr"}
 	parts = append(parts, r.contentParts()...)
@@ -155,7 +141,6 @@ func (r Request) Title() string {
 	return strings.Join(parts, " - ")
 }
 
-// Description returns description of the page
 func (r Request) Description() string {
 	parts := []string{"FIle BRowser"}
 	parts = append(parts, r.contentParts()...)
@@ -205,7 +190,6 @@ func computeLayoutPaths(request Request) string {
 	return builder.String()
 }
 
-// SetPrefsCookie set preferences cookie for given request
 func SetPrefsCookie(w http.ResponseWriter, request Request) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     LayoutPathsCookieName,
@@ -219,7 +203,6 @@ func SetPrefsCookie(w http.ResponseWriter, request Request) {
 	w.Header().Add("content-language", "en")
 }
 
-// GetIP retrieves request original IP
 func GetIP(r *http.Request) string {
 	for _, header := range ipHeaders {
 		if ip := r.Header.Get(header); len(ip) != 0 {

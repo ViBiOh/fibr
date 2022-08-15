@@ -9,7 +9,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// Share stores informations about shared paths
 type Share struct {
 	Creation time.Time     `json:"creation"`
 	ID       string        `json:"id"`
@@ -22,12 +21,10 @@ type Share struct {
 	File     bool          `json:"file"`
 }
 
-// IsZero verifies that instance is hydrated
 func (s Share) IsZero() bool {
 	return len(s.ID) == 0
 }
 
-// CheckPassword verifies that request has correct password for share
 func (s Share) CheckPassword(authorizationHeader string) error {
 	if s.Password == "" {
 		return nil
@@ -57,7 +54,6 @@ func (s Share) CheckPassword(authorizationHeader string) error {
 	return nil
 }
 
-// IsExpired check if given share is expired
 func (s Share) IsExpired(now time.Time) bool {
 	return s.Duration != 0 && s.Creation.Add(s.Duration).Before(now)
 }

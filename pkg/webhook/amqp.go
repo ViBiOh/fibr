@@ -8,8 +8,8 @@ import (
 	"github.com/streadway/amqp"
 )
 
-// AmqpHandler handle exif message
-func (a *App) AmqpHandler(message amqp.Delivery) error {
+// AMQPHandler handle exif message
+func (a *App) AMQPHandler(message amqp.Delivery) error {
 	var webhook provider.Webhook
 
 	if err := json.Unmarshal(message.Body, &webhook); err != nil {

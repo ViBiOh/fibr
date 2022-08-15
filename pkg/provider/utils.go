@@ -40,7 +40,6 @@ var (
 	quotesChar   = regexp.MustCompile(`["'` + "`" + `](?m)`)
 	specialChars = regexp.MustCompile(`[^a-z0-9.\-_/](?m)`)
 
-	// BufferPool for io.CopyBuffer
 	BufferPool = sync.Pool{
 		New: func() any {
 			return bytes.NewBuffer(make([]byte, 4*1024))
@@ -53,11 +52,9 @@ var (
 		},
 	}
 
-	// SlowClient allows 5 minutes timeout
 	SlowClient = request.CreateClient(5*time.Minute, request.NoRedirection)
 )
 
-// Join concatenates strings respecting terminal slashes
 func Join(parts ...string) string {
 	pathname := path.Join(parts...)
 
@@ -73,7 +70,6 @@ func Join(parts ...string) string {
 	return pathname
 }
 
-// Dirname ensures given name is a dirname, with a trailing slash
 func Dirname(name string) string {
 	if !strings.HasSuffix(name, "/") {
 		return name + "/"
@@ -81,17 +77,14 @@ func Dirname(name string) string {
 	return name
 }
 
-// GetPathname computes pathname for given params
 func GetPathname(folder, name string, share Share) string {
 	return Join("/", share.Path, folder, name)
 }
 
-// URL computes URL for given params
 func URL(folder, name string, share Share) string {
 	return Join("/", share.ID, folder, name)
 }
 
-// SanitizeName return sanitized name (remove diacritics)
 func SanitizeName(name string, removeSlash bool) (string, error) {
 	withoutLigatures := strings.ToLower(name)
 	for key, value := range transliterations {
@@ -120,14 +113,12 @@ func SanitizeName(name string, removeSlash bool) (string, error) {
 	return strings.Replace(sanitized, "__", "_", -1), nil
 }
 
-// SafeWrite writes content to writer with error handling
 func SafeWrite(w io.Writer, content string) {
 	if _, err := io.WriteString(w, content); err != nil {
 		logger.Error("write content: %s", err)
 	}
 }
 
-// DoneWriter writes content to writer with error handling and done checking
 func DoneWriter(isDone func() bool, w io.Writer, content string) {
 	if isDone() {
 		return
@@ -136,7 +127,6 @@ func DoneWriter(isDone func() bool, w io.Writer, content string) {
 	SafeWrite(w, content)
 }
 
-// FindPath finds index of given value into array, or -1 if not found
 func FindPath(arr []string, value string) int {
 	for index, item := range arr {
 		if strings.HasPrefix(item, value) {
@@ -147,7 +137,6 @@ func FindPath(arr []string, value string) int {
 	return -1
 }
 
-// RemoveIndex removes element at given index, if valid
 func RemoveIndex(arr []string, index int) []string {
 	if len(arr) == 0 || index < 0 || index >= len(arr) {
 		return arr
@@ -156,7 +145,6 @@ func RemoveIndex(arr []string, index int) []string {
 	return append(arr[:index], arr[index+1:]...)
 }
 
-// LoadJSON loads JSON content
 func LoadJSON(ctx context.Context, storageApp absto.Storage, filename string, content any) (err error) {
 	var reader io.ReadCloser
 	reader, err = storageApp.ReadFrom(ctx, filename)
@@ -175,7 +163,6 @@ func LoadJSON(ctx context.Context, storageApp absto.Storage, filename string, co
 	return
 }
 
-// SaveJSON saves JSON content
 func SaveJSON(ctx context.Context, storageApp absto.Storage, filename string, content any) error {
 	reader, writer := io.Pipe()
 
@@ -204,7 +191,6 @@ func SaveJSON(ctx context.Context, storageApp absto.Storage, filename string, co
 	return err
 }
 
-// SendLargeFile in a request with buffered copy
 func SendLargeFile(ctx context.Context, storageApp absto.Storage, item absto.Item, req request.Request) (*http.Response, error) {
 	file, err := storageApp.ReadFrom(ctx, item.Pathname) // will be closed by `PipeWriter`
 	if err != nil {
@@ -236,7 +222,6 @@ func SendLargeFile(ctx context.Context, storageApp absto.Storage, item absto.Ite
 	return request.DoWithClient(SlowClient, r)
 }
 
-// HandleClose closes given closer respecting given err
 func HandleClose(closer io.Closer, err error) error {
 	if closeErr := closer.Close(); closeErr != nil {
 		return model.WrapError(err, fmt.Errorf("close: %s", closeErr))
@@ -245,14 +230,12 @@ func HandleClose(closer io.Closer, err error) error {
 	return err
 }
 
-// LogClose closes given closer and logging in case of error
 func LogClose(closer io.Closer, fn, item string) {
 	if err := closer.Close(); err != nil {
 		logger.WithField("fn", fn).WithField("item", item).Error("close: %s", err)
 	}
 }
 
-// WriteToStorage writes given content to storage
 func WriteToStorage(ctx context.Context, storageApp absto.Storage, output string, size int64, reader io.Reader) error {
 	var err error
 	directory := path.Dir(output)
@@ -276,7 +259,6 @@ func WriteToStorage(ctx context.Context, storageApp absto.Storage, output string
 	return err
 }
 
-// EtagMatch check that given hash match the existing etag
 func EtagMatch(w http.ResponseWriter, r *http.Request, hash string) (etag string, match bool) {
 	etag = fmt.Sprintf(`W/"%s"`, hash)
 

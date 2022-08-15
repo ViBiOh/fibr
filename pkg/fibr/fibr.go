@@ -14,11 +14,9 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
-	httpModel "github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
-// App of package
 type App struct {
 	loginApp    provider.Auth
 	crudApp     provider.Crud
@@ -27,7 +25,6 @@ type App struct {
 	rendererApp renderer.App
 }
 
-// New creates new App from Config
 func New(crudApp provider.Crud, rendererApp renderer.App, shareApp provider.ShareManager, webhookApp provider.WebhookManager, loginApp provider.Auth) App {
 	return App{
 		crudApp:     crudApp,
@@ -140,14 +137,14 @@ func (a App) parseShare(request *provider.Request, authorizationHeader string) e
 
 func convertAuthenticationError(err error) error {
 	if errors.Is(err, auth.ErrForbidden) {
-		return httpModel.WrapForbidden(errors.New("you're not authorized to speak to me with this terms"))
+		return model.WrapForbidden(errors.New("you're not authorized to speak to me with this terms"))
 	}
 
 	if errors.Is(err, ident.ErrMalformedAuth) {
-		return httpModel.WrapInvalid(err)
+		return model.WrapInvalid(err)
 	}
 
-	return httpModel.WrapUnauthorized(err)
+	return model.WrapUnauthorized(err)
 }
 
 func logRequest(r *http.Request) {

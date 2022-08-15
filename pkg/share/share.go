@@ -23,7 +23,6 @@ var (
 	semaphoreDuration = time.Second * 10
 )
 
-// App of package
 type App struct {
 	storageApp absto.Storage
 	shares     map[string]provider.Share
@@ -37,14 +36,12 @@ type App struct {
 	sync.RWMutex
 }
 
-// Config of package
 type Config struct {
 	amqpExchange            *string
 	amqpRoutingKey          *string
 	amqpExclusiveRoutingKey *string
 }
 
-// Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
 		amqpExchange:            flags.String(fs, prefix, "share", "AmqpExchange", "AMQP Exchange Name", "fibr.shares", nil),
@@ -53,7 +50,6 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 	}
 }
 
-// New creates new App from Config
 func New(config Config, storageApp absto.Storage, amqpClient *amqp.Client) (*App, error) {
 	var amqpExchange string
 	var amqpExclusiveRoutingKey string
