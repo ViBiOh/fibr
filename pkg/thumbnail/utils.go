@@ -25,12 +25,8 @@ func (a App) HasLargeThumbnail(ctx context.Context, item absto.Item) bool {
 
 // HasThumbnail determine if thumbnail exist for given pathname
 func (a App) HasThumbnail(ctx context.Context, item absto.Item, scale uint64) bool {
-	if item.IsDir {
-		return false
-	}
-
-	_, err := a.storageApp.Info(ctx, a.PathForScale(item, scale))
-	return err == nil
+	_, ok := a.ThumbnailInfo(ctx, item, scale)
+	return ok
 }
 
 // ThumbnailInfo determine if thumbnail exist for given pathname and provide detail about it
