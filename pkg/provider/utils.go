@@ -214,7 +214,7 @@ func SendLargeFile(ctx context.Context, storageApp absto.Storage, item absto.Ite
 
 	r, err := req.Build(ctx, reader)
 	if err != nil {
-		return nil, fmt.Errorf("create request: %s", err)
+		return nil, fmt.Errorf("create request: %w", err)
 	}
 
 	r.ContentLength = item.Size
@@ -224,7 +224,7 @@ func SendLargeFile(ctx context.Context, storageApp absto.Storage, item absto.Ite
 
 func HandleClose(closer io.Closer, err error) error {
 	if closeErr := closer.Close(); closeErr != nil {
-		return model.WrapError(err, fmt.Errorf("close: %s", closeErr))
+		return model.WrapError(err, fmt.Errorf("close: %w", closeErr))
 	}
 
 	return err
@@ -241,7 +241,7 @@ func WriteToStorage(ctx context.Context, storageApp absto.Storage, output string
 	directory := path.Dir(output)
 
 	if err = storageApp.CreateDir(ctx, directory); err != nil {
-		return fmt.Errorf("create directory: %s", err)
+		return fmt.Errorf("create directory: %w", err)
 	}
 
 	if size == -1 {
@@ -252,7 +252,7 @@ func WriteToStorage(ctx context.Context, storageApp absto.Storage, output string
 
 	if err != nil {
 		if removeErr := storageApp.Remove(ctx, output); removeErr != nil {
-			err = model.WrapError(err, fmt.Errorf("remove: %s", removeErr))
+			err = model.WrapError(err, fmt.Errorf("remove: %w", removeErr))
 		}
 	}
 

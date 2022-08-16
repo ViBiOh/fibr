@@ -39,12 +39,12 @@ func (a App) Rename(ctx context.Context, old, new absto.Item) error {
 
 	for _, size := range a.sizes {
 		if err := a.storageApp.Rename(ctx, a.PathForScale(old, size), a.PathForScale(new, size)); err != nil && !absto.IsNotExist(err) {
-			return fmt.Errorf("rename thumbnail: %s", err)
+			return fmt.Errorf("rename thumbnail: %w", err)
 		}
 
 		if provider.VideoExtensions[old.Extension] != "" && a.HasStream(ctx, old) {
 			if err := a.renameStream(ctx, old, new); err != nil {
-				return fmt.Errorf("rename stream: %s", err)
+				return fmt.Errorf("rename stream: %w", err)
 			}
 		}
 	}

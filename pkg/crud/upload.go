@@ -21,13 +21,13 @@ func (a App) saveUploadedFile(ctx context.Context, request provider.Request, inp
 
 	fileName, filePath, err = getUploadNameAndPath(request, inputName, file)
 	if err != nil {
-		return "", fmt.Errorf("get upload name: %s", err)
+		return "", fmt.Errorf("get upload name: %w", err)
 	}
 
 	var size int64
 	size, err = getUploadSize(rawSize)
 	if err != nil {
-		return "", fmt.Errorf("get upload size: %s", err)
+		return "", fmt.Errorf("get upload size: %w", err)
 	}
 
 	err = provider.WriteToStorage(ctx, a.storageApp, filePath, size, file)
@@ -70,7 +70,7 @@ func getUploadSize(rawSize string) (int64, error) {
 
 	if len(rawSize) > 0 {
 		if size, err := strconv.ParseInt(rawSize, 10, 64); err != nil {
-			return size, fmt.Errorf("parse filesize: %s", err)
+			return size, fmt.Errorf("parse filesize: %w", err)
 		}
 	}
 

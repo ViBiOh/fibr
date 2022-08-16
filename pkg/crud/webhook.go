@@ -20,7 +20,7 @@ func (a App) createWebhook(w http.ResponseWriter, r *http.Request, request provi
 	var err error
 	err = r.ParseForm()
 	if err != nil {
-		a.error(w, r, request, model.WrapInvalid(fmt.Errorf("parse form: %s", err)))
+		a.error(w, r, request, model.WrapInvalid(fmt.Errorf("parse form: %w", err)))
 		return
 	}
 
@@ -72,7 +72,7 @@ func checkWebhookForm(r *http.Request) (recursive bool, kind provider.WebhookKin
 
 	kind, err = provider.ParseWebhookKind(r.Form.Get("kind"))
 	if err != nil {
-		err = model.WrapInvalid(fmt.Errorf("parse kind: %s", err))
+		err = model.WrapInvalid(fmt.Errorf("parse kind: %w", err))
 		return
 	}
 
@@ -92,7 +92,7 @@ func checkWebhookForm(r *http.Request) (recursive bool, kind provider.WebhookKin
 		webhookURL = generateTelegramURL(webhookURL, chatID)
 	} else {
 		if _, err = url.Parse(webhookURL); err != nil {
-			err = model.WrapInvalid(fmt.Errorf("parse url: %s", err))
+			err = model.WrapInvalid(fmt.Errorf("parse url: %w", err))
 			return
 		}
 	}

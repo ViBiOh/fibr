@@ -15,7 +15,7 @@ func (a App) AMQPHandler(message amqp.Delivery) error {
 	var resp provider.ExifResponse
 
 	if err := json.Unmarshal(message.Body, &resp); err != nil {
-		return fmt.Errorf("decode: %s", err)
+		return fmt.Errorf("decode: %w", err)
 	}
 
 	if resp.Exif.IsZero() {
@@ -33,7 +33,7 @@ func (a App) AMQPHandler(message amqp.Delivery) error {
 	resp.Exif.Description = exif.Description
 
 	if err := a.SaveExifFor(ctx, resp.Item, resp.Exif); err != nil {
-		return fmt.Errorf("save: %s", err)
+		return fmt.Errorf("save: %w", err)
 	}
 
 	return a.processExif(ctx, resp.Item, resp.Exif, true)

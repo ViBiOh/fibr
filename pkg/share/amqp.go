@@ -12,7 +12,7 @@ func (a *App) AMQPHandler(message amqp.Delivery) error {
 	var share provider.Share
 
 	if err := json.Unmarshal(message.Body, &share); err != nil {
-		return fmt.Errorf("decode: %s", err)
+		return fmt.Errorf("decode: %w", err)
 	}
 
 	a.Lock()

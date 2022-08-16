@@ -160,18 +160,18 @@ func (a App) checkFile(ctx context.Context, pathname string, shouldExist bool) (
 func (a App) updateCover(ctx context.Context, item absto.Item) error {
 	directory, err := a.storageApp.Info(ctx, item.Dir())
 	if err != nil {
-		return fmt.Errorf("get directory: %s", err)
+		return fmt.Errorf("get directory: %w", err)
 	}
 
 	aggregate, err := a.exifApp.GetAggregateFor(ctx, directory)
 	if err != nil && !absto.IsNotExist(err) {
-		return fmt.Errorf("get aggregate: %s", err)
+		return fmt.Errorf("get aggregate: %w", err)
 	}
 
 	aggregate.Cover = item.Name
 
 	if err := a.exifApp.SaveAggregateFor(ctx, directory, aggregate); err != nil {
-		return fmt.Errorf("save aggregate: %s", err)
+		return fmt.Errorf("save aggregate: %w", err)
 	}
 
 	return nil

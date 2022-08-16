@@ -149,7 +149,7 @@ func (a App) zipItems(ctx context.Context, done <-chan struct{}, request provide
 			var nestedItems []absto.Item
 			nestedItems, err = a.storageApp.List(ctx, request.SubPath(relativeURL))
 			if err != nil {
-				err = fmt.Errorf("zip nested folder `%s`: %s", relativeURL, err)
+				err = fmt.Errorf("zip nested folder `%s`: %w", relativeURL, err)
 				return
 			}
 
@@ -174,7 +174,7 @@ func (a App) addFileToZip(ctx context.Context, zipWriter *zip.Writer, item absto
 	var writer io.Writer
 	writer, err = zipWriter.CreateHeader(header)
 	if err != nil {
-		return fmt.Errorf("create zip header: %s", err)
+		return fmt.Errorf("create zip header: %w", err)
 	}
 
 	var reader io.ReadCloser

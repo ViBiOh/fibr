@@ -117,7 +117,7 @@ func (a App) mergeChunk(w http.ResponseWriter, r *http.Request, request provider
 func (a App) mergeChunkFiles(directory, destination string) error {
 	writer, err := os.OpenFile(destination, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0o600)
 	if err != nil {
-		return fmt.Errorf("open destination file `%s`: %s", destination, err)
+		return fmt.Errorf("open destination file `%s`: %w", destination, err)
 	}
 
 	defer func() {
@@ -135,7 +135,7 @@ func (a App) mergeChunkFiles(directory, destination string) error {
 	}()
 
 	if err = browseChunkFiles(directory, destination, writer); err != nil {
-		return fmt.Errorf("walk chunks in `%s`: %s", directory, err)
+		return fmt.Errorf("walk chunks in `%s`: %w", directory, err)
 	}
 
 	return nil
@@ -153,7 +153,7 @@ func browseChunkFiles(directory, destination string, writer io.Writer) error {
 
 		reader, err := os.Open(path)
 		if err != nil {
-			return fmt.Errorf("open chunk `%s`: %s", path, err)
+			return fmt.Errorf("open chunk `%s`: %w", path, err)
 		}
 
 		defer func() {
@@ -163,7 +163,7 @@ func browseChunkFiles(directory, destination string, writer io.Writer) error {
 		}()
 
 		if _, err = io.Copy(writer, reader); err != nil {
-			return fmt.Errorf("copy chunk `%s`: %s", path, err)
+			return fmt.Errorf("copy chunk `%s`: %w", path, err)
 		}
 
 		return nil

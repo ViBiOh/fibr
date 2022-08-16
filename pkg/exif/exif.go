@@ -73,7 +73,7 @@ func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheu
 		amqpExchange = strings.TrimSpace(*config.amqpExchange)
 
 		if err := amqpClient.Publisher(amqpExchange, "direct", nil); err != nil {
-			return App{}, fmt.Errorf("configure amqp: %s", err)
+			return App{}, fmt.Errorf("configure amqp: %w", err)
 		}
 	}
 
@@ -118,7 +118,7 @@ func (a App) enabled() bool {
 func (a App) extractAndSaveExif(ctx context.Context, item absto.Item) (exif exas.Exif, err error) {
 	exif, err = a.extractExif(ctx, item)
 	if err != nil {
-		err = fmt.Errorf("extract exif: %s", err)
+		err = fmt.Errorf("extract exif: %w", err)
 		return
 	}
 
@@ -135,7 +135,7 @@ func (a App) extractAndSaveExif(ctx context.Context, item absto.Item) (exif exas
 	}
 
 	if err = a.SaveExifFor(ctx, item, exif); err != nil {
-		err = fmt.Errorf("save exif: %s", err)
+		err = fmt.Errorf("save exif: %w", err)
 	}
 
 	return
@@ -154,12 +154,12 @@ func (a App) extractExif(ctx context.Context, item absto.Item) (exif exas.Exif, 
 
 	if err != nil {
 		a.increaseExif("error")
-		err = fmt.Errorf("fetch exif: %s", err)
+		err = fmt.Errorf("fetch exif: %w", err)
 		return
 	}
 
 	if err = httpjson.Read(resp, &exif); err != nil {
-		err = fmt.Errorf("read exif: %s", err)
+		err = fmt.Errorf("read exif: %w", err)
 	}
 
 	return

@@ -13,7 +13,7 @@ func findBcryptBestCost(maxDuration time.Duration) (int, error) {
 	for i := bcrypt.MinCost + 1; i <= bcrypt.MaxCost; i++ {
 		hashedPassword, err := bcrypt.GenerateFromPassword(password, i)
 		if err != nil {
-			return i, fmt.Errorf("generate password: %s", err)
+			return i, fmt.Errorf("generate password: %w", err)
 		}
 
 		start := time.Now()

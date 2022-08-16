@@ -92,7 +92,7 @@ func New(config Config, storage absto.Storage, prometheusRegisterer prometheus.R
 		amqpExchange = strings.TrimSpace(*config.amqpExchange)
 
 		if err := amqpClient.Publisher(amqpExchange, "direct", nil); err != nil {
-			return App{}, fmt.Errorf("configure amqp: %s", err)
+			return App{}, fmt.Errorf("configure amqp: %w", err)
 		}
 	}
 

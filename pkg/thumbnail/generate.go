@@ -27,7 +27,7 @@ func (a App) generate(ctx context.Context, item absto.Item, scale uint64) (err e
 	resp, err = a.requestVith(ctx, item, scale)
 	if err != nil {
 		a.increaseMetric(itemType.String(), "error")
-		return fmt.Errorf("request thumbnailer: %s", err)
+		return fmt.Errorf("request thumbnailer: %w", err)
 	}
 
 	if resp == nil {
@@ -36,7 +36,7 @@ func (a App) generate(ctx context.Context, item absto.Item, scale uint64) (err e
 
 	defer func() {
 		if closeErr := request.DiscardBody(resp.Body); closeErr != nil {
-			err = httpModel.WrapError(err, fmt.Errorf("close: %s", closeErr))
+			err = httpModel.WrapError(err, fmt.Errorf("close: %w", closeErr))
 		}
 	}()
 

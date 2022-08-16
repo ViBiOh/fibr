@@ -56,16 +56,16 @@ func (a App) saveMetadata(ctx context.Context, item absto.Item, data any) error 
 
 	if _, err := a.storageApp.Info(ctx, dirname); err != nil {
 		if !absto.IsNotExist(err) {
-			return fmt.Errorf("check directory existence: %s", err)
+			return fmt.Errorf("check directory existence: %w", err)
 		}
 
 		if err = a.storageApp.CreateDir(ctx, dirname); err != nil {
-			return fmt.Errorf("create directory: %s", err)
+			return fmt.Errorf("create directory: %w", err)
 		}
 	}
 
 	if err := provider.SaveJSON(ctx, a.storageApp, filename, data); err != nil {
-		return fmt.Errorf("save: %s", err)
+		return fmt.Errorf("save: %w", err)
 	}
 
 	if item.IsDir {

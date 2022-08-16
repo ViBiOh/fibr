@@ -77,12 +77,12 @@ func (et *EventType) UnmarshalJSON(b []byte) error {
 	var strValue string
 	err := json.Unmarshal(b, &strValue)
 	if err != nil {
-		return fmt.Errorf("unmarshal event type: %s", err)
+		return fmt.Errorf("unmarshal event type: %w", err)
 	}
 
 	value, err := ParseEventType(strValue)
 	if err != nil {
-		return fmt.Errorf("parse event type: %s", err)
+		return fmt.Errorf("parse event type: %w", err)
 	}
 
 	*et = value
@@ -282,7 +282,7 @@ func NewEventBus(size uint, prometheusRegisterer prometheus.Registerer, tracerAp
 		}, []string{"type", "state"})
 
 		if err := prometheusRegisterer.Register(counter); err != nil {
-			return EventBus{}, fmt.Errorf("register event metric: %s", err)
+			return EventBus{}, fmt.Errorf("register event metric: %w", err)
 		}
 	}
 

@@ -56,7 +56,7 @@ func (a App) computeStats(ctx context.Context, pathname string) (map[string]uint
 		return nil
 	})
 	if err != nil {
-		return nil, fmt.Errorf("browse files: %s", err)
+		return nil, fmt.Errorf("browse files: %w", err)
 	}
 
 	err = a.rawStorageApp.Walk(ctx, provider.MetadataDirectoryName+pathname, func(item absto.Item) error {
@@ -68,7 +68,7 @@ func (a App) computeStats(ctx context.Context, pathname string) (map[string]uint
 	})
 
 	if err != nil {
-		return nil, fmt.Errorf("browse metadatas: %s", err)
+		return nil, fmt.Errorf("browse metadatas: %w", err)
 	}
 
 	return map[string]uint64{

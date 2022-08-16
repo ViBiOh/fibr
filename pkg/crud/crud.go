@@ -95,7 +95,7 @@ func New(config Config, storage absto.Storage, rendererApp renderer.App, shareAp
 
 	if amqpClient != nil {
 		if err := amqpClient.SetupExclusive(app.amqpExclusiveRoutingKey); err != nil {
-			return app, fmt.Errorf("setup amqp exclusive: %s", err)
+			return app, fmt.Errorf("setup amqp exclusive: %w", err)
 		}
 	}
 
@@ -125,7 +125,7 @@ func New(config Config, storage absto.Storage, rendererApp renderer.App, shareAp
 
 	bcryptDuration, err := time.ParseDuration(strings.TrimSpace(*config.bcryptDuration))
 	if err != nil {
-		return app, fmt.Errorf("parse bcrypt duration: %s", err)
+		return app, fmt.Errorf("parse bcrypt duration: %w", err)
 	}
 
 	bcryptCost, err := findBcryptBestCost(bcryptDuration)

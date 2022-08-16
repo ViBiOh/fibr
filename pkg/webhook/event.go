@@ -64,11 +64,11 @@ func (a *App) EventConsumer(ctx context.Context, event provider.Event) {
 func send(ctx context.Context, id string, req request.Request, payload any) (int, error) {
 	resp, err := req.JSON(ctx, payload)
 	if err != nil {
-		return 0, fmt.Errorf("send webhook with id `%s`: %s", id, err)
+		return 0, fmt.Errorf("send webhook with id `%s`: %w", id, err)
 	}
 
 	if err = request.DiscardBody(resp.Body); err != nil {
-		return resp.StatusCode, fmt.Errorf("discard body for webhook with id `%s`: %s", id, err)
+		return resp.StatusCode, fmt.Errorf("discard body for webhook with id `%s`: %w", id, err)
 	}
 
 	return resp.StatusCode, nil
@@ -215,7 +215,7 @@ func (a *App) deleteItem(ctx context.Context, item absto.Item) error {
 		for id, webhook := range a.webhooks {
 			if webhook.Pathname == item.Pathname {
 				if err := a.delete(ctx, id); err != nil {
-					return fmt.Errorf("delete webhook `%s`: %s", id, err)
+					return fmt.Errorf("delete webhook `%s`: %w", id, err)
 				}
 			}
 		}
