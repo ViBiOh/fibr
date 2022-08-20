@@ -18,7 +18,6 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/amqp"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
-	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -72,14 +71,14 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 	}
 }
 
-func New(config Config, storage absto.Storage, rendererApp renderer.App, shareApp provider.ShareManager, webhookApp provider.WebhookManager, thumbnailApp thumbnail.App, exifApp exif.App, eventProducer provider.EventProducer, amqpClient *amqp.Client, tracerApp tracer.App) (App, error) {
+func New(config Config, storage absto.Storage, rendererApp renderer.App, shareApp provider.ShareManager, webhookApp provider.WebhookManager, thumbnailApp thumbnail.App, exifApp exif.App, eventProducer provider.EventProducer, amqpClient *amqp.Client, tracer trace.Tracer) (App, error) {
 	app := App{
 		sanitizeOnStart: *config.sanitizeOnStart,
 
 		chunkUpload:     *config.chunkUpload,
 		temporaryFolder: strings.TrimSpace(*config.temporaryFolder),
 
-		tracer:    tracerApp.GetTracer("crud"),
+		tracer:    tracer,
 		pushEvent: eventProducer,
 
 		rawStorageApp: storage,

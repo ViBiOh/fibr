@@ -119,7 +119,7 @@ func main() {
 	storageProvider, err := absto.New(abstoConfig, tracerApp.GetTracer("storage"))
 	logger.Fatal(err)
 
-	eventBus, err := provider.NewEventBus(10, prometheusRegisterer, tracerApp)
+	eventBus, err := provider.NewEventBus(10, prometheusRegisterer, tracerApp.GetTracer("bus"))
 	logger.Fatal(err)
 
 	amqpClient, err := amqp.New(amqpConfig, prometheusApp.Registerer())
@@ -137,7 +137,7 @@ func main() {
 	rendererApp, err := renderer.New(rendererConfig, content, fibr.FuncMap, tracerApp.GetTracer("renderer"))
 	logger.Fatal(err)
 
-	exifApp, err := exif.New(exifConfig, storageProvider, prometheusRegisterer, tracerApp, amqpClient, redisClient)
+	exifApp, err := exif.New(exifConfig, storageProvider, prometheusRegisterer, tracerApp.GetTracer("exif"), amqpClient, redisClient)
 	logger.Fatal(err)
 
 	webhookApp, err := webhook.New(webhookConfig, storageProvider, prometheusRegisterer, amqpClient, rendererApp, thumbnailApp)
@@ -155,7 +155,7 @@ func main() {
 	amqpWebhookApp, err := amqphandler.New(amqpWebhookConfig, amqpClient, webhookApp.AMQPHandler)
 	logger.Fatal(err)
 
-	crudApp, err := crud.New(crudConfig, storageProvider, rendererApp, shareApp, webhookApp, thumbnailApp, exifApp, eventBus.Push, amqpClient, tracerApp)
+	crudApp, err := crud.New(crudConfig, storageProvider, rendererApp, shareApp, webhookApp, thumbnailApp, exifApp, eventBus.Push, amqpClient, tracerApp.GetTracer("crud"))
 	logger.Fatal(err)
 
 	var middlewareApp provider.Auth

@@ -17,7 +17,6 @@ import (
 	prom "github.com/ViBiOh/httputils/v4/pkg/prometheus"
 	"github.com/ViBiOh/httputils/v4/pkg/redis"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
-	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -67,7 +66,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 	}
 }
 
-func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheus.Registerer, tracerApp tracer.App, amqpClient *amqpclient.Client, redisClient redis.App) (App, error) {
+func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheus.Registerer, tracer trace.Tracer, amqpClient *amqpclient.Client, redisClient redis.App) (App, error) {
 	var amqpExchange string
 	if amqpClient != nil {
 		amqpExchange = strings.TrimSpace(*config.amqpExchange)
@@ -88,7 +87,7 @@ func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheu
 		amqpExchange:   amqpExchange,
 		amqpRoutingKey: strings.TrimSpace(*config.amqpRoutingKey),
 
-		tracer:     tracerApp.GetTracer("exif"),
+		tracer:     tracer,
 		storageApp: storageApp,
 		listStorageApp: storageApp.WithIgnoreFn(func(item absto.Item) bool {
 			return !strings.HasSuffix(item.Name, ".json")
