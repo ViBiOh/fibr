@@ -38,17 +38,18 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 	"github.com/ViBiOh/httputils/v4/pkg/server"
 	"github.com/ViBiOh/httputils/v4/pkg/tracer"
+	"go.opentelemetry.io/otel/trace"
 )
 
 //go:embed templates static
 var content embed.FS
 
-func newLoginApp(tracerApp tracer.App, basicConfig basicMemory.Config) provider.Auth {
+func newLoginApp(tracer trace.Tracer, basicConfig basicMemory.Config) provider.Auth {
 	basicApp, err := basicMemory.New(basicConfig)
 	logger.Fatal(err)
 
 	basicProviderProvider := basic.New(basicApp, "fibr")
-	return authMiddleware.New(basicApp, tracerApp, basicProviderProvider)
+	return authMiddleware.New(basicApp, tracer, basicProviderProvider)
 }
 
 func generateIdentityName() string {
@@ -160,7 +161,7 @@ func main() {
 
 	var middlewareApp provider.Auth
 	if !*disableAuth {
-		middlewareApp = newLoginApp(tracerApp, basicConfig)
+		middlewareApp = newLoginApp(tracerApp.GetTracer("auth"), basicConfig)
 	}
 
 	fibrApp := fibr.New(&crudApp, rendererApp, shareApp, webhookApp, middlewareApp)

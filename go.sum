@@ -35,10 +35,10 @@ github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/ViBiOh/ChatPotte v0.1.1 h1:EzuR3iKxqF3GrTlqSuTjc7Z3lD/I2ECW69dbiP2yNCs=
 github.com/ViBiOh/ChatPotte v0.1.1/go.mod h1:EUC/dnF4psMbB1E7CI+UPWgtczZ2nRoPHkeUfzXUj7o=
-github.com/ViBiOh/absto v1.0.0 h1:xhmGyH6emqoBrkbCkTnvN25bvttKgWAyPwhu1v4VAG8=
-github.com/ViBiOh/absto v1.0.0/go.mod h1:ZoXcCx5C+xU9R6SBP4HPXSjf3WZcaVIfFCciiViZfCs=
-github.com/ViBiOh/auth/v2 v2.13.0 h1:AGPU5WFefkZHvLJkWA8bpMb0a2hu9zJNoYOiz7NLKpQ=
-github.com/ViBiOh/auth/v2 v2.13.0/go.mod h1:eGqz0ln1SdfuOG8N2XsruKh8NCU7Plx0P5mQPHsNWxQ=
+github.com/ViBiOh/absto v1.0.1 h1:5/PrhgB0XAgC3zLCwxxQlbhZkoCBBsrgJAxPwM5ZYXE=
+github.com/ViBiOh/absto v1.0.1/go.mod h1:ZoXcCx5C+xU9R6SBP4HPXSjf3WZcaVIfFCciiViZfCs=
+github.com/ViBiOh/auth/v2 v2.14.0 h1:v/t+pOZOBbSemSRV2TZ+C44fZFR0xQqIR7F/PZgC440=
+github.com/ViBiOh/auth/v2 v2.14.0/go.mod h1:w1nqMK6Zve6fpSvBi5J2gg8+4nDxmRpbUILqS0eTw5M=
 github.com/ViBiOh/exas v0.5.0 h1:ZL5v5rUOkkwo6PxhbOVe96L0RUre7SfStaVcqhE/IbU=
 github.com/ViBiOh/exas v0.5.0/go.mod h1:sKRV/vz85Vj0caT+a3XWVFp0gyzXe36eZWL+XKge93E=
 github.com/ViBiOh/flags v1.2.0 h1:DaujjNXzD29KxKyp4eZdn7c9+uBN5DokWgDAe7DcUmc=
@@ -298,8 +298,8 @@ golang.org/x/crypto v0.0.0-20190510104115-cbcb75029529/go.mod h1:yigFU9vqHzYiE8U
 golang.org/x/crypto v0.0.0-20190605123033-f99c8df09eb5/go.mod h1:yigFU9vqHzYiE8UmvKecakEJjdnWj3jj499lnFckfCI=
 golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550/go.mod h1:yigFU9vqHzYiE8UmvKecakEJjdnWj3jj499lnFckfCI=
 golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9/go.mod h1:LzIPMQfyMNhhGPhUkYOs5KpL4U8rLKemX1yGLhDgUto=
-golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa h1:zuSxTR4o9y82ebqCUJYNGJbGPo6sKVl54f/TVDObg1c=
-golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa/go.mod h1:IxCIyHEi3zRg3s0A5j5BB6A9Jmi73HwBIUl50j+osU4=
+golang.org/x/crypto v0.0.0-20220817201139-bc19a97f63c8 h1:GIAS/yBem/gq2MUqgNIzUHW7cJMmx3TGZOrnyYaNQ6c=
+golang.org/x/crypto v0.0.0-20220817201139-bc19a97f63c8/go.mod h1:IxCIyHEi3zRg3s0A5j5BB6A9Jmi73HwBIUl50j+osU4=
 golang.org/x/exp v0.0.0-20190121172915-509febef88a4/go.mod h1:CJ0aWSM057203Lf6IL+f9T1iT9GByDxfZKAQTCR3kQA=
 golang.org/x/exp v0.0.0-20190306152737-a1d7652674e8/go.mod h1:CJ0aWSM057203Lf6IL+f9T1iT9GByDxfZKAQTCR3kQA=
 golang.org/x/exp v0.0.0-20190510132918-efd6b22b2522/go.mod h1:ZjyILWgesfNpC6sMxTJOJm9Kp84zZh5NQWvqDGG3Qr8=
