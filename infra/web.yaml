@@ -63,10 +63,9 @@ spec:
         operator: Exists
     resources:
       limits:
-        memory: 256Mi
+        memory: 96Mi
       requests:
-        cpu: 400m
-        memory: 64Mi
+        memory: 96Mi
     securityContext:
       runAsGroup: 1000
       runAsUser: 1000
