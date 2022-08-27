@@ -91,6 +91,8 @@ func (a App) computeAndSaveAggregate(ctx context.Context, dir absto.Item) error 
 	directoryAggregate := newAggregate()
 	var minDate, maxDate time.Time
 
+	previousAggregate, _ := a.GetAggregateFor(ctx, dir)
+
 	err := a.storageApp.Walk(ctx, dir.Pathname, func(item absto.Item) error {
 		if item.Pathname == dir.Pathname {
 			return nil
@@ -123,6 +125,7 @@ func (a App) computeAndSaveAggregate(ctx context.Context, dir absto.Item) error 
 	}
 
 	return a.SaveAggregateFor(ctx, dir, provider.Aggregate{
+		Cover:    previousAggregate.Cover,
 		Location: directoryAggregate.value(),
 		Start:    minDate,
 		End:      maxDate,
