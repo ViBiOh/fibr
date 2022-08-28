@@ -39,8 +39,14 @@ func (a App) Rename(ctx context.Context, old, new absto.Item) error {
 	}
 
 	for _, size := range a.sizes {
-		if err := a.storageApp.Rename(ctx, a.PathForScale(old, size), a.PathForScale(new, size)); err != nil && !absto.IsNotExist(err) {
+		oldFilename := a.PathForScale(old, size)
+
+		if err := a.storageApp.Rename(ctx, oldFilename, a.PathForScale(new, size)); err != nil && !absto.IsNotExist(err) {
 			return fmt.Errorf("rename thumbnail: %w", err)
+		}
+
+		if err := a.redisClient.Delete(ctx, redisKey(oldFilename)); err != nil {
+			logger.Error("delete cache: %s", err)
 		}
 
 		if provider.VideoExtensions[old.Extension] != "" && a.HasStream(ctx, old) {
@@ -106,8 +112,14 @@ func (a App) delete(ctx context.Context, item absto.Item) {
 	}
 
 	for _, size := range a.sizes {
-		if err := a.storageApp.Remove(ctx, a.PathForScale(item, size)); err != nil {
+		filename := a.PathForScale(item, size)
+
+		if err := a.storageApp.Remove(ctx, filename); err != nil {
 			logger.Error("delete thumbnail: %s", err)
+		}
+
+		if err := a.redisClient.Delete(ctx, redisKey(filename)); err != nil {
+			logger.Error("delete cache: %s", err)
 		}
 
 		if provider.VideoExtensions[item.Extension] != "" && a.HasStream(ctx, item) {

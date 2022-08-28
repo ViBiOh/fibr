@@ -81,8 +81,8 @@ func typeOfItem(item absto.Item) model.ItemType {
 	return itemType
 }
 
-func redisKey(id string) string {
-	return version.Redis("thumbnail:" + sha.New(id))
+func redisKey(filename string) string {
+	return version.Redis("thumbnail:" + sha.New(filename))
 }
 
 func (a App) Info(ctx context.Context, pathname string) (absto.Item, error) {

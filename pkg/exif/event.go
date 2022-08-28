@@ -49,6 +49,10 @@ func (a App) Rename(ctx context.Context, old, new absto.Item) error {
 		return fmt.Errorf("rename exif: %w", err)
 	}
 
+	if err := a.redisClient.Delete(ctx, redisKey(old.ID)); err != nil {
+		return fmt.Errorf("cache: %s", err)
+	}
+
 	return nil
 }
 
@@ -153,6 +157,10 @@ func (a App) aggregateOnRename(ctx context.Context, old, new absto.Item) error {
 func (a App) delete(ctx context.Context, item absto.Item) error {
 	if err := a.storageApp.Remove(ctx, Path(item)); err != nil {
 		return fmt.Errorf("delete: %w", err)
+	}
+
+	if err := a.redisClient.Delete(ctx, redisKey(item.ID)); err != nil {
+		return fmt.Errorf("cache: %s", err)
 	}
 
 	if !item.IsDir {
