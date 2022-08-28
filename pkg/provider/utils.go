@@ -182,7 +182,7 @@ func SaveJSON(ctx context.Context, storageApp absto.Storage, filename string, co
 		done <- err
 	}()
 
-	err := storageApp.WriteTo(ctx, filename, reader)
+	err := storageApp.WriteTo(ctx, filename, reader, absto.WriteOpts{})
 
 	if jsonErr := <-done; jsonErr != nil {
 		err = model.WrapError(err, jsonErr)
@@ -244,12 +244,7 @@ func WriteToStorage(ctx context.Context, storageApp absto.Storage, output string
 		return fmt.Errorf("create directory: %w", err)
 	}
 
-	if size == -1 {
-		err = storageApp.WriteTo(ctx, output, reader)
-	} else {
-		err = storageApp.WriteSizedTo(ctx, output, size, reader)
-	}
-
+	err = storageApp.WriteTo(ctx, output, reader, absto.WriteOpts{Size: size})
 	if err != nil {
 		if removeErr := storageApp.Remove(ctx, output); removeErr != nil {
 			err = model.WrapError(err, fmt.Errorf("remove: %w", removeErr))

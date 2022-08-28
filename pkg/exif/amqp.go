@@ -11,7 +11,7 @@ import (
 	"github.com/streadway/amqp"
 )
 
-func (a App) AMQPHandler(message amqp.Delivery) error {
+func (a App) AMQPHandler(ctx context.Context, message amqp.Delivery) error {
 	var resp provider.ExifResponse
 
 	if err := json.Unmarshal(message.Body, &resp); err != nil {
@@ -22,8 +22,6 @@ func (a App) AMQPHandler(message amqp.Delivery) error {
 		logger.WithField("item", resp.Item.Pathname).Debug("no exif")
 		return nil
 	}
-
-	ctx := context.Background()
 
 	exif, err := a.loadExif(ctx, resp.Item)
 	if err != nil && !absto.IsNotExist(err) {

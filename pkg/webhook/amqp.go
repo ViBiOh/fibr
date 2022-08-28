@@ -1,6 +1,7 @@
 package webhook
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -9,7 +10,7 @@ import (
 )
 
 // AMQPHandler handle exif message
-func (a *App) AMQPHandler(message amqp.Delivery) error {
+func (a *App) AMQPHandler(_ context.Context, message amqp.Delivery) error {
 	var webhook provider.Webhook
 
 	if err := json.Unmarshal(message.Body, &webhook); err != nil {
