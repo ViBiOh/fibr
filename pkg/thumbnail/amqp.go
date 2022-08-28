@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
-	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 	vith "github.com/ViBiOh/vith/pkg/model"
 	"github.com/streadway/amqp"
@@ -25,8 +24,6 @@ func (a App) AMQPHandler(ctx context.Context, message amqp.Delivery) error {
 		ID:       absto.ID(req.Input),
 		Pathname: req.Input,
 	}, req.Scale))
-
-	logger.Info("evicting key=`%s` for input `%s` and scale=%d", key, req.Input, req.Scale)
 
 	return a.redisClient.Delete(ctx, key)
 }
