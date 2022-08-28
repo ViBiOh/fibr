@@ -1,6 +1,7 @@
 package share
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -8,7 +9,7 @@ import (
 	"github.com/streadway/amqp"
 )
 
-func (a *App) AMQPHandler(message amqp.Delivery) error {
+func (a *App) AMQPHandler(_ context.Context, message amqp.Delivery) error {
 	var share provider.Share
 
 	if err := json.Unmarshal(message.Body, &share); err != nil {

@@ -222,30 +222,16 @@ func (mr *StorageMockRecorder) WithIgnoreFn(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WithIgnoreFn", reflect.TypeOf((*Storage)(nil).WithIgnoreFn), arg0)
 }
 
-// WriteSizedTo mocks base method.
-func (m *Storage) WriteSizedTo(arg0 context.Context, arg1 string, arg2 int64, arg3 io.Reader) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "WriteSizedTo", arg0, arg1, arg2, arg3)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// WriteSizedTo indicates an expected call of WriteSizedTo.
-func (mr *StorageMockRecorder) WriteSizedTo(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteSizedTo", reflect.TypeOf((*Storage)(nil).WriteSizedTo), arg0, arg1, arg2, arg3)
-}
-
 // WriteTo mocks base method.
-func (m *Storage) WriteTo(arg0 context.Context, arg1 string, arg2 io.Reader) error {
+func (m *Storage) WriteTo(arg0 context.Context, arg1 string, arg2 io.Reader, arg3 model.WriteOpts) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "WriteTo", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "WriteTo", arg0, arg1, arg2, arg3)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // WriteTo indicates an expected call of WriteTo.
-func (mr *StorageMockRecorder) WriteTo(arg0, arg1, arg2 interface{}) *gomock.Call {
+func (mr *StorageMockRecorder) WriteTo(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteTo", reflect.TypeOf((*Storage)(nil).WriteTo), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteTo", reflect.TypeOf((*Storage)(nil).WriteTo), arg0, arg1, arg2, arg3)
 }

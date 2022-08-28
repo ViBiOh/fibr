@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"crypto/rand"
 	"embed"
 	"errors"
@@ -123,7 +124,7 @@ func main() {
 	eventBus, err := provider.NewEventBus(10, prometheusRegisterer, tracerApp.GetTracer("bus"))
 	logger.Fatal(err)
 
-	amqpClient, err := amqp.New(amqpConfig, prometheusApp.Registerer())
+	amqpClient, err := amqp.New(amqpConfig, prometheusApp.Registerer(), tracerApp.GetTracer("amqp"))
 	if err != nil && !errors.Is(err, amqp.ErrNoConfig) {
 		logger.Fatal(err)
 	} else if amqpClient != nil {
@@ -147,13 +148,13 @@ func main() {
 	shareApp, err := share.New(shareConfig, storageProvider, amqpClient)
 	logger.Fatal(err)
 
-	amqpExifApp, err := amqphandler.New(amqpExifConfig, amqpClient, exifApp.AMQPHandler)
+	amqpExifApp, err := amqphandler.New(amqpExifConfig, amqpClient, tracerApp.GetTracer("amqp_handler_exif"), exifApp.AMQPHandler)
 	logger.Fatal(err)
 
-	amqpShareApp, err := amqphandler.New(amqpShareConfig, amqpClient, shareApp.AMQPHandler)
+	amqpShareApp, err := amqphandler.New(amqpShareConfig, amqpClient, tracerApp.GetTracer("amqp_handler_share"), shareApp.AMQPHandler)
 	logger.Fatal(err)
 
-	amqpWebhookApp, err := amqphandler.New(amqpWebhookConfig, amqpClient, webhookApp.AMQPHandler)
+	amqpWebhookApp, err := amqphandler.New(amqpWebhookConfig, amqpClient, tracerApp.GetTracer("amqp_handler_webhook"), webhookApp.AMQPHandler)
 	logger.Fatal(err)
 
 	crudApp, err := crud.New(crudConfig, storageProvider, rendererApp, shareApp, webhookApp, thumbnailApp, exifApp, eventBus.Push, amqpClient, tracerApp.GetTracer("crud"))
@@ -167,9 +168,11 @@ func main() {
 	fibrApp := fibr.New(&crudApp, rendererApp, shareApp, webhookApp, middlewareApp)
 	handler := rendererApp.Handler(fibrApp.TemplateFunc)
 
-	go amqpExifApp.Start(healthApp.Done())
-	go amqpShareApp.Start(healthApp.Done())
-	go amqpWebhookApp.Start(healthApp.Done())
+	ctx := context.Background()
+
+	go amqpExifApp.Start(ctx, healthApp.Done())
+	go amqpShareApp.Start(ctx, healthApp.Done())
+	go amqpWebhookApp.Start(ctx, healthApp.Done())
 	go webhookApp.Start(healthApp.Done())
 	go shareApp.Start(healthApp.Done())
 	go crudApp.Start(healthApp.Done())
