@@ -133,7 +133,7 @@ func main() {
 
 	redisClient := redis.New(redisConfig, prometheusApp.Registerer(), tracerApp.GetTracer("redis"))
 
-	thumbnailApp, err := thumbnail.New(thumbnailConfig, storageProvider, prometheusRegisterer, amqpClient)
+	thumbnailApp, err := thumbnail.New(thumbnailConfig, storageProvider, redisClient, prometheusRegisterer, tracerApp.GetTracer("thumbnail"), amqpClient)
 	logger.Fatal(err)
 
 	rendererApp, err := renderer.New(rendererConfig, content, fibr.FuncMap, tracerApp.GetTracer("renderer"))

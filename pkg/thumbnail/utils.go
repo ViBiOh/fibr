@@ -3,18 +3,23 @@ package thumbnail
 import (
 	"context"
 	"fmt"
+	"time"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/fibr/pkg/version"
+	"github.com/ViBiOh/httputils/v4/pkg/cache"
+	"github.com/ViBiOh/httputils/v4/pkg/sha"
+	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 	"github.com/ViBiOh/vith/pkg/model"
 )
 
-// CanHaveThumbnail determine if thumbnail can be generated for given pathname
+var redisCacheDuration = time.Hour * 96
+
 func (a App) CanHaveThumbnail(item absto.Item) bool {
 	return !item.IsDir && provider.ThumbnailExtensions[item.Extension] && (a.maxSize == 0 || item.Size < a.maxSize || a.directAccess)
 }
 
-// HasLargeThumbnail determine if large thumbnail exist for given pathname
 func (a App) HasLargeThumbnail(ctx context.Context, item absto.Item) bool {
 	if a.largeSize == 0 {
 		return false
@@ -23,36 +28,23 @@ func (a App) HasLargeThumbnail(ctx context.Context, item absto.Item) bool {
 	return a.HasThumbnail(ctx, item, a.largeSize)
 }
 
-// HasThumbnail determine if thumbnail exist for given pathname
 func (a App) HasThumbnail(ctx context.Context, item absto.Item, scale uint64) bool {
-	_, ok := a.ThumbnailInfo(ctx, item, scale)
-	return ok
-}
-
-// ThumbnailInfo determine if thumbnail exist for given pathname and provide detail about it
-func (a App) ThumbnailInfo(ctx context.Context, item absto.Item, scale uint64) (thumbnailItem absto.Item, ok bool) {
 	if item.IsDir {
-		ok = false
-		return
+		return false
 	}
 
-	var err error
-	thumbnailItem, err = a.storageApp.Info(ctx, a.PathForScale(item, scale))
-	ok = err == nil
-	return
+	_, err := a.Info(ctx, a.PathForScale(item, scale))
+	return err == nil
 }
 
-// Path computes thumbnail path for a a given item
 func (a App) Path(item absto.Item) string {
 	return a.PathForScale(item, SmallSize)
 }
 
-// PathForLarge computes thumbnail path for a a given item and large size
 func (a App) PathForLarge(item absto.Item) string {
 	return a.PathForScale(item, a.largeSize)
 }
 
-// PathForScale computes thumbnail path for a a given item and scale
 func (a App) PathForScale(item absto.Item, scale uint64) string {
 	if item.IsDir {
 		return provider.MetadataDirectory(item)
@@ -66,16 +58,14 @@ func (a App) PathForScale(item absto.Item, scale uint64) string {
 	return getThumbnailPathForExtension(item, "webp")
 }
 
-// GetChunk retrieve the storage item in the metadata
 func (a App) GetChunk(ctx context.Context, pathname string) (absto.Item, error) {
-	return a.storageApp.Info(ctx, provider.MetadataDirectoryName+pathname)
+	return a.Info(ctx, provider.MetadataDirectoryName+pathname)
 }
 
 func getStreamPath(item absto.Item) string {
 	return getThumbnailPathForExtension(item, "m3u8")
 }
 
-// PathWithExtension computes thumbnail path with given extension
 func getThumbnailPathForExtension(item absto.Item, extension string) string {
 	return fmt.Sprintf("%s%s.%s", provider.MetadataDirectory(item), item.ID, extension)
 }
@@ -89,4 +79,17 @@ func typeOfItem(item absto.Item) model.ItemType {
 	}
 
 	return itemType
+}
+
+func redisKey(id string) string {
+	return version.Redis("thumbnail:" + sha.New(id))
+}
+
+func (a App) Info(ctx context.Context, pathname string) (absto.Item, error) {
+	ctx, end := tracer.StartSpan(ctx, a.tracer, "info")
+	defer end()
+
+	return cache.Retrieve(ctx, a.redisClient, redisKey(pathname), func(ctx context.Context) (absto.Item, error) {
+		return a.storageApp.Info(ctx, pathname)
+	}, redisCacheDuration)
 }

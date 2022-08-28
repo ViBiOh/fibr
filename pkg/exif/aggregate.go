@@ -8,8 +8,8 @@ import (
 	absto "github.com/ViBiOh/absto/pkg/model"
 	exas "github.com/ViBiOh/exas/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/fibr/pkg/version"
 	"github.com/ViBiOh/httputils/v4/pkg/cache"
-	"github.com/ViBiOh/httputils/v4/pkg/sha"
 	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 )
 
@@ -18,12 +18,10 @@ var (
 	aggregateRatio = 0.4
 
 	levels = []string{"city", "state", "country"}
-
-	cacheVersion = sha.New("vibioh/fibr/1")[:8]
 )
 
 func redisKey(itemID string) string {
-	return fmt.Sprintf("fibr:%s:exif:%s", cacheVersion, itemID)
+	return version.Redis("exif:" + itemID)
 }
 
 func (a App) GetExifFor(ctx context.Context, item absto.Item) (exas.Exif, error) {

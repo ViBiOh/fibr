@@ -59,6 +59,16 @@ func getEventLogger(item absto.Item) logger.Provider {
 func (a App) handleStartEvent(ctx context.Context, event provider.Event) error {
 	forced := event.IsForcedFor("exif")
 
+	if event.GetMetadata("force") == "cache" {
+		if err := a.redisClient.Delete(ctx, redisKey(event.Item.ID)); err != nil {
+			logger.WithField("fn", "exif.startEvent").WithField("item", event.Item.Pathname).Error("flush cache: %s", err)
+		}
+
+		if !forced {
+			return nil
+		}
+	}
+
 	item := event.Item
 	if !forced && a.hasMetadata(ctx, item) {
 		logger.WithField("item", item.Pathname).Debug("has metadata")

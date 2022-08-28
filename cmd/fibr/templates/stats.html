@@ -43,6 +43,14 @@
 
     <form method="post" action="#">
       <input type="hidden" name="method" value="TRACE" />
+      <input type="hidden" name="subset" value="cache" />
+      <p class="padding no-margin center">
+        <button type="submit" class="button bg-danger">Flush Redis cache</button>
+      </p>
+    </form>
+
+    <form method="post" action="#">
+      <input type="hidden" name="method" value="TRACE" />
       <input type="hidden" name="subset" value="all" />
       <p class="padding no-margin center">
         <button type="submit" class="button bg-danger">Regenerate all metadatas</button>

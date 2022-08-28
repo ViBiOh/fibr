@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"path"
 	"strings"
 	"time"
 
@@ -20,9 +19,11 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	prom "github.com/ViBiOh/httputils/v4/pkg/prometheus"
 	"github.com/ViBiOh/httputils/v4/pkg/query"
+	"github.com/ViBiOh/httputils/v4/pkg/redis"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 	"github.com/ViBiOh/httputils/v4/pkg/sha"
 	"github.com/prometheus/client_golang/prometheus"
+	"go.opentelemetry.io/otel/trace"
 )
 
 const (
@@ -33,6 +34,8 @@ const (
 var cacheDuration = fmt.Sprintf("private, max-age=%.0f", (time.Minute * 5).Seconds())
 
 type App struct {
+	redisClient     redis.App
+	tracer          trace.Tracer
 	storageApp      absto.Storage
 	smallStorageApp absto.Storage
 	largeStorageApp absto.Storage
@@ -86,7 +89,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 	}
 }
 
-func New(config Config, storage absto.Storage, prometheusRegisterer prometheus.Registerer, amqpClient *amqp.Client) (App, error) {
+func New(config Config, storage absto.Storage, redisClient redis.App, prometheusRegisterer prometheus.Registerer, tracer trace.Tracer, amqpClient *amqp.Client) (App, error) {
 	var amqpExchange string
 	if amqpClient != nil {
 		amqpExchange = strings.TrimSpace(*config.amqpExchange)
@@ -110,6 +113,9 @@ func New(config Config, storage absto.Storage, prometheusRegisterer prometheus.R
 		maxSize:      *config.maxSize,
 		minBitrate:   *config.minBitrate,
 		directAccess: *config.directAccess,
+
+		redisClient: redisClient,
+		tracer:      tracer,
 
 		amqpExchange:            amqpExchange,
 		amqpStreamRoutingKey:    strings.TrimSpace(*config.amqpStreamRoutingKey),
@@ -171,24 +177,27 @@ func (a App) Serve(w http.ResponseWriter, r *http.Request, item absto.Item) {
 
 	ctx := r.Context()
 
-	thumbnailInfo, ok := a.ThumbnailInfo(ctx, item, scale)
-	if !ok {
-		w.WriteHeader(http.StatusNoContent)
+	name := a.PathForScale(item, scale)
+
+	reader, err := a.storageApp.ReadFrom(ctx, name)
+	if err != nil {
+		if absto.IsNotExist(err) {
+			w.WriteHeader(http.StatusNoContent)
+		}
+
+		httperror.InternalServerError(w, err)
+
 		return
 	}
 
-	reader, err := a.storageApp.ReadFrom(ctx, thumbnailInfo.Pathname)
-	if err != nil {
-		httperror.InternalServerError(w, err)
-		return
-	}
+	baseName := name
 
 	defer provider.LogClose(reader, "thumbnail.Serve", item.Pathname)
 
 	w.Header().Add("Cache-Control", cacheDuration)
-	w.Header().Add("Content-Disposition", fmt.Sprintf("inline; filename=%s", path.Base(thumbnailInfo.Pathname)))
+	w.Header().Add("Content-Disposition", fmt.Sprintf("inline; filename=%s", baseName))
 
-	http.ServeContent(w, r, path.Base(thumbnailInfo.Pathname), item.Date, reader)
+	http.ServeContent(w, r, baseName, item.Date, reader)
 }
 
 // List return all thumbnails in a base64 form
@@ -238,7 +247,7 @@ func (a App) thumbnailHash(ctx context.Context, items []absto.Item) string {
 	hasher := sha.Stream()
 
 	for _, item := range items {
-		if info, err := a.storageApp.Info(ctx, a.PathForScale(item, SmallSize)); err == nil {
+		if info, err := a.Info(ctx, a.PathForScale(item, SmallSize)); err == nil {
 			hasher.Write(info)
 		}
 	}
