@@ -24,11 +24,11 @@ func Path(item absto.Item) string {
 
 func (a App) hasMetadata(ctx context.Context, item absto.Item) bool {
 	if item.IsDir {
-		_, err := a.storageApp.Info(ctx, Path(item))
+		_, err := a.GetAggregateFor(ctx, item)
 		return err == nil
 	}
 
-	data, err := a.loadExif(ctx, item)
+	data, err := a.GetExifFor(ctx, item)
 	if err != nil {
 		return false
 	}

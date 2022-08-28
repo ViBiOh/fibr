@@ -27,7 +27,7 @@ func (a App) AMQPHandler(ctx context.Context, message amqp.Delivery) error {
 		return nil
 	}
 
-	exif, err := a.loadExif(ctx, resp.Item)
+	exif, err := a.GetExifFor(ctx, resp.Item)
 	if err != nil && !absto.IsNotExist(err) {
 		logger.WithField("item", resp.Item.Pathname).Error("load exif: %s", err)
 	}

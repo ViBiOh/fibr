@@ -96,7 +96,7 @@ func (a App) computeAndSaveAggregate(ctx context.Context, dir absto.Item) error 
 			return nil
 		}
 
-		exifData, err := a.loadExif(ctx, item)
+		exifData, err := a.GetExifFor(ctx, item)
 		if err != nil {
 			if absto.IsNotExist(err) {
 				return nil
