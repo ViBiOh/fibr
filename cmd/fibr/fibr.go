@@ -88,6 +88,7 @@ func main() {
 	exifConfig := exif.Flags(fs, "exif")
 
 	amqpConfig := amqp.Flags(fs, "amqp")
+	amqpThumbnailConfig := amqphandler.Flags(fs, "amqpThumbnail", flags.NewOverride("Exchange", "fibr"), flags.NewOverride("Queue", "fibr.thumbnail"), flags.NewOverride("RoutingKey", "thumbnail_output"))
 	amqpExifConfig := amqphandler.Flags(fs, "amqpExif", flags.NewOverride("Exchange", "fibr"), flags.NewOverride("Queue", "fibr.exif"), flags.NewOverride("RoutingKey", "exif_output"))
 	amqpShareConfig := amqphandler.Flags(fs, "amqpShare", flags.NewOverride("Exchange", "fibr.shares"), flags.NewOverride("Queue", "fibr.share-"+generateIdentityName()), flags.NewOverride("RoutingKey", "share"), flags.NewOverride("Exclusive", true), flags.NewOverride("RetryInterval", time.Duration(0)))
 	amqpWebhookConfig := amqphandler.Flags(fs, "amqpWebhook", flags.NewOverride("Exchange", "fibr.webhooks"), flags.NewOverride("Queue", "fibr.webhook-"+generateIdentityName()), flags.NewOverride("RoutingKey", "webhook"), flags.NewOverride("Exclusive", true), flags.NewOverride("RetryInterval", time.Duration(0)))
@@ -148,6 +149,9 @@ func main() {
 	shareApp, err := share.New(shareConfig, storageProvider, amqpClient)
 	logger.Fatal(err)
 
+	amqpThumbnailApp, err := amqphandler.New(amqpThumbnailConfig, amqpClient, tracerApp.GetTracer("amqp_handler_thumbnail"), thumbnailApp.AMQPHandler)
+	logger.Fatal(err)
+
 	amqpExifApp, err := amqphandler.New(amqpExifConfig, amqpClient, tracerApp.GetTracer("amqp_handler_exif"), exifApp.AMQPHandler)
 	logger.Fatal(err)
 
@@ -170,6 +174,7 @@ func main() {
 
 	ctx := context.Background()
 
+	go amqpThumbnailApp.Start(ctx, healthApp.Done())
 	go amqpExifApp.Start(ctx, healthApp.Done())
 	go amqpShareApp.Start(ctx, healthApp.Done())
 	go amqpWebhookApp.Start(ctx, healthApp.Done())

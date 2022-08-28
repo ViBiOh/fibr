@@ -8,10 +8,14 @@ import (
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
+	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 	"github.com/streadway/amqp"
 )
 
 func (a App) AMQPHandler(ctx context.Context, message amqp.Delivery) error {
+	ctx, end := tracer.StartSpan(ctx, a.tracer, "amqp")
+	defer end()
+
 	var resp provider.ExifResponse
 
 	if err := json.Unmarshal(message.Body, &resp); err != nil {
