@@ -271,7 +271,7 @@ type EventBus struct {
 	done    chan struct{}
 }
 
-func NewEventBus(size uint, prometheusRegisterer prometheus.Registerer, tracer trace.Tracer) (EventBus, error) {
+func NewEventBus(size uint64, prometheusRegisterer prometheus.Registerer, tracer trace.Tracer) (EventBus, error) {
 	var counter *prometheus.CounterVec
 
 	if prometheusRegisterer != nil {

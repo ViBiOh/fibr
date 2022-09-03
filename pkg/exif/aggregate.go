@@ -9,7 +9,6 @@ import (
 	exas "github.com/ViBiOh/exas/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/version"
-	"github.com/ViBiOh/httputils/v4/pkg/cache"
 	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 )
 
@@ -35,6 +34,27 @@ func (a App) GetExifFor(ctx context.Context, item absto.Item) (exas.Exif, error)
 	return a.exifCacheApp.Get(ctx, item)
 }
 
+func (a App) ListExifFor(ctx context.Context, items ...absto.Item) (map[string]exas.Exif, error) {
+	ctx, end := tracer.StartSpan(ctx, a.tracer, "list_exif")
+	defer end()
+
+	exifs, err := a.exifCacheApp.List(ctx, items...)
+	if err != nil {
+		return nil, err
+	}
+
+	output := make(map[string]exas.Exif, len(items))
+	exifsLen := len(exifs)
+
+	for index, item := range items {
+		if index < exifsLen {
+			output[item.ID] = exifs[index]
+		}
+	}
+
+	return output, nil
+}
+
 func (a App) GetAggregateFor(ctx context.Context, item absto.Item) (provider.Aggregate, error) {
 	if !item.IsDir {
 		return provider.Aggregate{}, nil
@@ -47,11 +67,11 @@ func (a App) GetAggregateFor(ctx context.Context, item absto.Item) (provider.Agg
 }
 
 func (a App) SaveExifFor(ctx context.Context, item absto.Item, exif exas.Exif) error {
-	return cache.EvictOnSuccess(ctx, a.redisClient, redisKey(item), a.saveMetadata(ctx, item, exif))
+	return a.exifCacheApp.EvictOnSuccess(ctx, item, a.saveMetadata(ctx, item, exif))
 }
 
 func (a App) SaveAggregateFor(ctx context.Context, item absto.Item, aggregate provider.Aggregate) error {
-	return cache.EvictOnSuccess(ctx, a.redisClient, redisKey(item), a.saveMetadata(ctx, item, aggregate))
+	return a.aggregateCacheApp.EvictOnSuccess(ctx, item, a.saveMetadata(ctx, item, aggregate))
 }
 
 func (a App) aggregate(ctx context.Context, item absto.Item) error {

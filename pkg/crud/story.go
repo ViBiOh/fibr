@@ -24,15 +24,17 @@ func (a App) story(r *http.Request, request provider.Request, item absto.Item, f
 		logger.WithField("fn", "crud.story").WithField("item", request.Path).Error("get aggregate: %s", err)
 	}
 
+	exifs, err := a.exifApp.ListExifFor(ctx, files...)
+	if err != nil {
+		logger.WithField("fn", "crud.story").WithField("item", request.Path).Error("list exifs: %s", err)
+	}
+
 	for _, file := range files {
 		if cover.IsZero() || (len(directoryAggregate.Cover) != 0 && cover.Img.Name != directoryAggregate.Cover) {
 			cover = newCover(provider.StorageToRender(file, request), thumbnail.SmallSize)
 		}
 
-		exif, err := a.exifApp.GetExifFor(ctx, file)
-		if err != nil {
-			logger.WithField("item", file.Pathname).Error("get exif: %s", err)
-		}
+		exif := exifs[file.ID]
 
 		if !request.Share.Story && !hasMap && exif.Geocode.HasCoordinates() {
 			hasMap = true

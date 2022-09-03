@@ -6,7 +6,6 @@ import (
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/v4/pkg/cache"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 )
 
@@ -67,10 +66,8 @@ func (a App) generateItem(ctx context.Context, event provider.Event) {
 	forced := event.IsForcedFor("thumbnail")
 
 	for _, size := range a.sizes {
-		cacheKey := redisKey(a.PathForScale(event.Item, size))
-
 		if event.GetMetadata("force") == "cache" {
-			if err := a.redisClient.Delete(ctx, cacheKey); err != nil {
+			if err := a.redisClient.Delete(ctx, redisKey(a.PathForScale(event.Item, size))); err != nil {
 				logger.WithField("fn", "thumbnail.generate").WithField("item", event.Item.Pathname).Error("flush cache for scale %d: %s", size, err)
 			}
 
@@ -83,7 +80,7 @@ func (a App) generateItem(ctx context.Context, event provider.Event) {
 			continue
 		}
 
-		if err := cache.EvictOnSuccess(ctx, a.redisClient, cacheKey, a.generate(ctx, event.Item, size)); err != nil {
+		if err := a.cacheApp.EvictOnSuccess(ctx, a.PathForScale(event.Item, size), a.generate(ctx, event.Item, size)); err != nil {
 			logger.WithField("fn", "thumbnail.generate").WithField("item", event.Item.Pathname).Error("generate for scale %d: %s", size, err)
 		}
 	}
@@ -97,7 +94,7 @@ func (a App) generateStreamIfNeeded(ctx context.Context, event provider.Event) {
 	if needStream, err := a.shouldGenerateStream(ctx, event.Item); err != nil {
 		logger.Error("determine if stream generation is possible: %s", err)
 	} else if needStream {
-		if err = cache.EvictOnSuccess(ctx, a.redisClient, redisKey(getStreamPath(event.Item)), a.generateStream(ctx, event.Item)); err != nil {
+		if err = a.cacheApp.EvictOnSuccess(ctx, getStreamPath(event.Item), a.generateStream(ctx, event.Item)); err != nil {
 			logger.Error("generate stream: %s", err)
 		}
 	}

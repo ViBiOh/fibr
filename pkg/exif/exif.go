@@ -18,6 +18,7 @@ import (
 	prom "github.com/ViBiOh/httputils/v4/pkg/prometheus"
 	"github.com/ViBiOh/httputils/v4/pkg/redis"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
+	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -69,7 +70,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 	}
 }
 
-func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheus.Registerer, tracer trace.Tracer, amqpClient *amqpclient.Client, redisClient redis.App) (App, error) {
+func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheus.Registerer, tracerApp tracer.App, amqpClient *amqpclient.Client, redisClient redis.App) (App, error) {
 	var amqpExchange string
 	if amqpClient != nil {
 		amqpExchange = strings.TrimSpace(*config.amqpExchange)
@@ -90,7 +91,7 @@ func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheu
 		amqpExchange:   amqpExchange,
 		amqpRoutingKey: strings.TrimSpace(*config.amqpRoutingKey),
 
-		tracer:     tracer,
+		tracer:     tracerApp.GetTracer("exif"),
 		storageApp: storageApp,
 		listStorageApp: storageApp.WithIgnoreFn(func(item absto.Item) bool {
 			return !strings.HasSuffix(item.Name, ".json")
@@ -100,8 +101,15 @@ func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheu
 		aggregateMetric: prom.CounterVec(prometheusRegisterer, "fibr", "aggregate", "item", "state"),
 	}
 
-	app.exifCacheApp = cache.New(redisClient, redisKey, app.loadExif, cacheDuration)
-	app.aggregateCacheApp = cache.New(redisClient, redisKey, app.loadAggregate, cacheDuration)
+	app.exifCacheApp = cache.New(redisClient, redisKey, func(ctx context.Context, item absto.Item) (exas.Exif, error) {
+		value, err := app.loadExif(ctx, item)
+		if absto.IsNotExist(err) {
+			return value, cache.ErrIgnore
+		}
+
+		return value, err
+	}, cacheDuration, provider.MaxConcurrency, tracerApp.GetTracer("exif_cache"))
+	app.aggregateCacheApp = cache.New(redisClient, redisKey, app.loadAggregate, cacheDuration, provider.MaxConcurrency, tracerApp.GetTracer("ggregate_cache"))
 
 	return app, nil
 }

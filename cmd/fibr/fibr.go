@@ -122,7 +122,7 @@ func main() {
 	storageProvider, err := absto.New(abstoConfig, tracerApp.GetTracer("storage"))
 	logger.Fatal(err)
 
-	eventBus, err := provider.NewEventBus(10, prometheusRegisterer, tracerApp.GetTracer("bus"))
+	eventBus, err := provider.NewEventBus(provider.MaxConcurrency, prometheusRegisterer, tracerApp.GetTracer("bus"))
 	logger.Fatal(err)
 
 	amqpClient, err := amqp.New(amqpConfig, prometheusApp.Registerer(), tracerApp.GetTracer("amqp"))
@@ -134,13 +134,13 @@ func main() {
 
 	redisClient := redis.New(redisConfig, prometheusApp.Registerer(), tracerApp.GetTracer("redis"))
 
-	thumbnailApp, err := thumbnail.New(thumbnailConfig, storageProvider, redisClient, prometheusRegisterer, tracerApp.GetTracer("thumbnail"), amqpClient)
+	thumbnailApp, err := thumbnail.New(thumbnailConfig, storageProvider, redisClient, prometheusRegisterer, tracerApp, amqpClient)
 	logger.Fatal(err)
 
 	rendererApp, err := renderer.New(rendererConfig, content, fibr.FuncMap, tracerApp.GetTracer("renderer"))
 	logger.Fatal(err)
 
-	exifApp, err := exif.New(exifConfig, storageProvider, prometheusRegisterer, tracerApp.GetTracer("exif"), amqpClient, redisClient)
+	exifApp, err := exif.New(exifConfig, storageProvider, prometheusRegisterer, tracerApp, amqpClient, redisClient)
 	logger.Fatal(err)
 
 	webhookApp, err := webhook.New(webhookConfig, storageProvider, prometheusRegisterer, amqpClient, rendererApp, thumbnailApp)

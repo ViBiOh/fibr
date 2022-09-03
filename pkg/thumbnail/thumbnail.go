@@ -23,6 +23,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/redis"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 	"github.com/ViBiOh/httputils/v4/pkg/sha"
+	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -92,7 +93,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 	}
 }
 
-func New(config Config, storage absto.Storage, redisClient redis.App, prometheusRegisterer prometheus.Registerer, tracer trace.Tracer, amqpClient *amqp.Client) (App, error) {
+func New(config Config, storage absto.Storage, redisClient redis.App, prometheusRegisterer prometheus.Registerer, tracerApp tracer.App, amqpClient *amqp.Client) (App, error) {
 	var amqpExchange string
 	if amqpClient != nil {
 		amqpExchange = strings.TrimSpace(*config.amqpExchange)
@@ -118,7 +119,7 @@ func New(config Config, storage absto.Storage, redisClient redis.App, prometheus
 		directAccess: *config.directAccess,
 
 		redisClient: redisClient,
-		tracer:      tracer,
+		tracer:      tracerApp.GetTracer("thumbnail"),
 
 		amqpExchange:            amqpExchange,
 		amqpStreamRoutingKey:    strings.TrimSpace(*config.amqpStreamRoutingKey),
@@ -133,13 +134,20 @@ func New(config Config, storage absto.Storage, redisClient redis.App, prometheus
 		}),
 		amqpClient:    amqpClient,
 		metric:        prom.CounterVec(prometheusRegisterer, "fibr", "thumbnail", "item", "type", "state"),
-		pathnameInput: make(chan absto.Item, 10),
+		pathnameInput: make(chan absto.Item, provider.MaxConcurrency),
 
 		largeSize: largeSize,
 		sizes:     sizes,
 	}
 
-	app.cacheApp = cache.New(redisClient, redisKey, app.storageApp.Info, redisCacheDuration)
+	app.cacheApp = cache.New(redisClient, redisKey, func(ctx context.Context, pathname string) (absto.Item, error) {
+		value, err := app.storageApp.Info(ctx, pathname)
+		if absto.IsNotExist(err) {
+			return value, cache.ErrIgnore
+		}
+
+		return value, err
+	}, redisCacheDuration, provider.MaxConcurrency, tracerApp.GetTracer("thumbnail_cache"))
 
 	return app, nil
 }
@@ -256,7 +264,7 @@ func (a App) thumbnailHash(ctx context.Context, items []absto.Item) string {
 		ids[index] = a.PathForScale(item, SmallSize)
 	}
 
-	thumbnails, err := a.cacheApp.List(ctx, 10, ids...)
+	thumbnails, err := a.cacheApp.List(ctx, ids...)
 	if err != nil {
 		logger.Error("list thumbnail hash: %s", err)
 	}

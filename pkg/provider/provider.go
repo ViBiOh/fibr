@@ -9,6 +9,9 @@ import (
 const (
 	// MetadataDirectoryName directory where metadata are stored
 	MetadataDirectoryName = "/.fibr"
+
+	// MaxConcurrency defines how many concurrent task can be launch in parallel when possible
+	MaxConcurrency = uint64(6)
 )
 
 var (
