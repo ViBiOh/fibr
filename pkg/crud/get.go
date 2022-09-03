@@ -21,6 +21,8 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 	"github.com/ViBiOh/httputils/v4/pkg/sha"
 	"github.com/ViBiOh/httputils/v4/pkg/tracer"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 func (a App) getWithMessage(w http.ResponseWriter, r *http.Request, request provider.Request, message renderer.Message) (renderer.Page, error) {
@@ -139,7 +141,7 @@ func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.
 }
 
 func (a App) listFiles(r *http.Request, request provider.Request, item absto.Item) (items []absto.Item, err error) {
-	ctx, end := tracer.StartSpan(r.Context(), a.tracer, "files")
+	ctx, end := tracer.StartSpan(r.Context(), a.tracer, "files", trace.WithAttributes(attribute.String("item", item.Pathname)))
 	defer end()
 
 	if query.GetBool(r, "search") {

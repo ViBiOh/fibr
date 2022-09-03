@@ -16,10 +16,12 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 	"github.com/ViBiOh/httputils/v4/pkg/tracer"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 func (a App) list(ctx context.Context, request provider.Request, message renderer.Message, item absto.Item, files []absto.Item) (renderer.Page, error) {
-	ctx, end := tracer.StartSpan(ctx, a.tracer, "list")
+	ctx, end := tracer.StartSpan(ctx, a.tracer, "list", trace.WithAttributes(attribute.String("item", item.Pathname)))
 	defer end()
 
 	directoryAggregate, err := a.exifApp.GetAggregateFor(ctx, item)
@@ -28,7 +30,7 @@ func (a App) list(ctx context.Context, request provider.Request, message rendere
 	}
 
 	items := make([]provider.RenderItem, len(files))
-	wg := concurrent.NewLimited(6)
+	wg := concurrent.NewLimited(provider.MaxConcurrency)
 
 	var thumbnails map[string]absto.Item
 	wg.Go(func() {
