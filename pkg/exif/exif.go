@@ -102,6 +102,10 @@ func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheu
 	}
 
 	app.exifCacheApp = cache.New(redisClient, redisKey, func(ctx context.Context, item absto.Item) (exas.Exif, error) {
+		if item.IsDir {
+			return exas.Exif{}, cache.ErrIgnore
+		}
+
 		value, err := app.loadExif(ctx, item)
 		if absto.IsNotExist(err) {
 			return value, cache.ErrIgnore
@@ -109,7 +113,19 @@ func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheu
 
 		return value, err
 	}, cacheDuration, provider.MaxConcurrency, tracerApp.GetTracer("exif_cache"))
-	app.aggregateCacheApp = cache.New(redisClient, redisKey, app.loadAggregate, cacheDuration, provider.MaxConcurrency, tracerApp.GetTracer("ggregate_cache"))
+
+	app.aggregateCacheApp = cache.New(redisClient, redisKey, func(ctx context.Context, item absto.Item) (provider.Aggregate, error) {
+		if !item.IsDir {
+			return provider.Aggregate{}, cache.ErrIgnore
+		}
+
+		value, err := app.loadAggregate(ctx, item)
+		if absto.IsNotExist(err) {
+			return value, cache.ErrIgnore
+		}
+
+		return value, err
+	}, cacheDuration, provider.MaxConcurrency, tracerApp.GetTracer("ggregate_cache"))
 
 	return app, nil
 }

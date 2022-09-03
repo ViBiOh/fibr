@@ -357,6 +357,26 @@ func (mr *ExifManagerMockRecorder) GetExifFor(ctx, item interface{}) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetExifFor", reflect.TypeOf((*ExifManager)(nil).GetExifFor), ctx, item)
 }
 
+// ListAggregateFor mocks base method.
+func (m *ExifManager) ListAggregateFor(ctx context.Context, items ...model.Item) (map[string]provider.Aggregate, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx}
+	for _, a := range items {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ListAggregateFor", varargs...)
+	ret0, _ := ret[0].(map[string]provider.Aggregate)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListAggregateFor indicates an expected call of ListAggregateFor.
+func (mr *ExifManagerMockRecorder) ListAggregateFor(ctx interface{}, items ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx}, items...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListAggregateFor", reflect.TypeOf((*ExifManager)(nil).ListAggregateFor), varargs...)
+}
+
 // ListDir mocks base method.
 func (m *ExifManager) ListDir(ctx context.Context, item model.Item) ([]model.Item, error) {
 	m.ctrl.T.Helper()

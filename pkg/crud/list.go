@@ -24,44 +24,55 @@ func (a App) list(ctx context.Context, request provider.Request, message rendere
 	ctx, end := tracer.StartSpan(ctx, a.tracer, "list", trace.WithAttributes(attribute.String("item", item.Pathname)))
 	defer end()
 
-	directoryAggregate, err := a.exifApp.GetAggregateFor(ctx, item)
-	if err != nil && !absto.IsNotExist(err) {
-		logger.WithField("fn", "crud.List").WithField("item", request.Path).Error("get aggregate: %s", err)
-	}
+	wg := concurrent.NewSimple()
 
-	items := make([]provider.RenderItem, len(files))
-	wg := concurrent.NewLimited(provider.MaxConcurrency)
-
-	var thumbnails map[string]absto.Item
+	var directoryAggregate provider.Aggregate
 	wg.Go(func() {
 		var err error
-		thumbnails, err = a.thumbnailApp.ListDir(ctx, item)
-		if err != nil {
-			logger.WithField("item", item.Pathname).Error("list thumbnail: %s", err)
-			return
+
+		directoryAggregate, err = a.exifApp.GetAggregateFor(ctx, item)
+		if err != nil && !absto.IsNotExist(err) {
+			logger.WithField("fn", "crud.list").WithField("item", item.Pathname).Error("get aggregate: %s", err)
 		}
 	})
 
-	for index, item := range files {
-		index := index
-		item := item
+	var aggregates map[string]provider.Aggregate
+	wg.Go(func() {
+		var err error
 
-		wg.Go(func() {
-			aggregate, err := a.exifApp.GetAggregateFor(ctx, item)
-			if err != nil {
-				logger.WithField("fn", "crud.List").WithField("item", item.Pathname).Error("read: %s", err)
-			}
+		aggregates, err = a.exifApp.ListAggregateFor(ctx, files...)
+		if err != nil {
+			logger.WithField("fn", "crud.list").WithField("item", item.Pathname).Error("list exifs: %s", err)
+		}
+	})
 
-			renderItem := provider.StorageToRender(item, request)
-			renderItem.Aggregate = aggregate
-			renderItem.IsCover = item.Name == directoryAggregate.Cover
+	var thumbnails map[string]absto.Item
+	thumbnailDone := make(chan struct{})
+	go func() {
+		defer close(thumbnailDone)
 
-			items[index] = renderItem
-		})
-	}
+		var err error
+
+		thumbnails, err = a.thumbnailApp.ListDir(ctx, item)
+		if err != nil {
+			logger.WithField("fn", "crud.list").WithField("item", item.Pathname).Error("list thumbnail: %s", err)
+			return
+		}
+	}()
 
 	wg.Wait()
 
+	items := make([]provider.RenderItem, len(files))
+
+	for index, item := range files {
+		renderItem := provider.StorageToRender(item, request)
+		renderItem.Aggregate = aggregates[item.ID]
+		renderItem.IsCover = item.Name == directoryAggregate.Cover
+
+		items[index] = renderItem
+	}
+
+	<-thumbnailDone
 	hasThumbnail, hasStory, cover := a.enrichThumbnail(ctx, directoryAggregate, items, thumbnails)
 
 	content := map[string]any{

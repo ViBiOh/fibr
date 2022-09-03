@@ -66,6 +66,27 @@ func (a App) GetAggregateFor(ctx context.Context, item absto.Item) (provider.Agg
 	return a.aggregateCacheApp.Get(ctx, item)
 }
 
+func (a App) ListAggregateFor(ctx context.Context, items ...absto.Item) (map[string]provider.Aggregate, error) {
+	ctx, end := tracer.StartSpan(ctx, a.tracer, "list_aggregate")
+	defer end()
+
+	exifs, err := a.aggregateCacheApp.List(ctx, items...)
+	if err != nil {
+		return nil, err
+	}
+
+	output := make(map[string]provider.Aggregate, len(items))
+	exifsLen := len(exifs)
+
+	for index, item := range items {
+		if index < exifsLen {
+			output[item.ID] = exifs[index]
+		}
+	}
+
+	return output, nil
+}
+
 func (a App) SaveExifFor(ctx context.Context, item absto.Item, exif exas.Exif) error {
 	return a.exifCacheApp.EvictOnSuccess(ctx, item, a.saveMetadata(ctx, item, exif))
 }
@@ -107,7 +128,8 @@ func (a App) computeAndSaveAggregate(ctx context.Context, dir absto.Item) error 
 			if absto.IsNotExist(err) {
 				return nil
 			}
-			return fmt.Errorf("unable load exif data: %w", err)
+
+			return fmt.Errorf("load exif data: %w", err)
 		}
 
 		if !exifData.Date.IsZero() {

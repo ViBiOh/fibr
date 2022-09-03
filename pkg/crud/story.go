@@ -26,8 +26,6 @@ func (a App) story(r *http.Request, request provider.Request, item absto.Item, f
 	wg := concurrent.NewSimple()
 
 	var directoryAggregate provider.Aggregate
-	var exifs map[string]exas.Exif
-
 	wg.Go(func() {
 		var err error
 
@@ -37,6 +35,7 @@ func (a App) story(r *http.Request, request provider.Request, item absto.Item, f
 		}
 	})
 
+	var exifs map[string]exas.Exif
 	wg.Go(func() {
 		var err error
 
