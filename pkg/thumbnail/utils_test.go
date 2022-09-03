@@ -6,6 +6,7 @@ import (
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/mocks"
+	"github.com/ViBiOh/httputils/v4/pkg/cache"
 	"github.com/golang/mock/gomock"
 )
 
@@ -86,6 +87,7 @@ func TestHasThumbnail(t *testing.T) {
 			storageMock := mocks.NewStorage(ctrl)
 
 			tc.instance.storageApp = storageMock
+			tc.instance.cacheApp = cache.New(nil, nil, storageMock.Info, 0)
 
 			if intention == "found" {
 				storageMock.EXPECT().Info(gomock.Any(), gomock.Any()).Return(absto.Item{}, nil)

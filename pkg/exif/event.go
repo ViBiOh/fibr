@@ -49,7 +49,7 @@ func (a App) Rename(ctx context.Context, old, new absto.Item) error {
 		return fmt.Errorf("rename exif: %w", err)
 	}
 
-	if err := a.redisClient.Delete(ctx, redisKey(old.ID)); err != nil {
+	if err := a.redisClient.Delete(ctx, redisKey(old)); err != nil {
 		return fmt.Errorf("cache: %s", err)
 	}
 
@@ -64,7 +64,7 @@ func (a App) handleStartEvent(ctx context.Context, event provider.Event) error {
 	forced := event.IsForcedFor("exif")
 
 	if event.GetMetadata("force") == "cache" {
-		if err := a.redisClient.Delete(ctx, redisKey(event.Item.ID)); err != nil {
+		if err := a.redisClient.Delete(ctx, redisKey(event.Item)); err != nil {
 			logger.WithField("fn", "exif.startEvent").WithField("item", event.Item.Pathname).Error("flush cache: %s", err)
 		}
 
@@ -159,7 +159,7 @@ func (a App) delete(ctx context.Context, item absto.Item) error {
 		return fmt.Errorf("delete: %w", err)
 	}
 
-	if err := a.redisClient.Delete(ctx, redisKey(item.ID)); err != nil {
+	if err := a.redisClient.Delete(ctx, redisKey(item)); err != nil {
 		return fmt.Errorf("cache: %s", err)
 	}
 

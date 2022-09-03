@@ -8,7 +8,6 @@ import (
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/version"
-	"github.com/ViBiOh/httputils/v4/pkg/cache"
 	"github.com/ViBiOh/httputils/v4/pkg/sha"
 	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 	"github.com/ViBiOh/vith/pkg/model"
@@ -89,7 +88,5 @@ func (a App) Info(ctx context.Context, pathname string) (absto.Item, error) {
 	ctx, end := tracer.StartSpan(ctx, a.tracer, "info")
 	defer end()
 
-	return cache.Retrieve(ctx, a.redisClient, func(ctx context.Context) (absto.Item, error) {
-		return a.storageApp.Info(ctx, pathname)
-	}, redisCacheDuration, redisKey(pathname))
+	return a.cacheApp.Get(ctx, pathname)
 }

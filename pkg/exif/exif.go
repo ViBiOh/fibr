@@ -12,6 +12,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/flags"
 	amqpclient "github.com/ViBiOh/httputils/v4/pkg/amqp"
+	"github.com/ViBiOh/httputils/v4/pkg/cache"
 	"github.com/ViBiOh/httputils/v4/pkg/httpjson"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	prom "github.com/ViBiOh/httputils/v4/pkg/prometheus"
@@ -22,11 +23,13 @@ import (
 )
 
 type App struct {
-	tracer          trace.Tracer
-	storageApp      absto.Storage
-	listStorageApp  absto.Storage
-	exifMetric      *prometheus.CounterVec
-	aggregateMetric *prometheus.CounterVec
+	tracer            trace.Tracer
+	storageApp        absto.Storage
+	listStorageApp    absto.Storage
+	exifMetric        *prometheus.CounterVec
+	aggregateMetric   *prometheus.CounterVec
+	exifCacheApp      cache.App[absto.Item, exas.Exif]
+	aggregateCacheApp cache.App[absto.Item, provider.Aggregate]
 
 	redisClient redis.App
 
@@ -76,7 +79,7 @@ func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheu
 		}
 	}
 
-	return App{
+	app := App{
 		exifRequest:  request.New().URL(strings.TrimSpace(*config.exifURL)).BasicAuth(strings.TrimSpace(*config.exifUser), *config.exifPass),
 		directAccess: *config.directAccess,
 		maxSize:      int64(*config.maxSize),
@@ -95,7 +98,12 @@ func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheu
 
 		exifMetric:      prom.CounterVec(prometheusRegisterer, "fibr", "exif", "item", "state"),
 		aggregateMetric: prom.CounterVec(prometheusRegisterer, "fibr", "aggregate", "item", "state"),
-	}, nil
+	}
+
+	app.exifCacheApp = cache.New(redisClient, redisKey, app.loadExif, cacheDuration)
+	app.aggregateCacheApp = cache.New(redisClient, redisKey, app.loadAggregate, cacheDuration)
+
+	return app, nil
 }
 
 func (a App) ListDir(ctx context.Context, item absto.Item) ([]absto.Item, error) {

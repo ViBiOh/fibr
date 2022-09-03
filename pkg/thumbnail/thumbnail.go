@@ -15,6 +15,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/amqp"
+	"github.com/ViBiOh/httputils/v4/pkg/cache"
 	"github.com/ViBiOh/httputils/v4/pkg/httperror"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	prom "github.com/ViBiOh/httputils/v4/pkg/prometheus"
@@ -41,6 +42,8 @@ type App struct {
 	largeStorageApp absto.Storage
 	pathnameInput   chan absto.Item
 	metric          *prometheus.CounterVec
+
+	cacheApp cache.App[string, absto.Item]
 
 	amqpClient              *amqp.Client
 	amqpThumbnailRoutingKey string
@@ -107,7 +110,7 @@ func New(config Config, storage absto.Storage, redisClient redis.App, prometheus
 		sizes = []uint64{SmallSize}
 	}
 
-	return App{
+	app := App{
 		vithRequest: request.New().URL(*config.vithURL).BasicAuth(*config.vithUser, *config.vithPass).WithClient(provider.SlowClient),
 
 		maxSize:      *config.maxSize,
@@ -134,7 +137,11 @@ func New(config Config, storage absto.Storage, redisClient redis.App, prometheus
 
 		largeSize: largeSize,
 		sizes:     sizes,
-	}, nil
+	}
+
+	app.cacheApp = cache.New(redisClient, redisKey, app.storageApp.Info, redisCacheDuration)
+
+	return app, nil
 }
 
 // LargeThumbnailSize give large thumbnail size

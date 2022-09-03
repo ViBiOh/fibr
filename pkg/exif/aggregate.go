@@ -20,8 +20,8 @@ var (
 	levels = []string{"city", "state", "country"}
 )
 
-func redisKey(itemID string) string {
-	return version.Redis("exif:" + itemID)
+func redisKey(item absto.Item) string {
+	return version.Redis("exif:" + item.ID)
 }
 
 func (a App) GetExifFor(ctx context.Context, item absto.Item) (exas.Exif, error) {
@@ -32,14 +32,7 @@ func (a App) GetExifFor(ctx context.Context, item absto.Item) (exas.Exif, error)
 	ctx, end := tracer.StartSpan(ctx, a.tracer, "get_exif")
 	defer end()
 
-	return cache.Retrieve(ctx, a.redisClient, func(ctx context.Context) (exas.Exif, error) {
-		exif, err := a.loadExif(ctx, item)
-		if err != nil && !absto.IsNotExist(err) {
-			return exif, fmt.Errorf("load exif: %w", err)
-		}
-
-		return exif, nil
-	}, cacheDuration, redisKey(item.ID))
+	return a.exifCacheApp.Get(ctx, item)
 }
 
 func (a App) GetAggregateFor(ctx context.Context, item absto.Item) (provider.Aggregate, error) {
@@ -50,22 +43,15 @@ func (a App) GetAggregateFor(ctx context.Context, item absto.Item) (provider.Agg
 	ctx, end := tracer.StartSpan(ctx, a.tracer, "aggregate")
 	defer end()
 
-	return cache.Retrieve(ctx, a.redisClient, func(ctx context.Context) (provider.Aggregate, error) {
-		aggregate, err := a.loadAggregate(ctx, item)
-		if err != nil && !absto.IsNotExist(err) {
-			return aggregate, fmt.Errorf("load aggregate: %w", err)
-		}
-
-		return aggregate, nil
-	}, cacheDuration, redisKey(item.ID))
+	return a.aggregateCacheApp.Get(ctx, item)
 }
 
 func (a App) SaveExifFor(ctx context.Context, item absto.Item, exif exas.Exif) error {
-	return cache.EvictOnSuccess(ctx, a.redisClient, redisKey(item.ID), a.saveMetadata(ctx, item, exif))
+	return cache.EvictOnSuccess(ctx, a.redisClient, redisKey(item), a.saveMetadata(ctx, item, exif))
 }
 
 func (a App) SaveAggregateFor(ctx context.Context, item absto.Item, aggregate provider.Aggregate) error {
-	return cache.EvictOnSuccess(ctx, a.redisClient, redisKey(item.ID), a.saveMetadata(ctx, item, aggregate))
+	return cache.EvictOnSuccess(ctx, a.redisClient, redisKey(item), a.saveMetadata(ctx, item, aggregate))
 }
 
 func (a App) aggregate(ctx context.Context, item absto.Item) error {
