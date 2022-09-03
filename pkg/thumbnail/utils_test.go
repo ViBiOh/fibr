@@ -93,7 +93,7 @@ func TestHasThumbnail(t *testing.T) {
 				storageMock.EXPECT().Info(gomock.Any(), gomock.Any()).Return(absto.Item{}, nil)
 			}
 
-			if result := tc.instance.HasThumbnail(context.Background(), tc.input, SmallSize); result != tc.want {
+			if result := tc.instance.HasThumbnail(context.TODO(), tc.input, SmallSize); result != tc.want {
 				t.Errorf("HasThumbnail() = %t, want %t", result, tc.want)
 			}
 		})
