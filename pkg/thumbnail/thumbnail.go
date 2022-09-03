@@ -251,12 +251,20 @@ func (a App) List(w http.ResponseWriter, r *http.Request, item absto.Item, items
 }
 
 func (a App) thumbnailHash(ctx context.Context, items []absto.Item) string {
+	ids := make([]string, len(items))
+	for index, item := range items {
+		ids[index] = a.PathForScale(item, SmallSize)
+	}
+
+	thumbnails, err := a.cacheApp.List(ctx, 10, ids...)
+	if err != nil {
+		logger.Error("list thumbnail hash: %s", err)
+	}
+
 	hasher := sha.Stream()
 
-	for _, item := range items {
-		if info, err := a.Info(ctx, a.PathForScale(item, SmallSize)); err == nil {
-			hasher.Write(info)
-		}
+	for _, thumbnail := range thumbnails {
+		hasher.Write(thumbnail)
 	}
 
 	return hasher.Sum()
