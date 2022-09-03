@@ -32,14 +32,14 @@ func (a App) GetExifFor(ctx context.Context, item absto.Item) (exas.Exif, error)
 	ctx, end := tracer.StartSpan(ctx, a.tracer, "get_exif")
 	defer end()
 
-	return cache.Retrieve(ctx, a.redisClient, redisKey(item.ID), func(ctx context.Context) (exas.Exif, error) {
+	return cache.Retrieve(ctx, a.redisClient, func(ctx context.Context) (exas.Exif, error) {
 		exif, err := a.loadExif(ctx, item)
 		if err != nil && !absto.IsNotExist(err) {
 			return exif, fmt.Errorf("load exif: %w", err)
 		}
 
 		return exif, nil
-	}, cacheDuration)
+	}, cacheDuration, redisKey(item.ID))
 }
 
 func (a App) GetAggregateFor(ctx context.Context, item absto.Item) (provider.Aggregate, error) {
@@ -50,14 +50,14 @@ func (a App) GetAggregateFor(ctx context.Context, item absto.Item) (provider.Agg
 	ctx, end := tracer.StartSpan(ctx, a.tracer, "aggregate")
 	defer end()
 
-	return cache.Retrieve(ctx, a.redisClient, redisKey(item.ID), func(ctx context.Context) (provider.Aggregate, error) {
+	return cache.Retrieve(ctx, a.redisClient, func(ctx context.Context) (provider.Aggregate, error) {
 		aggregate, err := a.loadAggregate(ctx, item)
 		if err != nil && !absto.IsNotExist(err) {
 			return aggregate, fmt.Errorf("load aggregate: %w", err)
 		}
 
 		return aggregate, nil
-	}, cacheDuration)
+	}, cacheDuration, redisKey(item.ID))
 }
 
 func (a App) SaveExifFor(ctx context.Context, item absto.Item, exif exas.Exif) error {

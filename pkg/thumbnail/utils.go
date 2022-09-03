@@ -89,7 +89,7 @@ func (a App) Info(ctx context.Context, pathname string) (absto.Item, error) {
 	ctx, end := tracer.StartSpan(ctx, a.tracer, "info")
 	defer end()
 
-	return cache.Retrieve(ctx, a.redisClient, redisKey(pathname), func(ctx context.Context) (absto.Item, error) {
+	return cache.Retrieve(ctx, a.redisClient, func(ctx context.Context) (absto.Item, error) {
 		return a.storageApp.Info(ctx, pathname)
-	}, redisCacheDuration)
+	}, redisCacheDuration, redisKey(pathname))
 }
