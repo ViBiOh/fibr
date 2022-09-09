@@ -2,6 +2,7 @@ package exif
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"net/http"
@@ -22,6 +23,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"go.opentelemetry.io/otel/trace"
 )
+
+var errInvalidItemType = errors.New("invalid item type")
 
 type App struct {
 	tracer            trace.Tracer
@@ -103,28 +106,30 @@ func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheu
 
 	app.exifCacheApp = cache.New(redisClient, redisKey, func(ctx context.Context, item absto.Item) (exas.Exif, error) {
 		if item.IsDir {
-			return exas.Exif{}, cache.ErrIgnore
+			return exas.Exif{}, errInvalidItemType
 		}
 
-		value, err := app.loadExif(ctx, item)
-		if absto.IsNotExist(err) {
-			return value, cache.ErrIgnore
+		return app.loadExif(ctx, item)
+	}, func(item absto.Item, err error) {
+		if absto.IsNotExist(err) || errors.Is(err, errInvalidItemType) {
+			return
 		}
 
-		return value, err
+		logger.WithField("item", item.Pathname).Error("load exif: %s", item.Pathname, err)
 	}, cacheDuration, provider.MaxConcurrency, tracerApp.GetTracer("exif_cache"))
 
 	app.aggregateCacheApp = cache.New(redisClient, redisKey, func(ctx context.Context, item absto.Item) (provider.Aggregate, error) {
 		if !item.IsDir {
-			return provider.Aggregate{}, cache.ErrIgnore
+			return provider.Aggregate{}, errInvalidItemType
 		}
 
-		value, err := app.loadAggregate(ctx, item)
-		if absto.IsNotExist(err) {
-			return value, cache.ErrIgnore
+		return app.loadAggregate(ctx, item)
+	}, func(item absto.Item, err error) {
+		if absto.IsNotExist(err) || errors.Is(err, errInvalidItemType) {
+			return
 		}
 
-		return value, err
+		logger.WithField("item", item.Pathname).Error("load exif: %s", item.Pathname, err)
 	}, cacheDuration, provider.MaxConcurrency, tracerApp.GetTracer("ggregate_cache"))
 
 	return app, nil

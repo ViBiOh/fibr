@@ -2,12 +2,13 @@
 version: '2.1'
 
 services:
-  site:
+  service:
     image: vibioh/fibr
     environment:
       FIBR_AUTH_USERS: '${BASIC_USERS}'
       FIBR_EXIF_DIRECT_ACCESS: 'true'
       FIBR_THUMBNAIL_DIRECT_ACCESS: 'true'
+      FIBR_REDIS_ADDRESS: redis:6379
     ports:
       - '1080:1080/tcp'
     volumes:
@@ -17,6 +18,11 @@ services:
       - vith
       - exas
     user: '${DATA_USER_ID}'
+    restart: on-failure
+    read_only: true
+
+  redis:
+    image: redis
     restart: on-failure
     read_only: true
 

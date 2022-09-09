@@ -141,12 +141,13 @@ func New(config Config, storage absto.Storage, redisClient redis.App, prometheus
 	}
 
 	app.cacheApp = cache.New(redisClient, redisKey, func(ctx context.Context, pathname string) (absto.Item, error) {
-		value, err := app.storageApp.Info(ctx, pathname)
+		return app.storageApp.Info(ctx, pathname)
+	}, func(pathname string, err error) {
 		if absto.IsNotExist(err) {
-			return value, cache.ErrIgnore
+			return
 		}
 
-		return value, err
+		logger.WithField("item", pathname).Error("get info: %s", pathname, err)
 	}, redisCacheDuration, provider.MaxConcurrency, tracerApp.GetTracer("thumbnail_cache"))
 
 	return app, nil
