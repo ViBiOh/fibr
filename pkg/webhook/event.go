@@ -20,7 +20,6 @@ import (
 
 const amqpThumbnailDiscordDelay = 10 * time.Second
 
-// EventConsumer handle event pushed to the event bus
 func (a *App) EventConsumer(ctx context.Context, event provider.Event) {
 	a.RLock()
 	defer a.RUnlock()

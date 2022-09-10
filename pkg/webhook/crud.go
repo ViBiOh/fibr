@@ -24,7 +24,6 @@ func (a *App) generateID() (string, error) {
 	}
 }
 
-// List webhooks
 func (a *App) List() (webhooks []provider.Webhook) {
 	a.RLock()
 	defer a.RUnlock()
@@ -42,7 +41,6 @@ func (a *App) List() (webhooks []provider.Webhook) {
 	return webhooks
 }
 
-// Create a webhook
 func (a *App) Create(ctx context.Context, pathname string, recursive bool, kind provider.WebhookKind, url string, types []provider.EventType) (string, error) {
 	var id string
 
@@ -77,7 +75,6 @@ func (a *App) Create(ctx context.Context, pathname string, recursive bool, kind 
 	})
 }
 
-// Delete a webhook
 func (a *App) Delete(ctx context.Context, id string) error {
 	return a.Exclusive(ctx, a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
 		return a.delete(ctx, id)

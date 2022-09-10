@@ -9,7 +9,6 @@ import (
 	"github.com/streadway/amqp"
 )
 
-// AMQPHandler handle exif message
 func (a *App) AMQPHandler(_ context.Context, message amqp.Delivery) error {
 	var webhook provider.Webhook
 
