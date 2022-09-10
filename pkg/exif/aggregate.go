@@ -38,10 +38,7 @@ func (a App) ListExifFor(ctx context.Context, items ...absto.Item) (map[string]e
 	ctx, end := tracer.StartSpan(ctx, a.tracer, "list_exif")
 	defer end()
 
-	exifs, err := a.exifCacheApp.List(ctx, items...)
-	if err != nil {
-		return nil, err
-	}
+	exifs := a.exifCacheApp.List(ctx, onExifError, items...)
 
 	output := make(map[string]exas.Exif, len(items))
 	exifsLen := len(exifs)
@@ -70,10 +67,7 @@ func (a App) ListAggregateFor(ctx context.Context, items ...absto.Item) (map[str
 	ctx, end := tracer.StartSpan(ctx, a.tracer, "list_aggregate")
 	defer end()
 
-	exifs, err := a.aggregateCacheApp.List(ctx, items...)
-	if err != nil {
-		return nil, err
-	}
+	exifs := a.aggregateCacheApp.List(ctx, onAggregateError, items...)
 
 	output := make(map[string]provider.Aggregate, len(items))
 	exifsLen := len(exifs)

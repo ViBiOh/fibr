@@ -142,12 +142,6 @@ func New(config Config, storage absto.Storage, redisClient redis.App, prometheus
 
 	app.cacheApp = cache.New(redisClient, redisKey, func(ctx context.Context, pathname string) (absto.Item, error) {
 		return app.storageApp.Info(ctx, pathname)
-	}, func(pathname string, err error) {
-		if absto.IsNotExist(err) {
-			return
-		}
-
-		logger.WithField("item", pathname).Error("get info: %s", pathname, err)
 	}, redisCacheDuration, provider.MaxConcurrency, tracerApp.GetTracer("thumbnail_cache"))
 
 	return app, nil
@@ -265,14 +259,9 @@ func (a App) thumbnailHash(ctx context.Context, items []absto.Item) string {
 		ids[index] = a.PathForScale(item, SmallSize)
 	}
 
-	thumbnails, err := a.cacheApp.List(ctx, ids...)
-	if err != nil {
-		logger.Error("list thumbnail hash: %s", err)
-	}
-
 	hasher := sha.Stream()
 
-	for _, thumbnail := range thumbnails {
+	for _, thumbnail := range a.cacheApp.List(ctx, onCacheError, ids...) {
 		hasher.Write(thumbnail)
 	}
 

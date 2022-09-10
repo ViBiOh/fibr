@@ -87,7 +87,7 @@ func TestHasThumbnail(t *testing.T) {
 			storageMock := mocks.NewStorage(ctrl)
 
 			tc.instance.storageApp = storageMock
-			tc.instance.cacheApp = cache.New(nil, nil, storageMock.Info, nil, 0, 0, nil)
+			tc.instance.cacheApp = cache.New(nil, nil, storageMock.Info, 0, 0, nil)
 
 			if intention == "found" {
 				storageMock.EXPECT().Info(gomock.Any(), gomock.Any()).Return(absto.Item{}, nil)

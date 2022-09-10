@@ -110,12 +110,6 @@ func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheu
 		}
 
 		return app.loadExif(ctx, item)
-	}, func(item absto.Item, err error) {
-		if absto.IsNotExist(err) || errors.Is(err, errInvalidItemType) {
-			return
-		}
-
-		logger.WithField("item", item.Pathname).Error("load exif: %s", item.Pathname, err)
 	}, cacheDuration, provider.MaxConcurrency, tracerApp.GetTracer("exif_cache"))
 
 	app.aggregateCacheApp = cache.New(redisClient, redisKey, func(ctx context.Context, item absto.Item) (provider.Aggregate, error) {
@@ -124,12 +118,6 @@ func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheu
 		}
 
 		return app.loadAggregate(ctx, item)
-	}, func(item absto.Item, err error) {
-		if absto.IsNotExist(err) || errors.Is(err, errInvalidItemType) {
-			return
-		}
-
-		logger.WithField("item", item.Pathname).Error("load exif: %s", item.Pathname, err)
 	}, cacheDuration, provider.MaxConcurrency, tracerApp.GetTracer("ggregate_cache"))
 
 	return app, nil
