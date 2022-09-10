@@ -54,7 +54,7 @@ func (a App) story(r *http.Request, request provider.Request, item absto.Item, f
 
 		exif := exifs[file.ID]
 
-		if !request.Share.Story && !hasMap && exif.Geocode.HasCoordinates() {
+		if !hasMap && exif.Geocode.HasCoordinates() {
 			hasMap = true
 		}
 
