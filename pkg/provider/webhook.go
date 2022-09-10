@@ -94,7 +94,7 @@ func (w Webhook) hasType(eventType EventType) bool {
 }
 
 func (w Webhook) matchItem(item absto.Item) bool {
-	if len(item.Name) == 0 {
+	if item.IsZero() {
 		return false
 	}
 

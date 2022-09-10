@@ -23,7 +23,7 @@ func newCover(item provider.RenderItem, size uint64) cover {
 }
 
 func (c cover) IsZero() bool {
-	return len(c.Img.Item.Name) == 0
+	return c.Img.IsZero()
 }
 
 func (a App) getCover(ctx context.Context, request provider.Request, files []absto.Item) (output cover) {

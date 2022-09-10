@@ -57,7 +57,7 @@ type RenderItem struct {
 }
 
 func (r RenderItem) IsZero() bool {
-	return len(r.Item.Pathname) == 0
+	return r.Item.IsZero()
 }
 
 func (r RenderItem) IsImage() bool {
