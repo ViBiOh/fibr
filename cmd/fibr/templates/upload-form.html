@@ -393,6 +393,7 @@
 
       const uploadButton = document.getElementById('upload-button');
       if (uploadButton) {
+        uploadButton.disabled = true;
         replaceContent(uploadButton, generateThrobber(['throbber-white']));
       }
 
@@ -417,6 +418,7 @@
         } catch (err) {
           sliceFileList('file', i);
           if (uploadButton) {
+            uploadButton.disabled = false;
             uploadButton.innerHTML = 'Retry';
           }
           await setUploadStatus(container, 'X', 'danger', err);
