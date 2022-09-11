@@ -84,7 +84,10 @@
     async function fetchThumbnail() {
       let fetchURL = document.location.search;
       if (fetchURL.includes('?')) {
-        fetchURL += '&thumbnail';
+        if (!fetchURL.endsWith("&")) {
+          fetchURL += '&';
+        }
+        fetchURL += 'thumbnail';
       } else {
         fetchURL += '?thumbnail';
       }
