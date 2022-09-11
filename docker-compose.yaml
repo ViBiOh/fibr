@@ -5,6 +5,7 @@ services:
   service:
     image: vibioh/fibr
     environment:
+      FIBR_AMQP_URI: amqp://amqp:6572/
       FIBR_AUTH_USERS: '${BASIC_USERS}'
       FIBR_CHUNK_UPLOAD: 'true'
       FIBR_EXIF_DIRECT_ACCESS: 'true'
@@ -16,9 +17,10 @@ services:
       - ${DATA_DIR}:/data
       - /tmp:/tmp
     depends_on:
-      - image
-      - vith
+      - redis
+      - amqp
       - exas
+      - vith
     user: '${DATA_USER_ID}'
     restart: on-failure
     read_only: true
@@ -28,26 +30,35 @@ services:
     restart: on-failure
     read_only: true
 
+  amqp:
+    image: rabbitmq:management
+    ports:
+      - '15672:15672/tcp'
+    restart: on-failure
+
+  exas:
+    image: vibioh/exas
+    environment:
+      EXAS_AMQP_URI: 'amqp://amqp:6572/'
+      EXAS_GEOCODE_URL: 'https://nominatim.openstreetmap.org'
+      EXAS_STORAGE_FILE_SYSTEM_DIRECTORY: '/data'
+    volumes:
+      - ${DATA_DIR}:/data
+    user: '${DATA_USER_ID}'
+    restart: on-failure
+
   vith:
     image: vibioh/vith
     environment:
+      VITH_AMQP_URI: 'amqp://amqp:6572/'
       VITH_STORAGE_FILE_SYSTEM_DIRECTORY: '/data'
     volumes:
       - ${DATA_DIR}:/data
+    depends_on:
+      - image
     user: '${DATA_USER_ID}'
     restart: on-failure
 
   image:
     image: h2non/imaginary
-    restart: on-failure
-    read_only: true
-
-  exas:
-    image: vibioh/exas
-    environment:
-      EXAS_STORAGE_FILE_SYSTEM_DIRECTORY: '/data'
-      EXAS_GEOCODE_URL: 'https://nominatim.openstreetmap.org'
-    volumes:
-      - ${DATA_DIR}:/data
-    user: '${DATA_USER_ID}'
     restart: on-failure
