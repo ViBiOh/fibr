@@ -7,15 +7,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 )
 
-func onExifError(item absto.Item, err error) bool {
-	if !absto.IsNotExist(err) && !errors.Is(err, errInvalidItemType) {
-		logger.WithField("item", item.Pathname).Error("load exif: %s", item.Pathname, err)
-	}
-
-	return true
-}
-
-func onAggregateError(item absto.Item, err error) bool {
+func onListError(item absto.Item, err error) bool {
 	if !absto.IsNotExist(err) && !errors.Is(err, errInvalidItemType) {
 		logger.WithField("item", item.Pathname).Error("load exif: %s", item.Pathname, err)
 	}

@@ -20,6 +20,10 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
+func listLogger(pathname string) logger.Provider {
+	return logger.WithField("fn", "crud.list").WithField("item", pathname)
+}
+
 func (a App) list(ctx context.Context, request provider.Request, message renderer.Message, item absto.Item, files []absto.Item) (renderer.Page, error) {
 	ctx, end := tracer.StartSpan(ctx, a.tracer, "list", trace.WithAttributes(attribute.String("item", item.Pathname)))
 	defer end()
@@ -32,7 +36,7 @@ func (a App) list(ctx context.Context, request provider.Request, message rendere
 
 		directoryAggregate, err = a.exifApp.GetAggregateFor(ctx, item)
 		if err != nil && !absto.IsNotExist(err) {
-			logger.WithField("fn", "crud.list").WithField("item", item.Pathname).Error("get aggregate: %s", err)
+			listLogger(item.Pathname).Error("get aggregate: %s", err)
 		}
 	})
 
@@ -42,7 +46,7 @@ func (a App) list(ctx context.Context, request provider.Request, message rendere
 
 		aggregates, err = a.exifApp.ListAggregateFor(ctx, files...)
 		if err != nil {
-			logger.WithField("fn", "crud.list").WithField("item", item.Pathname).Error("list exifs: %s", err)
+			listLogger(item.Pathname).Error("list exifs: %s", err)
 		}
 	})
 
@@ -55,7 +59,7 @@ func (a App) list(ctx context.Context, request provider.Request, message rendere
 
 		thumbnails, err = a.thumbnailApp.ListDir(ctx, item)
 		if err != nil {
-			logger.WithField("fn", "crud.list").WithField("item", item.Pathname).Error("list thumbnail: %s", err)
+			listLogger(item.Pathname).Error("list thumbnail: %s", err)
 			return
 		}
 	}()

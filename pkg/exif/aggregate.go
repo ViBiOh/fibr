@@ -38,7 +38,7 @@ func (a App) ListExifFor(ctx context.Context, items ...absto.Item) (map[string]e
 	ctx, end := tracer.StartSpan(ctx, a.tracer, "list_exif")
 	defer end()
 
-	exifs, err := a.exifCacheApp.List(ctx, onExifError, items...)
+	exifs, err := a.exifCacheApp.List(ctx, onListError, items...)
 	if err != nil {
 		return nil, fmt.Errorf("list: %w", err)
 	}
@@ -70,7 +70,7 @@ func (a App) ListAggregateFor(ctx context.Context, items ...absto.Item) (map[str
 	ctx, end := tracer.StartSpan(ctx, a.tracer, "list_aggregate")
 	defer end()
 
-	exifs, err := a.aggregateCacheApp.List(ctx, onAggregateError, items...)
+	exifs, err := a.aggregateCacheApp.List(ctx, onListError, items...)
 	if err != nil {
 		return nil, fmt.Errorf("list: %w", err)
 	}
