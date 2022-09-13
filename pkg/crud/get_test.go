@@ -43,12 +43,28 @@ func BenchmarkServeGeoJSON(b *testing.B) {
 
 	mockExif := mocks.NewExifManager(ctrl)
 
-	mockExif.EXPECT().GetExifFor(gomock.Any(), gomock.Any()).Return(exas.Exif{
-		Geocode: exas.Geocode{
-			Latitude:  1.0,
-			Longitude: 1.0,
+	mockExif.EXPECT().ListExifFor(gomock.Any(), gomock.Any()).Return(map[string]exas.Exif{
+		"9012": {
+			Geocode: exas.Geocode{
+				Latitude:  1.0,
+				Longitude: 1.0,
+			},
+			Date: time.Date(2022, 0o2, 22, 22, 0o2, 22, 0, time.UTC),
 		},
-		Date: time.Date(2022, 0o2, 22, 22, 0o2, 22, 0, time.UTC),
+		"5678": {
+			Geocode: exas.Geocode{
+				Latitude:  1.0,
+				Longitude: 1.0,
+			},
+			Date: time.Date(2022, 0o2, 22, 22, 0o2, 22, 0, time.UTC),
+		},
+		"1234": {
+			Geocode: exas.Geocode{
+				Latitude:  1.0,
+				Longitude: 1.0,
+			},
+			Date: time.Date(2022, 0o2, 22, 22, 0o2, 22, 0, time.UTC),
+		},
 	}, nil).AnyTimes()
 
 	mockExif.EXPECT().ListDir(gomock.Any(), gomock.Any()).Return(items, nil).AnyTimes()

@@ -47,6 +47,14 @@ func (a ByHybridSort) Less(i, j int) bool {
 	return greaterTime(first.Date, second.Date)
 }
 
+type ByID []absto.Item
+
+func (a ByID) Len() int      { return len(a) }
+func (a ByID) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+func (a ByID) Less(i, j int) bool {
+	return a[i].ID < a[j].ID
+}
+
 type RenderItem struct {
 	Aggregate
 	URL  string

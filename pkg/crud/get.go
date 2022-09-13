@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"path"
 	"path/filepath"
@@ -12,6 +13,7 @@ import (
 	"time"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
+	exas "github.com/ViBiOh/exas/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/exif"
 	"github.com/ViBiOh/fibr/pkg/geo"
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -193,11 +195,20 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 		return
 	}
 
+	exifs, err := a.exifApp.ListExifFor(ctx, items...)
+	if err != nil {
+		a.error(w, r, request, err)
+	}
+
 	w.Header().Add("Content-Type", "application/json; charset=utf-8")
 	w.Header().Add("Cache-Control", "no-cache")
 	w.Header().Add("Etag", etag)
 	w.WriteHeader(http.StatusOK)
 
+	a.generateGeoJSON(ctx, w, request, items, exifs)
+}
+
+func (a App) generateGeoJSON(ctx context.Context, w io.Writer, request provider.Request, items []absto.Item, exifs map[string]exas.Exif) {
 	done := ctx.Done()
 	isDone := func() bool {
 		select {
@@ -208,6 +219,8 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 		}
 	}
 
+	sort.Sort(provider.ByID(items))
+
 	var commaNeeded bool
 	encoder := json.NewEncoder(w)
 
@@ -216,18 +229,17 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 	point := geo.NewPoint(geo.NewPosition(0, 0))
 	feature := geo.NewFeature(&point, map[string]any{})
 
-	for _, item := range items {
+	for id, exif := range exifs {
 		if isDone() {
 			return
 		}
 
-		exifContent, err := a.exifApp.GetExifFor(ctx, item)
-		if err != nil {
-			logger.WithField("item", item.Pathname).Error("get exif: %s", err)
+		if !exif.Geocode.HasCoordinates() {
 			continue
 		}
 
-		if !exifContent.Geocode.HasCoordinates() {
+		item := dichotomicFind(items, id)
+		if item.IsZero() {
 			continue
 		}
 
@@ -237,11 +249,11 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 			commaNeeded = true
 		}
 
-		point.Coordinates.Latitude = exifContent.Geocode.Latitude
-		point.Coordinates.Longitude = exifContent.Geocode.Longitude
+		point.Coordinates.Latitude = exif.Geocode.Latitude
+		point.Coordinates.Longitude = exif.Geocode.Longitude
 
 		feature.Properties["url"] = request.RelativeURL(item)
-		feature.Properties["date"] = exifContent.Date.Format(time.RFC850)
+		feature.Properties["date"] = exif.Date.Format(time.RFC850)
 
 		if err := encoder.Encode(feature); err != nil {
 			logger.WithField("item", item.Pathname).Error("encode feature: %s", err)
@@ -249,6 +261,28 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 	}
 
 	provider.SafeWrite(w, "]}")
+}
+
+func dichotomicFind(items []absto.Item, id string) absto.Item {
+	min := 0
+	max := len(items) - 1
+
+	for min <= max {
+		current := (min + max) / 2
+
+		item := items[current]
+		if item.ID == id {
+			return item
+		}
+
+		if item.ID < id {
+			max = current - 1
+		} else {
+			min = current + 1
+		}
+	}
+
+	return absto.Item{}
 }
 
 func (a App) exifHash(ctx context.Context, items []absto.Item) string {
@@ -263,7 +297,6 @@ func (a App) exifHash(ctx context.Context, items []absto.Item) string {
 	return hasher.Sum()
 }
 
-// Get output content
 func (a App) Get(w http.ResponseWriter, r *http.Request, request provider.Request) (renderer.Page, error) {
 	return a.getWithMessage(w, r, request, renderer.ParseMessage(r))
 }
