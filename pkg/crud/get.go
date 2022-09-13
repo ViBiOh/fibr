@@ -275,7 +275,7 @@ func dichotomicFind(items []absto.Item, id string) absto.Item {
 			return item
 		}
 
-		if item.ID < id {
+		if id < item.ID {
 			max = current - 1
 		} else {
 			min = current + 1
