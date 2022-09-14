@@ -87,3 +87,98 @@ func BenchmarkServeGeoJSON(b *testing.B) {
 		instance.serveGeoJSON(httptest.NewRecorder(), r, request, item, items)
 	}
 }
+
+func TestDichotomicFind(t *testing.T) {
+	t.Parallel()
+
+	type args struct {
+		items []absto.Item
+		id    string
+	}
+
+	cases := map[string]struct {
+		args args
+		want absto.Item
+	}{
+		"empty": {
+			args{},
+			absto.Item{},
+		},
+		"one item": {
+			args{
+				items: []absto.Item{
+					{ID: "1234"},
+				},
+				id: "1234",
+			},
+			absto.Item{ID: "1234"},
+		},
+		"not found": {
+			args{
+				items: []absto.Item{
+					{ID: "1234"},
+				},
+				id: "2345",
+			},
+			absto.Item{},
+		},
+		"odd number lower": {
+			args{
+				items: []absto.Item{
+					{ID: "1234"},
+					{ID: "2345"},
+					{ID: "3456"},
+				},
+				id: "1234",
+			},
+			absto.Item{ID: "1234"},
+		},
+		"odd number upper": {
+			args{
+				items: []absto.Item{
+					{ID: "1234"},
+					{ID: "2345"},
+					{ID: "3456"},
+				},
+				id: "3456",
+			},
+			absto.Item{ID: "3456"},
+		},
+		"even number lower": {
+			args{
+				items: []absto.Item{
+					{ID: "1234"},
+					{ID: "2345"},
+					{ID: "3456"},
+					{ID: "4567"},
+				},
+				id: "2345",
+			},
+			absto.Item{ID: "2345"},
+		},
+		"even number upper": {
+			args{
+				items: []absto.Item{
+					{ID: "1234"},
+					{ID: "2345"},
+					{ID: "3456"},
+					{ID: "4567"},
+				},
+				id: "4567",
+			},
+			absto.Item{ID: "4567"},
+		},
+	}
+
+	for intention, testCase := range cases {
+		intention, testCase := intention, testCase
+
+		t.Run(intention, func(t *testing.T) {
+			t.Parallel()
+
+			if got := dichotomicFind(testCase.args.items, testCase.args.id); got != testCase.want {
+				t.Errorf("dichotomicFind() = %#v, want %#v", got, testCase.want)
+			}
+		})
+	}
+}
