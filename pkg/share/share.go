@@ -79,7 +79,6 @@ func New(config Config, storageApp absto.Storage, amqpClient *amqp.Client) (*App
 	}, nil
 }
 
-// Exclusive does action on shares with exclusive lock
 func (a *App) Exclusive(ctx context.Context, name string, duration time.Duration, action func(ctx context.Context) error) (bool, error) {
 	fn := func() error {
 		a.Lock()
@@ -111,7 +110,6 @@ exclusive:
 	return true, nil
 }
 
-// Get returns a share based on path
 func (a *App) Get(requestPath string) provider.Share {
 	cleanPath := strings.TrimPrefix(requestPath, "/")
 
@@ -127,7 +125,6 @@ func (a *App) Get(requestPath string) provider.Share {
 	return provider.Share{}
 }
 
-// Start worker
 func (a *App) Start(done <-chan struct{}) {
 	if err := a.loadShares(context.Background()); err != nil {
 		logger.Error("refresh shares: %s", err)

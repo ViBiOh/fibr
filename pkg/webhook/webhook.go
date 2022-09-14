@@ -93,7 +93,6 @@ func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheu
 	}, nil
 }
 
-// Exclusive does action on webhook with exclusive lock
 func (a *App) Exclusive(ctx context.Context, name string, duration time.Duration, action func(ctx context.Context) error) error {
 	fn := func() error {
 		a.Lock()
@@ -125,7 +124,6 @@ exclusive:
 	return nil
 }
 
-// Start worker
 func (a *App) Start(_ <-chan struct{}) {
 	a.Lock()
 	defer a.Unlock()

@@ -268,6 +268,7 @@ type EventBus struct {
 	tracer  trace.Tracer
 	counter *prometheus.CounterVec
 	bus     chan Event
+	closed  chan struct{}
 	done    chan struct{}
 }
 
@@ -287,6 +288,7 @@ func NewEventBus(size uint64, prometheusRegisterer prometheus.Registerer, tracer
 	}
 
 	return EventBus{
+		closed:  make(chan struct{}),
 		done:    make(chan struct{}),
 		bus:     make(chan Event, size),
 		counter: counter,
@@ -302,11 +304,15 @@ func (e EventBus) increaseMetric(event Event, state string) {
 	e.counter.WithLabelValues(event.Type.String(), state).Inc()
 }
 
+func (e EventBus) Done() <-chan struct{} {
+	return e.done
+}
+
 func (e EventBus) Push(event Event) error {
 	select {
-	case <-e.done:
+	case <-e.closed:
 		e.increaseMetric(event, "refused")
-		return errors.New("done signal is received")
+		return errors.New("bus is closed")
 	case e.bus <- event:
 		e.increaseMetric(event, "push")
 		return nil
@@ -314,27 +320,29 @@ func (e EventBus) Push(event Event) error {
 }
 
 func (e EventBus) Start(done <-chan struct{}, storageApp absto.Storage, renamers []Renamer, consumers ...EventConsumer) {
-	defer close(e.bus)
 	defer close(e.done)
 
 	go func() {
-		for event := range e.bus {
-			ctx, end := tracer.StartSpan(context.Background(), e.tracer, "event", trace.WithAttributes(attribute.String("type", event.Type.String())))
+		defer close(e.bus)
+		defer close(e.closed)
 
-			if event.Type == RenameEvent && event.Item.IsDir {
-				RenameDirectory(ctx, storageApp, renamers, event.Item, *event.New)
-			}
-
-			for _, consumer := range consumers {
-				consumer(ctx, event)
-			}
-
-			end()
-			e.increaseMetric(event, "done")
-		}
+		<-done
 	}()
 
-	<-done
+	for event := range e.bus {
+		ctx, end := tracer.StartSpan(context.Background(), e.tracer, "event", trace.WithAttributes(attribute.String("type", event.Type.String())))
+
+		if event.Type == RenameEvent && event.Item.IsDir {
+			RenameDirectory(ctx, storageApp, renamers, event.Item, *event.New)
+		}
+
+		for _, consumer := range consumers {
+			consumer(ctx, event)
+		}
+
+		end()
+		e.increaseMetric(event, "done")
+	}
 }
 
 func RenameDirectory(ctx context.Context, storageApp absto.Storage, renamers []Renamer, old, new absto.Item) {
