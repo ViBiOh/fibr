@@ -33,8 +33,8 @@ cloud.google.com/go/storage v1.10.0/go.mod h1:FLPqc6j+Ki4BU591ie1oL6qBQGu2Bl/tZ9
 dmitri.shuralyov.com/gpu/mtl v0.0.0-20190408044501-666a987793e9/go.mod h1:H6x//7gZCb22OMCxBHrMx7a5I7Hp++hsVxbQ4BYO7hU=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
-github.com/ViBiOh/ChatPotte v0.2.13 h1:COVUL/+rG1JSaNKmFRKBGCLMPCcM8KyABsI+R11Zpq4=
-github.com/ViBiOh/ChatPotte v0.2.13/go.mod h1:Dr+Edj7dpEYJD7HXst8zmAbbH3r2QCQ3bt6ivU38/7Q=
+github.com/ViBiOh/ChatPotte v0.2.14 h1:P/u2yx6R1paDWVhPzu2IRj7OiQrnr9AFV9CFqTEKmOo=
+github.com/ViBiOh/ChatPotte v0.2.14/go.mod h1:lwOYt7xyhG9bcdUdxYaOBN59Owcc8GyM+M1xs9/Qntw=
 github.com/ViBiOh/absto v1.0.5 h1:S1QwKW9FUieYKuYOb7RrKqo0t7O40GSL2FdlYwXK3kQ=
 github.com/ViBiOh/absto v1.0.5/go.mod h1:0+iBxmam48r3lMeMtU0lL7yHsAdGkcHeS644b31GlLk=
 github.com/ViBiOh/auth/v2 v2.14.10 h1:R8S8RRx6dUB8k1daCE4nyrMic5bBBJQLRGvRfeBrCKs=
