@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/ViBiOh/ChatPotte v0.2.13
-	github.com/ViBiOh/absto v1.0.4
+	github.com/ViBiOh/absto v1.0.5
 	github.com/ViBiOh/auth/v2 v2.14.10
 	github.com/ViBiOh/exas v0.5.1
 	github.com/ViBiOh/flags v1.2.0
@@ -50,7 +50,7 @@ require (
 	go.opentelemetry.io/otel/exporters/jaeger v1.10.0 // indirect
 	go.opentelemetry.io/otel/metric v0.31.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.10.0 // indirect
-	golang.org/x/net v0.0.0-20220907135653-1e95f45603a7 // indirect
+	golang.org/x/net v0.0.0-20220909164309-bea034e7d591 // indirect
 	golang.org/x/sys v0.0.0-20220913175220-63ea55921009 // indirect
 	golang.org/x/term v0.0.0-20220722155259-a9ba230a4035 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
