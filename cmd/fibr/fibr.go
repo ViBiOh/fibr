@@ -4,12 +4,8 @@ import (
 	"context"
 	"crypto/rand"
 	"embed"
-	"errors"
-	"flag"
 	"fmt"
 	"net/http"
-	"os"
-	"time"
 
 	_ "net/http/pprof"
 
@@ -24,21 +20,14 @@ import (
 	"github.com/ViBiOh/fibr/pkg/share"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/fibr/pkg/webhook"
-	"github.com/ViBiOh/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/alcotest"
-	"github.com/ViBiOh/httputils/v4/pkg/amqp"
 	"github.com/ViBiOh/httputils/v4/pkg/amqphandler"
-	"github.com/ViBiOh/httputils/v4/pkg/health"
 	"github.com/ViBiOh/httputils/v4/pkg/httputils"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/owasp"
-	"github.com/ViBiOh/httputils/v4/pkg/prometheus"
 	"github.com/ViBiOh/httputils/v4/pkg/recoverer"
-	"github.com/ViBiOh/httputils/v4/pkg/redis"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
-	"github.com/ViBiOh/httputils/v4/pkg/request"
 	"github.com/ViBiOh/httputils/v4/pkg/server"
-	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -64,109 +53,68 @@ func generateIdentityName() string {
 }
 
 func main() {
-	fs := flag.NewFlagSet("fibr", flag.ExitOnError)
+	config, err := newConfig()
+	if err != nil {
+		logger.Fatal(fmt.Errorf("config: %w", err))
+	}
 
-	appServerConfig := server.Flags(fs, "", flags.NewOverride("ReadTimeout", 2*time.Minute), flags.NewOverride("WriteTimeout", 2*time.Minute))
-	promServerConfig := server.Flags(fs, "prometheus", flags.NewOverride("Port", uint(9090)), flags.NewOverride("IdleTimeout", 10*time.Second), flags.NewOverride("ShutdownTimeout", 5*time.Second))
-	healthConfig := health.Flags(fs, "")
-
-	alcotestConfig := alcotest.Flags(fs, "")
-	loggerConfig := logger.Flags(fs, "logger")
-	tracerConfig := tracer.Flags(fs, "tracer")
-	prometheusConfig := prometheus.Flags(fs, "prometheus", flags.NewOverride("Gzip", false))
-	owaspConfig := owasp.Flags(fs, "", flags.NewOverride("FrameOptions", "SAMEORIGIN"), flags.NewOverride("Csp", "default-src 'self'; base-uri 'self'; script-src 'self' 'httputils-nonce' unpkg.com/webp-hero@0.0.2/dist-cjs/ unpkg.com/leaflet@1.8.0/dist/ unpkg.com/leaflet.markercluster@1.5.1/; style-src 'httputils-nonce' unpkg.com/leaflet@1.8.0/dist/ unpkg.com/leaflet.markercluster@1.5.1/; img-src 'self' data: a.tile.openstreetmap.org b.tile.openstreetmap.org c.tile.openstreetmap.org"))
-
-	basicConfig := basicMemory.Flags(fs, "auth", flags.NewOverride("Profiles", "1:admin"))
-
-	crudConfig := crud.Flags(fs, "")
-	shareConfig := share.Flags(fs, "share")
-	webhookConfig := webhook.Flags(fs, "webhook")
-	rendererConfig := renderer.Flags(fs, "", flags.NewOverride("PublicURL", "http://localhost:1080"), flags.NewOverride("Title", "fibr"))
-
-	abstoConfig := absto.Flags(fs, "storage")
-	thumbnailConfig := thumbnail.Flags(fs, "thumbnail")
-	exifConfig := exif.Flags(fs, "exif")
-
-	amqpConfig := amqp.Flags(fs, "amqp")
-	amqpThumbnailConfig := amqphandler.Flags(fs, "amqpThumbnail", flags.NewOverride("Exchange", "fibr"), flags.NewOverride("Queue", "fibr.thumbnail"), flags.NewOverride("RoutingKey", "thumbnail_output"))
-	amqpExifConfig := amqphandler.Flags(fs, "amqpExif", flags.NewOverride("Exchange", "fibr"), flags.NewOverride("Queue", "fibr.exif"), flags.NewOverride("RoutingKey", "exif_output"))
-	amqpShareConfig := amqphandler.Flags(fs, "amqpShare", flags.NewOverride("Exchange", "fibr.shares"), flags.NewOverride("Queue", "fibr.share-"+generateIdentityName()), flags.NewOverride("RoutingKey", "share"), flags.NewOverride("Exclusive", true), flags.NewOverride("RetryInterval", time.Duration(0)))
-	amqpWebhookConfig := amqphandler.Flags(fs, "amqpWebhook", flags.NewOverride("Exchange", "fibr.webhooks"), flags.NewOverride("Queue", "fibr.webhook-"+generateIdentityName()), flags.NewOverride("RoutingKey", "webhook"), flags.NewOverride("Exclusive", true), flags.NewOverride("RetryInterval", time.Duration(0)))
-
-	redisConfig := redis.Flags(fs, "redis", flags.NewOverride("Address", ""))
-
-	disableAuth := flags.Bool(fs, "", "auth", "NoAuth", "Disable basic authentification", false, nil)
-
-	logger.Fatal(fs.Parse(os.Args[1:]))
-
-	alcotest.DoAndExit(alcotestConfig)
-	logger.Global(logger.New(loggerConfig))
-	defer logger.Close()
-
-	tracerApp, err := tracer.New(tracerConfig)
-	logger.Fatal(err)
-	defer tracerApp.Close()
-	request.AddTracerToDefaultClient(tracerApp.GetProvider())
+	alcotest.DoAndExit(config.alcotest)
 
 	go func() {
 		fmt.Println(http.ListenAndServe("localhost:9999", http.DefaultServeMux))
 	}()
 
-	appServer := server.New(appServerConfig)
-	promServer := server.New(promServerConfig)
-	prometheusApp := prometheus.New(prometheusConfig)
-	healthApp := health.New(healthConfig)
-
-	prometheusRegisterer := prometheusApp.Registerer()
-
-	storageProvider, err := absto.New(abstoConfig, tracerApp.GetTracer("storage"))
-	logger.Fatal(err)
-
-	eventBus, err := provider.NewEventBus(provider.MaxConcurrency, prometheusRegisterer, tracerApp.GetTracer("bus"))
-	logger.Fatal(err)
-
-	amqpClient, err := amqp.New(amqpConfig, prometheusApp.Registerer(), tracerApp.GetTracer("amqp"))
-	if err != nil && !errors.Is(err, amqp.ErrNoConfig) {
-		logger.Fatal(err)
-	} else if amqpClient != nil {
-		defer amqpClient.Close()
+	client, err := newClient(config)
+	if err != nil {
+		logger.Fatal(fmt.Errorf("client: %w", err))
 	}
 
-	redisClient := redis.New(redisConfig, prometheusApp.Registerer(), tracerApp.GetTracer("redis"))
+	defer client.Close()
 
-	thumbnailApp, err := thumbnail.New(thumbnailConfig, storageProvider, redisClient, prometheusRegisterer, tracerApp, amqpClient)
+	appServer := server.New(config.appServer)
+	promServer := server.New(config.promServer)
+
+	prometheusRegisterer := client.prometheus.Registerer()
+
+	storageProvider, err := absto.New(config.absto, client.tracer.GetTracer("storage"))
 	logger.Fatal(err)
 
-	rendererApp, err := renderer.New(rendererConfig, content, fibr.FuncMap, tracerApp.GetTracer("renderer"))
+	eventBus, err := provider.NewEventBus(provider.MaxConcurrency, prometheusRegisterer, client.tracer.GetTracer("bus"))
 	logger.Fatal(err)
 
-	exifApp, err := exif.New(exifConfig, storageProvider, prometheusRegisterer, tracerApp, amqpClient, redisClient)
+	thumbnailApp, err := thumbnail.New(config.thumbnail, storageProvider, client.redis, prometheusRegisterer, client.tracer, client.amqp)
 	logger.Fatal(err)
 
-	webhookApp, err := webhook.New(webhookConfig, storageProvider, prometheusRegisterer, amqpClient, rendererApp, thumbnailApp)
+	rendererApp, err := renderer.New(config.renderer, content, fibr.FuncMap, client.tracer.GetTracer("renderer"))
 	logger.Fatal(err)
 
-	shareApp, err := share.New(shareConfig, storageProvider, amqpClient)
+	exifApp, err := exif.New(config.exif, storageProvider, prometheusRegisterer, client.tracer, client.amqp, client.redis)
 	logger.Fatal(err)
 
-	amqpThumbnailApp, err := amqphandler.New(amqpThumbnailConfig, amqpClient, tracerApp.GetTracer("amqp_handler_thumbnail"), thumbnailApp.AMQPHandler)
+	webhookApp, err := webhook.New(config.webhook, storageProvider, prometheusRegisterer, client.amqp, rendererApp, thumbnailApp)
 	logger.Fatal(err)
 
-	amqpExifApp, err := amqphandler.New(amqpExifConfig, amqpClient, tracerApp.GetTracer("amqp_handler_exif"), exifApp.AMQPHandler)
+	shareApp, err := share.New(config.share, storageProvider, client.amqp)
 	logger.Fatal(err)
 
-	amqpShareApp, err := amqphandler.New(amqpShareConfig, amqpClient, tracerApp.GetTracer("amqp_handler_share"), shareApp.AMQPHandler)
+	amqpThumbnailApp, err := amqphandler.New(config.amqpThumbnail, client.amqp, client.tracer.GetTracer("amqp_handler_thumbnail"), thumbnailApp.AMQPHandler)
 	logger.Fatal(err)
 
-	amqpWebhookApp, err := amqphandler.New(amqpWebhookConfig, amqpClient, tracerApp.GetTracer("amqp_handler_webhook"), webhookApp.AMQPHandler)
+	amqpExifApp, err := amqphandler.New(config.amqpExif, client.amqp, client.tracer.GetTracer("amqp_handler_exif"), exifApp.AMQPHandler)
 	logger.Fatal(err)
 
-	crudApp, err := crud.New(crudConfig, storageProvider, rendererApp, shareApp, webhookApp, thumbnailApp, exifApp, eventBus.Push, amqpClient, tracerApp.GetTracer("crud"))
+	amqpShareApp, err := amqphandler.New(config.amqpShare, client.amqp, client.tracer.GetTracer("amqp_handler_share"), shareApp.AMQPHandler)
+	logger.Fatal(err)
+
+	amqpWebhookApp, err := amqphandler.New(config.amqpWebhook, client.amqp, client.tracer.GetTracer("amqp_handler_webhook"), webhookApp.AMQPHandler)
+	logger.Fatal(err)
+
+	crudApp, err := crud.New(config.crud, storageProvider, rendererApp, shareApp, webhookApp, thumbnailApp, exifApp, eventBus.Push, client.amqp, client.tracer.GetTracer("crud"))
 	logger.Fatal(err)
 
 	var middlewareApp provider.Auth
-	if !*disableAuth {
-		middlewareApp = newLoginApp(tracerApp.GetTracer("auth"), basicConfig)
+	if !*config.disableAuth {
+		middlewareApp = newLoginApp(client.tracer.GetTracer("auth"), config.basic)
 	}
 
 	fibrApp := fibr.New(&crudApp, rendererApp, shareApp, webhookApp, middlewareApp)
@@ -174,18 +122,18 @@ func main() {
 
 	ctx := context.Background()
 
-	go amqpThumbnailApp.Start(ctx, healthApp.Done())
-	go amqpExifApp.Start(ctx, healthApp.Done())
-	go amqpShareApp.Start(ctx, healthApp.Done())
-	go amqpWebhookApp.Start(ctx, healthApp.Done())
-	go webhookApp.Start(healthApp.Done())
-	go shareApp.Start(healthApp.Done())
-	go crudApp.Start(healthApp.Done())
-	go eventBus.Start(healthApp.Done(), storageProvider, []provider.Renamer{thumbnailApp.Rename, exifApp.Rename}, shareApp.EventConsumer, thumbnailApp.EventConsumer, exifApp.EventConsumer, webhookApp.EventConsumer)
+	go amqpThumbnailApp.Start(ctx, client.health.Done())
+	go amqpExifApp.Start(ctx, client.health.Done())
+	go amqpShareApp.Start(ctx, client.health.Done())
+	go amqpWebhookApp.Start(ctx, client.health.Done())
+	go webhookApp.Start(client.health.Done())
+	go shareApp.Start(client.health.Done())
+	go crudApp.Start(client.health.Done())
+	go eventBus.Start(client.health.Done(), storageProvider, []provider.Renamer{thumbnailApp.Rename, exifApp.Rename}, shareApp.EventConsumer, thumbnailApp.EventConsumer, exifApp.EventConsumer, webhookApp.EventConsumer)
 
-	go promServer.Start("prometheus", healthApp.End(), prometheusApp.Handler())
-	go appServer.Start("http", healthApp.End(), httputils.Handler(handler, healthApp, recoverer.Middleware, prometheusApp.Middleware, tracerApp.Middleware, owasp.New(owaspConfig).Middleware))
+	go promServer.Start("prometheus", client.health.End(), client.prometheus.Handler())
+	go appServer.Start("http", client.health.End(), httputils.Handler(handler, client.health, recoverer.Middleware, client.prometheus.Middleware, client.tracer.Middleware, owasp.New(config.owasp).Middleware))
 
-	healthApp.WaitForTermination(appServer.Done())
+	client.health.WaitForTermination(appServer.Done())
 	server.GracefulWait(appServer.Done(), promServer.Done(), amqpExifApp.Done(), amqpShareApp.Done(), amqpWebhookApp.Done(), eventBus.Done())
 }

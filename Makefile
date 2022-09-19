@@ -8,7 +8,7 @@ endif
 APP_NAME = fibr
 PACKAGES ?= ./...
 
-MAIN_SOURCE = cmd/fibr/fibr.go
+MAIN_SOURCE = ./cmd/fibr
 MAIN_RUNNER = go run $(MAIN_SOURCE)
 ifeq ($(DEBUG), true)
 	MAIN_RUNNER = dlv debug $(MAIN_SOURCE) --
