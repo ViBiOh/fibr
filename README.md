@@ -248,6 +248,18 @@ Usage of fibr:
         [amqpShare] Interval duration when send fails {FIBR_AMQP_SHARE_RETRY_INTERVAL}
   -amqpShareRoutingKey string
         [amqpShare] RoutingKey name {FIBR_AMQP_SHARE_ROUTING_KEY} (default "share")
+  -amqpThumbnailExchange string
+        [amqpThumbnail] Exchange name {FIBR_AMQP_THUMBNAIL_EXCHANGE} (default "fibr")
+  -amqpThumbnailExclusive
+        [amqpThumbnail] Queue exclusive mode (for fanout exchange) {FIBR_AMQP_THUMBNAIL_EXCLUSIVE}
+  -amqpThumbnailMaxRetry uint
+        [amqpThumbnail] Max send retries {FIBR_AMQP_THUMBNAIL_MAX_RETRY} (default 3)
+  -amqpThumbnailQueue string
+        [amqpThumbnail] Queue name {FIBR_AMQP_THUMBNAIL_QUEUE} (default "fibr.thumbnail")
+  -amqpThumbnailRetryInterval duration
+        [amqpThumbnail] Interval duration when send fails {FIBR_AMQP_THUMBNAIL_RETRY_INTERVAL} (default 1h0m0s)
+  -amqpThumbnailRoutingKey string
+        [amqpThumbnail] RoutingKey name {FIBR_AMQP_THUMBNAIL_ROUTING_KEY} (default "thumbnail_output")
   -amqpURI string
         [amqp] Address in the form amqps?://<user>:<password>@<address>:<port>/<vhost> {FIBR_AMQP_URI}
   -amqpWebhookExchange string
@@ -273,7 +285,7 @@ Usage of fibr:
   -chunkUpload
         [crud] Use chunk upload in browser {FIBR_CHUNK_UPLOAD}
   -csp string
-        [owasp] Content-Security-Policy {FIBR_CSP} (default "default-src 'self'; base-uri 'self'; script-src 'httputils-nonce' unpkg.com/leaflet@1.8.0/dist/ unpkg.com/leaflet.markercluster@1.5.1/; style-src 'httputils-nonce' unpkg.com/leaflet@1.8.0/dist/ unpkg.com/leaflet.markercluster@1.5.1/; img-src 'self' data: a.tile.openstreetmap.org b.tile.openstreetmap.org c.tile.openstreetmap.org")
+        [owasp] Content-Security-Policy {FIBR_CSP} (default "default-src 'self'; base-uri 'self'; script-src 'self' 'httputils-nonce' unpkg.com/webp-hero@0.0.2/dist-cjs/ unpkg.com/leaflet@1.9.1/dist/ unpkg.com/leaflet.markercluster@1.5.1/; style-src 'httputils-nonce' unpkg.com/leaflet@1.9.1/dist/ unpkg.com/leaflet.markercluster@1.5.1/; img-src 'self' data: a.tile.openstreetmap.org b.tile.openstreetmap.org c.tile.openstreetmap.org")
   -exifAmqpExchange string
         [exif] AMQP Exchange Name {FIBR_EXIF_AMQP_EXCHANGE} (default "fibr")
   -exifAmqpRoutingKey string
@@ -345,7 +357,7 @@ Usage of fibr:
   -readTimeout duration
         [server] Read Timeout {FIBR_READ_TIMEOUT} (default 2m0s)
   -redisAddress string
-        [redis] Redis Address (blank to disable) {FIBR_REDIS_ADDRESS}
+        [redis] Redis Address fqdn:port (blank to disable) {FIBR_REDIS_ADDRESS}
   -redisAlias string
         [redis] Connection alias, for metric {FIBR_REDIS_ALIAS}
   -redisDatabase int
