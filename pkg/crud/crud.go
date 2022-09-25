@@ -139,23 +139,25 @@ func New(config Config, storage absto.Storage, rendererApp renderer.App, shareAp
 	return app, nil
 }
 
-func (a App) Start(done <-chan struct{}) {
+func (a App) Start(ctx context.Context) {
 	if a.amqpClient == nil {
-		a.start(context.Background(), done)
+		a.start(ctx)
 		return
 	}
 
 	if _, err := a.amqpClient.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, time.Hour, func(ctx context.Context) error {
-		a.start(ctx, done)
+		a.start(ctx)
 		return nil
 	}); err != nil {
 		logger.Error("get exclusive semaphore: %s", err)
 	}
 }
 
-func (a App) start(ctx context.Context, done <-chan struct{}) {
+func (a App) start(ctx context.Context) {
 	logger.Info("Starting startup check...")
 	defer logger.Info("Ending startup check.")
+
+	done := ctx.Done()
 
 	err := a.storageApp.Walk(ctx, "", func(item absto.Item) error {
 		select {
