@@ -124,11 +124,11 @@ exclusive:
 	return nil
 }
 
-func (a *App) Start(_ <-chan struct{}) {
+func (a *App) Start(ctx context.Context) {
 	a.Lock()
 	defer a.Unlock()
 
-	if err := a.loadWebhooks(context.Background()); err != nil {
+	if err := a.loadWebhooks(ctx); err != nil {
 		logger.Error("refresh webhooks: %s", err)
 		return
 	}

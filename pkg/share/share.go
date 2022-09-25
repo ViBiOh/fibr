@@ -125,8 +125,8 @@ func (a *App) Get(requestPath string) provider.Share {
 	return provider.Share{}
 }
 
-func (a *App) Start(done <-chan struct{}) {
-	if err := a.loadShares(context.Background()); err != nil {
+func (a *App) Start(ctx context.Context) {
+	if err := a.loadShares(ctx); err != nil {
 		logger.Error("refresh shares: %s", err)
 		return
 	}
@@ -139,7 +139,7 @@ func (a *App) Start(done <-chan struct{}) {
 		purgeCron.Exclusive(a, a.amqpExclusiveRoutingKey, semaphoreDuration)
 	}
 
-	purgeCron.Start(a.cleanShares, done)
+	purgeCron.Start(ctx, a.cleanShares)
 }
 
 func (a *App) loadShares(ctx context.Context) error {

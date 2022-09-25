@@ -319,14 +319,14 @@ func (e EventBus) Push(event Event) error {
 	}
 }
 
-func (e EventBus) Start(done <-chan struct{}, storageApp absto.Storage, renamers []Renamer, consumers ...EventConsumer) {
+func (e EventBus) Start(ctx context.Context, storageApp absto.Storage, renamers []Renamer, consumers ...EventConsumer) {
 	defer close(e.done)
 
 	go func() {
 		defer close(e.bus)
 		defer close(e.closed)
 
-		<-done
+		<-ctx.Done()
 	}()
 
 	for event := range e.bus {
