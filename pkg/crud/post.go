@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
@@ -168,7 +169,7 @@ func (a App) handlePostDescription(w http.ResponseWriter, r *http.Request, reque
 	}
 
 	exif, err := a.exifApp.GetExifFor(ctx, item)
-	if err != nil {
+	if err != nil && !absto.IsNotExist(err) {
 		a.error(w, r, request, err)
 		return
 	}

@@ -150,7 +150,8 @@ func (a *App) loadShares(ctx context.Context) error {
 }
 
 func (a *App) refresh(ctx context.Context) error {
-	if err := provider.LoadJSON(ctx, a.storageApp, shareFilename, &a.shares); err != nil {
+	var err error
+	if a.shares, err = provider.LoadJSON[map[string]provider.Share](ctx, a.storageApp, shareFilename); err != nil {
 		if !absto.IsNotExist(err) {
 			return err
 		}

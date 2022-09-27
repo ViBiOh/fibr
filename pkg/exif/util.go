@@ -37,17 +37,15 @@ func (a App) hasMetadata(ctx context.Context, item absto.Item) bool {
 }
 
 func (a App) loadExif(ctx context.Context, item absto.Item) (exas.Exif, error) {
-	var data exas.Exif
-	return data, a.loadMetadata(ctx, item, &data)
+	return loadMetadata[exas.Exif](ctx, a.storageApp, item)
 }
 
 func (a App) loadAggregate(ctx context.Context, item absto.Item) (provider.Aggregate, error) {
-	var data provider.Aggregate
-	return data, a.loadMetadata(ctx, item, &data)
+	return loadMetadata[provider.Aggregate](ctx, a.storageApp, item)
 }
 
-func (a App) loadMetadata(ctx context.Context, item absto.Item, content any) error {
-	return provider.LoadJSON(ctx, a.storageApp, Path(item), content)
+func loadMetadata[T any](ctx context.Context, storageApp absto.Storage, item absto.Item) (T, error) {
+	return provider.LoadJSON[T](ctx, storageApp, Path(item))
 }
 
 func (a App) saveMetadata(ctx context.Context, item absto.Item, data any) error {

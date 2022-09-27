@@ -135,7 +135,9 @@ func (a *App) Start(ctx context.Context) {
 }
 
 func (a *App) loadWebhooks(ctx context.Context) error {
-	if err := provider.LoadJSON(ctx, a.storageApp, webhookFilename, &a.webhooks); err != nil {
+	var err error
+
+	if a.webhooks, err = provider.LoadJSON[map[string]provider.Webhook](ctx, a.storageApp, webhookFilename); err != nil {
 		if !absto.IsNotExist(err) {
 			return err
 		}

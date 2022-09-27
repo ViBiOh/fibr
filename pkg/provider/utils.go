@@ -145,18 +145,19 @@ func RemoveIndex(arr []string, index int) []string {
 	return append(arr[:index], arr[index+1:]...)
 }
 
-func LoadJSON(ctx context.Context, storageApp absto.Storage, filename string, content any) (err error) {
+func LoadJSON[T any](ctx context.Context, storageApp absto.Storage, filename string) (output T, err error) {
 	var reader io.ReadCloser
 	reader, err = storageApp.ReadFrom(ctx, filename)
 	if err != nil {
-		return fmt.Errorf("read: %w", err)
+		err = fmt.Errorf("read: %w", err)
+		return
 	}
 
 	defer func() {
 		err = HandleClose(reader, err)
 	}()
 
-	if err = json.NewDecoder(reader).Decode(content); err != nil {
+	if err = json.NewDecoder(reader).Decode(&output); err != nil {
 		err = fmt.Errorf("decode: %w", storageApp.ConvertError(err))
 	}
 
