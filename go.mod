@@ -4,12 +4,12 @@ go 1.19
 
 require (
 	github.com/ViBiOh/ChatPotte v0.2.16
-	github.com/ViBiOh/absto v1.0.7
+	github.com/ViBiOh/absto v1.0.8
 	github.com/ViBiOh/auth/v2 v2.14.12
-	github.com/ViBiOh/exas v0.5.4
+	github.com/ViBiOh/exas v0.5.6
 	github.com/ViBiOh/flags v1.2.0
 	github.com/ViBiOh/httputils/v4 v4.48.2
-	github.com/ViBiOh/vith v0.5.4
+	github.com/ViBiOh/vith v0.5.6
 	github.com/golang/mock v1.6.0
 	github.com/prometheus/client_golang v1.13.0
 	github.com/streadway/amqp v1.0.0
@@ -35,7 +35,7 @@ require (
 	github.com/klauspost/cpuid/v2 v2.1.1 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
-	github.com/minio/minio-go/v7 v7.0.39 // indirect
+	github.com/minio/minio-go/v7 v7.0.36 // indirect
 	github.com/minio/sha256-simd v1.0.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
