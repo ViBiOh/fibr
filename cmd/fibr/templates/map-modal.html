@@ -92,11 +92,11 @@
         }
 
         async function loadLeaflet() {
-          const leafletVersion = "1.9.1";
+          const leafletVersion = "1.9.2";
 
           await addStyle({{ js "`https://unpkg.com/leaflet@${leafletVersion}/dist/leaflet.css`" }}, 'sha512-UkezATkM8unVC0R/Z9Kmq4gorjNoFwLMAWR/1yZpINW08I79jEKx/c8NlLSvvimcu7SL8pgeOnynxfRpe+5QpA==', 'anonymous');
           await addStyle('https://unpkg.com/leaflet.markercluster@1.5.1/dist/MarkerCluster.Default.css', 'sha512-6ZCLMiYwTeli2rVh3XAPxy3YoR5fVxGdH/pz+KMCzRY2M65Emgkw00Yqmhh8qLGeYQ3LbVZGdmOX9KUjSKr0TA==', 'anonymous');
-          await resolveScript({{ js "`https://unpkg.com/leaflet@${leafletVersion}/dist/leaflet.js`" }}, 'sha512-y6IQOhEalDvx6StYG9hG/64K2vuX3bVJ2Q3sBd0uP2UlhIAwOc9DEFgQ/oz1dQmsc2XbWwhn5MfpT76+1bx2Gg==', 'anonymous');
+          await resolveScript({{ js "`https://unpkg.com/leaflet@${leafletVersion}/dist/leaflet.js`" }}, 'sha512-KMraOVM0qMVE0U1OULTpYO4gg5MZgazwPAPyMQWfOkEshpwlLQFCHZ/0lBXyviDNVL+pBGwmeXQnuvGK8Fscvg==', 'anonymous');
           await resolveScript('https://unpkg.com/leaflet.markercluster@1.5.1/dist/leaflet.markercluster.js', 'sha512-+Zr0llcuE/Ho6wXRYtlWypMyWSEMxrWJxrYgeAMDRSf1FF46gQ3PAVOVp5RHdxdzikZXuHZ0soHpqRkkPkI3KA==', 'anonymous');
         }
 
