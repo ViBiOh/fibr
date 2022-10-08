@@ -98,13 +98,13 @@ func (a App) mergeChunk(w http.ResponseWriter, r *http.Request, request provider
 	err = provider.WriteToStorage(ctx, a.storageApp, filePath, size, file)
 
 	if err == nil {
-		go func() {
-			if info, infoErr := a.storageApp.Info(context.Background(), filePath); infoErr != nil {
+		go func(ctx context.Context) {
+			if info, infoErr := a.storageApp.Info(ctx, filePath); infoErr != nil {
 				logger.Error("get info for upload event: %s", infoErr)
 			} else {
 				a.notify(provider.NewUploadEvent(request, info, a.bestSharePath(filePath), a.rendererApp))
 			}
-		}()
+		}(tracer.CopyToBackground(ctx))
 	}
 
 	if err = os.RemoveAll(tempFolder); err != nil {

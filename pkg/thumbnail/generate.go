@@ -58,7 +58,7 @@ func (a App) requestVith(ctx context.Context, item absto.Item, scale uint64) (*h
 
 	if a.amqpClient != nil {
 		a.increaseMetric(itemType.String(), "publish")
-		return nil, a.amqpClient.PublishJSON(vith.NewRequest(item.Pathname, outputName, itemType, scale), a.amqpExchange, a.amqpThumbnailRoutingKey)
+		return nil, a.amqpClient.PublishJSON(ctx, vith.NewRequest(item.Pathname, outputName, itemType, scale), a.amqpExchange, a.amqpThumbnailRoutingKey)
 	}
 
 	a.increaseMetric(itemType.String(), "request")

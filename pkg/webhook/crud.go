@@ -66,7 +66,7 @@ func (a *App) Create(ctx context.Context, pathname string, recursive bool, kind 
 		}
 
 		if a.amqpClient != nil {
-			if err = a.amqpClient.PublishJSON(webhook, a.amqpExchange, a.amqpRoutingKey); err != nil {
+			if err = a.amqpClient.PublishJSON(ctx, webhook, a.amqpExchange, a.amqpRoutingKey); err != nil {
 				return fmt.Errorf("publish webhook creation: %w", err)
 			}
 		}
@@ -89,7 +89,7 @@ func (a *App) delete(ctx context.Context, id string) error {
 	}
 
 	if a.amqpClient != nil {
-		if err := a.amqpClient.PublishJSON(provider.Webhook{ID: id}, a.amqpExchange, a.amqpRoutingKey); err != nil {
+		if err := a.amqpClient.PublishJSON(ctx, provider.Webhook{ID: id}, a.amqpExchange, a.amqpRoutingKey); err != nil {
 			return fmt.Errorf("publish webhook deletion: %w", err)
 		}
 	}

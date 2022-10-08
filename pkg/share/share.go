@@ -166,7 +166,7 @@ func (a *App) refresh(ctx context.Context) error {
 	return nil
 }
 
-func (a *App) purgeExpiredShares() bool {
+func (a *App) purgeExpiredShares(ctx context.Context) bool {
 	now := a.clock.Now()
 	changed := false
 
@@ -175,7 +175,7 @@ func (a *App) purgeExpiredShares() bool {
 			delete(a.shares, id)
 
 			if a.amqpClient != nil {
-				if err := a.amqpClient.PublishJSON(provider.Share{ID: id}, a.amqpExchange, a.amqpRoutingKey); err != nil {
+				if err := a.amqpClient.PublishJSON(ctx, provider.Share{ID: id}, a.amqpExchange, a.amqpRoutingKey); err != nil {
 					logger.WithField("fn", "share.purgeExpiredShares").WithField("item", id).Error("publish share purge: %s", err)
 				}
 			}
@@ -188,7 +188,7 @@ func (a *App) purgeExpiredShares() bool {
 }
 
 func (a *App) cleanShares(ctx context.Context) error {
-	if !a.purgeExpiredShares() {
+	if !a.purgeExpiredShares(ctx) {
 		return nil
 	}
 

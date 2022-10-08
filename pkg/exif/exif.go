@@ -189,8 +189,8 @@ func (a App) extractExif(ctx context.Context, item absto.Item) (exif exas.Exif, 
 	return
 }
 
-func (a App) publishExifRequest(item absto.Item) error {
+func (a App) publishExifRequest(ctx context.Context, item absto.Item) error {
 	a.increaseExif("publish")
 
-	return a.amqpClient.PublishJSON(item, a.amqpExchange, a.amqpRoutingKey)
+	return a.amqpClient.PublishJSON(ctx, item, a.amqpExchange, a.amqpRoutingKey)
 }

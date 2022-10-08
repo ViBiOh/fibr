@@ -75,7 +75,7 @@ func (a App) generateStream(ctx context.Context, item absto.Item) error {
 	if a.amqpClient != nil {
 		a.increaseMetric("stream", "publish")
 
-		err := a.amqpClient.PublishJSON(req, a.amqpExchange, a.amqpStreamRoutingKey)
+		err := a.amqpClient.PublishJSON(ctx, req, a.amqpExchange, a.amqpStreamRoutingKey)
 		if err != nil {
 			a.increaseMetric("stream", "error")
 		}

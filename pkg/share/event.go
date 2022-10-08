@@ -32,7 +32,7 @@ func (a *App) renameItem(ctx context.Context, old, new absto.Item) error {
 				a.shares[id] = share
 
 				if a.amqpClient != nil {
-					if err := a.amqpClient.PublishJSON(share, a.amqpExchange, a.amqpRoutingKey); err != nil {
+					if err := a.amqpClient.PublishJSON(ctx, share, a.amqpExchange, a.amqpRoutingKey); err != nil {
 						return fmt.Errorf("publish share rename: %w", err)
 					}
 				}

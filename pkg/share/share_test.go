@@ -1,6 +1,7 @@
 package share
 
 import (
+	"context"
 	"reflect"
 	"testing"
 	"time"
@@ -64,7 +65,7 @@ func TestPurgeExpiredShares(t *testing.T) {
 
 	for intention, tc := range cases {
 		t.Run(intention, func(t *testing.T) {
-			tc.instance.purgeExpiredShares()
+			tc.instance.purgeExpiredShares(context.TODO())
 			got := tc.instance.shares
 
 			if !reflect.DeepEqual(got, tc.want) {

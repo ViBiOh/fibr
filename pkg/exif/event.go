@@ -97,7 +97,7 @@ func (a App) handleUploadEvent(ctx context.Context, item absto.Item, aggregate b
 	}
 
 	if a.amqpClient != nil {
-		return a.publishExifRequest(item)
+		return a.publishExifRequest(ctx, item)
 	}
 
 	exif, err := a.extractAndSaveExif(ctx, item)
