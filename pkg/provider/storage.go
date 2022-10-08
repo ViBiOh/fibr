@@ -2,6 +2,7 @@ package provider
 
 import (
 	"mime"
+	"strconv"
 	"strings"
 	"time"
 
@@ -64,6 +65,20 @@ type RenderItem struct {
 	IsCover      bool
 }
 
+func (r RenderItem) String() string {
+	var output strings.Builder
+
+	output.WriteString(r.URL)
+	output.WriteString(strconv.FormatBool(r.HasThumbnail))
+	output.WriteString(r.Path)
+	output.WriteString(strconv.FormatBool(r.IsCover))
+	output.WriteString(r.ID)
+	output.WriteString(strconv.FormatInt(r.Size, 10))
+	output.WriteString(r.Date.String())
+
+	return output.String()
+}
+
 func (r RenderItem) IsZero() bool {
 	return r.Item.IsZero()
 }
@@ -105,6 +120,20 @@ func StorageToRender(item absto.Item, request Request) RenderItem {
 type StoryItem struct {
 	Exif model.Exif
 	RenderItem
+}
+
+func (s StoryItem) String() string {
+	var output strings.Builder
+
+	output.WriteString(s.URL)
+	output.WriteString(strconv.FormatBool(s.HasThumbnail))
+	output.WriteString(s.Path)
+	output.WriteString(strconv.FormatBool(s.IsCover))
+	output.WriteString(s.ID)
+	output.WriteString(strconv.FormatInt(s.Size, 10))
+	output.WriteString(s.Date.String())
+
+	return output.String()
 }
 
 func StorageToStory(item absto.Item, request Request, exif model.Exif) StoryItem {

@@ -3,6 +3,7 @@ package provider
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
@@ -80,6 +81,20 @@ type Request struct {
 	CanEdit     bool
 	CanShare    bool
 	CanWebhook  bool
+}
+
+func (r Request) String() string {
+	var output strings.Builder
+
+	output.WriteString(r.Path)
+	output.WriteString(strconv.FormatBool(r.CanEdit))
+	output.WriteString(r.Item)
+	output.WriteString(strconv.FormatBool(r.CanShare))
+	output.WriteString(r.Display)
+	output.WriteString(strconv.FormatBool(r.CanWebhook))
+	output.WriteString(r.Share.String())
+
+	return output.String()
 }
 
 func (r Request) UpdatePreferences() Request {

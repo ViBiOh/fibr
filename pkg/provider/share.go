@@ -3,6 +3,7 @@ package provider
 import (
 	"encoding/base64"
 	"errors"
+	"strconv"
 	"strings"
 	"time"
 
@@ -19,6 +20,19 @@ type Share struct {
 	Edit     bool          `json:"edit"`
 	Story    bool          `json:"story"`
 	File     bool          `json:"file"`
+}
+
+func (s Share) String() string {
+	var output strings.Builder
+
+	output.WriteString(s.ID)
+	output.WriteString(strconv.FormatBool(s.Edit))
+	output.WriteString(s.Path)
+	output.WriteString(strconv.FormatBool(s.Story))
+	output.WriteString(s.RootName)
+	output.WriteString(strconv.FormatBool(s.File))
+
+	return output.String()
 }
 
 func (s Share) IsZero() bool {
