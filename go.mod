@@ -3,19 +3,19 @@ module github.com/ViBiOh/fibr
 go 1.19
 
 require (
-	github.com/ViBiOh/ChatPotte v0.2.18
+	github.com/ViBiOh/ChatPotte v0.2.19
 	github.com/ViBiOh/absto v1.0.8
-	github.com/ViBiOh/auth/v2 v2.14.12
-	github.com/ViBiOh/exas v0.5.8
+	github.com/ViBiOh/auth/v2 v2.14.13
+	github.com/ViBiOh/exas v0.5.9
 	github.com/ViBiOh/flags v1.2.0
-	github.com/ViBiOh/httputils/v4 v4.49.0
-	github.com/ViBiOh/vith v0.5.7
+	github.com/ViBiOh/httputils/v4 v4.49.1
+	github.com/ViBiOh/vith v0.5.8
 	github.com/golang/mock v1.6.0
 	github.com/prometheus/client_golang v1.13.0
 	github.com/streadway/amqp v1.0.0
 	go.opentelemetry.io/otel v1.10.0
 	go.opentelemetry.io/otel/trace v1.10.0
-	golang.org/x/crypto v0.0.0-20220926161630-eccd6366d1be
+	golang.org/x/crypto v0.0.0-20221005025214-4161e89ecf1b
 	golang.org/x/text v0.3.7
 )
 
