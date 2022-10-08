@@ -118,7 +118,7 @@ func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheu
 		}
 
 		return app.loadAggregate(ctx, item)
-	}, cacheDuration, provider.MaxConcurrency, tracerApp.GetTracer("ggregate_cache"))
+	}, cacheDuration, provider.MaxConcurrency, tracerApp.GetTracer("aggregate_cache"))
 
 	return app, nil
 }
