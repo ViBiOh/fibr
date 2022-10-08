@@ -75,7 +75,7 @@ func (a App) handleFile(w http.ResponseWriter, r *http.Request, request provider
 	if query.GetBool(r, "browser") {
 		provider.SetPrefsCookie(w, request)
 
-		go a.notify(provider.NewAccessEvent(item, r))
+		go a.notify(tracer.CopyToBackground(r.Context()), provider.NewAccessEvent(item, r))
 
 		return a.browse(r.Context(), request, item, message)
 	}
@@ -127,7 +127,7 @@ func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.
 		return errorReturn(request, err)
 	}
 
-	go a.notify(provider.NewAccessEvent(item, r))
+	go a.notify(tracer.CopyToBackground(r.Context()), provider.NewAccessEvent(item, r))
 
 	if query.GetBool(r, "search") {
 		return a.search(r, request, items)

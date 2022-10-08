@@ -1,6 +1,7 @@
 package crud
 
 import (
+	"context"
 	"errors"
 	"net/http"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
+	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 )
 
 func (a App) regenerate(w http.ResponseWriter, r *http.Request, request provider.Request) {
@@ -33,15 +35,15 @@ func (a App) regenerate(w http.ResponseWriter, r *http.Request, request provider
 		return
 	}
 
-	go func() {
+	go func(ctx context.Context) {
 		err := a.storageApp.Walk(ctx, pathname, func(item absto.Item) error {
-			a.notify(provider.NewRestartEvent(item, subset))
+			a.notify(ctx, provider.NewRestartEvent(item, subset))
 			return nil
 		})
 		if err != nil {
 			logger.Error("error during regenerate of `%s`: %s", pathname, err)
 		}
-	}()
+	}(tracer.CopyToBackground(ctx))
 
 	a.rendererApp.Redirect(w, r, "?stats", renderer.NewSuccessMessage("Regeneration of %s in progress...", subset))
 }

@@ -167,7 +167,7 @@ func (a App) start(ctx context.Context) {
 		}
 
 		item = a.sanitizeName(ctx, item)
-		a.notify(provider.NewStartEvent(item))
+		a.notify(ctx, provider.NewStartEvent(item))
 
 		return nil
 	})

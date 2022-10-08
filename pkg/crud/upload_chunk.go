@@ -102,7 +102,7 @@ func (a App) mergeChunk(w http.ResponseWriter, r *http.Request, request provider
 			if info, infoErr := a.storageApp.Info(ctx, filePath); infoErr != nil {
 				logger.Error("get info for upload event: %s", infoErr)
 			} else {
-				a.notify(provider.NewUploadEvent(request, info, a.bestSharePath(filePath), a.rendererApp))
+				a.notify(ctx, provider.NewUploadEvent(request, info, a.bestSharePath(filePath), a.rendererApp))
 			}
 		}(tracer.CopyToBackground(ctx))
 	}

@@ -8,6 +8,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
+	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 )
 
 // Delete given path from filesystem
@@ -47,7 +48,7 @@ func (a App) Delete(w http.ResponseWriter, r *http.Request, request provider.Req
 		provider.SetPrefsCookie(w, request)
 	}
 
-	go a.notify(provider.NewDeleteEvent(request, info, a.rendererApp))
+	go a.notify(tracer.CopyToBackground(ctx), provider.NewDeleteEvent(request, info, a.rendererApp))
 
 	a.rendererApp.Redirect(w, r, fmt.Sprintf("?d=%s", request.Display), renderer.NewSuccessMessage("%s successfully deleted", info.Name))
 }

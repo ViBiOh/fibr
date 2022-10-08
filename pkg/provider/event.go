@@ -97,6 +97,7 @@ type Event struct {
 	ShareableURL string            `json:"shareable_url,omitempty"`
 	Item         absto.Item        `json:"item"`
 	Type         EventType         `json:"type"`
+	TraceLink    trace.Link        `json:"-"`
 }
 
 // IsForcedFor check if event is forced for given key
@@ -330,7 +331,7 @@ func (e EventBus) Start(ctx context.Context, storageApp absto.Storage, renamers 
 	}()
 
 	for event := range e.bus {
-		ctx, end := tracer.StartSpan(context.Background(), e.tracer, "event", trace.WithAttributes(attribute.String("type", event.Type.String())))
+		ctx, end := tracer.StartSpan(context.Background(), e.tracer, "event", trace.WithAttributes(attribute.String("type", event.Type.String())), trace.WithLinks(event.TraceLink))
 
 		if event.Type == RenameEvent && event.Item.IsDir {
 			RenameDirectory(ctx, storageApp, renamers, event.Item, *event.New)
