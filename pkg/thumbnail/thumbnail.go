@@ -217,7 +217,9 @@ func (a App) List(w http.ResponseWriter, r *http.Request, item absto.Item, items
 		return
 	}
 
-	ctx := r.Context()
+	ctx, end := tracer.StartSpan(r.Context(), a.tracer, "thumbnail_list", trace.WithSpanKind(trace.SpanKindInternal))
+	defer end()
+
 	var hash string
 
 	if query.GetBool(r, "search") {
@@ -254,6 +256,9 @@ func (a App) List(w http.ResponseWriter, r *http.Request, item absto.Item, items
 }
 
 func (a App) thumbnailHash(ctx context.Context, items []absto.Item) string {
+	ctx, end := tracer.StartSpan(ctx, a.tracer, "thumbnail_hash", trace.WithSpanKind(trace.SpanKindInternal))
+	defer end()
+
 	ids := make([]string, len(items))
 	for index, item := range items {
 		ids[index] = a.PathForScale(item, SmallSize)
@@ -277,6 +282,9 @@ func (a App) encodeContent(ctx context.Context, w io.Writer, isDone func() bool,
 	if item.IsDir || isDone() {
 		return
 	}
+
+	ctx, end := tracer.StartSpan(ctx, a.tracer, "thumbnail_encode", trace.WithSpanKind(trace.SpanKindInternal))
+	defer end()
 
 	reader, err := a.storageApp.ReadFrom(ctx, a.PathForScale(item, SmallSize))
 	if err != nil {
