@@ -12,9 +12,14 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/concurrent"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
+	"github.com/ViBiOh/httputils/v4/pkg/tracer"
+	"go.opentelemetry.io/otel/trace"
 )
 
 func (a App) browse(ctx context.Context, request provider.Request, item absto.Item, message renderer.Message) (renderer.Page, error) {
+	ctx, end := tracer.StartSpan(ctx, a.tracer, "browse", trace.WithSpanKind(trace.SpanKindInternal))
+	defer end()
+
 	var (
 		previous provider.RenderItem
 		next     provider.RenderItem
@@ -63,6 +68,9 @@ func (a App) browse(ctx context.Context, request provider.Request, item absto.It
 }
 
 func (a App) getFilesPreviousAndNext(ctx context.Context, item absto.Item, request provider.Request) (items []absto.Item, previous provider.RenderItem, next provider.RenderItem) {
+	ctx, end := tracer.StartSpan(ctx, a.tracer, "get_previous_next", trace.WithSpanKind(trace.SpanKindInternal))
+	defer end()
+
 	var err error
 	items, err = a.storageApp.List(ctx, item.Dir())
 	if err != nil {

@@ -84,6 +84,9 @@ func (a App) handleFile(w http.ResponseWriter, r *http.Request, request provider
 }
 
 func (a App) serveFile(w http.ResponseWriter, r *http.Request, item absto.Item) error {
+	_, end := tracer.StartSpan(r.Context(), a.tracer, "file", trace.WithSpanKind(trace.SpanKindInternal))
+	defer end()
+
 	etag, ok := provider.EtagMatch(w, r, sha.New(item))
 	if ok {
 		return nil
@@ -178,7 +181,7 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 		return
 	}
 
-	ctx, end := tracer.StartSpan(r.Context(), a.tracer, "geojson")
+	ctx, end := tracer.StartSpan(r.Context(), a.tracer, "geojson", trace.WithSpanKind(trace.SpanKindInternal))
 	defer end()
 
 	var hash string
