@@ -1,3 +1,4 @@
+---
 version: 2
 updates:
   - package-ecosystem: github-actions
@@ -12,7 +13,7 @@ updates:
     schedule:
       interval: weekly
       time: '06:00'
-      day: sunday
+      day: saturday
     commit-message:
       prefix: chore
       include: scope
