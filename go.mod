@@ -16,7 +16,7 @@ require (
 	go.opentelemetry.io/otel v1.10.0
 	go.opentelemetry.io/otel/trace v1.10.0
 	golang.org/x/crypto v0.0.0-20221005025214-4161e89ecf1b
-	golang.org/x/text v0.3.7
+	golang.org/x/text v0.3.8
 )
 
 require (
