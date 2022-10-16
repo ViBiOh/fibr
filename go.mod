@@ -6,10 +6,10 @@ require (
 	github.com/ViBiOh/ChatPotte v0.2.21
 	github.com/ViBiOh/absto v1.0.9
 	github.com/ViBiOh/auth/v2 v2.14.16
-	github.com/ViBiOh/exas v0.5.10
+	github.com/ViBiOh/exas v0.5.11
 	github.com/ViBiOh/flags v1.2.0
 	github.com/ViBiOh/httputils/v4 v4.49.3
-	github.com/ViBiOh/vith v0.5.9
+	github.com/ViBiOh/vith v0.5.10
 	github.com/golang/mock v1.6.0
 	github.com/prometheus/client_golang v1.13.0
 	github.com/streadway/amqp v1.0.0
