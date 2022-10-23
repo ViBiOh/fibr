@@ -36,12 +36,23 @@ func (a App) regenerate(w http.ResponseWriter, r *http.Request, request provider
 	}
 
 	go func(ctx context.Context) {
+		var directories []absto.Item
+
 		err := a.storageApp.Walk(ctx, pathname, func(item absto.Item) error {
-			a.notify(ctx, provider.NewRestartEvent(item, subset))
+			if item.IsDir {
+				directories = append(directories, item)
+			} else {
+				a.notify(ctx, provider.NewRestartEvent(item, subset))
+			}
+
 			return nil
 		})
 		if err != nil {
-			logger.Error("error during regenerate of `%s`: %s", pathname, err)
+			logger.Error("regenerate of `%s`: %s", pathname, err)
+		}
+
+		for _, directory := range directories {
+			a.notify(ctx, provider.NewStartEvent(directory))
 		}
 	}(tracer.CopyToBackground(ctx))
 

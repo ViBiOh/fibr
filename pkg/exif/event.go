@@ -87,7 +87,7 @@ func (a App) handleStartEvent(ctx context.Context, event provider.Event) error {
 		return nil
 	}
 
-	return a.handleUploadEvent(ctx, item, !forced)
+	return a.handleUploadEvent(ctx, item, false)
 }
 
 func (a App) handleUploadEvent(ctx context.Context, item absto.Item, aggregate bool) error {

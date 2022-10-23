@@ -159,6 +159,8 @@ func (a App) start(ctx context.Context) {
 
 	done := ctx.Done()
 
+	var directories []absto.Item
+
 	err := a.storageApp.Walk(ctx, "", func(item absto.Item) error {
 		select {
 		case <-done:
@@ -167,12 +169,21 @@ func (a App) start(ctx context.Context) {
 		}
 
 		item = a.sanitizeName(ctx, item)
-		a.notify(ctx, provider.NewStartEvent(item))
+
+		if item.IsDir {
+			directories = append(directories, item)
+		} else {
+			a.notify(ctx, provider.NewStartEvent(item))
+		}
 
 		return nil
 	})
 	if err != nil {
-		logger.Error("%s", err)
+		logger.Error("start: %s", err)
+	}
+
+	for _, directory := range directories {
+		a.notify(ctx, provider.NewStartEvent(directory))
 	}
 }
 
