@@ -8,7 +8,7 @@ require (
 	github.com/ViBiOh/auth/v2 v2.14.17
 	github.com/ViBiOh/exas v0.5.11
 	github.com/ViBiOh/flags v1.2.0
-	github.com/ViBiOh/httputils/v4 v4.49.5
+	github.com/ViBiOh/httputils/v4 v4.49.6
 	github.com/ViBiOh/vith v0.5.10
 	github.com/golang/mock v1.6.0
 	github.com/prometheus/client_golang v1.13.0
