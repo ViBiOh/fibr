@@ -95,9 +95,9 @@ type Event struct {
 	Metadata     map[string]string `json:"metadata,omitempty"`
 	URL          string            `json:"url,omitempty"`
 	ShareableURL string            `json:"shareable_url,omitempty"`
+	TraceLink    trace.Link        `json:"-"`
 	Item         absto.Item        `json:"item"`
 	Type         EventType         `json:"type"`
-	TraceLink    trace.Link        `json:"-"`
 }
 
 // IsForcedFor check if event is forced for given key
