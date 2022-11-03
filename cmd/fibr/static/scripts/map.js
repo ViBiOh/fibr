@@ -97,11 +97,7 @@ async function renderMap(geoURL) {
     bounds.push(coord);
     markers.addLayer(
       L.circleMarker(coord).bindPopup(
-        `<a href="${f.properties.url}?browser">
-                 <img src="${f.properties.url}?thumbnail" alt="Image thumbnail" class="thumbnail-img">
-               </a>
-               <br>
-               <span>${f.properties.date}</span>`,
+        `<a href="${f.properties.url}?browser"><img src="${f.properties.url}?thumbnail" alt="Image thumbnail" class="thumbnail-img"></a><br><span>${f.properties.date}</span>`,
         {
           maxWidth: 'auto',
           closeButton: false,
