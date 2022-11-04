@@ -94,9 +94,22 @@ async function fetchThumbnail() {
   }
 }
 
-window.addEventListener(
-  'load',
-  async () => {
+document.addEventListener(
+  'readystatechange',
+  async (event) => {
+    if (event.target.readyState !== 'complete') {
+      return;
+    }
+
+    let dateTimeFormatter = new Intl.DateTimeFormat(navigator.language, {
+      dateStyle: 'full',
+      timeStyle: 'long',
+    });
+
+    document.querySelectorAll('.date').forEach((item) => {
+      item.innerHTML = dateTimeFormatter.format(new Date(item.innerHTML));
+    });
+
     const thumbnailsElem = document.querySelectorAll('[data-thumbnail]');
     if (!thumbnailsElem) {
       return;
@@ -130,3 +143,35 @@ window.addEventListener(
   },
   false,
 );
+
+window.addEventListener('thumbnail-done', () => {
+  const lazyImageObserver = new IntersectionObserver(
+    async (entries, observer) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) {
+          continue;
+        }
+
+        const lazyImage = entry.target;
+        if (window.webpHero) {
+          const response = await fetch(lazyImage.dataset.src, {
+            credentials: 'same-origin',
+          });
+          const content = await response.arrayBuffer();
+
+          const webpMachine = new webpHero.WebpMachine();
+          lazyImage.src = await webpMachine.decode(new Uint8Array(content));
+          webpMachine.clearCache();
+        } else {
+          lazyImage.src = lazyImage.dataset.src;
+        }
+
+        lazyImageObserver.unobserve(lazyImage);
+      }
+    },
+  );
+
+  document
+    .querySelectorAll('img.thumbnail')
+    .forEach((lazyImage) => lazyImageObserver.observe(lazyImage));
+});

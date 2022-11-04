@@ -95,7 +95,9 @@ build-web:
 	minify "cmd/fibr/static/scripts/async-image.js" > "cmd/fibr/static/scripts/async-image.min.js" && mv "cmd/fibr/static/scripts/async-image.min.js" "cmd/fibr/static/scripts/async-image.js"
 	minify "cmd/fibr/static/scripts/map.js" > "cmd/fibr/static/scripts/map.min.js" && mv "cmd/fibr/static/scripts/map.min.js" "cmd/fibr/static/scripts/map.js"
 	minify "cmd/fibr/static/scripts/navigation.js" > "cmd/fibr/static/scripts/navigation.min.js" && mv "cmd/fibr/static/scripts/navigation.min.js" "cmd/fibr/static/scripts/navigation.js"
+	minify "cmd/fibr/static/scripts/upload.js" > "cmd/fibr/static/scripts/upload.min.js" && mv "cmd/fibr/static/scripts/upload.min.js" "cmd/fibr/static/scripts/upload.js"
 	minify "cmd/fibr/static/styles/main.css" > "cmd/fibr/static/styles/main.min.css" && mv "cmd/fibr/static/styles/main.min.css" "cmd/fibr/static/styles/main.css"
+	minify "cmd/fibr/static/styles/upload.css" > "cmd/fibr/static/styles/upload.min.css" && mv "cmd/fibr/static/styles/upload.min.css" "cmd/fibr/static/styles/upload.css"
 
 ## run: Locally run the application, e.g. node index.js, python -m myapp, go run myapp etc ...
 .PHONY: run

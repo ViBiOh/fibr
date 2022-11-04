@@ -123,3 +123,17 @@ async function renderMap(geoURL) {
 
   map.addLayer(markers);
 }
+
+document.addEventListener('readystatechange', async (event) => {
+  if (event.target.readyState === 'complete') {
+    if (document.location.hash === '#map') {
+      await renderMap(geoURL);
+    } else {
+      window.addEventListener('popstate', async () => {
+        if (document.location.hash === '#map') {
+          await renderMap(geoURL);
+        }
+      });
+    }
+  }
+});

@@ -226,49 +226,5 @@
     </ul>
   </div>
 
-  <script type="text/javascript" nonce="{{ .nonce }}">
-    window.addEventListener('load', () => {
-      let dateTimeFormatter = new Intl.DateTimeFormat(navigator.language, {
-        dateStyle: 'full',
-        timeStyle: 'long',
-      });
-      document.querySelectorAll('.date').forEach((item) => {
-        item.innerHTML = dateTimeFormatter.format(new Date(item.innerHTML));
-      });
-    });
-
-    window.addEventListener('thumbnail-done', () => {
-      const lazyImageObserver = new IntersectionObserver(
-        async (entries, observer) => {
-          for (const entry of entries) {
-            if (!entry.isIntersecting) {
-              continue;
-            }
-
-            const lazyImage = entry.target;
-            if (window.webpHero) {
-              const response = await fetch(lazyImage.dataset.src, {
-                credentials: 'same-origin',
-              })
-              const content = await response.arrayBuffer();
-
-              const webpMachine = new webpHero.WebpMachine();
-              lazyImage.src = await webpMachine.decode(new Uint8Array(content));
-              webpMachine.clearCache();
-            } else {
-              lazyImage.src = lazyImage.dataset.src;
-            }
-
-            lazyImageObserver.unobserve(lazyImage);
-          }
-        },
-      );
-
-      document
-        .querySelectorAll('img.thumbnail')
-        .forEach((lazyImage) => lazyImageObserver.observe(lazyImage));
-    });
-  </script>
-
   {{ template "footer" . }}
 {{ end }}

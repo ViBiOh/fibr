@@ -1,0 +1,34 @@
+#upload-modal:target,
+#upload-success:target {
+  display: flex;
+  z-index: 5;
+}
+
+#upload-modal:target ~ .content,
+#upload-success:target ~ .content {
+  pointer-events: none;
+}
+
+.upload-width {
+  max-width: 30rem;
+}
+
+.upload-item {
+  display: inline-block;
+  width: calc(100% - 2rem);
+}
+
+.upload-name {
+  text-align: left;
+}
+
+.opacity {
+  flex: 0 0;
+  opacity: 0;
+}
+
+.upload-status {
+  margin-left: 0.5rem;
+  text-align: right;
+  width: 2rem;
+}
