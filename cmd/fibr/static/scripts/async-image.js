@@ -145,7 +145,7 @@ document.addEventListener(
 );
 
 window.addEventListener('thumbnail-done', () => {
-  if (!lazyLoad) {
+  if (typeof lazyLoad === 'undefined' || !lazyLoad) {
     return;
   }
 
