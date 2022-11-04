@@ -5,6 +5,10 @@
 
   {{ $root := . }}
 
+  <script type="text/javascript" nonce="{{ .nonce }}">
+    const lazyLoad = true;
+  </script>
+
   <link rel="preload" as="image" href="{{ url "/svg/link?fill=#272727" }}">
 
   {{ if not .Request.Share.Story }}

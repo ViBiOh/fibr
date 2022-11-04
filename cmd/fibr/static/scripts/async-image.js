@@ -145,6 +145,10 @@ document.addEventListener(
 );
 
 window.addEventListener('thumbnail-done', () => {
+  if (!lazyLoad) {
+    return;
+  }
+
   const lazyImageObserver = new IntersectionObserver(
     async (entries, observer) => {
       for (const entry of entries) {
