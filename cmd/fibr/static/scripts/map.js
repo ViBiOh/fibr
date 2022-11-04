@@ -125,15 +125,17 @@ async function renderMap(geoURL) {
 }
 
 document.addEventListener('readystatechange', async (event) => {
-  if (event.target.readyState === 'complete') {
-    if (document.location.hash === '#map') {
-      await renderMap(geoURL);
-    } else {
-      window.addEventListener('popstate', async () => {
-        if (document.location.hash === '#map') {
-          await renderMap(geoURL);
-        }
-      });
-    }
+  if (event.target.readyState !== 'complete') {
+    return;
+  }
+
+  if (document.location.hash === '#map') {
+    await renderMap(geoURL);
+  } else {
+    window.addEventListener('popstate', async () => {
+      if (document.location.hash === '#map') {
+        await renderMap(geoURL);
+      }
+    });
   }
 });

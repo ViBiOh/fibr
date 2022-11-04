@@ -1,8 +1,3 @@
-/**
- * Drag'n drop.
- */
-const dropZone = document.getElementsByTagName('body')[0];
-
 let fileInput;
 let uploadList;
 let cancelButton;
@@ -16,16 +11,24 @@ function eventNoop(e) {
   e.stopPropagation();
 }
 
-dropZone.addEventListener('dragover', eventNoop);
-dropZone.addEventListener('dragleave', eventNoop);
-dropZone.addEventListener('drop', (e) => {
-  eventNoop(e);
-
-  window.location.hash = '#upload-modal';
-  if (fileInput) {
-    fileInput.files = e.dataTransfer.files;
-    fileInput.dispatchEvent(new Event('change'));
+document.addEventListener('readystatechange', async (event) => {
+  if (event.target.readyState !== 'complete') {
+    return;
   }
+
+  const dropZone = document.getElementsByTagName('body')[0];
+
+  dropZone.addEventListener('dragover', eventNoop);
+  dropZone.addEventListener('dragleave', eventNoop);
+  dropZone.addEventListener('drop', (e) => {
+    eventNoop(e);
+
+    window.location.hash = '#upload-modal';
+    if (fileInput) {
+      fileInput.files = e.dataTransfer.files;
+      fileInput.dispatchEvent(new Event('change'));
+    }
+  });
 });
 
 /**
@@ -454,52 +457,54 @@ function abort(e) {
 }
 
 document.addEventListener('readystatechange', async (event) => {
-  if (event.target.readyState === 'complete') {
-    fileInput = document.getElementById('file');
-    uploadList = document.getElementById('upload-list');
-    cancelButton = document.getElementById('upload-cancel');
+  if (event.target.readyState !== 'complete') {
+    return;
+  }
 
-    if (fileInput) {
-      fileInput.classList.add('opacity');
-      fileInput.multiple = true;
+  fileInput = document.getElementById('file');
+  uploadList = document.getElementById('upload-list');
+  cancelButton = document.getElementById('upload-cancel');
 
-      fileInput.addEventListener('change', () => {
-        window.location.hash = '#upload-modal';
+  if (fileInput) {
+    fileInput.classList.add('opacity');
+    fileInput.multiple = true;
 
-        replaceContent(uploadList);
+    fileInput.addEventListener('change', () => {
+      window.location.hash = '#upload-modal';
 
-        for (const file of fileInput.files) {
-          addUploadItem(uploadList, file);
-        }
-      });
+      replaceContent(uploadList);
 
-      const uploadButtonLink = document.getElementById('upload-button-link');
-      if (uploadButtonLink) {
-        uploadButtonLink.addEventListener('click', (e) => {
-          eventNoop(e);
-
-          fileInput.click();
-        });
+      for (const file of fileInput.files) {
+        addUploadItem(uploadList, file);
       }
-    }
+    });
 
-    const fileInputLabel = document.getElementById('file-label');
-    if (fileInputLabel) {
-      fileInputLabel.classList.remove('hidden');
-      fileInputLabel.innerHTML = 'Choose files...';
-    }
+    const uploadButtonLink = document.getElementById('upload-button-link');
+    if (uploadButtonLink) {
+      uploadButtonLink.addEventListener('click', (e) => {
+        eventNoop(e);
 
-    if (uploadList) {
-      uploadList.classList.remove('hidden');
+        fileInput.click();
+      });
     }
+  }
 
-    if (cancelButton) {
-      cancelButton.addEventListener('click', abort);
-    }
+  const fileInputLabel = document.getElementById('file-label');
+  if (fileInputLabel) {
+    fileInputLabel.classList.remove('hidden');
+    fileInputLabel.innerHTML = 'Choose files...';
+  }
 
-    const form = document.getElementById('upload-form');
-    if (form) {
-      form.addEventListener('submit', upload);
-    }
+  if (uploadList) {
+    uploadList.classList.remove('hidden');
+  }
+
+  if (cancelButton) {
+    cancelButton.addEventListener('click', abort);
+  }
+
+  const form = document.getElementById('upload-form');
+  if (form) {
+    form.addEventListener('submit', upload);
   }
 });

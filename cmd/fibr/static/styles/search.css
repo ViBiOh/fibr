@@ -1,0 +1,12 @@
+#search:target {
+  display: flex;
+  z-index: 5;
+}
+
+#search:target ~ .content {
+  pointer-events: none;
+}
+
+#size {
+  width: 7rem;
+}

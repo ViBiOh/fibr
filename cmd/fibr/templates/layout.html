@@ -64,12 +64,6 @@
     {{ end }}
   </header>
 
-  <style type="text/css" nonce="{{ .nonce }}">
-    .breakable {
-      word-break: break-word;
-    }
-  </style>
-
   {{ if .Message }}
     {{ template "message" .Message }}
   {{ end }}

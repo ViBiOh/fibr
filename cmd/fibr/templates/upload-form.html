@@ -1,7 +1,4 @@
 {{ define "upload-modal" }}
-  <script type="text/javascript" src="/scripts/upload.js?v={{ .Version }}"></script>
-  <link rel="stylesheet" type="text/css" href="/styles/upload.css?v={{ .Version }}">
-
   <script type="text/javascript" nonce="{{ .nonce }}">
     {{- if .ChunkUpload }}
     const uploadFile = uploadFileByChunks;

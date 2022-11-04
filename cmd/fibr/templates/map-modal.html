@@ -1,15 +1,4 @@
 {{ define "map-modal" }}
-  <style type="text/css" nonce="{{ .nonce }}">
-    #map:target {
-      display: flex;
-      z-index: 5;
-    }
-
-    #map:target ~ .content {
-      pointer-events: none;
-    }
-  </style>
-
   <div id="map" class="modal">
     <div class="modal-content no-background">
       <h2 class="flex flex-center header no-margin">
@@ -31,36 +20,6 @@
           </p>
         </noscript>
       </div>
-
-      <style type="text/css" nonce="{{ .nonce }}">
-        #map-container {
-          background-color: var(--grey);
-          color: var(--dark);
-          height: 80vh;
-          width: 80vw;
-        }
-
-        .thumbnail-img {
-          height: 15rem;
-        }
-
-        .thumbnail-popup {
-          bottom: 55px !important;
-          height: 15rem;
-          width: 19rem;
-        }
-
-        .map-throbber {
-          z-index: 500;
-        }
-
-        .map-throbber .throbber-dot {
-          height: 3.2rem;
-          width: 3.2rem;
-        }
-      </style>
-
-      <script type="text/javascript" src="/scripts/map.js?v={{ .Version }}"></script>
 
       <script type="text/javascript" nonce="{{ .nonce }}">
         const geoURL = '{{ $geoURL }}'

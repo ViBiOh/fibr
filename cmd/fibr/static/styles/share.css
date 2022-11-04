@@ -1,0 +1,71 @@
+#share-form:target {
+  display: flex;
+  z-index: 5;
+}
+
+#share-form:target ~ .content {
+  pointer-events: none;
+}
+
+
+#share-list:target {
+  display: flex;
+  z-index: 5;
+}
+
+#share-list:target ~ .content {
+  pointer-events: none;
+}
+
+#shares {
+  border-spacing: 0;
+  display: block;
+  overflow: auto;
+}
+
+#shares th,
+#shares td {
+  padding: 1rem;
+}
+
+.share-link {
+  color: var(--success);
+}
+
+.share-content:hover {
+  background-color: var(--grey);
+}
+
+.path {
+  max-width: 30rem;
+  text-align: left;
+}
+
+@media screen and (max-width: 485px) {
+  #shares th,
+  #shares td {
+    padding: 0.5rem;
+  }
+
+  .path {
+    max-width: 20rem;
+  }
+}
+
+@media screen and (max-width: 430px) {
+  .path {
+    max-width: 16rem;
+  }
+}
+
+@media screen and (max-width: 375px) {
+  .path {
+    max-width: 12rem;
+  }
+}
+
+@media screen and (max-width: 320px) {
+  .path {
+    max-width: 8rem;
+  }
+}

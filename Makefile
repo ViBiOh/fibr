@@ -50,6 +50,7 @@ init:
 	@curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap" | bash -s -- "-c" "git_hooks" "coverage" "release"
 	go install "github.com/golang/mock/mockgen@v1.6.0"
 	go install "github.com/golangci/golangci-lint/cmd/golangci-lint@latest"
+	go install "github.com/tdewolff/minify/v2/cmd/minify@latest"
 	go install "golang.org/x/tools/cmd/goimports@latest"
 	go install "golang.org/x/tools/go/analysis/passes/fieldalignment/cmd/fieldalignment@master"
 	go install "mvdan.cc/gofumpt@latest"
@@ -92,12 +93,9 @@ build:
 ## build: Build the application.
 .PHONY: build-web
 build-web:
-	minify "cmd/fibr/static/scripts/async-image.js" > "cmd/fibr/static/scripts/async-image.min.js" && mv "cmd/fibr/static/scripts/async-image.min.js" "cmd/fibr/static/scripts/async-image.js"
-	minify "cmd/fibr/static/scripts/map.js" > "cmd/fibr/static/scripts/map.min.js" && mv "cmd/fibr/static/scripts/map.min.js" "cmd/fibr/static/scripts/map.js"
-	minify "cmd/fibr/static/scripts/navigation.js" > "cmd/fibr/static/scripts/navigation.min.js" && mv "cmd/fibr/static/scripts/navigation.min.js" "cmd/fibr/static/scripts/navigation.js"
-	minify "cmd/fibr/static/scripts/upload.js" > "cmd/fibr/static/scripts/upload.min.js" && mv "cmd/fibr/static/scripts/upload.min.js" "cmd/fibr/static/scripts/upload.js"
-	minify "cmd/fibr/static/styles/main.css" > "cmd/fibr/static/styles/main.min.css" && mv "cmd/fibr/static/styles/main.min.css" "cmd/fibr/static/styles/main.css"
-	minify "cmd/fibr/static/styles/upload.css" > "cmd/fibr/static/styles/upload.min.css" && mv "cmd/fibr/static/styles/upload.min.css" "cmd/fibr/static/styles/upload.css"
+	rm -f "cmd/fibr/static/scripts/index.min.js" "cmd/fibr/static/styles/main.min.css"
+	minify --bundle --recursive --output "cmd/fibr/static/scripts/index.min.js" "cmd/fibr/static/scripts/"
+	minify --bundle --recursive --output "cmd/fibr/static/styles/main.min.css" "cmd/fibr/static/styles/"
 
 ## run: Locally run the application, e.g. node index.js, python -m myapp, go run myapp etc ...
 .PHONY: run
@@ -105,3 +103,8 @@ run:
 	$(MAIN_RUNNER) \
 		-ignorePattern ".git|node_modules" \
 		-authUsers "1:`htpasswd -nBb admin admin`"
+
+## config: Create local configuration
+.PHONY: config
+config:
+	@cp .env.example .env

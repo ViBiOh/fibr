@@ -1,0 +1,14 @@
+.exif-button {
+  bottom: 1rem;
+  position: absolute;
+  right: 1rem;
+}
+
+#exif-modal:target {
+  display: flex;
+  z-index: 5;
+}
+
+#exif-modal:target ~ .content {
+  pointer-events: none;
+}

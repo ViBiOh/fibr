@@ -1,7 +1,6 @@
 {{ define "files" }}
   {{ template "header" . }}
   {{ template "layout" . }}
-  {{ template "throbber" . }}
 
   {{ $root := . }}
 
@@ -323,10 +322,6 @@
             {{ end }}
           {{ end }}
         </li>
-      {{ end }}
-
-      {{ if and (eq .Request.Display "grid") .HasThumbnail }}
-        {{ template "async-image" . }}
       {{ end }}
     </ul>
   </div>

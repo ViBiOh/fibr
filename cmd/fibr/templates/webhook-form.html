@@ -1,15 +1,4 @@
 {{ define "webhook-directory" }}
-  <style type="text/css" nonce="{{ .nonce }}">
-    #webhook-form:target {
-      display: flex;
-      z-index: 5;
-    }
-
-    #webhook-form:target ~ .content {
-      pointer-events: none;
-    }
-  </style>
-
   <div id="webhook-form" class="modal">
     <div class="modal-content">
       <h2 class="header">Webhook on this directory</h2>

@@ -1,19 +1,4 @@
 {{ define "search-modal" }}
-  <style type="text/css" nonce="{{ .nonce }}">
-    #search:target {
-      display: flex;
-      z-index: 5;
-    }
-
-    #search:target ~ .content {
-      pointer-events: none;
-    }
-
-    #size {
-      width: 7rem;
-    }
-  </style>
-
   <div id="search" class="modal">
     <div class="modal-content">
       <h2 class="flex flex-center header no-margin">Search files</h2>

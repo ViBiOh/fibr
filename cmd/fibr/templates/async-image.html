@@ -13,15 +13,3 @@
     </noscript>
   </picture>
 {{ end }}
-
-{{ define "async-image" }}
-  <style type="text/css" nonce="{{ .nonce }}">
-    .thumbnail {
-      max-height: 100%;
-      vertical-align: middle;
-      width: 100%;
-    }
-  </style>
-
-  <script type="text/javascript" src="/scripts/async-image.js?v={{ .Version }}"></script>
-{{ end }}

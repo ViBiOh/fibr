@@ -8,23 +8,6 @@
 
 {{ define "exif-modal" }}
   {{ if .Exif.HasData }}
-    <style type="text/css" nonce="{{ .nonce }}">
-      .exif-button {
-        bottom: 1rem;
-        position: absolute;
-        right: 1rem;
-      }
-
-      #exif-modal:target {
-        display: flex;
-        z-index: 5;
-      }
-
-      #exif-modal:target ~ .content {
-        pointer-events: none;
-      }
-    </style>
-
     <div id="exif-modal" class="modal">
       <div class="modal-content">
         <h2 class="flex flex-center header no-margin">
