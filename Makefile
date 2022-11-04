@@ -38,7 +38,7 @@ version-date:
 
 ## dev: Build app
 .PHONY: dev
-dev: format style test build
+dev: format style test build build-web
 
 ## app: Build whole app
 .PHONY: app
