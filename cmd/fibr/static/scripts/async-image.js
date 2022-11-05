@@ -46,7 +46,7 @@ function findIndexEscapeSequence(escapeSequence, content) {
       escapePosition++;
 
       if (escapePosition === escapeSequence.length) {
-        return i;
+        return i - (escapeSequence.length - 1);
       }
     } else if (escapePosition !== 0) {
       escapePosition = 0;
@@ -74,7 +74,7 @@ async function* readChunk(response) {
 
     while (endPosition !== -1) {
       yield part.slice(0, endPosition);
-      part = part.slice(endPosition + (escapeSequence.length - 2));
+      part = part.slice(endPosition + escapeSequence.length);
 
       endPosition = findIndexEscapeSequence(escapeSequence, part);
     }
