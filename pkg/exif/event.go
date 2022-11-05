@@ -19,6 +19,9 @@ func (a App) EventConsumer(ctx context.Context, e provider.Event) {
 
 	switch e.Type {
 	case provider.StartEvent:
+		if err := provider.RenamePreviousID(ctx, a.storageApp, e.Item, ".json", a.Rename); err != nil {
+			logger.Error("rename from previous ID: %s", err)
+		}
 		if err = a.handleStartEvent(ctx, e); err != nil {
 			getEventLogger(e.Item).Error("start: %s", err)
 		}
