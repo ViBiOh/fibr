@@ -449,8 +449,6 @@ function abort(e) {
     if (cancelButton) {
       cancelButton.innerHTML = 'Close';
     }
-  } else {
-    window.location.hash = '';
   }
 
   return false;

@@ -1,46 +1,20 @@
 {{ define "navigation" }}
   <script type="text/javascript" nonce="{{ .nonce }}">
-    /**
-     * Go back from state.
-     */
-    function goBack() {
-      const previousHash = document.location.hash;
-      if (previousHash) {
-        document.location.hash = '';
+    {{- if .File }}
+      {{- $url := .Request.AbsoluteURL "/" }}
+      const parentPage = '{{ url $url }}?d={{ .Request.LayoutPath $url }}';
+    {{- end }}
 
-        if (/success$/gim.test(previousHash)) {
-          window.location.reload(true);
-        }
+    {{- if .Previous }}
+      {{- if not .Previous.IsZero }}
+        const previousFile = '{{ url (.Request.AbsoluteURL .Previous.URL) }}?browser';
+      {{- end }}
+    {{- end }}
 
-        return;
-      }
-
-      {{ if .File }}
-        {{ $url := .Request.AbsoluteURL "/" }}
-        window.location.href = '{{ url $url }}?d={{ .Request.LayoutPath $url }}';
-      {{ end }}
-    }
-
-    /**
-     * Go to the previous item.
-     */
-    function goToPrevious() {
-      {{ if .Previous }}
-        {{ if not .Previous.IsZero }}
-          window.location.href = '{{ url (.Request.AbsoluteURL .Previous.URL) }}?browser';
-        {{ end }}
-      {{ end }}
-    }
-
-    /**
-     * Go to the next item.
-     */
-    function goToNext() {
-      {{ if .Next }}
-        {{ if not .Next.IsZero }}
-          window.location.href = '{{ url (.Request.AbsoluteURL .Next.URL) }}?browser';
-        {{ end }}
-      {{ end }}
-    }
+    {{- if .Next }}
+      {{- if not .Next.IsZero }}
+        const nextFile = '{{ url (.Request.AbsoluteURL .Next.URL) }}?browser';
+      {{- end }}
+    {{- end }}
   </script>
 {{ end }}

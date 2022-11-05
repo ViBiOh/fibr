@@ -37,14 +37,57 @@ window.onkeyup = (e) => {
       break;
 
     case 'Escape':
-      if (typeof abort === 'function') {
-        abort(e);
-      } else {
-        goBack();
-      }
+      goBack(e);
       break;
   }
 };
+
+function goBack(e) {
+  const previousHash = document.location.hash;
+
+  if (previousHash) {
+    if (typeof abort === 'function' && typeof aborter !== 'undefined') {
+      abort(e);
+      return;
+    }
+
+    document.location.hash = '';
+
+    if (/success$/gim.test(previousHash)) {
+      window.location.reload(true);
+    }
+
+    return;
+  }
+
+  if (typeof parentPage === 'undefined') {
+    return;
+  }
+
+  window.location.href = parentPage;
+}
+
+/**
+ * Go to the previous item.
+ */
+function goToPrevious() {
+  if (typeof previousFile === 'undefined') {
+    return;
+  }
+
+  window.location.href = previousFile;
+}
+
+/**
+ * Go to the next item.
+ */
+function goToNext() {
+  if (typeof nextFile === 'undefined') {
+    return;
+  }
+
+  window.location.href = nextFile;
+}
 
 /**
  * Remove all child and append given one.
