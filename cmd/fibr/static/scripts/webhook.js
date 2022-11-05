@@ -15,7 +15,7 @@ document.addEventListener('readystatechange', (event) => {
     .getElementById('webhook-kind-raw')
     .addEventListener('change', (e) => {
       if (e.target.value === 'raw') {
-        urlWebhook.placeholder = 'http://website.com/fibr';
+        urlWebhook.placeholder = 'https://website.com/fibr';
         urlLabel.innerHTML = 'URL';
         telegramChatID.classList.add('hidden');
       }

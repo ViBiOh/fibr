@@ -75,8 +75,8 @@ async function* readChunk(response) {
 function encode(content) {
   const output = [];
 
-  for (let i = 0; i < content.length; i++) {
-    output.push(String.fromCharCode(content[i]));
+  for (let rune of content) {
+    output.push(String.fromCharCode(rune));
   }
 
   return btoa(output.join(''));
