@@ -102,6 +102,34 @@ async function fetchThumbnail() {
     throw new Error('unable to load thumbnails');
   }
 
+  let lazyImageObserver;
+
+  if (typeof lazyLoadThumbnail !== 'undefined' && lazyLoadThumbnail) {
+    lazyImageObserver = new IntersectionObserver(async (entries, observer) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) {
+          continue;
+        }
+
+        const lazyImage = entry.target;
+        if (window.webpHero) {
+          const response = await fetch(lazyImage.dataset.src, {
+            credentials: 'same-origin',
+          });
+          const content = await response.arrayBuffer();
+
+          const webpMachine = new webpHero.WebpMachine();
+          lazyImage.src = await webpMachine.decode(new Uint8Array(content));
+          webpMachine.clearCache();
+        } else {
+          lazyImage.src = lazyImage.dataset.src;
+        }
+
+        lazyImageObserver.unobserve(lazyImage);
+      }
+    });
+  }
+
   for await (let chunk of readChunk(response)) {
     const commaIndex = chunk.findIndex((element) => element === 44);
     if (commaIndex === -1) {
@@ -123,6 +151,10 @@ async function fetchThumbnail() {
     img.classList.add('thumbnail', 'full', 'block');
 
     replaceContent(picture, img);
+
+    if (lazyImageObserver !== undefined) {
+      lazyImageObserver.observe(img);
+    }
   }
 }
 
@@ -156,12 +188,6 @@ document.addEventListener(
     });
 
     try {
-      await fetchThumbnail();
-    } catch (e) {
-      console.error(e);
-    }
-
-    try {
       await isWebPCompatible();
     } catch (e) {
       await resolveScript(
@@ -169,49 +195,19 @@ document.addEventListener(
         'sha512-DA6h9H5Sqn55/uVn4JI4aSPFnAWoCQYYDXUnvjOAMNVx11///hX4QaFbQt5yWsrIm9hSI5fLJYfRWt3KXneSXQ==',
         'anonymous',
       );
+    }
 
+    try {
+      await fetchThumbnail();
+    } catch (e) {
+      console.error(e);
+    }
+
+    if (window.webpHero) {
       const webpMachine = new webpHero.WebpMachine();
       webpMachine.polyfillDocument();
       webpMachine.clearCache();
     }
-
-    window.dispatchEvent(new Event('thumbnail-done'));
   },
   false,
 );
-
-window.addEventListener('thumbnail-done', () => {
-  if (typeof lazyLoadThumbnail === 'undefined' || !lazyLoadThumbnail) {
-    return;
-  }
-
-  const lazyImageObserver = new IntersectionObserver(
-    async (entries, observer) => {
-      for (const entry of entries) {
-        if (!entry.isIntersecting) {
-          continue;
-        }
-
-        const lazyImage = entry.target;
-        if (window.webpHero) {
-          const response = await fetch(lazyImage.dataset.src, {
-            credentials: 'same-origin',
-          });
-          const content = await response.arrayBuffer();
-
-          const webpMachine = new webpHero.WebpMachine();
-          lazyImage.src = await webpMachine.decode(new Uint8Array(content));
-          webpMachine.clearCache();
-        } else {
-          lazyImage.src = lazyImage.dataset.src;
-        }
-
-        lazyImageObserver.unobserve(lazyImage);
-      }
-    },
-  );
-
-  document
-    .querySelectorAll('img.thumbnail')
-    .forEach((lazyImage) => lazyImageObserver.observe(lazyImage));
-});
