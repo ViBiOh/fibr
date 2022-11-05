@@ -11,7 +11,7 @@ require (
 	github.com/ViBiOh/httputils/v4 v4.49.6
 	github.com/ViBiOh/vith v0.5.10
 	github.com/golang/mock v1.6.0
-	github.com/prometheus/client_golang v1.13.0
+	github.com/prometheus/client_golang v1.13.1
 	github.com/streadway/amqp v1.0.0
 	go.opentelemetry.io/otel v1.11.1
 	go.opentelemetry.io/otel/trace v1.11.1
