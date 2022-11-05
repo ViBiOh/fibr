@@ -101,7 +101,7 @@ document.addEventListener(
       return;
     }
 
-    if (typeof fetchThumbnail === 'undefined' || !fetchThumbnail) {
+    if (typeof hasThumbnail === 'undefined' || !hasThumbnail) {
       return;
     }
 

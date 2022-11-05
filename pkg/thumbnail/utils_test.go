@@ -84,13 +84,15 @@ func TestHasThumbnail(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			storageMock := mocks.NewStorage(ctrl)
+			mockStorage := mocks.NewStorage(ctrl)
+			mockRedisClient := mocks.NewRedisClient(ctrl)
 
-			tc.instance.storageApp = storageMock
-			tc.instance.cacheApp = cache.New(nil, nil, storageMock.Info, 0, 0, nil)
+			tc.instance.storageApp = mockStorage
+			tc.instance.cacheApp = cache.New(mockRedisClient, nil, mockStorage.Info, 0, 0, nil)
 
 			if intention == "found" {
-				storageMock.EXPECT().Info(gomock.Any(), gomock.Any()).Return(absto.Item{}, nil)
+				mockRedisClient.EXPECT().Enabled().Return(false)
+				mockStorage.EXPECT().Info(gomock.Any(), gomock.Any()).Return(absto.Item{}, nil)
 			}
 
 			if result := tc.instance.HasThumbnail(context.TODO(), tc.input, SmallSize); result != tc.want {

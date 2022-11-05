@@ -13,6 +13,8 @@ import (
 	"github.com/ViBiOh/vith/pkg/model"
 )
 
+//go:generate mockgen -destination ../mocks/cache.go -package mocks -mock_names RedisClient=RedisClient github.com/ViBiOh/httputils/v4/pkg/cache RedisClient
+
 var redisCacheDuration = time.Hour * 96
 
 func (a App) CanHaveThumbnail(item absto.Item) bool {

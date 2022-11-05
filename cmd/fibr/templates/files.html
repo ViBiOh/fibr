@@ -326,7 +326,7 @@
 
       {{ if and (eq .Request.Display "grid") .HasThumbnail }}
         <script type="text/javascript" nonce="{{ .nonce }}">
-          const fetchThumbnail = true;
+          const hasThumbnail = true;
         </script>
       {{ end }}
     </ul>
