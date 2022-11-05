@@ -18,17 +18,6 @@ function isWebPCompatible() {
   });
 }
 
-function binaryToString(input) {
-  let output = '';
-
-  const len = input.byteLength;
-  for (let i = 0; i < len; i++) {
-    output += String.fromCharCode(input[i]);
-  }
-
-  return output;
-}
-
 function appendChunk(source, chunk) {
   const output = new Uint8Array(source.length + chunk.length);
 
@@ -104,23 +93,23 @@ async function fetchThumbnail() {
   }
 
   for await (let chunk of readChunk(response)) {
-    const line = binaryToString(chunk);
-
-    const commaIndex = line.indexOf(',');
+    const commaIndex = chunk.findIndex((element) => element === 44);
     if (commaIndex === -1) {
       console.error('invalid line for thumbnail:', line);
       continue;
     }
 
     const picture = document.getElementById(
-      `picture-${line.slice(0, commaIndex)}`,
+      `picture-${String.fromCharCode.apply(null, chunk.slice(0, commaIndex))}`,
     );
     if (!picture) {
       continue;
     }
 
     const img = new Image();
-    img.src = `data:image/webp;base64,${btoa(line.slice(commaIndex + 1))}`;
+    img.src = `data:image/webp;base64,${btoa(
+      String.fromCharCode.apply(null, chunk.slice(commaIndex + 1)),
+    )}`;
     img.alt = picture.dataset.alt;
     img.dataset.src = picture.dataset.src;
     img.classList.add('thumbnail', 'full', 'block');
