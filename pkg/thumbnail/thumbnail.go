@@ -3,7 +3,6 @@ package thumbnail
 import (
 	"bytes"
 	"context"
-	"encoding/base64"
 	"flag"
 	"fmt"
 	"io"
@@ -235,7 +234,7 @@ func (a App) List(w http.ResponseWriter, r *http.Request, item absto.Item, items
 		return
 	}
 
-	w.Header().Add("Content-Type", "text/plain; charset=utf-8")
+	w.Header().Add("Content-Type", "application/octet-stream")
 	w.Header().Add("Cache-Control", "no-cache")
 	w.Header().Add("Etag", etag)
 	w.WriteHeader(http.StatusOK)
@@ -308,19 +307,13 @@ func (a App) encodeContent(ctx context.Context, w io.Writer, isDone func() bool,
 	buffer := provider.BufferPool.Get().(*bytes.Buffer)
 	defer provider.BufferPool.Put(buffer)
 
-	encoder := base64.NewEncoder(base64.StdEncoding, w)
-
-	if _, err = io.CopyBuffer(encoder, reader, buffer.Bytes()); err != nil {
+	if _, err = io.CopyBuffer(w, reader, buffer.Bytes()); err != nil {
 		if !absto.IsNotExist(a.storageApp.ConvertError(err)) {
 			logEncodeContentError(item).Error("copy: %s", err)
 		}
 	}
 
-	if err := encoder.Close(); err != nil {
-		logger.Error("close thumbnail encoder: %s", err)
-	}
-
-	provider.DoneWriter(isDone, w, "\n")
+	provider.DoneWriter(isDone, w, "\x1c\x17\x04")
 }
 
 func logEncodeContentError(item absto.Item) logger.Provider {

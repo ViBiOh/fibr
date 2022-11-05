@@ -18,37 +18,68 @@ function isWebPCompatible() {
   });
 }
 
-// From https://developer.mozilla.org/en-US/docs/Web/API/ReadableStreamDefaultReader/read#example_2_-_handling_text_line_by_line
-async function* readLineByLine(response) {
-  const utf8Decoder = new TextDecoder('utf-8');
-  const reader = response.body.getReader();
-  let { value: chunk, done: readerDone } = await reader.read();
-  chunk = chunk ? utf8Decoder.decode(chunk, { stream: true }) : '';
+function binaryToString(input) {
+  let output = '';
 
-  let re = /\r\n|\n|\r/gm;
-  let startIndex = 0;
-
-  for (;;) {
-    const result = re.exec(chunk);
-    if (!result) {
-      if (readerDone) {
-        break;
-      }
-
-      const remainder = chunk.substr(startIndex);
-      ({ value: chunk, done: readerDone } = await reader.read());
-      chunk =
-        remainder + (chunk ? utf8Decoder.decode(chunk, { stream: true }) : '');
-      startIndex = re.lastIndex = 0;
-      continue;
-    }
-
-    yield chunk.substring(startIndex, result.index);
-    startIndex = re.lastIndex;
+  const len = input.byteLength;
+  for (let i = 0; i < len; i++) {
+    output += String.fromCharCode(input[i]);
   }
 
-  if (startIndex < chunk.length) {
-    yield chunk.substr(startIndex);
+  return output;
+}
+
+function appendChunk(source, chunk) {
+  const output = new Uint8Array(source.length + chunk.length);
+
+  output.set(source, 0);
+  output.set(chunk, source.length);
+
+  return output;
+}
+
+function findIndexEscapeSequence(escapeSequence, content) {
+  let escapePosition = 0;
+
+  for (let i = 0; i < content.length; i++) {
+    if (content[i] === escapeSequence[escapePosition]) {
+      escapePosition++;
+
+      if (escapePosition === escapeSequence.length) {
+        return i;
+      }
+    } else if (escapePosition !== 0) {
+      escapePosition = 0;
+    }
+  }
+
+  return -1;
+}
+
+async function* readChunk(response) {
+  const escapeSequence = [28, 23, 4];
+
+  const reader = response.body.getReader();
+  let { value: chunk, done: readerDone } = await reader.read();
+  let part = new Uint8Array(0);
+  let endPosition;
+
+  for (;;) {
+    if (readerDone) {
+      break;
+    }
+
+    part = appendChunk(part, chunk);
+    endPosition = findIndexEscapeSequence(escapeSequence, part);
+
+    while (endPosition !== -1) {
+      yield part.slice(0, endPosition);
+      part = part.slice(endPosition + (escapeSequence.length - 2));
+
+      endPosition = findIndexEscapeSequence(escapeSequence, part);
+    }
+
+    ({ value: chunk, done: readerDone } = await reader.read());
   }
 }
 
@@ -72,20 +103,24 @@ async function fetchThumbnail() {
     throw new Error('unable to load thumbnails');
   }
 
-  for await (let line of readLineByLine(response)) {
-    const parts = line.split(',');
-    if (parts.length != 2) {
+  for await (let chunk of readChunk(response)) {
+    const line = binaryToString(chunk);
+
+    const commaIndex = line.indexOf(',');
+    if (commaIndex === -1) {
       console.error('invalid line for thumbnail:', line);
       continue;
     }
 
-    const picture = document.getElementById(`picture-${parts[0]}`);
+    const picture = document.getElementById(
+      `picture-${line.slice(0, commaIndex)}`,
+    );
     if (!picture) {
       continue;
     }
 
     const img = new Image();
-    img.src = `data:image/webp;base64,${parts[1]}`;
+    img.src = `data:image/webp;base64,${btoa(line.slice(commaIndex + 1))}`;
     img.alt = picture.dataset.alt;
     img.dataset.src = picture.dataset.src;
     img.classList.add('thumbnail', 'full', 'block');
