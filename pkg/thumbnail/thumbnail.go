@@ -250,8 +250,14 @@ func (a App) List(w http.ResponseWriter, r *http.Request, item absto.Item, items
 		}
 	}
 
+	flusher, ok := w.(http.Flusher)
+
 	for _, item := range items {
 		a.encodeContent(ctx, w, isDone, item)
+
+		if ok {
+			flusher.Flush()
+		}
 	}
 }
 
