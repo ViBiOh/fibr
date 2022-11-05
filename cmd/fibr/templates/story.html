@@ -5,7 +5,8 @@
   {{ $root := . }}
 
   <script type="text/javascript" nonce="{{ .nonce }}">
-    const lazyLoad = true;
+    const fetchThumbnail = true;
+    const lazyLoadThumbnail = true;
   </script>
 
   <link rel="preload" as="image" href="{{ url "/svg/link?fill=#272727" }}">

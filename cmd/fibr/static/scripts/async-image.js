@@ -101,6 +101,10 @@ document.addEventListener(
       return;
     }
 
+    if (typeof fetchThumbnail === 'undefined' || !fetchThumbnail) {
+      return;
+    }
+
     let dateTimeFormatter = new Intl.DateTimeFormat(navigator.language, {
       dateStyle: 'full',
       timeStyle: 'long',
@@ -145,7 +149,7 @@ document.addEventListener(
 );
 
 window.addEventListener('thumbnail-done', () => {
-  if (typeof lazyLoad === 'undefined' || !lazyLoad) {
+  if (typeof lazyLoadThumbnail === 'undefined' || !lazyLoadThumbnail) {
     return;
   }
 
