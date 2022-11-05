@@ -1,21 +1,4 @@
 {{ define "webhook-list" }}
-  <script type="text/javascript" nonce="{{ .nonce }}">
-    document.addEventListener('readystatechange', async (event) => {
-      if (event.target.readyState === 'complete') {
-        {{ range .Webhooks }}
-          const webhookDelete{{ js .ID }} = document.getElementById('webhook-delete-{{ .ID }}');
-          if (webhookDelete{{ js .ID }}) {
-            webhookDelete{{ js .ID }}.addEventListener('click', (e) => {
-              if (!confirm('Are you sure you want to delete webhook for {{ .Pathname }}?')) {
-                e.preventDefault()
-              }
-            });
-          }
-        {{ end }}
-      }
-    });
-  </script>
-
   <div id="webhook-list" class="modal">
     <div class="modal-content">
       <h2 class="flex flex-center header no-margin">
@@ -83,7 +66,7 @@
                     <input type="hidden" name="type" value="webhook" />
                     <input type="hidden" name="method" value="DELETE" />
                     <input type="hidden" name="id" value="{{ .ID }}" />
-                    <button id="webhook-delete-{{ .ID }}" type="submit" class="button button-icon" title="Delete">
+                    <button id="webhook-delete-{{ .ID }}" type="submit" class="button button-icon" title="Delete" data-confirm="webhook for {{ .Pathname }}">
                       <img class="icon" src="{{ url "/svg/times?fill=crimson" }}" alt="Delete">
                     </button>
                   </form>

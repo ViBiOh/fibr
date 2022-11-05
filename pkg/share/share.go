@@ -150,8 +150,7 @@ func (a *App) loadShares(ctx context.Context) error {
 }
 
 func (a *App) refresh(ctx context.Context) error {
-	var err error
-	if a.shares, err = provider.LoadJSON[map[string]provider.Share](ctx, a.storageApp, shareFilename); err != nil {
+	if shares, err := provider.LoadJSON[map[string]provider.Share](ctx, a.storageApp, shareFilename); err != nil {
 		if !absto.IsNotExist(err) {
 			return err
 		}
@@ -161,6 +160,8 @@ func (a *App) refresh(ctx context.Context) error {
 		}
 
 		return provider.SaveJSON(ctx, a.storageApp, shareFilename, &a.shares)
+	} else {
+		a.shares = shares
 	}
 
 	return nil

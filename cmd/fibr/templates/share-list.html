@@ -1,21 +1,4 @@
 {{ define "share-list" }}
-  <script type="text/javascript" nonce="{{ .nonce }}">
-    document.addEventListener('readystatechange', async (event) => {
-      if (event.target.readyState === 'complete') {
-        {{ range .Shares }}
-          const shareDelete{{ js .ID }} = document.getElementById('share-delete-{{ .ID }}');
-          if (shareDelete{{ js .ID }}) {
-            shareDelete{{ js .ID }}.addEventListener('click', (e) => {
-              if (!confirm('Are you sure you want to delete share for {{ .Path }}?')) {
-                e.preventDefault()
-              }
-            });
-          }
-        {{ end }}
-      }
-    });
-  </script>
-
   <div id="share-list" class="modal">
     <div class="modal-content">
       <h2 class="flex flex-center header no-margin">
@@ -70,7 +53,7 @@
                     <input type="hidden" name="type" value="share" />
                     <input type="hidden" name="method" value="DELETE" />
                     <input type="hidden" name="id" value="{{ .ID }}" />
-                    <button id="share-delete-{{ .ID }}" type="submit" class="button button-icon" alt="Delete">
+                    <button id="share-delete-{{ .ID }}" type="submit" class="button button-icon" title="Delete" data-confirm="share for {{ .Path }}">
                       <img class="icon" src="{{ url "/svg/times?fill=crimson" }}" alt="Delete">
                     </button>
                   </form>
