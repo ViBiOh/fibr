@@ -72,6 +72,16 @@ async function* readChunk(response) {
   }
 }
 
+function encode(content) {
+  const output = [];
+
+  for (let i = 0; i < content.length; i++) {
+    output.push(String.fromCharCode(content[i]));
+  }
+
+  return btoa(output.join(''));
+}
+
 /**
  * Async image loading
  */
@@ -107,9 +117,7 @@ async function fetchThumbnail() {
     }
 
     const img = new Image();
-    img.src = `data:image/webp;base64,${btoa(
-      String.fromCharCode.apply(null, chunk.slice(commaIndex + 1)),
-    )}`;
+    img.src = `data:image/webp;base64,${encode(chunk.slice(commaIndex + 1))}`;
     img.alt = picture.dataset.alt;
     img.dataset.src = picture.dataset.src;
     img.classList.add('thumbnail', 'full', 'block');

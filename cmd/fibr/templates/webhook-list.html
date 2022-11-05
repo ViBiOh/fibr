@@ -78,12 +78,12 @@
                   {{ end }}
                 </th>
 
-                <td >
+                <td>
                   <form method="post">
                     <input type="hidden" name="type" value="webhook" />
                     <input type="hidden" name="method" value="DELETE" />
                     <input type="hidden" name="id" value="{{ .ID }}" />
-                    <button id="webhook-delete-{{ .ID }}" type="submit" class="button button-icon" tile="Delete">
+                    <button id="webhook-delete-{{ .ID }}" type="submit" class="button button-icon" title="Delete">
                       <img class="icon" src="{{ url "/svg/times?fill=crimson" }}" alt="Delete">
                     </button>
                   </form>
