@@ -110,6 +110,12 @@
           </a>
         </li>
       {{ end }}
+
+      {{ if and (eq .Request.Display "grid") $hasThumbnail }}
+        <script type="text/javascript" nonce="{{ .nonce }}">
+          const hasThumbnail = true;
+        </script>
+      {{ end }}
     </ul>
   </div>
 
