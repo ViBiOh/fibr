@@ -1,10 +1,16 @@
 {{ define "upload-modal" }}
-  <script type="text/javascript" nonce="{{ .nonce }}">
-    {{- if .ChunkUpload }}
-    const uploadFile = uploadFileByChunks;
-    {{- else }}
-    const uploadFile = uploadFileByXHR;
-    {{- end }}
+  <script type="text/javascript" nonce="{{ .nonce }}" defer>
+    document.addEventListener('readystatechange', async (event) => {
+      if (event.target.readyState !== 'complete') {
+        return;
+      }
+
+      {{- if .ChunkUpload }}
+      uploadFile = uploadFileByChunks;
+      {{- else }}
+      uploadFile = uploadFileByXHR;
+      {{- end }}
+    });
   </script>
 
 

@@ -209,6 +209,7 @@ async function setUploadStatus(container, content, style, title) {
   }
 }
 
+let uploadFile;
 let aborter;
 
 const chunkSize = 1024 * 1024;
