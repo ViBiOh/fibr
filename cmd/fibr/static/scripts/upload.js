@@ -460,6 +460,14 @@ document.addEventListener('readystatechange', async (event) => {
     return;
   }
 
+  if (typeof chunkUpload !== 'undefined') {
+    if (chunkUpload) {
+      uploadFile = uploadFileByChunks;
+    } else {
+      uploadFile = uploadFileByXHR;
+    }
+  }
+
   fileInput = document.getElementById('file');
   uploadList = document.getElementById('upload-list');
   cancelButton = document.getElementById('upload-cancel');
