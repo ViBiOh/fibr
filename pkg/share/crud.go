@@ -27,21 +27,23 @@ func (a *App) generateID() (string, error) {
 }
 
 // List shares
-func (a *App) List() (shares []provider.Share) {
+func (a *App) List() (output []provider.Share) {
 	a.RLock()
 	defer a.RUnlock()
 
-	var i int64
-	shares = make([]provider.Share, len(a.shares))
+	output = make([]provider.Share, 0, len(a.shares))
 
 	for _, value := range a.shares {
-		shares[i] = value
-		i++
+		index := sort.Search(len(output), func(i int) bool {
+			return output[i].ID > value.ID
+		})
+
+		output = append(output, value)
+		copy(output[index+1:], output[index:])
+		output[index] = value
 	}
 
-	sort.Sort(provider.ShareByID(shares))
-
-	return shares
+	return output
 }
 
 // Create a share

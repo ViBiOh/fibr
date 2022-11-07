@@ -110,11 +110,3 @@ func (w Webhook) matchItem(item absto.Item) bool {
 
 	return itemDir == w.Pathname
 }
-
-type WebhookByID []Webhook
-
-func (a WebhookByID) Len() int      { return len(a) }
-func (a WebhookByID) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
-func (a WebhookByID) Less(i, j int) bool {
-	return a[i].ID < a[j].ID
-}

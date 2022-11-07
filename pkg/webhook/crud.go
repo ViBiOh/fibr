@@ -24,21 +24,23 @@ func (a *App) generateID() (string, error) {
 	}
 }
 
-func (a *App) List() (webhooks []provider.Webhook) {
+func (a *App) List() (output []provider.Webhook) {
 	a.RLock()
 	defer a.RUnlock()
 
-	var i int64
-	webhooks = make([]provider.Webhook, len(a.webhooks))
+	output = make([]provider.Webhook, len(a.webhooks))
 
 	for _, value := range a.webhooks {
-		webhooks[i] = value
-		i++
+		index := sort.Search(len(output), func(i int) bool {
+			return output[i].ID > value.ID
+		})
+
+		output = append(output, value)
+		copy(output[index+1:], output[index:])
+		output[index] = value
 	}
 
-	sort.Sort(provider.WebhookByID(webhooks))
-
-	return webhooks
+	return output
 }
 
 func (a *App) Create(ctx context.Context, pathname string, recursive bool, kind provider.WebhookKind, url string, types []provider.EventType) (string, error) {
