@@ -28,7 +28,7 @@ func (a *App) List() (output []provider.Webhook) {
 	a.RLock()
 	defer a.RUnlock()
 
-	output = make([]provider.Webhook, len(a.webhooks))
+	output = make([]provider.Webhook, 0, len(a.webhooks))
 
 	for _, value := range a.webhooks {
 		index := sort.Search(len(output), func(i int) bool {
