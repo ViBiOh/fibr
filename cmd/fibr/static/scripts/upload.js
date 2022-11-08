@@ -507,7 +507,7 @@ document.addEventListener('readystatechange', async (event) => {
   }
 
   if (cancelButton) {
-    cancelButton.addEventListener('click', abort);
+    cancelButton.addEventListener('click', goBack);
   }
 
   const form = document.getElementById('upload-form');
