@@ -338,20 +338,26 @@ async function uploadFileByXHR(container, method, filename, file) {
     xhr.addEventListener(
       'readystatechange',
       (e) => {
-        if (xhr.readyState === XMLHttpRequest.DONE) {
-          if (xhr.status >= 200 && xhr.status < 400) {
-            if (progress) {
-              progress.value = 100;
-            }
-
-            resolve(xhr.responseText);
-            xhr = undefined;
-          } else {
-            reject(e);
-            xhr = undefined;
-          }
-        } else if (xhr.readyState === XMLHttpRequest.UNSENT) {
+        if (xhr.readyState === XMLHttpRequest.UNSENT) {
           reject(new Error('request aborted'));
+          xhr = undefined;
+
+          return;
+        }
+
+        if (xhr.readyState !== XMLHttpRequest.DONE) {
+          return;
+        }
+
+        if (xhr.status >= 200 && xhr.status < 400) {
+          if (progress) {
+            progress.value = 100;
+          }
+
+          resolve(xhr.responseText);
+          xhr = undefined;
+        } else {
+          reject(e);
           xhr = undefined;
         }
       },

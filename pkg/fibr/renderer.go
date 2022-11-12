@@ -18,14 +18,8 @@ var FuncMap = template.FuncMap{
 	"rebuildPaths": func(parts []string, index int) string {
 		return fmt.Sprintf("/%s/", strings.Join(parts[:index+1], "/"))
 	},
-	"js": func(content string) template.JS {
-		return template.JS(content)
-	},
 	"raw": func(content string) template.URL {
 		return template.URL(content)
-	},
-	"join": func(arr []string) string {
-		return strings.Join(arr, ",")
 	},
 	"splitLines": func(value string) []string {
 		return strings.Split(value, "\n")
