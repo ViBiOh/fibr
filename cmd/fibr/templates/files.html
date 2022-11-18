@@ -56,40 +56,20 @@
       overflow: auto;
     }
 
-    {{ range .Files }}
-      {{ if $root.Request.CanEdit }}
-        #delete-modal-{{ .ID }}:target,
-        #edit-modal-{{ .ID }}:target,
-      {{ end }}
-
-      {{ if $root.Request.CanShare }}
-        #share-form-{{ .ID }}:target,
-      {{ end }}
-
-      {{ if $root.Request.CanWebhook }}
-        #webhook-form-{{ .ID }}:target,
-      {{ end }}
-    {{ end }}
-    #folder-modal:target {
+    .delete-modal:target,
+    .edit-modal:target,
+    .share-form:target,
+    .webhook-form:target,
+    .folder-modal:target {
       display: flex;
       z-index: 5;
     }
 
-    {{ range .Files }}
-      {{ if $root.Request.CanEdit }}
-        #delete-modal-{{ .ID }}:target ~ .content,
-        #edit-modal-{{ .ID }}:target ~ .content,
-      {{ end }}
-
-      {{ if $root.Request.CanShare }}
-        #share-form-{{ .ID }}:target ~ .content,
-      {{ end }}
-
-      {{ if $root.Request.CanWebhook }}
-        #webhook-form-{{ .ID }}:target ~ .content,
-      {{ end }}
-    {{ end }}
-    #folder-modal:target ~ .content {
+    .delete-modal:target ~ .content,
+    .edit-modal:target ~ .content,
+    .share-form:target ~ .content,
+    .webhook-form:target ~ .content,
+    .folder-modal:target ~ .content {
       pointer-events: none;
     }
 

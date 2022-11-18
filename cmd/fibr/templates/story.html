@@ -96,22 +96,14 @@
       margin-left: 0.5rem;
     }
 
-    {{ if .Request.CanEdit }}
-      {{ range .Files }}
-        #desc-modal-{{ .ID }}:target,
-      {{ end }}
-      #desc-modal:target {
-        display: flex;
-        z-index: 5;
-      }
+    .desc-modal:target {
+      display: flex;
+      z-index: 5;
+    }
 
-      {{ range .Files }}
-        #desc-modal-{{ .ID }}:target ~ .content,
-      {{ end }}
-      #desc-modal:target ~ .content {
-        pointer-events: none;
-      }
-    {{ end }}
+    .desc-modal:target ~ .content {
+      pointer-events: none;
+    }
 
     .context {
       display: flex;
