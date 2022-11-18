@@ -1,11 +1,11 @@
-#upload-modal:target,
-#upload-success:target {
+.upload-modal:target,
+.upload-success:target {
   display: flex;
   z-index: 5;
 }
 
-#upload-modal:target ~ .content,
-#upload-success:target ~ .content {
+.upload-modal:target ~ .content,
+.upload-success:target ~ .content {
   pointer-events: none;
 }
 
