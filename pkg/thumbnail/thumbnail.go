@@ -15,7 +15,6 @@ import (
 	"github.com/ViBiOh/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/amqp"
 	"github.com/ViBiOh/httputils/v4/pkg/cache"
-	"github.com/ViBiOh/httputils/v4/pkg/concurrent"
 	"github.com/ViBiOh/httputils/v4/pkg/httperror"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	prom "github.com/ViBiOh/httputils/v4/pkg/prometheus"
@@ -31,8 +30,6 @@ import (
 const (
 	// SmallSize is the square size of each thumbnail generated
 	SmallSize uint64 = 150
-
-	parallelLimit = 4
 )
 
 var cacheDuration = fmt.Sprintf("private, max-age=%.0f", (time.Minute * 5).Seconds())
@@ -252,41 +249,15 @@ func (a App) List(w http.ResponseWriter, r *http.Request, item absto.Item, items
 		}
 	}
 
-	encodeDone := make(chan struct{})
-	output := make(chan encodeData, parallelLimit)
-
-	go func() {
-		defer close(encodeDone)
-
-		flusher, ok := w.(http.Flusher)
-
-		for content := range output {
-			if content.isZero() {
-				continue
-			}
-
-			a.encodeContent(ctx, w, isDone, content)
-
-			if ok {
-				flusher.Flush()
-			}
-		}
-	}()
-
-	wg := concurrent.NewLimited(parallelLimit)
+	flusher, ok := w.(http.Flusher)
 
 	for _, item := range items {
-		item := item
+		a.encodeContent(ctx, w, isDone, item)
 
-		wg.Go(func() {
-			output <- a.getEncodeData(ctx, isDone, item)
-		})
+		if ok {
+			flusher.Flush()
+		}
 	}
-
-	wg.Wait()
-
-	close(output)
-	<-encodeDone
 }
 
 func (a App) thumbnailHash(ctx context.Context, items []absto.Item) string {
@@ -312,57 +283,39 @@ func (a App) thumbnailHash(ctx context.Context, items []absto.Item) string {
 	return hasher.Sum()
 }
 
-type encodeData struct {
-	data     io.ReadCloser
-	id       string
-	pathname string
-}
-
-func (ed encodeData) isZero() bool {
-	return len(ed.id) == 0
-}
-
-func (a App) getEncodeData(ctx context.Context, isDone func() bool, item absto.Item) encodeData {
+func (a App) encodeContent(ctx context.Context, w io.Writer, isDone func() bool, item absto.Item) {
 	if item.IsDir || isDone() {
-		return encodeData{}
+		return
 	}
 
-	ctx, end := tracer.StartSpan(ctx, a.tracer, "thumbnail_read", trace.WithSpanKind(trace.SpanKindInternal))
+	ctx, end := tracer.StartSpan(ctx, a.tracer, "thumbnail_encode", trace.WithSpanKind(trace.SpanKindInternal))
 	defer end()
 
 	reader, err := a.storageApp.ReadFrom(ctx, a.PathForScale(item, SmallSize))
 	if err != nil {
 		if !absto.IsNotExist(err) {
-			logger.WithField("fn", "thumbnail.getEncodeData").WithField("item", item.Pathname).Error("open: %s", err)
+			logEncodeContentError(item).Error("open: %s", err)
 		}
 
-		return encodeData{}
+		return
 	}
+	defer provider.LogClose(reader, "thumbnail.encodeContent", item.Pathname)
 
-	return encodeData{
-		id:       item.ID,
-		pathname: item.Pathname,
-		data:     reader,
-	}
-}
-
-func (a App) encodeContent(ctx context.Context, w io.Writer, isDone func() bool, content encodeData) {
-	_, end := tracer.StartSpan(ctx, a.tracer, "thumbnail_encode", trace.WithSpanKind(trace.SpanKindInternal))
-	defer end()
-
-	defer provider.LogClose(content.data, "thumbnail.encodeContent", content.pathname)
-
-	provider.DoneWriter(isDone, w, content.id)
+	provider.DoneWriter(isDone, w, item.ID)
 	provider.DoneWriter(isDone, w, `,`)
 
 	buffer := provider.BufferPool.Get().(*bytes.Buffer)
 	defer provider.BufferPool.Put(buffer)
 
-	if _, err := io.CopyBuffer(w, content.data, buffer.Bytes()); err != nil {
+	if _, err = io.CopyBuffer(w, reader, buffer.Bytes()); err != nil {
 		if !absto.IsNotExist(a.storageApp.ConvertError(err)) {
-			logger.WithField("fn", "thumbnail.encodeContent").WithField("item", content.pathname).Error("copy: %s", err)
+			logEncodeContentError(item).Error("copy: %s", err)
 		}
 	}
 
 	provider.DoneWriter(isDone, w, "\x1c\x17\x04")
+}
+
+func logEncodeContentError(item absto.Item) logger.Provider {
+	return logger.WithField("fn", "thumbnail.encodeContent").WithField("item", item.Pathname)
 }
