@@ -29,11 +29,11 @@ async function addStyle(src, integrity, crossorigin) {
 }
 
 async function loadLeaflet() {
-  const leafletVersion = '1.9.2';
+  const leafletVersion = '1.9.3';
 
   await addStyle(
     `https://unpkg.com/leaflet@${leafletVersion}/dist/leaflet.css`,
-    'sha512-UkezATkM8unVC0R/Z9Kmq4gorjNoFwLMAWR/1yZpINW08I79jEKx/c8NlLSvvimcu7SL8pgeOnynxfRpe+5QpA==',
+    'sha512-mD70nAW2ThLsWH0zif8JPbfraZ8hbCtjQ+5RU1m4+ztZq6/MymyZeB55pWsi4YAX+73yvcaJyk61mzfYMvtm9w==',
     'anonymous',
   );
   await addStyle(
@@ -43,7 +43,7 @@ async function loadLeaflet() {
   );
   await resolveScript(
     `https://unpkg.com/leaflet@${leafletVersion}/dist/leaflet.js`,
-    'sha512-KMraOVM0qMVE0U1OULTpYO4gg5MZgazwPAPyMQWfOkEshpwlLQFCHZ/0lBXyviDNVL+pBGwmeXQnuvGK8Fscvg==',
+    'sha512-Dqm3h1Y4qiHUjbhxTuBGQsza0Tfppn53SHlu/uj1f+RT+xfShfe7r6czRf5r2NmllO2aKx+tYJgoxboOkn1Scg==',
     'anonymous',
   );
   await resolveScript(
