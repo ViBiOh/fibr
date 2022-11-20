@@ -285,7 +285,7 @@ Usage of fibr:
   -chunkUpload
         [crud] Use chunk upload in browser {FIBR_CHUNK_UPLOAD}
   -csp string
-        [owasp] Content-Security-Policy {FIBR_CSP} (default "default-src 'self'; base-uri 'self'; script-src 'self' 'httputils-nonce' unpkg.com/webp-hero@0.0.2/dist-cjs/ unpkg.com/leaflet@1.9.3/dist/ unpkg.com/leaflet.markercluster@1.5.1/; style-src 'httputils-nonce' unpkg.com/leaflet@1.9.3/dist/ unpkg.com/leaflet.markercluster@1.5.1/; img-src 'self' data: a.tile.openstreetmap.org b.tile.openstreetmap.org c.tile.openstreetmap.org")
+        [owasp] Content-Security-Policy {FIBR_CSP} (default "default-src 'self'; base-uri 'self'; script-src 'self' 'httputils-nonce' unpkg.com/webp-hero@0.0.2/dist-cjs/ unpkg.com/leaflet@1.9.3/dist/ unpkg.com/leaflet.markercluster@1.5.1/; style-src 'self' 'httputils-nonce' unpkg.com/leaflet@1.9.3/dist/ unpkg.com/leaflet.markercluster@1.5.1/; img-src 'self' data: a.tile.openstreetmap.org b.tile.openstreetmap.org c.tile.openstreetmap.org")
   -exifAmqpExchange string
         [exif] AMQP Exchange Name {FIBR_EXIF_AMQP_EXCHANGE} (default "fibr")
   -exifAmqpRoutingKey string
@@ -382,8 +382,12 @@ Usage of fibr:
         [storage] Storage Object Access Key {FIBR_STORAGE_OBJECT_ACCESS_KEY}
   -storageObjectBucket string
         [storage] Storage Object Bucket {FIBR_STORAGE_OBJECT_BUCKET}
+  -storageObjectClass string
+        [storage] Storage Object Class {FIBR_STORAGE_OBJECT_CLASS}
   -storageObjectEndpoint string
         [storage] Storage Object endpoint {FIBR_STORAGE_OBJECT_ENDPOINT}
+  -storageObjectRegion string
+        [storage] Storage Object Region {FIBR_STORAGE_OBJECT_REGION}
   -storageObjectSSL
         [storage] Use SSL {FIBR_STORAGE_OBJECT_SSL} (default true)
   -storageObjectSecretAccess string

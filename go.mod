@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/ViBiOh/ChatPotte v0.2.25
-	github.com/ViBiOh/absto v1.0.15
+	github.com/ViBiOh/absto v1.1.0
 	github.com/ViBiOh/auth/v2 v2.14.20
 	github.com/ViBiOh/exas v0.5.11
 	github.com/ViBiOh/flags v1.2.0
