@@ -123,7 +123,7 @@ The webhook can be recursive (all children folders will be notified too) for eve
 
 #### Security
 
-Webhooks can be sent with an [HTTP Signature](https://tools.ietf.org/id/draft-cavage-http-signatures-12.html) if you configure the [`webhookSecret`](#usage). It adds an `Authorization` header to the sent request that serves as an authentification mechanism for the receiver: if the signature is not valid, you should not trust the caller.
+Webhooks can be sent with an [HTTP Signature](https://datatracker.ietf.org/doc/html/draft-cavage-http-signatures-12) if you configure the [`webhookSecret`](#usage). It adds an `Authorization` header to the sent request that serves as an authentification mechanism for the receiver: if the signature is not valid, you should not trust the caller.
 
 I've implemented a [very simple function](https://github.com/ViBiOh/httputils/blob/main/pkg/request/signature.go#L34) you can add to your receiver for checking it.
 
