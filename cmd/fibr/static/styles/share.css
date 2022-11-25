@@ -1,19 +1,18 @@
-#share-form:target {
+.share-form-modal:target {
   display: flex;
   z-index: 5;
 }
 
-#share-form:target ~ .content {
+.share-form-modal:target ~ .content {
   pointer-events: none;
 }
 
-
-#share-list:target {
+.share-list-modal:target {
   display: flex;
   z-index: 5;
 }
 
-#share-list:target ~ .content {
+.share-list-modal:target ~ .content {
   pointer-events: none;
 }
 
