@@ -19,7 +19,7 @@ on:
       - released
 
 env:
-  SCRIPTS_NO_INTERACTIVE: 'true'
+  SCRIPTS_NO_INTERACTIVE: "true"
 
 defaults:
   run:
@@ -37,7 +37,7 @@ jobs:
       - name: Setup Golang
         uses: actions/setup-go@v3
         with:
-          go-version: '^1.19'
+          go-version: "^1.19"
       - name: Build
         run: make init
       - name: GPG
@@ -57,9 +57,10 @@ jobs:
           export GIT_TAG="$(basename ${{ github.ref }})"
           scripts/release build assets clean
       - name: Docker
+        if: ${{ env.docker_user != '' }}
         env:
-          DOCKER_USER: ${{ secrets.DOCKER_USER }}
+          DOCKER_USER: ${{ env.docker_user }}
           DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
         run: |
           curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap" | bash -s -- "-c" "docker_promote"
-          scripts/docker_promote "${{ secrets.DOCKER_USER }}/$(make name)" "$(make version-date)" "$(basename ${{ github.ref }})"
+          scripts/docker_promote "${{ env.DOCKER_USER }}/$(make name)" "$(make version-date)" "$(basename ${{ github.ref }})"
