@@ -10,6 +10,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/crud"
 	"github.com/ViBiOh/fibr/pkg/exif"
 	"github.com/ViBiOh/fibr/pkg/share"
+	"github.com/ViBiOh/fibr/pkg/storage"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/fibr/pkg/webhook"
 	"github.com/ViBiOh/flags"
@@ -36,6 +37,7 @@ type configuration struct {
 	health        health.Config
 	owasp         owasp.Config
 	basic         basicMemory.Config
+	storage       storage.Config
 	crud          crud.Config
 	share         share.Config
 	webhook       webhook.Config
@@ -66,6 +68,7 @@ func newConfig() (configuration, error) {
 		prometheus:    prometheus.Flags(fs, "prometheus", flags.NewOverride("Gzip", false)),
 		owasp:         owasp.Flags(fs, "", flags.NewOverride("FrameOptions", "SAMEORIGIN"), flags.NewOverride("Csp", "default-src 'self'; base-uri 'self'; script-src 'self' 'httputils-nonce' unpkg.com/webp-hero@0.0.2/dist-cjs/ unpkg.com/leaflet@1.9.3/dist/ unpkg.com/leaflet.markercluster@1.5.1/; style-src 'self' 'httputils-nonce' unpkg.com/leaflet@1.9.3/dist/ unpkg.com/leaflet.markercluster@1.5.1/; img-src 'self' data: a.tile.openstreetmap.org b.tile.openstreetmap.org c.tile.openstreetmap.org")),
 		basic:         basicMemory.Flags(fs, "auth", flags.NewOverride("Profiles", "1:admin")),
+		storage:       storage.Flags(fs, ""),
 		crud:          crud.Flags(fs, ""),
 		share:         share.Flags(fs, "share"),
 		webhook:       webhook.Flags(fs, "webhook"),

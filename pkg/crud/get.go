@@ -133,7 +133,19 @@ func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.
 	go a.notify(tracer.CopyToBackground(r.Context()), provider.NewAccessEvent(item, r))
 
 	if query.GetBool(r, "search") {
-		return a.search(r, request, items)
+		files, hasMap, err := a.searchApp.Search(r, request, items)
+		if err != nil {
+			return errorReturn(request, err)
+		}
+
+		return renderer.NewPage("search", http.StatusOK, map[string]any{
+			"Paths":   getPathParts(request),
+			"Files":   files,
+			"Cover":   a.getCover(r.Context(), request, items),
+			"Search":  r.URL.Query(),
+			"Request": request,
+			"HasMap":  hasMap,
+		}), nil
 	}
 
 	provider.SetPrefsCookie(w, request)
@@ -150,7 +162,7 @@ func (a App) listFiles(r *http.Request, request provider.Request, item absto.Ite
 	defer end()
 
 	if query.GetBool(r, "search") {
-		items, err = a.searchFiles(r, request)
+		items, err = a.searchApp.Files(r, request)
 	} else {
 		items, err = a.storageApp.List(ctx, request.Filepath())
 	}

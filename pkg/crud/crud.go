@@ -6,13 +6,13 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
-	"regexp"
 	"strings"
 	"time"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/exif"
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/fibr/pkg/search"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/amqp"
@@ -36,6 +36,7 @@ type App struct {
 	shareApp      provider.ShareManager
 	webhookApp    provider.WebhookManager
 	exifApp       provider.ExifManager
+	searchApp     search.App
 	pushEvent     provider.EventProducer
 
 	amqpClient              *amqp.Client
@@ -50,7 +51,6 @@ type App struct {
 }
 
 type Config struct {
-	ignore                  *string
 	amqpExclusiveRoutingKey *string
 	bcryptDuration          *string
 	temporaryFolder         *string
@@ -60,7 +60,6 @@ type Config struct {
 
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		ignore:          flags.String(fs, prefix, "crud", "IgnorePattern", "Ignore pattern when listing files or directory", "", nil),
 		sanitizeOnStart: flags.Bool(fs, prefix, "crud", "SanitizeOnStart", "Sanitize name on start", false, nil),
 		bcryptDuration:  flags.String(fs, prefix, "crud", "BcryptDuration", "Wanted bcrypt duration for calculating effective cost", "0.25s", nil),
 
@@ -71,7 +70,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 	}
 }
 
-func New(config Config, storage absto.Storage, rendererApp renderer.App, shareApp provider.ShareManager, webhookApp provider.WebhookManager, thumbnailApp thumbnail.App, exifApp exif.App, eventProducer provider.EventProducer, amqpClient *amqp.Client, tracer trace.Tracer) (App, error) {
+func New(config Config, storageApp absto.Storage, filteredStorage absto.Storage, rendererApp renderer.App, shareApp provider.ShareManager, webhookApp provider.WebhookManager, thumbnailApp thumbnail.App, exifApp exif.App, searchApp search.App, eventProducer provider.EventProducer, amqpClient *amqp.Client, tracer trace.Tracer) (App, error) {
 	app := App{
 		sanitizeOnStart: *config.sanitizeOnStart,
 
@@ -81,12 +80,14 @@ func New(config Config, storage absto.Storage, rendererApp renderer.App, shareAp
 		tracer:    tracer,
 		pushEvent: eventProducer,
 
-		rawStorageApp: storage,
+		rawStorageApp: storageApp,
+		storageApp:    filteredStorage,
 		rendererApp:   rendererApp,
 		thumbnailApp:  thumbnailApp,
 		exifApp:       exifApp,
 		shareApp:      shareApp,
 		webhookApp:    webhookApp,
+		searchApp:     searchApp,
 
 		amqpClient:              amqpClient,
 		amqpExclusiveRoutingKey: strings.TrimSpace(*config.amqpExclusiveRoutingKey),
@@ -97,30 +98,6 @@ func New(config Config, storage absto.Storage, rendererApp renderer.App, shareAp
 			return app, fmt.Errorf("setup amqp exclusive: %w", err)
 		}
 	}
-
-	var ignorePattern *regexp.Regexp
-	ignore := *config.ignore
-	if len(ignore) != 0 {
-		pattern, err := regexp.Compile(ignore)
-		if err != nil {
-			return App{}, err
-		}
-
-		ignorePattern = pattern
-		logger.Info("Ignoring files with pattern `%s`", ignore)
-	}
-
-	app.storageApp = storage.WithIgnoreFn(func(item absto.Item) bool {
-		if strings.HasPrefix(item.Pathname, provider.MetadataDirectoryName) {
-			return true
-		}
-
-		if ignorePattern != nil && ignorePattern.MatchString(item.Name) {
-			return true
-		}
-
-		return false
-	})
 
 	bcryptDuration, err := time.ParseDuration(strings.TrimSpace(*config.bcryptDuration))
 	if err != nil {

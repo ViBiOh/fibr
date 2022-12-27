@@ -17,7 +17,9 @@ import (
 	"github.com/ViBiOh/fibr/pkg/exif"
 	"github.com/ViBiOh/fibr/pkg/fibr"
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/fibr/pkg/search"
 	"github.com/ViBiOh/fibr/pkg/share"
+	"github.com/ViBiOh/fibr/pkg/storage"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/fibr/pkg/webhook"
 	"github.com/ViBiOh/httputils/v4/pkg/alcotest"
@@ -76,25 +78,28 @@ func main() {
 
 	prometheusRegisterer := client.prometheus.Registerer()
 
-	storageProvider, err := absto.New(config.absto, client.tracer.GetTracer("storage"))
+	storageApp, err := absto.New(config.absto, client.tracer.GetTracer("storage"))
+	logger.Fatal(err)
+
+	filteredStorage, err := storage.Get(config.storage, storageApp)
 	logger.Fatal(err)
 
 	eventBus, err := provider.NewEventBus(provider.MaxConcurrency, prometheusRegisterer, client.tracer.GetTracer("bus"))
 	logger.Fatal(err)
 
-	thumbnailApp, err := thumbnail.New(config.thumbnail, storageProvider, client.redis, prometheusRegisterer, client.tracer, client.amqp)
+	thumbnailApp, err := thumbnail.New(config.thumbnail, storageApp, client.redis, prometheusRegisterer, client.tracer, client.amqp)
 	logger.Fatal(err)
 
 	rendererApp, err := renderer.New(config.renderer, content, fibr.FuncMap, client.tracer.GetTracer("renderer"))
 	logger.Fatal(err)
 
-	exifApp, err := exif.New(config.exif, storageProvider, prometheusRegisterer, client.tracer, client.amqp, client.redis)
+	exifApp, err := exif.New(config.exif, storageApp, prometheusRegisterer, client.tracer, client.amqp, client.redis)
 	logger.Fatal(err)
 
-	webhookApp, err := webhook.New(config.webhook, storageProvider, prometheusRegisterer, client.amqp, rendererApp, thumbnailApp)
+	webhookApp, err := webhook.New(config.webhook, storageApp, prometheusRegisterer, client.amqp, rendererApp, thumbnailApp)
 	logger.Fatal(err)
 
-	shareApp, err := share.New(config.share, storageProvider, client.amqp)
+	shareApp, err := share.New(config.share, storageApp, client.amqp)
 	logger.Fatal(err)
 
 	amqpThumbnailApp, err := amqphandler.New(config.amqpThumbnail, client.amqp, client.tracer.GetTracer("amqp_handler_thumbnail"), thumbnailApp.AMQPHandler)
@@ -109,7 +114,9 @@ func main() {
 	amqpWebhookApp, err := amqphandler.New(config.amqpWebhook, client.amqp, client.tracer.GetTracer("amqp_handler_webhook"), webhookApp.AMQPHandler)
 	logger.Fatal(err)
 
-	crudApp, err := crud.New(config.crud, storageProvider, rendererApp, shareApp, webhookApp, thumbnailApp, exifApp, eventBus.Push, client.amqp, client.tracer.GetTracer("crud"))
+	searchApp := search.New(filteredStorage, thumbnailApp, exifApp, client.tracer.GetTracer("search"))
+
+	crudApp, err := crud.New(config.crud, storageApp, filteredStorage, rendererApp, shareApp, webhookApp, thumbnailApp, exifApp, searchApp, eventBus.Push, client.amqp, client.tracer.GetTracer("crud"))
 	logger.Fatal(err)
 
 	var middlewareApp provider.Auth
@@ -130,7 +137,7 @@ func main() {
 	go webhookApp.Start(ctx)
 	go shareApp.Start(ctx)
 	go crudApp.Start(ctx)
-	go eventBus.Start(ctx, storageProvider, []provider.Renamer{thumbnailApp.Rename, exifApp.Rename}, shareApp.EventConsumer, thumbnailApp.EventConsumer, exifApp.EventConsumer, webhookApp.EventConsumer)
+	go eventBus.Start(ctx, storageApp, []provider.Renamer{thumbnailApp.Rename, exifApp.Rename}, shareApp.EventConsumer, thumbnailApp.EventConsumer, exifApp.EventConsumer, webhookApp.EventConsumer)
 
 	go promServer.Start("prometheus", client.health.End(), client.prometheus.Handler())
 	go appServer.Start("http", client.health.End(), httputils.Handler(handler, client.health, recoverer.Middleware, client.prometheus.Middleware, client.tracer.Middleware, owasp.New(config.owasp).Middleware))
