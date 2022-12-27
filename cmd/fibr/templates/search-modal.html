@@ -33,6 +33,15 @@
 
           <label for="before" class="block">Before</label>
           <input id="before" name="before" type="date" placeholder="2020-12-31" value="{{ with .Search.before }}{{ index . 0 }}{{ end }}">
+
+          <label for="since" class="block">Since</label>
+          <input id="since" name="since" type="number" min="0" value="{{ with .Search.since }}{{ index . 0 }}{{ end }}">
+
+          <select aria-label="Since unit" name="sinceUnit">
+            <option value="days" {{ with .Search.sinceUnit }}{{ if eq (index . 0) "days" }}selected{{ end }}{{ end }}>Days</option>
+            <option value="months" {{ with .Search.sinceUnit }}{{ if eq (index . 0) "months" }}selected{{ end }}{{ end }}>Months</option>
+            <option value="years" {{ with .Search.sinceUnit }}{{ if eq (index . 0) "years" }}selected{{ end }}{{ end }}>Years</option>
+          </select>
         </p>
 
         <p class="padding no-margin">

@@ -2,66 +2,94 @@ package search
 
 import (
 	"testing"
-
-	absto "github.com/ViBiOh/absto/pkg/model"
+	"time"
 )
 
-func TestMatchSize(t *testing.T) {
+func TestComputeSince(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
-		item absto.Item
+		input time.Time
+		unit  string
+		value int
 	}
 
 	cases := map[string]struct {
-		instance search
-		args     args
-		want     bool
+		args args
+		want time.Time
 	}{
-		"no size": {
-			search{
-				size:        0,
-				greaterThan: true,
-			},
+		"unknown": {
 			args{
-				item: absto.Item{Size: 1000},
+				input: time.Date(2004, 2, 29, 12, 0, 0, 0, time.UTC),
 			},
-			true,
+			time.Date(2004, 2, 29, 12, 0, 0, 0, time.UTC),
 		},
-		"greater for greater": {
-			search{
-				size:        900,
-				greaterThan: true,
-			},
+		"days": {
 			args{
-				item: absto.Item{Size: 1000},
+				input: time.Date(2004, 2, 29, 12, 0, 0, 0, time.UTC),
+				unit:  "days",
+				value: 10,
 			},
-			true,
+			time.Date(2004, 2, 19, 12, 0, 0, 0, time.UTC),
 		},
-		"greater for lower": {
-			search{
-				size:        900,
-				greaterThan: false,
-			},
+		"months": {
 			args{
-				item: absto.Item{Size: 1000},
+				input: time.Date(2004, 2, 29, 12, 0, 0, 0, time.UTC),
+				unit:  "months",
+				value: 1,
 			},
-			false,
+			time.Date(2004, 1, 29, 12, 0, 0, 0, time.UTC),
 		},
-		"lower for lower": {
-			search{
-				size:        900,
-				greaterThan: false,
-			},
+		"months more day": {
 			args{
-				item: absto.Item{Size: 800},
+				input: time.Date(2004, 10, 31, 12, 0, 0, 0, time.UTC),
+				unit:  "months",
+				value: 1,
 			},
-			true,
+			time.Date(2004, 9, 30, 12, 0, 0, 0, time.UTC),
+		},
+		"months february": {
+			args{
+				input: time.Date(2004, 3, 31, 12, 0, 0, 0, time.UTC),
+				unit:  "months",
+				value: 1,
+			},
+			time.Date(2004, 2, 29, 12, 0, 0, 0, time.UTC),
+		},
+		"many months": {
+			args{
+				input: time.Date(2004, 12, 12, 12, 0, 0, 0, time.UTC),
+				unit:  "months",
+				value: 12,
+			},
+			time.Date(2003, 12, 12, 12, 0, 0, 0, time.UTC),
+		},
+		"leap years": {
+			args{
+				input: time.Date(2004, 2, 29, 12, 0, 0, 0, time.UTC),
+				unit:  "years",
+				value: 1,
+			},
+			time.Date(2003, 2, 28, 12, 0, 0, 0, time.UTC),
+		},
+		"years": {
+			args{
+				input: time.Date(2007, 2, 28, 12, 0, 0, 0, time.UTC),
+				unit:  "years",
+				value: 3,
+			},
+			time.Date(2004, 2, 28, 12, 0, 0, 0, time.UTC),
 		},
 	}
 
-	for intention, tc := range cases {
+	for intention, testCase := range cases {
+		intention, testCase := intention, testCase
+
 		t.Run(intention, func(t *testing.T) {
-			if got := tc.instance.matchSize(tc.args.item); got != tc.want {
-				t.Errorf("MatchSize() = %t, want %t", got, tc.want)
+			t.Parallel()
+
+			if got := computeSince(testCase.args.input, testCase.args.unit, testCase.args.value); got != testCase.want {
+				t.Errorf("computeSince() = %s, want %s", got, testCase.want)
 			}
 		})
 	}

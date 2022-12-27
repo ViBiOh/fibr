@@ -20,6 +20,32 @@ func computeSize(unit string, size int64) int64 {
 	}
 }
 
+func computeSince(input time.Time, unit string, value int) time.Time {
+	switch unit {
+	case "days":
+		return input.AddDate(0, 0, -value)
+
+	case "months":
+		output := input.AddDate(0, -value, 0)
+		for input.Day() > 28 && output.Day() < 28 {
+			output = output.AddDate(0, 0, -1)
+		}
+
+		return output
+
+	case "years":
+		output := input.AddDate(-value, 0, 0)
+		if output.Month() > input.Month() {
+			output = output.AddDate(0, 0, -1)
+		}
+
+		return output
+
+	default:
+		return input
+	}
+}
+
 func computeMimes(aliases []string) []string {
 	var output []string
 

@@ -2,6 +2,7 @@ package search
 
 import (
 	"net/http"
+	"time"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/exif"
@@ -31,7 +32,7 @@ func New(storageApp absto.Storage, thumbnailApp thumbnail.App, exifApp exif.App,
 func (a App) Files(r *http.Request, request provider.Request) (items []absto.Item, err error) {
 	params := r.URL.Query()
 
-	criterions, err := parseSearch(params)
+	criterions, err := parseSearch(params, time.Now())
 	if err != nil {
 		return nil, httpModel.WrapInvalid(err)
 	}

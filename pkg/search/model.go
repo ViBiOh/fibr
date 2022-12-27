@@ -26,7 +26,7 @@ type search struct {
 	greaterThan bool
 }
 
-func parseSearch(params url.Values) (output search, err error) {
+func parseSearch(params url.Values, now time.Time) (output search, err error) {
 	if name := strings.TrimSpace(params.Get("name")); len(name) > 0 {
 		output.pattern, err = regexp.Compile(name)
 		if err != nil {
@@ -42,6 +42,21 @@ func parseSearch(params url.Values) (output search, err error) {
 	output.after, err = parseDate(strings.TrimSpace(params.Get("after")))
 	if err != nil {
 		return
+	}
+
+	if rawSince := params.Get("since"); len(rawSince) != 0 {
+		var value int
+
+		value, err = strconv.Atoi(rawSince)
+		if err != nil {
+			return
+		}
+
+		before := computeSince(now, params.Get("sinceUnit"), value)
+
+		if before.After(output.after) {
+			output.after = before
+		}
 	}
 
 	rawSize := strings.TrimSpace(params.Get("size"))
