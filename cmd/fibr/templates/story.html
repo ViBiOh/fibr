@@ -13,7 +13,7 @@
 
   {{ if not .Request.Share.Story }}
     <link rel="preload" as="image" href="{{ url "/svg/list?fill=aliceblue" }}">
-    <link rel="preload" as="image" href="{{ url "/svg/th?fill=aliceblue" }}">
+    <link rel="preload" as="image" href="{{ url "/svg/grid?fill=aliceblue" }}">
     <link rel="preload" as="image" href="{{ url "/svg/image?fill=aliceblue" }}">
   {{ end }}
 
@@ -144,7 +144,7 @@
           <img class="icon" src="{{ url "/svg/list?fill=aliceblue" }}" alt="List">
         </a>
         <a id="grid-display" class="button button-icon" href="?d=grid">
-          <img class="icon" src="{{ url "/svg/th?fill=aliceblue" }}" alt="Grid">
+          <img class="icon" src="{{ url "/svg/grid?fill=aliceblue" }}" alt="Grid">
         </a>
         <a id="story-display" class="button button-icon" href="?d=story">
           <img class="icon" src="{{ url "/svg/image?fill=aliceblue" }}" alt="Image story">

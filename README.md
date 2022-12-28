@@ -22,7 +22,7 @@ Web File Browser and Manager.
 [![codecov](https://codecov.io/gh/ViBiOh/fibr/branch/main/graph/badge.svg)](https://codecov.io/gh/ViBiOh/fibr)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ViBiOh_fibr&metric=alert_status)](https://sonarcloud.io/dashboard?id=ViBiOh_fibr)
 
-Thanks to [FontAwesome](https://fontawesome.com) for providing awesome svg.
+Thanks to [FontAwesome](https://fontawesome.com) and [Lucide](https://lucide.dev) for providing awesome svg icons.
 
 I do it mostly for myself, but if you want to support me, you can star this project to give more visibility or sponsor my work (it pays server hosting, tooling, etc.).
 

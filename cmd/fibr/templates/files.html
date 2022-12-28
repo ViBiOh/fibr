@@ -5,10 +5,10 @@
   {{ $root := . }}
 
   <link rel="preload" as="image" href="{{ url "/svg/list?fill=aliceblue" }}">
-  <link rel="preload" as="image" href="{{ url "/svg/th?fill=aliceblue" }}">
+  <link rel="preload" as="image" href="{{ url "/svg/grid?fill=aliceblue" }}">
 
   {{ if .Request.CanEdit }}
-    <link rel="preload" as="image" href="{{ url "/svg/cloud-upload-alt?fill=aliceblue" }}">
+    <link rel="preload" as="image" href="{{ url "/svg/upload?fill=aliceblue" }}">
     <link rel="preload" as="image" href="{{ url "/svg/folder-solid?fill=aliceblue" }}">
     <link rel="preload" as="image" href="{{ url "/svg/times?fill=crimson" }}">
     <link rel="preload" as="image" href="{{ url "/svg/pencil-alt?fill=aliceblue" }}">
@@ -18,7 +18,7 @@
   {{ end }}
 
   {{ if .Request.CanShare }}
-    <link rel="preload" as="image" href="{{ url "/svg/share-alt-square?fill=aliceblue" }}">
+    <link rel="preload" as="image" href="{{ url "/svg/share?fill=aliceblue" }}">
 
     {{ template "share-directory" . }}
     {{ template "share-list" . }}
@@ -159,7 +159,7 @@
         <img class="icon" src="{{ url "/svg/list?fill=aliceblue" }}" alt="List">
       </a>
       <a id="grid-display" class="button button-icon" href="?d=grid">
-        <img class="icon" src="{{ url "/svg/th?fill=aliceblue" }}" alt="Grid">
+        <img class="icon" src="{{ url "/svg/grid?fill=aliceblue" }}" alt="Grid">
       </a>
       {{ if .HasStory }}
         <a id="story-display" class="button button-icon" href="?d=story">
@@ -172,16 +172,16 @@
 
       {{ if .Request.CanEdit }}
         <a id="upload-button-link" href="#upload-modal" class="button button-icon">
-          <img class="icon" src="{{ url "/svg/cloud-upload-alt?fill=aliceblue" }}" alt="Upload">
+          <img class="icon" src="{{ url "/svg/upload?fill=aliceblue" }}" alt="Upload">
         </a>
         <a href="#folder-modal" class="button button-icon">
-          <img class="icon" src="{{ url "/svg/folder-solid?fill=aliceblue" }}" alt="Create folder">
+          <img class="icon" src="{{ url "/svg/folder-plus?fill=aliceblue" }}" alt="Create folder">
         </a>
       {{ end }}
 
       {{ if .Request.CanShare }}
         <a href="#share-list" class="button button-icon">
-          <img class="icon" src="{{ url "/svg/share-alt-square?fill=aliceblue" }}" alt="Share">
+          <img class="icon" src="{{ url "/svg/share?fill=aliceblue" }}" alt="Share">
         </a>
       {{ end }}
 
@@ -229,7 +229,7 @@
 
             {{ if $root.Request.CanShare }}
               <a href="#share-form-{{ .ID }}" class="button button-icon file-share" title="Share">
-                <img class="icon icon-square" src="{{ url "/svg/share-alt-square?fill=aliceblue" }}" alt="Share {{ .Name }}">
+                <img class="icon icon-square" src="{{ url "/svg/share?fill=aliceblue" }}" alt="Share {{ .Name }}">
               </a>
             {{ end }}
 
