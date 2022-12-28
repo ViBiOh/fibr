@@ -9,7 +9,7 @@
     const lazyLoadThumbnail = true;
   </script>
 
-  <link rel="preload" as="image" href="{{ url "/svg/link?fill=#272727" }}">
+  <link rel="preload" as="image" href="{{ url "/svg/link?fill=%23272727" }}">
 
   {{ if not .Request.Share.Story }}
     <link rel="preload" as="image" href="{{ url "/svg/list?fill=aliceblue" }}">
@@ -175,7 +175,7 @@
             {{ if or (.Exif.Geocode.HasAddress) (not .Exif.Date.IsZero) }}
               <p class="context">
                 {{ if .Exif.Geocode.HasAddress }}
-                  <img class="icon icon-bottom margin-right-half" src="{{ url "/svg/location?fill=#272727" }}" alt="Location">
+                  <img class="icon icon-bottom margin-right-half" src="{{ url "/svg/location?fill=%23272727" }}" alt="Location">
                   <span class="location">
                     {{ if index .Exif.Geocode.Address "city_district" }}
                       {{ index .Exif.Geocode.Address "city_district" }},
@@ -192,7 +192,7 @@
                 </span>
 
                 {{ if not .Exif.Date.IsZero }}
-                  <img class="icon icon-bottom margin-right-half{{ if .Exif.Geocode.HasAddress }} margin-left-half{{ end }}" src="{{ url "/svg/calendar?fill=#272727" }}" alt="Location">
+                  <img class="icon icon-bottom margin-right-half{{ if .Exif.Geocode.HasAddress }} margin-left-half{{ end }}" src="{{ url "/svg/calendar?fill=%23272727" }}" alt="Location">
                   <span class="date">{{ .Exif.Date.Format "Monday _2 January 15:04:05 2006 MST" }}</span>
                 {{ end }}
               </p>
@@ -200,7 +200,7 @@
 
             {{ if index .Exif.Data "Model" }}
               <p>
-                <img class="icon icon-bottom margin-right-half" src="{{ url "/svg/camera?fill=#272727" }}" alt="Camera model">
+                <img class="icon icon-bottom margin-right-half" src="{{ url "/svg/camera?fill=%23272727" }}" alt="Camera model">
                 {{ index .Exif.Data "Model" }}
               </p>
             {{ end }}
@@ -216,11 +216,11 @@
 
             {{ if $root.Request.CanEdit }}
               <a href="#desc-modal-{{ .ID }}" class="button button-icon desc-edit" title="Edit description">
-                <img class="icon" src="{{ url "/svg/pencil-alt?fill=#272727" }}" alt="Edit description">
+                <img class="icon" src="{{ url "/svg/pencil-alt?fill=%23272727" }}" alt="Edit description">
               </a>
             {{ end }}
             <a href="#{{ .ID }}" class="button button-icon permalink" title="Link to image">
-              <img class="icon" src="{{ url "/svg/link?fill=#272727" }}" alt="Link">
+              <img class="icon" src="{{ url "/svg/link?fill=%23272727" }}" alt="Link">
             </a>
           </div>
         </li>
