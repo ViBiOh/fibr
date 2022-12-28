@@ -11,6 +11,15 @@
       overflow: auto;
     }
 
+    .saved-search-folder-modal:target {
+      display: flex;
+      z-index: 5;
+    }
+
+    .saved-search-folder-modal:target ~ .content {
+      pointer-events: none;
+    }
+
     {{ if eq .Request.Display "list" }}
       .file-download {
         display: none;
@@ -50,6 +59,10 @@
 
   {{ template "search-modal" . }}
   {{ template "items-style" . }}
+
+  {{ if .Request.CanEdit }}
+    {{ template "saved-search-folder-modal" }}
+  {{ end }}
 
   {{ if .HasMap }}
     {{ template "map-modal" . }}

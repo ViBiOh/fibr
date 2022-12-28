@@ -106,7 +106,7 @@ func (a App) handleMultipart(w http.ResponseWriter, r *http.Request, request pro
 				a.error(w, r, request, model.WrapInvalid(fmt.Errorf("parse chunk number: %w", err)))
 			}
 
-			chunkNumber = fmt.Sprintf("%10d", chunkNumberValue)
+			chunkNumber = fmt.Sprintf("%010d", chunkNumberValue)
 
 			a.uploadChunk(w, r, request, values["filename"], chunkNumber, file)
 		} else {
@@ -197,7 +197,12 @@ func (a App) handlePost(w http.ResponseWriter, r *http.Request, request provider
 	case http.MethodPatch:
 		a.Rename(w, r, request)
 	case http.MethodPut:
-		a.Create(w, r, request)
+		switch putType := r.FormValue("type"); putType {
+		case "folder":
+			a.Create(w, r, request)
+		default:
+			a.error(w, r, request, model.WrapInvalid(fmt.Errorf("unknown type `%s`", putType)))
+		}
 	case http.MethodDelete:
 		a.Delete(w, r, request)
 	case http.MethodTrace:

@@ -57,6 +57,11 @@
           </a>
         {{ end }}
       {{ else }}
+        {{ if and .Request.CanEdit .Search }}
+          <a class="padding" href="#create-saved-search">
+            <img class="icon" src="{{ url "/svg/folder-search?fill=" }}aliceblue" alt="Created saved search folder">
+          </a>
+        {{ end }}
         <a class="padding" href="#search" download>
           <img class="icon" src="{{ url "/svg/search?fill=" }}{{ if .Search }}limegreen{{ else }}aliceblue{{ end }}" alt="Search files">
         </a>

@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
@@ -17,13 +18,19 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 )
 
+var ErrRelativePath = errors.New("forbidden relative path")
+
 func (a App) uploadChunk(w http.ResponseWriter, r *http.Request, request provider.Request, fileName, chunkNumber string, file io.Reader) {
 	if file == nil {
 		a.error(w, r, request, model.WrapInvalid(errors.New("no file provided for save")))
 		return
 	}
 
-	var err error
+	fileName, err := safeFilename(fileName)
+	if err != nil {
+		a.error(w, r, request, model.WrapInvalid(err))
+		return
+	}
 
 	tempDestination := filepath.Join(a.temporaryFolder, sha.New(fileName))
 	tempFile := filepath.Join(tempDestination, chunkNumber)
@@ -65,9 +72,12 @@ func (a App) mergeChunk(w http.ResponseWriter, r *http.Request, request provider
 	ctx, end := tracer.StartSpan(r.Context(), a.tracer, "mergeChunk")
 	defer end()
 
-	var err error
+	fileName, err := safeFilename(values["filename"])
+	if err != nil {
+		a.error(w, r, request, model.WrapInvalid(err))
+		return
+	}
 
-	fileName := values["filename"]
 	tempFolder := filepath.Join(a.temporaryFolder, sha.New(fileName))
 	tempFile := filepath.Join(tempFolder, fileName)
 
@@ -168,4 +178,17 @@ func browseChunkFiles(directory, destination string, writer io.Writer) error {
 
 		return nil
 	})
+}
+
+func safeFilename(fileName string) (string, error) {
+	if strings.Contains(fileName, "..") {
+		return fileName, ErrRelativePath
+	}
+
+	output, err := provider.SanitizeName(fileName, true)
+	if err != nil {
+		return fileName, fmt.Errorf("sanitize: %w", err)
+	}
+
+	return output, nil
 }
