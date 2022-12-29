@@ -114,7 +114,8 @@ func main() {
 	amqpWebhookApp, err := amqphandler.New(config.amqpWebhook, client.amqp, client.tracer.GetTracer("amqp_handler_webhook"), webhookApp.AMQPHandler)
 	logger.Fatal(err)
 
-	searchApp := search.New(filteredStorage, thumbnailApp, exifApp, client.tracer.GetTracer("search"))
+	searchApp, err := search.New(config.search, filteredStorage, thumbnailApp, exifApp, client.amqp, client.tracer.GetTracer("search"))
+	logger.Fatal(err)
 
 	crudApp, err := crud.New(config.crud, storageApp, filteredStorage, rendererApp, shareApp, webhookApp, thumbnailApp, exifApp, searchApp, eventBus.Push, client.amqp, client.tracer.GetTracer("crud"))
 	logger.Fatal(err)

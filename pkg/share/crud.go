@@ -26,10 +26,9 @@ func (a *App) generateID() (string, error) {
 	}
 }
 
-// List shares
 func (a *App) List() (output []provider.Share) {
-	a.RLock()
-	defer a.RUnlock()
+	a.mutex.RLock()
+	defer a.mutex.RUnlock()
 
 	output = make([]provider.Share, 0, len(a.shares))
 
@@ -46,7 +45,6 @@ func (a *App) List() (output []provider.Share) {
 	return output
 }
 
-// Create a share
 func (a *App) Create(ctx context.Context, filepath string, edit, story bool, password string, isDir bool, duration time.Duration) (string, error) {
 	var id string
 
@@ -87,7 +85,6 @@ func (a *App) Create(ctx context.Context, filepath string, edit, story bool, pas
 	return id, err
 }
 
-// Delete a share
 func (a *App) Delete(ctx context.Context, id string) error {
 	_, err := a.Exclusive(ctx, a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
 		return a.delete(ctx, id)

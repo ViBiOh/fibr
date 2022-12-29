@@ -11,12 +11,12 @@
       overflow: auto;
     }
 
-    .saved-search-folder-modal:target {
+    .saved-search-modal:target {
       display: flex;
       z-index: 5;
     }
 
-    .saved-search-folder-modal:target ~ .content {
+    .saved-search-modal:target ~ .content {
       pointer-events: none;
     }
 
@@ -61,7 +61,7 @@
   {{ template "items-style" . }}
 
   {{ if .Request.CanEdit }}
-    {{ template "saved-search-folder-modal" }}
+    {{ template "create-saved-search-modal" }}
   {{ end }}
 
   {{ if .HasMap }}

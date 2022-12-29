@@ -25,8 +25,8 @@ func (a *App) generateID() (string, error) {
 }
 
 func (a *App) List() (output []provider.Webhook) {
-	a.RLock()
-	defer a.RUnlock()
+	a.mutex.RLock()
+	defer a.mutex.RUnlock()
 
 	output = make([]provider.Webhook, 0, len(a.webhooks))
 

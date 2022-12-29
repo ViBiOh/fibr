@@ -1,0 +1,39 @@
+{{ define "create-saved-search-modal" }}
+  <div id="create-saved-search" class="modal saved-search-modal">
+    <div class="modal-content">
+      <h2 class="header">Create new saved-search</h2>
+
+      <form method="post" action="#">
+        <input type="hidden" name="type" value="saved-search" />
+        <input type="hidden" name="method" value="PUT" />
+
+        <p class="padding no-margin">
+          <label for="name" class="block">Name</label>
+          <input id="name" class="full" type="text" name="name" />
+        </p>
+
+        {{ template "form_buttons" "Create" }}
+      </form>
+    </div>
+  </div>
+{{ end }}
+
+{{ define "delete-saved-search-modal" }}
+  <div id="delete-saved-search-modal-{{ .ID }}" class="modal delete-modal">
+    <div class="modal-content">
+      <h2 class="header">Confirmation</h2>
+
+      <form method="post" action="#">
+        <input type="hidden" name="type" value="saved-search" />
+        <input type="hidden" name="method" value="DELETE" />
+        <input type="hidden" name="name" value="{{ .Name }}" />
+
+        <p class="padding no-margin center">
+          Are you sure you want to delete <strong>{{ .Name }}</strong>?
+        </p>
+
+        {{ template "form_buttons" "Confirm" }}
+      </form>
+    </div>
+  </div>
+{{ end }}

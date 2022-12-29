@@ -64,6 +64,20 @@ func (a App) list(ctx context.Context, request provider.Request, message rendere
 		}
 	}()
 
+	var savedSearches map[string]provider.Search
+	savedSearchDone := make(chan struct{})
+	go func() {
+		defer close(savedSearchDone)
+
+		var err error
+
+		savedSearches, err = a.searchApp.List(ctx, item)
+		if err != nil {
+			listLogger(item.Pathname).Error("list saved searches: %s", err)
+			return
+		}
+	}()
+
 	wg.Wait()
 
 	items := make([]provider.RenderItem, len(files))
@@ -79,16 +93,19 @@ func (a App) list(ctx context.Context, request provider.Request, message rendere
 	<-thumbnailDone
 	hasThumbnail, hasStory, cover := a.enrichThumbnail(ctx, directoryAggregate, items, thumbnails)
 
+	<-savedSearchDone
+
 	content := map[string]any{
-		"Paths":        getPathParts(request),
-		"Files":        items,
-		"Cover":        cover,
-		"Request":      request,
-		"Message":      message,
-		"HasMap":       len(directoryAggregate.Location),
-		"HasThumbnail": hasThumbnail,
-		"HasStory":     hasStory,
-		"ChunkUpload":  a.chunkUpload,
+		"Paths":         getPathParts(request),
+		"Files":         items,
+		"SavedSearches": savedSearches,
+		"Cover":         cover,
+		"Request":       request,
+		"Message":       message,
+		"HasMap":        len(directoryAggregate.Location),
+		"HasThumbnail":  hasThumbnail,
+		"HasStory":      hasStory,
+		"ChunkUpload":   a.chunkUpload,
 	}
 
 	if request.CanShare {

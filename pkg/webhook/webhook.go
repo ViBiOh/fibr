@@ -39,7 +39,7 @@ type App struct {
 	rendererApp  renderer.App
 	thumbnailApp thumbnail.App
 
-	sync.RWMutex
+	mutex sync.RWMutex
 }
 
 type Config struct {
@@ -95,8 +95,8 @@ func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheu
 
 func (a *App) Exclusive(ctx context.Context, name string, duration time.Duration, action func(ctx context.Context) error) error {
 	fn := func() error {
-		a.Lock()
-		defer a.Unlock()
+		a.mutex.Lock()
+		defer a.mutex.Unlock()
 
 		if err := a.loadWebhooks(ctx); err != nil {
 			return fmt.Errorf("refresh webhooks: %w", err)
@@ -125,8 +125,8 @@ exclusive:
 }
 
 func (a *App) Start(ctx context.Context) {
-	a.Lock()
-	defer a.Unlock()
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
 
 	if err := a.loadWebhooks(ctx); err != nil {
 		logger.Error("refresh webhooks: %s", err)

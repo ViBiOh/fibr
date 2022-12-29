@@ -21,8 +21,8 @@ import (
 const amqpThumbnailDiscordDelay = 10 * time.Second
 
 func (a *App) EventConsumer(ctx context.Context, event provider.Event) {
-	a.RLock()
-	defer a.RUnlock()
+	a.mutex.RLock()
+	defer a.mutex.RUnlock()
 
 	for _, webhook := range a.webhooks {
 		if !webhook.Match(event) {

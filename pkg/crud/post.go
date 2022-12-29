@@ -200,11 +200,20 @@ func (a App) handlePost(w http.ResponseWriter, r *http.Request, request provider
 		switch putType := r.FormValue("type"); putType {
 		case "folder":
 			a.Create(w, r, request)
+		case "saved-search":
+			a.CreateSavedSearch(w, r, request)
 		default:
 			a.error(w, r, request, model.WrapInvalid(fmt.Errorf("unknown type `%s`", putType)))
 		}
 	case http.MethodDelete:
-		a.Delete(w, r, request)
+		switch putType := r.FormValue("type"); putType {
+		case "file":
+			a.Delete(w, r, request)
+		case "saved-search":
+			a.DeleteSavedSearch(w, r, request)
+		default:
+			a.error(w, r, request, model.WrapInvalid(fmt.Errorf("unknown type `%s`", putType)))
+		}
 	case http.MethodTrace:
 		a.regenerate(w, r, request)
 	default:

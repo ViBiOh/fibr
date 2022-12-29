@@ -31,6 +31,12 @@
     {{ template "webhook-list" . }}
   {{ end }}
 
+  {{ range .SavedSearches }}
+    {{ if $root.Request.CanEdit }}
+      {{ template "delete-saved-search-modal" . }}
+    {{ end }}
+  {{ end }}
+
   {{ range .Files }}
     {{ if $root.Request.CanEdit }}
       {{ template "edit-modal" . }}
@@ -205,6 +211,21 @@
     </div>
 
     <ul id="files" class="no-margin no-padding">
+      {{ range .SavedSearches }}
+        <li class="file relative padding-half">
+          <a class="filelink center ellipsis" href="?{{ raw .Query }}" title="{{ .Name }}">
+            <img class="icon {{ if eq $root.Request.Display "grid" }}icon-large{{ end }}" src="{{ url "/svg/folder-search?fill=aliceblue" }}" alt="Saved Search">
+            <span class="filename ellipsis {{ if eq $root.Request.Display "list" }}padding-left{{ end }}">{{ .Name }}</span>
+
+            {{ if $root.Request.CanEdit }}
+              <a href="#delete-saved-search-modal-{{ .ID }}" class="button button-icon file-delete" title="Delete">
+                <img class="icon icon-square" src="{{ url "/svg/times?fill=crimson" }}" alt="Delete">
+              </a>
+            {{ end }}
+          </a>
+        </li>
+      {{ end }}
+
       {{ range .Files }}
         <li class="file relative {{ if not .HasThumbnail }}padding-half{{ end }}">
           <a class="filelink center ellipsis" href="{{ .URL }}{{ if .IsDir }}?d={{ $root.Request.LayoutPath ($root.Request.AbsoluteURL .URL) }}{{ else }}?browser{{ end }}" title="{{ .Name }}">

@@ -33,7 +33,7 @@ type App struct {
 	amqpRoutingKey          string
 	amqpExclusiveRoutingKey string
 
-	sync.RWMutex
+	mutex sync.RWMutex
 }
 
 type Config struct {
@@ -81,8 +81,8 @@ func New(config Config, storageApp absto.Storage, amqpClient *amqp.Client) (*App
 
 func (a *App) Exclusive(ctx context.Context, name string, duration time.Duration, action func(ctx context.Context) error) (bool, error) {
 	fn := func() error {
-		a.Lock()
-		defer a.Unlock()
+		a.mutex.Lock()
+		defer a.mutex.Unlock()
 
 		if err := a.refresh(ctx); err != nil {
 			return fmt.Errorf("refresh shares: %w", err)
@@ -113,8 +113,8 @@ exclusive:
 func (a *App) Get(requestPath string) provider.Share {
 	cleanPath := strings.TrimPrefix(requestPath, "/")
 
-	a.RLock()
-	defer a.RUnlock()
+	a.mutex.RLock()
+	defer a.mutex.RUnlock()
 
 	for key, share := range a.shares {
 		if strings.HasPrefix(cleanPath, key) {
@@ -143,8 +143,8 @@ func (a *App) Start(ctx context.Context) {
 }
 
 func (a *App) loadShares(ctx context.Context) error {
-	a.Lock()
-	defer a.Unlock()
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
 
 	return a.refresh(ctx)
 }

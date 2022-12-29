@@ -368,6 +368,8 @@ Usage of fibr:
         [redis] Redis Username, if any {FIBR_REDIS_USERNAME}
   -sanitizeOnStart
         [crud] Sanitize name on start {FIBR_SANITIZE_ON_START}
+  -searchAmqpExclusiveRoutingKey string
+        [search] AMQP Routing Key for exclusive lock on default exchange {FIBR_SEARCH_AMQP_EXCLUSIVE_ROUTING_KEY} (default "fibr.semaphore.search")
   -shareAmqpExchange string
         [share] AMQP Exchange Name {FIBR_SHARE_AMQP_EXCHANGE} (default "fibr.shares")
   -shareAmqpExclusiveRoutingKey string

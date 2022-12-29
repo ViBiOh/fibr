@@ -16,8 +16,8 @@ func (a *App) AMQPHandler(_ context.Context, message amqp.Delivery) error {
 		return fmt.Errorf("decode: %w", err)
 	}
 
-	a.Lock()
-	defer a.Unlock()
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
 
 	if len(webhook.URL) == 0 {
 		delete(a.webhooks, webhook.ID)

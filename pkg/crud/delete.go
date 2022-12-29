@@ -11,7 +11,6 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 )
 
-// Delete given path from filesystem
 func (a App) Delete(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !request.CanEdit {
 		a.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
@@ -51,4 +50,33 @@ func (a App) Delete(w http.ResponseWriter, r *http.Request, request provider.Req
 	go a.notify(tracer.CopyToBackground(ctx), provider.NewDeleteEvent(request, info, a.rendererApp))
 
 	a.rendererApp.Redirect(w, r, fmt.Sprintf("?d=%s", request.Display), renderer.NewSuccessMessage("%s successfully deleted", info.Name))
+}
+
+// Delete given path from filesystem
+func (a App) DeleteSavedSearch(w http.ResponseWriter, r *http.Request, request provider.Request) {
+	if !request.CanEdit {
+		a.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
+		return
+	}
+
+	name, err := checkFormName(r, "name")
+	if err != nil && !errors.Is(err, ErrEmptyName) {
+		a.error(w, r, request, err)
+		return
+	}
+
+	ctx := r.Context()
+
+	item, err := a.storageApp.Info(ctx, request.Filepath())
+	if err != nil {
+		a.error(w, r, request, model.WrapNotFound(err))
+		return
+	}
+
+	if err = a.searchApp.Delete(ctx, item, name); err != nil {
+		a.error(w, r, request, err)
+		return
+	}
+
+	a.rendererApp.Redirect(w, r, fmt.Sprintf("?d=%s", request.Display), renderer.NewSuccessMessage("%s successfully deleted", name))
 }

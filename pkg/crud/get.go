@@ -35,7 +35,7 @@ func (a App) getWithMessage(w http.ResponseWriter, r *http.Request, request prov
 
 	if err != nil && absto.IsNotExist(err) && provider.StreamExtensions[filepath.Ext(pathname)] {
 		if request.Share.File {
-			// URL with /<share_id>/segment.ts will be the pas `/path/of/shared/file/segment.ts`, so we need to remove two directories before appending segment
+			// URL with /<share_id>/segment.ts will be the path `/path/of/shared/file/segment.ts`, so we need to remove two directories before appending segment
 			pathname = provider.Dirname(path.Dir(path.Dir(pathname))) + path.Base(pathname)
 		}
 
@@ -44,10 +44,10 @@ func (a App) getWithMessage(w http.ResponseWriter, r *http.Request, request prov
 
 	if err != nil {
 		if absto.IsNotExist(err) {
-			return errorReturn(request, model.WrapNotFound(err))
+			err = model.WrapNotFound(err)
 		}
 
-		return errorReturn(request, model.WrapNotFound(err))
+		return errorReturn(request, err)
 	}
 
 	if item.IsDir && !strings.HasSuffix(r.URL.Path, "/") {
