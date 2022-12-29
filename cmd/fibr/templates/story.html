@@ -175,7 +175,7 @@
             {{ if or (.Exif.Geocode.HasAddress) (not .Exif.Date.IsZero) }}
               <p class="context">
                 {{ if .Exif.Geocode.HasAddress }}
-                  <img class="icon icon-bottom margin-right-half" src="{{ url "/svg/location?fill=%23272727" }}" alt="Location">
+                  <img class="icon margin-right-half" src="{{ url "/svg/location?fill=%23272727" }}" alt="Location">
                   <span class="location">
                     {{ if index .Exif.Geocode.Address "city_district" }}
                       {{ index .Exif.Geocode.Address "city_district" }},
@@ -192,15 +192,15 @@
                 </span>
 
                 {{ if not .Exif.Date.IsZero }}
-                  <img class="icon icon-bottom margin-right-half{{ if .Exif.Geocode.HasAddress }} margin-left-half{{ end }}" src="{{ url "/svg/calendar?fill=%23272727" }}" alt="Location">
+                  <img class="icon margin-right-half{{ if .Exif.Geocode.HasAddress }} margin-left-half{{ end }}" src="{{ url "/svg/calendar?fill=%23272727" }}" alt="Location">
                   <span class="date">{{ .Exif.Date.Format "Monday _2 January 15:04:05 2006 MST" }}</span>
                 {{ end }}
               </p>
             {{ end }}
 
             {{ if index .Exif.Data "Model" }}
-              <p>
-                <img class="icon icon-bottom margin-right-half" src="{{ url "/svg/camera?fill=%23272727" }}" alt="Camera model">
+              <p class="context">
+                <img class="icon margin-right-half" src="{{ url "/svg/camera?fill=%23272727" }}" alt="Camera model">
                 {{ index .Exif.Data "Model" }}
               </p>
             {{ end }}

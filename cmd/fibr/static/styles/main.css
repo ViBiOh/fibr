@@ -136,10 +136,6 @@ a:hover {
   width: var(--icon-size);
 }
 
-.icon-bottom {
-  vertical-align: sub;
-}
-
 .icon-large {
   height: var(--icon-large);
   width: var(--icon-large);
