@@ -100,7 +100,7 @@
 
     <ul id="files" class="no-margin no-padding">
       {{ range .Files }}
-        <li class="tile relative {{ if not .HasThumbnail }}file{{ end }}">
+        <li class="file relative {{ if not .HasThumbnail }}file{{ end }}">
           <a class="filelink center ellipsis" href="{{ .URL }}{{ if .IsDir }}?d={{ $root.Request.LayoutPath ($root.Request.AbsoluteURL .URL) }}{{ else }}?browser{{ end }}" title="{{ .Name }}">
             {{ if .HasThumbnail }}
               {{ if not $hasThumbnail }}
