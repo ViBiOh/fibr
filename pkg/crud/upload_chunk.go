@@ -69,7 +69,7 @@ func (a App) uploadChunk(w http.ResponseWriter, r *http.Request, request provide
 }
 
 func (a App) mergeChunk(w http.ResponseWriter, r *http.Request, request provider.Request, values map[string]string) {
-	ctx, end := tracer.StartSpan(r.Context(), a.tracer, "mergeChunk")
+	ctx, end := tracer.StartSpan(r.Context(), a.tracer, "merge_chunk")
 	defer end()
 
 	fileName, err := safeFilename(values["filename"])

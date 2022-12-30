@@ -27,14 +27,14 @@ func (a App) GetMetadataFor(ctx context.Context, item absto.Item) (provider.Meta
 		return provider.Metadata{}, nil
 	}
 
-	ctx, end := tracer.StartSpan(ctx, a.tracer, "get_exif")
+	ctx, end := tracer.StartSpan(ctx, a.tracer, "get_metadata")
 	defer end()
 
 	return a.exifCacheApp.Get(ctx, item)
 }
 
 func (a App) GetAllMetadataFor(ctx context.Context, items ...absto.Item) (map[string]provider.Metadata, error) {
-	ctx, end := tracer.StartSpan(ctx, a.tracer, "list_exif")
+	ctx, end := tracer.StartSpan(ctx, a.tracer, "get_all_metadata")
 	defer end()
 
 	exifs, err := a.exifCacheApp.List(ctx, onListError, items...)
@@ -59,14 +59,14 @@ func (a App) GetAggregateFor(ctx context.Context, item absto.Item) (provider.Agg
 		return provider.Aggregate{}, nil
 	}
 
-	ctx, end := tracer.StartSpan(ctx, a.tracer, "aggregate")
+	ctx, end := tracer.StartSpan(ctx, a.tracer, "get_aggregate")
 	defer end()
 
 	return a.aggregateCacheApp.Get(ctx, item)
 }
 
 func (a App) GetAllAggregateFor(ctx context.Context, items ...absto.Item) (map[string]provider.Aggregate, error) {
-	ctx, end := tracer.StartSpan(ctx, a.tracer, "list_aggregate")
+	ctx, end := tracer.StartSpan(ctx, a.tracer, "get_all_aggregate")
 	defer end()
 
 	exifs, err := a.aggregateCacheApp.List(ctx, onListError, items...)
