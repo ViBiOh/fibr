@@ -15,8 +15,8 @@ import (
 	basicMemory "github.com/ViBiOh/auth/v2/pkg/store/memory"
 	"github.com/ViBiOh/fibr/pkg/crud"
 	"github.com/ViBiOh/fibr/pkg/exclusive"
-	"github.com/ViBiOh/fibr/pkg/exif"
 	"github.com/ViBiOh/fibr/pkg/fibr"
+	"github.com/ViBiOh/fibr/pkg/metadata"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/search"
 	"github.com/ViBiOh/fibr/pkg/share"
@@ -99,7 +99,7 @@ func main() {
 		exclusiveApp = exclusive.New(client.redis)
 	}
 
-	exifApp, err := exif.New(config.exif, storageApp, prometheusRegisterer, client.tracer, client.amqp, client.redis, exclusiveApp)
+	metadataApp, err := metadata.New(config.metadata, storageApp, prometheusRegisterer, client.tracer, client.amqp, client.redis, exclusiveApp)
 	logger.Fatal(err)
 
 	webhookApp, err := webhook.New(config.webhook, storageApp, prometheusRegisterer, client.amqp, rendererApp, thumbnailApp, exclusiveApp)
@@ -111,7 +111,7 @@ func main() {
 	amqpThumbnailApp, err := amqphandler.New(config.amqpThumbnail, client.amqp, client.tracer.GetTracer("amqp_handler_thumbnail"), thumbnailApp.AMQPHandler)
 	logger.Fatal(err)
 
-	amqpExifApp, err := amqphandler.New(config.amqpExif, client.amqp, client.tracer.GetTracer("amqp_handler_exif"), exifApp.AMQPHandler)
+	amqpExifApp, err := amqphandler.New(config.amqpExif, client.amqp, client.tracer.GetTracer("amqp_handler_exif"), metadataApp.AMQPHandler)
 	logger.Fatal(err)
 
 	amqpShareApp, err := amqphandler.New(config.amqpShare, client.amqp, client.tracer.GetTracer("amqp_handler_share"), shareApp.AMQPHandler)
@@ -120,9 +120,9 @@ func main() {
 	amqpWebhookApp, err := amqphandler.New(config.amqpWebhook, client.amqp, client.tracer.GetTracer("amqp_handler_webhook"), webhookApp.AMQPHandler)
 	logger.Fatal(err)
 
-	searchApp := search.New(filteredStorage, thumbnailApp, exifApp, exclusiveApp, client.tracer.GetTracer("search"))
+	searchApp := search.New(filteredStorage, thumbnailApp, metadataApp, exclusiveApp, client.tracer.GetTracer("search"))
 
-	crudApp, err := crud.New(config.crud, storageApp, filteredStorage, rendererApp, shareApp, webhookApp, thumbnailApp, exifApp, searchApp, eventBus.Push, exclusiveApp, client.tracer.GetTracer("crud"))
+	crudApp, err := crud.New(config.crud, storageApp, filteredStorage, rendererApp, shareApp, webhookApp, thumbnailApp, metadataApp, searchApp, eventBus.Push, exclusiveApp, client.tracer.GetTracer("crud"))
 	logger.Fatal(err)
 
 	var middlewareApp provider.Auth
@@ -143,7 +143,7 @@ func main() {
 	go webhookApp.Start(ctx)
 	go shareApp.Start(ctx)
 	go crudApp.Start(ctx)
-	go eventBus.Start(ctx, storageApp, []provider.Renamer{thumbnailApp.Rename, exifApp.Rename}, shareApp.EventConsumer, thumbnailApp.EventConsumer, exifApp.EventConsumer, webhookApp.EventConsumer)
+	go eventBus.Start(ctx, storageApp, []provider.Renamer{thumbnailApp.Rename, metadataApp.Rename}, shareApp.EventConsumer, thumbnailApp.EventConsumer, metadataApp.EventConsumer, webhookApp.EventConsumer)
 
 	go promServer.Start("prometheus", client.health.End(), client.prometheus.Handler())
 	go appServer.Start("http", client.health.End(), httputils.Handler(handler, client.health, recoverer.Middleware, client.prometheus.Middleware, client.tracer.Middleware, owasp.New(config.owasp).Middleware))

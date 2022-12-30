@@ -1,4 +1,4 @@
-package exif
+package metadata
 
 import (
 	"context"

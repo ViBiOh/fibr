@@ -13,8 +13,8 @@ import (
 	"time"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
-	"github.com/ViBiOh/fibr/pkg/exif"
 	"github.com/ViBiOh/fibr/pkg/geo"
+	"github.com/ViBiOh/fibr/pkg/metadata"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
@@ -303,7 +303,7 @@ func (a App) exifHash(ctx context.Context, items []absto.Item) string {
 	hasher := sha.Stream()
 
 	for _, item := range items {
-		if info, err := a.storageApp.Info(ctx, exif.Path(item)); err == nil {
+		if info, err := a.storageApp.Info(ctx, metadata.Path(item)); err == nil {
 			hasher.Write(info)
 		}
 	}

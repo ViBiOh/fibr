@@ -1,4 +1,4 @@
-package exif
+package metadata
 
 func (a App) increaseExif(state string) {
 	if a.exifMetric == nil {

@@ -8,7 +8,7 @@ import (
 	"github.com/ViBiOh/absto/pkg/absto"
 	basicMemory "github.com/ViBiOh/auth/v2/pkg/store/memory"
 	"github.com/ViBiOh/fibr/pkg/crud"
-	"github.com/ViBiOh/fibr/pkg/exif"
+	"github.com/ViBiOh/fibr/pkg/metadata"
 	"github.com/ViBiOh/fibr/pkg/share"
 	"github.com/ViBiOh/fibr/pkg/storage"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
@@ -44,7 +44,7 @@ type configuration struct {
 	renderer      renderer.Config
 	absto         absto.Config
 	thumbnail     thumbnail.Config
-	exif          exif.Config
+	metadata      metadata.Config
 	amqp          amqp.Config
 	amqpThumbnail amqphandler.Config
 	amqpExif      amqphandler.Config
@@ -75,7 +75,7 @@ func newConfig() (configuration, error) {
 		renderer:      renderer.Flags(fs, "", flags.NewOverride("PublicURL", "http://localhost:1080"), flags.NewOverride("Title", "fibr")),
 		absto:         absto.Flags(fs, "storage"),
 		thumbnail:     thumbnail.Flags(fs, "thumbnail"),
-		exif:          exif.Flags(fs, "exif"),
+		metadata:      metadata.Flags(fs, "exif"),
 		amqp:          amqp.Flags(fs, "amqp"),
 		amqpThumbnail: amqphandler.Flags(fs, "amqpThumbnail", flags.NewOverride("Exchange", "fibr"), flags.NewOverride("Queue", "fibr.thumbnail"), flags.NewOverride("RoutingKey", "thumbnail_output")),
 		amqpExif:      amqphandler.Flags(fs, "amqpExif", flags.NewOverride("Exchange", "fibr"), flags.NewOverride("Queue", "fibr.exif"), flags.NewOverride("RoutingKey", "exif_output")),
