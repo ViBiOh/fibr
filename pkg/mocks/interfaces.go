@@ -13,7 +13,6 @@ import (
 	model "github.com/ViBiOh/absto/pkg/model"
 	ident "github.com/ViBiOh/auth/v2/pkg/ident"
 	model0 "github.com/ViBiOh/auth/v2/pkg/model"
-	model1 "github.com/ViBiOh/exas/pkg/model"
 	provider "github.com/ViBiOh/fibr/pkg/provider"
 	renderer "github.com/ViBiOh/httputils/v4/pkg/renderer"
 	gomock "github.com/golang/mock/gomock"
@@ -342,19 +341,19 @@ func (mr *ExifManagerMockRecorder) GetAggregateFor(ctx, item interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAggregateFor", reflect.TypeOf((*ExifManager)(nil).GetAggregateFor), ctx, item)
 }
 
-// GetExifFor mocks base method.
-func (m *ExifManager) GetExifFor(ctx context.Context, item model.Item) (model1.Exif, error) {
+// GetMetadataFor mocks base method.
+func (m *ExifManager) GetMetadataFor(ctx context.Context, item model.Item) (provider.Metadata, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetExifFor", ctx, item)
-	ret0, _ := ret[0].(model1.Exif)
+	ret := m.ctrl.Call(m, "GetMetadataFor", ctx, item)
+	ret0, _ := ret[0].(provider.Metadata)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetExifFor indicates an expected call of GetExifFor.
-func (mr *ExifManagerMockRecorder) GetExifFor(ctx, item interface{}) *gomock.Call {
+// GetMetadataFor indicates an expected call of GetMetadataFor.
+func (mr *ExifManagerMockRecorder) GetMetadataFor(ctx, item interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetExifFor", reflect.TypeOf((*ExifManager)(nil).GetExifFor), ctx, item)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMetadataFor", reflect.TypeOf((*ExifManager)(nil).GetMetadataFor), ctx, item)
 }
 
 // ListAggregateFor mocks base method.
@@ -393,14 +392,14 @@ func (mr *ExifManagerMockRecorder) ListDir(ctx, item interface{}) *gomock.Call {
 }
 
 // ListExifFor mocks base method.
-func (m *ExifManager) ListExifFor(ctx context.Context, items ...model.Item) (map[string]model1.Exif, error) {
+func (m *ExifManager) ListExifFor(ctx context.Context, items ...model.Item) (map[string]provider.Metadata, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx}
 	for _, a := range items {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "ListExifFor", varargs...)
-	ret0, _ := ret[0].(map[string]model1.Exif)
+	ret0, _ := ret[0].(map[string]provider.Metadata)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -427,7 +426,7 @@ func (mr *ExifManagerMockRecorder) SaveAggregateFor(ctx, item, aggregate interfa
 }
 
 // SaveExifFor mocks base method.
-func (m *ExifManager) SaveExifFor(ctx context.Context, item model.Item, exif model1.Exif) error {
+func (m *ExifManager) SaveExifFor(ctx context.Context, item model.Item, exif provider.Metadata) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SaveExifFor", ctx, item, exif)
 	ret0, _ := ret[0].(error)

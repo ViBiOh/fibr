@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
-	exas "github.com/ViBiOh/exas/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
@@ -28,7 +27,7 @@ func (a App) hasMetadata(ctx context.Context, item absto.Item) bool {
 		return err == nil
 	}
 
-	data, err := a.GetExifFor(ctx, item)
+	data, err := a.GetMetadataFor(ctx, item)
 	if err != nil {
 		return false
 	}
@@ -36,8 +35,8 @@ func (a App) hasMetadata(ctx context.Context, item absto.Item) bool {
 	return data.HasData()
 }
 
-func (a App) loadExif(ctx context.Context, item absto.Item) (exas.Exif, error) {
-	return loadMetadata[exas.Exif](ctx, a.storageApp, item)
+func (a App) loadExif(ctx context.Context, item absto.Item) (provider.Metadata, error) {
+	return loadMetadata[provider.Metadata](ctx, a.storageApp, item)
 }
 
 func (a App) loadAggregate(ctx context.Context, item absto.Item) (provider.Aggregate, error) {

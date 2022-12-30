@@ -8,7 +8,6 @@ import (
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/auth/v2/pkg/ident"
 	"github.com/ViBiOh/auth/v2/pkg/model"
-	exas "github.com/ViBiOh/exas/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
@@ -46,7 +45,7 @@ type ExifManager interface {
 	GetAggregateFor(ctx context.Context, item absto.Item) (Aggregate, error)
 	ListAggregateFor(ctx context.Context, items ...absto.Item) (map[string]Aggregate, error)
 	SaveAggregateFor(ctx context.Context, item absto.Item, aggregate Aggregate) error
-	GetExifFor(ctx context.Context, item absto.Item) (exas.Exif, error)
-	ListExifFor(ctx context.Context, items ...absto.Item) (map[string]exas.Exif, error)
-	SaveExifFor(ctx context.Context, item absto.Item, exif exas.Exif) error
+	GetMetadataFor(ctx context.Context, item absto.Item) (Metadata, error)
+	ListExifFor(ctx context.Context, items ...absto.Item) (map[string]Metadata, error)
+	SaveExifFor(ctx context.Context, item absto.Item, exif Metadata) error
 }

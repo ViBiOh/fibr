@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
-	exas "github.com/ViBiOh/exas/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v4/pkg/concurrent"
@@ -35,7 +34,7 @@ func (a App) story(r *http.Request, request provider.Request, item absto.Item, f
 		}
 	})
 
-	var exifs map[string]exas.Exif
+	var exifs map[string]provider.Metadata
 	wg.Go(func() {
 		var err error
 

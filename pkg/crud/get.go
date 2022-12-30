@@ -13,7 +13,6 @@ import (
 	"time"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
-	exas "github.com/ViBiOh/exas/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/exif"
 	"github.com/ViBiOh/fibr/pkg/geo"
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -223,7 +222,7 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 	a.generateGeoJSON(ctx, w, request, items, exifs)
 }
 
-func (a App) generateGeoJSON(ctx context.Context, w io.Writer, request provider.Request, items []absto.Item, exifs map[string]exas.Exif) {
+func (a App) generateGeoJSON(ctx context.Context, w io.Writer, request provider.Request, items []absto.Item, exifs map[string]provider.Metadata) {
 	done := ctx.Done()
 	isDone := func() bool {
 		select {

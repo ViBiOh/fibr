@@ -7,7 +7,6 @@ import (
 	"time"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
-	"github.com/ViBiOh/exas/pkg/model"
 )
 
 func lowerString(first, second string) bool {
@@ -118,7 +117,7 @@ func StorageToRender(item absto.Item, request Request) RenderItem {
 }
 
 type StoryItem struct {
-	Exif model.Exif
+	Exif Metadata
 	RenderItem
 }
 
@@ -136,7 +135,7 @@ func (s StoryItem) String() string {
 	return output.String()
 }
 
-func StorageToStory(item absto.Item, request Request, exif model.Exif) StoryItem {
+func StorageToStory(item absto.Item, request Request, exif Metadata) StoryItem {
 	return StoryItem{
 		RenderItem: StorageToRender(item, request),
 		Exif:       exif,

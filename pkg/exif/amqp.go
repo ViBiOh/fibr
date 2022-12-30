@@ -27,16 +27,16 @@ func (a App) AMQPHandler(ctx context.Context, message amqp.Delivery) error {
 		return nil
 	}
 
-	exif, err := a.GetExifFor(ctx, resp.Item)
+	exif, err := a.GetMetadataFor(ctx, resp.Item)
 	if err != nil && !absto.IsNotExist(err) {
 		logger.WithField("item", resp.Item.Pathname).Error("load exif: %s", err)
 	}
 
-	resp.Exif.Description = exif.Description
+	exif.Exif = resp.Exif
 
-	if err := a.SaveExifFor(ctx, resp.Item, resp.Exif); err != nil {
+	if err := a.SaveExifFor(ctx, resp.Item, exif); err != nil {
 		return fmt.Errorf("save: %w", err)
 	}
 
-	return a.processExif(ctx, resp.Item, resp.Exif, true)
+	return a.processExif(ctx, resp.Item, exif, true)
 }

@@ -169,7 +169,7 @@ func (a App) handlePostDescription(w http.ResponseWriter, r *http.Request, reque
 		return
 	}
 
-	exif, err := a.exifApp.GetExifFor(ctx, item)
+	exif, err := a.exifApp.GetMetadataFor(ctx, item)
 	if err != nil && !absto.IsNotExist(err) {
 		a.error(w, r, request, err)
 		return

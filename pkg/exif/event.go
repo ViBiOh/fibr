@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
-	exas "github.com/ViBiOh/exas/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 )
@@ -112,7 +111,7 @@ func (a App) handleUploadEvent(ctx context.Context, item absto.Item, aggregate b
 	return a.processExif(ctx, item, exif, aggregate)
 }
 
-func (a App) processExif(ctx context.Context, item absto.Item, exif exas.Exif, aggregate bool) error {
+func (a App) processExif(ctx context.Context, item absto.Item, exif provider.Metadata, aggregate bool) error {
 	if err := a.updateDate(ctx, item, exif); err != nil {
 		return fmt.Errorf("update date: %w", err)
 	}

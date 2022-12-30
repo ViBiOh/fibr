@@ -6,7 +6,6 @@ import (
 	"time"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
-	exas "github.com/ViBiOh/exas/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/version"
 	"github.com/ViBiOh/httputils/v4/pkg/tracer"
@@ -23,9 +22,9 @@ func redisKey(item absto.Item) string {
 	return version.Redis("exif:" + item.ID)
 }
 
-func (a App) GetExifFor(ctx context.Context, item absto.Item) (exas.Exif, error) {
+func (a App) GetMetadataFor(ctx context.Context, item absto.Item) (provider.Metadata, error) {
 	if item.IsDir {
-		return exas.Exif{}, nil
+		return provider.Metadata{}, nil
 	}
 
 	ctx, end := tracer.StartSpan(ctx, a.tracer, "get_exif")
@@ -34,7 +33,7 @@ func (a App) GetExifFor(ctx context.Context, item absto.Item) (exas.Exif, error)
 	return a.exifCacheApp.Get(ctx, item)
 }
 
-func (a App) ListExifFor(ctx context.Context, items ...absto.Item) (map[string]exas.Exif, error) {
+func (a App) ListExifFor(ctx context.Context, items ...absto.Item) (map[string]provider.Metadata, error) {
 	ctx, end := tracer.StartSpan(ctx, a.tracer, "list_exif")
 	defer end()
 
@@ -43,7 +42,7 @@ func (a App) ListExifFor(ctx context.Context, items ...absto.Item) (map[string]e
 		return nil, fmt.Errorf("list: %w", err)
 	}
 
-	output := make(map[string]exas.Exif, len(items))
+	output := make(map[string]provider.Metadata, len(items))
 	exifsLen := len(exifs)
 
 	for index, item := range items {
@@ -87,7 +86,7 @@ func (a App) ListAggregateFor(ctx context.Context, items ...absto.Item) (map[str
 	return output, nil
 }
 
-func (a App) SaveExifFor(ctx context.Context, item absto.Item, exif exas.Exif) error {
+func (a App) SaveExifFor(ctx context.Context, item absto.Item, exif provider.Metadata) error {
 	return a.exifCacheApp.EvictOnSuccess(ctx, item, a.saveMetadata(ctx, item, exif))
 }
 
@@ -123,7 +122,7 @@ func (a App) computeAndSaveAggregate(ctx context.Context, dir absto.Item) error 
 			return nil
 		}
 
-		exifData, err := a.GetExifFor(ctx, item)
+		exifData, err := a.GetMetadataFor(ctx, item)
 		if err != nil {
 			if absto.IsNotExist(err) {
 				return nil

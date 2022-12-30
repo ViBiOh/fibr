@@ -6,7 +6,6 @@ import (
 	"sort"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
-	exas "github.com/ViBiOh/exas/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v4/pkg/concurrent"
@@ -24,7 +23,7 @@ func (a App) browse(ctx context.Context, request provider.Request, item absto.It
 		previous provider.RenderItem
 		next     provider.RenderItem
 		files    []absto.Item
-		exif     exas.Exif
+		exif     provider.Metadata
 	)
 
 	wg := concurrent.NewSimple()
@@ -39,8 +38,8 @@ func (a App) browse(ctx context.Context, request provider.Request, item absto.It
 
 	wg.Go(func() {
 		var err error
-		exif, err = a.exifApp.GetExifFor(ctx, item)
-		if err != nil {
+		exif, err = a.exifApp.GetMetadataFor(ctx, item)
+		if err != nil && !absto.IsNotExist(err) {
 			logger.WithField("item", item.Pathname).Error("load exif: %s", err)
 		}
 	})

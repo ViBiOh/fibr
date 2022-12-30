@@ -7,6 +7,11 @@ import (
 	exas "github.com/ViBiOh/exas/pkg/model"
 )
 
+type Metadata struct {
+	Description string `json:"description,omitempty"`
+	exas.Exif
+}
+
 type Aggregate struct {
 	Start    time.Time `json:"start,omitempty"`
 	End      time.Time `json:"end,omitempty"`

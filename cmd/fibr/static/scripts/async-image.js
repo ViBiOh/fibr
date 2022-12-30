@@ -172,6 +172,21 @@ async function fetchThumbnail() {
   }
 }
 
+document.addEventListener('readystatechange', async (event) => {
+  if (event.target.readyState !== 'complete') {
+    return;
+  }
+
+  let dateTimeFormatter = new Intl.DateTimeFormat(navigator.language, {
+    dateStyle: 'full',
+    timeStyle: 'long',
+  });
+
+  document.querySelectorAll('.date').forEach((item) => {
+    item.innerHTML = dateTimeFormatter.format(new Date(item.innerHTML));
+  });
+});
+
 document.addEventListener(
   'readystatechange',
   async (event) => {
@@ -182,15 +197,6 @@ document.addEventListener(
     if (typeof hasThumbnail === 'undefined' || !hasThumbnail) {
       return;
     }
-
-    let dateTimeFormatter = new Intl.DateTimeFormat(navigator.language, {
-      dateStyle: 'full',
-      timeStyle: 'long',
-    });
-
-    document.querySelectorAll('.date').forEach((item) => {
-      item.innerHTML = dateTimeFormatter.format(new Date(item.innerHTML));
-    });
 
     const thumbnailsElem = document.querySelectorAll('[data-thumbnail]');
     if (!thumbnailsElem) {

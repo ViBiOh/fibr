@@ -120,7 +120,7 @@ func (a App) Search(r *http.Request, request provider.Request, files []absto.Ite
 		items[i] = renderItem
 
 		if !hasMap {
-			if exif, err := a.exifApp.GetExifFor(ctx, item); err == nil && exif.Geocode.Longitude != 0 && exif.Geocode.Latitude != 0 {
+			if exif, err := a.exifApp.GetMetadataFor(ctx, item); err == nil && exif.Geocode.Longitude != 0 && exif.Geocode.Latitude != 0 {
 				hasMap = true
 			}
 		}

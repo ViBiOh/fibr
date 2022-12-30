@@ -5,10 +5,10 @@ import (
 	"fmt"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
-	exas "github.com/ViBiOh/exas/pkg/model"
+	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
-func (a App) updateDate(ctx context.Context, item absto.Item, data exas.Exif) error {
+func (a App) updateDate(ctx context.Context, item absto.Item, data provider.Metadata) error {
 	if data.Date.IsZero() || item.Date.Equal(data.Date) {
 		return nil
 	}

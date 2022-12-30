@@ -193,7 +193,7 @@
 
                 {{ if not .Exif.Date.IsZero }}
                   <img class="icon margin-right-half{{ if .Exif.Geocode.HasAddress }} margin-left-half{{ end }}" src="{{ url "/svg/calendar?fill=%23272727" }}" alt="Location">
-                  <span class="date">{{ .Exif.Date.Format "Monday _2 January 15:04:05 2006 MST" }}</span>
+                  <span class="date">{{ .Exif.Date.Format "2006-01-02T15:04:05Z07:00" }}</span>
                 {{ end }}
               </p>
             {{ end }}

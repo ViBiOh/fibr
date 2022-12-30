@@ -32,7 +32,7 @@ type App struct {
 	listStorageApp    absto.Storage
 	exifMetric        *prometheus.CounterVec
 	aggregateMetric   *prometheus.CounterVec
-	exifCacheApp      cache.App[absto.Item, exas.Exif]
+	exifCacheApp      cache.App[absto.Item, provider.Metadata]
 	aggregateCacheApp cache.App[absto.Item, provider.Aggregate]
 
 	redisClient redis.App
@@ -104,9 +104,9 @@ func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheu
 		aggregateMetric: prom.CounterVec(prometheusRegisterer, "fibr", "aggregate", "item", "state"),
 	}
 
-	app.exifCacheApp = cache.New(redisClient, redisKey, func(ctx context.Context, item absto.Item) (exas.Exif, error) {
+	app.exifCacheApp = cache.New(redisClient, redisKey, func(ctx context.Context, item absto.Item) (provider.Metadata, error) {
 		if item.IsDir {
-			return exas.Exif{}, errInvalidItemType
+			return provider.Metadata{}, errInvalidItemType
 		}
 
 		return app.loadExif(ctx, item)
@@ -139,30 +139,29 @@ func (a App) enabled() bool {
 	return !a.exifRequest.IsZero()
 }
 
-func (a App) extractAndSaveExif(ctx context.Context, item absto.Item) (exif exas.Exif, err error) {
-	exif, err = a.extractExif(ctx, item)
+func (a App) extractAndSaveExif(ctx context.Context, item absto.Item) (provider.Metadata, error) {
+	exif, err := a.extractExif(ctx, item)
 	if err != nil {
-		err = fmt.Errorf("extract exif: %w", err)
-		return
+		return provider.Metadata{}, fmt.Errorf("extract exif: %w", err)
 	}
 
-	previousExif, err := a.GetExifFor(ctx, item)
+	metadata, err := a.GetMetadataFor(ctx, item)
 	if err != nil && !absto.IsNotExist(err) {
 		logger.WithField("item", item.Pathname).Error("load exif: %s", err)
 	}
 
-	exif.Description = previousExif.Description
+	metadata.Exif = exif
 
 	if exif.IsZero() {
 		logger.WithField("item", item.Pathname).Debug("no exif")
-		return
+		return metadata, nil
 	}
 
-	if err = a.SaveExifFor(ctx, item, exif); err != nil {
-		err = fmt.Errorf("save exif: %w", err)
+	if err = a.SaveExifFor(ctx, item, metadata); err != nil {
+		return metadata, fmt.Errorf("save exif: %w", err)
 	}
 
-	return
+	return metadata, nil
 }
 
 func (a App) extractExif(ctx context.Context, item absto.Item) (exif exas.Exif, err error) {
