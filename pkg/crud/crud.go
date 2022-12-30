@@ -11,7 +11,6 @@ import (
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/exclusive"
-	"github.com/ViBiOh/fibr/pkg/exif"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/search"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
@@ -35,7 +34,7 @@ type App struct {
 	storageApp      absto.Storage
 	shareApp        provider.ShareManager
 	webhookApp      provider.WebhookManager
-	exifApp         provider.ExifManager
+	exifApp         provider.MetadataManager
 	searchApp       search.App
 	pushEvent       provider.EventProducer
 	exclusiveApp    exclusive.App
@@ -64,7 +63,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 	}
 }
 
-func New(config Config, storageApp absto.Storage, filteredStorage absto.Storage, rendererApp renderer.App, shareApp provider.ShareManager, webhookApp provider.WebhookManager, thumbnailApp thumbnail.App, exifApp exif.App, searchApp search.App, eventProducer provider.EventProducer, exclusiveApp exclusive.App, tracer trace.Tracer) (App, error) {
+func New(config Config, storageApp absto.Storage, filteredStorage absto.Storage, rendererApp renderer.App, shareApp provider.ShareManager, webhookApp provider.WebhookManager, thumbnailApp thumbnail.App, exifApp provider.MetadataManager, searchApp search.App, eventProducer provider.EventProducer, exclusiveApp exclusive.App, tracer trace.Tracer) (App, error) {
 	app := App{
 		sanitizeOnStart: *config.sanitizeOnStart,
 

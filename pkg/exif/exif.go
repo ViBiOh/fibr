@@ -148,7 +148,7 @@ func (a App) extractAndSaveExif(ctx context.Context, item absto.Item) (provider.
 		return provider.Metadata{}, fmt.Errorf("extract exif: %w", err)
 	}
 
-	return a.update(ctx, item, WithExif(exif))
+	return a.Update(ctx, item, provider.ReplaceExif(exif))
 }
 
 func (a App) extractExif(ctx context.Context, item absto.Item) (exif exas.Exif, err error) {

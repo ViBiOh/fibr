@@ -209,7 +209,7 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 		return
 	}
 
-	exifs, err := a.exifApp.ListExifFor(ctx, items...)
+	exifs, err := a.exifApp.GetAllMetadataFor(ctx, items...)
 	if err != nil {
 		a.error(w, r, request, err)
 	}

@@ -33,7 +33,7 @@ func (a App) GetMetadataFor(ctx context.Context, item absto.Item) (provider.Meta
 	return a.exifCacheApp.Get(ctx, item)
 }
 
-func (a App) ListExifFor(ctx context.Context, items ...absto.Item) (map[string]provider.Metadata, error) {
+func (a App) GetAllMetadataFor(ctx context.Context, items ...absto.Item) (map[string]provider.Metadata, error) {
 	ctx, end := tracer.StartSpan(ctx, a.tracer, "list_exif")
 	defer end()
 
@@ -65,7 +65,7 @@ func (a App) GetAggregateFor(ctx context.Context, item absto.Item) (provider.Agg
 	return a.aggregateCacheApp.Get(ctx, item)
 }
 
-func (a App) ListAggregateFor(ctx context.Context, items ...absto.Item) (map[string]provider.Aggregate, error) {
+func (a App) GetAllAggregateFor(ctx context.Context, items ...absto.Item) (map[string]provider.Aggregate, error) {
 	ctx, end := tracer.StartSpan(ctx, a.tracer, "list_aggregate")
 	defer end()
 

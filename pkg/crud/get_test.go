@@ -41,9 +41,9 @@ func BenchmarkServeGeoJSON(b *testing.B) {
 	ctrl := gomock.NewController(b)
 	defer ctrl.Finish()
 
-	mockExif := mocks.NewExifManager(ctrl)
+	mockExif := mocks.NewMetadataManager(ctrl)
 
-	mockExif.EXPECT().ListExifFor(gomock.Any(), gomock.Any()).Return(map[string]provider.Metadata{
+	mockExif.EXPECT().GetAllMetadataFor(gomock.Any(), gomock.Any()).Return(map[string]provider.Metadata{
 		"9012": {
 			Exif: exas.Exif{
 				Geocode: exas.Geocode{

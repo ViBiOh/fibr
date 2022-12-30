@@ -6,7 +6,6 @@ import (
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/exclusive"
-	"github.com/ViBiOh/fibr/pkg/exif"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	httpModel "github.com/ViBiOh/httputils/v4/pkg/model"
@@ -17,12 +16,12 @@ import (
 type App struct {
 	tracer       trace.Tracer
 	storageApp   absto.Storage
-	exifApp      provider.ExifManager
+	exifApp      provider.MetadataManager
 	exclusiveApp exclusive.App
 	thumbnailApp thumbnail.App
 }
 
-func New(storageApp absto.Storage, thumbnailApp thumbnail.App, exifApp exif.App, exclusiveApp exclusive.App, tracer trace.Tracer) App {
+func New(storageApp absto.Storage, thumbnailApp thumbnail.App, exifApp provider.MetadataManager, exclusiveApp exclusive.App, tracer trace.Tracer) App {
 	return App{
 		tracer:       tracer,
 		storageApp:   storageApp,

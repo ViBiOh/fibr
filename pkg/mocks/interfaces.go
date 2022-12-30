@@ -10,9 +10,8 @@ import (
 	reflect "reflect"
 	time "time"
 
-	model "github.com/ViBiOh/absto/pkg/model"
 	ident "github.com/ViBiOh/auth/v2/pkg/ident"
-	model0 "github.com/ViBiOh/auth/v2/pkg/model"
+	model "github.com/ViBiOh/auth/v2/pkg/model"
 	provider "github.com/ViBiOh/fibr/pkg/provider"
 	renderer "github.com/ViBiOh/httputils/v4/pkg/renderer"
 	gomock "github.com/golang/mock/gomock"
@@ -128,11 +127,11 @@ func (m *Auth) EXPECT() *AuthMockRecorder {
 }
 
 // IsAuthenticated mocks base method.
-func (m *Auth) IsAuthenticated(arg0 *http.Request) (ident.Provider, model0.User, error) {
+func (m *Auth) IsAuthenticated(arg0 *http.Request) (ident.Provider, model.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "IsAuthenticated", arg0)
 	ret0, _ := ret[0].(ident.Provider)
-	ret1, _ := ret[1].(model0.User)
+	ret1, _ := ret[1].(model.User)
 	ret2, _ := ret[2].(error)
 	return ret0, ret1, ret2
 }
@@ -301,140 +300,4 @@ func (m *WebhookManager) List() []provider.Webhook {
 func (mr *WebhookManagerMockRecorder) List() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*WebhookManager)(nil).List))
-}
-
-// ExifManager is a mock of ExifManager interface.
-type ExifManager struct {
-	ctrl     *gomock.Controller
-	recorder *ExifManagerMockRecorder
-}
-
-// ExifManagerMockRecorder is the mock recorder for ExifManager.
-type ExifManagerMockRecorder struct {
-	mock *ExifManager
-}
-
-// NewExifManager creates a new mock instance.
-func NewExifManager(ctrl *gomock.Controller) *ExifManager {
-	mock := &ExifManager{ctrl: ctrl}
-	mock.recorder = &ExifManagerMockRecorder{mock}
-	return mock
-}
-
-// EXPECT returns an object that allows the caller to indicate expected use.
-func (m *ExifManager) EXPECT() *ExifManagerMockRecorder {
-	return m.recorder
-}
-
-// GetAggregateFor mocks base method.
-func (m *ExifManager) GetAggregateFor(ctx context.Context, item model.Item) (provider.Aggregate, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAggregateFor", ctx, item)
-	ret0, _ := ret[0].(provider.Aggregate)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetAggregateFor indicates an expected call of GetAggregateFor.
-func (mr *ExifManagerMockRecorder) GetAggregateFor(ctx, item interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAggregateFor", reflect.TypeOf((*ExifManager)(nil).GetAggregateFor), ctx, item)
-}
-
-// GetMetadataFor mocks base method.
-func (m *ExifManager) GetMetadataFor(ctx context.Context, item model.Item) (provider.Metadata, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetMetadataFor", ctx, item)
-	ret0, _ := ret[0].(provider.Metadata)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetMetadataFor indicates an expected call of GetMetadataFor.
-func (mr *ExifManagerMockRecorder) GetMetadataFor(ctx, item interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMetadataFor", reflect.TypeOf((*ExifManager)(nil).GetMetadataFor), ctx, item)
-}
-
-// ListAggregateFor mocks base method.
-func (m *ExifManager) ListAggregateFor(ctx context.Context, items ...model.Item) (map[string]provider.Aggregate, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx}
-	for _, a := range items {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "ListAggregateFor", varargs...)
-	ret0, _ := ret[0].(map[string]provider.Aggregate)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ListAggregateFor indicates an expected call of ListAggregateFor.
-func (mr *ExifManagerMockRecorder) ListAggregateFor(ctx interface{}, items ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx}, items...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListAggregateFor", reflect.TypeOf((*ExifManager)(nil).ListAggregateFor), varargs...)
-}
-
-// ListDir mocks base method.
-func (m *ExifManager) ListDir(ctx context.Context, item model.Item) ([]model.Item, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListDir", ctx, item)
-	ret0, _ := ret[0].([]model.Item)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ListDir indicates an expected call of ListDir.
-func (mr *ExifManagerMockRecorder) ListDir(ctx, item interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListDir", reflect.TypeOf((*ExifManager)(nil).ListDir), ctx, item)
-}
-
-// ListExifFor mocks base method.
-func (m *ExifManager) ListExifFor(ctx context.Context, items ...model.Item) (map[string]provider.Metadata, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx}
-	for _, a := range items {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "ListExifFor", varargs...)
-	ret0, _ := ret[0].(map[string]provider.Metadata)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ListExifFor indicates an expected call of ListExifFor.
-func (mr *ExifManagerMockRecorder) ListExifFor(ctx interface{}, items ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx}, items...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListExifFor", reflect.TypeOf((*ExifManager)(nil).ListExifFor), varargs...)
-}
-
-// SaveAggregateFor mocks base method.
-func (m *ExifManager) SaveAggregateFor(ctx context.Context, item model.Item, aggregate provider.Aggregate) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SaveAggregateFor", ctx, item, aggregate)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// SaveAggregateFor indicates an expected call of SaveAggregateFor.
-func (mr *ExifManagerMockRecorder) SaveAggregateFor(ctx, item, aggregate interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveAggregateFor", reflect.TypeOf((*ExifManager)(nil).SaveAggregateFor), ctx, item, aggregate)
-}
-
-// UpdateDescription mocks base method.
-func (m *ExifManager) UpdateDescription(ctx context.Context, item model.Item, description string) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateDescription", ctx, item, description)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// UpdateDescription indicates an expected call of UpdateDescription.
-func (mr *ExifManagerMockRecorder) UpdateDescription(ctx, item, description interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDescription", reflect.TypeOf((*ExifManager)(nil).UpdateDescription), ctx, item, description)
 }

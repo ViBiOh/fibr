@@ -170,7 +170,7 @@ func (a App) handlePostDescription(w http.ResponseWriter, r *http.Request, reque
 
 	description := r.FormValue("description")
 
-	if err = a.exifApp.UpdateDescription(ctx, item, description); err != nil {
+	if _, err = a.exifApp.Update(ctx, item, provider.ReplaceDescription(description)); err != nil {
 		a.error(w, r, request, err)
 		return
 	}

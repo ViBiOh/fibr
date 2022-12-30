@@ -45,7 +45,7 @@ func (a App) list(ctx context.Context, request provider.Request, message rendere
 	wg.Go(func() {
 		var err error
 
-		aggregates, err = a.exifApp.ListAggregateFor(ctx, files...)
+		aggregates, err = a.exifApp.GetAllAggregateFor(ctx, files...)
 		if err != nil {
 			listLogger(item.Pathname).Error("list exifs: %s", err)
 		}
