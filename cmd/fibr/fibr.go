@@ -14,6 +14,7 @@ import (
 	authMiddleware "github.com/ViBiOh/auth/v2/pkg/middleware"
 	basicMemory "github.com/ViBiOh/auth/v2/pkg/store/memory"
 	"github.com/ViBiOh/fibr/pkg/crud"
+	"github.com/ViBiOh/fibr/pkg/exclusive"
 	"github.com/ViBiOh/fibr/pkg/exif"
 	"github.com/ViBiOh/fibr/pkg/fibr"
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -93,13 +94,18 @@ func main() {
 	rendererApp, err := renderer.New(config.renderer, content, fibr.FuncMap, client.tracer.GetTracer("renderer"))
 	logger.Fatal(err)
 
-	exifApp, err := exif.New(config.exif, storageApp, prometheusRegisterer, client.tracer, client.amqp, client.redis)
+	var exclusiveApp exclusive.App
+	if client.redis.Enabled() {
+		exclusiveApp = exclusive.New(client.redis)
+	}
+
+	exifApp, err := exif.New(config.exif, storageApp, prometheusRegisterer, client.tracer, client.amqp, client.redis, exclusiveApp)
 	logger.Fatal(err)
 
-	webhookApp, err := webhook.New(config.webhook, storageApp, prometheusRegisterer, client.amqp, rendererApp, thumbnailApp)
+	webhookApp, err := webhook.New(config.webhook, storageApp, prometheusRegisterer, client.amqp, rendererApp, thumbnailApp, exclusiveApp)
 	logger.Fatal(err)
 
-	shareApp, err := share.New(config.share, storageApp, client.amqp)
+	shareApp, err := share.New(config.share, storageApp, client.amqp, exclusiveApp)
 	logger.Fatal(err)
 
 	amqpThumbnailApp, err := amqphandler.New(config.amqpThumbnail, client.amqp, client.tracer.GetTracer("amqp_handler_thumbnail"), thumbnailApp.AMQPHandler)
@@ -114,10 +120,9 @@ func main() {
 	amqpWebhookApp, err := amqphandler.New(config.amqpWebhook, client.amqp, client.tracer.GetTracer("amqp_handler_webhook"), webhookApp.AMQPHandler)
 	logger.Fatal(err)
 
-	searchApp, err := search.New(config.search, filteredStorage, thumbnailApp, exifApp, client.amqp, client.tracer.GetTracer("search"))
-	logger.Fatal(err)
+	searchApp := search.New(filteredStorage, thumbnailApp, exifApp, exclusiveApp, client.tracer.GetTracer("search"))
 
-	crudApp, err := crud.New(config.crud, storageApp, filteredStorage, rendererApp, shareApp, webhookApp, thumbnailApp, exifApp, searchApp, eventBus.Push, client.amqp, client.tracer.GetTracer("crud"))
+	crudApp, err := crud.New(config.crud, storageApp, filteredStorage, rendererApp, shareApp, webhookApp, thumbnailApp, exifApp, searchApp, eventBus.Push, exclusiveApp, client.tracer.GetTracer("crud"))
 	logger.Fatal(err)
 
 	var middlewareApp provider.Auth

@@ -10,12 +10,12 @@ import (
 	"time"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
+	"github.com/ViBiOh/fibr/pkg/exclusive"
 	"github.com/ViBiOh/fibr/pkg/exif"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/search"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/flags"
-	"github.com/ViBiOh/httputils/v4/pkg/amqp"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 	"go.opentelemetry.io/otel/trace"
@@ -30,18 +30,15 @@ var (
 )
 
 type App struct {
-	tracer        trace.Tracer
-	rawStorageApp absto.Storage
-	storageApp    absto.Storage
-	shareApp      provider.ShareManager
-	webhookApp    provider.WebhookManager
-	exifApp       provider.ExifManager
-	searchApp     search.App
-	pushEvent     provider.EventProducer
-
-	amqpClient              *amqp.Client
-	amqpExclusiveRoutingKey string
-
+	tracer          trace.Tracer
+	rawStorageApp   absto.Storage
+	storageApp      absto.Storage
+	shareApp        provider.ShareManager
+	webhookApp      provider.WebhookManager
+	exifApp         provider.ExifManager
+	searchApp       search.App
+	pushEvent       provider.EventProducer
+	exclusiveApp    exclusive.App
 	temporaryFolder string
 	rendererApp     renderer.App
 	thumbnailApp    thumbnail.App
@@ -51,11 +48,10 @@ type App struct {
 }
 
 type Config struct {
-	amqpExclusiveRoutingKey *string
-	bcryptDuration          *string
-	temporaryFolder         *string
-	sanitizeOnStart         *bool
-	chunkUpload             *bool
+	bcryptDuration  *string
+	temporaryFolder *string
+	sanitizeOnStart *bool
+	chunkUpload     *bool
 }
 
 func Flags(fs *flag.FlagSet, prefix string) Config {
@@ -65,12 +61,10 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 
 		chunkUpload:     flags.Bool(fs, prefix, "crud", "ChunkUpload", "Use chunk upload in browser", false, nil),
 		temporaryFolder: flags.String(fs, prefix, "crud", "TemporaryFolder", "Temporary folder for chunk upload", "/tmp", nil),
-
-		amqpExclusiveRoutingKey: flags.String(fs, prefix, "crud", "AmqpExclusiveRoutingKey", "AMQP Routing Key for exclusive lock on default exchange", "fibr.semaphore.start", nil),
 	}
 }
 
-func New(config Config, storageApp absto.Storage, filteredStorage absto.Storage, rendererApp renderer.App, shareApp provider.ShareManager, webhookApp provider.WebhookManager, thumbnailApp thumbnail.App, exifApp exif.App, searchApp search.App, eventProducer provider.EventProducer, amqpClient *amqp.Client, tracer trace.Tracer) (App, error) {
+func New(config Config, storageApp absto.Storage, filteredStorage absto.Storage, rendererApp renderer.App, shareApp provider.ShareManager, webhookApp provider.WebhookManager, thumbnailApp thumbnail.App, exifApp exif.App, searchApp search.App, eventProducer provider.EventProducer, exclusiveApp exclusive.App, tracer trace.Tracer) (App, error) {
 	app := App{
 		sanitizeOnStart: *config.sanitizeOnStart,
 
@@ -89,14 +83,7 @@ func New(config Config, storageApp absto.Storage, filteredStorage absto.Storage,
 		webhookApp:    webhookApp,
 		searchApp:     searchApp,
 
-		amqpClient:              amqpClient,
-		amqpExclusiveRoutingKey: strings.TrimSpace(*config.amqpExclusiveRoutingKey),
-	}
-
-	if amqpClient != nil {
-		if err := amqpClient.SetupExclusive(app.amqpExclusiveRoutingKey); err != nil {
-			return app, fmt.Errorf("setup amqp exclusive: %w", err)
-		}
+		exclusiveApp: exclusiveApp,
 	}
 
 	bcryptDuration, err := time.ParseDuration(strings.TrimSpace(*config.bcryptDuration))
@@ -117,16 +104,11 @@ func New(config Config, storageApp absto.Storage, filteredStorage absto.Storage,
 }
 
 func (a App) Start(ctx context.Context) {
-	if a.amqpClient == nil {
-		a.start(ctx)
-		return
-	}
-
-	if _, err := a.amqpClient.Exclusive(context.Background(), a.amqpExclusiveRoutingKey, time.Hour, func(ctx context.Context) error {
+	if err := a.exclusiveApp.Execute(ctx, "fibr:mutex:start", func(ctx context.Context) error {
 		a.start(ctx)
 		return nil
 	}); err != nil {
-		logger.Error("get exclusive semaphore: %s", err)
+		logger.Error("start: %s", err)
 	}
 }
 

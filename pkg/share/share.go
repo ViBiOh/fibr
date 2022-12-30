@@ -10,6 +10,7 @@ import (
 	"time"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
+	"github.com/ViBiOh/fibr/pkg/exclusive"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/amqp"
@@ -22,65 +23,52 @@ type GetNow func() time.Time
 var shareFilename = provider.MetadataDirectoryName + "/shares.json"
 
 type App struct {
-	storageApp absto.Storage
-	shares     map[string]provider.Share
-	clock      GetNow
-
-	amqpClient              *amqp.Client
-	amqpExchange            string
-	amqpRoutingKey          string
-	amqpExclusiveRoutingKey string
-
-	mutex sync.RWMutex
+	exclusiveApp   exclusive.App
+	storageApp     absto.Storage
+	shares         map[string]provider.Share
+	clock          GetNow
+	amqpClient     *amqp.Client
+	amqpExchange   string
+	amqpRoutingKey string
+	mutex          sync.RWMutex
 }
 
 type Config struct {
-	amqpExchange            *string
-	amqpRoutingKey          *string
-	amqpExclusiveRoutingKey *string
+	amqpExchange   *string
+	amqpRoutingKey *string
 }
 
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		amqpExchange:            flags.String(fs, prefix, "share", "AmqpExchange", "AMQP Exchange Name", "fibr.shares", nil),
-		amqpRoutingKey:          flags.String(fs, prefix, "share", "AmqpRoutingKey", "AMQP Routing Key for share", "share", nil),
-		amqpExclusiveRoutingKey: flags.String(fs, prefix, "share", "AmqpExclusiveRoutingKey", "AMQP Routing Key for exclusive lock on default exchange", "fibr.semaphore.shares", nil),
+		amqpExchange:   flags.String(fs, prefix, "share", "AmqpExchange", "AMQP Exchange Name", "fibr.shares", nil),
+		amqpRoutingKey: flags.String(fs, prefix, "share", "AmqpRoutingKey", "AMQP Routing Key for share", "share", nil),
 	}
 }
 
-func New(config Config, storageApp absto.Storage, amqpClient *amqp.Client) (*App, error) {
+func New(config Config, storageApp absto.Storage, amqpClient *amqp.Client, exclusiveApp exclusive.App) (*App, error) {
 	var amqpExchange string
-	var amqpExclusiveRoutingKey string
 
 	if amqpClient != nil {
 		amqpExchange = strings.TrimSpace(*config.amqpExchange)
-		amqpExclusiveRoutingKey = strings.TrimSpace(*config.amqpExclusiveRoutingKey)
 
 		if err := amqpClient.Publisher(amqpExchange, "fanout", nil); err != nil {
 			return &App{}, fmt.Errorf("configure amqp: %w", err)
 		}
-
-		amqpExchange = strings.TrimSpace(*config.amqpExchange)
-		if err := amqpClient.SetupExclusive(amqpExclusiveRoutingKey); err != nil {
-			return &App{}, fmt.Errorf("setup amqp exclusive: %w", err)
-		}
 	}
 
 	return &App{
-		clock: time.Now,
-
-		shares:     make(map[string]provider.Share),
-		storageApp: storageApp,
-
-		amqpClient:              amqpClient,
-		amqpExchange:            amqpExchange,
-		amqpRoutingKey:          strings.TrimSpace(*config.amqpRoutingKey),
-		amqpExclusiveRoutingKey: amqpExclusiveRoutingKey,
+		clock:          time.Now,
+		shares:         make(map[string]provider.Share),
+		storageApp:     storageApp,
+		exclusiveApp:   exclusiveApp,
+		amqpClient:     amqpClient,
+		amqpExchange:   amqpExchange,
+		amqpRoutingKey: strings.TrimSpace(*config.amqpRoutingKey),
 	}, nil
 }
 
-func (a *App) Exclusive(ctx context.Context, name string, duration time.Duration, action func(ctx context.Context) error) (bool, error) {
-	fn := func() error {
+func (a *App) Exclusive(ctx context.Context, name string, _ time.Duration, action func(ctx context.Context) error) (bool, error) {
+	return a.exclusiveApp.Try(ctx, "fibr:mutex:"+name, func(ctx context.Context) error {
 		a.mutex.Lock()
 		defer a.mutex.Unlock()
 
@@ -89,25 +77,7 @@ func (a *App) Exclusive(ctx context.Context, name string, duration time.Duration
 		}
 
 		return action(ctx)
-	}
-
-	if a.amqpClient == nil {
-		return true, fn()
-	}
-
-exclusive:
-	acquired, err := a.amqpClient.Exclusive(ctx, name, duration, func(ctx context.Context) error {
-		return fn()
 	})
-	if err != nil {
-		return true, err
-	}
-	if !acquired {
-		time.Sleep(time.Second)
-		goto exclusive
-	}
-
-	return true, nil
 }
 
 func (a *App) Get(requestPath string) provider.Share {
@@ -136,7 +106,7 @@ func (a *App) Start(ctx context.Context) {
 	}).OnSignal(syscall.SIGUSR1)
 
 	if a.amqpClient != nil {
-		purgeCron.Exclusive(a, a.amqpExclusiveRoutingKey, provider.SemaphoreDuration)
+		purgeCron.Exclusive(a, "purge", exclusive.SemaphoreDuration)
 	}
 
 	purgeCron.Start(ctx, a.cleanShares)

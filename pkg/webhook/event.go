@@ -210,7 +210,7 @@ func (a *App) accessEvent(event provider.Event) string {
 }
 
 func (a *App) deleteItem(ctx context.Context, item absto.Item) error {
-	return a.Exclusive(ctx, a.amqpExclusiveRoutingKey, func(_ context.Context) error {
+	return a.Exclusive(ctx, item.ID, func(_ context.Context) error {
 		for id, webhook := range a.webhooks {
 			if webhook.Pathname == item.Pathname {
 				if err := a.delete(ctx, id); err != nil {

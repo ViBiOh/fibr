@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
+	"github.com/ViBiOh/fibr/pkg/exclusive"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/flags"
@@ -21,76 +22,61 @@ import (
 var webhookFilename = provider.MetadataDirectoryName + "/webhooks.json"
 
 type App struct {
-	storageApp absto.Storage
-	webhooks   map[string]provider.Webhook
-	counter    *prometheus.CounterVec
-
-	amqpClient              *amqp.Client
-	amqpExchange            string
-	amqpExclusiveRoutingKey string
-	amqpRoutingKey          string
-
-	hmacSecret []byte
-
-	rendererApp  renderer.App
-	thumbnailApp thumbnail.App
-
-	mutex sync.RWMutex
+	exclusiveApp   exclusive.App
+	storageApp     absto.Storage
+	webhooks       map[string]provider.Webhook
+	counter        *prometheus.CounterVec
+	amqpClient     *amqp.Client
+	amqpExchange   string
+	amqpRoutingKey string
+	rendererApp    renderer.App
+	hmacSecret     []byte
+	thumbnailApp   thumbnail.App
+	mutex          sync.RWMutex
 }
 
 type Config struct {
 	hmacSecret *string
 
-	amqpExchange            *string
-	amqpRoutingKey          *string
-	amqpExclusiveRoutingKey *string
+	amqpExchange   *string
+	amqpRoutingKey *string
 }
 
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		hmacSecret: flags.String(fs, prefix, "webhook", "Secret", "Secret for HMAC Signature", "", nil),
-
-		amqpExchange:            flags.String(fs, prefix, "webhook", "AmqpExchange", "AMQP Exchange Name", "fibr.webhooks", nil),
-		amqpRoutingKey:          flags.String(fs, prefix, "webhook", "AmqpRoutingKey", "AMQP Routing Key for webhook", "webhook", nil),
-		amqpExclusiveRoutingKey: flags.String(fs, prefix, "webhook", "AmqpExclusiveRoutingKey", "AMQP Routing Key for exclusive lock on default exchange", "fibr.semaphore.webhooks", nil),
+		hmacSecret:     flags.String(fs, prefix, "webhook", "Secret", "Secret for HMAC Signature", "", nil),
+		amqpExchange:   flags.String(fs, prefix, "webhook", "AmqpExchange", "AMQP Exchange Name", "fibr.webhooks", nil),
+		amqpRoutingKey: flags.String(fs, prefix, "webhook", "AmqpRoutingKey", "AMQP Routing Key for webhook", "webhook", nil),
 	}
 }
 
-func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheus.Registerer, amqpClient *amqp.Client, rendererApp renderer.App, thumbnailApp thumbnail.App) (*App, error) {
+func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheus.Registerer, amqpClient *amqp.Client, rendererApp renderer.App, thumbnailApp thumbnail.App, exclusiveApp exclusive.App) (*App, error) {
 	var amqpExchange string
-	var amqpExclusiveRoutingKey string
 
 	if amqpClient != nil {
 		amqpExchange = strings.TrimSpace(*config.amqpExchange)
-		amqpExclusiveRoutingKey = strings.TrimSpace(*config.amqpExclusiveRoutingKey)
 
 		if err := amqpClient.Publisher(amqpExchange, "fanout", nil); err != nil {
 			return &App{}, fmt.Errorf("configure amqp: %w", err)
 		}
-
-		amqpExchange = strings.TrimSpace(*config.amqpExchange)
-		if err := amqpClient.SetupExclusive(amqpExclusiveRoutingKey); err != nil {
-			return &App{}, fmt.Errorf("setup amqp exclusive: %w", err)
-		}
 	}
 
 	return &App{
-		storageApp:   storageApp,
-		rendererApp:  rendererApp,
-		thumbnailApp: thumbnailApp,
-		webhooks:     make(map[string]provider.Webhook),
-		counter:      prom.CounterVec(prometheusRegisterer, "fibr", "webhook", "item", "code"),
-		hmacSecret:   []byte(*config.hmacSecret),
-
-		amqpClient:              amqpClient,
-		amqpExchange:            amqpExchange,
-		amqpRoutingKey:          strings.TrimSpace(*config.amqpRoutingKey),
-		amqpExclusiveRoutingKey: amqpExclusiveRoutingKey,
+		storageApp:     storageApp,
+		rendererApp:    rendererApp,
+		thumbnailApp:   thumbnailApp,
+		exclusiveApp:   exclusiveApp,
+		webhooks:       make(map[string]provider.Webhook),
+		counter:        prom.CounterVec(prometheusRegisterer, "fibr", "webhook", "item", "code"),
+		hmacSecret:     []byte(*config.hmacSecret),
+		amqpClient:     amqpClient,
+		amqpExchange:   amqpExchange,
+		amqpRoutingKey: strings.TrimSpace(*config.amqpRoutingKey),
 	}, nil
 }
 
 func (a *App) Exclusive(ctx context.Context, name string, action func(ctx context.Context) error) error {
-	return provider.Exclusive(ctx, a.amqpClient, a.amqpExclusiveRoutingKey, func(ctx context.Context) error {
+	return a.exclusiveApp.Execute(ctx, "fibr:mutex:"+name, func(ctx context.Context) error {
 		a.mutex.Lock()
 		defer a.mutex.Unlock()
 

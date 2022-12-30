@@ -1,61 +1,35 @@
 package search
 
 import (
-	"flag"
-	"fmt"
 	"net/http"
-	"strings"
 	"time"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
+	"github.com/ViBiOh/fibr/pkg/exclusive"
 	"github.com/ViBiOh/fibr/pkg/exif"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
-	"github.com/ViBiOh/flags"
-	"github.com/ViBiOh/httputils/v4/pkg/amqp"
 	httpModel "github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 	"go.opentelemetry.io/otel/trace"
 )
 
-type Config struct {
-	amqpExclusiveRoutingKey *string
-}
-
-func Flags(fs *flag.FlagSet, prefix string) Config {
-	return Config{
-		amqpExclusiveRoutingKey: flags.String(fs, prefix, "search", "AmqpExclusiveRoutingKey", "AMQP Routing Key for exclusive lock on default exchange", "fibr.semaphore.search", nil),
-	}
-}
-
 type App struct {
-	tracer                  trace.Tracer
-	storageApp              absto.Storage
-	exifApp                 provider.ExifManager
-	amqpClient              *amqp.Client
-	amqpExclusiveRoutingKey string
-	thumbnailApp            thumbnail.App
+	tracer       trace.Tracer
+	storageApp   absto.Storage
+	exifApp      provider.ExifManager
+	exclusiveApp exclusive.App
+	thumbnailApp thumbnail.App
 }
 
-func New(config Config, storageApp absto.Storage, thumbnailApp thumbnail.App, exifApp exif.App, amqpClient *amqp.Client, tracer trace.Tracer) (App, error) {
-	var amqpExclusiveRoutingKey string
-
-	if amqpClient != nil {
-		amqpExclusiveRoutingKey = strings.TrimSpace(*config.amqpExclusiveRoutingKey)
-
-		if err := amqpClient.SetupExclusive(amqpExclusiveRoutingKey); err != nil {
-			return App{}, fmt.Errorf("setup amqp exclusive: %w", err)
-		}
-	}
-
+func New(storageApp absto.Storage, thumbnailApp thumbnail.App, exifApp exif.App, exclusiveApp exclusive.App, tracer trace.Tracer) App {
 	return App{
 		tracer:       tracer,
 		storageApp:   storageApp,
 		thumbnailApp: thumbnailApp,
 		exifApp:      exifApp,
-
-		amqpExclusiveRoutingKey: amqpExclusiveRoutingKey,
-	}, nil
+		exclusiveApp: exclusiveApp,
+	}
 }
 
 func (a App) Files(r *http.Request, request provider.Request) (items []absto.Item, err error) {

@@ -9,7 +9,6 @@ import (
 	basicMemory "github.com/ViBiOh/auth/v2/pkg/store/memory"
 	"github.com/ViBiOh/fibr/pkg/crud"
 	"github.com/ViBiOh/fibr/pkg/exif"
-	"github.com/ViBiOh/fibr/pkg/search"
 	"github.com/ViBiOh/fibr/pkg/share"
 	"github.com/ViBiOh/fibr/pkg/storage"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
@@ -52,7 +51,6 @@ type configuration struct {
 	amqpShare     amqphandler.Config
 	amqpWebhook   amqphandler.Config
 	redis         redis.Config
-	search        search.Config
 	disableAuth   *bool
 }
 
@@ -84,7 +82,6 @@ func newConfig() (configuration, error) {
 		amqpShare:     amqphandler.Flags(fs, "amqpShare", flags.NewOverride("Exchange", "fibr.shares"), flags.NewOverride("Queue", "fibr.share-"+generateIdentityName()), flags.NewOverride("RoutingKey", "share"), flags.NewOverride("Exclusive", true), flags.NewOverride("RetryInterval", time.Duration(0))),
 		amqpWebhook:   amqphandler.Flags(fs, "amqpWebhook", flags.NewOverride("Exchange", "fibr.webhooks"), flags.NewOverride("Queue", "fibr.webhook-"+generateIdentityName()), flags.NewOverride("RoutingKey", "webhook"), flags.NewOverride("Exclusive", true), flags.NewOverride("RetryInterval", time.Duration(0))),
 		redis:         redis.Flags(fs, "redis", flags.NewOverride("Address", "")),
-		search:        search.Flags(fs, "search"),
 		disableAuth:   flags.Bool(fs, "", "auth", "NoAuth", "Disable basic authentification", false, nil),
 	}, fs.Parse(os.Args[1:])
 }

@@ -31,7 +31,7 @@ func WithDescription(description string) MetadataOption {
 func (a App) update(ctx context.Context, item absto.Item, opts ...MetadataOption) (provider.Metadata, error) {
 	var metadata provider.Metadata
 
-	return metadata, provider.Exclusive(ctx, a.amqpClient, a.amqpExclusiveRoutingKey, func(ctx context.Context) error {
+	return metadata, a.exclusiveApp.Execute(ctx, "fibr:mutex:"+item.ID, func(ctx context.Context) error {
 		var err error
 
 		metadata, err := a.GetMetadataFor(ctx, item)

@@ -220,8 +220,6 @@ Be careful when using the CLI, if someone list the processes on the system, they
 Usage of fibr:
   -address string
         [server] Listen address {FIBR_ADDRESS}
-  -amqpExclusiveRoutingKey string
-        [crud] AMQP Routing Key for exclusive lock on default exchange {FIBR_AMQP_EXCLUSIVE_ROUTING_KEY} (default "fibr.semaphore.start")
   -amqpExifExchange string
         [amqpExif] Exchange name {FIBR_AMQP_EXIF_EXCHANGE} (default "fibr")
   -amqpExifExclusive
@@ -288,8 +286,6 @@ Usage of fibr:
         [owasp] Content-Security-Policy {FIBR_CSP} (default "default-src 'self'; base-uri 'self'; script-src 'self' 'httputils-nonce' unpkg.com/webp-hero@0.0.2/dist-cjs/ unpkg.com/leaflet@1.9.3/dist/ unpkg.com/leaflet.markercluster@1.5.1/; style-src 'self' 'httputils-nonce' unpkg.com/leaflet@1.9.3/dist/ unpkg.com/leaflet.markercluster@1.5.1/; img-src 'self' data: a.tile.openstreetmap.org b.tile.openstreetmap.org c.tile.openstreetmap.org")
   -exifAmqpExchange string
         [exif] AMQP Exchange Name {FIBR_EXIF_AMQP_EXCHANGE} (default "fibr")
-  -exifAmqpExclusiveRoutingKey string
-        [exif] AMQP Routing Key for exclusive lock on default exchange {FIBR_EXIF_AMQP_EXCLUSIVE_ROUTING_KEY} (default "fibr.semaphore.exif")
   -exifAmqpRoutingKey string
         [exif] AMQP Routing Key for exif {FIBR_EXIF_AMQP_ROUTING_KEY} (default "exif_input")
   -exifDirectAccess
@@ -370,8 +366,6 @@ Usage of fibr:
         [redis] Redis Username, if any {FIBR_REDIS_USERNAME}
   -sanitizeOnStart
         [crud] Sanitize name on start {FIBR_SANITIZE_ON_START}
-  -searchAmqpExclusiveRoutingKey string
-        [search] AMQP Routing Key for exclusive lock on default exchange {FIBR_SEARCH_AMQP_EXCLUSIVE_ROUTING_KEY} (default "fibr.semaphore.search")
   -shareAmqpExchange string
         [share] AMQP Exchange Name {FIBR_SHARE_AMQP_EXCHANGE} (default "fibr.shares")
   -shareAmqpExclusiveRoutingKey string
@@ -432,8 +426,6 @@ Usage of fibr:
         [alcotest] User-Agent for check {FIBR_USER_AGENT} (default "Alcotest")
   -webhookAmqpExchange string
         [webhook] AMQP Exchange Name {FIBR_WEBHOOK_AMQP_EXCHANGE} (default "fibr.webhooks")
-  -webhookAmqpExclusiveRoutingKey string
-        [webhook] AMQP Routing Key for exclusive lock on default exchange {FIBR_WEBHOOK_AMQP_EXCLUSIVE_ROUTING_KEY} (default "fibr.semaphore.webhooks")
   -webhookAmqpRoutingKey string
         [webhook] AMQP Routing Key for webhook {FIBR_WEBHOOK_AMQP_ROUTING_KEY} (default "webhook")
   -webhookSecret string
@@ -450,4 +442,4 @@ Fibr doesn't handle multiple instances running at the same time on the same `roo
 
 Shares' metadatas are stored in a file, loaded at the start of the application. If an _instance A_ adds a share, _instance B_ can't see it. If they are both behind the same load-balancer, it can leads to an erratic behavior. Fibr has also an internal cron that purge expired shares and write the new metadatas to the file. If _instance A_ adds a share and _instance B_ runs the cron, the share added in _instance A_ is lost.
 
-If you enable AMQP, it can handle thoses behaviours by using an exclusive lock with an AMQP semaphore mechanism.
+If you enable Redis caching, it can handle thoses behaviours by using an exclusive lock with the Redis semaphore mechanism.

@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
+	"github.com/ViBiOh/fibr/pkg/exclusive"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 )
@@ -25,7 +26,7 @@ func (a *App) EventConsumer(ctx context.Context, e provider.Event) {
 }
 
 func (a *App) renameItem(ctx context.Context, old, new absto.Item) error {
-	_, err := a.Exclusive(ctx, a.amqpExclusiveRoutingKey, provider.SemaphoreDuration, func(_ context.Context) error {
+	_, err := a.Exclusive(ctx, old.ID, exclusive.SemaphoreDuration, func(ctx context.Context) error {
 		for id, share := range a.shares {
 			if strings.HasPrefix(share.Path, old.Pathname) {
 				share.Path = strings.Replace(share.Path, old.Pathname, new.Pathname, 1)
@@ -46,7 +47,7 @@ func (a *App) renameItem(ctx context.Context, old, new absto.Item) error {
 }
 
 func (a *App) deleteItem(ctx context.Context, item absto.Item) error {
-	_, err := a.Exclusive(ctx, a.amqpExclusiveRoutingKey, provider.SemaphoreDuration, func(_ context.Context) error {
+	_, err := a.Exclusive(ctx, item.ID, exclusive.SemaphoreDuration, func(_ context.Context) error {
 		for id, share := range a.shares {
 			if strings.HasPrefix(share.Path, item.Pathname) {
 				if err := a.delete(ctx, id); err != nil {
