@@ -187,6 +187,9 @@ func NewUploadEvent(request Request, item absto.Item, shareableURL string, rende
 		Item:         item,
 		URL:          rendererApp.PublicURL(request.AbsoluteURL(item.Name)),
 		ShareableURL: rendererApp.PublicURL(shareableURL),
+		Metadata: map[string]string{
+			"force": "all",
+		},
 	}
 }
 
