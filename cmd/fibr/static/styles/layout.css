@@ -1,3 +1,7 @@
 .breakable {
   word-break: break-word;
 }
+
+.top-shadow {
+  box-shadow: 0 -.5em .5em -.5em var(--white);
+}

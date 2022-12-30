@@ -141,10 +141,6 @@ func (a App) computeAndSaveAggregate(ctx context.Context, dir absto.Item) error 
 		return fmt.Errorf("aggregate: %w", err)
 	}
 
-	if len(directoryAggregate) == 0 {
-		return nil
-	}
-
 	return a.SaveAggregateFor(ctx, dir, provider.Aggregate{
 		Cover:    previousAggregate.Cover,
 		Location: directoryAggregate.value(),
