@@ -67,8 +67,8 @@ func New(config Config, storageApp absto.Storage, amqpClient *amqp.Client, exclu
 	}, nil
 }
 
-func (a *App) Exclusive(ctx context.Context, name string, _ time.Duration, action func(ctx context.Context) error) (bool, error) {
-	return a.exclusiveApp.Try(ctx, "fibr:mutex:"+name, func(ctx context.Context) error {
+func (a *App) Exclusive(ctx context.Context, name string, duration time.Duration, action func(ctx context.Context) error) (bool, error) {
+	return a.exclusiveApp.Try(ctx, "fibr:mutex:"+name, duration, func(ctx context.Context) error {
 		a.mutex.Lock()
 		defer a.mutex.Unlock()
 
@@ -106,7 +106,7 @@ func (a *App) Start(ctx context.Context) {
 	}).OnSignal(syscall.SIGUSR1)
 
 	if a.amqpClient != nil {
-		purgeCron.Exclusive(a, "purge", exclusive.SemaphoreDuration)
+		purgeCron.Exclusive(a, "purge", exclusive.Duration)
 	}
 
 	purgeCron.Start(ctx, a.cleanShares)

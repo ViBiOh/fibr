@@ -49,7 +49,7 @@ func (a *App) List() (output []provider.Share) {
 func (a *App) Create(ctx context.Context, filepath string, edit, story bool, password string, isDir bool, duration time.Duration) (string, error) {
 	var id string
 
-	_, err := a.Exclusive(ctx, "create", exclusive.SemaphoreDuration, func(ctx context.Context) error {
+	_, err := a.Exclusive(ctx, "create", exclusive.Duration, func(ctx context.Context) error {
 		var err error
 		id, err = a.generateID()
 		if err != nil {
@@ -87,7 +87,7 @@ func (a *App) Create(ctx context.Context, filepath string, edit, story bool, pas
 }
 
 func (a *App) Delete(ctx context.Context, id string) error {
-	_, err := a.Exclusive(ctx, id, exclusive.SemaphoreDuration, func(_ context.Context) error {
+	_, err := a.Exclusive(ctx, id, exclusive.Duration, func(_ context.Context) error {
 		return a.delete(ctx, id)
 	})
 

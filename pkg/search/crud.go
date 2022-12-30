@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
+	"github.com/ViBiOh/fibr/pkg/exclusive"
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
@@ -64,7 +65,7 @@ func (a App) Delete(ctx context.Context, item absto.Item, name string) error {
 }
 
 func (a App) update(ctx context.Context, item absto.Item, opts ...SearchesOption) error {
-	return a.exclusiveApp.Execute(ctx, "fibr:mutex:"+item.ID, func(ctx context.Context) error {
+	return a.exclusiveApp.Execute(ctx, "fibr:mutex:"+item.ID, exclusive.Duration, func(ctx context.Context) error {
 		searches, err := a.load(ctx, item)
 		if err != nil {
 			return fmt.Errorf("load: %w", err)

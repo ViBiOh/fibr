@@ -7,7 +7,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/redis"
 )
 
-const SemaphoreDuration = time.Second * 10
+const Duration = time.Second * 10
 
 type App struct {
 	redisClient redis.App
@@ -19,13 +19,13 @@ func New(redisClient redis.App) App {
 	}
 }
 
-func (a App) Execute(ctx context.Context, name string, action func(context.Context) error) error {
+func (a App) Execute(ctx context.Context, name string, duration time.Duration, action func(context.Context) error) error {
 	if !a.redisClient.Enabled() {
 		return action(ctx)
 	}
 
 exclusive:
-	acquired, err := a.redisClient.Exclusive(ctx, name, SemaphoreDuration, action)
+	acquired, err := a.redisClient.Exclusive(ctx, name, duration, action)
 	if err != nil {
 		return err
 	}
@@ -38,10 +38,10 @@ exclusive:
 	return nil
 }
 
-func (a App) Try(ctx context.Context, name string, action func(context.Context) error) (bool, error) {
+func (a App) Try(ctx context.Context, name string, duration time.Duration, action func(context.Context) error) (bool, error) {
 	if !a.redisClient.Enabled() {
 		return true, action(ctx)
 	}
 
-	return a.redisClient.Exclusive(ctx, name, SemaphoreDuration, action)
+	return a.redisClient.Exclusive(ctx, name, duration, action)
 }

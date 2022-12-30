@@ -104,7 +104,7 @@ func New(config Config, storageApp absto.Storage, filteredStorage absto.Storage,
 }
 
 func (a App) Start(ctx context.Context) {
-	if err := a.exclusiveApp.Execute(ctx, "fibr:mutex:start", func(ctx context.Context) error {
+	if err := a.exclusiveApp.Execute(ctx, "fibr:mutex:start", time.Hour, func(ctx context.Context) error {
 		a.start(ctx)
 		return nil
 	}); err != nil {

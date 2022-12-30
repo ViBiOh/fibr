@@ -6,6 +6,7 @@ import (
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	exas "github.com/ViBiOh/exas/pkg/model"
+	"github.com/ViBiOh/fibr/pkg/exclusive"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 )
@@ -31,7 +32,7 @@ func WithDescription(description string) MetadataOption {
 func (a App) update(ctx context.Context, item absto.Item, opts ...MetadataOption) (provider.Metadata, error) {
 	var metadata provider.Metadata
 
-	return metadata, a.exclusiveApp.Execute(ctx, "fibr:mutex:"+item.ID, func(ctx context.Context) error {
+	return metadata, a.exclusiveApp.Execute(ctx, "fibr:mutex:"+item.ID, exclusive.Duration, func(ctx context.Context) error {
 		var err error
 
 		metadata, err := a.GetMetadataFor(ctx, item)

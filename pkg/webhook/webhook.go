@@ -76,7 +76,7 @@ func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheu
 }
 
 func (a *App) Exclusive(ctx context.Context, name string, action func(ctx context.Context) error) error {
-	return a.exclusiveApp.Execute(ctx, "fibr:mutex:"+name, func(ctx context.Context) error {
+	return a.exclusiveApp.Execute(ctx, "fibr:mutex:"+name, exclusive.Duration, func(ctx context.Context) error {
 		a.mutex.Lock()
 		defer a.mutex.Unlock()
 
