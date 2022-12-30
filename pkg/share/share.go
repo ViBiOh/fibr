@@ -13,20 +13,18 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/amqp"
-	"github.com/ViBiOh/httputils/v4/pkg/clock"
 	"github.com/ViBiOh/httputils/v4/pkg/cron"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 )
 
-var (
-	shareFilename     = provider.MetadataDirectoryName + "/shares.json"
-	semaphoreDuration = time.Second * 10
-)
+type GetNow func() time.Time
+
+var shareFilename = provider.MetadataDirectoryName + "/shares.json"
 
 type App struct {
 	storageApp absto.Storage
 	shares     map[string]provider.Share
-	clock      clock.Clock
+	clock      GetNow
 
 	amqpClient              *amqp.Client
 	amqpExchange            string
@@ -69,6 +67,8 @@ func New(config Config, storageApp absto.Storage, amqpClient *amqp.Client) (*App
 	}
 
 	return &App{
+		clock: time.Now,
+
 		shares:     make(map[string]provider.Share),
 		storageApp: storageApp,
 
@@ -136,7 +136,7 @@ func (a *App) Start(ctx context.Context) {
 	}).OnSignal(syscall.SIGUSR1)
 
 	if a.amqpClient != nil {
-		purgeCron.Exclusive(a, a.amqpExclusiveRoutingKey, semaphoreDuration)
+		purgeCron.Exclusive(a, a.amqpExclusiveRoutingKey, provider.SemaphoreDuration)
 	}
 
 	purgeCron.Start(ctx, a.cleanShares)
@@ -168,7 +168,7 @@ func (a *App) refresh(ctx context.Context) error {
 }
 
 func (a *App) purgeExpiredShares(ctx context.Context) bool {
-	now := a.clock.Now()
+	now := a.clock()
 	changed := false
 
 	for id, share := range a.shares {

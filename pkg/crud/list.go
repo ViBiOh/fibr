@@ -11,6 +11,7 @@ import (
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/fibr/pkg/search"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v4/pkg/concurrent"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
@@ -64,7 +65,7 @@ func (a App) list(ctx context.Context, request provider.Request, message rendere
 		}
 	}()
 
-	var savedSearches map[string]provider.Search
+	var savedSearches search.Searches
 	savedSearchDone := make(chan struct{})
 	go func() {
 		defer close(savedSearchDone)

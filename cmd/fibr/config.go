@@ -60,7 +60,7 @@ func newConfig() (configuration, error) {
 	fs := flag.NewFlagSet("fibr", flag.ExitOnError)
 
 	return configuration{
-		appServer:  server.Flags(fs, "", flags.NewOverride("ReadTimeout", 2*time.Minute), flags.NewOverride("WriteTimeout", 2*time.Minute)),
+		appServer:  server.Flags(fs, "", flags.NewOverride("ReadTimeout", time.Minute), flags.NewOverride("WriteTimeout", time.Minute)),
 		promServer: server.Flags(fs, "prometheus", flags.NewOverride("Port", uint(9090)), flags.NewOverride("IdleTimeout", 10*time.Second), flags.NewOverride("ShutdownTimeout", 5*time.Second)),
 		health:     health.Flags(fs, ""),
 

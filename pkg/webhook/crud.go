@@ -46,7 +46,7 @@ func (a *App) List() (output []provider.Webhook) {
 func (a *App) Create(ctx context.Context, pathname string, recursive bool, kind provider.WebhookKind, url string, types []provider.EventType) (string, error) {
 	var id string
 
-	return id, a.Exclusive(ctx, a.amqpExclusiveRoutingKey, semaphoreDuration, func(ctx context.Context) (err error) {
+	return id, a.Exclusive(ctx, a.amqpExclusiveRoutingKey, func(ctx context.Context) (err error) {
 		id, err = a.generateID()
 		if err != nil {
 			return fmt.Errorf("generate id: %w", err)
@@ -78,7 +78,7 @@ func (a *App) Create(ctx context.Context, pathname string, recursive bool, kind 
 }
 
 func (a *App) Delete(ctx context.Context, id string) error {
-	return a.Exclusive(ctx, a.amqpExclusiveRoutingKey, semaphoreDuration, func(_ context.Context) error {
+	return a.Exclusive(ctx, a.amqpExclusiveRoutingKey, func(_ context.Context) error {
 		return a.delete(ctx, id)
 	})
 }

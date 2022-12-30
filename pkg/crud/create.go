@@ -66,7 +66,7 @@ func (a App) CreateSavedSearch(w http.ResponseWriter, r *http.Request, request p
 		return
 	}
 
-	if err = a.searchApp.Update(ctx, item, provider.Search{
+	if err = a.searchApp.Add(ctx, item, provider.Search{
 		ID:    sha.New(name),
 		Name:  name,
 		Query: r.URL.RawQuery,

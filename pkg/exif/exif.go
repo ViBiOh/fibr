@@ -15,7 +15,6 @@ import (
 	amqpclient "github.com/ViBiOh/httputils/v4/pkg/amqp"
 	"github.com/ViBiOh/httputils/v4/pkg/cache"
 	"github.com/ViBiOh/httputils/v4/pkg/httpjson"
-	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	prom "github.com/ViBiOh/httputils/v4/pkg/prometheus"
 	"github.com/ViBiOh/httputils/v4/pkg/redis"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
@@ -37,9 +36,10 @@ type App struct {
 
 	redisClient redis.App
 
-	amqpClient     *amqpclient.Client
-	amqpExchange   string
-	amqpRoutingKey string
+	amqpClient              *amqpclient.Client
+	amqpExchange            string
+	amqpRoutingKey          string
+	amqpExclusiveRoutingKey string
 
 	exifRequest request.Request
 
@@ -52,8 +52,9 @@ type Config struct {
 	exifUser *string
 	exifPass *string
 
-	amqpExchange   *string
-	amqpRoutingKey *string
+	amqpExchange            *string
+	amqpRoutingKey          *string
+	amqpExclusiveRoutingKey *string
 
 	maxSize      *int
 	directAccess *bool
@@ -68,18 +69,27 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 		directAccess: flags.Bool(fs, prefix, "exif", "DirectAccess", "Use Exas with direct access to filesystem (no large file upload, send a GET request, Basic Auth recommended)", false, nil),
 		maxSize:      flags.Int(fs, prefix, "exif", "MaxSize", "Max file size (in bytes) for extracting exif (0 to no limit). Not used if DirectAccess enabled.", 1024*1024*200, nil),
 
-		amqpExchange:   flags.String(fs, prefix, "exif", "AmqpExchange", "AMQP Exchange Name", "fibr", nil),
-		amqpRoutingKey: flags.String(fs, prefix, "exif", "AmqpRoutingKey", "AMQP Routing Key for exif", "exif_input", nil),
+		amqpExchange:            flags.String(fs, prefix, "exif", "AmqpExchange", "AMQP Exchange Name", "fibr", nil),
+		amqpRoutingKey:          flags.String(fs, prefix, "exif", "AmqpRoutingKey", "AMQP Routing Key for exif", "exif_input", nil),
+		amqpExclusiveRoutingKey: flags.String(fs, prefix, "exif", "AmqpExclusiveRoutingKey", "AMQP Routing Key for exclusive lock on default exchange", "fibr.semaphore.exif", nil),
 	}
 }
 
 func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheus.Registerer, tracerApp tracer.App, amqpClient *amqpclient.Client, redisClient redis.App) (App, error) {
 	var amqpExchange string
+	var amqpExclusiveRoutingKey string
+
 	if amqpClient != nil {
 		amqpExchange = strings.TrimSpace(*config.amqpExchange)
 
 		if err := amqpClient.Publisher(amqpExchange, "direct", nil); err != nil {
 			return App{}, fmt.Errorf("configure amqp: %w", err)
+		}
+
+		amqpExclusiveRoutingKey = strings.TrimSpace(*config.amqpExclusiveRoutingKey)
+
+		if err := amqpClient.SetupExclusive(amqpExclusiveRoutingKey); err != nil {
+			return App{}, fmt.Errorf("setup amqp exclusive: %w", err)
 		}
 	}
 
@@ -90,9 +100,10 @@ func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheu
 
 		redisClient: redisClient,
 
-		amqpClient:     amqpClient,
-		amqpExchange:   amqpExchange,
-		amqpRoutingKey: strings.TrimSpace(*config.amqpRoutingKey),
+		amqpClient:              amqpClient,
+		amqpExchange:            amqpExchange,
+		amqpRoutingKey:          strings.TrimSpace(*config.amqpRoutingKey),
+		amqpExclusiveRoutingKey: amqpExclusiveRoutingKey,
 
 		tracer:     tracerApp.GetTracer("exif"),
 		storageApp: storageApp,
@@ -145,23 +156,7 @@ func (a App) extractAndSaveExif(ctx context.Context, item absto.Item) (provider.
 		return provider.Metadata{}, fmt.Errorf("extract exif: %w", err)
 	}
 
-	metadata, err := a.GetMetadataFor(ctx, item)
-	if err != nil && !absto.IsNotExist(err) {
-		logger.WithField("item", item.Pathname).Error("load exif: %s", err)
-	}
-
-	metadata.Exif = exif
-
-	if exif.IsZero() {
-		logger.WithField("item", item.Pathname).Debug("no exif")
-		return metadata, nil
-	}
-
-	if err = a.SaveExifFor(ctx, item, metadata); err != nil {
-		return metadata, fmt.Errorf("save exif: %w", err)
-	}
-
-	return metadata, nil
+	return a.update(ctx, item, WithExif(exif))
 }
 
 func (a App) extractExif(ctx context.Context, item absto.Item) (exif exas.Exif, err error) {

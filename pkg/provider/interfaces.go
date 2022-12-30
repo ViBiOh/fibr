@@ -47,5 +47,5 @@ type ExifManager interface {
 	SaveAggregateFor(ctx context.Context, item absto.Item, aggregate Aggregate) error
 	GetMetadataFor(ctx context.Context, item absto.Item) (Metadata, error)
 	ListExifFor(ctx context.Context, items ...absto.Item) (map[string]Metadata, error)
-	SaveExifFor(ctx context.Context, item absto.Item, exif Metadata) error
+	UpdateDescription(ctx context.Context, item absto.Item, description string) error
 }

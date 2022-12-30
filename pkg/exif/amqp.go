@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/tracer"
@@ -27,16 +26,6 @@ func (a App) AMQPHandler(ctx context.Context, message amqp.Delivery) error {
 		return nil
 	}
 
-	exif, err := a.GetMetadataFor(ctx, resp.Item)
-	if err != nil && !absto.IsNotExist(err) {
-		logger.WithField("item", resp.Item.Pathname).Error("load exif: %s", err)
-	}
-
-	exif.Exif = resp.Exif
-
-	if err := a.SaveExifFor(ctx, resp.Item, exif); err != nil {
-		return fmt.Errorf("save: %w", err)
-	}
-
-	return a.processExif(ctx, resp.Item, exif, true)
+	_, err := a.update(ctx, resp.Item, WithExif(resp.Exif))
+	return err
 }

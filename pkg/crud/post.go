@@ -9,7 +9,6 @@ import (
 	"strconv"
 	"strings"
 
-	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
@@ -169,20 +168,14 @@ func (a App) handlePostDescription(w http.ResponseWriter, r *http.Request, reque
 		return
 	}
 
-	exif, err := a.exifApp.GetMetadataFor(ctx, item)
-	if err != nil && !absto.IsNotExist(err) {
+	description := r.FormValue("description")
+
+	if err = a.exifApp.UpdateDescription(ctx, item, description); err != nil {
 		a.error(w, r, request, err)
 		return
 	}
 
-	exif.Description = r.FormValue("description")
-
-	if err = a.exifApp.SaveExifFor(ctx, item, exif); err != nil {
-		a.error(w, r, request, err)
-		return
-	}
-
-	go a.notify(tracer.CopyToBackground(ctx), provider.NewDescriptionEvent(item, a.bestSharePath(item.Pathname), exif.Description, a.rendererApp))
+	go a.notify(tracer.CopyToBackground(ctx), provider.NewDescriptionEvent(item, a.bestSharePath(item.Pathname), description, a.rendererApp))
 
 	a.rendererApp.Redirect(w, r, fmt.Sprintf("?d=%s#%s", request.Display, item.ID), renderer.NewSuccessMessage("Description successfully edited"))
 }

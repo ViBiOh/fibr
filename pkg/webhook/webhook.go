@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"strings"
 	"sync"
-	"time"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -19,10 +18,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-var (
-	webhookFilename   = provider.MetadataDirectoryName + "/webhooks.json"
-	semaphoreDuration = time.Second * 10
-)
+var webhookFilename = provider.MetadataDirectoryName + "/webhooks.json"
 
 type App struct {
 	storageApp absto.Storage
@@ -93,8 +89,8 @@ func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheu
 	}, nil
 }
 
-func (a *App) Exclusive(ctx context.Context, name string, duration time.Duration, action func(ctx context.Context) error) error {
-	fn := func() error {
+func (a *App) Exclusive(ctx context.Context, name string, action func(ctx context.Context) error) error {
+	return provider.Exclusive(ctx, a.amqpClient, a.amqpExclusiveRoutingKey, func(ctx context.Context) error {
 		a.mutex.Lock()
 		defer a.mutex.Unlock()
 
@@ -103,25 +99,7 @@ func (a *App) Exclusive(ctx context.Context, name string, duration time.Duration
 		}
 
 		return action(ctx)
-	}
-
-	if a.amqpClient == nil {
-		return fn()
-	}
-
-exclusive:
-	acquired, err := a.amqpClient.Exclusive(ctx, name, duration, func(ctx context.Context) error {
-		return fn()
 	})
-	if err != nil {
-		return err
-	}
-	if !acquired {
-		time.Sleep(time.Second)
-		goto exclusive
-	}
-
-	return nil
 }
 
 func (a *App) Start(ctx context.Context) {

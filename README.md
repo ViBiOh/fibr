@@ -288,6 +288,8 @@ Usage of fibr:
         [owasp] Content-Security-Policy {FIBR_CSP} (default "default-src 'self'; base-uri 'self'; script-src 'self' 'httputils-nonce' unpkg.com/webp-hero@0.0.2/dist-cjs/ unpkg.com/leaflet@1.9.3/dist/ unpkg.com/leaflet.markercluster@1.5.1/; style-src 'self' 'httputils-nonce' unpkg.com/leaflet@1.9.3/dist/ unpkg.com/leaflet.markercluster@1.5.1/; img-src 'self' data: a.tile.openstreetmap.org b.tile.openstreetmap.org c.tile.openstreetmap.org")
   -exifAmqpExchange string
         [exif] AMQP Exchange Name {FIBR_EXIF_AMQP_EXCHANGE} (default "fibr")
+  -exifAmqpExclusiveRoutingKey string
+        [exif] AMQP Routing Key for exclusive lock on default exchange {FIBR_EXIF_AMQP_EXCLUSIVE_ROUTING_KEY} (default "fibr.semaphore.exif")
   -exifAmqpRoutingKey string
         [exif] AMQP Routing Key for exif {FIBR_EXIF_AMQP_ROUTING_KEY} (default "exif_input")
   -exifDirectAccess
@@ -355,7 +357,7 @@ Usage of fibr:
   -publicURL string
         Public URL {FIBR_PUBLIC_URL} (default "http://localhost:1080")
   -readTimeout duration
-        [server] Read Timeout {FIBR_READ_TIMEOUT} (default 2m0s)
+        [server] Read Timeout {FIBR_READ_TIMEOUT} (default 1m0s)
   -redisAddress string
         [redis] Redis Address fqdn:port (blank to disable) {FIBR_REDIS_ADDRESS}
   -redisAlias string
@@ -437,7 +439,7 @@ Usage of fibr:
   -webhookSecret string
         [webhook] Secret for HMAC Signature {FIBR_WEBHOOK_SECRET}
   -writeTimeout duration
-        [server] Write Timeout {FIBR_WRITE_TIMEOUT} (default 2m0s)
+        [server] Write Timeout {FIBR_WRITE_TIMEOUT} (default 1m0s)
 ```
 
 # Caveats

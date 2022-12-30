@@ -425,16 +425,16 @@ func (mr *ExifManagerMockRecorder) SaveAggregateFor(ctx, item, aggregate interfa
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveAggregateFor", reflect.TypeOf((*ExifManager)(nil).SaveAggregateFor), ctx, item, aggregate)
 }
 
-// SaveExifFor mocks base method.
-func (m *ExifManager) SaveExifFor(ctx context.Context, item model.Item, exif provider.Metadata) error {
+// UpdateDescription mocks base method.
+func (m *ExifManager) UpdateDescription(ctx context.Context, item model.Item, description string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SaveExifFor", ctx, item, exif)
+	ret := m.ctrl.Call(m, "UpdateDescription", ctx, item, description)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// SaveExifFor indicates an expected call of SaveExifFor.
-func (mr *ExifManagerMockRecorder) SaveExifFor(ctx, item, exif interface{}) *gomock.Call {
+// UpdateDescription indicates an expected call of UpdateDescription.
+func (mr *ExifManagerMockRecorder) UpdateDescription(ctx, item, description interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveExifFor", reflect.TypeOf((*ExifManager)(nil).SaveExifFor), ctx, item, exif)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDescription", reflect.TypeOf((*ExifManager)(nil).UpdateDescription), ctx, item, description)
 }

@@ -1,7 +1,6 @@
 package search
 
 import (
-	"context"
 	"flag"
 	"fmt"
 	"net/http"
@@ -57,27 +56,6 @@ func New(config Config, storageApp absto.Storage, thumbnailApp thumbnail.App, ex
 
 		amqpExclusiveRoutingKey: amqpExclusiveRoutingKey,
 	}, nil
-}
-
-func (a App) Exclusive(ctx context.Context, name string, duration time.Duration, action func(ctx context.Context) error) error {
-	if a.amqpClient == nil {
-		return action(ctx)
-	}
-
-exclusive:
-	acquired, err := a.amqpClient.Exclusive(ctx, name, duration, func(ctx context.Context) error {
-		return action(ctx)
-	})
-	if err != nil {
-		return err
-	}
-
-	if !acquired {
-		time.Sleep(time.Second)
-		goto exclusive
-	}
-
-	return nil
 }
 
 func (a App) Files(r *http.Request, request provider.Request) (items []absto.Item, err error) {

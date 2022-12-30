@@ -86,10 +86,6 @@ func (a App) ListAggregateFor(ctx context.Context, items ...absto.Item) (map[str
 	return output, nil
 }
 
-func (a App) SaveExifFor(ctx context.Context, item absto.Item, exif provider.Metadata) error {
-	return a.exifCacheApp.EvictOnSuccess(ctx, item, a.saveMetadata(ctx, item, exif))
-}
-
 func (a App) SaveAggregateFor(ctx context.Context, item absto.Item, aggregate provider.Aggregate) error {
 	return a.aggregateCacheApp.EvictOnSuccess(ctx, item, a.saveMetadata(ctx, item, aggregate))
 }
