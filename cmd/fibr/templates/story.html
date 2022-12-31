@@ -140,21 +140,21 @@
   <div class="content">
     {{ if not .Request.Share.Story }}
       <div id="menu" class="flex flex-center">
-        <a id="list-display" class="button button-icon" href="?d=list">
-          <img class="icon" src="{{ url "/svg/list?fill=aliceblue" }}" alt="List">
+        <a id="list-display" class="button button-icon" href="?d=list" title="List layout">
+          <img class="icon" src="{{ url "/svg/list?fill=aliceblue" }}" alt="list">
         </a>
-        <a id="grid-display" class="button button-icon" href="?d=grid">
-          <img class="icon" src="{{ url "/svg/grid?fill=aliceblue" }}" alt="Grid">
+        <a id="grid-display" class="button button-icon" href="?d=grid" title="Grid layout">
+          <img class="icon" src="{{ url "/svg/grid?fill=aliceblue" }}" alt="grid">
         </a>
-        <a id="story-display" class="button button-icon" href="?d=story">
-          <img class="icon" src="{{ url "/svg/image?fill=aliceblue" }}" alt="Image story">
+        <a id="story-display" class="button button-icon" href="?d=story" title="Story layout">
+          <img class="icon" src="{{ url "/svg/image?fill=aliceblue" }}" alt="picture">
         </a>
 
         <span class="flex-grow"></span>
 
         {{ if .HasMap }}
-          <a class="padding" href="#map" download>
-            <img class="icon" src="{{ url "/svg/map?fill=aliceblue" }}" alt="View on map">
+          <a class="padding" href="#map" title="View on map">
+            <img class="icon" src="{{ url "/svg/map?fill=aliceblue" }}" alt="map">
           </a>
         {{ end }}
       </div>
@@ -167,7 +167,7 @@
             {{ template "async-image-item-large" .RenderItem }}
 
             {{ if .IsVideo }}
-              <img class="icon icon-overlay" src="{{ url "/svg/play?fill=rgba(192,192,192,0.8)" }}" alt="Play video">
+              <img class="icon icon-overlay" src="{{ url "/svg/play?fill=rgba(192,192,192,0.8)" }}" alt="play icon" title="Play video">
             {{ end }}
           </a>
 
@@ -175,7 +175,7 @@
             {{ if or (.Exif.Geocode.HasAddress) (not .Exif.Date.IsZero) }}
               <p class="context">
                 {{ if .Exif.Geocode.HasAddress }}
-                  <img class="icon margin-right-half" src="{{ url "/svg/location?fill=%23272727" }}" alt="Location">
+                  <img class="icon margin-right-half" src="{{ url "/svg/location?fill=%23272727" }}" alt="location">
                   <span class="location">
                     {{ if index .Exif.Geocode.Address "city_district" }}
                       {{ index .Exif.Geocode.Address "city_district" }},
@@ -192,7 +192,7 @@
                 </span>
 
                 {{ if not .Exif.Date.IsZero }}
-                  <img class="icon margin-right-half{{ if .Exif.Geocode.HasAddress }} margin-left-half{{ end }}" src="{{ url "/svg/calendar?fill=%23272727" }}" alt="Location">
+                  <img class="icon margin-right-half{{ if .Exif.Geocode.HasAddress }} margin-left-half{{ end }}" src="{{ url "/svg/calendar?fill=%23272727" }}" alt="calendar">
                   <span class="date">{{ .Exif.Date.Format "2006-01-02T15:04:05Z07:00" }}</span>
                 {{ end }}
               </p>
@@ -200,7 +200,7 @@
 
             {{ if index .Exif.Data "Model" }}
               <p class="context">
-                <img class="icon margin-right-half" src="{{ url "/svg/camera?fill=%23272727" }}" alt="Camera model">
+                <img class="icon margin-right-half" src="{{ url "/svg/camera?fill=%23272727" }}" alt="camera">
                 {{ index .Exif.Data "Model" }}
               </p>
             {{ end }}
@@ -216,11 +216,11 @@
 
             {{ if $root.Request.CanEdit }}
               <a href="#desc-modal-{{ .ID }}" class="button button-icon desc-edit" title="Edit description">
-                <img class="icon" src="{{ url "/svg/pencil-alt?fill=%23272727" }}" alt="Edit description">
+                <img class="icon" src="{{ url "/svg/pencil-alt?fill=%23272727" }}" alt="edit description">
               </a>
             {{ end }}
             <a href="#{{ .ID }}" class="button button-icon permalink" title="Link to image">
-              <img class="icon" src="{{ url "/svg/link?fill=%23272727" }}" alt="Link">
+              <img class="icon" src="{{ url "/svg/link?fill=%23272727" }}" alt="link">
             </a>
           </div>
         </li>

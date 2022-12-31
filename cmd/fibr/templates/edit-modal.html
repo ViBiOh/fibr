@@ -18,6 +18,13 @@
           <input id="name-{{ .ID }}" type="text" name="newName" value="{{ .Name }}" />
         </p>
 
+        {{ if not .IsDir }}
+          <p class="padding no-margin">
+            <label for="tags-{{ .ID }}" class="block">Tags, blank separated</label>
+            <input id="tags-{{ .ID }}" type="text" name="tags" value="{{ join .Tags " " }}" />
+          </p>
+        {{ end }}
+
         {{ if .HasThumbnail }}
           <p class="padding no-margin center">
             <input id="cover-{{ .ID }}" type="checkbox" name="cover" value="true" {{ if .IsCover }}checked{{ end }} />

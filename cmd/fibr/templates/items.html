@@ -49,6 +49,13 @@
         font-size: 1rem;
         text-align: right;
       }
+
+      .tags {
+        display: inline-block;
+        flex: 0.5 0.5;
+        font-size: 1rem;
+        text-align: right;
+      }
     {{ end }}
 
     {{ if eq .Request.Display "grid" }}
@@ -96,6 +103,12 @@
         position: absolute;
         bottom: 0.5rem;
         right:  0.5rem;
+      }
+
+      .tags {
+        bottom: 0.5rem;
+        left:  0.5rem;
+        position: absolute;
       }
     {{ end }}
   </style>

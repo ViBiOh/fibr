@@ -70,7 +70,7 @@ func (a App) Rename(w http.ResponseWriter, r *http.Request, request provider.Req
 	var oldItem absto.Item
 	var newItem absto.Item
 
-	if oldPath != newPath {
+	if !strings.EqualFold(oldPath, newPath) {
 		if _, err := a.checkFile(ctx, newPath, false); err != nil {
 			a.error(w, r, request, err)
 			return
@@ -93,15 +93,22 @@ func (a App) Rename(w http.ResponseWriter, r *http.Request, request provider.Req
 			provider.SetPrefsCookie(w, request)
 		}
 	} else {
-		newItem, err = a.checkFile(ctx, newPath, true)
+		newItem, err = a.checkFile(ctx, oldPath, true)
 		if err != nil {
 			a.error(w, r, request, err)
 			return
 		}
 	}
 
-	if !newItem.IsDir && cover {
-		if err := a.updateCover(ctx, newItem); err != nil {
+	if !newItem.IsDir {
+		if cover {
+			if err := a.updateCover(ctx, newItem); err != nil {
+				a.error(w, r, request, model.WrapInternal(err))
+				return
+			}
+		}
+
+		if _, err = a.metadataApp.Update(ctx, newItem, provider.ReplaceTags(strings.Split(r.Form.Get("tags"), " "))); err != nil {
 			a.error(w, r, request, model.WrapInternal(err))
 			return
 		}
@@ -164,14 +171,14 @@ func (a App) updateCover(ctx context.Context, item absto.Item) error {
 		return fmt.Errorf("get directory: %w", err)
 	}
 
-	aggregate, err := a.exifApp.GetAggregateFor(ctx, directory)
+	aggregate, err := a.metadataApp.GetAggregateFor(ctx, directory)
 	if err != nil && !absto.IsNotExist(err) {
 		return fmt.Errorf("get aggregate: %w", err)
 	}
 
 	aggregate.Cover = item.Name
 
-	if err := a.exifApp.SaveAggregateFor(ctx, directory, aggregate); err != nil {
+	if err := a.metadataApp.SaveAggregateFor(ctx, directory, aggregate); err != nil {
 		return fmt.Errorf("save aggregate: %w", err)
 	}
 

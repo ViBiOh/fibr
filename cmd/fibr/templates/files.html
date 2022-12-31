@@ -9,7 +9,7 @@
 
   {{ if .Request.CanEdit }}
     <link rel="preload" as="image" href="{{ url "/svg/upload?fill=aliceblue" }}">
-    <link rel="preload" as="image" href="{{ url "/svg/folder-solid?fill=aliceblue" }}">
+    <link rel="preload" as="image" href="{{ url "/svg/folder?fill=aliceblue" }}">
     <link rel="preload" as="image" href="{{ url "/svg/times?fill=crimson" }}">
     <link rel="preload" as="image" href="{{ url "/svg/pencil-alt?fill=aliceblue" }}">
 
@@ -161,15 +161,15 @@
 
   <div class="content">
     <div id="menu" class="flex flex-center">
-      <a id="list-display" class="button button-icon" href="?d=list">
-        <img class="icon" src="{{ url "/svg/list?fill=aliceblue" }}" alt="List">
+      <a id="list-display" class="button button-icon" href="?d=list" title="List layout">
+        <img class="icon" src="{{ url "/svg/list?fill=aliceblue" }}" alt="list">
       </a>
-      <a id="grid-display" class="button button-icon" href="?d=grid">
-        <img class="icon" src="{{ url "/svg/grid?fill=aliceblue" }}" alt="Grid">
+      <a id="grid-display" class="button button-icon" href="?d=grid" title="Grid layout">
+        <img class="icon" src="{{ url "/svg/grid?fill=aliceblue" }}" alt="grid">
       </a>
       {{ if .HasStory }}
-        <a id="story-display" class="button button-icon" href="?d=story">
-          <img class="icon" src="{{ url "/svg/image?fill=aliceblue" }}" alt="Image story">
+        <a id="story-display" class="button button-icon" href="?d=story" title="Story layout">
+          <img class="icon" src="{{ url "/svg/image?fill=aliceblue" }}" alt="picture">
         </a>
       {{ end }}
 
@@ -177,35 +177,35 @@
       <span class="flex-grow"></span>
 
       {{ if .Request.CanEdit }}
-        <a id="upload-button-link" href="#upload-modal" class="button button-icon">
-          <img class="icon" src="{{ url "/svg/upload?fill=aliceblue" }}" alt="Upload">
+        <a id="upload-button-link" href="#upload-modal" class="button button-icon" title="Upload file">
+          <img class="icon" src="{{ url "/svg/upload?fill=aliceblue" }}" alt="upload">
         </a>
-        <a href="#folder-modal" class="button button-icon">
-          <img class="icon" src="{{ url "/svg/folder-plus?fill=aliceblue" }}" alt="Create folder">
+        <a href="#folder-modal" class="button button-icon" title="Create folder">
+          <img class="icon" src="{{ url "/svg/folder-plus?fill=aliceblue" }}" alt="folder with a plus">
         </a>
       {{ end }}
 
       {{ if .Request.CanShare }}
-        <a href="#share-list" class="button button-icon">
-          <img class="icon" src="{{ url "/svg/share?fill=aliceblue" }}" alt="Share">
+        <a href="#share-list" class="button button-icon" title="Share">
+          <img class="icon" src="{{ url "/svg/share?fill=aliceblue" }}" alt="share">
         </a>
       {{ end }}
 
       {{ if .Request.CanWebhook }}
-        <a href="#webhook-list" class="button button-icon">
-          <img class="icon" src="{{ url "/svg/webhook?fill=aliceblue" }}" alt="Webhook">
+        <a href="#webhook-list" class="button button-icon" title="Webhook">
+          <img class="icon" src="{{ url "/svg/webhook?fill=aliceblue" }}" alt="webhook">
         </a>
       {{ end }}
 
       {{ if gt (len .Files) 0 }}
-        <a class="padding" href="?download" download>
-          <img class="icon" src="{{ url "/svg/download?fill=aliceblue" }}" alt="Download">
+        <a class="padding" href="?download" title="Download files in an archive" download>
+          <img class="icon" src="{{ url "/svg/download?fill=aliceblue" }}" alt="download">
         </a>
       {{ end }}
 
       {{ if .HasMap }}
-        <a class="padding" href="#map" download>
-          <img class="icon" src="{{ url "/svg/map?fill=aliceblue" }}" alt="View on map">
+        <a class="padding" href="#map" title="View on map">
+          <img class="icon" src="{{ url "/svg/map?fill=aliceblue" }}" alt="map">
         </a>
       {{ end }}
     </div>
@@ -213,13 +213,13 @@
     <ul id="files" class="no-margin no-padding">
       {{ range .SavedSearches }}
         <li class="file relative padding-half">
-          <a class="filelink center ellipsis" href="?{{ raw .Query }}" title="{{ .Name }}">
-            <img class="icon {{ if eq $root.Request.Display "grid" }}icon-large{{ end }}" src="{{ url "/svg/folder-search?fill=aliceblue" }}" alt="Saved Search">
+          <a class="filelink center ellipsis" href="?{{ raw .Query }}" title="Saved search {{ .Name }}">
+            <img class="icon {{ if eq $root.Request.Display "grid" }}icon-large{{ end }}" src="{{ url "/svg/folder-search?fill=aliceblue" }}" alt="folder with magnifying glass">
             <span class="filename ellipsis {{ if eq $root.Request.Display "list" }}padding-left{{ end }}">{{ .Name }}</span>
 
             {{ if $root.Request.CanEdit }}
               <a href="#delete-saved-search-modal-{{ .ID }}" class="button button-icon file-delete" title="Delete">
-                <img class="icon icon-square" src="{{ url "/svg/times?fill=crimson" }}" alt="Delete">
+                <img class="icon icon-square" src="{{ url "/svg/times?fill=crimson" }}" alt="delete">
               </a>
             {{ end }}
           </a>
@@ -233,36 +233,46 @@
               {{ template "async-image-item" . }}
 
               {{ if .IsVideo }}
-                <img class="icon icon-overlay" src="{{ url "/svg/play?fill=rgba(192,192,192,0.8)" }}" alt="Play video">
+                <img class="icon icon-overlay" src="{{ url "/svg/play?fill=rgba(192,192,192,0.8)" }}" alt="play icon" title="Play video">
               {{ end }}
 
               {{ if .IsCover }}
-                <img class="icon icon-overlay-small" src="{{ url "/svg/rss?fill=rgba(192,192,192,0.8)" }}" alt="Is cover image" title="Is cover image">
+                <img class="icon icon-overlay-small" src="{{ url "/svg/rss?fill=rgba(192,192,192,0.8)" }}" alt="waves" title="Is cover image">
               {{ end }}
             {{ else }}
-              <img class="icon {{ if eq $root.Request.Display "grid" }}icon-large{{ end }}" src="{{ url "/svg/" }}{{ if .IsDir }}folder{{ else }}{{ iconFromExtension . }}{{ end }}?fill=aliceblue" alt="{{ if .IsDir }}Folder{{ else }}File{{ end }}">
+              <img class="icon {{ if eq $root.Request.Display "grid" }}icon-large{{ end }}" src="{{ url "/svg/" }}{{ if .IsDir }}folder{{ else }}{{ iconFromExtension . }}{{ end }}?fill=aliceblue" alt="{{ if .IsDir }}folder{{ else }}file{{ end }}">
               <span class="filename ellipsis {{ if eq $root.Request.Display "list" }}padding-left{{ end }}">{{ .Name }}</span>
             {{ end }}
 
-            <a href="{{ .URL }}?download" class="button button-icon file-download" title="Download" download="{{ .Name }}">
-              <img class="icon icon-square" src="{{ url "/svg/download?fill=aliceblue" }}" alt="Download">
+            <a href="{{ .URL }}?download" class="button button-icon file-download" title="Download {{ .Name }}" download="{{ .Name }}">
+              <img class="icon icon-square" src="{{ url "/svg/download?fill=aliceblue" }}" alt="download">
             </a>
 
             {{ if $root.Request.CanShare }}
-              <a href="#share-form-{{ .ID }}" class="button button-icon file-share" title="Share">
-                <img class="icon icon-square" src="{{ url "/svg/share?fill=aliceblue" }}" alt="Share {{ .Name }}">
+              <a href="#share-form-{{ .ID }}" class="button button-icon file-share" title="Share {{ .Name }}">
+                <img class="icon icon-square" src="{{ url "/svg/share?fill=aliceblue" }}" alt="share">
               </a>
             {{ end }}
 
             {{ if $root.Request.CanEdit }}
-              <a href="#edit-modal-{{ .ID }}" class="button button-icon file-edit" title="Edit">
-                <img class="icon icon-square" src="{{ url "/svg/pencil-alt?fill=aliceblue" }}" alt="Edit">
+              <a href="#edit-modal-{{ .ID }}" class="button button-icon file-edit" title="Edit {{ .Name }}">
+                <img class="icon icon-square" src="{{ url "/svg/pencil-alt?fill=aliceblue" }}" alt="edit">
               </a>
-              <a href="#delete-modal-{{ .ID }}" class="button button-icon file-delete" title="Delete">
-                <img class="icon icon-square" src="{{ url "/svg/times?fill=crimson" }}" alt="Delete">
+              <a href="#delete-modal-{{ .ID }}" class="button button-icon file-delete" title="Delete {{ .Name }}">
+                <img class="icon icon-square" src="{{ url "/svg/times?fill=crimson" }}" alt="delete">
               </a>
             {{ end }}
           </a>
+
+          {{ if .Tags }}
+            {{- if eq $root.Request.Display "grid" -}}
+              <img class="icon tags" src="{{ url "/svg/tag" }}?fill=aliceblue" alt="tag" title="#{{ join .Tags " #" }}">
+            {{ else }}
+              <em class="tags ellipsis padding-left">
+                #{{ join .Tags " #" }}
+              </em>
+            {{ end}}
+          {{ end }}
 
           {{ if .IsDir }}
             {{ if or .Aggregate.Location (not .Aggregate.Start.IsZero) }}
@@ -273,7 +283,7 @@
                 <img
                   class="icon exif"
                   src="{{ url "/svg/info" }}?fill=aliceblue"
-                  alt="Exif"
+                  alt="exif"
                   title="
                     {{- if .Aggregate.Location }}
                       {{- .Aggregate.Location }}

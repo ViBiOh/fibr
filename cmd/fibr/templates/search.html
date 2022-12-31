@@ -70,11 +70,11 @@
 
   <div class="content">
     <div id="menu" class="flex flex-center">
-      <a id="list-display" class="button button-icon" href="?d=list&{{ raw .Search.Encode }}">
-        <img class="icon" src="{{ url "/svg/list?fill=aliceblue" }}" alt="List">
+      <a id="list-display" class="button button-icon" href="?d=list&{{ raw .Search.Encode }}" title="List layout">
+        <img class="icon" src="{{ url "/svg/list?fill=aliceblue" }}" alt="list">
       </a>
-      <a id="grid-display" class="button button-icon" href="?d=grid&{{ raw .Search.Encode }}">
-        <img class="icon" src="{{ url "/svg/grid?fill=aliceblue" }}" alt="Grid">
+      <a id="grid-display" class="button button-icon" href="?d=grid&{{ raw .Search.Encode }}" title="Grid layout">
+        <img class="icon" src="{{ url "/svg/grid?fill=aliceblue" }}" alt="grid">
       </a>
 
       <span class="padding-left">
@@ -84,14 +84,14 @@
       <span class="flex-grow"></span>
 
       {{ if gt (len .Files) 0 }}
-        <a class="padding" href="?download&{{ raw .Search.Encode }}" download>
-          <img class="icon" src="{{ url "/svg/download?fill=aliceblue" }}" alt="Download">
+        <a class="padding" href="?download&{{ raw .Search.Encode }}" title="Download results in an archive" download>
+          <img class="icon" src="{{ url "/svg/download?fill=aliceblue" }}" alt="download">
         </a>
       {{ end }}
 
       {{ if .HasMap }}
-        <a class="padding" href="#map" download>
-          <img class="icon" src="{{ url "/svg/map?fill=aliceblue" }}" alt="View on map">
+        <a class="padding" href="#map" title="View on map">
+          <img class="icon" src="{{ url "/svg/map?fill=aliceblue" }}" alt="map">
         </a>
       {{ end }}
     </div>
@@ -110,15 +110,15 @@
               {{ template "async-image-item" . }}
 
               {{ if .IsVideo }}
-                <img class="icon icon-overlay" src="{{ url "/svg/play?fill=rgba(192,192,192,0.8)" }}" alt="Play video">
+                <img class="icon icon-overlay" src="{{ url "/svg/play?fill=rgba(192,192,192,0.8)" }}" alt="play icon" title="Play video">
               {{ end }}
             {{ else }}
-              <img class="icon {{ if eq $root.Request.Display "grid" }}icon-large{{ end }}" src="{{ url "/svg/" }}{{ if .IsDir }}folder{{ else }}{{ iconFromExtension . }}{{ end }}?fill=aliceblue" alt="{{ if .IsDir }}Folder{{ else }}File{{ end }}">
+              <img class="icon {{ if eq $root.Request.Display "grid" }}icon-large{{ end }}" src="{{ url "/svg/" }}{{ if .IsDir }}folder{{ else }}{{ iconFromExtension . }}{{ end }}?fill=aliceblue" alt="{{ if .IsDir }}folder{{ else }}file{{ end }}">
               <span class="filename ellipsis {{ if eq $root.Request.Display "list" }}padding-left{{ end }}">{{ .URL }}</span>
             {{ end }}
 
-            <a href="{{ .URL }}?download" class="button button-icon file-download" title="Download" download="{{ .Name }}">
-              <img class="icon" src="{{ url "/svg/download?fill=aliceblue" }}" alt="Download">
+            <a href="{{ .URL }}?download" class="button button-icon file-download" title="Download {{ .Name }}" download="{{ .Name }}">
+              <img class="icon" src="{{ url "/svg/download?fill=aliceblue" }}" alt="download">
             </a>
           </a>
         </li>

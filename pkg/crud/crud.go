@@ -34,7 +34,7 @@ type App struct {
 	storageApp      absto.Storage
 	shareApp        provider.ShareManager
 	webhookApp      provider.WebhookManager
-	exifApp         provider.MetadataManager
+	metadataApp     provider.MetadataManager
 	searchApp       search.App
 	pushEvent       provider.EventProducer
 	exclusiveApp    exclusive.App
@@ -77,7 +77,7 @@ func New(config Config, storageApp absto.Storage, filteredStorage absto.Storage,
 		storageApp:    filteredStorage,
 		rendererApp:   rendererApp,
 		thumbnailApp:  thumbnailApp,
-		exifApp:       exifApp,
+		metadataApp:   exifApp,
 		shareApp:      shareApp,
 		webhookApp:    webhookApp,
 		searchApp:     searchApp,

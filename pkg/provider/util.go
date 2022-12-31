@@ -265,13 +265,3 @@ func EtagMatch(w http.ResponseWriter, r *http.Request, hash string) (etag string
 
 	return
 }
-
-func findIndex(arr []string, value string) int {
-	for index, item := range arr {
-		if item == value {
-			return index
-		}
-	}
-
-	return -1
-}

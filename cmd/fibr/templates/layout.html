@@ -33,37 +33,40 @@
         {{ end }}
       </span>
 
-      {{ if not (and .Previous.IsZero .Next.IsZero) }}
-        <nav class="flex">
-          {{ if not .Previous.IsZero }}
-            <a class="button button-icon" href="{{ url (.Request.AbsoluteURL .Previous.URL) }}?browser">
-              <img class="icon" src="{{ url "/svg/arrow-left?fill=aliceblue" }}" alt="Previous file">
-            </a>
-          {{ end }}
+      <nav class="flex">
+        {{ if not .Previous.IsZero }}
+          <a class="button button-icon" href="{{ url (.Request.AbsoluteURL .Previous.URL) }}?browser" title="Previous file">
+            <img class="icon" src="{{ url "/svg/arrow-left?fill=aliceblue" }}" alt="left arrow">
+          </a>
+        {{ end }}
 
-          {{ if not .Next.IsZero }}
-            <a class="button button-icon" href="{{ url (.Request.AbsoluteURL .Next.URL) }}?browser">
-              <img class="icon" src="{{ url "/svg/arrow-right?fill=aliceblue" }}" alt="Next file">
-            </a>
-          {{ end }}
-        </nav>
-      {{ end }}
+        {{ if not .Next.IsZero }}
+          <a class="button button-icon" href="{{ url (.Request.AbsoluteURL .Next.URL) }}?browser" title="Next file">
+            <img class="icon" src="{{ url "/svg/arrow-right?fill=aliceblue" }}" alt="right arrow">
+          </a>
+        {{ end }}
+
+        {{- $url := .Request.AbsoluteURL "/" }}
+        <a class="button button-icon" href="{{ url $url }}?d={{ .Request.LayoutPath $url }}" title="Back to folder">
+          <img class="icon" src="{{ url "/svg/folder-back?fill=aliceblue" }}" alt="folder back">
+        </a>
+      </nav>
     {{ else }}
       </span>
       {{ if .Request.Share.Story }}
         {{ if .HasMap }}
-          <a class="padding" href="#map" download>
-            <img class="icon" src="{{ url "/svg/map?fill=aliceblue" }}" alt="View on map">
+          <a class="padding" href="#map" title="View on map">
+            <img class="icon" src="{{ url "/svg/map?fill=aliceblue" }}" alt="map">
           </a>
         {{ end }}
       {{ else }}
         {{ if and .Request.CanEdit .Search }}
-          <a class="padding" href="#create-saved-search">
-            <img class="icon" src="{{ url "/svg/folder-search?fill=" }}aliceblue" alt="Created saved search folder">
+          <a class="padding" href="#create-saved-search" title="Created saved search folder">
+            <img class="icon" src="{{ url "/svg/folder-search?fill=" }}aliceblue" alt="folder with magnifying glass">
           </a>
         {{ end }}
-        <a class="padding" href="#search" download>
-          <img class="icon" src="{{ url "/svg/search?fill=" }}{{ if .Search }}limegreen{{ else }}aliceblue{{ end }}" alt="Search files">
+        <a class="padding" href="#search" title="Search files">
+          <img class="icon" src="{{ url "/svg/search?fill=" }}{{ if .Search }}limegreen{{ else }}aliceblue{{ end }}" alt="magnifying glass">
         </a>
       {{ end }}
     {{ end }}

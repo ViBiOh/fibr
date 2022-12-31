@@ -57,7 +57,7 @@
       </video>
     {{ else }}
       {{ if .File.IsImage }}
-        <img src="{{ $url }}" alt="{{ .File.Name }}" />
+        <img src="{{ $url }}" alt="Image {{ .File.Name }}" />
       {{ else }}
         <object data="{{ $url }}" type="{{ .File.Mime }}"></object>
       {{ end }}

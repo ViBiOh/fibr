@@ -35,7 +35,7 @@ func (a App) list(ctx context.Context, request provider.Request, message rendere
 	wg.Go(func() {
 		var err error
 
-		directoryAggregate, err = a.exifApp.GetAggregateFor(ctx, item)
+		directoryAggregate, err = a.metadataApp.GetAggregateFor(ctx, item)
 		if err != nil && !absto.IsNotExist(err) {
 			listLogger(item.Pathname).Error("get aggregate: %s", err)
 		}
@@ -45,9 +45,19 @@ func (a App) list(ctx context.Context, request provider.Request, message rendere
 	wg.Go(func() {
 		var err error
 
-		aggregates, err = a.exifApp.GetAllAggregateFor(ctx, files...)
+		aggregates, err = a.metadataApp.GetAllAggregateFor(ctx, files...)
 		if err != nil {
-			listLogger(item.Pathname).Error("list exifs: %s", err)
+			listLogger(item.Pathname).Error("list aggregates: %s", err)
+		}
+	})
+
+	var metadatas map[string]provider.Metadata
+	wg.Go(func() {
+		var err error
+
+		metadatas, err = a.metadataApp.GetAllMetadataFor(ctx, files...)
+		if err != nil {
+			listLogger(item.Pathname).Error("list metadatas: %s", err)
 		}
 	})
 
@@ -85,8 +95,13 @@ func (a App) list(ctx context.Context, request provider.Request, message rendere
 
 	for index, item := range files {
 		renderItem := provider.StorageToRender(item, request)
-		renderItem.Aggregate = aggregates[item.ID]
-		renderItem.IsCover = item.Name == directoryAggregate.Cover
+		renderItem.Tags = metadatas[item.ID].Tags
+
+		if item.IsDir {
+			renderItem.Aggregate = aggregates[item.ID]
+		} else {
+			renderItem.IsCover = item.Name == directoryAggregate.Cover
+		}
 
 		items[index] = renderItem
 	}

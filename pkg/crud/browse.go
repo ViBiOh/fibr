@@ -23,7 +23,7 @@ func (a App) browse(ctx context.Context, request provider.Request, item absto.It
 		previous provider.RenderItem
 		next     provider.RenderItem
 		files    []absto.Item
-		exif     provider.Metadata
+		metadata provider.Metadata
 	)
 
 	wg := concurrent.NewSimple()
@@ -38,9 +38,9 @@ func (a App) browse(ctx context.Context, request provider.Request, item absto.It
 
 	wg.Go(func() {
 		var err error
-		exif, err = a.exifApp.GetMetadataFor(ctx, item)
+		metadata, err = a.metadataApp.GetMetadataFor(ctx, item)
 		if err != nil && !absto.IsNotExist(err) {
-			logger.WithField("item", item.Pathname).Error("load exif: %s", err)
+			logger.WithField("item", item.Pathname).Error("load metadata: %s", err)
 		}
 	})
 
@@ -54,7 +54,7 @@ func (a App) browse(ctx context.Context, request provider.Request, item absto.It
 	return renderer.NewPage("file", http.StatusOK, map[string]any{
 		"Paths":     getPathParts(request),
 		"File":      renderItem,
-		"Exif":      exif,
+		"Exif":      metadata,
 		"Cover":     a.getCover(ctx, request, files),
 		"HasStream": renderItem.IsVideo() && a.thumbnailApp.HasStream(ctx, item),
 

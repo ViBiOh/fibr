@@ -18,7 +18,7 @@ func (a App) Update(ctx context.Context, item absto.Item, opts ...provider.Metad
 
 		metadata, err := a.GetMetadataFor(ctx, item)
 		if err != nil && !absto.IsNotExist(err) {
-			logger.WithField("item", item.Pathname).Error("load exif: %s", err)
+			logger.WithField("item", item.Pathname).Error("load metadata: %s", err)
 		}
 
 		for _, opt := range opts {
@@ -26,7 +26,7 @@ func (a App) Update(ctx context.Context, item absto.Item, opts ...provider.Metad
 		}
 
 		if err = a.exifCacheApp.EvictOnSuccess(ctx, item, a.saveMetadata(ctx, item, metadata)); err != nil {
-			return fmt.Errorf("save exif: %w", err)
+			return fmt.Errorf("save metadata: %w", err)
 		}
 
 		return nil

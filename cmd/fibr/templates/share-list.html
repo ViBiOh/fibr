@@ -35,16 +35,16 @@
                 </th>
                 <td class="center">
                   {{ if .Edit }}
-                    <img class="icon" src="{{ url "/svg/edit?fill=aliceblue" }}" alt="Editable">
+                    <img class="icon" src="{{ url "/svg/edit?fill=aliceblue" }}" alt="pencil" title="Editable">
                   {{ end }}
                   {{ if .Story }}
-                    <img class="icon" src="{{ url "/svg/image?fill=aliceblue" }}" alt="Story mode">
+                    <img class="icon" src="{{ url "/svg/image?fill=aliceblue" }}" alt="image" title="Story mode">
                   {{ end }}
                   {{ if .Password }}
-                    <img class="icon" src="{{ url "/svg/lock?fill=aliceblue" }}" alt="Password protected">
+                    <img class="icon" src="{{ url "/svg/lock?fill=aliceblue" }}" alt="lock" title="Password protected">
                   {{ end }}
                   {{ if .Duration }}
-                    <img class="icon" src="{{ url "/svg/hourglass?fill=aliceblue" }}" alt="Duration">
+                    <img class="icon" src="{{ url "/svg/hourglass?fill=aliceblue" }}" alt="hourglass" title="Duration">
                     {{ .Duration.Hours }}h
                   {{ end }}
                 </td>
@@ -53,7 +53,7 @@
                     <input type="hidden" name="type" value="share" />
                     <input type="hidden" name="method" value="DELETE" />
                     <input type="hidden" name="id" value="{{ .ID }}" />
-                    <button id="share-delete-{{ .ID }}" type="submit" class="button button-icon" title="Delete" data-confirm="share for {{ .Path }}">
+                    <button id="share-delete-{{ .ID }}" type="submit" class="button button-icon" title="Delete {{ .Path }}" data-confirm="share for {{ .Path }}">
                       <img class="icon" src="{{ url "/svg/times?fill=crimson" }}" alt="Delete">
                     </button>
                   </form>

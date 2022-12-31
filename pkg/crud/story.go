@@ -28,7 +28,7 @@ func (a App) story(r *http.Request, request provider.Request, item absto.Item, f
 	wg.Go(func() {
 		var err error
 
-		directoryAggregate, err = a.exifApp.GetAggregateFor(ctx, item)
+		directoryAggregate, err = a.metadataApp.GetAggregateFor(ctx, item)
 		if err != nil && !absto.IsNotExist(err) {
 			logger.WithField("fn", "crud.story").WithField("item", request.Path).Error("get aggregate: %s", err)
 		}
@@ -38,7 +38,7 @@ func (a App) story(r *http.Request, request provider.Request, item absto.Item, f
 	wg.Go(func() {
 		var err error
 
-		exifs, err = a.exifApp.GetAllMetadataFor(ctx, files...)
+		exifs, err = a.metadataApp.GetAllMetadataFor(ctx, files...)
 		if err != nil {
 			logger.WithField("fn", "crud.story").WithField("item", request.Path).Error("list exifs: %s", err)
 		}

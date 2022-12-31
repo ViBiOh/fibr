@@ -270,7 +270,7 @@ func (a App) thumbnailHash(ctx context.Context, items []absto.Item) string {
 	}
 
 	thumbnails, err := a.cacheApp.List(ctx, onCacheError, ids...)
-	if err != nil {
+	if err != nil && !absto.IsNotExist(err) {
 		logger.Error("list thumbnails from cache: %s", err)
 	}
 

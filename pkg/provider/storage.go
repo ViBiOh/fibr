@@ -56,9 +56,11 @@ func (a ByID) Less(i, j int) bool {
 }
 
 type RenderItem struct {
-	Aggregate
-	URL  string
-	Path string
+	Aggregate Aggregate
+	Tags      []string
+	URL       string
+	Path      string
+
 	absto.Item
 	HasThumbnail bool
 	IsCover      bool

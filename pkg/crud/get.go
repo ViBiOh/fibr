@@ -198,7 +198,7 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 	var hash string
 	if query.GetBool(r, "search") {
 		hash = a.exifHash(ctx, items)
-	} else if exifs, err := a.exifApp.ListDir(ctx, item); err != nil {
+	} else if exifs, err := a.metadataApp.ListDir(ctx, item); err != nil {
 		logger.WithField("item", item.Pathname).Error("list exifs: %s", err)
 	} else {
 		hash = sha.New(exifs)
@@ -209,7 +209,7 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 		return
 	}
 
-	exifs, err := a.exifApp.GetAllMetadataFor(ctx, items...)
+	exifs, err := a.metadataApp.GetAllMetadataFor(ctx, items...)
 	if err != nil {
 		a.error(w, r, request, err)
 	}
