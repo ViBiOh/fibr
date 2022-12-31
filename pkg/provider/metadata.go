@@ -46,6 +46,24 @@ func ReplaceDescription(description string) MetadataAction {
 	}
 }
 
+func AddTag(tag string) MetadataAction {
+	return func(instance Metadata) Metadata {
+		instance.Tags = append(instance.Tags, tag)
+
+		return instance
+	}
+}
+
+func RemoveTag(tag string) MetadataAction {
+	return func(instance Metadata) Metadata {
+		if index := findIndex(instance.Tags, tag); index != -1 {
+			instance.Tags = append(instance.Tags[:index], instance.Tags[index+1:]...)
+		}
+
+		return instance
+	}
+}
+
 type MetadataManager interface {
 	ListDir(ctx context.Context, item absto.Item) ([]absto.Item, error)
 
