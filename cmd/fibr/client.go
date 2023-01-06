@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
@@ -22,14 +23,14 @@ type client struct {
 	health     health.App
 }
 
-func newClient(config configuration) (client, error) {
+func newClient(ctx context.Context, config configuration) (client, error) {
 	var output client
 	var err error
 
 	output.logger = logger.New(config.logger)
 	logger.Global(output.logger)
 
-	output.tracer, err = tracer.New(config.tracer)
+	output.tracer, err = tracer.New(ctx, config.tracer)
 	if err != nil {
 		return output, fmt.Errorf("tracer: %w", err)
 	}
@@ -51,8 +52,8 @@ func newClient(config configuration) (client, error) {
 	return output, nil
 }
 
-func (c client) Close() {
+func (c client) Close(ctx context.Context) {
 	c.amqp.Close()
-	c.tracer.Close()
+	c.tracer.Close(ctx)
 	c.logger.Close()
 }

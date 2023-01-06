@@ -67,12 +67,14 @@ func main() {
 		fmt.Println(http.ListenAndServe("localhost:9999", http.DefaultServeMux))
 	}()
 
-	client, err := newClient(config)
+	ctx := context.Background()
+
+	client, err := newClient(ctx, config)
 	if err != nil {
 		logger.Fatal(fmt.Errorf("client: %w", err))
 	}
 
-	defer client.Close()
+	defer client.Close(ctx)
 
 	appServer := server.New(config.appServer)
 	promServer := server.New(config.promServer)
@@ -133,20 +135,20 @@ func main() {
 	fibrApp := fibr.New(&crudApp, rendererApp, shareApp, webhookApp, middlewareApp)
 	handler := rendererApp.Handler(fibrApp.TemplateFunc)
 
-	amqpCtx := context.Background()
-	ctx := client.health.Context()
+	doneCtx := client.health.ContextDone()
+	endCtx := client.health.ContextEnd()
 
-	go amqpThumbnailApp.Start(amqpCtx, client.health.Done())
-	go amqpExifApp.Start(amqpCtx, client.health.Done())
-	go amqpShareApp.Start(amqpCtx, client.health.Done())
-	go amqpWebhookApp.Start(amqpCtx, client.health.Done())
-	go webhookApp.Start(ctx)
-	go shareApp.Start(ctx)
-	go crudApp.Start(ctx)
-	go eventBus.Start(ctx, storageApp, []provider.Renamer{thumbnailApp.Rename, metadataApp.Rename}, shareApp.EventConsumer, thumbnailApp.EventConsumer, metadataApp.EventConsumer, webhookApp.EventConsumer)
+	go amqpThumbnailApp.Start(doneCtx)
+	go amqpExifApp.Start(doneCtx)
+	go amqpShareApp.Start(doneCtx)
+	go amqpWebhookApp.Start(doneCtx)
+	go webhookApp.Start(endCtx)
+	go shareApp.Start(endCtx)
+	go crudApp.Start(endCtx)
+	go eventBus.Start(endCtx, storageApp, []provider.Renamer{thumbnailApp.Rename, metadataApp.Rename}, shareApp.EventConsumer, thumbnailApp.EventConsumer, metadataApp.EventConsumer, webhookApp.EventConsumer)
 
-	go promServer.Start("prometheus", client.health.End(), client.prometheus.Handler())
-	go appServer.Start("http", client.health.End(), httputils.Handler(handler, client.health, recoverer.Middleware, client.prometheus.Middleware, client.tracer.Middleware, owasp.New(config.owasp).Middleware))
+	go promServer.Start(endCtx, "prometheus", client.prometheus.Handler())
+	go appServer.Start(endCtx, "http", httputils.Handler(handler, client.health, recoverer.Middleware, client.prometheus.Middleware, client.tracer.Middleware, owasp.New(config.owasp).Middleware))
 
 	client.health.WaitForTermination(appServer.Done())
 	server.GracefulWait(appServer.Done(), promServer.Done(), amqpExifApp.Done(), amqpShareApp.Done(), amqpWebhookApp.Done(), eventBus.Done())
