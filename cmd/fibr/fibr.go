@@ -135,8 +135,8 @@ func main() {
 	fibrApp := fibr.New(&crudApp, rendererApp, shareApp, webhookApp, middlewareApp)
 	handler := rendererApp.Handler(fibrApp.TemplateFunc)
 
-	doneCtx := client.health.ContextDone()
-	endCtx := client.health.ContextEnd()
+	doneCtx := client.health.Done(ctx)
+	endCtx := client.health.End(ctx)
 
 	go amqpThumbnailApp.Start(doneCtx)
 	go amqpExifApp.Start(doneCtx)
