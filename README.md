@@ -171,7 +171,7 @@ This is for local purpose with simple and hassle-free sharing in a private netwo
 go install github.com/ViBiOh/fibr/cmd/fibr@latest
 fibr \
   -noAuth \
-  -storageDirectory "$(pwd)" \
+  -storageFileSystemDirectory "$(pwd)" \
   -thumbnailURL "" \
   -exifURL ""
 ```

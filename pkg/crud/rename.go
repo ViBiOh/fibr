@@ -108,7 +108,13 @@ func (a App) Rename(w http.ResponseWriter, r *http.Request, request provider.Req
 			}
 		}
 
-		if _, err = a.metadataApp.Update(ctx, newItem, provider.ReplaceTags(strings.Split(r.Form.Get("tags"), " "))); err != nil {
+		var tags []string
+
+		if rawTags := r.Form.Get("tags"); len(rawTags) > 0 {
+			tags = strings.Split(rawTags, " ")
+		}
+
+		if _, err = a.metadataApp.Update(ctx, newItem, provider.ReplaceTags(tags)); err != nil {
 			a.error(w, r, request, model.WrapInternal(err))
 			return
 		}
