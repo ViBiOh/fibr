@@ -353,7 +353,7 @@ Usage of fibr:
   -publicURL string
         Public URL {FIBR_PUBLIC_URL} (default "http://localhost:1080")
   -readTimeout duration
-        [server] Read Timeout {FIBR_READ_TIMEOUT} (default 1m0s)
+        [server] Read Timeout {FIBR_READ_TIMEOUT} (default 2m0s)
   -redisAddress string
         [redis] Redis Address fqdn:port (blank to disable) {FIBR_REDIS_ADDRESS}
   -redisAlias string
@@ -368,8 +368,6 @@ Usage of fibr:
         [crud] Sanitize name on start {FIBR_SANITIZE_ON_START}
   -shareAmqpExchange string
         [share] AMQP Exchange Name {FIBR_SHARE_AMQP_EXCHANGE} (default "fibr.shares")
-  -shareAmqpExclusiveRoutingKey string
-        [share] AMQP Routing Key for exclusive lock on default exchange {FIBR_SHARE_AMQP_EXCLUSIVE_ROUTING_KEY} (default "fibr.semaphore.shares")
   -shareAmqpRoutingKey string
         [share] AMQP Routing Key for share {FIBR_SHARE_AMQP_ROUTING_KEY} (default "share")
   -shutdownTimeout duration
@@ -431,7 +429,7 @@ Usage of fibr:
   -webhookSecret string
         [webhook] Secret for HMAC Signature {FIBR_WEBHOOK_SECRET}
   -writeTimeout duration
-        [server] Write Timeout {FIBR_WRITE_TIMEOUT} (default 1m0s)
+        [server] Write Timeout {FIBR_WRITE_TIMEOUT} (default 2m0s)
 ```
 
 # Caveats
