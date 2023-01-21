@@ -74,10 +74,8 @@ func (a *App) Create(ctx context.Context, filepath string, edit, story bool, pas
 			return fmt.Errorf("save shares: %w", err)
 		}
 
-		if a.amqpClient != nil {
-			if err = a.amqpClient.PublishJSON(ctx, share, a.amqpExchange, a.amqpRoutingKey); err != nil {
-				return fmt.Errorf("publish share creation: %w", err)
-			}
+		if err = a.redisClient.PublishJSON(ctx, a.pubsubChannel, share); err != nil {
+			return fmt.Errorf("publish share creation: %w", err)
 		}
 
 		return nil
@@ -101,10 +99,8 @@ func (a *App) delete(ctx context.Context, id string) error {
 		return fmt.Errorf("save shares: %w", err)
 	}
 
-	if a.amqpClient != nil {
-		if err := a.amqpClient.PublishJSON(ctx, provider.Share{ID: id}, a.amqpExchange, a.amqpRoutingKey); err != nil {
-			return fmt.Errorf("publish share deletion: %w", err)
-		}
+	if err := a.redisClient.PublishJSON(ctx, a.pubsubChannel, provider.Share{ID: id}); err != nil {
+		return fmt.Errorf("publish share deletion: %w", err)
 	}
 
 	return nil

@@ -107,16 +107,13 @@ func main() {
 	webhookApp, err := webhook.New(config.webhook, storageApp, prometheusRegisterer, client.amqp, rendererApp, thumbnailApp, exclusiveApp)
 	logger.Fatal(err)
 
-	shareApp, err := share.New(config.share, storageApp, client.amqp, exclusiveApp)
+	shareApp, err := share.New(config.share, storageApp, client.redis, exclusiveApp)
 	logger.Fatal(err)
 
 	amqpThumbnailApp, err := amqphandler.New(config.amqpThumbnail, client.amqp, client.tracer.GetTracer("amqp_handler_thumbnail"), thumbnailApp.AMQPHandler)
 	logger.Fatal(err)
 
 	amqpExifApp, err := amqphandler.New(config.amqpExif, client.amqp, client.tracer.GetTracer("amqp_handler_exif"), metadataApp.AMQPHandler)
-	logger.Fatal(err)
-
-	amqpShareApp, err := amqphandler.New(config.amqpShare, client.amqp, client.tracer.GetTracer("amqp_handler_share"), shareApp.AMQPHandler)
 	logger.Fatal(err)
 
 	amqpWebhookApp, err := amqphandler.New(config.amqpWebhook, client.amqp, client.tracer.GetTracer("amqp_handler_webhook"), webhookApp.AMQPHandler)
@@ -140,7 +137,6 @@ func main() {
 
 	go amqpThumbnailApp.Start(doneCtx)
 	go amqpExifApp.Start(doneCtx)
-	go amqpShareApp.Start(doneCtx)
 	go amqpWebhookApp.Start(doneCtx)
 	go webhookApp.Start(endCtx)
 	go shareApp.Start(endCtx)
@@ -151,5 +147,5 @@ func main() {
 	go appServer.Start(endCtx, "http", httputils.Handler(handler, client.health, recoverer.Middleware, client.prometheus.Middleware, client.tracer.Middleware, owasp.New(config.owasp).Middleware))
 
 	client.health.WaitForTermination(appServer.Done())
-	server.GracefulWait(appServer.Done(), promServer.Done(), amqpExifApp.Done(), amqpShareApp.Done(), amqpWebhookApp.Done(), eventBus.Done())
+	server.GracefulWait(appServer.Done(), promServer.Done(), amqpExifApp.Done(), amqpWebhookApp.Done(), eventBus.Done(), shareApp.Done())
 }

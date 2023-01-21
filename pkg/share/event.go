@@ -32,10 +32,8 @@ func (a *App) renameItem(ctx context.Context, old, new absto.Item) error {
 				share.Path = strings.Replace(share.Path, old.Pathname, new.Pathname, 1)
 				a.shares[id] = share
 
-				if a.amqpClient != nil {
-					if err := a.amqpClient.PublishJSON(ctx, share, a.amqpExchange, a.amqpRoutingKey); err != nil {
-						return fmt.Errorf("publish share rename: %w", err)
-					}
+				if err := a.redisClient.PublishJSON(ctx, a.pubsubChannel, share); err != nil {
+					return fmt.Errorf("publish share rename: %w", err)
 				}
 			}
 		}

@@ -19,8 +19,12 @@ func New(redisClient redis.Client) App {
 	}
 }
 
+func (a App) Enabled() bool {
+	return a.redisClient != nil && a.redisClient.Enabled()
+}
+
 func (a App) Execute(ctx context.Context, name string, duration time.Duration, action func(context.Context) error) error {
-	if !a.redisClient.Enabled() {
+	if !a.Enabled() {
 		return action(ctx)
 	}
 
@@ -39,7 +43,7 @@ exclusive:
 }
 
 func (a App) Try(ctx context.Context, name string, duration time.Duration, action func(context.Context) error) (bool, error) {
-	if !a.redisClient.Enabled() {
+	if !a.Enabled() {
 		return true, action(ctx)
 	}
 

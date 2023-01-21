@@ -11,6 +11,7 @@ import (
 )
 
 //go:generate mockgen -destination ../mocks/storage.go -package mocks -mock_names Storage=Storage github.com/ViBiOh/absto/pkg/model Storage
+//go:generate mockgen -destination ../mocks/redis_client.go -package mocks -mock_names Client=RedisClient github.com/ViBiOh/httputils/v4/pkg/redis Client
 
 //go:generate mockgen -source interfaces.go -destination ../mocks/interfaces.go -package mocks -mock_names Crud=Crud,Auth=Auth,ShareManager=ShareManager,WebhookManager=WebhookManager
 

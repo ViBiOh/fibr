@@ -234,18 +234,6 @@ Usage of fibr:
         [amqpExif] RoutingKey name {FIBR_AMQP_EXIF_ROUTING_KEY} (default "exif_output")
   -amqpPrefetch int
         [amqp] Prefetch count for QoS {FIBR_AMQP_PREFETCH} (default 1)
-  -amqpShareExchange string
-        [amqpShare] Exchange name {FIBR_AMQP_SHARE_EXCHANGE} (default "fibr.shares")
-  -amqpShareExclusive
-        [amqpShare] Queue exclusive mode (for fanout exchange) {FIBR_AMQP_SHARE_EXCLUSIVE} (default true)
-  -amqpShareMaxRetry uint
-        [amqpShare] Max send retries {FIBR_AMQP_SHARE_MAX_RETRY} (default 3)
-  -amqpShareQueue string
-        [amqpShare] Queue name {FIBR_AMQP_SHARE_QUEUE} (default "fibr.share-<random>")
-  -amqpShareRetryInterval duration
-        [amqpShare] Interval duration when send fails {FIBR_AMQP_SHARE_RETRY_INTERVAL}
-  -amqpShareRoutingKey string
-        [amqpShare] RoutingKey name {FIBR_AMQP_SHARE_ROUTING_KEY} (default "share")
   -amqpThumbnailExchange string
         [amqpThumbnail] Exchange name {FIBR_AMQP_THUMBNAIL_EXCHANGE} (default "fibr")
   -amqpThumbnailExclusive
@@ -366,10 +354,8 @@ Usage of fibr:
         [redis] Redis Username, if any {FIBR_REDIS_USERNAME}
   -sanitizeOnStart
         [crud] Sanitize name on start {FIBR_SANITIZE_ON_START}
-  -shareAmqpExchange string
-        [share] AMQP Exchange Name {FIBR_SHARE_AMQP_EXCHANGE} (default "fibr.shares")
-  -shareAmqpRoutingKey string
-        [share] AMQP Routing Key for share {FIBR_SHARE_AMQP_ROUTING_KEY} (default "share")
+  -sharePubSubChannel string
+        [share] Channel name {FIBR_SHARE_PUB_SUB_CHANNEL} (default "fibr:shares-channel")
   -shutdownTimeout duration
         [server] Shutdown Timeout {FIBR_SHUTDOWN_TIMEOUT} (default 10s)
   -storageFileSystemDirectory /data

@@ -6,10 +6,14 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ViBiOh/fibr/pkg/mocks"
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/golang/mock/gomock"
 )
 
 func TestPurgeExpiredShares(t *testing.T) {
+	t.Parallel()
+
 	cases := map[string]struct {
 		instance *App
 		want     map[string]provider.Share
@@ -62,13 +66,29 @@ func TestPurgeExpiredShares(t *testing.T) {
 		},
 	}
 
-	for intention, tc := range cases {
-		t.Run(intention, func(t *testing.T) {
-			tc.instance.purgeExpiredShares(context.TODO())
-			got := tc.instance.shares
+	for intention, testCase := range cases {
+		intention, testCase := intention, testCase
 
-			if !reflect.DeepEqual(got, tc.want) {
-				t.Errorf("purgeExpiredShares() = %+v, want %+v", got, tc.want)
+		t.Run(intention, func(t *testing.T) {
+			t.Parallel()
+
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+			redisMocks := mocks.NewRedisClient(ctrl)
+
+			testCase.instance.redisClient = redisMocks
+
+			switch intention {
+			case "purge at boundaries":
+				redisMocks.EXPECT().PublishJSON(gomock.Any(), gomock.Any(), provider.Share{ID: "1"})
+				redisMocks.EXPECT().PublishJSON(gomock.Any(), gomock.Any(), provider.Share{ID: "3"})
+			}
+
+			testCase.instance.purgeExpiredShares(context.TODO())
+			got := testCase.instance.shares
+
+			if !reflect.DeepEqual(got, testCase.want) {
+				t.Errorf("purgeExpiredShares() = %+v, want %+v", got, testCase.want)
 			}
 		})
 	}
