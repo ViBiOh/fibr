@@ -83,7 +83,7 @@ func (a App) handleFile(w http.ResponseWriter, r *http.Request, request provider
 }
 
 func (a App) serveFile(w http.ResponseWriter, r *http.Request, item absto.Item) error {
-	_, end := tracer.StartSpan(r.Context(), a.tracer, "file", trace.WithSpanKind(trace.SpanKindInternal))
+	ctx, end := tracer.StartSpan(r.Context(), a.tracer, "file", trace.WithSpanKind(trace.SpanKindInternal))
 	defer end()
 
 	etag, ok := provider.EtagMatch(w, r, sha.New(item))
@@ -91,7 +91,7 @@ func (a App) serveFile(w http.ResponseWriter, r *http.Request, item absto.Item) 
 		return nil
 	}
 
-	file, err := a.storageApp.ReadFrom(r.Context(), item.Pathname)
+	file, err := a.storageApp.ReadFrom(ctx, item.Pathname)
 	if err != nil {
 		return fmt.Errorf("get reader for `%s`: %w", item.Pathname, err)
 	}
