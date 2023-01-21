@@ -10,10 +10,10 @@ import (
 const Duration = time.Second * 10
 
 type App struct {
-	redisClient redis.App
+	redisClient redis.Client
 }
 
-func New(redisClient redis.App) App {
+func New(redisClient redis.Client) App {
 	return App{
 		redisClient: redisClient,
 	}
