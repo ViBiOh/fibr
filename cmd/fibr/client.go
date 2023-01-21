@@ -15,7 +15,7 @@ import (
 )
 
 type client struct {
-	redis      redis.App
+	redis      redis.Client
 	tracer     tracer.App
 	amqp       *amqp.Client
 	prometheus prometheus.App

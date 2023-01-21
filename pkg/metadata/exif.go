@@ -36,7 +36,7 @@ type App struct {
 	aggregateCacheApp cache.App[absto.Item, provider.Aggregate]
 
 	exclusiveApp exclusive.App
-	redisClient  redis.App
+	redisClient  redis.Client
 
 	amqpClient     *amqpclient.Client
 	amqpExchange   string
@@ -74,7 +74,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 	}
 }
 
-func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheus.Registerer, tracerApp tracer.App, amqpClient *amqpclient.Client, redisClient redis.App, exclusiveApp exclusive.App) (App, error) {
+func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheus.Registerer, tracerApp tracer.App, amqpClient *amqpclient.Client, redisClient redis.Client, exclusiveApp exclusive.App) (App, error) {
 	var amqpExchange string
 
 	if amqpClient != nil {

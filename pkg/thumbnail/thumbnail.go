@@ -35,7 +35,7 @@ const (
 var cacheDuration = fmt.Sprintf("private, max-age=%.0f", (time.Minute * 5).Seconds())
 
 type App struct {
-	redisClient     redis.App
+	redisClient     redis.Client
 	tracer          trace.Tracer
 	storageApp      absto.Storage
 	smallStorageApp absto.Storage
@@ -92,7 +92,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 	}
 }
 
-func New(config Config, storage absto.Storage, redisClient redis.App, prometheusRegisterer prometheus.Registerer, tracerApp tracer.App, amqpClient *amqp.Client) (App, error) {
+func New(config Config, storage absto.Storage, redisClient redis.Client, prometheusRegisterer prometheus.Registerer, tracerApp tracer.App, amqpClient *amqp.Client) (App, error) {
 	var amqpExchange string
 	if amqpClient != nil {
 		amqpExchange = strings.TrimSpace(*config.amqpExchange)
