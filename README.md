@@ -248,18 +248,6 @@ Usage of fibr:
         [amqpThumbnail] RoutingKey name {FIBR_AMQP_THUMBNAIL_ROUTING_KEY} (default "thumbnail_output")
   -amqpURI string
         [amqp] Address in the form amqps?://<user>:<password>@<address>:<port>/<vhost> {FIBR_AMQP_URI}
-  -amqpWebhookExchange string
-        [amqpWebhook] Exchange name {FIBR_AMQP_WEBHOOK_EXCHANGE} (default "fibr.webhooks")
-  -amqpWebhookExclusive
-        [amqpWebhook] Queue exclusive mode (for fanout exchange) {FIBR_AMQP_WEBHOOK_EXCLUSIVE} (default true)
-  -amqpWebhookMaxRetry uint
-        [amqpWebhook] Max send retries {FIBR_AMQP_WEBHOOK_MAX_RETRY} (default 3)
-  -amqpWebhookQueue string
-        [amqpWebhook] Queue name {FIBR_AMQP_WEBHOOK_QUEUE} (default "fibr.webhook-<random>")
-  -amqpWebhookRetryInterval duration
-        [amqpWebhook] Interval duration when send fails {FIBR_AMQP_WEBHOOK_RETRY_INTERVAL}
-  -amqpWebhookRoutingKey string
-        [amqpWebhook] RoutingKey name {FIBR_AMQP_WEBHOOK_ROUTING_KEY} (default "webhook")
   -authProfiles string
         [auth] Users profiles in the form 'id:profile1|profile2,id2:profile1' {FIBR_AUTH_PROFILES} (default "1:admin")
   -authUsers string
@@ -408,10 +396,8 @@ Usage of fibr:
         [alcotest] URL to check {FIBR_URL}
   -userAgent string
         [alcotest] User-Agent for check {FIBR_USER_AGENT} (default "Alcotest")
-  -webhookAmqpExchange string
-        [webhook] AMQP Exchange Name {FIBR_WEBHOOK_AMQP_EXCHANGE} (default "fibr.webhooks")
-  -webhookAmqpRoutingKey string
-        [webhook] AMQP Routing Key for webhook {FIBR_WEBHOOK_AMQP_ROUTING_KEY} (default "webhook")
+  -webhookPubSubChannel string
+        [webhook] Channel name {FIBR_WEBHOOK_PUB_SUB_CHANNEL} (default "fibr:webhooks-channel")
   -webhookSecret string
         [webhook] Secret for HMAC Signature {FIBR_WEBHOOK_SECRET}
   -writeTimeout duration
@@ -426,4 +412,4 @@ Fibr doesn't handle multiple instances running at the same time on the same `roo
 
 Shares' metadatas are stored in a file, loaded at the start of the application. If an _instance A_ adds a share, _instance B_ can't see it. If they are both behind the same load-balancer, it can leads to an erratic behavior. Fibr has also an internal cron that purge expired shares and write the new metadatas to the file. If _instance A_ adds a share and _instance B_ runs the cron, the share added in _instance A_ is lost.
 
-If you enable Redis caching, it can handle thoses behaviours by using an exclusive lock with the Redis semaphore mechanism.
+If you enable Redis caching, it can handle thoses behaviours by using an exclusive lock with the Redis semaphore mechanism and the PubSub mechanism to send event.

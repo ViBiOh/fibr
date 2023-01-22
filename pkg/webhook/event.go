@@ -18,7 +18,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 )
 
-const amqpThumbnailDiscordDelay = 10 * time.Second
+const pubsubThumbnailDiscordDelay = 10 * time.Second
 
 func (a *App) EventConsumer(ctx context.Context, event provider.Event) {
 	a.mutex.RLock()
@@ -110,9 +110,9 @@ func (a *App) discordHandle(ctx context.Context, webhook provider.Webhook, event
 		Fields:      fields,
 	}
 
-	if a.amqpClient != nil {
+	if a.redisClient != nil {
 		// Waiting a couple of seconds before checking for thumbnail
-		time.Sleep(amqpThumbnailDiscordDelay)
+		time.Sleep(pubsubThumbnailDiscordDelay)
 	}
 
 	if a.thumbnailApp.HasThumbnail(ctx, event.Item, thumbnail.SmallSize) {

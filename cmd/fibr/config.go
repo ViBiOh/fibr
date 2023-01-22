@@ -48,7 +48,6 @@ type configuration struct {
 	amqp          amqp.Config
 	amqpThumbnail amqphandler.Config
 	amqpExif      amqphandler.Config
-	amqpWebhook   amqphandler.Config
 	redis         redis.Config
 	disableAuth   *bool
 }
@@ -78,7 +77,6 @@ func newConfig() (configuration, error) {
 		amqp:          amqp.Flags(fs, "amqp"),
 		amqpThumbnail: amqphandler.Flags(fs, "amqpThumbnail", flags.NewOverride("Exchange", "fibr"), flags.NewOverride("Queue", "fibr.thumbnail"), flags.NewOverride("RoutingKey", "thumbnail_output")),
 		amqpExif:      amqphandler.Flags(fs, "amqpExif", flags.NewOverride("Exchange", "fibr"), flags.NewOverride("Queue", "fibr.exif"), flags.NewOverride("RoutingKey", "exif_output")),
-		amqpWebhook:   amqphandler.Flags(fs, "amqpWebhook", flags.NewOverride("Exchange", "fibr.webhooks"), flags.NewOverride("Queue", "fibr.webhook-"+generateIdentityName()), flags.NewOverride("RoutingKey", "webhook"), flags.NewOverride("Exclusive", true), flags.NewOverride("RetryInterval", time.Duration(0))),
 		redis:         redis.Flags(fs, "redis", flags.NewOverride("Address", "")),
 		disableAuth:   flags.Bool(fs, "", "auth", "NoAuth", "Disable basic authentification", false, nil),
 	}, fs.Parse(os.Args[1:])

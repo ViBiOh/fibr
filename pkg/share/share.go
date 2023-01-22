@@ -96,8 +96,11 @@ func (a *App) Start(ctx context.Context) {
 		return
 	}
 
-	unsubscribe := redis.SubscribeFor(ctx, a.redisClient, a.pubsubChannel, a.PubSubHandle)
+	done, unsubscribe := redis.SubscribeFor(ctx, a.redisClient, a.pubsubChannel, a.PubSubHandle)
+	defer func() { <-done }()
 	defer func() {
+		logger.Info("Unsubscribing Share's PubSub...")
+
 		if unsubscribeErr := unsubscribe(tracer.CopyToBackground(ctx)); unsubscribeErr != nil {
 			logger.Error("Share's unsubscribe: %s", unsubscribeErr)
 		}
@@ -112,6 +115,8 @@ func (a *App) Start(ctx context.Context) {
 	}
 
 	purgeCron.Start(ctx, a.cleanShares)
+
+	<-ctx.Done()
 }
 
 func (a *App) loadShares(ctx context.Context) error {

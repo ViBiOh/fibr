@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"crypto/rand"
 	"embed"
 	"fmt"
 	"net/http"
@@ -43,16 +42,6 @@ func newLoginApp(tracer trace.Tracer, basicConfig basicMemory.Config) provider.A
 
 	basicProviderProvider := basic.New(basicApp, "fibr")
 	return authMiddleware.New(basicApp, tracer, basicProviderProvider)
-}
-
-func generateIdentityName() string {
-	raw := make([]byte, 4)
-	if _, err := rand.Read(raw); err != nil {
-		logger.Error("generate identity name: %s", err)
-		return "error"
-	}
-
-	return fmt.Sprintf("%x", raw)
 }
 
 func main() {
@@ -104,8 +93,7 @@ func main() {
 	metadataApp, err := metadata.New(config.metadata, storageApp, prometheusRegisterer, client.tracer, client.amqp, client.redis, exclusiveApp)
 	logger.Fatal(err)
 
-	webhookApp, err := webhook.New(config.webhook, storageApp, prometheusRegisterer, client.amqp, rendererApp, thumbnailApp, exclusiveApp)
-	logger.Fatal(err)
+	webhookApp := webhook.New(config.webhook, storageApp, prometheusRegisterer, client.redis, rendererApp, thumbnailApp, exclusiveApp)
 
 	shareApp, err := share.New(config.share, storageApp, client.redis, exclusiveApp)
 	logger.Fatal(err)
@@ -114,9 +102,6 @@ func main() {
 	logger.Fatal(err)
 
 	amqpExifApp, err := amqphandler.New(config.amqpExif, client.amqp, client.tracer.GetTracer("amqp_handler_exif"), metadataApp.AMQPHandler)
-	logger.Fatal(err)
-
-	amqpWebhookApp, err := amqphandler.New(config.amqpWebhook, client.amqp, client.tracer.GetTracer("amqp_handler_webhook"), webhookApp.AMQPHandler)
 	logger.Fatal(err)
 
 	searchApp := search.New(filteredStorage, thumbnailApp, metadataApp, exclusiveApp, client.tracer.GetTracer("search"))
@@ -137,7 +122,6 @@ func main() {
 
 	go amqpThumbnailApp.Start(doneCtx)
 	go amqpExifApp.Start(doneCtx)
-	go amqpWebhookApp.Start(doneCtx)
 	go webhookApp.Start(endCtx)
 	go shareApp.Start(endCtx)
 	go crudApp.Start(endCtx)
@@ -147,5 +131,5 @@ func main() {
 	go appServer.Start(endCtx, "http", httputils.Handler(handler, client.health, recoverer.Middleware, client.prometheus.Middleware, client.tracer.Middleware, owasp.New(config.owasp).Middleware))
 
 	client.health.WaitForTermination(appServer.Done())
-	server.GracefulWait(appServer.Done(), promServer.Done(), amqpExifApp.Done(), amqpWebhookApp.Done(), eventBus.Done(), shareApp.Done())
+	server.GracefulWait(appServer.Done(), promServer.Done(), amqpExifApp.Done(), eventBus.Done(), webhookApp.Done(), shareApp.Done())
 }

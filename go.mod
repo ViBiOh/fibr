@@ -8,8 +8,9 @@ require (
 	github.com/ViBiOh/auth/v2 v2.14.20
 	github.com/ViBiOh/exas v0.6.0
 	github.com/ViBiOh/flags v1.2.0
-	github.com/ViBiOh/httputils/v4 v4.52.9
+	github.com/ViBiOh/httputils/v4 v4.52.11
 	github.com/ViBiOh/vith v0.5.10
+	github.com/go-redis/redis/v8 v8.11.5
 	github.com/golang/mock v1.6.0
 	github.com/prometheus/client_golang v1.14.0
 	github.com/streadway/amqp v1.0.0
@@ -27,7 +28,6 @@ require (
 	github.com/felixge/httpsnoop v1.0.3 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
-	github.com/go-redis/redis/v8 v8.11.5 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
