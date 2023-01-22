@@ -99,17 +99,22 @@ func (mr *RedisClientMockRecorder) Exclusive(arg0, arg1, arg2, arg3 interface{})
 }
 
 // Expire mocks base method.
-func (m *RedisClient) Expire(arg0 context.Context, arg1 string, arg2 time.Duration) error {
+func (m *RedisClient) Expire(arg0 context.Context, arg1 time.Duration, arg2 ...string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Expire", arg0, arg1, arg2)
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "Expire", varargs...)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Expire indicates an expected call of Expire.
-func (mr *RedisClientMockRecorder) Expire(arg0, arg1, arg2 interface{}) *gomock.Call {
+func (mr *RedisClientMockRecorder) Expire(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Expire", reflect.TypeOf((*RedisClient)(nil).Expire), arg0, arg1, arg2)
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Expire", reflect.TypeOf((*RedisClient)(nil).Expire), varargs...)
 }
 
 // Load mocks base method.
