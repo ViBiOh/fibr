@@ -29,28 +29,20 @@ func (a App) doRename(ctx context.Context, oldPath, newPath string, oldItem abst
 	return newItem, nil
 }
 
-func (a App) Rename(w http.ResponseWriter, r *http.Request, request provider.Request) {
-	if !request.CanEdit {
-		a.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
-		return
-	}
-
+func parseRenameParams(r *http.Request, request provider.Request) (string, string, string, string, bool, error) {
 	oldName, err := checkFormName(r, "name")
 	if err != nil && !errors.Is(err, ErrEmptyName) {
-		a.error(w, r, request, err)
-		return
+		return "", "", "", "", false, err
 	}
 
 	newFolder, err := getNewFolder(r)
 	if err != nil {
-		a.error(w, r, request, err)
-		return
+		return "", "", "", "", false, err
 	}
 
 	newName, err := getNewName(r)
 	if err != nil {
-		a.error(w, r, request, err)
-		return
+		return "", "", "", "", false, err
 	}
 
 	if strings.HasSuffix(oldName, "/") {
@@ -59,12 +51,27 @@ func (a App) Rename(w http.ResponseWriter, r *http.Request, request provider.Req
 
 	cover, err := getFormBool(r.Form.Get("cover"))
 	if err != nil {
-		a.error(w, r, request, err)
-		return
+		return "", "", "", "", false, err
 	}
 
 	oldPath := request.SubPath(oldName)
 	newPath := provider.GetPathname(newFolder, newName, request.Share)
+
+	return oldPath, newPath, newFolder, newName, cover, nil
+}
+
+func (a App) Rename(w http.ResponseWriter, r *http.Request, request provider.Request) {
+	if !request.CanEdit {
+		a.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
+		return
+	}
+
+	oldPath, newPath, newFolder, newName, cover, err := parseRenameParams(r, request)
+	if err != nil {
+		a.error(w, r, request, err)
+		return
+	}
+
 	ctx := r.Context()
 
 	var oldItem absto.Item
