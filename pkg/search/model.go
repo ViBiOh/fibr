@@ -8,6 +8,7 @@ import (
 	"time"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
+	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
 const (
@@ -22,8 +23,13 @@ type search struct {
 	before      time.Time
 	after       time.Time
 	mimes       []string
+	tags        []string
 	size        int64
 	greaterThan bool
+}
+
+func (s search) hasTags() bool {
+	return len(s.tags) > 0
 }
 
 func parseSearch(params url.Values, now time.Time) (output search, err error) {
@@ -122,4 +128,27 @@ func (s search) matchMimes(item absto.Item) bool {
 	}
 
 	return false
+}
+
+func (s search) matchTags(metadata provider.Metadata) bool {
+	if len(metadata.Tags) == 0 {
+		return false
+	}
+
+	for _, tag := range s.tags {
+		var found bool
+
+		for _, itemTag := range metadata.Tags {
+			if itemTag == tag {
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			return false
+		}
+	}
+
+	return true
 }
