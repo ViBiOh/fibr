@@ -121,6 +121,16 @@
               <img class="icon" src="{{ url "/svg/download?fill=aliceblue" }}" alt="download">
             </a>
           </a>
+
+          {{ if .Tags }}
+            {{- if eq $root.Request.Display "grid" -}}
+              <img class="icon tags" src="{{ url "/svg/tag" }}?fill=aliceblue" alt="tag" title="#{{ join .Tags " #" }}">
+            {{ else }}
+              <em class="tags ellipsis padding-left">
+                #{{ join .Tags " #" }}
+              </em>
+            {{ end}}
+          {{ end }}
         </li>
       {{ end }}
 

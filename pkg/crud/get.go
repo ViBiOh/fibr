@@ -132,19 +132,7 @@ func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.
 	go a.notify(tracer.CopyToBackground(r.Context()), provider.NewAccessEvent(item, r))
 
 	if query.GetBool(r, "search") {
-		files, hasMap, err := a.searchApp.Search(r, request, items)
-		if err != nil {
-			return errorReturn(request, err)
-		}
-
-		return renderer.NewPage("search", http.StatusOK, map[string]any{
-			"Paths":   getPathParts(request),
-			"Files":   files,
-			"Cover":   a.getCover(r.Context(), request, items),
-			"Search":  r.URL.Query(),
-			"Request": request,
-			"HasMap":  hasMap,
-		}), nil
+		return a.search(r, request, item, items)
 	}
 
 	provider.SetPrefsCookie(w, request)

@@ -40,6 +40,10 @@ func parseSearch(params url.Values, now time.Time) (output search, err error) {
 		}
 	}
 
+	if tags := strings.TrimSpace(params.Get("tags")); len(tags) > 0 {
+		output.tags = strings.Split(tags, " ")
+	}
+
 	output.before, err = parseDate(strings.TrimSpace(params.Get("before")))
 	if err != nil {
 		return

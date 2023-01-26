@@ -68,31 +68,3 @@ func (a App) Files(r *http.Request, request provider.Request) (items []absto.Ite
 
 	return
 }
-
-func (a App) Search(r *http.Request, request provider.Request, files []absto.Item) ([]provider.RenderItem, bool, error) {
-	ctx, end := tracer.StartSpan(r.Context(), a.tracer, "search")
-	defer end()
-
-	items := make([]provider.RenderItem, len(files))
-	var hasMap bool
-
-	renderWithThumbnail := request.Display == provider.GridDisplay
-
-	for i, item := range files {
-		renderItem := provider.StorageToRender(item, request)
-
-		if renderWithThumbnail && a.thumbnailApp.CanHaveThumbnail(item) && a.thumbnailApp.HasThumbnail(ctx, item, thumbnail.SmallSize) {
-			renderItem.HasThumbnail = true
-		}
-
-		items[i] = renderItem
-
-		if !hasMap {
-			if exif, err := a.exifApp.GetMetadataFor(ctx, item); err == nil && exif.Geocode.Longitude != 0 && exif.Geocode.Latitude != 0 {
-				hasMap = true
-			}
-		}
-	}
-
-	return items, hasMap, nil
-}

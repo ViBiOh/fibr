@@ -28,6 +28,11 @@
         </p>
 
         <p class="padding no-margin">
+          <label for="tags" class="block">Tags</label>
+          <input id="tags" name="tags" type="text" value="{{ if .Search.tags }}{{ join .Search.tags " " }}{{ end }}" placeholder="Tags..." class="full">
+        </p>
+
+        <p class="padding no-margin">
           <label for="after" class="block">After</label>
           <input id="after" name="after" type="date" placeholder="2020-01-31" value="{{ with .Search.after }}{{ index . 0 }}{{ end }}">
 
