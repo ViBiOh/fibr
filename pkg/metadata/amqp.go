@@ -26,6 +26,10 @@ func (a App) AMQPHandler(ctx context.Context, message amqp.Delivery) error {
 		return nil
 	}
 
-	_, err := a.Update(ctx, resp.Item, provider.ReplaceExif(resp.Exif))
-	return err
+	metadata, err := a.Update(ctx, resp.Item, provider.ReplaceExif(resp.Exif))
+	if err != nil {
+		return fmt.Errorf("update: %w", err)
+	}
+
+	return a.processMetadata(ctx, resp.Item, metadata, true)
 }
