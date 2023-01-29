@@ -43,7 +43,6 @@ spec:
       FIBR_EXIF_URL: http://exas
       FIBR_IGNORE_PATTERN: '.st(folder|ignore)'
       FIBR_LOGGER_JSON: 'true'
-      FIBR_LOGGER_LEVEL: DEBUG
       FIBR_PUBLIC_URL: https://fibr.vibioh.fr
       FIBR_REDIS_ADDRESS: 'redis:80'
       FIBR_SANITIZE_ON_START: 'true'
