@@ -11,9 +11,9 @@ import (
 )
 
 func (a App) Update(ctx context.Context, item absto.Item, opts ...provider.MetadataAction) (provider.Metadata, error) {
-	var metadata provider.Metadata
+	var output provider.Metadata
 
-	return metadata, a.exclusiveApp.Execute(ctx, "fibr:mutex:"+item.ID, exclusive.Duration, func(ctx context.Context) error {
+	return output, a.exclusiveApp.Execute(ctx, "fibr:mutex:"+item.ID, exclusive.Duration, func(ctx context.Context) error {
 		var err error
 
 		metadata, err := a.GetMetadataFor(ctx, item)
@@ -28,6 +28,8 @@ func (a App) Update(ctx context.Context, item absto.Item, opts ...provider.Metad
 		if err = a.exifCacheApp.EvictOnSuccess(ctx, item, a.saveMetadata(ctx, item, metadata)); err != nil {
 			return fmt.Errorf("save metadata: %w", err)
 		}
+
+		output = metadata
 
 		return nil
 	})
