@@ -11,6 +11,12 @@
 
   <link rel="preload" as="image" href="{{ url "/svg/link?fill=%23272727" }}">
 
+  {{ if .Request.CanEdit }}
+    <link rel="preload" as="image" href="{{ url "/svg/upload?fill=aliceblue" }}">
+
+    {{ template "upload-modal" . }}
+  {{ end }}
+
   {{ if not .Request.Share.Story }}
     <link rel="preload" as="image" href="{{ url "/svg/list?fill=aliceblue" }}">
     <link rel="preload" as="image" href="{{ url "/svg/grid?fill=aliceblue" }}">
@@ -39,6 +45,15 @@
       padding-top: 0.5rem;
       margin-bottom: 0.5rem;
       overflow: auto;
+    }
+
+    .upload-modal:target {
+      display: flex;
+      z-index: 5;
+    }
+
+    .upload-modal:target ~ .content {
+      pointer-events: none;
     }
 
     #story-display {
@@ -151,6 +166,12 @@
         </a>
 
         <span class="flex-grow"></span>
+
+        {{ if .Request.CanEdit }}
+          <a id="upload-button-link" href="#upload-modal" class="button button-icon" title="Upload file">
+            <img class="icon" src="{{ url "/svg/upload?fill=aliceblue" }}" alt="upload">
+          </a>
+        {{ end }}
 
         {{ if .HasMap }}
           <a class="padding" href="#map" title="View on map">
