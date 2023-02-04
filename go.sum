@@ -1,7 +1,7 @@
 github.com/ViBiOh/ChatPotte v0.2.28 h1:wLmLAxuOVOSWlwL9mY4O/PwbNkmfNkUfs1BuBZxS2cA=
 github.com/ViBiOh/ChatPotte v0.2.28/go.mod h1:IpTk9qtfKTTKzge9xVe+r4mzSMqFySGQxVv05vBVcFE=
-github.com/ViBiOh/absto v1.2.3 h1:LS15voYHXoQuGyl61BaQnZpDAcB2v4FBImA129Qqgh8=
-github.com/ViBiOh/absto v1.2.3/go.mod h1:/2mTfXwNI9d+UnWQXSBJ2ZeJgVDbfm17uLJsX+sCVoE=
+github.com/ViBiOh/absto v1.2.4 h1:HURHmMQfLlKZ/Wi6FSrv856doo9MznYlFzBU95ntE7Y=
+github.com/ViBiOh/absto v1.2.4/go.mod h1:qiva9M6ArvFL7Q50afXms3cehSSaJD6konwZXZe+T+g=
 github.com/ViBiOh/auth/v2 v2.14.20 h1:xCTQrnTOFLiyFLIV0CMXlCPrHEbimganZsbTbdHUh50=
 github.com/ViBiOh/auth/v2 v2.14.20/go.mod h1:lL4rXpvS0Gtui4CSy0J/AK1pq59XVXaR4Qz1ELsQ3eY=
 github.com/ViBiOh/exas v0.6.0 h1:UWQuzesHShBSMkQw7mWAj4NBwL1Hb/fDcgzk/UpacYQ=
