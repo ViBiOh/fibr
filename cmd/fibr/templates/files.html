@@ -233,11 +233,11 @@
               {{ template "async-image-item" . }}
 
               {{ if .IsVideo }}
-                <img class="icon icon-overlay" src="{{ url "/svg/play?fill=rgba(192,192,192,0.8)" }}" alt="play icon" title="Play video">
+                <img class="icon icon-overlay" src="{{ url "/svg/play?fill=rgba(39,39,39,0.8)" }}" alt="play icon" title="Play video">
               {{ end }}
 
               {{ if .IsCover }}
-                <img class="icon icon-overlay-small" src="{{ url "/svg/rss?fill=rgba(192,192,192,0.8)" }}" alt="waves" title="Is cover image">
+                <img class="icon icon-overlay-small" src="{{ url "/svg/rss?fill=rgba(39,39,39,0.8)" }}" alt="waves" title="Is cover image">
               {{ end }}
             {{ else }}
               <img class="icon {{ if eq $root.Request.Display "grid" }}icon-large{{ end }}" src="{{ url "/svg/" }}{{ if .IsDir }}folder{{ else }}{{ iconFromExtension . }}{{ end }}?fill=aliceblue" alt="{{ if .IsDir }}folder{{ else }}file{{ end }}">
