@@ -46,7 +46,7 @@ function findIndexEscapeSequence(escapeSequence, content) {
 }
 
 async function* readChunk(response) {
-  const escapeSequence = [28, 23, 4];
+  const escapeSequence = [28, 23, 4, 28];
 
   const reader = response.body.getReader();
   let { value: chunk, done: readerDone } = await reader.read();

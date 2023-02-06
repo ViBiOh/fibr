@@ -313,7 +313,7 @@ func (a App) encodeContent(ctx context.Context, w io.Writer, isDone func() bool,
 		}
 	}
 
-	provider.DoneWriter(isDone, w, "\x1c\x17\x04")
+	provider.DoneWriter(isDone, w, "\x1c\x17\x04\x1c")
 }
 
 func logEncodeContentError(item absto.Item) logger.Provider {
