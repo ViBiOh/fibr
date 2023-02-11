@@ -9,8 +9,8 @@ import (
 	reflect "reflect"
 	time "time"
 
-	redis "github.com/go-redis/redis/v8"
 	gomock "github.com/golang/mock/gomock"
+	redis "github.com/redis/go-redis/v9"
 )
 
 // RedisClient is a mock of Client interface.
@@ -164,6 +164,20 @@ func (m *RedisClient) Ping(arg0 context.Context) error {
 func (mr *RedisClientMockRecorder) Ping(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Ping", reflect.TypeOf((*RedisClient)(nil).Ping), arg0)
+}
+
+// Pipeline mocks base method.
+func (m *RedisClient) Pipeline() redis.Pipeliner {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Pipeline")
+	ret0, _ := ret[0].(redis.Pipeliner)
+	return ret0
+}
+
+// Pipeline indicates an expected call of Pipeline.
+func (mr *RedisClientMockRecorder) Pipeline() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Pipeline", reflect.TypeOf((*RedisClient)(nil).Pipeline))
 }
 
 // Publish mocks base method.
