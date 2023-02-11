@@ -4,8 +4,8 @@ go 1.20
 
 require (
 	github.com/ViBiOh/ChatPotte v0.2.28
-	github.com/ViBiOh/absto v1.2.4
-	github.com/ViBiOh/auth/v2 v2.14.20
+	github.com/ViBiOh/absto v1.2.5
+	github.com/ViBiOh/auth/v2 v2.14.21
 	github.com/ViBiOh/exas v0.6.0
 	github.com/ViBiOh/flags v1.2.0
 	github.com/ViBiOh/httputils/v4 v4.53.4
@@ -16,7 +16,7 @@ require (
 	github.com/streadway/amqp v1.0.0
 	go.opentelemetry.io/otel v1.13.0
 	go.opentelemetry.io/otel/trace v1.13.0
-	golang.org/x/crypto v0.5.0
+	golang.org/x/crypto v0.6.0
 	golang.org/x/text v0.7.0
 )
 
@@ -51,7 +51,7 @@ require (
 	go.opentelemetry.io/otel/exporters/jaeger v1.13.0 // indirect
 	go.opentelemetry.io/otel/metric v0.36.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.13.0 // indirect
-	golang.org/x/net v0.5.0 // indirect
+	golang.org/x/net v0.6.0 // indirect
 	golang.org/x/sys v0.5.0 // indirect
 	golang.org/x/term v0.5.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
