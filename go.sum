@@ -1,9 +1,9 @@
 github.com/ViBiOh/ChatPotte v0.2.28 h1:wLmLAxuOVOSWlwL9mY4O/PwbNkmfNkUfs1BuBZxS2cA=
 github.com/ViBiOh/ChatPotte v0.2.28/go.mod h1:IpTk9qtfKTTKzge9xVe+r4mzSMqFySGQxVv05vBVcFE=
-github.com/ViBiOh/absto v1.2.5 h1:gA64RwGkme+y4mp9k/27jGa41qoxBPXwdCyeCYi0+ns=
-github.com/ViBiOh/absto v1.2.5/go.mod h1:/gCo2DPI+bb6bV4GyuQN44b6LF/zX+/CrFwaRUTXv88=
-github.com/ViBiOh/auth/v2 v2.14.21 h1:NkZbPdKzjCisIUs6RH9wlLcA8AndAguFuoWOOpmAGkc=
-github.com/ViBiOh/auth/v2 v2.14.21/go.mod h1:npTKV292NG8qYxvtMQtiP2WQW6mBL0Y2JowAZbY1ShY=
+github.com/ViBiOh/absto v1.2.6 h1:u/hwmYnaM3Efo9m8Ntifi028iLI06awDxWkX7NjoLu4=
+github.com/ViBiOh/absto v1.2.6/go.mod h1:FgEjHmzpXy4lGVHXa6LRH54b0WpyJBQ4baD7s1rS48g=
+github.com/ViBiOh/auth/v2 v2.14.22 h1:jTk4jMUn0rs82k1uJlX2GVdZ8lYnpiHxVFhxJRG61N0=
+github.com/ViBiOh/auth/v2 v2.14.22/go.mod h1:vagvXqM3CyLCrDgexp7a77X8OlRTPJuOBthGntAAdUA=
 github.com/ViBiOh/exas v0.6.0 h1:UWQuzesHShBSMkQw7mWAj4NBwL1Hb/fDcgzk/UpacYQ=
 github.com/ViBiOh/exas v0.6.0/go.mod h1:w6aibKNptsqVwIIIeuifr/1JM551/idiiKhHgDzf7sk=
 github.com/ViBiOh/flags v1.2.0 h1:DaujjNXzD29KxKyp4eZdn7c9+uBN5DokWgDAe7DcUmc=
@@ -64,8 +64,8 @@ github.com/matttproud/golang_protobuf_extensions v1.0.4 h1:mmDVorXM7PCGKw94cs5zk
 github.com/matttproud/golang_protobuf_extensions v1.0.4/go.mod h1:BSXmuO+STAnVfrANrmjBb36TMTDstsz7MSK+HVaYKv4=
 github.com/minio/md5-simd v1.1.2 h1:Gdi1DZK69+ZVMoNHRXJyNcxrMA4dSxoYHZSQbirFg34=
 github.com/minio/md5-simd v1.1.2/go.mod h1:MzdKDxYpY2BT9XQFocsiZf/NKVtR7nkE4RoEpN+20RM=
-github.com/minio/minio-go/v7 v7.0.47 h1:sLiuCKGSIcn/MI6lREmTzX91DX/oRau4ia0j6e6eOSs=
-github.com/minio/minio-go/v7 v7.0.47/go.mod h1:nCrRzjoSUQh8hgKKtu3Y708OLvRLtuASMg2/nvmbarw=
+github.com/minio/minio-go/v7 v7.0.48 h1:VQtYB/2xHW2SlxqhjRlDpvSiSOfGlyFlXZF1EHARPHM=
+github.com/minio/minio-go/v7 v7.0.48/go.mod h1:nCrRzjoSUQh8hgKKtu3Y708OLvRLtuASMg2/nvmbarw=
 github.com/minio/sha256-simd v1.0.0 h1:v1ta+49hkWZyvaKwrQB8elexRqm6Y0aMLjCNsrYxo6g=
 github.com/minio/sha256-simd v1.0.0/go.mod h1:OuYzVNI5vcoYIAmbIvHPl3N3jUzVedXbKy5RFepssQM=
 github.com/modern-go/concurrent v0.0.0-20180228061459-e0a39a4cb421/go.mod h1:6dJC0mAP4ikYIbvyc7fijjWJddQyLn8Ig3JB5CqoB9Q=
