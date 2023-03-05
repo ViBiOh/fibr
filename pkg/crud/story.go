@@ -16,7 +16,7 @@ import (
 
 func (a App) story(r *http.Request, request provider.Request, item absto.Item, files []absto.Item) (renderer.Page, error) {
 	ctx, end := tracer.StartSpan(r.Context(), a.tracer, "story", trace.WithAttributes(attribute.String("item", item.Pathname)))
-	defer end()
+	defer end(nil)
 
 	items := make([]provider.StoryItem, 0, len(files))
 	var cover cover

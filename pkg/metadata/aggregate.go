@@ -22,20 +22,22 @@ func redisKey(item absto.Item) string {
 	return version.Redis("exif:" + item.ID)
 }
 
-func (a App) GetMetadataFor(ctx context.Context, item absto.Item) (provider.Metadata, error) {
+func (a App) GetMetadataFor(ctx context.Context, item absto.Item) (metadata provider.Metadata, err error) {
 	if item.IsDir {
 		return provider.Metadata{}, nil
 	}
 
 	ctx, end := tracer.StartSpan(ctx, a.tracer, "get_metadata")
-	defer end()
+	defer end(&err)
 
 	return a.exifCacheApp.Get(ctx, item)
 }
 
 func (a App) GetAllMetadataFor(ctx context.Context, items ...absto.Item) (map[string]provider.Metadata, error) {
+	var err error
+
 	ctx, end := tracer.StartSpan(ctx, a.tracer, "get_all_metadata")
-	defer end()
+	defer end(&err)
 
 	exifs, err := a.exifCacheApp.List(ctx, onListError, items...)
 	if err != nil {
@@ -54,20 +56,22 @@ func (a App) GetAllMetadataFor(ctx context.Context, items ...absto.Item) (map[st
 	return output, nil
 }
 
-func (a App) GetAggregateFor(ctx context.Context, item absto.Item) (provider.Aggregate, error) {
+func (a App) GetAggregateFor(ctx context.Context, item absto.Item) (aggregate provider.Aggregate, err error) {
 	if !item.IsDir {
 		return provider.Aggregate{}, nil
 	}
 
 	ctx, end := tracer.StartSpan(ctx, a.tracer, "get_aggregate")
-	defer end()
+	defer end(&err)
 
 	return a.aggregateCacheApp.Get(ctx, item)
 }
 
 func (a App) GetAllAggregateFor(ctx context.Context, items ...absto.Item) (map[string]provider.Aggregate, error) {
+	var err error
+
 	ctx, end := tracer.StartSpan(ctx, a.tracer, "get_all_aggregate")
-	defer end()
+	defer end(&err)
 
 	exifs, err := a.aggregateCacheApp.List(ctx, onListError, items...)
 	if err != nil {

@@ -13,10 +13,10 @@ import (
 	"github.com/ViBiOh/fibr/pkg/exclusive"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/flags"
+	"github.com/ViBiOh/httputils/v4/pkg/cntxt"
 	"github.com/ViBiOh/httputils/v4/pkg/cron"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/redis"
-	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 )
 
 type GetNow func() time.Time
@@ -101,7 +101,7 @@ func (a *App) Start(ctx context.Context) {
 	defer func() {
 		logger.Info("Unsubscribing Share's PubSub...")
 
-		if unsubscribeErr := unsubscribe(tracer.CopyToBackground(ctx)); unsubscribeErr != nil {
+		if unsubscribeErr := unsubscribe(cntxt.WithoutDeadline(ctx)); unsubscribeErr != nil {
 			logger.Error("Share's unsubscribe: %s", unsubscribeErr)
 		}
 	}()

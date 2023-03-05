@@ -11,9 +11,9 @@ import (
 	"github.com/streadway/amqp"
 )
 
-func (a App) AMQPHandler(ctx context.Context, message amqp.Delivery) error {
+func (a App) AMQPHandler(ctx context.Context, message amqp.Delivery) (err error) {
 	ctx, end := tracer.StartSpan(ctx, a.tracer, "amqp")
-	defer end()
+	defer end(&err)
 
 	var req vith.Request
 	if err := json.Unmarshal(message.Body, &req); err != nil {

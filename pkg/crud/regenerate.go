@@ -7,10 +7,10 @@ import (
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/v4/pkg/cntxt"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
-	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 )
 
 func (a App) regenerate(w http.ResponseWriter, r *http.Request, request provider.Request) {
@@ -54,7 +54,7 @@ func (a App) regenerate(w http.ResponseWriter, r *http.Request, request provider
 		for _, directory := range directories {
 			a.notify(ctx, provider.NewStartEvent(directory))
 		}
-	}(tracer.CopyToBackground(ctx))
+	}(cntxt.WithoutDeadline(ctx))
 
 	a.rendererApp.Redirect(w, r, "?stats", renderer.NewSuccessMessage("Regeneration of %s in progress...", subset))
 }

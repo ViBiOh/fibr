@@ -27,7 +27,7 @@ func listLogger(pathname string) logger.Provider {
 
 func (a App) list(ctx context.Context, request provider.Request, message renderer.Message, item absto.Item, files []absto.Item) (renderer.Page, error) {
 	ctx, end := tracer.StartSpan(ctx, a.tracer, "list", trace.WithAttributes(attribute.String("item", item.Pathname)))
-	defer end()
+	defer end(nil)
 
 	wg := concurrent.NewSimple()
 

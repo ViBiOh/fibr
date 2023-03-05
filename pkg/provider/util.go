@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -16,7 +17,6 @@ import (
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
-	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
@@ -177,7 +177,7 @@ func SaveJSON(ctx context.Context, storageApp absto.Storage, filename string, co
 		}
 
 		if closeErr := writer.Close(); closeErr != nil {
-			err = model.WrapError(err, fmt.Errorf("close encoder: %w", closeErr))
+			err = errors.Join(err, fmt.Errorf("close encoder: %w", closeErr))
 		}
 
 		done <- err
@@ -186,7 +186,7 @@ func SaveJSON(ctx context.Context, storageApp absto.Storage, filename string, co
 	err := storageApp.WriteTo(ctx, filename, reader, absto.WriteOpts{})
 
 	if jsonErr := <-done; jsonErr != nil {
-		err = model.WrapError(err, jsonErr)
+		err = errors.Join(err, jsonErr)
 	}
 
 	return err
@@ -225,7 +225,7 @@ func SendLargeFile(ctx context.Context, storageApp absto.Storage, item absto.Ite
 
 func HandleClose(closer io.Closer, err error) error {
 	if closeErr := closer.Close(); closeErr != nil {
-		return model.WrapError(err, fmt.Errorf("close: %w", closeErr))
+		return errors.Join(err, fmt.Errorf("close: %w", closeErr))
 	}
 
 	return err
@@ -248,7 +248,7 @@ func WriteToStorage(ctx context.Context, storageApp absto.Storage, output string
 	err = storageApp.WriteTo(ctx, output, reader, absto.WriteOpts{Size: size})
 	if err != nil {
 		if removeErr := storageApp.Remove(ctx, output); removeErr != nil {
-			err = model.WrapError(err, fmt.Errorf("remove: %w", removeErr))
+			err = errors.Join(err, fmt.Errorf("remove: %w", removeErr))
 		}
 	}
 

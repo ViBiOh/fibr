@@ -12,12 +12,14 @@ import (
 )
 
 func (a App) AMQPHandler(ctx context.Context, message amqp.Delivery) error {
+	var err error
+
 	ctx, end := tracer.StartSpan(ctx, a.tracer, "amqp")
-	defer end()
+	defer end(&err)
 
 	var resp provider.ExifResponse
 
-	if err := json.Unmarshal(message.Body, &resp); err != nil {
+	if err = json.Unmarshal(message.Body, &resp); err != nil {
 		return fmt.Errorf("decode: %w", err)
 	}
 

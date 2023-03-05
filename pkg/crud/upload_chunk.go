@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/v4/pkg/cntxt"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/sha"
@@ -70,7 +71,7 @@ func (a App) uploadChunk(w http.ResponseWriter, r *http.Request, request provide
 
 func (a App) mergeChunk(w http.ResponseWriter, r *http.Request, request provider.Request, values map[string]string) {
 	ctx, end := tracer.StartSpan(r.Context(), a.tracer, "merge_chunk")
-	defer end()
+	defer end(nil)
 
 	fileName, err := safeFilename(values["filename"])
 	if err != nil {
@@ -114,7 +115,7 @@ func (a App) mergeChunk(w http.ResponseWriter, r *http.Request, request provider
 			} else {
 				a.notify(ctx, provider.NewUploadEvent(request, info, a.bestSharePath(filePath), a.rendererApp))
 			}
-		}(tracer.CopyToBackground(ctx))
+		}(cntxt.WithoutDeadline(ctx))
 	}
 
 	if err = os.RemoveAll(tempFolder); err != nil {

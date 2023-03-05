@@ -10,9 +10,9 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/v4/pkg/cntxt"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
-	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 )
 
 func parseMultipart(r *http.Request) (map[string]string, *multipart.Part, error) {
@@ -175,7 +175,7 @@ func (a App) handlePostDescription(w http.ResponseWriter, r *http.Request, reque
 		return
 	}
 
-	go a.notify(tracer.CopyToBackground(ctx), provider.NewDescriptionEvent(item, a.bestSharePath(item.Pathname), description, a.rendererApp))
+	go a.notify(cntxt.WithoutDeadline(ctx), provider.NewDescriptionEvent(item, a.bestSharePath(item.Pathname), description, a.rendererApp))
 
 	a.rendererApp.Redirect(w, r, fmt.Sprintf("?d=%s#%s", request.Display, item.ID), renderer.NewSuccessMessage("Description successfully edited"))
 }

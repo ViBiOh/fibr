@@ -84,9 +84,9 @@ func redisKey(filename string) string {
 	return version.Redis("thumbnail:" + sha.New(filename))
 }
 
-func (a App) Info(ctx context.Context, pathname string) (absto.Item, error) {
+func (a App) Info(ctx context.Context, pathname string) (item absto.Item, err error) {
 	ctx, end := tracer.StartSpan(ctx, a.tracer, "info")
-	defer end()
+	defer end(&err)
 
 	return a.cacheApp.Get(ctx, pathname)
 }

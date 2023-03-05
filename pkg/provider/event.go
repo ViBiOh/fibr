@@ -344,7 +344,7 @@ func (e EventBus) Start(ctx context.Context, storageApp absto.Storage, renamers 
 			consumer(ctx, event)
 		}
 
-		end()
+		end(nil)
 		e.increaseMetric(event, "done")
 	}
 }

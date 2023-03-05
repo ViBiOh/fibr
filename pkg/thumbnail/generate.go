@@ -2,13 +2,13 @@ package thumbnail
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
-	httpModel "github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 	vith "github.com/ViBiOh/vith/pkg/model"
 )
@@ -36,7 +36,7 @@ func (a App) generate(ctx context.Context, item absto.Item, scale uint64) (err e
 
 	defer func() {
 		if closeErr := request.DiscardBody(resp.Body); closeErr != nil {
-			err = httpModel.WrapError(err, fmt.Errorf("close: %w", closeErr))
+			err = errors.Join(err, fmt.Errorf("close: %w", closeErr))
 		}
 	}()
 

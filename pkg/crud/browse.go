@@ -17,7 +17,7 @@ import (
 
 func (a App) browse(ctx context.Context, request provider.Request, item absto.Item, message renderer.Message) (renderer.Page, error) {
 	ctx, end := tracer.StartSpan(ctx, a.tracer, "browse", trace.WithSpanKind(trace.SpanKindInternal))
-	defer end()
+	defer end(nil)
 
 	var (
 		previous provider.RenderItem
@@ -68,7 +68,7 @@ func (a App) browse(ctx context.Context, request provider.Request, item absto.It
 
 func (a App) getFilesPreviousAndNext(ctx context.Context, item absto.Item, request provider.Request) (items []absto.Item, previous provider.RenderItem, next provider.RenderItem) {
 	ctx, end := tracer.StartSpan(ctx, a.tracer, "get_previous_next", trace.WithSpanKind(trace.SpanKindInternal))
-	defer end()
+	defer end(nil)
 
 	var err error
 	items, err = a.storageApp.List(ctx, item.Dir())

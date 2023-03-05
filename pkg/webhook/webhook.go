@@ -12,11 +12,11 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/flags"
+	"github.com/ViBiOh/httputils/v4/pkg/cntxt"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	prom "github.com/ViBiOh/httputils/v4/pkg/prometheus"
 	"github.com/ViBiOh/httputils/v4/pkg/redis"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
-	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -90,7 +90,7 @@ func (a *App) Start(ctx context.Context) {
 	defer func() {
 		logger.Info("Unsubscribing Webhook's PubSub...")
 
-		if unsubscribeErr := unsubscribe(tracer.CopyToBackground(ctx)); unsubscribeErr != nil {
+		if unsubscribeErr := unsubscribe(cntxt.WithoutDeadline(ctx)); unsubscribeErr != nil {
 			logger.Error("Webhook's unsubscribe: %s", unsubscribeErr)
 		}
 	}()

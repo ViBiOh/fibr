@@ -217,7 +217,7 @@ func (a App) List(w http.ResponseWriter, r *http.Request, item absto.Item, items
 	}
 
 	ctx, end := tracer.StartSpan(r.Context(), a.tracer, "list", trace.WithSpanKind(trace.SpanKindInternal))
-	defer end()
+	defer end(nil)
 
 	var hash string
 
@@ -262,7 +262,7 @@ func (a App) List(w http.ResponseWriter, r *http.Request, item absto.Item, items
 
 func (a App) thumbnailHash(ctx context.Context, items []absto.Item) string {
 	ctx, end := tracer.StartSpan(ctx, a.tracer, "hash", trace.WithSpanKind(trace.SpanKindInternal))
-	defer end()
+	defer end(nil)
 
 	ids := make([]string, len(items))
 	for index, item := range items {
@@ -289,7 +289,7 @@ func (a App) encodeContent(ctx context.Context, w io.Writer, isDone func() bool,
 	}
 
 	ctx, end := tracer.StartSpan(ctx, a.tracer, "encode", trace.WithSpanKind(trace.SpanKindInternal))
-	defer end()
+	defer end(nil)
 
 	reader, err := a.storageApp.ReadFrom(ctx, a.PathForScale(item, SmallSize))
 	if err != nil {

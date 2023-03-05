@@ -36,7 +36,7 @@ func (a App) Files(r *http.Request, request provider.Request) (items []absto.Ite
 	params := r.URL.Query()
 
 	ctx, end := tracer.StartSpan(r.Context(), a.tracer, "filter")
-	defer end()
+	defer end(&err)
 
 	criterions, err := parseSearch(params, time.Now())
 	if err != nil {

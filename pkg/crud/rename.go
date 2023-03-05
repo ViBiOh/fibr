@@ -9,9 +9,9 @@ import (
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/v4/pkg/cntxt"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
-	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 )
 
 func (a App) doRename(ctx context.Context, oldPath, newPath string, oldItem absto.Item) (absto.Item, error) {
@@ -24,7 +24,7 @@ func (a App) doRename(ctx context.Context, oldPath, newPath string, oldItem abst
 		return absto.Item{}, fmt.Errorf("get info of new item: %w", err)
 	}
 
-	go a.notify(tracer.CopyToBackground(ctx), provider.NewRenameEvent(oldItem, newItem, a.bestSharePath(newPath), a.rendererApp))
+	go a.notify(cntxt.WithoutDeadline(ctx), provider.NewRenameEvent(oldItem, newItem, a.bestSharePath(newPath), a.rendererApp))
 
 	return newItem, nil
 }

@@ -16,6 +16,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/geo"
 	"github.com/ViBiOh/fibr/pkg/metadata"
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/v4/pkg/cntxt"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/query"
@@ -74,7 +75,7 @@ func (a App) handleFile(w http.ResponseWriter, r *http.Request, request provider
 	if query.GetBool(r, "browser") {
 		provider.SetPrefsCookie(w, request)
 
-		go a.notify(tracer.CopyToBackground(r.Context()), provider.NewAccessEvent(item, r))
+		go a.notify(cntxt.WithoutDeadline(r.Context()), provider.NewAccessEvent(item, r))
 
 		return a.browse(r.Context(), request, item, message)
 	}
@@ -83,8 +84,10 @@ func (a App) handleFile(w http.ResponseWriter, r *http.Request, request provider
 }
 
 func (a App) serveFile(w http.ResponseWriter, r *http.Request, item absto.Item) error {
+	var err error
+
 	ctx, end := tracer.StartSpan(r.Context(), a.tracer, "file", trace.WithSpanKind(trace.SpanKindInternal))
-	defer end()
+	defer end(&err)
 
 	etag, ok := provider.EtagMatch(w, r, sha.New(item))
 	if ok {
@@ -129,7 +132,7 @@ func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.
 		return errorReturn(request, err)
 	}
 
-	go a.notify(tracer.CopyToBackground(r.Context()), provider.NewAccessEvent(item, r))
+	go a.notify(cntxt.WithoutDeadline(r.Context()), provider.NewAccessEvent(item, r))
 
 	if query.GetBool(r, "search") {
 		return a.search(r, request, item, items)
@@ -146,7 +149,7 @@ func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.
 
 func (a App) listFiles(r *http.Request, request provider.Request, item absto.Item) (items []absto.Item, err error) {
 	ctx, end := tracer.StartSpan(r.Context(), a.tracer, "files", trace.WithAttributes(attribute.String("item", item.Pathname)))
-	defer end()
+	defer end(&err)
 
 	if query.GetBool(r, "search") {
 		items, err = a.searchApp.Files(r, request)
@@ -181,7 +184,7 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 	}
 
 	ctx, end := tracer.StartSpan(r.Context(), a.tracer, "geojson", trace.WithSpanKind(trace.SpanKindInternal))
-	defer end()
+	defer end(nil)
 
 	var hash string
 	if query.GetBool(r, "search") {

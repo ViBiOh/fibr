@@ -10,6 +10,7 @@ import (
 	"strconv"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/v4/pkg/cntxt"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
@@ -39,7 +40,7 @@ func (a App) saveUploadedFile(ctx context.Context, request provider.Request, inp
 			} else {
 				a.notify(ctx, provider.NewUploadEvent(request, info, a.bestSharePath(filePath), a.rendererApp))
 			}
-		}(tracer.CopyToBackground(ctx))
+		}(cntxt.WithoutDeadline(ctx))
 	}
 
 	return fileName, err
@@ -84,7 +85,7 @@ func (a App) upload(w http.ResponseWriter, r *http.Request, request provider.Req
 	}
 
 	ctx, end := tracer.StartSpan(r.Context(), a.tracer, "upload")
-	defer end()
+	defer end(nil)
 
 	filename, err := a.saveUploadedFile(ctx, request, values["filename"], values["size"], file)
 	if err != nil {

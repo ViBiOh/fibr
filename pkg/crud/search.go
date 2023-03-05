@@ -12,7 +12,7 @@ import (
 
 func (a App) search(r *http.Request, request provider.Request, item absto.Item, files []absto.Item) (renderer.Page, error) {
 	ctx, end := tracer.StartSpan(r.Context(), a.tracer, "search")
-	defer end()
+	defer end(nil)
 
 	metadatas, err := a.metadataApp.GetAllMetadataFor(ctx, files...)
 	if err != nil {
