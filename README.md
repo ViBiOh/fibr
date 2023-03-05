@@ -389,9 +389,9 @@ Usage of fibr:
   -title string
         Application title {FIBR_TITLE} (default "fibr")
   -tracerRate string
-        [tracer] Jaeger sample rate, 'always', 'never' or a float value {FIBR_TRACER_RATE} (default "always")
+        [tracer] OpenTracing sample rate, 'always', 'never' or a float value {FIBR_TRACER_RATE} (default "always")
   -tracerURL string
-        [tracer] Jaeger endpoint URL (e.g. http://jaeger:14268/api/traces) {FIBR_TRACER_URL}
+        [tracer] OpenTracing gRPC endpoint (e.g. otel-exporter:4317) {FIBR_TRACER_URL}
   -url string
         [alcotest] URL to check {FIBR_URL}
   -userAgent string
