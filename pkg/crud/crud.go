@@ -21,6 +21,18 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+type Items []absto.Item
+
+func (i Items) FindDirectory(name string) (absto.Item, bool) {
+	for _, item := range i {
+		if item.IsDir && absto.Dirname(item.Pathname) == name {
+			return item, true
+		}
+	}
+
+	return absto.Item{}, false
+}
+
 var (
 	ErrNotAuthorized  = errors.New("you're not authorized to do this ⛔")
 	ErrEmptyName      = errors.New("name is empty")
@@ -117,7 +129,7 @@ func (a App) start(ctx context.Context) {
 
 	done := ctx.Done()
 
-	var directories []absto.Item
+	var directories Items
 
 	err := a.storageApp.Walk(ctx, "", func(item absto.Item) error {
 		select {
@@ -132,6 +144,8 @@ func (a App) start(ctx context.Context) {
 			directories = append(directories, item)
 		} else {
 			a.notify(ctx, provider.NewStartEvent(item))
+
+			a.sanitizeOrphan(directories, item)
 		}
 
 		return nil
@@ -162,6 +176,12 @@ func (a App) sanitizeName(ctx context.Context, item absto.Item) absto.Item {
 	}
 
 	return a.rename(ctx, item, name)
+}
+
+func (a App) sanitizeOrphan(directories Items, item absto.Item) {
+	if _, ok := directories.FindDirectory(item.Dir()); !ok {
+		logger.Warn("File with name `%s` doesn't have a parent directory", item.Pathname)
+	}
 }
 
 func (a App) rename(ctx context.Context, item absto.Item, name string) absto.Item {
