@@ -23,29 +23,28 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 }
 
 func Get(config Config, storage absto.Storage) (absto.Storage, error) {
-	ignore := *config.ignore
-	if len(ignore) == 0 {
-		return storage, nil
+	var pattern *regexp.Regexp
+
+	if ignore := *config.ignore; len(ignore) != 0 {
+		var err error
+
+		pattern, err = regexp.Compile(ignore)
+		if err != nil {
+			return storage, fmt.Errorf("regexp compile: %w", err)
+		}
+
+		logger.Info("Ignoring files with pattern `%s`", ignore)
 	}
 
-	pattern, err := regexp.Compile(ignore)
-	if err != nil {
-		return storage, fmt.Errorf("regexp compile: %w", err)
-	}
-
-	logger.Info("Ignoring files with pattern `%s`", ignore)
-
-	filteredStorage := storage.WithIgnoreFn(func(item absto.Item) bool {
+	return storage.WithIgnoreFn(func(item absto.Item) bool {
 		if strings.HasPrefix(item.Pathname, provider.MetadataDirectoryName) {
 			return true
 		}
 
-		if pattern.MatchString(item.Name) {
+		if pattern != nil && pattern.MatchString(item.Name) {
 			return true
 		}
 
 		return false
-	})
-
-	return filteredStorage, nil
+	}), nil
 }
