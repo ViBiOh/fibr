@@ -187,7 +187,12 @@ func (a App) sanitizeOrphan(ctx context.Context, directories Items, item absto.I
 
 	if !a.sanitizeOnStart {
 		logger.Warn("File with name `%s` doesn't have a parent directory", item.Pathname)
-	} else if err := a.storageApp.CreateDir(ctx, dirname); err != nil {
+		return
+	}
+
+	logger.Info("Creating folder `%s`", dirname)
+
+	if err := a.storageApp.CreateDir(ctx, dirname); err != nil {
 		logger.Error("create a parent directory for `%s`: %s", item.Pathname, err)
 	}
 }
