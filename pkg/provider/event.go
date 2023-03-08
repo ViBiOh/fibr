@@ -317,6 +317,13 @@ func (e EventBus) Push(event Event) error {
 	case <-e.closed:
 		e.increaseMetric(event, "refused")
 		return errors.New("bus is closed")
+	default:
+	}
+
+	select {
+	case <-e.closed:
+		e.increaseMetric(event, "refused")
+		return errors.New("bus is closed")
 	case e.bus <- event:
 		e.increaseMetric(event, "push")
 		return nil

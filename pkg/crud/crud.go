@@ -144,7 +144,10 @@ func (a App) start(ctx context.Context) {
 			directories = append(directories, item)
 		} else {
 			a.notify(ctx, provider.NewStartEvent(item))
-			a.sanitizeOrphan(ctx, directories, item)
+
+			if created := a.sanitizeOrphan(ctx, directories, item); !created.IsZero() {
+				directories = append(directories, created)
+			}
 		}
 
 		return nil
@@ -177,24 +180,33 @@ func (a App) sanitizeName(ctx context.Context, item absto.Item) absto.Item {
 	return a.rename(ctx, item, name)
 }
 
-func (a App) sanitizeOrphan(ctx context.Context, directories Items, item absto.Item) {
+func (a App) sanitizeOrphan(ctx context.Context, directories Items, item absto.Item) absto.Item {
 	dirname := item.Dir()
 
 	_, ok := directories.FindDirectory(dirname)
 	if ok {
-		return
+		return absto.Item{}
 	}
 
 	if !a.sanitizeOnStart {
 		logger.Warn("File with name `%s` doesn't have a parent directory", item.Pathname)
-		return
+		return absto.Item{}
 	}
 
 	logger.Info("Creating folder `%s`", dirname)
 
 	if err := a.storageApp.CreateDir(ctx, dirname); err != nil {
 		logger.Error("create a parent directory for `%s`: %s", item.Pathname, err)
+		return absto.Item{}
 	}
+
+	item, err := a.storageApp.Info(ctx, dirname)
+	if err != nil {
+		logger.Error("getting the parent directory infos `%s`: %s", item.Pathname, err)
+		return absto.Item{}
+	}
+
+	return item
 }
 
 func (a App) rename(ctx context.Context, item absto.Item, name string) absto.Item {
