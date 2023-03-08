@@ -44,7 +44,7 @@ spec:
       FIBR_IGNORE_PATTERN: '.st(folder|ignore)'
       FIBR_LOGGER_JSON: 'true'
       FIBR_PUBLIC_URL: https://fibr.vibioh.fr
-      FIBR_REDIS_ADDRESS: 'redis:80'
+      FIBR_REDIS_ADDRESS: redis:80/6
       FIBR_SANITIZE_ON_START: 'true'
       FIBR_THUMBNAIL_DIRECT_ACCESS: 'true'
       FIBR_THUMBNAIL_LARGE_SIZE: '1000'
