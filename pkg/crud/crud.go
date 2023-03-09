@@ -193,20 +193,26 @@ func (a App) sanitizeOrphan(ctx context.Context, directories Items, item absto.I
 		return absto.Item{}
 	}
 
-	logger.Info("Creating folder `%s`", dirname)
+	sanitizedName, err := provider.SanitizeName(dirname, false)
+	if err != nil {
+		logger.Error("sanitize name for directory `%s`: %s", dirname, err)
+		return absto.Item{}
+	}
 
-	if err := a.storageApp.CreateDir(ctx, dirname); err != nil {
+	logger.Info("Creating folder `%s`", sanitizedName)
+
+	if err := a.storageApp.CreateDir(ctx, sanitizedName); err != nil {
 		logger.Error("create a parent directory for `%s`: %s", item.Pathname, err)
 		return absto.Item{}
 	}
 
-	item, err := a.storageApp.Info(ctx, dirname)
+	directoryItem, err := a.storageApp.Info(ctx, sanitizedName)
 	if err != nil {
 		logger.Error("getting the parent directory infos `%s`: %s", item.Pathname, err)
 		return absto.Item{}
 	}
 
-	return item
+	return directoryItem
 }
 
 func (a App) rename(ctx context.Context, item absto.Item, name string) absto.Item {
