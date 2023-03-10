@@ -341,7 +341,7 @@ Usage of fibr:
   -redisUsername string
         [redis] Redis Username, if any {FIBR_REDIS_USERNAME}
   -sanitizeOnStart
-        [crud] Sanitize name on start {FIBR_SANITIZE_ON_START}
+        [crud] Sanitize on start {FIBR_SANITIZE_ON_START}
   -sharePubSubChannel string
         [share] Channel name {FIBR_SHARE_PUB_SUB_CHANNEL} (default "fibr:shares-channel")
   -shutdownTimeout duration

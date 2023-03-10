@@ -67,7 +67,7 @@ type Config struct {
 
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		sanitizeOnStart: flags.Bool(fs, prefix, "crud", "SanitizeOnStart", "Sanitize name on start", false, nil),
+		sanitizeOnStart: flags.Bool(fs, prefix, "crud", "SanitizeOnStart", "Sanitize on start", false, nil),
 		bcryptDuration:  flags.String(fs, prefix, "crud", "BcryptDuration", "Wanted bcrypt duration for calculating effective cost", "0.25s", nil),
 
 		chunkUpload:     flags.Bool(fs, prefix, "crud", "ChunkUpload", "Use chunk upload in browser", false, nil),
