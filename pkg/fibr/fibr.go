@@ -72,6 +72,7 @@ func (a App) parseRequest(r *http.Request) (provider.Request, error) {
 		request.CanEdit = true
 		request.CanShare = true
 		request.CanWebhook = true
+
 		return request, nil
 	}
 
@@ -92,6 +93,7 @@ func (a App) parseRequest(r *http.Request) (provider.Request, error) {
 
 func parsePreferences(r *http.Request) provider.Preferences {
 	var cookieValue string
+
 	if cookie, err := r.Cookie(provider.LayoutPathsCookieName); err == nil {
 		cookieValue = cookie.Value
 	}

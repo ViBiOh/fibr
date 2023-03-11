@@ -4,7 +4,6 @@ import (
 	"fmt"
 )
 
-// Type is a type of GeoJSON Object.
 type Type string
 
 const (
