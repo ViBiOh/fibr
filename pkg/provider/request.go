@@ -49,8 +49,39 @@ func ParseDisplay(input string) Display {
 	}
 }
 
+type DisplayPreferences map[string]Display
+
+func ParseDisplayPreferences(value string) map[string]Display {
+	output := make(DisplayPreferences)
+
+	for _, part := range strings.Split(value, ",") {
+		parts := strings.SplitN(part, preferencesPathSeparator, 2)
+		if len(parts) == 2 {
+			output[parts[0]] = ParseDisplay(parts[1])
+		}
+	}
+
+	return output
+}
+
+func (dp DisplayPreferences) String() string {
+	var builder strings.Builder
+
+	for key, value := range dp {
+		if builder.Len() > 0 {
+			builder.WriteString(",")
+		}
+
+		builder.WriteString(key)
+		builder.WriteString("|")
+		builder.WriteString(string(value))
+	}
+
+	return builder.String()
+}
+
 type Preferences struct {
-	LayoutPaths map[string]Display
+	LayoutPaths DisplayPreferences
 }
 
 func ParsePreferences(value string) Preferences {
@@ -60,27 +91,40 @@ func ParsePreferences(value string) Preferences {
 		return output
 	}
 
-	output.LayoutPaths = make(map[string]Display)
-
-	for _, part := range strings.Split(value, ",") {
-		parts := strings.SplitN(part, preferencesPathSeparator, 2)
-		if len(parts) == 2 {
-			output.LayoutPaths[parts[0]] = ParseDisplay(parts[1])
-		}
-	}
+	output.LayoutPaths = ParseDisplayPreferences(value)
 
 	return output
 }
 
+func (p Preferences) SetCookie(w http.ResponseWriter) {
+	http.SetCookie(w, &http.Cookie{
+		Name:     LayoutPathsCookieName,
+		Value:    p.LayoutPaths.String(),
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteStrictMode,
+	})
+}
+
+func (p Preferences) GetLayout(path string) Display {
+	if layout, ok := p.LayoutPaths[path]; ok {
+		return layout
+	}
+
+	return DefaultDisplay
+}
+
 func (p Preferences) AddLayout(path string, display Display) Preferences {
 	if p.LayoutPaths == nil {
-		p.LayoutPaths = map[string]Display{
+		p.LayoutPaths = DisplayPreferences{
 			path: display,
 		}
 		return p
 	}
 
 	p.LayoutPaths[path] = display
+
 	return p
 }
 
@@ -127,6 +171,7 @@ func (r Request) UpdatePreferences() Request {
 
 func (r Request) DeletePreference(path string) Request {
 	r.Preferences.RemoveLayout(path)
+
 	return r
 }
 
@@ -161,11 +206,7 @@ func (r Request) SubPath(name string) string {
 }
 
 func (r Request) LayoutPath(path string) Display {
-	if layout, ok := r.Preferences.LayoutPaths[path]; ok {
-		return layout
-	}
-
-	return DefaultDisplay
+	return r.Preferences.GetLayout(path)
 }
 
 func (r Request) Title() string {
@@ -208,31 +249,8 @@ func (r Request) contentParts() []string {
 	return parts
 }
 
-func computeLayoutPaths(request Request) string {
-	var builder strings.Builder
-
-	for key, value := range request.Preferences.LayoutPaths {
-		if builder.Len() > 0 {
-			builder.WriteString(",")
-		}
-
-		builder.WriteString(key)
-		builder.WriteString("|")
-		builder.WriteString(string(value))
-	}
-
-	return builder.String()
-}
-
 func SetPrefsCookie(w http.ResponseWriter, request Request) {
-	http.SetCookie(w, &http.Cookie{
-		Name:     LayoutPathsCookieName,
-		Value:    computeLayoutPaths(request),
-		Path:     "/",
-		HttpOnly: true,
-		Secure:   true,
-		SameSite: http.SameSiteStrictMode,
-	})
+	request.Preferences.SetCookie(w)
 
 	w.Header().Add("content-language", "en")
 }
