@@ -201,11 +201,11 @@ func (a App) updateCover(ctx context.Context, item absto.Item) error {
 func updatePreferences(request provider.Request, oldPath, newPath string) {
 	paths := request.Preferences.LayoutPaths
 
-	for index, layoutPath := range paths {
-		if layoutPath != oldPath {
-			paths[index] = newPath
-		} else {
-			paths[index] = layoutPath
+	for path, display := range paths {
+		if path == oldPath {
+			delete(paths, path)
+
+			paths[newPath] = display
 		}
 	}
 }

@@ -231,7 +231,7 @@ func TestLayoutPath(t *testing.T) {
 	cases := map[string]struct {
 		instance Request
 		args     args
-		want     string
+		want     Display
 	}{
 		"empty list": {
 			Request{},
@@ -243,9 +243,9 @@ func TestLayoutPath(t *testing.T) {
 		"story": {
 			Request{
 				Preferences: Preferences{
-					LayoutPaths: map[string]string{
-						"/sheets":  "list",
-						"/reports": "story",
+					LayoutPaths: map[string]Display{
+						"/sheets":  ListDisplay,
+						"/reports": StoryDisplay,
 					},
 				},
 			},

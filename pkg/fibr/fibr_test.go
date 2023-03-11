@@ -347,9 +347,9 @@ func TestParseRequest(t *testing.T) {
 				CanShare:   true,
 				CanWebhook: true,
 				Preferences: provider.Preferences{
-					LayoutPaths: map[string]string{
-						"assets":            "list",
-						"documents/monthly": "story",
+					LayoutPaths: map[string]provider.Display{
+						"assets":            provider.ListDisplay,
+						"documents/monthly": provider.StoryDisplay,
 					},
 				},
 			},

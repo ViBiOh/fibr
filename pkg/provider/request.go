@@ -9,13 +9,15 @@ import (
 	absto "github.com/ViBiOh/absto/pkg/model"
 )
 
+type Display string
+
 var (
 	// GridDisplay format
-	GridDisplay = "grid"
+	GridDisplay Display = "grid"
 	// ListDisplay format
-	ListDisplay = "list"
+	ListDisplay Display = "list"
 	// StoryDisplay format
-	StoryDisplay = "story"
+	StoryDisplay Display = "story"
 
 	// DefaultDisplay format
 	DefaultDisplay = GridDisplay
@@ -31,8 +33,24 @@ var (
 	}
 )
 
+func ParseDisplay(input string) Display {
+	switch input {
+	case string(GridDisplay):
+		return GridDisplay
+
+	case string(ListDisplay):
+		return ListDisplay
+
+	case string(StoryDisplay):
+		return StoryDisplay
+
+	default:
+		return DefaultDisplay
+	}
+}
+
 type Preferences struct {
-	LayoutPaths map[string]string
+	LayoutPaths map[string]Display
 }
 
 func ParsePreferences(value string) Preferences {
@@ -42,21 +60,21 @@ func ParsePreferences(value string) Preferences {
 		return output
 	}
 
-	output.LayoutPaths = make(map[string]string)
+	output.LayoutPaths = make(map[string]Display)
 
 	for _, part := range strings.Split(value, ",") {
 		parts := strings.SplitN(part, preferencesPathSeparator, 2)
 		if len(parts) == 2 {
-			output.LayoutPaths[parts[0]] = parts[1]
+			output.LayoutPaths[parts[0]] = ParseDisplay(parts[1])
 		}
 	}
 
 	return output
 }
 
-func (p Preferences) AddLayout(path, display string) Preferences {
+func (p Preferences) AddLayout(path string, display Display) Preferences {
 	if p.LayoutPaths == nil {
-		p.LayoutPaths = map[string]string{
+		p.LayoutPaths = map[string]Display{
 			path: display,
 		}
 		return p
@@ -75,7 +93,7 @@ func (p Preferences) RemoveLayout(path string) Preferences {
 type Request struct {
 	Path        string
 	Item        string
-	Display     string
+	Display     Display
 	Preferences Preferences
 	Share       Share
 	CanEdit     bool
@@ -90,7 +108,7 @@ func (r Request) String() string {
 	output.WriteString(strconv.FormatBool(r.CanEdit))
 	output.WriteString(r.Item)
 	output.WriteString(strconv.FormatBool(r.CanShare))
-	output.WriteString(r.Display)
+	output.WriteString(string(r.Display))
 	output.WriteString(strconv.FormatBool(r.CanWebhook))
 	output.WriteString(r.Share.String())
 
@@ -142,10 +160,11 @@ func (r Request) SubPath(name string) string {
 	return Join(r.Share.Path, r.Path, name)
 }
 
-func (r Request) LayoutPath(path string) string {
+func (r Request) LayoutPath(path string) Display {
 	if layout, ok := r.Preferences.LayoutPaths[path]; ok {
 		return layout
 	}
+
 	return DefaultDisplay
 }
 
@@ -199,7 +218,7 @@ func computeLayoutPaths(request Request) string {
 
 		builder.WriteString(key)
 		builder.WriteString("|")
-		builder.WriteString(value)
+		builder.WriteString(string(value))
 	}
 
 	return builder.String()

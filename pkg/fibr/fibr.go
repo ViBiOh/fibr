@@ -40,7 +40,7 @@ func (a App) parseRequest(r *http.Request) (provider.Request, error) {
 		Path:        r.URL.Path,
 		CanEdit:     false,
 		CanShare:    false,
-		Display:     parseDisplay(r),
+		Display:     provider.ParseDisplay(r.URL.Query().Get("d")),
 		Preferences: parsePreferences(r),
 	}
 
@@ -88,17 +88,6 @@ func (a App) parseRequest(r *http.Request) (provider.Request, error) {
 	}
 
 	return request, nil
-}
-
-func parseDisplay(r *http.Request) string {
-	switch r.URL.Query().Get("d") {
-	case provider.ListDisplay:
-		return provider.ListDisplay
-	case provider.StoryDisplay:
-		return provider.StoryDisplay
-	default:
-		return provider.DefaultDisplay
-	}
 }
 
 func parsePreferences(r *http.Request) provider.Preferences {
