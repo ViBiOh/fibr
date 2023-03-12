@@ -9,7 +9,6 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 )
 
-// EventConsumer handle event pushed to the event bus
 func (a App) EventConsumer(ctx context.Context, e provider.Event) {
 	if a.vithRequest.IsZero() && a.amqpClient == nil {
 		return
@@ -31,7 +30,6 @@ func (a App) EventConsumer(ctx context.Context, e provider.Event) {
 	}
 }
 
-// Rename thumbnail of an item
 func (a App) Rename(ctx context.Context, old, new absto.Item) error {
 	if old.IsDir {
 		return nil

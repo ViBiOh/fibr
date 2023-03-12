@@ -20,32 +20,21 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-// EventType is the enumeration of event that can happen
 type EventType uint
 
-// EventProducer is a func that push an event
 type EventProducer func(Event) error
 
-// EventConsumer is a func that consume an event
 type EventConsumer func(context.Context, Event)
 
-// Renamer is a func that rename an item
 type Renamer func(context.Context, absto.Item, absto.Item) error
 
 const (
-	// UploadEvent occurs when someone upload a file
 	UploadEvent EventType = iota
-	// CreateDir occurs when a directory is created
 	CreateDir
-	// RenameEvent occurs when an item is renamed
 	RenameEvent
-	// DeleteEvent occurs when an item is deleted
 	DeleteEvent
-	// StartEvent occurs when fibr start
 	StartEvent
-	// AccessEvent occurs when content is accessed
 	AccessEvent
-	// DescriptionEvent occurs when a description is added
 	DescriptionEvent
 )
 
@@ -65,7 +54,6 @@ func (et EventType) String() string {
 	return eventTypeValues[et]
 }
 
-// MarshalJSON marshals the enum as a quoted json string
 func (et EventType) MarshalJSON() ([]byte, error) {
 	buffer := bytes.NewBufferString(`"`)
 	buffer.WriteString(et.String())
@@ -100,7 +88,6 @@ type Event struct {
 	Type         EventType         `json:"type"`
 }
 
-// IsForcedFor check if event is forced for given key
 func (e Event) IsForcedFor(key string) bool {
 	force := e.GetMetadata("force")
 
@@ -267,7 +254,6 @@ func NewAccessEvent(item absto.Item, r *http.Request) Event {
 	}
 }
 
-// EventBus describes a channel for exchanging Event
 type EventBus struct {
 	tracer  trace.Tracer
 	counter *prometheus.CounterVec

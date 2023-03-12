@@ -12,17 +12,12 @@ import (
 type Display string
 
 var (
-	// GridDisplay format
-	GridDisplay Display = "grid"
-	// ListDisplay format
-	ListDisplay Display = "list"
-	// StoryDisplay format
+	GridDisplay  Display = "grid"
+	ListDisplay  Display = "list"
 	StoryDisplay Display = "story"
 
-	// DefaultDisplay format
 	DefaultDisplay = GridDisplay
 
-	// LayoutPathsCookieName for saving preferences
 	LayoutPathsCookieName = "layout_paths"
 
 	preferencesPathSeparator = "|"

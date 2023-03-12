@@ -158,7 +158,6 @@ func (a App) enrichThumbnail(ctx context.Context, directoryAggregate provider.Ag
 	return
 }
 
-// Download content of a directory into a streamed zip
 func (a App) Download(w http.ResponseWriter, r *http.Request, request provider.Request, items []absto.Item) {
 	zipWriter := zip.NewWriter(w)
 	defer func() {

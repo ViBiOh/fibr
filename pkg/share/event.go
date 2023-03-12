@@ -11,7 +11,6 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 )
 
-// EventConsumer handle event pushed to the event bus
 func (a *App) EventConsumer(ctx context.Context, e provider.Event) {
 	switch e.Type {
 	case provider.RenameEvent:

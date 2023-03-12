@@ -51,7 +51,6 @@ func NewPosition(lon, lat float64) Position {
 	}
 }
 
-// MarshalJSON marshals the position as an array.
 func (p Position) MarshalJSON() ([]byte, error) {
 	return []byte(fmt.Sprintf("[%f,%f]", p.Longitude, p.Latitude)), nil
 }

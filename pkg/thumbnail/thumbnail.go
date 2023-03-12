@@ -27,10 +27,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-const (
-	// SmallSize is the square size of each thumbnail generated
-	SmallSize uint64 = 150
-)
+const SmallSize uint64 = 150
 
 var cacheDuration = fmt.Sprintf("private, max-age=%.0f", (time.Minute * 5).Seconds())
 
@@ -146,12 +143,10 @@ func New(config Config, storage absto.Storage, redisClient redis.Client, prometh
 	return app, nil
 }
 
-// LargeThumbnailSize give large thumbnail size
 func (a App) LargeThumbnailSize() uint64 {
 	return a.largeSize
 }
 
-// Stream check if stream is present and serve it
 func (a App) Stream(w http.ResponseWriter, r *http.Request, item absto.Item) {
 	reader, err := a.storageApp.ReadFrom(r.Context(), getStreamPath(item))
 	if err != nil {
@@ -170,7 +165,6 @@ func (a App) Stream(w http.ResponseWriter, r *http.Request, item absto.Item) {
 	http.ServeContent(w, r, item.Name, item.Date, reader)
 }
 
-// Serve check if thumbnail is present and serve it
 func (a App) Serve(w http.ResponseWriter, r *http.Request, item absto.Item) {
 	if !a.CanHaveThumbnail(item) {
 		w.WriteHeader(http.StatusNoContent)
@@ -209,7 +203,6 @@ func (a App) Serve(w http.ResponseWriter, r *http.Request, item absto.Item) {
 	http.ServeContent(w, r, baseName, item.Date, reader)
 }
 
-// List return all thumbnails in a base64 form
 func (a App) List(w http.ResponseWriter, r *http.Request, item absto.Item, items []absto.Item) {
 	if len(items) == 0 {
 		w.WriteHeader(http.StatusNoContent)

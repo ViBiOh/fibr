@@ -13,7 +13,6 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
-// FuncMap is the map of function available in templates
 var FuncMap = template.FuncMap{
 	"rebuildPaths": func(parts []string, index int) string {
 		return fmt.Sprintf("/%s/", strings.Join(parts[:index+1], "/"))
@@ -63,7 +62,6 @@ var FuncMap = template.FuncMap{
 	},
 }
 
-// TemplateFunc for rendering GUI
 func (a App) TemplateFunc(w http.ResponseWriter, r *http.Request) (renderer.Page, error) {
 	if !isMethodAllowed(r) {
 		return renderer.Page{}, model.WrapMethodNotAllowed(errors.New("you lack of method for calling me"))

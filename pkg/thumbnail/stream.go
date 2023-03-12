@@ -14,7 +14,6 @@ import (
 	"github.com/ViBiOh/vith/pkg/model"
 )
 
-// HasStream checks if given item has a streamable version
 func (a App) HasStream(ctx context.Context, item absto.Item) bool {
 	_, err := a.Info(ctx, getStreamPath(item))
 	return err == nil
