@@ -34,12 +34,16 @@ func (a *App) EventConsumer(ctx context.Context, event provider.Event) {
 		switch webhook.Kind {
 		case provider.Raw:
 			statusCode, err = a.rawHandle(ctx, webhook, event)
+
 		case provider.Discord:
 			statusCode, err = a.discordHandle(ctx, webhook, event)
+
 		case provider.Slack:
 			statusCode, err = a.slackHandle(ctx, webhook, event)
+
 		case provider.Telegram:
 			statusCode, err = a.telegramHandle(ctx, webhook, event)
+
 		default:
 			logger.Warn("unknown kind `%d` for webhook", webhook.Kind)
 		}
@@ -51,13 +55,11 @@ func (a *App) EventConsumer(ctx context.Context, event provider.Event) {
 		}
 	}
 
-	go func() {
-		if event.Type == provider.DeleteEvent {
-			if err := a.deleteItem(ctx, event.Item); err != nil {
-				logger.Error("delete webhooks for item: %s", err)
-			}
+	if event.Type == provider.DeleteEvent {
+		if err := a.deleteItem(ctx, event.Item); err != nil {
+			logger.Error("delete webhooks for item: %s", err)
 		}
-	}()
+	}
 }
 
 func send(ctx context.Context, id string, req request.Request, payload any) (int, error) {
