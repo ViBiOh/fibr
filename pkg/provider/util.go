@@ -3,7 +3,6 @@ package provider
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -127,71 +126,6 @@ func DoneWriter(isDone func() bool, w io.Writer, content string) {
 	SafeWrite(w, content)
 }
 
-func FindPath(arr []string, value string) int {
-	for index, item := range arr {
-		if strings.HasPrefix(item, value) {
-			return index
-		}
-	}
-
-	return -1
-}
-
-func RemoveIndex(arr []string, index int) []string {
-	if len(arr) == 0 || index < 0 || index >= len(arr) {
-		return arr
-	}
-
-	return append(arr[:index], arr[index+1:]...)
-}
-
-func LoadJSON[T any](ctx context.Context, storageApp absto.Storage, filename string) (output T, err error) {
-	var reader io.ReadCloser
-	reader, err = storageApp.ReadFrom(ctx, filename)
-	if err != nil {
-		err = fmt.Errorf("read: %w", err)
-		return
-	}
-
-	defer func() {
-		err = HandleClose(reader, err)
-	}()
-
-	if err = json.NewDecoder(reader).Decode(&output); err != nil {
-		err = fmt.Errorf("decode: %w", storageApp.ConvertError(err))
-	}
-
-	return
-}
-
-func SaveJSON(ctx context.Context, storageApp absto.Storage, filename string, content any) error {
-	reader, writer := io.Pipe()
-
-	done := make(chan error)
-	go func() {
-		defer close(done)
-		var err error
-
-		if jsonErr := json.NewEncoder(writer).Encode(content); jsonErr != nil {
-			err = fmt.Errorf("encode: %w", jsonErr)
-		}
-
-		if closeErr := writer.Close(); closeErr != nil {
-			err = errors.Join(err, fmt.Errorf("close encoder: %w", closeErr))
-		}
-
-		done <- err
-	}()
-
-	err := storageApp.WriteTo(ctx, filename, reader, absto.WriteOpts{})
-
-	if jsonErr := <-done; jsonErr != nil {
-		err = errors.Join(err, jsonErr)
-	}
-
-	return err
-}
-
 func SendLargeFile(ctx context.Context, storageApp absto.Storage, item absto.Item, req request.Request) (*http.Response, error) {
 	file, err := storageApp.ReadFrom(ctx, item.Pathname) // will be closed by `PipeWriter`
 	if err != nil {
@@ -221,14 +155,6 @@ func SendLargeFile(ctx context.Context, storageApp absto.Storage, item absto.Ite
 	r.ContentLength = item.Size
 
 	return request.DoWithClient(SlowClient, r)
-}
-
-func HandleClose(closer io.Closer, err error) error {
-	if closeErr := closer.Close(); closeErr != nil {
-		return errors.Join(err, fmt.Errorf("close: %w", closeErr))
-	}
-
-	return err
 }
 
 func LogClose(closer io.Closer, fn, item string) {

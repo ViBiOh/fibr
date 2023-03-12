@@ -4,6 +4,7 @@ import (
 	"archive/zip"
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -234,7 +235,7 @@ func (a App) addFileToZip(ctx context.Context, zipWriter *zip.Writer, item absto
 	}
 
 	defer func() {
-		err = provider.HandleClose(reader, err)
+		err = errors.Join(err, reader.Close())
 	}()
 
 	buffer := provider.BufferPool.Get().(*bytes.Buffer)
