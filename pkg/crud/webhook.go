@@ -39,6 +39,7 @@ func (a App) createWebhook(w http.ResponseWriter, r *http.Request, request provi
 		} else {
 			a.error(w, r, request, model.WrapInternal(err))
 		}
+
 		return
 	}
 

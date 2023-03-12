@@ -15,10 +15,10 @@ import (
 	"github.com/ViBiOh/fibr/pkg/search"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/flags"
+	"github.com/ViBiOh/httputils/v4/pkg/bcrypt"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 	"go.opentelemetry.io/otel/trace"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type Items []absto.Item
@@ -102,10 +102,9 @@ func New(config Config, storageApp absto.Storage, filteredStorage absto.Storage,
 		return app, fmt.Errorf("parse bcrypt duration: %w", err)
 	}
 
-	bcryptCost, err := findBcryptBestCost(bcryptDuration)
+	bcryptCost, err := bcrypt.FindBestCost(bcryptDuration)
 	if err != nil {
 		logger.Error("find best bcrypt cost: %s", err)
-		bcryptCost = bcrypt.DefaultCost
 	}
 	logger.Info("Best bcrypt cost is %d", bcryptCost)
 
