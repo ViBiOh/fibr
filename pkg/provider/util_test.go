@@ -42,6 +42,12 @@ func TestSanitizeName(t *testing.T) {
 			"path_name",
 			nil,
 		},
+		"should replace points": {
+			"path/../with/security/risk.md",
+			false,
+			"path/_/with/security/risk.md",
+			nil,
+		},
 	}
 
 	for intention, tc := range cases {

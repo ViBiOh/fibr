@@ -38,6 +38,7 @@ var (
 	}
 	quotesChar   = regexp.MustCompile(`["'` + "`" + `](?m)`)
 	specialChars = regexp.MustCompile(`[^a-z0-9.\-_/](?m)`)
+	pathEscape   = regexp.MustCompile(`\.{2,}(?m)`)
 
 	BufferPool = sync.Pool{
 		New: func() any {
@@ -103,8 +104,9 @@ func SanitizeName(name string, removeSlash bool) (string, error) {
 	withoutSpaces := strings.Replace(withoutDiacritics, " ", "_", -1)
 	withoutQuotes := quotesChar.ReplaceAllString(withoutSpaces, "_")
 	withoutSpecials := specialChars.ReplaceAllString(withoutQuotes, "")
+	withoutPathEscape := pathEscape.ReplaceAllString(withoutSpecials, "_")
 
-	sanitized := withoutSpecials
+	sanitized := withoutPathEscape
 	if removeSlash {
 		sanitized = strings.Replace(sanitized, "/", "_", -1)
 	}
