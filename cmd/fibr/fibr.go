@@ -120,14 +120,11 @@ func main() {
 	fibrApp := fibr.New(&crudApp, rendererApp, shareApp, webhookApp, middlewareApp)
 	handler := rendererApp.Handler(fibrApp.TemplateFunc)
 
-	doneCtx := client.health.Done(ctx)
 	endCtx := client.health.End(ctx)
 
-	go amqpThumbnailApp.Start(doneCtx)
-	go amqpExifApp.Start(doneCtx)
-	go webhookApp.Start(endCtx)
-	go shareApp.Start(endCtx)
-	go sanitizerApp.Start(endCtx)
+	Starters{amqpThumbnailApp.Start, amqpExifApp.Start}.Do(client.health.Done(ctx))
+	Starters{webhookApp.Start, shareApp.Start, sanitizerApp.Start}.Do(endCtx)
+
 	go eventBus.Start(endCtx, storageApp, []provider.Renamer{thumbnailApp.Rename, metadataApp.Rename}, shareApp.EventConsumer, thumbnailApp.EventConsumer, metadataApp.EventConsumer, webhookApp.EventConsumer)
 
 	go promServer.Start(endCtx, "prometheus", client.prometheus.Handler())
