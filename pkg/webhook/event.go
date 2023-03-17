@@ -56,9 +56,12 @@ func (a *App) EventConsumer(ctx context.Context, event provider.Event) {
 	}
 
 	if event.Type == provider.DeleteEvent {
-		if err := a.deleteItem(ctx, event.Item); err != nil {
-			logger.Error("delete webhooks for item: %s", err)
-		}
+		// Fire a goroutine to release the mutex lock
+		go func() {
+			if err := a.deleteItem(ctx, event.Item); err != nil {
+				logger.Error("delete webhooks for item: %s", err)
+			}
+		}()
 	}
 }
 
