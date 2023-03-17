@@ -14,7 +14,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
-func (a App) doRename(ctx context.Context, oldPath, newPath string, oldItem absto.Item) (absto.Item, error) {
+func (a App) DoRename(ctx context.Context, oldPath, newPath string, oldItem absto.Item) (absto.Item, error) {
 	if err := a.storageApp.Rename(ctx, oldPath, newPath); err != nil {
 		return absto.Item{}, fmt.Errorf("rename: %w", err)
 	}
@@ -89,7 +89,7 @@ func (a App) Rename(w http.ResponseWriter, r *http.Request, request provider.Req
 			return
 		}
 
-		newItem, err = a.doRename(ctx, oldPath, newPath, oldItem)
+		newItem, err = a.DoRename(ctx, oldPath, newPath, oldItem)
 		if err != nil {
 			a.error(w, r, request, model.WrapInternal(err))
 			return

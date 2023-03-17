@@ -9,6 +9,7 @@ import (
 	basicMemory "github.com/ViBiOh/auth/v2/pkg/store/memory"
 	"github.com/ViBiOh/fibr/pkg/crud"
 	"github.com/ViBiOh/fibr/pkg/metadata"
+	"github.com/ViBiOh/fibr/pkg/sanitizer"
 	"github.com/ViBiOh/fibr/pkg/share"
 	"github.com/ViBiOh/fibr/pkg/storage"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
@@ -39,6 +40,7 @@ type configuration struct {
 	basic         basicMemory.Config
 	storage       storage.Config
 	crud          crud.Config
+	sanitizer     sanitizer.Config
 	share         share.Config
 	webhook       webhook.Config
 	renderer      renderer.Config
@@ -68,6 +70,7 @@ func newConfig() (configuration, error) {
 		basic:         basicMemory.Flags(fs, "auth", flags.NewOverride("Profiles", "1:admin")),
 		storage:       storage.Flags(fs, ""),
 		crud:          crud.Flags(fs, ""),
+		sanitizer:     sanitizer.Flags(fs, ""),
 		share:         share.Flags(fs, "share"),
 		webhook:       webhook.Flags(fs, "webhook"),
 		renderer:      renderer.Flags(fs, "", flags.NewOverride("PublicURL", "http://localhost:1080"), flags.NewOverride("Title", "fibr")),

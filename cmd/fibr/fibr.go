@@ -17,6 +17,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/fibr"
 	"github.com/ViBiOh/fibr/pkg/metadata"
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/fibr/pkg/sanitizer"
 	"github.com/ViBiOh/fibr/pkg/search"
 	"github.com/ViBiOh/fibr/pkg/share"
 	"github.com/ViBiOh/fibr/pkg/storage"
@@ -106,8 +107,10 @@ func main() {
 
 	searchApp := search.New(filteredStorage, thumbnailApp, metadataApp, exclusiveApp, client.tracer.GetTracer("search"))
 
-	crudApp, err := crud.New(config.crud, storageApp, filteredStorage, rendererApp, shareApp, webhookApp, thumbnailApp, metadataApp, searchApp, eventBus.Push, exclusiveApp, client.tracer.GetTracer("crud"))
+	crudApp, err := crud.New(config.crud, storageApp, filteredStorage, rendererApp, shareApp, webhookApp, thumbnailApp, metadataApp, searchApp, eventBus.Push, client.tracer.GetTracer("crud"))
 	logger.Fatal(err)
+
+	sanitizerApp := sanitizer.New(config.sanitizer, filteredStorage, exclusiveApp, crudApp, eventBus.Push)
 
 	var middlewareApp provider.Auth
 	if !*config.disableAuth {
@@ -124,7 +127,7 @@ func main() {
 	go amqpExifApp.Start(doneCtx)
 	go webhookApp.Start(endCtx)
 	go shareApp.Start(endCtx)
-	go crudApp.Start(endCtx)
+	go sanitizerApp.Start(endCtx)
 	go eventBus.Start(endCtx, storageApp, []provider.Renamer{thumbnailApp.Rename, metadataApp.Rename}, shareApp.EventConsumer, thumbnailApp.EventConsumer, metadataApp.EventConsumer, webhookApp.EventConsumer)
 
 	go promServer.Start(endCtx, "prometheus", client.prometheus.Handler())
