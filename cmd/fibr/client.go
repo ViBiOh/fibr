@@ -39,7 +39,6 @@ func newClient(ctx context.Context, config configuration) (client, error) {
 
 	output.prometheus = prometheus.New(config.prometheus)
 	output.health = health.New(config.health)
-
 	output.redis = redis.New(config.redis, output.tracer.GetTracer("redis"))
 
 	output.amqp, err = amqp.New(config.amqp, output.prometheus.Registerer(), output.tracer.GetTracer("amqp"))

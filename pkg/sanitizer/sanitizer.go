@@ -18,6 +18,7 @@ type Renamer interface {
 }
 
 type App struct {
+	done            chan struct{}
 	storageApp      absto.Storage
 	exclusiveApp    exclusive.App
 	pushEvent       provider.EventProducer
@@ -49,6 +50,7 @@ func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) Config 
 
 func New(config Config, storageApp absto.Storage, exclusiveApp exclusive.App, renamer Renamer, pushEvent provider.EventProducer) App {
 	return App{
+		done:            make(chan struct{}),
 		storageApp:      storageApp,
 		exclusiveApp:    exclusiveApp,
 		renamer:         renamer,
@@ -57,7 +59,13 @@ func New(config Config, storageApp absto.Storage, exclusiveApp exclusive.App, re
 	}
 }
 
+func (a App) Done() <-chan struct{} {
+	return a.done
+}
+
 func (a App) Start(ctx context.Context) {
+	defer close(a.done)
+
 	if err := a.exclusiveApp.Execute(ctx, "fibr:mutex:start", time.Hour, func(ctx context.Context) error {
 		a.start(ctx)
 		return nil
