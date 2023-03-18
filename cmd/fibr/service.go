@@ -1,17 +1,13 @@
 package main
 
 import (
-	"github.com/ViBiOh/absto/pkg/absto"
-	model "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/crud"
-	"github.com/ViBiOh/fibr/pkg/exclusive"
 	"github.com/ViBiOh/fibr/pkg/fibr"
 	"github.com/ViBiOh/fibr/pkg/metadata"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/sanitizer"
 	"github.com/ViBiOh/fibr/pkg/search"
 	"github.com/ViBiOh/fibr/pkg/share"
-	"github.com/ViBiOh/fibr/pkg/storage"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/fibr/pkg/webhook"
 	"github.com/ViBiOh/httputils/v4/pkg/amqphandler"
@@ -19,8 +15,6 @@ import (
 )
 
 type services struct {
-	eventBus         provider.EventBus
-	storageApp       model.Storage
 	webhookApp       *webhook.App
 	shareApp         *share.App
 	sanitizerApp     sanitizer.App
@@ -32,25 +26,8 @@ type services struct {
 	thumbnailApp     thumbnail.App
 }
 
-func newServices(config configuration, clients client) (services, error) {
-	prometheusRegisterer := clients.prometheus.Registerer()
-
-	storageApp, err := absto.New(config.absto, clients.tracer.GetTracer("storage"))
-	if err != nil {
-		return services{}, err
-	}
-
-	filteredStorage, err := storage.Get(config.storage, storageApp)
-	if err != nil {
-		return services{}, err
-	}
-
-	eventBus, err := provider.NewEventBus(provider.MaxConcurrency, prometheusRegisterer, clients.tracer.GetTracer("bus"))
-	if err != nil {
-		return services{}, err
-	}
-
-	thumbnailApp, err := thumbnail.New(config.thumbnail, storageApp, clients.redis, prometheusRegisterer, clients.tracer, clients.amqp)
+func newServices(config configuration, clients client, adapters adapters) (services, error) {
+	thumbnailApp, err := thumbnail.New(config.thumbnail, adapters.storageApp, clients.redis, adapters.prometheusRegisterer, clients.tracer, clients.amqp)
 	if err != nil {
 		return services{}, err
 	}
@@ -60,19 +37,14 @@ func newServices(config configuration, clients client) (services, error) {
 		return services{}, err
 	}
 
-	var exclusiveApp exclusive.App
-	if clients.redis.Enabled() {
-		exclusiveApp = exclusive.New(clients.redis)
-	}
-
-	metadataApp, err := metadata.New(config.metadata, storageApp, prometheusRegisterer, clients.tracer, clients.amqp, clients.redis, exclusiveApp)
+	metadataApp, err := metadata.New(config.metadata, adapters.storageApp, adapters.prometheusRegisterer, clients.tracer, clients.amqp, clients.redis, adapters.exclusiveApp)
 	if err != nil {
 		return services{}, err
 	}
 
-	webhookApp := webhook.New(config.webhook, storageApp, prometheusRegisterer, clients.redis, rendererApp, thumbnailApp, exclusiveApp)
+	webhookApp := webhook.New(config.webhook, adapters.storageApp, adapters.prometheusRegisterer, clients.redis, rendererApp, thumbnailApp, adapters.exclusiveApp)
 
-	shareApp, err := share.New(config.share, storageApp, clients.redis, exclusiveApp)
+	shareApp, err := share.New(config.share, adapters.storageApp, clients.redis, adapters.exclusiveApp)
 	if err != nil {
 		return services{}, err
 	}
@@ -87,14 +59,14 @@ func newServices(config configuration, clients client) (services, error) {
 		return services{}, err
 	}
 
-	searchApp := search.New(filteredStorage, thumbnailApp, metadataApp, exclusiveApp, clients.tracer.GetTracer("search"))
+	searchApp := search.New(adapters.filteredStorage, thumbnailApp, metadataApp, adapters.exclusiveApp, clients.tracer.GetTracer("search"))
 
-	crudApp, err := crud.New(config.crud, storageApp, filteredStorage, rendererApp, shareApp, webhookApp, thumbnailApp, metadataApp, searchApp, eventBus.Push, clients.tracer.GetTracer("crud"))
+	crudApp, err := crud.New(config.crud, adapters.storageApp, adapters.filteredStorage, rendererApp, shareApp, webhookApp, thumbnailApp, metadataApp, searchApp, adapters.eventBus.Push, clients.tracer.GetTracer("crud"))
 	if err != nil {
 		return services{}, err
 	}
 
-	sanitizerApp := sanitizer.New(config.sanitizer, filteredStorage, exclusiveApp, crudApp, eventBus.Push)
+	sanitizerApp := sanitizer.New(config.sanitizer, adapters.filteredStorage, adapters.exclusiveApp, crudApp, adapters.eventBus.Push)
 
 	var middlewareApp provider.Auth
 	if !*config.disableAuth {
@@ -104,13 +76,11 @@ func newServices(config configuration, clients client) (services, error) {
 	fibrApp := fibr.New(&crudApp, rendererApp, shareApp, webhookApp, middlewareApp)
 
 	return services{
-		storageApp:       storageApp,
 		amqpThumbnailApp: amqpThumbnailApp,
 		amqpExifApp:      amqpExifApp,
 		fibrApp:          fibrApp,
 		sanitizerApp:     sanitizerApp,
 		rendererApp:      rendererApp,
-		eventBus:         eventBus,
 		webhookApp:       webhookApp,
 		shareApp:         shareApp,
 		thumbnailApp:     thumbnailApp,

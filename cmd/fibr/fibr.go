@@ -49,7 +49,12 @@ func main() {
 
 	defer clients.Close(ctx)
 
-	services, err := newServices(config, clients)
+	adapters, err := newAdapters(config, clients)
+	if err != nil {
+		logger.Fatal(fmt.Errorf("adapters: %w", err))
+	}
+
+	services, err := newServices(config, clients, adapters)
 	if err != nil {
 		logger.Fatal(fmt.Errorf("services: %w", err))
 	}
@@ -69,7 +74,7 @@ func main() {
 	ports.Start(endCtx)
 	defer ports.GracefulWait()
 
-	go services.eventBus.Start(endCtx, services.storageApp, []provider.Renamer{services.thumbnailApp.Rename, services.metadataApp.Rename}, services.shareApp.EventConsumer, services.thumbnailApp.EventConsumer, services.metadataApp.EventConsumer, services.webhookApp.EventConsumer)
+	go adapters.eventBus.Start(endCtx, adapters.storageApp, []provider.Renamer{services.thumbnailApp.Rename, services.metadataApp.Rename}, services.shareApp.EventConsumer, services.thumbnailApp.EventConsumer, services.metadataApp.EventConsumer, services.webhookApp.EventConsumer)
 
 	clients.health.WaitForTermination(ports.TerminateOnDone())
 }
