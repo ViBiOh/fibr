@@ -42,7 +42,7 @@ func (a App) regenerate(w http.ResponseWriter, r *http.Request, request provider
 			if item.IsDir {
 				directories = append(directories, item)
 			} else {
-				a.notify(ctx, provider.NewRestartEvent(item, subset))
+				a.pushEvent(provider.NewRestartEvent(ctx, item, subset))
 			}
 
 			return nil
@@ -52,7 +52,7 @@ func (a App) regenerate(w http.ResponseWriter, r *http.Request, request provider
 		}
 
 		for _, directory := range directories {
-			a.notify(ctx, provider.NewStartEvent(directory))
+			a.pushEvent(provider.NewStartEvent(ctx, directory))
 		}
 	}(cntxt.WithoutDeadline(ctx))
 

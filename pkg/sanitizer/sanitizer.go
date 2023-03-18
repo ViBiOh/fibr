@@ -30,18 +30,6 @@ type Config struct {
 	sanitizeOnStart *bool
 }
 
-type Items []absto.Item
-
-func (i Items) FindDirectory(name string) (absto.Item, bool) {
-	for _, item := range i {
-		if item.IsDir && absto.Dirname(item.Pathname) == name {
-			return item, true
-		}
-	}
-
-	return absto.Item{}, false
-}
-
 func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) Config {
 	return Config{
 		sanitizeOnStart: flags.Bool(fs, prefix, "crud", "SanitizeOnStart", "Sanitize on start", false, nil),
@@ -67,20 +55,19 @@ func (a App) Start(ctx context.Context) {
 	defer close(a.done)
 
 	if err := a.exclusiveApp.Execute(ctx, "fibr:mutex:start", time.Hour, func(ctx context.Context) error {
-		a.start(ctx)
-		return nil
+		return a.start(ctx)
 	}); err != nil {
 		logger.Error("start: %s", err)
 	}
 }
 
-func (a App) start(ctx context.Context) {
+func (a App) start(ctx context.Context) error {
 	logger.Info("Starting startup check...")
 	defer logger.Info("Ending startup check.")
 
 	done := ctx.Done()
 
-	var directories Items
+	var directories []absto.Item
 
 	err := a.storageApp.Walk(ctx, "", func(item absto.Item) error {
 		select {
@@ -94,22 +81,20 @@ func (a App) start(ctx context.Context) {
 		if item.IsDir {
 			directories = append(directories, item)
 		} else {
-			a.notify(ctx, provider.NewStartEvent(item))
-
-			if created := a.sanitizeOrphan(ctx, directories, item); !created.IsZero() {
-				directories = append(directories, created)
-			}
+			a.pushEvent(provider.NewStartEvent(ctx, item))
 		}
 
 		return nil
 	})
 	if err != nil {
-		logger.Error("start: %s", err)
+		return err
 	}
 
 	for _, directory := range directories {
-		a.notify(ctx, provider.NewStartEvent(directory))
+		a.pushEvent(provider.NewStartEvent(ctx, directory))
 	}
+
+	return nil
 }
 
 func (a App) sanitizeName(ctx context.Context, item absto.Item) absto.Item {
@@ -128,45 +113,6 @@ func (a App) sanitizeName(ctx context.Context, item absto.Item) absto.Item {
 		return item
 	}
 
-	return a.rename(ctx, item, name)
-}
-
-func (a App) sanitizeOrphan(ctx context.Context, directories Items, item absto.Item) absto.Item {
-	dirname := item.Dir()
-
-	_, ok := directories.FindDirectory(dirname)
-	if ok {
-		return absto.Item{}
-	}
-
-	if !a.sanitizeOnStart {
-		logger.Warn("File with name `%s` doesn't have a parent directory", item.Pathname)
-		return absto.Item{}
-	}
-
-	sanitizedName, err := provider.SanitizeName(dirname, false)
-	if err != nil {
-		logger.Error("sanitize name for directory `%s`: %s", dirname, err)
-		return absto.Item{}
-	}
-
-	logger.Info("Creating folder `%s`", sanitizedName)
-
-	if err := a.storageApp.CreateDir(ctx, sanitizedName); err != nil {
-		logger.Error("create a parent directory for `%s`: %s", item.Pathname, err)
-		return absto.Item{}
-	}
-
-	directoryItem, err := a.storageApp.Info(ctx, sanitizedName)
-	if err != nil {
-		logger.Error("getting the parent directory infos `%s`: %s", item.Pathname, err)
-		return absto.Item{}
-	}
-
-	return directoryItem
-}
-
-func (a App) rename(ctx context.Context, item absto.Item, name string) absto.Item {
 	logger.Info("Renaming `%s` to `%s`", item.Pathname, name)
 
 	renamedItem, err := a.renamer.DoRename(ctx, item.Pathname, name, item)

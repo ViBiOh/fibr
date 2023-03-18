@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"path"
@@ -22,7 +21,7 @@ import (
 
 type EventType uint
 
-type EventProducer func(Event) error
+type EventProducer func(Event)
 
 type EventConsumer func(context.Context, Event)
 
@@ -167,11 +166,12 @@ func (e Event) GetTo() string {
 	return newName
 }
 
-func NewUploadEvent(request Request, item absto.Item, shareableURL string, rendererApp renderer.App) Event {
+func NewUploadEvent(ctx context.Context, request Request, item absto.Item, shareableURL string, rendererApp renderer.App) Event {
 	return Event{
 		Time:         time.Now(),
 		Type:         UploadEvent,
 		Item:         item,
+		TraceLink:    trace.LinkFromContext(ctx),
 		URL:          rendererApp.PublicURL(request.AbsoluteURL(item.Name)),
 		ShareableURL: rendererApp.PublicURL(shareableURL),
 		Metadata: map[string]string{
@@ -180,22 +180,24 @@ func NewUploadEvent(request Request, item absto.Item, shareableURL string, rende
 	}
 }
 
-func NewRenameEvent(old, new absto.Item, shareableURL string, rendererApp renderer.App) Event {
+func NewRenameEvent(ctx context.Context, old, new absto.Item, shareableURL string, rendererApp renderer.App) Event {
 	return Event{
 		Time:         time.Now(),
 		Type:         RenameEvent,
 		Item:         old,
+		TraceLink:    trace.LinkFromContext(ctx),
 		New:          &new,
 		URL:          rendererApp.PublicURL(new.Pathname),
 		ShareableURL: rendererApp.PublicURL(shareableURL),
 	}
 }
 
-func NewDescriptionEvent(item absto.Item, shareableURL string, description string, rendererApp renderer.App) Event {
+func NewDescriptionEvent(ctx context.Context, item absto.Item, shareableURL string, description string, rendererApp renderer.App) Event {
 	return Event{
 		Time:         time.Now(),
 		Type:         DescriptionEvent,
 		Item:         item,
+		TraceLink:    trace.LinkFromContext(ctx),
 		URL:          rendererApp.PublicURL(item.Pathname),
 		ShareableURL: rendererApp.PublicURL(shareableURL),
 		Metadata: map[string]string{
@@ -204,35 +206,38 @@ func NewDescriptionEvent(item absto.Item, shareableURL string, description strin
 	}
 }
 
-func NewDeleteEvent(request Request, item absto.Item, rendererApp renderer.App) Event {
+func NewDeleteEvent(ctx context.Context, request Request, item absto.Item, rendererApp renderer.App) Event {
 	return Event{
-		Time: time.Now(),
-		Type: DeleteEvent,
-		Item: item,
-		URL:  rendererApp.PublicURL(request.AbsoluteURL("")),
+		Time:      time.Now(),
+		Type:      DeleteEvent,
+		Item:      item,
+		TraceLink: trace.LinkFromContext(ctx),
+		URL:       rendererApp.PublicURL(request.AbsoluteURL("")),
 	}
 }
 
-func NewStartEvent(item absto.Item) Event {
+func NewStartEvent(ctx context.Context, item absto.Item) Event {
 	return Event{
-		Time: time.Now(),
-		Type: StartEvent,
-		Item: item,
+		Time:      time.Now(),
+		Type:      StartEvent,
+		Item:      item,
+		TraceLink: trace.LinkFromContext(ctx),
 	}
 }
 
-func NewRestartEvent(item absto.Item, subset string) Event {
+func NewRestartEvent(ctx context.Context, item absto.Item, subset string) Event {
 	return Event{
-		Time: time.Now(),
-		Type: StartEvent,
-		Item: item,
+		Time:      time.Now(),
+		Type:      StartEvent,
+		Item:      item,
+		TraceLink: trace.LinkFromContext(ctx),
 		Metadata: map[string]string{
 			"force": subset,
 		},
 	}
 }
 
-func NewAccessEvent(item absto.Item, r *http.Request) Event {
+func NewAccessEvent(ctx context.Context, item absto.Item, r *http.Request) Event {
 	metadata := make(map[string]string)
 	for key, values := range r.Header {
 		if strings.EqualFold(key, "Authorization") {
@@ -246,11 +251,12 @@ func NewAccessEvent(item absto.Item, r *http.Request) Event {
 	metadata["URL"] = r.URL.String()
 
 	return Event{
-		Time:     time.Now(),
-		Type:     AccessEvent,
-		Item:     item,
-		Metadata: metadata,
-		URL:      r.URL.String(),
+		Time:      time.Now(),
+		Type:      AccessEvent,
+		Item:      item,
+		TraceLink: trace.LinkFromContext(ctx),
+		Metadata:  metadata,
+		URL:       r.URL.String(),
 	}
 }
 
@@ -298,21 +304,20 @@ func (e EventBus) Done() <-chan struct{} {
 	return e.done
 }
 
-func (e EventBus) Push(event Event) error {
+func (e EventBus) Push(event Event) {
 	select {
 	case <-e.closed:
 		e.increaseMetric(event, "refused")
-		return errors.New("bus is closed")
+		logger.Error("bus is closed")
 	default:
 	}
 
 	select {
 	case <-e.closed:
 		e.increaseMetric(event, "refused")
-		return errors.New("bus is closed")
+		logger.Error("bus is closed")
 	case e.bus <- event:
 		e.increaseMetric(event, "push")
-		return nil
 	}
 }
 

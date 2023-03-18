@@ -9,7 +9,6 @@ import (
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/v4/pkg/cntxt"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
@@ -24,7 +23,7 @@ func (a App) DoRename(ctx context.Context, oldPath, newPath string, oldItem abst
 		return absto.Item{}, fmt.Errorf("get info of new item: %w", err)
 	}
 
-	go a.notify(cntxt.WithoutDeadline(ctx), provider.NewRenameEvent(oldItem, newItem, a.bestSharePath(newPath), a.rendererApp))
+	go a.pushEvent(provider.NewRenameEvent(ctx, oldItem, newItem, a.bestSharePath(newPath), a.rendererApp))
 
 	return newItem, nil
 }

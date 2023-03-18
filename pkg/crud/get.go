@@ -16,7 +16,6 @@ import (
 	"github.com/ViBiOh/fibr/pkg/geo"
 	"github.com/ViBiOh/fibr/pkg/metadata"
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/v4/pkg/cntxt"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/query"
@@ -75,7 +74,7 @@ func (a App) handleFile(w http.ResponseWriter, r *http.Request, request provider
 	if query.GetBool(r, "browser") {
 		provider.SetPrefsCookie(w, request)
 
-		go a.notify(cntxt.WithoutDeadline(r.Context()), provider.NewAccessEvent(item, r))
+		go a.pushEvent(provider.NewAccessEvent(r.Context(), item, r))
 
 		return a.browse(r.Context(), request, item, message)
 	}
@@ -132,7 +131,7 @@ func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.
 		return errorReturn(request, err)
 	}
 
-	go a.notify(cntxt.WithoutDeadline(r.Context()), provider.NewAccessEvent(item, r))
+	go a.pushEvent(provider.NewAccessEvent(r.Context(), item, r))
 
 	if query.GetBool(r, "search") {
 		return a.search(r, request, item, items)
