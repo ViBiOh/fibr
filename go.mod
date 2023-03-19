@@ -4,16 +4,16 @@ go 1.20
 
 require (
 	github.com/ViBiOh/ChatPotte v0.2.29
-	github.com/ViBiOh/absto v1.4.0
+	github.com/ViBiOh/absto v1.4.1
 	github.com/ViBiOh/auth/v2 v2.14.23
 	github.com/ViBiOh/exas v0.6.0
 	github.com/ViBiOh/flags v1.2.0
-	github.com/ViBiOh/httputils/v4 v4.54.4
+	github.com/ViBiOh/httputils/v4 v4.55.0
 	github.com/ViBiOh/vith v0.5.10
 	github.com/golang/mock v1.6.0
 	github.com/prometheus/client_golang v1.14.0
+	github.com/rabbitmq/amqp091-go v1.7.0
 	github.com/redis/go-redis/v9 v9.0.2
-	github.com/streadway/amqp v1.0.0
 	go.opentelemetry.io/otel v1.14.0
 	go.opentelemetry.io/otel/trace v1.14.0
 	golang.org/x/crypto v0.7.0
@@ -44,6 +44,8 @@ require (
 	github.com/prometheus/client_model v0.3.0 // indirect
 	github.com/prometheus/common v0.42.0 // indirect
 	github.com/prometheus/procfs v0.8.0 // indirect
+	github.com/redis/go-redis/extra/rediscmd/v9 v9.0.2 // indirect
+	github.com/redis/go-redis/extra/redisotel/v9 v9.0.2 // indirect
 	github.com/rs/xid v1.4.0 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/tdewolff/minify/v2 v2.12.5 // indirect

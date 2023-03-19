@@ -24,8 +24,10 @@ type client struct {
 }
 
 func newClient(ctx context.Context, config configuration) (client, error) {
-	var output client
-	var err error
+	var (
+		output client
+		err    error
+	)
 
 	output.logger = logger.New(config.logger)
 	logger.Global(output.logger)
@@ -39,7 +41,11 @@ func newClient(ctx context.Context, config configuration) (client, error) {
 
 	output.prometheus = prometheus.New(config.prometheus)
 	output.health = health.New(config.health)
-	output.redis = redis.New(config.redis, output.tracer.GetTracer("redis"))
+
+	output.redis, err = redis.New(config.redis, output.tracer.GetProvider())
+	if err != nil {
+		return output, fmt.Errorf("redis: %w", err)
+	}
 
 	output.amqp, err = amqp.New(config.amqp, output.prometheus.Registerer(), output.tracer.GetTracer("amqp"))
 	if err != nil && !errors.Is(err, amqp.ErrNoConfig) {
@@ -51,6 +57,7 @@ func newClient(ctx context.Context, config configuration) (client, error) {
 
 func (c client) Close(ctx context.Context) {
 	c.amqp.Close()
+	c.redis.Close()
 	c.tracer.Close(ctx)
 	c.logger.Close()
 }

@@ -9,8 +9,8 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"strings"
 
+	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/cntxt"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
@@ -18,8 +18,6 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/sha"
 	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 )
-
-var ErrRelativePath = errors.New("forbidden relative path")
 
 func (a App) uploadChunk(w http.ResponseWriter, r *http.Request, request provider.Request, fileName, chunkNumber string, file io.Reader) {
 	if file == nil {
@@ -182,8 +180,8 @@ func browseChunkFiles(directory, destination string, writer io.Writer) error {
 }
 
 func safeFilename(fileName string) (string, error) {
-	if strings.Contains(fileName, "..") {
-		return fileName, ErrRelativePath
+	if err := absto.CheckRelativePath(fileName); err != nil {
+		return fileName, err
 	}
 
 	output, err := provider.SanitizeName(fileName, true)

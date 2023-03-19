@@ -8,7 +8,7 @@ import (
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 	vith "github.com/ViBiOh/vith/pkg/model"
-	"github.com/streadway/amqp"
+	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 func (a App) AMQPHandler(ctx context.Context, message amqp.Delivery) (err error) {
