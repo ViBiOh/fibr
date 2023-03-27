@@ -182,12 +182,12 @@ For long-living sharing with password and self-contained app in Docker, with no 
 
 ```bash
 docker run -d \
-  -p 1080:1080/tcp \
+  --publish 1080:1080/tcp \
   --name fibr \
-  -v ${PWD}:/data/ \
-  -e FIBR_AUTH_USERS="1:$(htpasswd -nBb login password)" \
-  -e FIBR_THUMBNAIL_URL="" \
-  -e FIBR_EXIF_URL="" \
+  --volume ${PWD}:/data/ \
+  --env FIBR_AUTH_USERS="1:$(htpasswd -nBb login password)" \
+  --env FIBR_THUMBNAIL_URL="" \
+  --env FIBR_EXIF_URL="" \
   vibioh/fibr
 ```
 
@@ -198,7 +198,8 @@ For prod-ready run with thumbnails generation of image, PDF and videos, _this is
 You can inspire yourself from the [docker-compose.yaml](docker-compose.yaml) file I personnaly used. Beware of `-authUsers` option: bcrypted passwords contain dollar sign, which `docker-compose` tries to resolve as a shell variable, [you must escape it](https://docs.docker.com/compose/compose-file/compose-file-v2/#variable-substitution).
 
 ```bash
-DATA_USER_ID="$(id -u)" DATA_DIR="$(pwd)" BASIC_USERS="1:$(htpasswd -nBb admin password)" docker compose up
+make config-compose
+docker compose --env-file ".env.compose" up
 ```
 
 You'll find a Kubernetes exemple in the [`infra/`](infra) folder, using my [`app chart`](https://github.com/ViBiOh/charts/tree/main/app). My personnal k8s runs on `arm64` and thumbnail converters are not yet ready for this architecture, so I use a mix of `helm` and `docker-compose.yaml`.

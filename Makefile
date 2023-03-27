@@ -108,3 +108,10 @@ run:
 .PHONY: config
 config:
 	@cp .env.example .env
+
+## config: Create local configuration for docker compose
+.PHONY: config-compose
+config-compose:
+	@printf "DATA_USER_ID=%s\n" "$(shell id -u)" > .env.compose
+	@printf "DATA_DIR=%s\n" "$(shell pwd)" >> .env.compose
+	@printf "BASIC_USERS=1:%b\n" '$(shell htpasswd -nBb admin password | sed 's|\$$|\$$\$$|g')' >> .env.compose

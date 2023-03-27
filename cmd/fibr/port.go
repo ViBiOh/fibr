@@ -5,9 +5,11 @@ import (
 	"net/http"
 
 	"github.com/ViBiOh/httputils/v4/pkg/httputils"
+	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/owasp"
 	"github.com/ViBiOh/httputils/v4/pkg/recoverer"
 	"github.com/ViBiOh/httputils/v4/pkg/server"
+	"golang.org/x/net/webdav"
 )
 
 type port struct {
@@ -27,6 +29,19 @@ func newPorts(config configuration, clients client, services services) ports {
 				services.rendererApp.Handler(services.fibrApp.TemplateFunc),
 				clients.health, recoverer.Middleware, clients.prometheus.Middleware, clients.tracer.Middleware, owasp.New(config.owasp).Middleware,
 			),
+		},
+		{
+			serverApp: server.New(config.webdavServer),
+			name:      "webdav",
+			handler: &webdav.Handler{
+				FileSystem: webdav.Dir("/tmp"),
+				LockSystem: webdav.NewMemLS(),
+				Logger: func(r *http.Request, err error) {
+					if err != nil {
+						logger.Error("%s", err)
+					}
+				},
+			},
 		},
 		{
 			serverApp: server.New(config.promServer),

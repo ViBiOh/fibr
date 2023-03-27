@@ -34,6 +34,7 @@ type configuration struct {
 	tracer        tracer.Config
 	prometheus    prometheus.Config
 	appServer     server.Config
+	webdavServer  server.Config
 	promServer    server.Config
 	health        health.Config
 	owasp         owasp.Config
@@ -59,6 +60,7 @@ func newConfig() (configuration, error) {
 
 	return configuration{
 		appServer:     server.Flags(fs, "", flags.NewOverride("ReadTimeout", time.Minute*2), flags.NewOverride("WriteTimeout", time.Minute*2)),
+		webdavServer:  server.Flags(fs, "webdav", flags.NewOverride("Port", uint(1081)), flags.NewOverride("ReadTimeout", time.Minute*2), flags.NewOverride("WriteTimeout", time.Minute*2)),
 		promServer:    server.Flags(fs, "prometheus", flags.NewOverride("Port", uint(9090)), flags.NewOverride("IdleTimeout", 10*time.Second), flags.NewOverride("ShutdownTimeout", 5*time.Second)),
 		health:        health.Flags(fs, ""),
 		alcotest:      alcotest.Flags(fs, ""),
