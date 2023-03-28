@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 
+	fibrWebdav "github.com/ViBiOh/fibr/pkg/webdav"
 	"github.com/ViBiOh/httputils/v4/pkg/httputils"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/owasp"
@@ -20,7 +21,7 @@ type port struct {
 
 type ports []port
 
-func newPorts(config configuration, clients client, services services) ports {
+func newPorts(config configuration, clients client, adapters adapters, services services) ports {
 	return ports{
 		{
 			serverApp: server.New(config.appServer),
@@ -34,8 +35,8 @@ func newPorts(config configuration, clients client, services services) ports {
 			serverApp: server.New(config.webdavServer),
 			name:      "webdav",
 			handler: &webdav.Handler{
-				FileSystem: webdav.Dir("/tmp"),
-				LockSystem: webdav.NewMemLS(),
+				FileSystem: fibrWebdav.NewFilesystem(adapters.filteredStorage),
+				LockSystem: fibrWebdav.NoLock{},
 				Logger: func(r *http.Request, err error) {
 					if err != nil {
 						logger.Error("%s", err)

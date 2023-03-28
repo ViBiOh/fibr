@@ -59,7 +59,7 @@ func main() {
 		logger.Fatal(fmt.Errorf("services: %w", err))
 	}
 
-	ports := newPorts(config, clients, services)
+	ports := newPorts(config, clients, adapters, services)
 
 	endCtx := clients.health.End(ctx)
 
