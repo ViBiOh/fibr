@@ -6,6 +6,7 @@ services:
     image: vibioh/fibr
     environment:
       FIBR_AUTH_USERS: '${BASIC_USERS}'
+      FIBR_AMQP_URI: 'amqp://guest:guest@rabbit/fibr'
       FIBR_CHUNK_UPLOAD: 'true'
       FIBR_EXIF_DIRECT_ACCESS: 'true'
       FIBR_REDIS_ADDRESS: redis:6379
@@ -17,6 +18,7 @@ services:
       - /tmp:/tmp
     depends_on:
       - redis
+      - rabbit
       - exas
       - vith
     user: '${DATA_USER_ID}'
@@ -28,23 +30,34 @@ services:
     restart: on-failure
     read_only: true
 
+  rabbit:
+    image: rabbitmq:3-alpine
+    environment:
+      RABBITMQ_DEFAULT_VHOST: fibr
+    restart: on-failure
+
   exas:
     image: vibioh/exas
     environment:
+      EXAS_AMQP_URI: 'amqp://guest:guest@rabbit/fibr'
       EXAS_GEOCODE_URL: 'https://nominatim.openstreetmap.org'
       EXAS_STORAGE_FILE_SYSTEM_DIRECTORY: '/data'
     volumes:
       - ${DATA_DIR}:/data
+    depends_on:
+      - rabbit
     user: '${DATA_USER_ID}'
     restart: on-failure
 
   vith:
     image: vibioh/vith
     environment:
+      VITH_AMQP_URI: 'amqp://guest:guest@rabbit/fibr'
       VITH_STORAGE_FILE_SYSTEM_DIRECTORY: '/data'
     volumes:
       - ${DATA_DIR}:/data
     depends_on:
+      - rabbit
       - image
     user: '${DATA_USER_ID}'
     restart: on-failure
