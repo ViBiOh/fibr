@@ -1,5 +1,5 @@
 ---
-version: '2.1'
+version: '3.9'
 
 services:
   service:
@@ -14,27 +14,24 @@ services:
     ports:
       - '1080:1080/tcp'
     volumes:
-      - ${DATA_DIR}:/data
-      - /tmp:/tmp
+      - '${DATA_DIR}:/data'
+      - '/tmp:/tmp'
     depends_on:
       - redis
       - rabbit
       - exas
       - vith
     user: '${DATA_USER_ID}'
-    restart: on-failure
     read_only: true
 
   redis:
     image: redis
-    restart: on-failure
     read_only: true
 
   rabbit:
     image: rabbitmq:3-alpine
     environment:
       RABBITMQ_DEFAULT_VHOST: fibr
-    restart: on-failure
 
   exas:
     image: vibioh/exas
@@ -43,11 +40,11 @@ services:
       EXAS_GEOCODE_URL: 'https://nominatim.openstreetmap.org'
       EXAS_STORAGE_FILE_SYSTEM_DIRECTORY: '/data'
     volumes:
-      - ${DATA_DIR}:/data
+      - '${DATA_DIR}:/data'
     depends_on:
       - rabbit
     user: '${DATA_USER_ID}'
-    restart: on-failure
+    read_only: true
 
   vith:
     image: vibioh/vith
@@ -55,13 +52,12 @@ services:
       VITH_AMQP_URI: 'amqp://guest:guest@rabbit/fibr'
       VITH_STORAGE_FILE_SYSTEM_DIRECTORY: '/data'
     volumes:
-      - ${DATA_DIR}:/data
+      - '${DATA_DIR}:/data'
     depends_on:
       - rabbit
       - image
     user: '${DATA_USER_ID}'
-    restart: on-failure
+    read_only: true
 
   image:
     image: h2non/imaginary
-    restart: on-failure
