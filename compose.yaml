@@ -6,7 +6,7 @@ services:
     image: vibioh/fibr
     environment:
       FIBR_AUTH_USERS: '${BASIC_USERS}'
-      FIBR_AMQP_URI: 'amqp://guest:guest@rabbit/fibr'
+      FIBR_AMQP_URI: 'amqp://guest:guest@rabbit/'
       FIBR_AMQP_WAIT_TIMEOUT: '30s'
       FIBR_CHUNK_UPLOAD: 'true'
       FIBR_EXIF_DIRECT_ACCESS: 'true'
@@ -31,13 +31,11 @@ services:
 
   rabbit:
     image: rabbitmq:3-alpine
-    environment:
-      RABBITMQ_DEFAULT_VHOST: fibr
 
   exas:
     image: vibioh/exas
     environment:
-      EXAS_AMQP_URI: 'amqp://guest:guest@rabbit/fibr'
+      EXAS_AMQP_URI: 'amqp://guest:guest@rabbit/'
       EXAS_AMQP_WAIT_TIMEOUT: '30s'
       EXAS_GEOCODE_URL: 'https://nominatim.openstreetmap.org'
       EXAS_STORAGE_FILE_SYSTEM_DIRECTORY: '/data'
@@ -51,7 +49,7 @@ services:
   vith:
     image: vibioh/vith
     environment:
-      VITH_AMQP_URI: 'amqp://guest:guest@rabbit/fibr'
+      VITH_AMQP_URI: 'amqp://guest:guest@rabbit/'
       VITH_AMQP_WAIT_TIMEOUT: '30s'
       VITH_STORAGE_FILE_SYSTEM_DIRECTORY: '/data'
     volumes:
