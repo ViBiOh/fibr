@@ -180,7 +180,7 @@ func browseChunkFiles(directory, destination string, writer io.Writer) error {
 }
 
 func safeFilename(fileName string) (string, error) {
-	if err := absto.CheckRelativePath(fileName); err != nil {
+	if err := absto.ValidPath(fileName); err != nil {
 		return fileName, err
 	}
 

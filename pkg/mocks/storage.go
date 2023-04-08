@@ -138,10 +138,10 @@ func (mr *StorageMockRecorder) Path(arg0 interface{}) *gomock.Call {
 }
 
 // ReadFrom mocks base method.
-func (m *Storage) ReadFrom(arg0 context.Context, arg1 string) (io.ReadSeekCloser, error) {
+func (m *Storage) ReadFrom(arg0 context.Context, arg1 string) (model.ReadAtSeekCloser, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ReadFrom", arg0, arg1)
-	ret0, _ := ret[0].(io.ReadSeekCloser)
+	ret0, _ := ret[0].(model.ReadAtSeekCloser)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

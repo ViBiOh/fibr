@@ -249,6 +249,8 @@ Usage of fibr:
         [amqpThumbnail] RoutingKey name {FIBR_AMQP_THUMBNAIL_ROUTING_KEY} (default "thumbnail_output")
   -amqpURI string
         [amqp] Address in the form amqps?://<user>:<password>@<address>:<port>/<vhost> {FIBR_AMQP_URI}
+  -amqpWaitTimeout duration
+        [amqp] Wait duration for AMQP to be ready {FIBR_AMQP_WAIT_TIMEOUT} (default 5s)
   -authProfiles string
         [auth] Users profiles in the form 'id:profile1|profile2,id2:profile1' {FIBR_AUTH_PROFILES} (default "1:admin")
   -authUsers string
@@ -332,7 +334,7 @@ Usage of fibr:
   -readTimeout duration
         [server] Read Timeout {FIBR_READ_TIMEOUT} (default 2m0s)
   -redisAddress string
-        [redis] Redis Address fqdn:port (blank to disable) {FIBR_REDIS_ADDRESS}
+        [redis] Redis Address host:port (blank to disable) {FIBR_REDIS_ADDRESS}
   -redisAlias string
         [redis] Connection alias, for metric {FIBR_REDIS_ALIAS}
   -redisDatabase int
