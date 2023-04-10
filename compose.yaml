@@ -6,7 +6,7 @@ services:
     image: vibioh/fibr
     environment:
       FIBR_AUTH_USERS: '${BASIC_USERS}'
-      FIBR_AMQP_URI: 'amqp://guest:guest@rabbit/'
+      FIBR_AMQP_URI: 'amqp://guest:guest@rabbit:5672/'
       FIBR_AMQP_WAIT_TIMEOUT: '30s'
       FIBR_CHUNK_UPLOAD: 'true'
       FIBR_EXIF_DIRECT_ACCESS: 'true'
@@ -17,11 +17,19 @@ services:
     volumes:
       - '${DATA_DIR}:/data'
       - '/tmp:/tmp'
+    entrypoint:
+      - /wait
+      - -timeout
+      - 30s
+      - -address
+      - tcp:rabbit:5672
+      - -address
+      - tcp:redis:6379
+      - -next
+      - /fibr
     depends_on:
       - redis
       - rabbit
-      - exas
-      - vith
     user: '${DATA_USER_ID}'
     read_only: true
 
@@ -32,15 +40,26 @@ services:
   rabbit:
     image: rabbitmq:3-alpine
 
+  image:
+    image: h2non/imaginary
+
   exas:
     image: vibioh/exas
     environment:
-      EXAS_AMQP_URI: 'amqp://guest:guest@rabbit/'
+      EXAS_AMQP_URI: 'amqp://guest:guest@rabbit:5672/'
       EXAS_AMQP_WAIT_TIMEOUT: '30s'
       EXAS_GEOCODE_URL: 'https://nominatim.openstreetmap.org'
       EXAS_STORAGE_FILE_SYSTEM_DIRECTORY: '/data'
     volumes:
       - '${DATA_DIR}:/data'
+    entrypoint:
+      - /wait
+      - -timeout
+      - 30s
+      - -address
+      - tcp:service:1080
+      - -next
+      - /exas
     depends_on:
       - rabbit
     user: '${DATA_USER_ID}'
@@ -49,16 +68,21 @@ services:
   vith:
     image: vibioh/vith
     environment:
-      VITH_AMQP_URI: 'amqp://guest:guest@rabbit/'
+      VITH_AMQP_URI: 'amqp://guest:guest@rabbit:5672/'
       VITH_AMQP_WAIT_TIMEOUT: '30s'
       VITH_STORAGE_FILE_SYSTEM_DIRECTORY: '/data'
     volumes:
       - '${DATA_DIR}:/data'
+    entrypoint:
+      - /wait
+      - -timeout
+      - 30s
+      - -address
+      - tcp:service:1080
+      - -next
+      - /vith
     depends_on:
       - rabbit
       - image
     user: '${DATA_USER_ID}'
     read_only: true
-
-  image:
-    image: h2non/imaginary
