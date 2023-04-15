@@ -8,10 +8,10 @@ require (
 	github.com/ViBiOh/auth/v2 v2.14.23
 	github.com/ViBiOh/exas v0.6.0
 	github.com/ViBiOh/flags v1.3.0
-	github.com/ViBiOh/httputils/v4 v4.56.1
+	github.com/ViBiOh/httputils/v4 v4.56.2
 	github.com/ViBiOh/vith v0.5.10
 	github.com/golang/mock v1.6.0
-	github.com/prometheus/client_golang v1.14.0
+	github.com/prometheus/client_golang v1.15.0
 	github.com/rabbitmq/amqp091-go v1.8.0
 	github.com/redis/go-redis/v9 v9.0.3
 	go.opentelemetry.io/otel v1.14.0
@@ -43,7 +43,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/prometheus/client_model v0.3.0 // indirect
 	github.com/prometheus/common v0.42.0 // indirect
-	github.com/prometheus/procfs v0.8.0 // indirect
+	github.com/prometheus/procfs v0.9.0 // indirect
 	github.com/redis/go-redis/extra/rediscmd/v9 v9.0.2 // indirect
 	github.com/redis/go-redis/extra/redisotel/v9 v9.0.2 // indirect
 	github.com/rs/xid v1.4.0 // indirect
@@ -61,7 +61,7 @@ require (
 	golang.org/x/net v0.9.0 // indirect
 	golang.org/x/sys v0.7.0 // indirect
 	golang.org/x/term v0.7.0 // indirect
-	google.golang.org/genproto v0.0.0-20230403163135-c38d8f061ccd // indirect
+	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1 // indirect
 	google.golang.org/grpc v1.54.0 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
