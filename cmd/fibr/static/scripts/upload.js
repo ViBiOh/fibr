@@ -123,7 +123,7 @@ async function addUploadItem(container, file) {
   const progress = document.createElement('progress');
   progress.classList.add('flex-grow', 'margin-left');
   progress.max = 100;
-  progress.value = 0;
+  progress.value = 1;
   progressContainer.appendChild(progress);
 
   itemWrapper.appendChild(progressContainer);
