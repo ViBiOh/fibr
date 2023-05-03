@@ -50,9 +50,9 @@ type Config struct {
 
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		bcryptDuration:  flags.String(fs, prefix, "crud", "BcryptDuration", "Wanted bcrypt duration for calculating effective cost", "0.25s", nil),
-		chunkUpload:     flags.Bool(fs, prefix, "crud", "ChunkUpload", "Use chunk upload in browser", false, nil),
-		temporaryFolder: flags.String(fs, prefix, "crud", "TemporaryFolder", "Temporary folder for chunk upload", "/tmp", nil),
+		bcryptDuration:  flags.New("BcryptDuration", "Wanted bcrypt duration for calculating effective cost").Prefix(prefix).DocPrefix("crud").String(fs, "0.25s", nil),
+		chunkUpload:     flags.New("ChunkUpload", "Use chunk upload in browser").Prefix(prefix).DocPrefix("crud").Bool(fs, false, nil),
+		temporaryFolder: flags.New("TemporaryFolder", "Temporary folder for chunk upload").Prefix(prefix).DocPrefix("crud").String(fs, "/tmp", nil),
 	}
 }
 

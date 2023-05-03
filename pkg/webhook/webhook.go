@@ -43,8 +43,8 @@ type Config struct {
 
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		hmacSecret:    flags.String(fs, prefix, "webhook", "Secret", "Secret for HMAC Signature", "", nil),
-		pubsubChannel: flags.String(fs, prefix, "share", "PubSubChannel", "Channel name", "fibr:webhooks-channel", nil),
+		hmacSecret:    flags.New("Secret", "Secret for HMAC Signature").Prefix(prefix).DocPrefix("webhook").String(fs, "", nil),
+		pubsubChannel: flags.New("PubSubChannel", "Channel name").Prefix(prefix).DocPrefix("share").String(fs, "fibr:webhooks-channel", nil),
 	}
 }
 

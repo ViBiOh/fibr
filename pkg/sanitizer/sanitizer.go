@@ -32,7 +32,7 @@ type Config struct {
 
 func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) Config {
 	return Config{
-		sanitizeOnStart: flags.Bool(fs, prefix, "crud", "SanitizeOnStart", "Sanitize on start", false, nil),
+		sanitizeOnStart: flags.New("SanitizeOnStart", "Sanitize on start").Prefix(prefix).DocPrefix("crud").Bool(fs, false, nil),
 	}
 }
 

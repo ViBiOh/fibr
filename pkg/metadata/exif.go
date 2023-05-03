@@ -62,15 +62,15 @@ type Config struct {
 
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		exifURL:  flags.String(fs, prefix, "exif", "URL", "Exif Tool URL (exas)", "http://exas:1080", nil),
-		exifUser: flags.String(fs, prefix, "exif", "User", "Exif Tool URL Basic User", "", nil),
-		exifPass: flags.String(fs, prefix, "exif", "Password", "Exif Tool URL Basic Password", "", nil),
+		exifURL:  flags.New("URL", "Exif Tool URL (exas)").Prefix(prefix).DocPrefix("exif").String(fs, "http://exas:1080", nil),
+		exifUser: flags.New("User", "Exif Tool URL Basic User").Prefix(prefix).DocPrefix("exif").String(fs, "", nil),
+		exifPass: flags.New("Password", "Exif Tool URL Basic Password").Prefix(prefix).DocPrefix("exif").String(fs, "", nil),
 
-		directAccess: flags.Bool(fs, prefix, "exif", "DirectAccess", "Use Exas with direct access to filesystem (no large file upload, send a GET request, Basic Auth recommended)", false, nil),
-		maxSize:      flags.Int(fs, prefix, "exif", "MaxSize", "Max file size (in bytes) for extracting exif (0 to no limit). Not used if DirectAccess enabled.", 1024*1024*200, nil),
+		directAccess: flags.New("DirectAccess", "Use Exas with direct access to filesystem (no large file upload, send a GET request, Basic Auth recommended)").Prefix(prefix).DocPrefix("exif").Bool(fs, false, nil),
+		maxSize:      flags.New("MaxSize", "Max file size (in bytes) for extracting exif (0 to no limit). Not used if DirectAccess enabled.").Prefix(prefix).DocPrefix("exif").Int(fs, 1024*1024*200, nil),
 
-		amqpExchange:   flags.String(fs, prefix, "exif", "AmqpExchange", "AMQP Exchange Name", "fibr", nil),
-		amqpRoutingKey: flags.String(fs, prefix, "exif", "AmqpRoutingKey", "AMQP Routing Key for exif", "exif_input", nil),
+		amqpExchange:   flags.New("AmqpExchange", "AMQP Exchange Name").Prefix(prefix).DocPrefix("exif").String(fs, "fibr", nil),
+		amqpRoutingKey: flags.New("AmqpRoutingKey", "AMQP Routing Key for exif").Prefix(prefix).DocPrefix("exif").String(fs, "exif_input", nil),
 	}
 }
 

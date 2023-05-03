@@ -80,6 +80,6 @@ func newConfig() (configuration, error) {
 		amqpThumbnail: amqphandler.Flags(fs, "amqpThumbnail", flags.NewOverride("Exchange", "fibr"), flags.NewOverride("Queue", "fibr.thumbnail"), flags.NewOverride("RoutingKey", "thumbnail_output")),
 		amqpExif:      amqphandler.Flags(fs, "amqpExif", flags.NewOverride("Exchange", "fibr"), flags.NewOverride("Queue", "fibr.exif"), flags.NewOverride("RoutingKey", "exif_output")),
 		redis:         redis.Flags(fs, "redis", flags.NewOverride("Address", "")),
-		disableAuth:   flags.Bool(fs, "", "auth", "NoAuth", "Disable basic authentification", false, nil),
+		disableAuth:   flags.New("NoAuth", "Disable basic authentification").DocPrefix("auth").Bool(fs, false, nil),
 	}, fs.Parse(os.Args[1:])
 }

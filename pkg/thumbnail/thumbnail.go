@@ -73,19 +73,19 @@ type Config struct {
 
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		vithURL:  flags.String(fs, prefix, "thumbnail", "URL", "Vith Thumbnail URL", "http://vith:1080", nil),
-		vithUser: flags.String(fs, prefix, "thumbnail", "User", "Vith Thumbnail Basic Auth User", "", nil),
-		vithPass: flags.String(fs, prefix, "thumbnail", "Password", "Vith Thumbnail Basic Auth Password", "", nil),
+		vithURL:  flags.New("URL", "Vith Thumbnail URL").Prefix(prefix).DocPrefix("thumbnail").String(fs, "http://vith:1080", nil),
+		vithUser: flags.New("User", "Vith Thumbnail Basic Auth User").Prefix(prefix).DocPrefix("thumbnail").String(fs, "", nil),
+		vithPass: flags.New("Password", "Vith Thumbnail Basic Auth Password").Prefix(prefix).DocPrefix("thumbnail").String(fs, "", nil),
 
-		directAccess: flags.Bool(fs, prefix, "thumbnail", "DirectAccess", "Use Vith with direct access to filesystem (no large file upload, send a GET request, Basic Auth recommended)", false, nil),
-		maxSize:      flags.Int64(fs, prefix, "thumbnail", "MaxSize", "Maximum file size (in bytes) for generating thumbnail (0 to no limit). Not used if DirectAccess enabled.", 1024*1024*200, nil),
-		minBitrate:   flags.Uint64(fs, prefix, "thumbnail", "MinBitrate", "Minimal video bitrate (in bits per second) to generate a streamable version (in HLS), if DirectAccess enabled", 80*1000*1000, nil),
+		directAccess: flags.New("DirectAccess", "Use Vith with direct access to filesystem (no large file upload, send a GET request, Basic Auth recommended)").Prefix(prefix).DocPrefix("thumbnail").Bool(fs, false, nil),
+		maxSize:      flags.New("MaxSize", "Maximum file size (in bytes) for generating thumbnail (0 to no limit). Not used if DirectAccess enabled.").Prefix(prefix).DocPrefix("thumbnail").Int64(fs, 1024*1024*200, nil),
+		minBitrate:   flags.New("MinBitrate", "Minimal video bitrate (in bits per second) to generate a streamable version (in HLS), if DirectAccess enabled").Prefix(prefix).DocPrefix("thumbnail").Uint64(fs, 80*1000*1000, nil),
 
-		amqpExchange:            flags.String(fs, prefix, "thumbnail", "AmqpExchange", "AMQP Exchange Name", "fibr", nil),
-		amqpStreamRoutingKey:    flags.String(fs, prefix, "thumbnail", "AmqpStreamRoutingKey", "AMQP Routing Key for stream", "stream", nil),
-		amqpThumbnailRoutingKey: flags.String(fs, prefix, "thumbnail", "AmqpThumbnailRoutingKey", "AMQP Routing Key for thumbnail", "thumbnail", nil),
+		amqpExchange:            flags.New("AmqpExchange", "AMQP Exchange Name").Prefix(prefix).DocPrefix("thumbnail").String(fs, "fibr", nil),
+		amqpStreamRoutingKey:    flags.New("AmqpStreamRoutingKey", "AMQP Routing Key for stream").Prefix(prefix).DocPrefix("thumbnail").String(fs, "stream", nil),
+		amqpThumbnailRoutingKey: flags.New("AmqpThumbnailRoutingKey", "AMQP Routing Key for thumbnail").Prefix(prefix).DocPrefix("thumbnail").String(fs, "thumbnail", nil),
 
-		largeSize: flags.Uint64(fs, prefix, "thumbnail", "LargeSize", "Size of large thumbnail for story display (thumbnail are always squared). 0 to disable", 800, nil),
+		largeSize: flags.New("LargeSize", "Size of large thumbnail for story display (thumbnail are always squared). 0 to disable").Prefix(prefix).DocPrefix("thumbnail").Uint64(fs, 800, nil),
 	}
 }
 
