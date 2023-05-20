@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/ViBiOh/ChatPotte v0.2.30
-	github.com/ViBiOh/absto v1.4.7
+	github.com/ViBiOh/absto v1.5.0
 	github.com/ViBiOh/auth/v2 v2.14.24
 	github.com/ViBiOh/exas v0.6.0
 	github.com/ViBiOh/flags v1.3.1
@@ -47,7 +47,7 @@ require (
 	github.com/redis/go-redis/extra/rediscmd/v9 v9.0.4 // indirect
 	github.com/redis/go-redis/extra/redisotel/v9 v9.0.4 // indirect
 	github.com/rs/xid v1.5.0 // indirect
-	github.com/sirupsen/logrus v1.9.0 // indirect
+	github.com/sirupsen/logrus v1.9.2 // indirect
 	github.com/tdewolff/minify/v2 v2.12.5 // indirect
 	github.com/tdewolff/parse/v2 v2.6.5 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
