@@ -56,6 +56,7 @@ type configuration struct {
 
 func newConfig() (configuration, error) {
 	fs := flag.NewFlagSet("fibr", flag.ExitOnError)
+	fs.Usage = flags.Usage(fs)
 
 	return configuration{
 		appServer:     server.Flags(fs, "", flags.NewOverride("ReadTimeout", time.Minute*2), flags.NewOverride("WriteTimeout", time.Minute*2)),
