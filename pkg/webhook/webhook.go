@@ -30,7 +30,7 @@ type App struct {
 	counter       *prometheus.CounterVec
 	redisClient   redis.Client
 	pubsubChannel string
-	rendererApp   renderer.App
+	rendererApp   *renderer.App
 	hmacSecret    []byte
 	thumbnailApp  thumbnail.App
 	mutex         sync.RWMutex
@@ -48,7 +48,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 	}
 }
 
-func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheus.Registerer, redisClient redis.Client, rendererApp renderer.App, thumbnailApp thumbnail.App, exclusiveApp exclusive.App) *App {
+func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheus.Registerer, redisClient redis.Client, rendererApp *renderer.App, thumbnailApp thumbnail.App, exclusiveApp exclusive.App) *App {
 	return &App{
 		done:          make(chan struct{}),
 		storageApp:    storageApp,

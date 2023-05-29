@@ -40,7 +40,7 @@ type App struct {
 	pathnameInput   chan absto.Item
 	metric          *prometheus.CounterVec
 
-	cacheApp cache.App[string, absto.Item]
+	cacheApp *cache.App[string, absto.Item]
 
 	amqpClient              *amqp.Client
 	amqpThumbnailRoutingKey string

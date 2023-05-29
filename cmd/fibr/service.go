@@ -19,9 +19,9 @@ type services struct {
 	shareApp         *share.App
 	sanitizerApp     sanitizer.App
 	fibrApp          fibr.App
-	rendererApp      renderer.App
-	amqpThumbnailApp amqphandler.App
-	amqpExifApp      amqphandler.App
+	rendererApp      *renderer.App
+	amqpThumbnailApp *amqphandler.App
+	amqpExifApp      *amqphandler.App
 	metadataApp      metadata.App
 	thumbnailApp     thumbnail.App
 }

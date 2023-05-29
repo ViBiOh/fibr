@@ -32,8 +32,8 @@ type App struct {
 	listStorageApp    absto.Storage
 	exifMetric        *prometheus.CounterVec
 	aggregateMetric   *prometheus.CounterVec
-	exifCacheApp      cache.App[absto.Item, provider.Metadata]
-	aggregateCacheApp cache.App[absto.Item, provider.Aggregate]
+	exifCacheApp      *cache.App[absto.Item, provider.Metadata]
+	aggregateCacheApp *cache.App[absto.Item, provider.Aggregate]
 
 	exclusiveApp exclusive.App
 	redisClient  redis.Client

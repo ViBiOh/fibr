@@ -18,9 +18,9 @@ type client struct {
 	redis      redis.Client
 	tracer     tracer.App
 	amqp       *amqp.Client
-	prometheus prometheus.App
-	logger     logger.Logger
-	health     health.App
+	prometheus *prometheus.App
+	logger     *logger.Logger
+	health     *health.App
 }
 
 func newClient(ctx context.Context, config configuration) (client, error) {

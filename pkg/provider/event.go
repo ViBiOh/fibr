@@ -166,7 +166,7 @@ func (e Event) GetTo() string {
 	return newName
 }
 
-func NewUploadEvent(ctx context.Context, request Request, item absto.Item, shareableURL string, rendererApp renderer.App) Event {
+func NewUploadEvent(ctx context.Context, request Request, item absto.Item, shareableURL string, rendererApp *renderer.App) Event {
 	return Event{
 		Time:         time.Now(),
 		Type:         UploadEvent,
@@ -180,7 +180,7 @@ func NewUploadEvent(ctx context.Context, request Request, item absto.Item, share
 	}
 }
 
-func NewRenameEvent(ctx context.Context, old, new absto.Item, shareableURL string, rendererApp renderer.App) Event {
+func NewRenameEvent(ctx context.Context, old, new absto.Item, shareableURL string, rendererApp *renderer.App) Event {
 	return Event{
 		Time:         time.Now(),
 		Type:         RenameEvent,
@@ -192,7 +192,7 @@ func NewRenameEvent(ctx context.Context, old, new absto.Item, shareableURL strin
 	}
 }
 
-func NewDescriptionEvent(ctx context.Context, item absto.Item, shareableURL string, description string, rendererApp renderer.App) Event {
+func NewDescriptionEvent(ctx context.Context, item absto.Item, shareableURL string, description string, rendererApp *renderer.App) Event {
 	return Event{
 		Time:         time.Now(),
 		Type:         DescriptionEvent,
@@ -206,7 +206,7 @@ func NewDescriptionEvent(ctx context.Context, item absto.Item, shareableURL stri
 	}
 }
 
-func NewDeleteEvent(ctx context.Context, request Request, item absto.Item, rendererApp renderer.App) Event {
+func NewDeleteEvent(ctx context.Context, request Request, item absto.Item, rendererApp *renderer.App) Event {
 	return Event{
 		Time:      time.Now(),
 		Type:      DeleteEvent,

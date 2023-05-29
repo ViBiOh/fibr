@@ -22,10 +22,10 @@ type App struct {
 	crudApp     provider.Crud
 	shareApp    provider.ShareManager
 	webhookApp  provider.WebhookManager
-	rendererApp renderer.App
+	rendererApp *renderer.App
 }
 
-func New(crudApp provider.Crud, rendererApp renderer.App, shareApp provider.ShareManager, webhookApp provider.WebhookManager, loginApp provider.Auth) App {
+func New(crudApp provider.Crud, rendererApp *renderer.App, shareApp provider.ShareManager, webhookApp provider.WebhookManager, loginApp provider.Auth) App {
 	return App{
 		crudApp:     crudApp,
 		rendererApp: rendererApp,

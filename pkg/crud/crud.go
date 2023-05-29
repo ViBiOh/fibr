@@ -36,7 +36,7 @@ type App struct {
 	searchApp       search.App
 	pushEvent       provider.EventProducer
 	temporaryFolder string
-	rendererApp     renderer.App
+	rendererApp     *renderer.App
 	thumbnailApp    thumbnail.App
 	bcryptCost      int
 	chunkUpload     bool
@@ -56,7 +56,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 	}
 }
 
-func New(config Config, storageApp absto.Storage, filteredStorage absto.Storage, rendererApp renderer.App, shareApp provider.ShareManager, webhookApp provider.WebhookManager, thumbnailApp thumbnail.App, exifApp provider.MetadataManager, searchApp search.App, eventProducer provider.EventProducer, tracer trace.Tracer) (App, error) {
+func New(config Config, storageApp absto.Storage, filteredStorage absto.Storage, rendererApp *renderer.App, shareApp provider.ShareManager, webhookApp provider.WebhookManager, thumbnailApp thumbnail.App, exifApp provider.MetadataManager, searchApp search.App, eventProducer provider.EventProducer, tracer trace.Tracer) (App, error) {
 	app := App{
 		chunkUpload:     *config.chunkUpload,
 		temporaryFolder: strings.TrimSpace(*config.temporaryFolder),
