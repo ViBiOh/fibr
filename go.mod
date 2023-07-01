@@ -9,7 +9,7 @@ require (
 	github.com/ViBiOh/exas v0.6.0
 	github.com/ViBiOh/flags v1.3.1
 	github.com/ViBiOh/httputils/v4 v4.59.1
-	github.com/ViBiOh/vith v0.5.10
+	github.com/ViBiOh/vith v0.6.0
 	github.com/golang/mock v1.6.0
 	github.com/prometheus/client_golang v1.16.0
 	github.com/rabbitmq/amqp091-go v1.8.1
