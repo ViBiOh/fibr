@@ -1,7 +1,17 @@
 ---
 name: Git
 
-permissions: {}
+permissions:
+  actions: none
+  checks: none
+  contents: read
+  deployments: none
+  issues: none
+  packages: none
+  pages: none
+  pull-requests: none
+  repository-projects: none
+  security-events: none
 
 on:
   - pull_request

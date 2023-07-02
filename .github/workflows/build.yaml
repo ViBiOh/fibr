@@ -1,7 +1,17 @@
 ---
 name: Build
 
-permissions: {}
+permissions:
+  actions: none
+  checks: none
+  contents: read
+  deployments: none
+  issues: none
+  packages: none
+  pages: none
+  pull-requests: none
+  repository-projects: none
+  security-events: none
 
 on:
   push:
@@ -12,7 +22,7 @@ on:
       - main
 
 env:
-  SCRIPTS_NO_INTERACTIVE: 'true'
+  SCRIPTS_NO_INTERACTIVE: "true"
 
 defaults:
   run:
@@ -28,7 +38,7 @@ jobs:
       - name: Setup Golang
         uses: actions/setup-go@v4
         with:
-          go-version: '^1.20'
+          go-version: "^1.20"
 
       - name: Build
         run: |
@@ -61,7 +71,7 @@ jobs:
       - name: Setup Golang
         uses: actions/setup-go@v4
         with:
-          go-version: '^1.20'
+          go-version: "^1.20"
       - name: Build
         env:
           GO_ARCHS: linux/amd64 linux/arm linux/arm64 darwin/amd64 darwin/arm64
