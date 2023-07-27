@@ -216,192 +216,99 @@ Be careful when using the CLI, if someone list the processes on the system, they
 
 ```bash
 Usage of fibr:
-  -address string
-        [server] Listen address {FIBR_ADDRESS}
-  -amqpExifExchange string
-        [amqpExif] Exchange name {FIBR_AMQP_EXIF_EXCHANGE} (default "fibr")
-  -amqpExifExclusive
-        [amqpExif] Queue exclusive mode (for fanout exchange) {FIBR_AMQP_EXIF_EXCLUSIVE}
-  -amqpExifMaxRetry uint
-        [amqpExif] Max send retries {FIBR_AMQP_EXIF_MAX_RETRY} (default 3)
-  -amqpExifQueue string
-        [amqpExif] Queue name {FIBR_AMQP_EXIF_QUEUE} (default "fibr.exif")
-  -amqpExifRetryInterval duration
-        [amqpExif] Interval duration when send fails {FIBR_AMQP_EXIF_RETRY_INTERVAL} (default 1h0m0s)
-  -amqpExifRoutingKey string
-        [amqpExif] RoutingKey name {FIBR_AMQP_EXIF_ROUTING_KEY} (default "exif_output")
-  -amqpPrefetch int
-        [amqp] Prefetch count for QoS {FIBR_AMQP_PREFETCH} (default 1)
-  -amqpThumbnailExchange string
-        [amqpThumbnail] Exchange name {FIBR_AMQP_THUMBNAIL_EXCHANGE} (default "fibr")
-  -amqpThumbnailExclusive
-        [amqpThumbnail] Queue exclusive mode (for fanout exchange) {FIBR_AMQP_THUMBNAIL_EXCLUSIVE}
-  -amqpThumbnailMaxRetry uint
-        [amqpThumbnail] Max send retries {FIBR_AMQP_THUMBNAIL_MAX_RETRY} (default 3)
-  -amqpThumbnailQueue string
-        [amqpThumbnail] Queue name {FIBR_AMQP_THUMBNAIL_QUEUE} (default "fibr.thumbnail")
-  -amqpThumbnailRetryInterval duration
-        [amqpThumbnail] Interval duration when send fails {FIBR_AMQP_THUMBNAIL_RETRY_INTERVAL} (default 1h0m0s)
-  -amqpThumbnailRoutingKey string
-        [amqpThumbnail] RoutingKey name {FIBR_AMQP_THUMBNAIL_ROUTING_KEY} (default "thumbnail_output")
-  -amqpURI string
-        [amqp] Address in the form amqps?://<user>:<password>@<address>:<port>/<vhost> {FIBR_AMQP_URI}
-  -amqpWaitTimeout duration
-        [amqp] Wait duration for AMQP to be ready {FIBR_AMQP_WAIT_TIMEOUT} (default 5s)
-  -authProfiles string
-        [auth] Users profiles in the form 'id:profile1|profile2,id2:profile1' {FIBR_AUTH_PROFILES} (default "1:admin")
-  -authUsers string
-        [auth] Users credentials in the form 'id:login:password,id2:login2:password2' {FIBR_AUTH_USERS}
-  -bcryptDuration string
-        [crud] Wanted bcrypt duration for calculating effective cost {FIBR_BCRYPT_DURATION} (default "0.25s")
-  -cert string
-        [server] Certificate file {FIBR_CERT}
-  -chunkUpload
-        [crud] Use chunk upload in browser {FIBR_CHUNK_UPLOAD}
-  -csp string
-        [owasp] Content-Security-Policy {FIBR_CSP} (default "default-src 'self'; base-uri 'self'; script-src 'self' 'httputils-nonce' unpkg.com/webp-hero@0.0.2/dist-cjs/ unpkg.com/leaflet@1.9.4/dist/ unpkg.com/leaflet.markercluster@1.5.1/; style-src 'self' 'httputils-nonce' unpkg.com/leaflet@1.9.4/dist/ unpkg.com/leaflet.markercluster@1.5.1/; img-src 'self' data: a.tile.openstreetmap.org b.tile.openstreetmap.org c.tile.openstreetmap.org")
-  -exifAmqpExchange string
-        [exif] AMQP Exchange Name {FIBR_EXIF_AMQP_EXCHANGE} (default "fibr")
-  -exifAmqpRoutingKey string
-        [exif] AMQP Routing Key for exif {FIBR_EXIF_AMQP_ROUTING_KEY} (default "exif_input")
-  -exifDirectAccess
-        [exif] Use Exas with direct access to filesystem (no large file upload, send a GET request, Basic Auth recommended) {FIBR_EXIF_DIRECT_ACCESS}
-  -exifMaxSize int
-        [exif] Max file size (in bytes) for extracting exif (0 to no limit). Not used if DirectAccess enabled. {FIBR_EXIF_MAX_SIZE} (default 209715200)
-  -exifPassword string
-        [exif] Exif Tool URL Basic Password {FIBR_EXIF_PASSWORD}
-  -exifURL string
-        [exif] Exif Tool URL (exas) {FIBR_EXIF_URL} (default "http://exas:1080")
-  -exifUser string
-        [exif] Exif Tool URL Basic User {FIBR_EXIF_USER}
-  -frameOptions string
-        [owasp] X-Frame-Options {FIBR_FRAME_OPTIONS} (default "SAMEORIGIN")
-  -graceDuration duration
-        [http] Grace duration when SIGTERM received {FIBR_GRACE_DURATION} (default 30s)
-  -hsts
-        [owasp] Indicate Strict Transport Security {FIBR_HSTS} (default true)
-  -idleTimeout duration
-        [server] Idle Timeout {FIBR_IDLE_TIMEOUT} (default 2m0s)
-  -ignorePattern string
-        [crud] Ignore pattern when listing files or directory {FIBR_IGNORE_PATTERN}
-  -key string
-        [server] Key file {FIBR_KEY}
-  -loggerJson
-        [logger] Log format as JSON {FIBR_LOGGER_JSON}
-  -loggerLevel string
-        [logger] Logger level {FIBR_LOGGER_LEVEL} (default "INFO")
-  -loggerLevelKey string
-        [logger] Key for level in JSON {FIBR_LOGGER_LEVEL_KEY} (default "level")
-  -loggerMessageKey string
-        [logger] Key for message in JSON {FIBR_LOGGER_MESSAGE_KEY} (default "message")
-  -loggerTimeKey string
-        [logger] Key for timestamp in JSON {FIBR_LOGGER_TIME_KEY} (default "time")
-  -minify
-        Minify HTML {FIBR_MINIFY} (default true)
-  -noAuth
-        [auth] Disable basic authentification {FIBR_NO_AUTH}
-  -okStatus int
-        [http] Healthy HTTP Status code {FIBR_OK_STATUS} (default 204)
-  -pathPrefix string
-        Root Path Prefix {FIBR_PATH_PREFIX}
-  -port uint
-        [server] Listen port (0 to disable) {FIBR_PORT} (default 1080)
-  -prometheusAddress string
-        [prometheus] Listen address {FIBR_PROMETHEUS_ADDRESS}
-  -prometheusCert string
-        [prometheus] Certificate file {FIBR_PROMETHEUS_CERT}
-  -prometheusGzip
-        [prometheus] Enable gzip compression of metrics output {FIBR_PROMETHEUS_GZIP}
-  -prometheusIdleTimeout duration
-        [prometheus] Idle Timeout {FIBR_PROMETHEUS_IDLE_TIMEOUT} (default 10s)
-  -prometheusIgnore string
-        [prometheus] Ignored path prefixes for metrics, comma separated {FIBR_PROMETHEUS_IGNORE}
-  -prometheusKey string
-        [prometheus] Key file {FIBR_PROMETHEUS_KEY}
-  -prometheusPort uint
-        [prometheus] Listen port (0 to disable) {FIBR_PROMETHEUS_PORT} (default 9090)
-  -prometheusReadTimeout duration
-        [prometheus] Read Timeout {FIBR_PROMETHEUS_READ_TIMEOUT} (default 5s)
-  -prometheusShutdownTimeout duration
-        [prometheus] Shutdown Timeout {FIBR_PROMETHEUS_SHUTDOWN_TIMEOUT} (default 5s)
-  -prometheusWriteTimeout duration
-        [prometheus] Write Timeout {FIBR_PROMETHEUS_WRITE_TIMEOUT} (default 10s)
-  -publicURL string
-        Public URL {FIBR_PUBLIC_URL} (default "http://localhost:1080")
-  -readTimeout duration
-        [server] Read Timeout {FIBR_READ_TIMEOUT} (default 2m0s)
-  -redisAddress string
-        [redis] Redis Address host:port (blank to disable) {FIBR_REDIS_ADDRESS}
-  -redisAlias string
-        [redis] Connection alias, for metric {FIBR_REDIS_ALIAS}
-  -redisDatabase int
-        [redis] Redis Database {FIBR_REDIS_DATABASE}
-  -redisPassword string
-        [redis] Redis Password, if any {FIBR_REDIS_PASSWORD}
-  -redisUsername string
-        [redis] Redis Username, if any {FIBR_REDIS_USERNAME}
-  -sanitizeOnStart
-        [crud] Sanitize on start {FIBR_SANITIZE_ON_START}
-  -sharePubSubChannel string
-        [share] Channel name {FIBR_SHARE_PUB_SUB_CHANNEL} (default "fibr:shares-channel")
-  -shutdownTimeout duration
-        [server] Shutdown Timeout {FIBR_SHUTDOWN_TIMEOUT} (default 10s)
-  -storageFileSystemDirectory /data
-        [storage] Path to directory. Default is dynamic. /data on a server and Current Working Directory in a terminal. {FIBR_STORAGE_FILE_SYSTEM_DIRECTORY} (default "/Users/macbook/code/fibr")
-  -storageObjectAccessKey string
-        [storage] Storage Object Access Key {FIBR_STORAGE_OBJECT_ACCESS_KEY}
-  -storageObjectBucket string
-        [storage] Storage Object Bucket {FIBR_STORAGE_OBJECT_BUCKET}
-  -storageObjectClass string
-        [storage] Storage Object Class {FIBR_STORAGE_OBJECT_CLASS}
-  -storageObjectEndpoint string
-        [storage] Storage Object endpoint {FIBR_STORAGE_OBJECT_ENDPOINT}
-  -storageObjectRegion string
-        [storage] Storage Object Region {FIBR_STORAGE_OBJECT_REGION}
-  -storageObjectSSL
-        [storage] Use SSL {FIBR_STORAGE_OBJECT_SSL} (default true)
-  -storageObjectSecretAccess string
-        [storage] Storage Object Secret Access {FIBR_STORAGE_OBJECT_SECRET_ACCESS}
-  -storagePartSize uint
-        [storage] PartSize configuration {FIBR_STORAGE_PART_SIZE} (default 5242880)
-  -temporaryFolder string
-        [crud] Temporary folder for chunk upload {FIBR_TEMPORARY_FOLDER} (default "/tmp")
-  -thumbnailAmqpExchange string
-        [thumbnail] AMQP Exchange Name {FIBR_THUMBNAIL_AMQP_EXCHANGE} (default "fibr")
-  -thumbnailAmqpStreamRoutingKey string
-        [thumbnail] AMQP Routing Key for stream {FIBR_THUMBNAIL_AMQP_STREAM_ROUTING_KEY} (default "stream")
-  -thumbnailAmqpThumbnailRoutingKey string
-        [thumbnail] AMQP Routing Key for thumbnail {FIBR_THUMBNAIL_AMQP_THUMBNAIL_ROUTING_KEY} (default "thumbnail")
-  -thumbnailDirectAccess
-        [thumbnail] Use Vith with direct access to filesystem (no large file upload, send a GET request, Basic Auth recommended) {FIBR_THUMBNAIL_DIRECT_ACCESS}
-  -thumbnailLargeSize uint
-        [thumbnail] Size of large thumbnail for story display (thumbnail are always squared). 0 to disable {FIBR_THUMBNAIL_LARGE_SIZE} (default 800)
-  -thumbnailMaxSize int
-        [thumbnail] Maximum file size (in bytes) for generating thumbnail (0 to no limit). Not used if DirectAccess enabled. {FIBR_THUMBNAIL_MAX_SIZE} (default 209715200)
-  -thumbnailMinBitrate uint
-        [thumbnail] Minimal video bitrate (in bits per second) to generate a streamable version (in HLS), if DirectAccess enabled {FIBR_THUMBNAIL_MIN_BITRATE} (default 80000000)
-  -thumbnailPassword string
-        [thumbnail] Vith Thumbnail Basic Auth Password {FIBR_THUMBNAIL_PASSWORD}
-  -thumbnailURL string
-        [thumbnail] Vith Thumbnail URL {FIBR_THUMBNAIL_URL} (default "http://vith:1080")
-  -thumbnailUser string
-        [thumbnail] Vith Thumbnail Basic Auth User {FIBR_THUMBNAIL_USER}
-  -title string
-        Application title {FIBR_TITLE} (default "fibr")
-  -tracerRate string
-        [tracer] OpenTracing sample rate, 'always', 'never' or a float value {FIBR_TRACER_RATE} (default "always")
-  -tracerURL string
-        [tracer] OpenTracing gRPC endpoint (e.g. otel-exporter:4317) {FIBR_TRACER_URL}
-  -url string
-        [alcotest] URL to check {FIBR_URL}
-  -userAgent string
-        [alcotest] User-Agent for check {FIBR_USER_AGENT} (default "Alcotest")
-  -webhookPubSubChannel string
-        [webhook] Channel name {FIBR_WEBHOOK_PUB_SUB_CHANNEL} (default "fibr:webhooks-channel")
-  -webhookSecret string
-        [webhook] Secret for HMAC Signature {FIBR_WEBHOOK_SECRET}
-  -writeTimeout duration
-        [server] Write Timeout {FIBR_WRITE_TIMEOUT} (default 2m0s)
+  --address                           string        [server] Listen address ${FIBR_ADDRESS}
+  --amqpExifExchange                  string        [amqpExif] Exchange name ${FIBR_AMQP_EXIF_EXCHANGE} (default "fibr")
+  --amqpExifExclusive                               [amqpExif] Queue exclusive mode (for fanout exchange) ${FIBR_AMQP_EXIF_EXCLUSIVE} (default false)
+  --amqpExifMaxRetry                  uint          [amqpExif] Max send retries ${FIBR_AMQP_EXIF_MAX_RETRY} (default 3)
+  --amqpExifQueue                     string        [amqpExif] Queue name ${FIBR_AMQP_EXIF_QUEUE} (default "fibr.exif")
+  --amqpExifRetryInterval             duration      [amqpExif] Interval duration when send fails ${FIBR_AMQP_EXIF_RETRY_INTERVAL} (default 1h0m0s)
+  --amqpExifRoutingKey                string        [amqpExif] RoutingKey name ${FIBR_AMQP_EXIF_ROUTING_KEY} (default "exif_output")
+  --amqpPrefetch                      int           [amqp] Prefetch count for QoS ${FIBR_AMQP_PREFETCH} (default 1)
+  --amqpThumbnailExchange             string        [amqpThumbnail] Exchange name ${FIBR_AMQP_THUMBNAIL_EXCHANGE} (default "fibr")
+  --amqpThumbnailExclusive                          [amqpThumbnail] Queue exclusive mode (for fanout exchange) ${FIBR_AMQP_THUMBNAIL_EXCLUSIVE} (default false)
+  --amqpThumbnailMaxRetry             uint          [amqpThumbnail] Max send retries ${FIBR_AMQP_THUMBNAIL_MAX_RETRY} (default 3)
+  --amqpThumbnailQueue                string        [amqpThumbnail] Queue name ${FIBR_AMQP_THUMBNAIL_QUEUE} (default "fibr.thumbnail")
+  --amqpThumbnailRetryInterval        duration      [amqpThumbnail] Interval duration when send fails ${FIBR_AMQP_THUMBNAIL_RETRY_INTERVAL} (default 1h0m0s)
+  --amqpThumbnailRoutingKey           string        [amqpThumbnail] RoutingKey name ${FIBR_AMQP_THUMBNAIL_ROUTING_KEY} (default "thumbnail_output")
+  --amqpURI                           string        [amqp] Address in the form amqps?://<user>:<password>@<address>:<port>/<vhost> ${FIBR_AMQP_URI}
+  --authProfiles                      string        [auth] Users profiles in the form 'id:profile1|profile2,id2:profile1' ${FIBR_AUTH_PROFILES} (default "1:admin")
+  --authUsers                         string        [auth] Users credentials in the form 'id:login:password,id2:login2:password2' ${FIBR_AUTH_USERS}
+  --bcryptDuration                    string        [crud] Wanted bcrypt duration for calculating effective cost ${FIBR_BCRYPT_DURATION} (default "0.25s")
+  --cert                              string        [server] Certificate file ${FIBR_CERT}
+  --chunkUpload                                     [crud] Use chunk upload in browser ${FIBR_CHUNK_UPLOAD} (default false)
+  --csp                               string        [owasp] Content-Security-Policy ${FIBR_CSP} (default "default-src 'self'; base-uri 'self'; script-src 'self' 'httputils-nonce' unpkg.com/webp-hero@0.0.2/dist-cjs/ unpkg.com/leaflet@1.9.4/dist/ unpkg.com/leaflet.markercluster@1.5.1/; style-src 'self' 'httputils-nonce' unpkg.com/leaflet@1.9.4/dist/ unpkg.com/leaflet.markercluster@1.5.1/; img-src 'self' data: a.tile.openstreetmap.org b.tile.openstreetmap.org c.tile.openstreetmap.org")
+  --exifAmqpExchange                  string        [exif] AMQP Exchange Name ${FIBR_EXIF_AMQP_EXCHANGE} (default "fibr")
+  --exifAmqpRoutingKey                string        [exif] AMQP Routing Key for exif ${FIBR_EXIF_AMQP_ROUTING_KEY} (default "exif_input")
+  --exifDirectAccess                                [exif] Use Exas with direct access to filesystem (no large file upload, send a GET request, Basic Auth recommended) ${FIBR_EXIF_DIRECT_ACCESS} (default false)
+  --exifMaxSize                       int           [exif] Max file size (in bytes) for extracting exif (0 to no limit). Not used if DirectAccess enabled. ${FIBR_EXIF_MAX_SIZE} (default 209715200)
+  --exifPassword                      string        [exif] Exif Tool URL Basic Password ${FIBR_EXIF_PASSWORD}
+  --exifURL                           string        [exif] Exif Tool URL (exas) ${FIBR_EXIF_URL} (default "http://exas:1080")
+  --exifUser                          string        [exif] Exif Tool URL Basic User ${FIBR_EXIF_USER}
+  --frameOptions                      string        [owasp] X-Frame-Options ${FIBR_FRAME_OPTIONS} (default "SAMEORIGIN")
+  --graceDuration                     duration      [http] Grace duration when SIGTERM received ${FIBR_GRACE_DURATION} (default 30s)
+  --hsts                                            [owasp] Indicate Strict Transport Security ${FIBR_HSTS} (default true)
+  --idleTimeout                       duration      [server] Idle Timeout ${FIBR_IDLE_TIMEOUT} (default 2m0s)
+  --ignorePattern                     string        [crud] Ignore pattern when listing files or directory ${FIBR_IGNORE_PATTERN}
+  --key                               string        [server] Key file ${FIBR_KEY}
+  --loggerJson                                      [logger] Log format as JSON ${FIBR_LOGGER_JSON} (default false)
+  --loggerLevel                       string        [logger] Logger level ${FIBR_LOGGER_LEVEL} (default "INFO")
+  --loggerLevelKey                    string        [logger] Key for level in JSON ${FIBR_LOGGER_LEVEL_KEY} (default "level")
+  --loggerMessageKey                  string        [logger] Key for message in JSON ${FIBR_LOGGER_MESSAGE_KEY} (default "message")
+  --loggerTimeKey                     string        [logger] Key for timestamp in JSON ${FIBR_LOGGER_TIME_KEY} (default "time")
+  --minify                                          Minify HTML ${FIBR_MINIFY} (default true)
+  --noAuth                                          [auth] Disable basic authentification ${FIBR_NO_AUTH} (default false)
+  --okStatus                          int           [http] Healthy HTTP Status code ${FIBR_OK_STATUS} (default 204)
+  --pathPrefix                        string        Root Path Prefix ${FIBR_PATH_PREFIX}
+  --port                              uint          [server] Listen port (0 to disable) ${FIBR_PORT} (default 1080)
+  --prometheusAddress                 string        [prometheus] Listen address ${FIBR_PROMETHEUS_ADDRESS}
+  --prometheusCert                    string        [prometheus] Certificate file ${FIBR_PROMETHEUS_CERT}
+  --prometheusGzip                                  [prometheus] Enable gzip compression of metrics output ${FIBR_PROMETHEUS_GZIP} (default false)
+  --prometheusIdleTimeout             duration      [prometheus] Idle Timeout ${FIBR_PROMETHEUS_IDLE_TIMEOUT} (default 10s)
+  --prometheusIgnore                  string slice  [prometheus] Ignored path prefixe for metrics ${FIBR_PROMETHEUS_IGNORE}, as a string slice, environment variable separated by ","
+  --prometheusKey                     string        [prometheus] Key file ${FIBR_PROMETHEUS_KEY}
+  --prometheusPort                    uint          [prometheus] Listen port (0 to disable) ${FIBR_PROMETHEUS_PORT} (default 9090)
+  --prometheusReadTimeout             duration      [prometheus] Read Timeout ${FIBR_PROMETHEUS_READ_TIMEOUT} (default 5s)
+  --prometheusShutdownTimeout         duration      [prometheus] Shutdown Timeout ${FIBR_PROMETHEUS_SHUTDOWN_TIMEOUT} (default 5s)
+  --prometheusWriteTimeout            duration      [prometheus] Write Timeout ${FIBR_PROMETHEUS_WRITE_TIMEOUT} (default 10s)
+  --publicURL                         string        Public URL ${FIBR_PUBLIC_URL} (default "http://localhost:1080")
+  --readTimeout                       duration      [server] Read Timeout ${FIBR_READ_TIMEOUT} (default 2m0s)
+  --redisAddress                      string        [redis] Redis Address host:port (blank to disable) ${FIBR_REDIS_ADDRESS}
+  --redisAlias                        string        [redis] Connection alias, for metric ${FIBR_REDIS_ALIAS}
+  --redisDatabase                     int           [redis] Redis Database ${FIBR_REDIS_DATABASE} (default 0)
+  --redisPassword                     string        [redis] Redis Password, if any ${FIBR_REDIS_PASSWORD}
+  --redisPipelineSize                 int           [redis] Redis Pipeline Size ${FIBR_REDIS_PIPELINE_SIZE} (default 50)
+  --redisUsername                     string        [redis] Redis Username, if any ${FIBR_REDIS_USERNAME}
+  --sanitizeOnStart                                 [crud] Sanitize on start ${FIBR_SANITIZE_ON_START} (default false)
+  --sharePubSubChannel                string        [share] Channel name ${FIBR_SHARE_PUB_SUB_CHANNEL} (default "fibr:shares-channel")
+  --shutdownTimeout                   duration      [server] Shutdown Timeout ${FIBR_SHUTDOWN_TIMEOUT} (default 10s)
+  --storageFileSystemDirectory        /data         [storage] Path to directory. Default is dynamic. /data on a server and Current Working Directory in a terminal. ${FIBR_STORAGE_FILE_SYSTEM_DIRECTORY} (default /Users/vboutour/code/fibr)
+  --storageObjectAccessKey            string        [storage] Storage Object Access Key ${FIBR_STORAGE_OBJECT_ACCESS_KEY}
+  --storageObjectBucket               string        [storage] Storage Object Bucket ${FIBR_STORAGE_OBJECT_BUCKET}
+  --storageObjectClass                string        [storage] Storage Object Class ${FIBR_STORAGE_OBJECT_CLASS}
+  --storageObjectEndpoint             string        [storage] Storage Object endpoint ${FIBR_STORAGE_OBJECT_ENDPOINT}
+  --storageObjectRegion               string        [storage] Storage Object Region ${FIBR_STORAGE_OBJECT_REGION}
+  --storageObjectSSL                                [storage] Use SSL ${FIBR_STORAGE_OBJECT_SSL} (default true)
+  --storageObjectSecretAccess         string        [storage] Storage Object Secret Access ${FIBR_STORAGE_OBJECT_SECRET_ACCESS}
+  --storagePartSize                   uint          [storage] PartSize configuration ${FIBR_STORAGE_PART_SIZE} (default 5242880)
+  --temporaryFolder                   string        [crud] Temporary folder for chunk upload ${FIBR_TEMPORARY_FOLDER} (default "/tmp")
+  --thumbnailAmqpExchange             string        [thumbnail] AMQP Exchange Name ${FIBR_THUMBNAIL_AMQP_EXCHANGE} (default "fibr")
+  --thumbnailAmqpStreamRoutingKey     string        [thumbnail] AMQP Routing Key for stream ${FIBR_THUMBNAIL_AMQP_STREAM_ROUTING_KEY} (default "stream")
+  --thumbnailAmqpThumbnailRoutingKey  string        [thumbnail] AMQP Routing Key for thumbnail ${FIBR_THUMBNAIL_AMQP_THUMBNAIL_ROUTING_KEY} (default "thumbnail")
+  --thumbnailDirectAccess                           [thumbnail] Use Vith with direct access to filesystem (no large file upload, send a GET request, Basic Auth recommended) ${FIBR_THUMBNAIL_DIRECT_ACCESS} (default false)
+  --thumbnailLargeSize                uint          [thumbnail] Size of large thumbnail for story display (thumbnail are always squared). 0 to disable ${FIBR_THUMBNAIL_LARGE_SIZE} (default 800)
+  --thumbnailMaxSize                  int           [thumbnail] Maximum file size (in bytes) for generating thumbnail (0 to no limit). Not used if DirectAccess enabled. ${FIBR_THUMBNAIL_MAX_SIZE} (default 209715200)
+  --thumbnailMinBitrate               uint          [thumbnail] Minimal video bitrate (in bits per second) to generate a streamable version (in HLS), if DirectAccess enabled ${FIBR_THUMBNAIL_MIN_BITRATE} (default 80000000)
+  --thumbnailPassword                 string        [thumbnail] Vith Thumbnail Basic Auth Password ${FIBR_THUMBNAIL_PASSWORD}
+  --thumbnailURL                      string        [thumbnail] Vith Thumbnail URL ${FIBR_THUMBNAIL_URL} (default "http://vith:1080")
+  --thumbnailUser                     string        [thumbnail] Vith Thumbnail Basic Auth User ${FIBR_THUMBNAIL_USER}
+  --title                             string        Application title ${FIBR_TITLE} (default "fibr")
+  --tracerRate                        string        [tracer] OpenTracing sample rate, 'always', 'never' or a float value ${FIBR_TRACER_RATE} (default "always")
+  --tracerURL                         string        [tracer] OpenTracing gRPC endpoint (e.g. otel-exporter:4317) ${FIBR_TRACER_URL}
+  --url                               string        [alcotest] URL to check ${FIBR_URL}
+  --userAgent                         string        [alcotest] User-Agent for check ${FIBR_USER_AGENT} (default "Alcotest")
+  --webhookPubSubChannel              string        [webhook] Channel name ${FIBR_WEBHOOK_PUB_SUB_CHANNEL} (default "fibr:webhooks-channel")
+  --webhookSecret                     string        [webhook] Secret for HMAC Signature ${FIBR_WEBHOOK_SECRET}
+  --writeTimeout                      duration      [server] Write Timeout ${FIBR_WRITE_TIMEOUT} (default 2m0s)
 ```
 
 # Caveats
