@@ -94,8 +94,8 @@ build:
 .PHONY: build-web
 build-web:
 	rm -f "cmd/fibr/static/scripts/index.min.js" "cmd/fibr/static/styles/main.min.css"
-	minify --bundle --recursive --output "cmd/fibr/static/scripts/index.min.js" "cmd/fibr/static/scripts/"
-	minify --bundle --recursive --output "cmd/fibr/static/styles/main.min.css" "cmd/fibr/static/styles/"
+	minify --bundle --output "cmd/fibr/static/scripts/index.min.js" "cmd/fibr/static/scripts/"*.js
+	minify --bundle --output "cmd/fibr/static/styles/main.min.css" "cmd/fibr/static/styles/"*.css
 
 ## run: Locally run the application, e.g. node index.js, python -m myapp, go run myapp etc ...
 .PHONY: run
