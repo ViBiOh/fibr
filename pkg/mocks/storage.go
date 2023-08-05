@@ -7,6 +7,7 @@ package mocks
 import (
 	context "context"
 	io "io"
+	fs "io/fs"
 	reflect "reflect"
 	time "time"
 
@@ -51,20 +52,6 @@ func (mr *StorageMockRecorder) ConvertError(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ConvertError", reflect.TypeOf((*Storage)(nil).ConvertError), arg0)
 }
 
-// CreateDir mocks base method.
-func (m *Storage) CreateDir(arg0 context.Context, arg1 string) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateDir", arg0, arg1)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// CreateDir indicates an expected call of CreateDir.
-func (mr *StorageMockRecorder) CreateDir(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateDir", reflect.TypeOf((*Storage)(nil).CreateDir), arg0, arg1)
-}
-
 // Enabled mocks base method.
 func (m *Storage) Enabled() bool {
 	m.ctrl.T.Helper()
@@ -77,21 +64,6 @@ func (m *Storage) Enabled() bool {
 func (mr *StorageMockRecorder) Enabled() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Enabled", reflect.TypeOf((*Storage)(nil).Enabled))
-}
-
-// Info mocks base method.
-func (m *Storage) Info(arg0 context.Context, arg1 string) (model.Item, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Info", arg0, arg1)
-	ret0, _ := ret[0].(model.Item)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Info indicates an expected call of Info.
-func (mr *StorageMockRecorder) Info(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Info", reflect.TypeOf((*Storage)(nil).Info), arg0, arg1)
 }
 
 // List mocks base method.
@@ -109,6 +81,20 @@ func (mr *StorageMockRecorder) List(arg0, arg1 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*Storage)(nil).List), arg0, arg1)
 }
 
+// Mkdir mocks base method.
+func (m *Storage) Mkdir(arg0 context.Context, arg1 string, arg2 fs.FileMode) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Mkdir", arg0, arg1, arg2)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Mkdir indicates an expected call of Mkdir.
+func (mr *StorageMockRecorder) Mkdir(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Mkdir", reflect.TypeOf((*Storage)(nil).Mkdir), arg0, arg1, arg2)
+}
+
 // Name mocks base method.
 func (m *Storage) Name() string {
 	m.ctrl.T.Helper()
@@ -121,6 +107,21 @@ func (m *Storage) Name() string {
 func (mr *StorageMockRecorder) Name() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Name", reflect.TypeOf((*Storage)(nil).Name))
+}
+
+// OpenFile mocks base method.
+func (m *Storage) OpenFile(arg0 context.Context, arg1 string, arg2 int, arg3 fs.FileMode) (*model.FileItem, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "OpenFile", arg0, arg1, arg2, arg3)
+	ret0, _ := ret[0].(*model.FileItem)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// OpenFile indicates an expected call of OpenFile.
+func (mr *StorageMockRecorder) OpenFile(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OpenFile", reflect.TypeOf((*Storage)(nil).OpenFile), arg0, arg1, arg2, arg3)
 }
 
 // Path mocks base method.
@@ -152,18 +153,18 @@ func (mr *StorageMockRecorder) ReadFrom(arg0, arg1 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReadFrom", reflect.TypeOf((*Storage)(nil).ReadFrom), arg0, arg1)
 }
 
-// Remove mocks base method.
-func (m *Storage) Remove(arg0 context.Context, arg1 string) error {
+// RemoveAll mocks base method.
+func (m *Storage) RemoveAll(arg0 context.Context, arg1 string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Remove", arg0, arg1)
+	ret := m.ctrl.Call(m, "RemoveAll", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// Remove indicates an expected call of Remove.
-func (mr *StorageMockRecorder) Remove(arg0, arg1 interface{}) *gomock.Call {
+// RemoveAll indicates an expected call of RemoveAll.
+func (mr *StorageMockRecorder) RemoveAll(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Remove", reflect.TypeOf((*Storage)(nil).Remove), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveAll", reflect.TypeOf((*Storage)(nil).RemoveAll), arg0, arg1)
 }
 
 // Rename mocks base method.
@@ -178,6 +179,21 @@ func (m *Storage) Rename(arg0 context.Context, arg1, arg2 string) error {
 func (mr *StorageMockRecorder) Rename(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Rename", reflect.TypeOf((*Storage)(nil).Rename), arg0, arg1, arg2)
+}
+
+// Stat mocks base method.
+func (m *Storage) Stat(arg0 context.Context, arg1 string) (model.Item, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Stat", arg0, arg1)
+	ret0, _ := ret[0].(model.Item)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Stat indicates an expected call of Stat.
+func (mr *StorageMockRecorder) Stat(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Stat", reflect.TypeOf((*Storage)(nil).Stat), arg0, arg1)
 }
 
 // UpdateDate mocks base method.

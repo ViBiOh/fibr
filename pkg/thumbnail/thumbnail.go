@@ -123,10 +123,10 @@ func New(config Config, storage absto.Storage, redisClient redis.Client, prometh
 
 		storageApp: storage,
 		smallStorageApp: storage.WithIgnoreFn(func(item absto.Item) bool {
-			return !strings.HasSuffix(item.Name, ".webp") || strings.HasSuffix(item.Name, "_large.webp")
+			return !strings.HasSuffix(item.Name(), ".webp") || strings.HasSuffix(item.Name(), "_large.webp")
 		}),
 		largeStorageApp: storage.WithIgnoreFn(func(item absto.Item) bool {
-			return !strings.HasSuffix(item.Name, "_large.webp")
+			return !strings.HasSuffix(item.Name(), "_large.webp")
 		}),
 		amqpClient:    amqpClient,
 		metric:        prom.CounterVec(prometheusRegisterer, "fibr", "thumbnail", "item", "type", "state"),
@@ -137,7 +137,7 @@ func New(config Config, storage absto.Storage, redisClient redis.Client, prometh
 	}
 
 	app.cacheApp = cache.New(redisClient, redisKey, func(ctx context.Context, pathname string) (absto.Item, error) {
-		return app.storageApp.Info(ctx, pathname)
+		return app.storageApp.Stat(ctx, pathname)
 	}, redisCacheDuration, provider.MaxConcurrency, tracerApp.GetTracer("thumbnail_cache"))
 
 	return app, nil
@@ -162,7 +162,7 @@ func (a App) Stream(w http.ResponseWriter, r *http.Request, item absto.Item) {
 	defer provider.LogClose(reader, "thumbnail.Stream", item.Pathname)
 
 	w.Header().Add("Content-Type", "application/x-mpegURL")
-	http.ServeContent(w, r, item.Name, item.Date, reader)
+	http.ServeContent(w, r, item.Name(), item.Date, reader)
 }
 
 func (a App) Serve(w http.ResponseWriter, r *http.Request, item absto.Item) {
@@ -277,7 +277,7 @@ func (a App) thumbnailHash(ctx context.Context, items []absto.Item) string {
 }
 
 func (a App) encodeContent(ctx context.Context, w io.Writer, isDone func() bool, item absto.Item) {
-	if item.IsDir || isDone() {
+	if item.IsDir() || isDone() {
 		return
 	}
 

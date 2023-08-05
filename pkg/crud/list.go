@@ -98,10 +98,10 @@ func (a App) list(ctx context.Context, request provider.Request, message rendere
 		renderItem := provider.StorageToRender(item, request)
 		renderItem.Tags = metadatas[item.ID].Tags
 
-		if item.IsDir {
+		if item.IsDir() {
 			renderItem.Aggregate = aggregates[item.ID]
 		} else {
-			renderItem.IsCover = item.Name == directoryAggregate.Cover
+			renderItem.IsCover = item.Name() == directoryAggregate.Cover
 		}
 
 		items[index] = renderItem
@@ -144,7 +144,7 @@ func (a App) enrichThumbnail(ctx context.Context, directoryAggregate provider.Ag
 
 		hasThumbnail = true
 
-		if cover.IsZero() || (len(directoryAggregate.Cover) != 0 && cover.Img.Name != directoryAggregate.Cover) {
+		if cover.IsZero() || (len(directoryAggregate.Cover) != 0 && cover.Img.Name() != directoryAggregate.Cover) {
 			cover = newCover(item, thumbnail.SmallSize)
 		}
 
@@ -189,7 +189,7 @@ func (a App) zipItems(ctx context.Context, done <-chan struct{}, request provide
 		default:
 			relativeURL := request.RelativeURL(item)
 
-			if !item.IsDir {
+			if !item.IsDir() {
 				if err = a.addFileToZip(ctx, zipWriter, item, relativeURL); err != nil {
 					return
 				}
@@ -215,7 +215,7 @@ func (a App) zipItems(ctx context.Context, done <-chan struct{}, request provide
 func (a App) addFileToZip(ctx context.Context, zipWriter *zip.Writer, item absto.Item, pathname string) (err error) {
 	header := &zip.FileHeader{
 		Name:               pathname,
-		UncompressedSize64: uint64(item.Size),
+		UncompressedSize64: uint64(item.Size()),
 		Modified:           item.Date,
 		Method:             zip.Deflate,
 	}

@@ -17,13 +17,13 @@ func (a App) regenerate(w http.ResponseWriter, r *http.Request, request provider
 	pathname := request.Filepath()
 	ctx := r.Context()
 
-	info, err := a.storageApp.Info(ctx, pathname)
+	info, err := a.storageApp.Stat(ctx, pathname)
 	if err != nil {
 		a.error(w, r, request, model.WrapInternal(err))
 		return
 	}
 
-	if !info.IsDir {
+	if !info.IsDir() {
 		a.error(w, r, request, model.WrapInvalid(errors.New("regenerate is only available for folder")))
 		return
 	}
@@ -39,7 +39,7 @@ func (a App) regenerate(w http.ResponseWriter, r *http.Request, request provider
 		var directories []absto.Item
 
 		err := a.storageApp.Walk(ctx, pathname, func(item absto.Item) error {
-			if item.IsDir {
+			if item.IsDir() {
 				directories = append(directories, item)
 			} else {
 				a.pushEvent(provider.NewRestartEvent(ctx, item, subset))

@@ -31,7 +31,7 @@ func DoRemove(name string) SearchesOption {
 }
 
 func path(item absto.Item) string {
-	if item.IsDir {
+	if item.IsDir() {
 		return provider.MetadataDirectory(item) + "searches.json"
 	}
 
@@ -100,12 +100,12 @@ func (a App) save(ctx context.Context, item absto.Item, content Searches) error 
 	filename := path(item)
 	dirname := filepath.Dir(filename)
 
-	if _, err := a.storageApp.Info(ctx, dirname); err != nil {
+	if _, err := a.storageApp.Stat(ctx, dirname); err != nil {
 		if !absto.IsNotExist(err) {
 			return fmt.Errorf("check directory existence: %w", err)
 		}
 
-		if err = a.storageApp.CreateDir(ctx, dirname); err != nil {
+		if err = a.storageApp.Mkdir(ctx, dirname, provider.DirectoryPerm); err != nil {
 			return fmt.Errorf("create directory: %w", err)
 		}
 	}

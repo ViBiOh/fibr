@@ -107,7 +107,7 @@ func (a *App) loadWebhooks(ctx context.Context) error {
 			return err
 		}
 
-		if err := a.storageApp.CreateDir(ctx, provider.MetadataDirectoryName); err != nil {
+		if err := a.storageApp.Mkdir(ctx, provider.MetadataDirectoryName, provider.DirectoryPerm); err != nil {
 			return fmt.Errorf("create dir: %w", err)
 		}
 

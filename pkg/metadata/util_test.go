@@ -27,8 +27,8 @@ func TestGetExifPath(t *testing.T) {
 		"dir": {
 			args{
 				item: absto.Item{
-					Pathname: "/photos",
-					IsDir:    true,
+					Pathname:   "/photos",
+					IsDirValue: true,
 				},
 			},
 			"/.fibr/photos/aggregate.json",

@@ -154,7 +154,7 @@ func SendLargeFile(ctx context.Context, storageApp absto.Storage, item absto.Ite
 		return nil, fmt.Errorf("create request: %w", err)
 	}
 
-	r.ContentLength = item.Size
+	r.ContentLength = item.Size()
 
 	return request.DoWithClient(SlowClient, r)
 }
@@ -169,13 +169,13 @@ func WriteToStorage(ctx context.Context, storageApp absto.Storage, output string
 	var err error
 	directory := path.Dir(output)
 
-	if err = storageApp.CreateDir(ctx, directory); err != nil {
+	if err = storageApp.Mkdir(ctx, directory, DirectoryPerm); err != nil {
 		return fmt.Errorf("create directory: %w", err)
 	}
 
 	err = storageApp.WriteTo(ctx, output, reader, absto.WriteOpts{Size: size})
 	if err != nil {
-		if removeErr := storageApp.Remove(ctx, output); removeErr != nil {
+		if removeErr := storageApp.RemoveAll(ctx, output); removeErr != nil {
 			err = errors.Join(err, fmt.Errorf("remove: %w", removeErr))
 		}
 	}

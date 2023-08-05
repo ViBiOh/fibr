@@ -108,7 +108,7 @@ func (a App) mergeChunk(w http.ResponseWriter, r *http.Request, request provider
 
 	if err == nil {
 		go func(ctx context.Context) {
-			if info, infoErr := a.storageApp.Info(ctx, filePath); infoErr != nil {
+			if info, infoErr := a.storageApp.Stat(ctx, filePath); infoErr != nil {
 				logger.Error("get info for upload event: %s", infoErr)
 			} else {
 				a.pushEvent(provider.NewUploadEvent(ctx, request, info, a.bestSharePath(filePath), a.rendererApp))

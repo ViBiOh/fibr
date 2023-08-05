@@ -47,7 +47,7 @@ func (a App) story(r *http.Request, request provider.Request, item absto.Item, f
 	wg.Wait()
 
 	for _, file := range files {
-		if cover.IsZero() || (len(directoryAggregate.Cover) != 0 && cover.Img.Name != directoryAggregate.Cover) {
+		if cover.IsZero() || (len(directoryAggregate.Cover) != 0 && cover.Img.Name() != directoryAggregate.Cover) {
 			cover = newCover(provider.StorageToRender(file, request), thumbnail.SmallSize)
 		}
 

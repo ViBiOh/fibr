@@ -16,25 +16,25 @@ import (
 func BenchmarkServeGeoJSON(b *testing.B) {
 	items := []absto.Item{
 		{
-			ID:        "1234",
-			Name:      "first.jpeg",
-			Pathname:  "/first.jpeg",
-			Extension: ".jpeg",
-			IsDir:     false,
+			ID:         "1234",
+			NameValue:  "first.jpeg",
+			Pathname:   "/first.jpeg",
+			Extension:  ".jpeg",
+			IsDirValue: false,
 		},
 		{
-			ID:        "5678",
-			Name:      "second.jpeg",
-			Pathname:  "/second.jpeg",
-			Extension: ".jpeg",
-			IsDir:     false,
+			ID:         "5678",
+			NameValue:  "second.jpeg",
+			Pathname:   "/second.jpeg",
+			Extension:  ".jpeg",
+			IsDirValue: false,
 		},
 		{
-			ID:        "9012",
-			Name:      "third.jpeg",
-			Pathname:  "/third.jpeg",
-			Extension: ".jpeg",
-			IsDir:     false,
+			ID:         "9012",
+			NameValue:  "third.jpeg",
+			Pathname:   "/third.jpeg",
+			Extension:  ".jpeg",
+			IsDirValue: false,
 		},
 	}
 
@@ -82,11 +82,11 @@ func BenchmarkServeGeoJSON(b *testing.B) {
 	r := httptest.NewRequest(http.MethodGet, "/", nil)
 	request := provider.Request{}
 	item := absto.Item{
-		ID:        "1234",
-		Name:      "first.jpeg",
-		Pathname:  "/first.jpeg",
-		Extension: ".jpeg",
-		IsDir:     false,
+		ID:         "1234",
+		NameValue:  "first.jpeg",
+		Pathname:   "/first.jpeg",
+		Extension:  ".jpeg",
+		IsDirValue: false,
 	}
 
 	for i := 0; i < b.N; i++ {

@@ -90,7 +90,7 @@ func (a App) createShare(w http.ResponseWriter, r *http.Request, request provide
 
 	ctx := r.Context()
 
-	info, err := a.storageApp.Info(ctx, request.Filepath())
+	info, err := a.storageApp.Stat(ctx, request.Filepath())
 	if err != nil {
 		if absto.IsNotExist(err) {
 			a.error(w, r, request, model.WrapNotFound(err))
@@ -100,7 +100,7 @@ func (a App) createShare(w http.ResponseWriter, r *http.Request, request provide
 		return
 	}
 
-	id, err := a.shareApp.Create(ctx, request.Filepath(), edit, story, password, info.IsDir, duration)
+	id, err := a.shareApp.Create(ctx, request.Filepath(), edit, story, password, info.IsDir(), duration)
 	if err != nil {
 		a.error(w, r, request, model.WrapInternal(err))
 		return
@@ -114,7 +114,7 @@ func (a App) createShare(w http.ResponseWriter, r *http.Request, request provide
 	}
 
 	redirection := request.Filepath()
-	if !info.IsDir {
+	if !info.IsDir() {
 		redirection = fmt.Sprintf("%s/", path.Dir(redirection))
 	}
 

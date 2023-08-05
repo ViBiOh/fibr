@@ -113,7 +113,7 @@ func (s search) matchSize(item absto.Item) bool {
 		return true
 	}
 
-	if (s.size - item.Size) > 0 == s.greaterThan {
+	if (s.size - item.Size()) > 0 == s.greaterThan {
 		return false
 	}
 

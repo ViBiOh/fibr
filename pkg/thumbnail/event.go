@@ -20,7 +20,7 @@ func (a App) EventConsumer(ctx context.Context, e provider.Event) {
 	case provider.UploadEvent:
 		a.generateItem(ctx, e)
 	case provider.RenameEvent:
-		if !e.Item.IsDir {
+		if !e.Item.IsDir() {
 			if err := a.Rename(ctx, e.Item, *e.New); err != nil {
 				logger.Error("rename item: %s", err)
 			}
@@ -31,7 +31,7 @@ func (a App) EventConsumer(ctx context.Context, e provider.Event) {
 }
 
 func (a App) Rename(ctx context.Context, old, new absto.Item) error {
-	if old.IsDir {
+	if old.IsDir() {
 		return nil
 	}
 
@@ -99,8 +99,8 @@ func (a App) generateStreamIfNeeded(ctx context.Context, event provider.Event) {
 }
 
 func (a App) delete(ctx context.Context, item absto.Item) {
-	if item.IsDir {
-		if err := a.storageApp.Remove(ctx, provider.MetadataDirectory(item)); err != nil {
+	if item.IsDir() {
+		if err := a.storageApp.RemoveAll(ctx, provider.MetadataDirectory(item)); err != nil {
 			logger.Error("delete thumbnail folder: %s", err)
 		}
 		return
@@ -109,7 +109,7 @@ func (a App) delete(ctx context.Context, item absto.Item) {
 	for _, size := range a.sizes {
 		filename := a.PathForScale(item, size)
 
-		if err := a.storageApp.Remove(ctx, filename); err != nil {
+		if err := a.storageApp.RemoveAll(ctx, filename); err != nil {
 			logger.Error("delete thumbnail: %s", err)
 		}
 

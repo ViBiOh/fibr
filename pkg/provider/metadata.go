@@ -16,16 +16,16 @@ type ExifResponse struct {
 }
 
 type Metadata struct {
-	Description string   `json:"description,omitempty"`
-	Tags        []string `json:"tags,omitempty"`
+	Description string   `msg:"description,omitempty" json:"description,omitempty"`
+	Tags        []string `msg:"tags,omitempty" json:"tags,omitempty"`
 	exas.Exif
 }
 
 type Aggregate struct {
-	Start    time.Time `json:"start,omitempty"`
-	End      time.Time `json:"end,omitempty"`
-	Location string    `json:"location,omitempty"`
-	Cover    string    `json:"cover,omitempty"`
+	Start    time.Time `msg:"start,omitempty" json:"start,omitempty"`
+	End      time.Time `msg:"end,omitempty" json:"end,omitempty"`
+	Location string    `msg:"location,omitempty" json:"location,omitempty"`
+	Cover    string    `msg:"cover,omitempty" json:"cover,omitempty"`
 }
 
 type MetadataAction func(Metadata) Metadata

@@ -30,7 +30,7 @@ func (a App) getWithMessage(w http.ResponseWriter, r *http.Request, request prov
 	ctx := r.Context()
 
 	pathname := request.Filepath()
-	item, err := a.storageApp.Info(ctx, pathname)
+	item, err := a.storageApp.Stat(ctx, pathname)
 
 	if err != nil && absto.IsNotExist(err) && provider.StreamExtensions[filepath.Ext(pathname)] {
 		if request.Share.File {
@@ -49,12 +49,12 @@ func (a App) getWithMessage(w http.ResponseWriter, r *http.Request, request prov
 		return errorReturn(request, err)
 	}
 
-	if item.IsDir && !strings.HasSuffix(r.URL.Path, "/") {
+	if item.IsDir() && !strings.HasSuffix(r.URL.Path, "/") {
 		a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/?d=%s", r.URL.Path, request.Display), renderer.Message{})
 		return renderer.Page{}, nil
 	}
 
-	if !item.IsDir {
+	if !item.IsDir() {
 		return a.handleFile(w, r, request, item, message)
 	}
 	return a.handleDir(w, r, request, item, message)
@@ -102,7 +102,7 @@ func (a App) serveFile(w http.ResponseWriter, r *http.Request, item absto.Item) 
 
 	w.Header().Add("Etag", etag)
 
-	http.ServeContent(w, r, item.Name, item.Date, file)
+	http.ServeContent(w, r, item.Name(), item.Date, file)
 	return nil
 }
 
@@ -293,7 +293,7 @@ func (a App) exifHash(ctx context.Context, items []absto.Item) string {
 	hasher := sha.Stream()
 
 	for _, item := range items {
-		if info, err := a.storageApp.Info(ctx, metadata.Path(item)); err == nil {
+		if info, err := a.storageApp.Stat(ctx, metadata.Path(item)); err == nil {
 			hasher.Write(info)
 		}
 	}

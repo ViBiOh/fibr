@@ -23,7 +23,7 @@ func redisKey(item absto.Item) string {
 }
 
 func (a App) GetMetadataFor(ctx context.Context, item absto.Item) (metadata provider.Metadata, err error) {
-	if item.IsDir {
+	if item.IsDir() {
 		return provider.Metadata{}, nil
 	}
 
@@ -57,7 +57,7 @@ func (a App) GetAllMetadataFor(ctx context.Context, items ...absto.Item) (map[st
 }
 
 func (a App) GetAggregateFor(ctx context.Context, item absto.Item) (aggregate provider.Aggregate, err error) {
-	if !item.IsDir {
+	if !item.IsDir() {
 		return provider.Aggregate{}, nil
 	}
 
@@ -95,7 +95,7 @@ func (a App) SaveAggregateFor(ctx context.Context, item absto.Item, aggregate pr
 }
 
 func (a App) aggregate(ctx context.Context, item absto.Item) error {
-	if !item.IsDir {
+	if !item.IsDir() {
 		file, err := a.getDirOf(ctx, item)
 		if err != nil {
 			return fmt.Errorf("get directory: %w", err)
@@ -166,5 +166,5 @@ func aggregateDate(min, max, current time.Time) (time.Time, time.Time) {
 }
 
 func (a App) getDirOf(ctx context.Context, item absto.Item) (absto.Item, error) {
-	return a.storageApp.Info(ctx, item.Dir())
+	return a.storageApp.Stat(ctx, item.Dir())
 }

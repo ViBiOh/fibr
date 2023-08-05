@@ -32,7 +32,7 @@ func (a App) Create(w http.ResponseWriter, r *http.Request, request provider.Req
 
 	pathname := request.SubPath(name)
 
-	if err = a.storageApp.CreateDir(r.Context(), pathname); err != nil {
+	if err = a.storageApp.Mkdir(r.Context(), pathname, provider.DirectoryPerm); err != nil {
 		a.error(w, r, request, model.WrapInternal(err))
 		return
 	}
@@ -60,7 +60,7 @@ func (a App) CreateSavedSearch(w http.ResponseWriter, r *http.Request, request p
 
 	ctx := r.Context()
 
-	item, err := a.storageApp.Info(ctx, request.Filepath())
+	item, err := a.storageApp.Stat(ctx, request.Filepath())
 	if err != nil {
 		a.error(w, r, request, model.WrapNotFound(err))
 		return

@@ -46,7 +46,7 @@ func (a App) Files(r *http.Request, request provider.Request) (items []absto.Ite
 	hasTags := criterions.hasTags()
 
 	err = a.storageApp.Walk(ctx, request.Filepath(), func(item absto.Item) error {
-		if item.IsDir || !criterions.match(item) {
+		if item.IsDir() || !criterions.match(item) {
 			return nil
 		}
 

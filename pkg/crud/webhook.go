@@ -32,7 +32,7 @@ func (a App) createWebhook(w http.ResponseWriter, r *http.Request, request provi
 
 	ctx := r.Context()
 
-	info, err := a.storageApp.Info(ctx, request.Path)
+	info, err := a.storageApp.Stat(ctx, request.Path)
 	if err != nil {
 		if absto.IsNotExist(err) {
 			a.error(w, r, request, model.WrapNotFound(err))
@@ -43,7 +43,7 @@ func (a App) createWebhook(w http.ResponseWriter, r *http.Request, request provi
 		return
 	}
 
-	if !info.IsDir {
+	if !info.IsDir() {
 		a.error(w, r, request, model.WrapInvalid(errors.New("webhook are only available on directories")))
 		return
 	}

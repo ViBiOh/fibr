@@ -100,7 +100,7 @@ func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheu
 		exclusiveApp: exclusiveApp,
 		storageApp:   storageApp,
 		listStorageApp: storageApp.WithIgnoreFn(func(item absto.Item) bool {
-			return !strings.HasSuffix(item.Name, ".json")
+			return !strings.HasSuffix(item.Name(), ".json")
 		}),
 
 		exifMetric:      prom.CounterVec(prometheusRegisterer, "fibr", "exif", "item", "state"),
@@ -108,7 +108,7 @@ func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheu
 	}
 
 	app.exifCacheApp = cache.New(redisClient, redisKey, func(ctx context.Context, item absto.Item) (provider.Metadata, error) {
-		if item.IsDir {
+		if item.IsDir() {
 			return provider.Metadata{}, errInvalidItemType
 		}
 
@@ -116,7 +116,7 @@ func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheu
 	}, cacheDuration, provider.MaxConcurrency, tracerApp.GetTracer("exif_cache"))
 
 	app.aggregateCacheApp = cache.New(redisClient, redisKey, func(ctx context.Context, item absto.Item) (provider.Aggregate, error) {
-		if !item.IsDir {
+		if !item.IsDir() {
 			return provider.Aggregate{}, errInvalidItemType
 		}
 
@@ -127,7 +127,7 @@ func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheu
 }
 
 func (a App) ListDir(ctx context.Context, item absto.Item) ([]absto.Item, error) {
-	if !item.IsDir {
+	if !item.IsDir() {
 		return nil, nil
 	}
 

@@ -41,7 +41,7 @@ func Get(config Config, storage absto.Storage) (absto.Storage, error) {
 			return true
 		}
 
-		if pattern != nil && pattern.MatchString(item.Name) {
+		if pattern != nil && pattern.MatchString(item.Name()) {
 			return true
 		}
 

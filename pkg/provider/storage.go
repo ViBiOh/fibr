@@ -31,15 +31,15 @@ func (a ByHybridSort) Less(i, j int) bool {
 	first := a[i]
 	second := a[j]
 
-	if first.IsDir && second.IsDir {
-		return lowerString(first.Name, second.Name)
+	if first.IsDir() && second.IsDir() {
+		return lowerString(first.Name(), second.Name())
 	}
 
-	if first.IsDir {
+	if first.IsDir() {
 		return true
 	}
 
-	if second.IsDir {
+	if second.IsDir() {
 		return false
 	}
 
@@ -73,7 +73,7 @@ func (r RenderItem) String() string {
 	output.WriteString(r.Path)
 	output.WriteString(strconv.FormatBool(r.IsCover))
 	output.WriteString(r.ID)
-	output.WriteString(strconv.FormatInt(r.Size, 10))
+	output.WriteString(strconv.FormatInt(r.Size(), 10))
 	output.WriteString(r.Date.String())
 
 	return output.String()
@@ -130,7 +130,7 @@ func (s StoryItem) String() string {
 	output.WriteString(s.Path)
 	output.WriteString(strconv.FormatBool(s.IsCover))
 	output.WriteString(s.ID)
-	output.WriteString(strconv.FormatInt(s.Size, 10))
+	output.WriteString(strconv.FormatInt(s.Size(), 10))
 	output.WriteString(s.Date.String())
 
 	return output.String()

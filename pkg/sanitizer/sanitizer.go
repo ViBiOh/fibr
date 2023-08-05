@@ -78,7 +78,7 @@ func (a App) start(ctx context.Context) error {
 
 		item = a.sanitizeName(ctx, item)
 
-		if item.IsDir {
+		if item.IsDir() {
 			directories = append(directories, item)
 		} else {
 			a.pushEvent(provider.NewStartEvent(ctx, item))

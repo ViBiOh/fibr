@@ -46,11 +46,11 @@ func (a App) computeStats(ctx context.Context, pathname string) (map[string]uint
 	var filesCount, directoriesCount, filesSize, metadataSize uint64
 
 	err := a.storageApp.Walk(ctx, pathname, func(item absto.Item) error {
-		if item.IsDir {
+		if item.IsDir() {
 			directoriesCount++
 		} else {
 			filesCount++
-			filesSize += uint64(item.Size)
+			filesSize += uint64(item.Size())
 		}
 
 		return nil
@@ -60,8 +60,8 @@ func (a App) computeStats(ctx context.Context, pathname string) (map[string]uint
 	}
 
 	err = a.rawStorageApp.Walk(ctx, provider.MetadataDirectoryName+pathname, func(item absto.Item) error {
-		if !item.IsDir {
-			metadataSize += uint64(item.Size)
+		if !item.IsDir() {
+			metadataSize += uint64(item.Size())
 		}
 
 		return nil

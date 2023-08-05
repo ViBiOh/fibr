@@ -10,11 +10,11 @@ import (
 )
 
 func (a App) CanHaveExif(item absto.Item) bool {
-	return provider.ThumbnailExtensions[item.Extension] && (a.maxSize == 0 || item.Size < a.maxSize || a.directAccess)
+	return provider.ThumbnailExtensions[item.Extension] && (a.maxSize == 0 || item.Size() < a.maxSize || a.directAccess)
 }
 
 func Path(item absto.Item) string {
-	if item.IsDir {
+	if item.IsDir() {
 		return provider.MetadataDirectory(item) + "aggregate.json"
 	}
 
@@ -22,7 +22,7 @@ func Path(item absto.Item) string {
 }
 
 func (a App) hasMetadata(ctx context.Context, item absto.Item) bool {
-	if item.IsDir {
+	if item.IsDir() {
 		_, err := a.GetAggregateFor(ctx, item)
 		return err == nil
 	}
@@ -51,12 +51,12 @@ func (a App) saveMetadata(ctx context.Context, item absto.Item, data any) error 
 	filename := Path(item)
 	dirname := filepath.Dir(filename)
 
-	if _, err := a.storageApp.Info(ctx, dirname); err != nil {
+	if _, err := a.storageApp.Stat(ctx, dirname); err != nil {
 		if !absto.IsNotExist(err) {
 			return fmt.Errorf("check directory existence: %w", err)
 		}
 
-		if err = a.storageApp.CreateDir(ctx, dirname); err != nil {
+		if err = a.storageApp.Mkdir(ctx, dirname, provider.DirectoryPerm); err != nil {
 			return fmt.Errorf("create directory: %w", err)
 		}
 	}
@@ -65,7 +65,7 @@ func (a App) saveMetadata(ctx context.Context, item absto.Item, data any) error 
 		return fmt.Errorf("save: %w", err)
 	}
 
-	if item.IsDir {
+	if item.IsDir() {
 		a.increaseAggregate("save")
 	} else {
 		a.increaseExif("save")

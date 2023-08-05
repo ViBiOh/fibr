@@ -123,11 +123,11 @@ func (e Event) GetName() string {
 		return e.getFrom()
 	}
 
-	if e.Item.IsDir {
-		return Dirname(e.Item.Name)
+	if e.Item.IsDir() {
+		return Dirname(e.Item.Name())
 	}
 
-	return e.Item.Name
+	return e.Item.Name()
 }
 
 func (e Event) getFrom() string {
@@ -137,9 +137,9 @@ func (e Event) getFrom() string {
 		fromName = previousDir
 	}
 
-	fromName = path.Join(fromName, e.Item.Name)
+	fromName = path.Join(fromName, e.Item.Name())
 
-	if e.Item.IsDir {
+	if e.Item.IsDir() {
 		fromName = Dirname(fromName)
 	}
 
@@ -157,9 +157,9 @@ func (e Event) GetTo() string {
 		newName = newDir
 	}
 
-	newName = path.Join(newName, e.New.Name)
+	newName = path.Join(newName, e.New.Name())
 
-	if e.New.IsDir {
+	if e.New.IsDir() {
 		newName = Dirname(newName)
 	}
 
@@ -172,7 +172,7 @@ func NewUploadEvent(ctx context.Context, request Request, item absto.Item, share
 		Type:         UploadEvent,
 		Item:         item,
 		TraceLink:    trace.LinkFromContext(ctx),
-		URL:          rendererApp.PublicURL(request.AbsoluteURL(item.Name)),
+		URL:          rendererApp.PublicURL(request.AbsoluteURL(item.Name())),
 		ShareableURL: rendererApp.PublicURL(shareableURL),
 		Metadata: map[string]string{
 			"force": "all",
@@ -334,7 +334,7 @@ func (e EventBus) Start(ctx context.Context, storageApp absto.Storage, renamers 
 	for event := range e.bus {
 		ctx, end := tracer.StartSpan(context.Background(), e.tracer, "event", trace.WithAttributes(attribute.String("type", event.Type.String())), trace.WithLinks(event.TraceLink))
 
-		if event.Type == RenameEvent && event.Item.IsDir {
+		if event.Type == RenameEvent && event.Item.IsDir() {
 			RenameDirectory(ctx, storageApp, renamers, event.Item, *event.New)
 		}
 
@@ -348,17 +348,17 @@ func (e EventBus) Start(ctx context.Context, storageApp absto.Storage, renamers 
 }
 
 func RenameDirectory(ctx context.Context, storageApp absto.Storage, renamers []Renamer, old, new absto.Item) {
-	if err := storageApp.CreateDir(ctx, MetadataDirectory(new)); err != nil {
+	if err := storageApp.Mkdir(ctx, MetadataDirectory(new), DirectoryPerm); err != nil {
 		logger.Error("create new metadata directory: %s", err)
 		return
 	}
 
 	if err := storageApp.Walk(ctx, new.Pathname, func(item absto.Item) error {
 		oldItem := item
-		oldItem.Pathname = Join(old.Pathname, item.Name)
+		oldItem.Pathname = Join(old.Pathname, item.Name())
 		oldItem.ID = absto.ID(oldItem.Pathname)
 
-		if item.IsDir && item.Pathname != new.Pathname {
+		if item.IsDir() && item.Pathname != new.Pathname {
 			RenameDirectory(ctx, storageApp, renamers, oldItem, item)
 			return nil
 		}
@@ -374,7 +374,7 @@ func RenameDirectory(ctx context.Context, storageApp absto.Storage, renamers []R
 		logger.Error("walk new metadata directory: %s", err)
 	}
 
-	if err := storageApp.Remove(ctx, MetadataDirectory(old)); err != nil {
+	if err := storageApp.RemoveAll(ctx, MetadataDirectory(old)); err != nil {
 		logger.Error("delete old metadata directory: %s", err)
 		return
 	}

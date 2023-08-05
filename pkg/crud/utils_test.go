@@ -32,9 +32,9 @@ func TestGetPreviousAndNext(t *testing.T) {
 	}{
 		"one item": {
 			args{
-				file: absto.Item{Name: filename},
+				file: absto.Item{NameValue: filename},
 				files: []absto.Item{
-					{Name: filename},
+					{NameValue: filename},
 				},
 			},
 			nil,
@@ -42,28 +42,28 @@ func TestGetPreviousAndNext(t *testing.T) {
 		},
 		"no next item": {
 			args{
-				file: absto.Item{Name: filename},
+				file: absto.Item{NameValue: filename},
 				files: []absto.Item{
-					{Name: ".git", IsDir: true},
-					{Name: otherFilename},
-					{Name: filename},
+					{NameValue: ".git", IsDirValue: true},
+					{NameValue: otherFilename},
+					{NameValue: filename},
 				},
 			},
-			&absto.Item{Name: otherFilename},
+			&absto.Item{NameValue: otherFilename},
 			nil,
 		},
 		"full items": {
 			args{
-				file: absto.Item{Name: filename},
+				file: absto.Item{NameValue: filename},
 				files: []absto.Item{
-					{Name: ".git", IsDir: true},
-					{Name: otherFilename},
-					{Name: filename},
-					{Name: "main.go"},
+					{NameValue: ".git", IsDirValue: true},
+					{NameValue: otherFilename},
+					{NameValue: filename},
+					{NameValue: "main.go"},
 				},
 			},
-			&absto.Item{Name: otherFilename},
-			&absto.Item{Name: "main.go"},
+			&absto.Item{NameValue: otherFilename},
+			&absto.Item{NameValue: "main.go"},
 		},
 	}
 

@@ -84,8 +84,8 @@ func TestRelativeURL(t *testing.T) {
 			},
 			args{
 				item: absto.Item{
-					Pathname: "/folder",
-					IsDir:    true,
+					Pathname:   "/folder",
+					IsDirValue: true,
 				},
 			},
 			"folder/",

@@ -18,7 +18,7 @@ func (a App) DoRename(ctx context.Context, oldPath, newPath string, oldItem abst
 		return absto.Item{}, fmt.Errorf("rename: %w", err)
 	}
 
-	newItem, err := a.storageApp.Info(ctx, newPath)
+	newItem, err := a.storageApp.Stat(ctx, newPath)
 	if err != nil {
 		return absto.Item{}, fmt.Errorf("get info of new item: %w", err)
 	}
@@ -94,7 +94,7 @@ func (a App) Rename(w http.ResponseWriter, r *http.Request, request provider.Req
 			return
 		}
 
-		if oldItem.IsDir {
+		if oldItem.IsDir() {
 			updatePreferences(request, oldPath, newPath)
 			provider.SetPrefsCookie(w, request)
 		}
@@ -106,7 +106,7 @@ func (a App) Rename(w http.ResponseWriter, r *http.Request, request provider.Req
 		}
 	}
 
-	if !newItem.IsDir {
+	if !newItem.IsDir() {
 		if cover {
 			if err := a.updateCover(ctx, newItem); err != nil {
 				a.error(w, r, request, model.WrapInternal(err))
@@ -129,11 +129,11 @@ func (a App) Rename(w http.ResponseWriter, r *http.Request, request provider.Req
 	var message string
 
 	if newFolder != request.Path {
-		message = fmt.Sprintf("%s successfully moved to %s", oldItem.Name, provider.URL(newFolder, newName, request.Share))
+		message = fmt.Sprintf("%s successfully moved to %s", oldItem.Name(), provider.URL(newFolder, newName, request.Share))
 	} else if oldPath != newPath {
-		message = fmt.Sprintf("%s successfully renamed to %s", oldItem.Name, newItem.Name)
+		message = fmt.Sprintf("%s successfully renamed to %s", oldItem.Name(), newItem.Name())
 	} else {
-		message = fmt.Sprintf("%s successfully updated", newItem.Name)
+		message = fmt.Sprintf("%s successfully updated", newItem.Name())
 	}
 
 	a.rendererApp.Redirect(w, r, fmt.Sprintf("?d=%s", request.Display), renderer.NewSuccessMessage(message))
@@ -158,7 +158,7 @@ func getNewName(r *http.Request) (string, error) {
 }
 
 func (a App) checkFile(ctx context.Context, pathname string, shouldExist bool) (info absto.Item, err error) {
-	info, err = a.storageApp.Info(ctx, pathname)
+	info, err = a.storageApp.Stat(ctx, pathname)
 
 	if err == nil {
 		if !shouldExist {
@@ -178,7 +178,7 @@ func (a App) checkFile(ctx context.Context, pathname string, shouldExist bool) (
 }
 
 func (a App) updateCover(ctx context.Context, item absto.Item) error {
-	directory, err := a.storageApp.Info(ctx, item.Dir())
+	directory, err := a.storageApp.Stat(ctx, item.Dir())
 	if err != nil {
 		return fmt.Errorf("get directory: %w", err)
 	}
@@ -188,7 +188,7 @@ func (a App) updateCover(ctx context.Context, item absto.Item) error {
 		return fmt.Errorf("get aggregate: %w", err)
 	}
 
-	aggregate.Cover = item.Name
+	aggregate.Cover = item.Name()
 
 	if err := a.metadataApp.SaveAggregateFor(ctx, directory, aggregate); err != nil {
 		return fmt.Errorf("save aggregate: %w", err)

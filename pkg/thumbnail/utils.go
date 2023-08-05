@@ -16,7 +16,7 @@ import (
 var redisCacheDuration = time.Hour * 96
 
 func (a App) CanHaveThumbnail(item absto.Item) bool {
-	return !item.IsDir && provider.ThumbnailExtensions[item.Extension] && (a.maxSize == 0 || item.Size < a.maxSize || a.directAccess)
+	return !item.IsDir() && provider.ThumbnailExtensions[item.Extension] && (a.maxSize == 0 || item.Size() < a.maxSize || a.directAccess)
 }
 
 func (a App) HasLargeThumbnail(ctx context.Context, item absto.Item) bool {
@@ -28,7 +28,7 @@ func (a App) HasLargeThumbnail(ctx context.Context, item absto.Item) bool {
 }
 
 func (a App) HasThumbnail(ctx context.Context, item absto.Item, scale uint64) bool {
-	if item.IsDir {
+	if item.IsDir() {
 		return false
 	}
 
@@ -45,7 +45,7 @@ func (a App) PathForLarge(item absto.Item) string {
 }
 
 func (a App) PathForScale(item absto.Item, scale uint64) string {
-	if item.IsDir {
+	if item.IsDir() {
 		return provider.MetadataDirectory(item)
 	}
 

@@ -26,7 +26,7 @@ func (a App) EventConsumer(ctx context.Context, e provider.Event) {
 			getEventLogger(e.Item).Error("upload: %s", err)
 		}
 	case provider.RenameEvent:
-		if !e.Item.IsDir {
+		if !e.Item.IsDir() {
 			err = a.Rename(ctx, e.Item, *e.New)
 			if err == nil {
 				err = a.aggregateOnRename(ctx, e.Item, *e.New)
@@ -78,7 +78,7 @@ func (a App) handleStartEvent(ctx context.Context, event provider.Event) error {
 		return nil
 	}
 
-	if item.IsDir {
+	if item.IsDir() {
 		if len(item.Pathname) != 0 {
 			return a.aggregate(ctx, item)
 		}
@@ -154,7 +154,7 @@ func (a App) aggregateOnRename(ctx context.Context, old, new absto.Item) error {
 }
 
 func (a App) delete(ctx context.Context, item absto.Item) error {
-	if err := a.storageApp.Remove(ctx, Path(item)); err != nil {
+	if err := a.storageApp.RemoveAll(ctx, Path(item)); err != nil {
 		return fmt.Errorf("delete: %w", err)
 	}
 
@@ -162,7 +162,7 @@ func (a App) delete(ctx context.Context, item absto.Item) error {
 		return fmt.Errorf("cache: %s", err)
 	}
 
-	if !item.IsDir {
+	if !item.IsDir() {
 		if err := a.aggregate(ctx, item); err != nil {
 			return fmt.Errorf("aggregate directory: %w", err)
 		}

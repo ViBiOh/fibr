@@ -20,11 +20,11 @@ func getPreviousAndNext(file absto.Item, files []absto.Item) (*absto.Item, *abst
 	)
 
 	for index, neighbor := range files {
-		if neighbor.IsDir {
+		if neighbor.IsDir() {
 			continue
 		}
 
-		if neighbor.Name == file.Name {
+		if neighbor.Name() == file.Name() {
 			found = true
 			continue
 		}

@@ -25,30 +25,30 @@ func (a App) Delete(w http.ResponseWriter, r *http.Request, request provider.Req
 	ctx := r.Context()
 
 	pathname := request.SubPath(name)
-	info, err := a.storageApp.Info(ctx, pathname)
+	info, err := a.storageApp.Stat(ctx, pathname)
 	if err != nil {
 		a.error(w, r, request, model.WrapNotFound(err))
 		return
 	}
 
 	deletePath := info.Pathname
-	if info.IsDir {
+	if info.IsDir() {
 		deletePath = provider.Dirname(deletePath)
 	}
 
-	if err = a.storageApp.Remove(ctx, deletePath); err != nil {
+	if err = a.storageApp.RemoveAll(ctx, deletePath); err != nil {
 		a.error(w, r, request, model.WrapInternal(err))
 		return
 	}
 
-	if info.IsDir {
+	if info.IsDir() {
 		request = request.DeletePreference(pathname)
 		provider.SetPrefsCookie(w, request)
 	}
 
 	go a.pushEvent(provider.NewDeleteEvent(ctx, request, info, a.rendererApp))
 
-	a.rendererApp.Redirect(w, r, fmt.Sprintf("?d=%s", request.Display), renderer.NewSuccessMessage("%s successfully deleted", info.Name))
+	a.rendererApp.Redirect(w, r, fmt.Sprintf("?d=%s", request.Display), renderer.NewSuccessMessage("%s successfully deleted", info.Name()))
 }
 
 func (a App) DeleteSavedSearch(w http.ResponseWriter, r *http.Request, request provider.Request) {
@@ -65,7 +65,7 @@ func (a App) DeleteSavedSearch(w http.ResponseWriter, r *http.Request, request p
 
 	ctx := r.Context()
 
-	item, err := a.storageApp.Info(ctx, request.Filepath())
+	item, err := a.storageApp.Stat(ctx, request.Filepath())
 	if err != nil {
 		a.error(w, r, request, model.WrapNotFound(err))
 		return

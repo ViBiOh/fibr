@@ -7,6 +7,7 @@ import (
 )
 
 const (
+	DirectoryPerm         = 0o700
 	MetadataDirectoryName = "/.fibr"
 	MaxConcurrency        = uint64(6)
 )
@@ -28,7 +29,7 @@ var (
 
 func MetadataDirectory(item absto.Item) string {
 	pathname := item.Pathname
-	if !item.IsDir {
+	if !item.IsDir() {
 		pathname = filepath.Dir(pathname)
 	}
 

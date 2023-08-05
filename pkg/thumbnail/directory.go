@@ -15,7 +15,7 @@ func (a App) ListDir(ctx context.Context, item absto.Item) (map[string]absto.Ite
 }
 
 func (a App) listDirectoryForScale(ctx context.Context, item absto.Item, storageApp absto.Storage) (map[string]absto.Item, error) {
-	if !item.IsDir {
+	if !item.IsDir() {
 		return nil, nil
 	}
 

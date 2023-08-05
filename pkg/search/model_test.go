@@ -22,7 +22,7 @@ func TestMatchSize(t *testing.T) {
 				greaterThan: true,
 			},
 			args{
-				item: absto.Item{Size: 1000},
+				item: absto.Item{SizeValue: 1000},
 			},
 			true,
 		},
@@ -32,7 +32,7 @@ func TestMatchSize(t *testing.T) {
 				greaterThan: true,
 			},
 			args{
-				item: absto.Item{Size: 1000},
+				item: absto.Item{SizeValue: 1000},
 			},
 			true,
 		},
@@ -42,7 +42,7 @@ func TestMatchSize(t *testing.T) {
 				greaterThan: false,
 			},
 			args{
-				item: absto.Item{Size: 1000},
+				item: absto.Item{SizeValue: 1000},
 			},
 			false,
 		},
@@ -52,7 +52,7 @@ func TestMatchSize(t *testing.T) {
 				greaterThan: false,
 			},
 			args{
-				item: absto.Item{Size: 800},
+				item: absto.Item{SizeValue: 800},
 			},
 			true,
 		},

@@ -161,7 +161,7 @@ func (a App) handlePostDescription(w http.ResponseWriter, r *http.Request, reque
 
 	ctx := r.Context()
 
-	item, err := a.storageApp.Info(ctx, request.SubPath(name))
+	item, err := a.storageApp.Stat(ctx, request.SubPath(name))
 	if err != nil {
 		a.error(w, r, request, err)
 		return

@@ -177,7 +177,7 @@ func (r Request) RelativeURL(item absto.Item) string {
 		pathname = fmt.Sprintf("/%s", strings.TrimPrefix(pathname, r.Share.Path))
 	}
 
-	if item.IsDir {
+	if item.IsDir() {
 		pathname = Dirname(pathname)
 	}
 

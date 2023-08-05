@@ -165,7 +165,7 @@ func (a *App) slackHandle(ctx context.Context, webhook provider.Webhook, event p
 	}
 
 	if a.thumbnailApp.CanHaveThumbnail(event.Item) {
-		section.Accessory = slack.NewAccessory(event.GetURL()+"?thumbnail", fmt.Sprintf("Thumbnail of %s", event.Item.Name))
+		section.Accessory = slack.NewAccessory(event.GetURL()+"?thumbnail", fmt.Sprintf("Thumbnail of %s", event.Item.Name()))
 	}
 
 	return send(ctx, webhook.ID, request.Post(webhook.URL), slack.NewResponse(a.eventText(event)).AddBlock(slack.NewSection(slack.NewText(fmt.Sprintf("*<%s|%s>*", contentURL, title)))).AddBlock(section))
@@ -180,20 +180,20 @@ func (a *App) eventText(event provider.Event) string {
 	case provider.AccessEvent:
 		return a.accessEvent(event)
 	case provider.CreateDir:
-		return fmt.Sprintf("🗂 A directory `%s` has been created: %s", event.Item.Name, event.GetURL())
+		return fmt.Sprintf("🗂 A directory `%s` has been created: %s", event.Item.Name(), event.GetURL())
 	case provider.UploadEvent:
 		return fmt.Sprintf("💾 A file has been uploaded: %s?browser", event.GetURL())
 	case provider.RenameEvent:
 		return fmt.Sprintf("✏️ `%s` has been renamed to `%s`: %s?browser", event.Item.Pathname, event.New.Pathname, event.GetURL())
 	case provider.DeleteEvent:
-		return fmt.Sprintf("❌ `%s` has been deleted : %s", event.Item.Name, event.GetURL())
+		return fmt.Sprintf("❌ `%s` has been deleted : %s", event.Item.Name(), event.GetURL())
 	case provider.DescriptionEvent:
 		contentURL := event.GetURL()
 		return fmt.Sprintf("💬 %s %s", event.Metadata["description"], fmt.Sprintf("%s/?d=story#%s", contentURL[:strings.LastIndex(contentURL, "/")], event.Item.ID))
 	case provider.StartEvent:
 		return fmt.Sprintf("🚀 Fibr starts routine for path `%s`", event.Item.Pathname)
 	default:
-		return fmt.Sprintf("🙄 Event `%s` occurred on `%s`", event.Type, event.Item.Name)
+		return fmt.Sprintf("🙄 Event `%s` occurred on `%s`", event.Type, event.Item.Name())
 	}
 }
 
