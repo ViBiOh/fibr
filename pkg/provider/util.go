@@ -169,7 +169,7 @@ func WriteToStorage(ctx context.Context, storageApp absto.Storage, output string
 	var err error
 	directory := path.Dir(output)
 
-	if err = storageApp.Mkdir(ctx, directory, DirectoryPerm); err != nil {
+	if err = storageApp.Mkdir(ctx, directory, absto.DirectoryPerm); err != nil {
 		return fmt.Errorf("create directory: %w", err)
 	}
 

@@ -34,13 +34,13 @@ func (a App) uploadChunk(w http.ResponseWriter, r *http.Request, request provide
 	tempDestination := filepath.Join(a.temporaryFolder, sha.New(fileName))
 	tempFile := filepath.Join(tempDestination, chunkNumber)
 
-	if err = os.MkdirAll(tempDestination, 0o700); err != nil {
+	if err = os.MkdirAll(tempDestination, absto.DirectoryPerm); err != nil {
 		a.error(w, r, request, model.WrapInternal(err))
 		return
 	}
 
 	var writer *os.File
-	writer, err = os.OpenFile(tempFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0o600)
+	writer, err = os.OpenFile(tempFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, absto.RegularFilePerm)
 	if err != nil {
 		return
 	}
@@ -124,7 +124,7 @@ func (a App) mergeChunk(w http.ResponseWriter, r *http.Request, request provider
 }
 
 func (a App) mergeChunkFiles(directory, destination string) error {
-	writer, err := os.OpenFile(destination, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0o600)
+	writer, err := os.OpenFile(destination, os.O_RDWR|os.O_CREATE|os.O_TRUNC, absto.RegularFilePerm)
 	if err != nil {
 		return fmt.Errorf("open destination file `%s`: %w", destination, err)
 	}

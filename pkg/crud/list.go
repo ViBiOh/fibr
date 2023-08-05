@@ -219,7 +219,7 @@ func (a App) addFileToZip(ctx context.Context, zipWriter *zip.Writer, item absto
 		Modified:           item.Date,
 		Method:             zip.Deflate,
 	}
-	header.SetMode(0o600)
+	header.SetMode(absto.RegularFilePerm)
 
 	var writer io.Writer
 	writer, err = zipWriter.CreateHeader(header)

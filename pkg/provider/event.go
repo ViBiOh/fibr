@@ -348,7 +348,7 @@ func (e EventBus) Start(ctx context.Context, storageApp absto.Storage, renamers 
 }
 
 func RenameDirectory(ctx context.Context, storageApp absto.Storage, renamers []Renamer, old, new absto.Item) {
-	if err := storageApp.Mkdir(ctx, MetadataDirectory(new), DirectoryPerm); err != nil {
+	if err := storageApp.Mkdir(ctx, MetadataDirectory(new), absto.DirectoryPerm); err != nil {
 		logger.Error("create new metadata directory: %s", err)
 		return
 	}

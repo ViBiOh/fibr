@@ -7,7 +7,6 @@ import (
 )
 
 const (
-	DirectoryPerm         = 0o700
 	MetadataDirectoryName = "/.fibr"
 	MaxConcurrency        = uint64(6)
 )

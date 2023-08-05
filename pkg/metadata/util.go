@@ -56,7 +56,7 @@ func (a App) saveMetadata(ctx context.Context, item absto.Item, data any) error 
 			return fmt.Errorf("check directory existence: %w", err)
 		}
 
-		if err = a.storageApp.Mkdir(ctx, dirname, provider.DirectoryPerm); err != nil {
+		if err = a.storageApp.Mkdir(ctx, dirname, absto.DirectoryPerm); err != nil {
 			return fmt.Errorf("create directory: %w", err)
 		}
 	}
