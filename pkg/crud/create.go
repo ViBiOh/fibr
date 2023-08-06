@@ -10,7 +10,6 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
-	"github.com/ViBiOh/httputils/v4/pkg/sha"
 )
 
 func (a App) Create(w http.ResponseWriter, r *http.Request, request provider.Request) {
@@ -68,7 +67,7 @@ func (a App) CreateSavedSearch(w http.ResponseWriter, r *http.Request, request p
 	}
 
 	if err = a.searchApp.Add(ctx, item, provider.Search{
-		ID:    sha.New(name),
+		ID:    provider.Hash(name),
 		Name:  name,
 		Query: r.URL.RawQuery,
 	}); err != nil {

@@ -3,11 +3,11 @@ package version
 import (
 	"fmt"
 
-	"github.com/ViBiOh/httputils/v4/pkg/sha"
+	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
 var (
-	cacheVersion = sha.New("vibioh/fibr/1")[:8]
+	cacheVersion = provider.Hash("vibioh/fibr/1")[:8]
 	cachePrefix  = "fibr:" + cacheVersion
 )
 

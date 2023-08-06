@@ -15,7 +15,6 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/cntxt"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
-	"github.com/ViBiOh/httputils/v4/pkg/sha"
 	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 )
 
@@ -31,7 +30,7 @@ func (a App) uploadChunk(w http.ResponseWriter, r *http.Request, request provide
 		return
 	}
 
-	tempDestination := filepath.Join(a.temporaryFolder, sha.New(fileName))
+	tempDestination := filepath.Join(a.temporaryFolder, provider.Hash(fileName))
 	tempFile := filepath.Join(tempDestination, chunkNumber)
 
 	if err = os.MkdirAll(tempDestination, absto.DirectoryPerm); err != nil {
@@ -77,7 +76,7 @@ func (a App) mergeChunk(w http.ResponseWriter, r *http.Request, request provider
 		return
 	}
 
-	tempFolder := filepath.Join(a.temporaryFolder, sha.New(fileName))
+	tempFolder := filepath.Join(a.temporaryFolder, provider.Hash(fileName))
 	tempFile := filepath.Join(tempFolder, fileName)
 
 	if err := a.mergeChunkFiles(tempFolder, tempFile); err != nil {

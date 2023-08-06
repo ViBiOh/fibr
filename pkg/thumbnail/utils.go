@@ -8,7 +8,6 @@ import (
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/version"
-	"github.com/ViBiOh/httputils/v4/pkg/sha"
 	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 	"github.com/ViBiOh/vith/pkg/model"
 )
@@ -81,7 +80,7 @@ func typeOfItem(item absto.Item) model.ItemType {
 }
 
 func redisKey(filename string) string {
-	return version.Redis("thumbnail:" + sha.New(filename))
+	return version.Redis("thumbnail:" + provider.Hash(filename))
 }
 
 func (a App) Info(ctx context.Context, pathname string) (item absto.Item, err error) {

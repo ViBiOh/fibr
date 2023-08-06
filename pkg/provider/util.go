@@ -3,12 +3,14 @@ package provider
 import (
 	"bytes"
 	"context"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"path"
 	"regexp"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -17,6 +19,8 @@ import (
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
+	"github.com/rs/xid"
+	"github.com/zeebo/xxh3"
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
@@ -192,4 +196,20 @@ func EtagMatch(w http.ResponseWriter, r *http.Request, hash string) (etag string
 	}
 
 	return
+}
+
+func Identifier() string {
+	return xid.New().String()
+}
+
+func Hash(value string) string {
+	return strconv.FormatUint(xxh3.HashString(value), 16)
+}
+
+func RawHash(content any) string {
+	hasher := xxh3.New()
+
+	fmt.Fprintf(hasher, "%v", content)
+
+	return hex.EncodeToString(hasher.Sum(nil))
 }

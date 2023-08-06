@@ -88,7 +88,7 @@ func (a App) serveFile(w http.ResponseWriter, r *http.Request, item absto.Item) 
 	ctx, end := tracer.StartSpan(r.Context(), a.tracer, "file", trace.WithSpanKind(trace.SpanKindInternal))
 	defer end(&err)
 
-	etag, ok := provider.EtagMatch(w, r, sha.New(item))
+	etag, ok := provider.EtagMatch(w, r, provider.Hash(item.String()))
 	if ok {
 		return nil
 	}
@@ -191,7 +191,7 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 	} else if exifs, err := a.metadataApp.ListDir(ctx, item); err != nil {
 		logger.WithField("item", item.Pathname).Error("list exifs: %s", err)
 	} else {
-		hash = sha.New(exifs)
+		hash = provider.RawHash(exifs)
 	}
 
 	etag, ok := provider.EtagMatch(w, r, hash)

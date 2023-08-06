@@ -9,17 +9,11 @@ import (
 
 	"github.com/ViBiOh/fibr/pkg/exclusive"
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/v4/pkg/sha"
-	"github.com/ViBiOh/httputils/v4/pkg/uuid"
 )
 
 func (a *App) generateID() (string, error) {
 	for {
-		id, err := uuid.New()
-		if err != nil {
-			return "", err
-		}
-		idSha := sha.New(id)[:8]
+		idSha := provider.Hash(provider.Identifier())[:8]
 
 		if _, ok := a.shares[idSha]; !ok {
 			return idSha, nil

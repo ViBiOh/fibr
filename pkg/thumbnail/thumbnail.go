@@ -219,7 +219,7 @@ func (a App) List(w http.ResponseWriter, r *http.Request, item absto.Item, items
 	} else if thumbnails, err := a.ListDir(ctx, item); err != nil {
 		logger.WithField("item", item.Pathname).Error("list thumbnails: %s", err)
 	} else {
-		hash = sha.New(thumbnails)
+		hash = provider.RawHash(thumbnails)
 	}
 
 	etag, ok := provider.EtagMatch(w, r, hash)
