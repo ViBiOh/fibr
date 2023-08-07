@@ -142,8 +142,11 @@ a:hover {
 }
 
 .icon-overlay {
+  background-color: var(--white);
+  border-radius: 50%;
   height: var(--icon-large);
   left: calc((100% - var(--icon-large)) / 2);
+  padding-left: 1rem;
   pointer-events: none;
   position: absolute;
   top: calc((100% - var(--icon-large)) / 2);
