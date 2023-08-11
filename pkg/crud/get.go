@@ -16,11 +16,11 @@ import (
 	"github.com/ViBiOh/fibr/pkg/geo"
 	"github.com/ViBiOh/fibr/pkg/metadata"
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/v4/pkg/hash"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/query"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
-	"github.com/ViBiOh/httputils/v4/pkg/sha"
 	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
@@ -290,7 +290,7 @@ func dichotomicFind(items []absto.Item, id string) absto.Item {
 }
 
 func (a App) exifHash(ctx context.Context, items []absto.Item) string {
-	hasher := sha.Stream()
+	hasher := hash.Stream()
 
 	for _, item := range items {
 		if info, err := a.storageApp.Stat(ctx, metadata.Path(item)); err == nil {

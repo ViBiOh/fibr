@@ -15,13 +15,13 @@ import (
 	"github.com/ViBiOh/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/amqp"
 	"github.com/ViBiOh/httputils/v4/pkg/cache"
+	"github.com/ViBiOh/httputils/v4/pkg/hash"
 	"github.com/ViBiOh/httputils/v4/pkg/httperror"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	prom "github.com/ViBiOh/httputils/v4/pkg/prometheus"
 	"github.com/ViBiOh/httputils/v4/pkg/query"
 	"github.com/ViBiOh/httputils/v4/pkg/redis"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
-	"github.com/ViBiOh/httputils/v4/pkg/sha"
 	"github.com/ViBiOh/httputils/v4/pkg/tracer"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.opentelemetry.io/otel/trace"
@@ -267,7 +267,7 @@ func (a App) thumbnailHash(ctx context.Context, items []absto.Item) string {
 		logger.Error("list thumbnails from cache: %s", err)
 	}
 
-	hasher := sha.Stream()
+	hasher := hash.Stream()
 
 	for _, thumbnail := range thumbnails {
 		hasher.Write(thumbnail)

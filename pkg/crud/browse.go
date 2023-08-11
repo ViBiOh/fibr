@@ -26,7 +26,7 @@ func (a App) browse(ctx context.Context, request provider.Request, item absto.It
 		metadata provider.Metadata
 	)
 
-	wg := concurrent.NewSimple()
+	wg := concurrent.NewLimiter(-1)
 
 	if request.Share.IsZero() || !request.Share.File {
 		wg.Go(func() {

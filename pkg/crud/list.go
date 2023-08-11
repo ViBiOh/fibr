@@ -30,7 +30,7 @@ func (a App) list(ctx context.Context, request provider.Request, message rendere
 	ctx, end := tracer.StartSpan(ctx, a.tracer, "list", trace.WithAttributes(attribute.String("item", item.Pathname)))
 	defer end(nil)
 
-	wg := concurrent.NewSimple()
+	wg := concurrent.NewLimiter(-1)
 
 	var directoryAggregate provider.Aggregate
 	wg.Go(func() {

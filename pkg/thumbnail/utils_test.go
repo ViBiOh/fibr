@@ -86,12 +86,12 @@ func TestHasThumbnail(t *testing.T) {
 
 			mockStorage := mocks.NewStorage(ctrl)
 			mockRedisClient := mocks.NewRedisClient(ctrl)
+			mockRedisClient.EXPECT().Enabled().Return(false)
 
 			tc.instance.storageApp = mockStorage
 			tc.instance.cacheApp = cache.New(mockRedisClient, nil, mockStorage.Stat, 0, 0, nil)
 
 			if intention == "found" {
-				mockRedisClient.EXPECT().Enabled().Return(false)
 				mockStorage.EXPECT().Stat(gomock.Any(), gomock.Any()).Return(absto.Item{}, nil)
 			}
 

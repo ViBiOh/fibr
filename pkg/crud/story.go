@@ -22,7 +22,7 @@ func (a App) story(r *http.Request, request provider.Request, item absto.Item, f
 	var cover cover
 	var hasMap bool
 
-	wg := concurrent.NewSimple()
+	wg := concurrent.NewLimiter(-1)
 
 	var directoryAggregate provider.Aggregate
 	wg.Go(func() {
