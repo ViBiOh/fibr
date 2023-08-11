@@ -272,16 +272,17 @@ Usage of fibr:
   --prometheusWriteTimeout            duration      [prometheus] Write Timeout ${FIBR_PROMETHEUS_WRITE_TIMEOUT} (default 10s)
   --publicURL                         string        Public URL ${FIBR_PUBLIC_URL} (default "http://localhost:1080")
   --readTimeout                       duration      [server] Read Timeout ${FIBR_READ_TIMEOUT} (default 2m0s)
-  --redisAddress                      string        [redis] Redis Address host:port (blank to disable) ${FIBR_REDIS_ADDRESS}
+  --redisAddress                      string slice  [redis] Redis Address host:port (blank to disable) ${FIBR_REDIS_ADDRESS}, as a string slice, environment variable separated by ","
   --redisAlias                        string        [redis] Connection alias, for metric ${FIBR_REDIS_ALIAS}
   --redisDatabase                     int           [redis] Redis Database ${FIBR_REDIS_DATABASE} (default 0)
+  --redisMinIdleConn                  int           [redis] Redis Minimum Idle Connections ${FIBR_REDIS_MIN_IDLE_CONN} (default 0)
   --redisPassword                     string        [redis] Redis Password, if any ${FIBR_REDIS_PASSWORD}
-  --redisPipelineSize                 int           [redis] Redis Pipeline Size ${FIBR_REDIS_PIPELINE_SIZE} (default 50)
+  --redisPoolSize                     int           [redis] Redis Pool Size (default GOMAXPROCS*10) ${FIBR_REDIS_POOL_SIZE} (default 0)
   --redisUsername                     string        [redis] Redis Username, if any ${FIBR_REDIS_USERNAME}
   --sanitizeOnStart                                 [crud] Sanitize on start ${FIBR_SANITIZE_ON_START} (default false)
   --sharePubSubChannel                string        [share] Channel name ${FIBR_SHARE_PUB_SUB_CHANNEL} (default "fibr:shares-channel")
   --shutdownTimeout                   duration      [server] Shutdown Timeout ${FIBR_SHUTDOWN_TIMEOUT} (default 10s)
-  --storageFileSystemDirectory        /data         [storage] Path to directory. Default is dynamic. /data on a server and Current Working Directory in a terminal. ${FIBR_STORAGE_FILE_SYSTEM_DIRECTORY} (default /Users/vboutour/code/fibr)
+  --storageFileSystemDirectory        /data         [storage] Path to directory. Default is dynamic. /data on a server and Current Working Directory in a terminal. ${FIBR_STORAGE_FILE_SYSTEM_DIRECTORY} (default ${PWD})
   --storageObjectAccessKey            string        [storage] Storage Object Access Key ${FIBR_STORAGE_OBJECT_ACCESS_KEY}
   --storageObjectBucket               string        [storage] Storage Object Bucket ${FIBR_STORAGE_OBJECT_BUCKET}
   --storageObjectClass                string        [storage] Storage Object Class ${FIBR_STORAGE_OBJECT_CLASS}
