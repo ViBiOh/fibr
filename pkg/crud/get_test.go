@@ -10,7 +10,7 @@ import (
 	exas "github.com/ViBiOh/exas/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/mocks"
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/golang/mock/gomock"
+	"go.uber.org/mock/gomock"
 )
 
 func BenchmarkServeGeoJSON(b *testing.B) {

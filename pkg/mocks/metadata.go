@@ -10,7 +10,7 @@ import (
 
 	model "github.com/ViBiOh/absto/pkg/model"
 	provider "github.com/ViBiOh/fibr/pkg/provider"
-	gomock "github.com/golang/mock/gomock"
+	gomock "go.uber.org/mock/gomock"
 )
 
 // MetadataManager is a mock of MetadataManager interface.

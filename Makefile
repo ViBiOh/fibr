@@ -48,9 +48,7 @@ app: init dev
 .PHONY: init
 init:
 	@curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap" | bash -s -- "-c" "git_hooks" "coverage" "release"
-	go install "github.com/golang/mock/mockgen@v1.6.0"
 	go install "github.com/golangci/golangci-lint/cmd/golangci-lint@latest"
-	go install "github.com/tdewolff/minify/v2/cmd/minify@latest"
 	go install "golang.org/x/tools/cmd/goimports@latest"
 	go install "golang.org/x/tools/go/analysis/passes/fieldalignment/cmd/fieldalignment@master"
 	go install "mvdan.cc/gofumpt@latest"
@@ -71,6 +69,7 @@ style:
 ## mocks: Generate mocks
 .PHONY: mocks
 mocks:
+	go install "go.uber.org/mock/mockgen@latest"
 	find . -name "mocks" -type d -exec rm -r "{}" \+
 	go generate -run mockgen $(PACKAGES)
 
@@ -93,6 +92,7 @@ build:
 ## build: Build the application.
 .PHONY: build-web
 build-web:
+	go install "github.com/tdewolff/minify/v2/cmd/minify@latest"
 	rm -f "cmd/fibr/static/scripts/index.min.js" "cmd/fibr/static/styles/main.min.css"
 	minify --bundle --output "cmd/fibr/static/scripts/index.min.js" "cmd/fibr/static/scripts/"*.js
 	minify --bundle --output "cmd/fibr/static/styles/main.min.css" "cmd/fibr/static/styles/"*.css

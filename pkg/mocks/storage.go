@@ -12,7 +12,7 @@ import (
 	time "time"
 
 	model "github.com/ViBiOh/absto/pkg/model"
-	gomock "github.com/golang/mock/gomock"
+	gomock "go.uber.org/mock/gomock"
 )
 
 // Storage is a mock of Storage interface.

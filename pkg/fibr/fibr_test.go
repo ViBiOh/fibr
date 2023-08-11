@@ -16,7 +16,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/mocks"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	httpModel "github.com/ViBiOh/httputils/v4/pkg/model"
-	"github.com/golang/mock/gomock"
+	"go.uber.org/mock/gomock"
 	"golang.org/x/crypto/bcrypt"
 )
 

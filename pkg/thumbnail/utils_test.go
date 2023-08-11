@@ -7,7 +7,7 @@ import (
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/mocks"
 	"github.com/ViBiOh/httputils/v4/pkg/cache"
-	"github.com/golang/mock/gomock"
+	"go.uber.org/mock/gomock"
 )
 
 func TestCanHaveThumbnail(t *testing.T) {

@@ -5,7 +5,7 @@ import (
 
 	"github.com/ViBiOh/fibr/pkg/mocks"
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/golang/mock/gomock"
+	"go.uber.org/mock/gomock"
 )
 
 func TestBestSharePath(t *testing.T) {

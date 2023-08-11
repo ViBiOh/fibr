@@ -14,7 +14,7 @@ import (
 	model "github.com/ViBiOh/auth/v2/pkg/model"
 	provider "github.com/ViBiOh/fibr/pkg/provider"
 	renderer "github.com/ViBiOh/httputils/v4/pkg/renderer"
-	gomock "github.com/golang/mock/gomock"
+	gomock "go.uber.org/mock/gomock"
 )
 
 // Crud is a mock of Crud interface.

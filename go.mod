@@ -10,7 +10,6 @@ require (
 	github.com/ViBiOh/flags v1.3.1
 	github.com/ViBiOh/httputils/v4 v4.62.0
 	github.com/ViBiOh/vith v0.6.0
-	github.com/golang/mock v1.6.0
 	github.com/prometheus/client_golang v1.16.0
 	github.com/rabbitmq/amqp091-go v1.8.1
 	github.com/redis/go-redis/v9 v9.0.5
@@ -18,6 +17,7 @@ require (
 	github.com/zeebo/xxh3 v1.0.2
 	go.opentelemetry.io/otel v1.16.0
 	go.opentelemetry.io/otel/trace v1.16.0
+	go.uber.org/mock v0.2.0
 	golang.org/x/crypto v0.12.0
 	golang.org/x/text v0.12.0
 )
