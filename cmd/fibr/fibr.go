@@ -4,6 +4,7 @@ import (
 	"context"
 	"embed"
 	"fmt"
+	"log"
 	"net/http"
 
 	_ "net/http/pprof"
@@ -31,7 +32,7 @@ func newLoginApp(tracer trace.Tracer, basicConfig basicMemory.Config) provider.A
 func main() {
 	config, err := newConfig()
 	if err != nil {
-		logger.Fatal(fmt.Errorf("configuration: %w", err))
+		log.Fatal(fmt.Errorf("config: %s", err))
 	}
 
 	alcotest.DoAndExit(config.alcotest)
