@@ -8,7 +8,7 @@ require (
 	github.com/ViBiOh/auth/v2 v2.14.25
 	github.com/ViBiOh/exas v0.7.1
 	github.com/ViBiOh/flags v1.3.1
-	github.com/ViBiOh/httputils/v4 v4.62.0
+	github.com/ViBiOh/httputils/v4 v4.63.1
 	github.com/ViBiOh/vith v0.6.0
 	github.com/prometheus/client_golang v1.16.0
 	github.com/rabbitmq/amqp091-go v1.8.1
@@ -52,11 +52,15 @@ require (
 	github.com/tdewolff/minify/v2 v2.12.8 // indirect
 	github.com/tdewolff/parse/v2 v2.6.7 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.42.0 // indirect
+	go.opentelemetry.io/contrib/instrumentation/runtime v0.42.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/internal/retry v1.16.0 // indirect
+	go.opentelemetry.io/otel/exporters/otlp/otlpmetric v0.39.0 // indirect
+	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc v0.39.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.16.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.16.0 // indirect
 	go.opentelemetry.io/otel/metric v1.16.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.16.0 // indirect
+	go.opentelemetry.io/otel/sdk/metric v0.39.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.0.0 // indirect
 	golang.org/x/net v0.14.0 // indirect
 	golang.org/x/sys v0.11.0 // indirect
