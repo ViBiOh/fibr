@@ -3,10 +3,10 @@ package metadata
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/v4/pkg/logger"
 )
 
 func (a App) EventConsumer(ctx context.Context, e provider.Event) {
@@ -55,8 +55,8 @@ func (a App) Rename(ctx context.Context, old, new absto.Item) error {
 	return nil
 }
 
-func getEventLogger(item absto.Item) logger.Provider {
-	return logger.WithField("fn", "exif.EventConsumer").WithField("item", item.Pathname)
+func getEventLogger(item absto.Item) *slog.Logger {
+	return slog.With("fn", "exif.EventConsumer").With("item", item.Pathname)
 }
 
 func (a App) handleStartEvent(ctx context.Context, event provider.Event) error {
@@ -64,7 +64,7 @@ func (a App) handleStartEvent(ctx context.Context, event provider.Event) error {
 
 	if event.GetMetadata("force") == "cache" {
 		if err := a.redisClient.Delete(ctx, redisKey(event.Item)); err != nil {
-			logger.WithField("fn", "exif.startEvent").WithField("item", event.Item.Pathname).Error("flush cache: %s", err)
+			slog.Error("flush cache", "err", err, "fn", "exif.startEvent", "item", event.Item.Pathname)
 		}
 
 		if !forced {
@@ -74,7 +74,7 @@ func (a App) handleStartEvent(ctx context.Context, event provider.Event) error {
 
 	item := event.Item
 	if !forced && a.hasMetadata(ctx, item) {
-		logger.WithField("item", item.Pathname).Debug("has metadata")
+		slog.Debug("has metadata", "item", item.Pathname)
 		return nil
 	}
 
@@ -91,7 +91,7 @@ func (a App) handleStartEvent(ctx context.Context, event provider.Event) error {
 
 func (a App) handleUploadEvent(ctx context.Context, item absto.Item, aggregate bool) error {
 	if !a.CanHaveExif(item) {
-		logger.WithField("item", item.Pathname).Debug("can't have exif")
+		slog.Debug("can't have exif", "item", item.Pathname)
 		return nil
 	}
 

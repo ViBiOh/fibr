@@ -3,11 +3,11 @@ package metadata
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/exclusive"
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/v4/pkg/logger"
 )
 
 func (a App) Update(ctx context.Context, item absto.Item, opts ...provider.MetadataAction) (provider.Metadata, error) {
@@ -18,7 +18,7 @@ func (a App) Update(ctx context.Context, item absto.Item, opts ...provider.Metad
 
 		metadata, err := a.GetMetadataFor(ctx, item)
 		if err != nil && !absto.IsNotExist(err) {
-			logger.WithField("item", item.Pathname).Error("load metadata: %s", err)
+			slog.Error("load metadata", "err", err, "item", item.Pathname)
 		}
 
 		for _, opt := range opts {

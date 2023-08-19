@@ -5,23 +5,23 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"path"
 	"strings"
 	"time"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
-	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
-	"github.com/ViBiOh/httputils/v4/pkg/tracer"
-	"github.com/prometheus/client_golang/prometheus"
+	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
 	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
 )
 
 type EventType uint
 
-type EventProducer func(Event)
+type EventProducer func(context.Context, Event)
 
 type EventConsumer func(context.Context, Event)
 
@@ -262,24 +262,23 @@ func NewAccessEvent(ctx context.Context, item absto.Item, r *http.Request) Event
 
 type EventBus struct {
 	tracer  trace.Tracer
-	counter *prometheus.CounterVec
+	counter metric.Int64Counter
 	bus     chan Event
 	closed  chan struct{}
 	done    chan struct{}
 }
 
-func NewEventBus(size uint64, prometheusRegisterer prometheus.Registerer, tracer trace.Tracer) (EventBus, error) {
-	var counter *prometheus.CounterVec
+func NewEventBus(size uint64, meterProvider metric.MeterProvider, tracerProvider trace.TracerProvider) (EventBus, error) {
+	var counter metric.Int64Counter
 
-	if prometheusRegisterer != nil {
-		counter = prometheus.NewCounterVec(prometheus.CounterOpts{
-			Namespace: "fibr",
-			Subsystem: "event",
-			Name:      "item",
-		}, []string{"type", "state"})
+	if meterProvider != nil {
+		meter := meterProvider.Meter("github.com/ViBiOh/fibr/pkr/provider")
 
-		if err := prometheusRegisterer.Register(counter); err != nil {
-			return EventBus{}, fmt.Errorf("register event metric: %w", err)
+		var err error
+
+		counter, err = meter.Int64Counter("fibr.event")
+		if err != nil {
+			return EventBus{}, fmt.Errorf("create event counter: %w", err)
 		}
 	}
 
@@ -288,36 +287,36 @@ func NewEventBus(size uint64, prometheusRegisterer prometheus.Registerer, tracer
 		done:    make(chan struct{}),
 		bus:     make(chan Event, size),
 		counter: counter,
-		tracer:  tracer,
+		tracer:  tracerProvider.Tracer("bus"),
 	}, nil
 }
 
-func (e EventBus) increaseMetric(event Event, state string) {
+func (e EventBus) increaseMetric(ctx context.Context, event Event, state string) {
 	if e.counter == nil {
 		return
 	}
 
-	e.counter.WithLabelValues(event.Type.String(), state).Inc()
+	e.counter.Add(ctx, 1, metric.WithAttributes(attribute.String("type", event.Type.String()), attribute.String("state", state)))
 }
 
 func (e EventBus) Done() <-chan struct{} {
 	return e.done
 }
 
-func (e EventBus) Push(event Event) {
+func (e EventBus) Push(ctx context.Context, event Event) {
 	select {
 	case <-e.closed:
-		e.increaseMetric(event, "refused")
-		logger.Error("bus is closed")
+		e.increaseMetric(ctx, event, "refused")
+		slog.Error("bus is closed")
 	default:
 	}
 
 	select {
 	case <-e.closed:
-		e.increaseMetric(event, "refused")
-		logger.Error("bus is closed")
+		e.increaseMetric(ctx, event, "refused")
+		slog.Error("bus is closed")
 	case e.bus <- event:
-		e.increaseMetric(event, "push")
+		e.increaseMetric(ctx, event, "push")
 	}
 }
 
@@ -332,7 +331,7 @@ func (e EventBus) Start(ctx context.Context, storageApp absto.Storage, renamers 
 	}()
 
 	for event := range e.bus {
-		ctx, end := tracer.StartSpan(context.Background(), e.tracer, "event", trace.WithAttributes(attribute.String("type", event.Type.String())), trace.WithLinks(event.TraceLink))
+		ctx, end := telemetry.StartSpan(context.Background(), e.tracer, "event", trace.WithAttributes(attribute.String("type", event.Type.String())), trace.WithLinks(event.TraceLink))
 
 		if event.Type == RenameEvent && event.Item.IsDir() {
 			RenameDirectory(ctx, storageApp, renamers, event.Item, *event.New)
@@ -343,13 +342,13 @@ func (e EventBus) Start(ctx context.Context, storageApp absto.Storage, renamers 
 		}
 
 		end(nil)
-		e.increaseMetric(event, "done")
+		e.increaseMetric(ctx, event, "done")
 	}
 }
 
 func RenameDirectory(ctx context.Context, storageApp absto.Storage, renamers []Renamer, old, new absto.Item) {
 	if err := storageApp.Mkdir(ctx, MetadataDirectory(new), absto.DirectoryPerm); err != nil {
-		logger.Error("create new metadata directory: %s", err)
+		slog.Error("create new metadata directory", "err", err)
 		return
 	}
 
@@ -365,17 +364,17 @@ func RenameDirectory(ctx context.Context, storageApp absto.Storage, renamers []R
 
 		for _, renamer := range renamers {
 			if err := renamer(ctx, oldItem, item); err != nil {
-				logger.Error("rename metadata from `%s` to `%s`: %s", oldItem.Pathname, item.Pathname, err)
+				slog.Error("rename metadata", "err", err, "old", oldItem.Pathname, "new", item.Pathname)
 			}
 		}
 
 		return nil
 	}); err != nil {
-		logger.Error("walk new metadata directory: %s", err)
+		slog.Error("walk new metadata directory", "err", err)
 	}
 
 	if err := storageApp.RemoveAll(ctx, MetadataDirectory(old)); err != nil {
-		logger.Error("delete old metadata directory: %s", err)
+		slog.Error("delete old metadata directory", "err", err)
 		return
 	}
 }

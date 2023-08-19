@@ -5,6 +5,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"strings"
 
@@ -16,11 +17,9 @@ import (
 	amqpclient "github.com/ViBiOh/httputils/v4/pkg/amqp"
 	"github.com/ViBiOh/httputils/v4/pkg/cache"
 	"github.com/ViBiOh/httputils/v4/pkg/httpjson"
-	prom "github.com/ViBiOh/httputils/v4/pkg/prometheus"
 	"github.com/ViBiOh/httputils/v4/pkg/redis"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
-	"github.com/ViBiOh/httputils/v4/pkg/tracer"
-	"github.com/prometheus/client_golang/prometheus"
+	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -30,8 +29,8 @@ type App struct {
 	tracer            trace.Tracer
 	storageApp        absto.Storage
 	listStorageApp    absto.Storage
-	exifMetric        *prometheus.CounterVec
-	aggregateMetric   *prometheus.CounterVec
+	exifMetric        metric.Int64Counter
+	aggregateMetric   metric.Int64Counter
 	exifCacheApp      *cache.App[absto.Item, provider.Metadata]
 	aggregateCacheApp *cache.App[absto.Item, provider.Aggregate]
 
@@ -74,7 +73,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 	}
 }
 
-func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheus.Registerer, tracerApp tracer.App, amqpClient *amqpclient.Client, redisClient redis.Client, exclusiveApp exclusive.App) (App, error) {
+func New(config Config, storageApp absto.Storage, meterProvider metric.MeterProvider, traceProvider trace.TracerProvider, amqpClient *amqpclient.Client, redisClient redis.Client, exclusiveApp exclusive.App) (App, error) {
 	var amqpExchange string
 
 	if amqpClient != nil {
@@ -96,15 +95,28 @@ func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheu
 		amqpExchange:   amqpExchange,
 		amqpRoutingKey: strings.TrimSpace(*config.amqpRoutingKey),
 
-		tracer:       tracerApp.GetTracer("exif"),
+		tracer:       traceProvider.Tracer("exif"),
 		exclusiveApp: exclusiveApp,
 		storageApp:   storageApp,
 		listStorageApp: storageApp.WithIgnoreFn(func(item absto.Item) bool {
 			return !strings.HasSuffix(item.Name(), ".json")
 		}),
+	}
 
-		exifMetric:      prom.CounterVec(prometheusRegisterer, "fibr", "exif", "item", "state"),
-		aggregateMetric: prom.CounterVec(prometheusRegisterer, "fibr", "aggregate", "item", "state"),
+	if meterProvider != nil {
+		meter := meterProvider.Meter("github.com/ViBiOh/fibr/pkg/metadata/exif")
+
+		var err error
+
+		app.exifMetric, err = meter.Int64Counter("fibr.exif")
+		if err != nil {
+			slog.Error("create exif counter", "err", err)
+		}
+
+		app.aggregateMetric, err = meter.Int64Counter("fibr.aggregate")
+		if err != nil {
+			slog.Error("create aggregate counter", "err", err)
+		}
 	}
 
 	app.exifCacheApp = cache.New(redisClient, redisKey, func(ctx context.Context, item absto.Item) (provider.Metadata, error) {
@@ -113,7 +125,7 @@ func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheu
 		}
 
 		return app.loadExif(ctx, item)
-	}, cacheDuration, provider.MaxConcurrency, tracerApp.GetTracer("exif_cache"))
+	}, traceProvider.Tracer("exif_cache")).WithMaxConcurrency(provider.MaxConcurrency)
 
 	app.aggregateCacheApp = cache.New(redisClient, redisKey, func(ctx context.Context, item absto.Item) (provider.Aggregate, error) {
 		if !item.IsDir() {
@@ -121,7 +133,7 @@ func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheu
 		}
 
 		return app.loadAggregate(ctx, item)
-	}, cacheDuration, provider.MaxConcurrency, tracerApp.GetTracer("aggregate_cache"))
+	}, traceProvider.Tracer("aggregate_cache")).WithMaxConcurrency(provider.MaxConcurrency)
 
 	return app, nil
 }
@@ -154,7 +166,7 @@ func (a App) extractAndSaveExif(ctx context.Context, item absto.Item) (provider.
 func (a App) extractExif(ctx context.Context, item absto.Item) (exif exas.Exif, err error) {
 	var resp *http.Response
 
-	a.increaseExif("request")
+	a.increaseExif(ctx, "request")
 
 	if a.directAccess {
 		resp, err = a.exifRequest.Method(http.MethodGet).Path(item.Pathname).Send(ctx, nil)
@@ -163,7 +175,7 @@ func (a App) extractExif(ctx context.Context, item absto.Item) (exif exas.Exif, 
 	}
 
 	if err != nil {
-		a.increaseExif("error")
+		a.increaseExif(ctx, "error")
 		err = fmt.Errorf("fetch exif: %w", err)
 		return
 	}
@@ -176,7 +188,7 @@ func (a App) extractExif(ctx context.Context, item absto.Item) (exif exas.Exif, 
 }
 
 func (a App) publishExifRequest(ctx context.Context, item absto.Item) error {
-	a.increaseExif("publish")
+	a.increaseExif(ctx, "publish")
 
 	return a.amqpClient.PublishJSON(ctx, item, a.amqpExchange, a.amqpRoutingKey)
 }

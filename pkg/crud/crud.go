@@ -4,6 +4,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"strings"
 	"time"
@@ -14,7 +15,6 @@ import (
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/bcrypt"
-	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -79,9 +79,9 @@ func New(config Config, storageApp absto.Storage, filteredStorage absto.Storage,
 
 	bcryptCost, err := bcrypt.FindBestCost(bcryptDuration)
 	if err != nil {
-		logger.Error("find best bcrypt cost: %s", err)
+		slog.Error("find best bcrypt cost", "err", err)
 	}
-	logger.Info("Best bcrypt cost is %d", bcryptCost)
+	slog.Info("Best bcrypt cost computed", "cost", bcryptCost)
 
 	app.bcryptCost = bcryptCost
 

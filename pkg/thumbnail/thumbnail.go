@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"strings"
 	"time"
@@ -17,13 +18,11 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/cache"
 	"github.com/ViBiOh/httputils/v4/pkg/hash"
 	"github.com/ViBiOh/httputils/v4/pkg/httperror"
-	"github.com/ViBiOh/httputils/v4/pkg/logger"
-	prom "github.com/ViBiOh/httputils/v4/pkg/prometheus"
 	"github.com/ViBiOh/httputils/v4/pkg/query"
 	"github.com/ViBiOh/httputils/v4/pkg/redis"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
-	"github.com/ViBiOh/httputils/v4/pkg/tracer"
-	"github.com/prometheus/client_golang/prometheus"
+	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
+	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -38,7 +37,7 @@ type App struct {
 	smallStorageApp absto.Storage
 	largeStorageApp absto.Storage
 	pathnameInput   chan absto.Item
-	metric          *prometheus.CounterVec
+	metric          metric.Int64Counter
 
 	cacheApp *cache.App[string, absto.Item]
 
@@ -89,7 +88,7 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 	}
 }
 
-func New(config Config, storage absto.Storage, redisClient redis.Client, prometheusRegisterer prometheus.Registerer, tracerApp tracer.App, amqpClient *amqp.Client) (App, error) {
+func New(config Config, storage absto.Storage, redisClient redis.Client, meterProvider metric.MeterProvider, traceProvider trace.TracerProvider, amqpClient *amqp.Client) (App, error) {
 	var amqpExchange string
 	if amqpClient != nil {
 		amqpExchange = strings.TrimSpace(*config.amqpExchange)
@@ -115,7 +114,7 @@ func New(config Config, storage absto.Storage, redisClient redis.Client, prometh
 		directAccess: *config.directAccess,
 
 		redisClient: redisClient,
-		tracer:      tracerApp.GetTracer("thumbnail"),
+		tracer:      traceProvider.Tracer("thumbnail"),
 
 		amqpExchange:            amqpExchange,
 		amqpStreamRoutingKey:    strings.TrimSpace(*config.amqpStreamRoutingKey),
@@ -129,16 +128,26 @@ func New(config Config, storage absto.Storage, redisClient redis.Client, prometh
 			return !strings.HasSuffix(item.Name(), "_large.webp")
 		}),
 		amqpClient:    amqpClient,
-		metric:        prom.CounterVec(prometheusRegisterer, "fibr", "thumbnail", "item", "type", "state"),
 		pathnameInput: make(chan absto.Item, provider.MaxConcurrency),
 
 		largeSize: largeSize,
 		sizes:     sizes,
 	}
 
+	if meterProvider != nil {
+		meter := meterProvider.Meter("github.com/ViBiOh/fibr/pkg/thumbnail")
+
+		var err error
+
+		app.metric, err = meter.Int64Counter("fibr_thumbnail")
+		if err != nil {
+			return app, fmt.Errorf("create thumbnail counter: %w", err)
+		}
+	}
+
 	app.cacheApp = cache.New(redisClient, redisKey, func(ctx context.Context, pathname string) (absto.Item, error) {
 		return app.storageApp.Stat(ctx, pathname)
-	}, redisCacheDuration, provider.MaxConcurrency, tracerApp.GetTracer("thumbnail_cache"))
+	}, traceProvider.Tracer("thumbnail_cache")).WithMaxConcurrency(provider.MaxConcurrency)
 
 	return app, nil
 }
@@ -209,7 +218,7 @@ func (a App) List(w http.ResponseWriter, r *http.Request, item absto.Item, items
 		return
 	}
 
-	ctx, end := tracer.StartSpan(r.Context(), a.tracer, "list", trace.WithSpanKind(trace.SpanKindInternal))
+	ctx, end := telemetry.StartSpan(r.Context(), a.tracer, "list", trace.WithSpanKind(trace.SpanKindInternal))
 	defer end(nil)
 
 	var hash string
@@ -217,7 +226,7 @@ func (a App) List(w http.ResponseWriter, r *http.Request, item absto.Item, items
 	if query.GetBool(r, "search") {
 		hash = a.thumbnailHash(ctx, items)
 	} else if thumbnails, err := a.ListDir(ctx, item); err != nil {
-		logger.WithField("item", item.Pathname).Error("list thumbnails: %s", err)
+		slog.Error("list thumbnails", "err", err, "item", item.Pathname)
 	} else {
 		hash = provider.RawHash(thumbnails)
 	}
@@ -254,7 +263,7 @@ func (a App) List(w http.ResponseWriter, r *http.Request, item absto.Item, items
 }
 
 func (a App) thumbnailHash(ctx context.Context, items []absto.Item) string {
-	ctx, end := tracer.StartSpan(ctx, a.tracer, "hash", trace.WithSpanKind(trace.SpanKindInternal))
+	ctx, end := telemetry.StartSpan(ctx, a.tracer, "hash", trace.WithSpanKind(trace.SpanKindInternal))
 	defer end(nil)
 
 	ids := make([]string, len(items))
@@ -264,7 +273,7 @@ func (a App) thumbnailHash(ctx context.Context, items []absto.Item) string {
 
 	thumbnails, err := a.cacheApp.List(ctx, onCacheError, ids...)
 	if err != nil && !absto.IsNotExist(err) {
-		logger.Error("list thumbnails from cache: %s", err)
+		slog.Error("list thumbnails from cache", "err", err)
 	}
 
 	hasher := hash.Stream()
@@ -281,13 +290,13 @@ func (a App) encodeContent(ctx context.Context, w io.Writer, isDone func() bool,
 		return
 	}
 
-	ctx, end := tracer.StartSpan(ctx, a.tracer, "encode", trace.WithSpanKind(trace.SpanKindInternal))
+	ctx, end := telemetry.StartSpan(ctx, a.tracer, "encode", trace.WithSpanKind(trace.SpanKindInternal))
 	defer end(nil)
 
 	reader, err := a.storageApp.ReadFrom(ctx, a.PathForScale(item, SmallSize))
 	if err != nil {
 		if !absto.IsNotExist(err) {
-			logEncodeContentError(item).Error("open: %s", err)
+			logEncodeContentError(item).Error("open", "err", err)
 		}
 
 		return
@@ -302,13 +311,13 @@ func (a App) encodeContent(ctx context.Context, w io.Writer, isDone func() bool,
 
 	if _, err = io.CopyBuffer(w, reader, buffer.Bytes()); err != nil {
 		if !absto.IsNotExist(a.storageApp.ConvertError(err)) {
-			logEncodeContentError(item).Error("copy: %s", err)
+			logEncodeContentError(item).Error("copy", "err", err)
 		}
 	}
 
 	provider.DoneWriter(isDone, w, "\x1c\x17\x04\x1c")
 }
 
-func logEncodeContentError(item absto.Item) logger.Provider {
-	return logger.WithField("fn", "thumbnail.encodeContent").WithField("item", item.Pathname)
+func logEncodeContentError(item absto.Item) *slog.Logger {
+	return slog.With("fn", "thumbnail.encodeContent").With("item", item.Pathname)
 }

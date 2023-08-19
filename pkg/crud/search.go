@@ -7,11 +7,11 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
-	"github.com/ViBiOh/httputils/v4/pkg/tracer"
+	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
 )
 
 func (a App) search(r *http.Request, request provider.Request, item absto.Item, files []absto.Item) (renderer.Page, error) {
-	ctx, end := tracer.StartSpan(r.Context(), a.tracer, "search")
+	ctx, end := telemetry.StartSpan(r.Context(), a.tracer, "search")
 	defer end(nil)
 
 	metadatas, err := a.metadataApp.GetAllMetadataFor(ctx, files...)

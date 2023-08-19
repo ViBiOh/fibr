@@ -26,7 +26,7 @@ func (a App) generate(ctx context.Context, item absto.Item, scale uint64) (err e
 	var resp *http.Response
 	resp, err = a.requestVith(ctx, item, scale)
 	if err != nil {
-		a.increaseMetric(itemType.String(), "error")
+		a.increaseMetric(ctx, itemType.String(), "error")
 		return fmt.Errorf("request thumbnailer: %w", err)
 	}
 
@@ -46,7 +46,7 @@ func (a App) generate(ctx context.Context, item absto.Item, scale uint64) (err e
 
 	err = provider.WriteToStorage(ctx, a.storageApp, a.PathForScale(item, scale), resp.ContentLength, resp.Body)
 	if err == nil {
-		a.increaseMetric(itemType.String(), "save")
+		a.increaseMetric(ctx, itemType.String(), "save")
 	}
 
 	return err
@@ -57,11 +57,11 @@ func (a App) requestVith(ctx context.Context, item absto.Item, scale uint64) (*h
 	outputName := a.PathForScale(item, scale)
 
 	if a.amqpClient != nil {
-		a.increaseMetric(itemType.String(), "publish")
+		a.increaseMetric(ctx, itemType.String(), "publish")
 		return nil, a.amqpClient.PublishJSON(ctx, vith.NewRequest(item.Pathname, outputName, itemType, scale), a.amqpExchange, a.amqpThumbnailRoutingKey)
 	}
 
-	a.increaseMetric(itemType.String(), "request")
+	a.increaseMetric(ctx, itemType.String(), "request")
 
 	if a.directAccess {
 		return a.vithRequest.Method(http.MethodGet).Path("%s?type=%s&scale=%d&output=%s", item.Pathname, itemType, scale, outputName).Send(ctx, nil)

@@ -4,17 +4,17 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/v4/pkg/logger"
-	"github.com/ViBiOh/httputils/v4/pkg/tracer"
+	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 func (a App) AMQPHandler(ctx context.Context, message amqp.Delivery) error {
 	var err error
 
-	ctx, end := tracer.StartSpan(ctx, a.tracer, "amqp")
+	ctx, end := telemetry.StartSpan(ctx, a.tracer, "amqp")
 	defer end(&err)
 
 	var resp provider.ExifResponse
@@ -24,7 +24,7 @@ func (a App) AMQPHandler(ctx context.Context, message amqp.Delivery) error {
 	}
 
 	if resp.Exif.IsZero() {
-		logger.WithField("item", resp.Item.Pathname).Debug("no exif")
+		slog.Debug("no exif", "item", resp.Item.Pathname)
 		return nil
 	}
 

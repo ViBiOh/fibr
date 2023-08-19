@@ -129,6 +129,20 @@ func (mr *RedisClientMockRecorder) Expire(arg0, arg1 interface{}, arg2 ...interf
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Expire", reflect.TypeOf((*RedisClient)(nil).Expire), varargs...)
 }
 
+// FlushAll mocks base method.
+func (m *RedisClient) FlushAll(arg0 context.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FlushAll", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// FlushAll indicates an expected call of FlushAll.
+func (mr *RedisClientMockRecorder) FlushAll(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FlushAll", reflect.TypeOf((*RedisClient)(nil).FlushAll), arg0)
+}
+
 // Load mocks base method.
 func (m *RedisClient) Load(arg0 context.Context, arg1 string) ([]byte, error) {
 	m.ctrl.T.Helper()

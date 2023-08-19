@@ -3,12 +3,12 @@ package crud
 import (
 	"context"
 	"errors"
+	"log/slog"
 	"net/http"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/cntxt"
-	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
@@ -42,17 +42,17 @@ func (a App) regenerate(w http.ResponseWriter, r *http.Request, request provider
 			if item.IsDir() {
 				directories = append(directories, item)
 			} else {
-				a.pushEvent(provider.NewRestartEvent(ctx, item, subset))
+				a.pushEvent(ctx, provider.NewRestartEvent(ctx, item, subset))
 			}
 
 			return nil
 		})
 		if err != nil {
-			logger.Error("regenerate of `%s`: %s", pathname, err)
+			slog.Error("regenerate", "err", err, "pathname", pathname)
 		}
 
 		for _, directory := range directories {
-			a.pushEvent(provider.NewStartEvent(ctx, directory))
+			a.pushEvent(ctx, provider.NewStartEvent(ctx, directory))
 		}
 	}(cntxt.WithoutDeadline(ctx))
 

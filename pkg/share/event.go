@@ -3,23 +3,23 @@ package share
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"strings"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/exclusive"
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/v4/pkg/logger"
 )
 
 func (a *App) EventConsumer(ctx context.Context, e provider.Event) {
 	switch e.Type {
 	case provider.RenameEvent:
 		if err := a.renameItem(ctx, e.Item, *e.New); err != nil {
-			logger.Error("rename share: %s", err)
+			slog.Error("rename share", "err", err)
 		}
 	case provider.DeleteEvent:
 		if err := a.deleteItem(ctx, e.Item); err != nil {
-			logger.Error("rename share: %s", err)
+			slog.Error("delete share", "err", err)
 		}
 	}
 }

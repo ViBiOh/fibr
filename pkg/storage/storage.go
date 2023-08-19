@@ -3,13 +3,13 @@ package storage
 import (
 	"flag"
 	"fmt"
+	"log/slog"
 	"regexp"
 	"strings"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/flags"
-	"github.com/ViBiOh/httputils/v4/pkg/logger"
 )
 
 type Config struct {
@@ -33,7 +33,7 @@ func Get(config Config, storage absto.Storage) (absto.Storage, error) {
 			return storage, fmt.Errorf("regexp compile: %w", err)
 		}
 
-		logger.Info("Ignoring files with pattern `%s`", ignore)
+		slog.Info("Ignoring files with pattern", "pattern", ignore)
 	}
 
 	return storage.WithIgnoreFn(func(item absto.Item) bool {

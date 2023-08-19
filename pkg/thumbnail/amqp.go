@@ -6,13 +6,13 @@ import (
 	"fmt"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
-	"github.com/ViBiOh/httputils/v4/pkg/tracer"
+	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
 	vith "github.com/ViBiOh/vith/pkg/model"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 func (a App) AMQPHandler(ctx context.Context, message amqp.Delivery) (err error) {
-	ctx, end := tracer.StartSpan(ctx, a.tracer, "amqp")
+	ctx, end := telemetry.StartSpan(ctx, a.tracer, "amqp")
 	defer end(&err)
 
 	var req vith.Request

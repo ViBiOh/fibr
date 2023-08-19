@@ -66,9 +66,9 @@ func (a App) saveMetadata(ctx context.Context, item absto.Item, data any) error 
 	}
 
 	if item.IsDir() {
-		a.increaseAggregate("save")
+		a.increaseAggregate(ctx, "save")
 	} else {
-		a.increaseExif("save")
+		a.increaseExif(ctx, "save")
 	}
 
 	return nil

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"path"
 	"path/filepath"
@@ -16,12 +17,12 @@ import (
 	"github.com/ViBiOh/fibr/pkg/geo"
 	"github.com/ViBiOh/fibr/pkg/metadata"
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/v4/pkg/cntxt"
 	"github.com/ViBiOh/httputils/v4/pkg/hash"
-	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/query"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
-	"github.com/ViBiOh/httputils/v4/pkg/tracer"
+	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -74,7 +75,7 @@ func (a App) handleFile(w http.ResponseWriter, r *http.Request, request provider
 	if query.GetBool(r, "browser") {
 		provider.SetPrefsCookie(w, request)
 
-		go a.pushEvent(provider.NewAccessEvent(r.Context(), item, r))
+		go a.pushEvent(cntxt.WithoutDeadline(r.Context()), provider.NewAccessEvent(r.Context(), item, r))
 
 		return a.browse(r.Context(), request, item, message)
 	}
@@ -85,7 +86,7 @@ func (a App) handleFile(w http.ResponseWriter, r *http.Request, request provider
 func (a App) serveFile(w http.ResponseWriter, r *http.Request, item absto.Item) error {
 	var err error
 
-	ctx, end := tracer.StartSpan(r.Context(), a.tracer, "file", trace.WithSpanKind(trace.SpanKindInternal))
+	ctx, end := telemetry.StartSpan(r.Context(), a.tracer, "file", trace.WithSpanKind(trace.SpanKindInternal))
 	defer end(&err)
 
 	etag, ok := provider.EtagMatch(w, r, provider.Hash(item.String()))
@@ -131,7 +132,7 @@ func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.
 		return errorReturn(request, err)
 	}
 
-	go a.pushEvent(provider.NewAccessEvent(r.Context(), item, r))
+	go a.pushEvent(cntxt.WithoutDeadline(r.Context()), provider.NewAccessEvent(r.Context(), item, r))
 
 	if query.GetBool(r, "search") {
 		return a.search(r, request, item, items)
@@ -147,7 +148,7 @@ func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.
 }
 
 func (a App) listFiles(r *http.Request, request provider.Request, item absto.Item) (items []absto.Item, err error) {
-	ctx, end := tracer.StartSpan(r.Context(), a.tracer, "files", trace.WithAttributes(attribute.String("item", item.Pathname)))
+	ctx, end := telemetry.StartSpan(r.Context(), a.tracer, "files", trace.WithAttributes(attribute.String("item", item.Pathname)))
 	defer end(&err)
 
 	if query.GetBool(r, "search") {
@@ -159,7 +160,7 @@ func (a App) listFiles(r *http.Request, request provider.Request, item absto.Ite
 	if request.IsStory() {
 		thumbnails, err := a.thumbnailApp.ListDirLarge(ctx, item)
 		if err != nil {
-			logger.WithField("item", item.Pathname).Error("list large thumbnails: %s", err)
+			slog.Error("list large thumbnails", "err", err, "item", item.Pathname)
 		}
 
 		storyItems := items[:0]
@@ -182,14 +183,14 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 		return
 	}
 
-	ctx, end := tracer.StartSpan(r.Context(), a.tracer, "geojson", trace.WithSpanKind(trace.SpanKindInternal))
+	ctx, end := telemetry.StartSpan(r.Context(), a.tracer, "geojson", trace.WithSpanKind(trace.SpanKindInternal))
 	defer end(nil)
 
 	var hash string
 	if query.GetBool(r, "search") {
 		hash = a.exifHash(ctx, items)
 	} else if exifs, err := a.metadataApp.ListDir(ctx, item); err != nil {
-		logger.WithField("item", item.Pathname).Error("list exifs: %s", err)
+		slog.Error("list exifs", "err", err, "item", item.Pathname)
 	} else {
 		hash = provider.RawHash(exifs)
 	}
@@ -260,7 +261,7 @@ func (a App) generateGeoJSON(ctx context.Context, w io.Writer, request provider.
 		feature.Properties["date"] = exif.Date.Format(time.RFC850)
 
 		if err := encoder.Encode(feature); err != nil {
-			logger.WithField("item", item.Pathname).Error("encode feature: %s", err)
+			slog.Error("encode feature", "err", err, "item", item.Pathname)
 		}
 	}
 

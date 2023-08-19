@@ -1,20 +1,21 @@
 package webhook
 
 import (
+	"log/slog"
+
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/v4/pkg/logger"
 )
 
 func (a *App) PubSubHandle(webhook provider.Webhook, err error) {
 	if err != nil {
-		logger.Error("Webhook's PubSub: %s", err)
+		slog.Error("Webhook's PubSub", "err", err)
 		return
 	}
 
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
-	logger.WithField("id", webhook.ID).Info("Webhook's PubSub")
+	slog.Info("Webhook's PubSub", "id", webhook.ID)
 
 	if len(webhook.URL) == 0 {
 		delete(a.webhooks, webhook.ID)

@@ -49,11 +49,11 @@ spec:
       FIBR_REDIS_MIN_IDLE_CONN: "50"
       FIBR_REDIS_POOL_SIZE: "500"
       FIBR_SANITIZE_ON_START: "true"
+      FIBR_TELEMETRY_URL: otel-collector.observability:4317
       FIBR_THUMBNAIL_DIRECT_ACCESS: "true"
       FIBR_THUMBNAIL_LARGE_SIZE: "1000"
       FIBR_THUMBNAIL_MIN_BITRATE: "30000000"
       FIBR_THUMBNAIL_URL: http://vith
-      FIBR_TRACER_URL: otel-collector.observability:4317
       GOMAXPROCS: "1"
       OTEL_SERVICE_NAME: fibr
     secrets:

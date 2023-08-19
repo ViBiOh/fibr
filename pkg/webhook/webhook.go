@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"log/slog"
 	"strings"
 	"sync"
 
@@ -13,11 +14,9 @@ import (
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/cntxt"
-	"github.com/ViBiOh/httputils/v4/pkg/logger"
-	prom "github.com/ViBiOh/httputils/v4/pkg/prometheus"
 	"github.com/ViBiOh/httputils/v4/pkg/redis"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
-	"github.com/prometheus/client_golang/prometheus"
+	"go.opentelemetry.io/otel/metric"
 )
 
 var webhookFilename = provider.MetadataDirectoryName + "/webhooks.json"
@@ -27,7 +26,7 @@ type App struct {
 	storageApp    absto.Storage
 	done          chan struct{}
 	webhooks      map[string]provider.Webhook
-	counter       *prometheus.CounterVec
+	counter       metric.Int64Counter
 	redisClient   redis.Client
 	pubsubChannel string
 	rendererApp   *renderer.App
@@ -48,7 +47,19 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 	}
 }
 
-func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheus.Registerer, redisClient redis.Client, rendererApp *renderer.App, thumbnailApp thumbnail.App, exclusiveApp exclusive.App) *App {
+func New(config Config, storageApp absto.Storage, meterProvider metric.MeterProvider, redisClient redis.Client, rendererApp *renderer.App, thumbnailApp thumbnail.App, exclusiveApp exclusive.App) *App {
+	var counter metric.Int64Counter
+	if meterProvider != nil {
+		meter := meterProvider.Meter("github.com/ViBiOh/fibr/pkg/webhook")
+
+		var err error
+
+		counter, err = meter.Int64Counter("fibr.webhook")
+		if err != nil {
+			slog.Error("create webhook counter", "err", err)
+		}
+	}
+
 	return &App{
 		done:          make(chan struct{}),
 		storageApp:    storageApp,
@@ -56,7 +67,7 @@ func New(config Config, storageApp absto.Storage, prometheusRegisterer prometheu
 		thumbnailApp:  thumbnailApp,
 		exclusiveApp:  exclusiveApp,
 		webhooks:      make(map[string]provider.Webhook),
-		counter:       prom.CounterVec(prometheusRegisterer, "fibr", "webhook", "item", "code"),
+		counter:       counter,
 		hmacSecret:    []byte(*config.hmacSecret),
 		redisClient:   redisClient,
 		pubsubChannel: strings.TrimSpace(*config.pubsubChannel),
@@ -81,17 +92,17 @@ func (a *App) Start(ctx context.Context) {
 	defer close(a.done)
 
 	if err := a.loadWebhooks(ctx); err != nil {
-		logger.Error("refresh webhooks: %s", err)
+		slog.Error("refresh webhooks", "err", err)
 		return
 	}
 
 	done, unsubscribe := redis.SubscribeFor(ctx, a.redisClient, a.pubsubChannel, a.PubSubHandle)
 	defer func() { <-done }()
 	defer func() {
-		logger.Info("Unsubscribing Webhook's PubSub...")
+		slog.Info("Unsubscribing Webhook's PubSub...")
 
 		if unsubscribeErr := unsubscribe(cntxt.WithoutDeadline(ctx)); unsubscribeErr != nil {
-			logger.Error("Webhook's unsubscribe: %s", unsubscribeErr)
+			slog.Error("Webhook's unsubscribe", "err", unsubscribeErr)
 		}
 	}()
 

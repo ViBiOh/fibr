@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"log/slog"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -13,9 +14,8 @@ import (
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/cntxt"
-	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
-	"github.com/ViBiOh/httputils/v4/pkg/tracer"
+	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
 )
 
 func (a App) uploadChunk(w http.ResponseWriter, r *http.Request, request provider.Request, fileName, chunkNumber string, file io.Reader) {
@@ -46,7 +46,7 @@ func (a App) uploadChunk(w http.ResponseWriter, r *http.Request, request provide
 
 	defer func() {
 		if closeErr := writer.Close(); closeErr != nil {
-			logger.Error("close chunk writer: %s", closeErr)
+			slog.Error("close chunk writer", "err", closeErr)
 		}
 
 		if err == nil {
@@ -54,7 +54,7 @@ func (a App) uploadChunk(w http.ResponseWriter, r *http.Request, request provide
 		}
 
 		if removeErr := os.Remove(tempFile); removeErr != nil {
-			logger.Error("remove chunk file `%s`: %s", tempFile, removeErr)
+			slog.Error("remove chunk file", "err", removeErr, "file", tempFile)
 		}
 	}()
 
@@ -67,7 +67,7 @@ func (a App) uploadChunk(w http.ResponseWriter, r *http.Request, request provide
 }
 
 func (a App) mergeChunk(w http.ResponseWriter, r *http.Request, request provider.Request, values map[string]string) {
-	ctx, end := tracer.StartSpan(r.Context(), a.tracer, "merge_chunk")
+	ctx, end := telemetry.StartSpan(r.Context(), a.tracer, "merge_chunk")
 	defer end(nil)
 
 	fileName, err := safeFilename(values["filename"])
@@ -108,15 +108,15 @@ func (a App) mergeChunk(w http.ResponseWriter, r *http.Request, request provider
 	if err == nil {
 		go func(ctx context.Context) {
 			if info, infoErr := a.storageApp.Stat(ctx, filePath); infoErr != nil {
-				logger.Error("get info for upload event: %s", infoErr)
+				slog.Error("get info for upload event", "err", infoErr)
 			} else {
-				a.pushEvent(provider.NewUploadEvent(ctx, request, info, a.bestSharePath(filePath), a.rendererApp))
+				a.pushEvent(ctx, provider.NewUploadEvent(ctx, request, info, a.bestSharePath(filePath), a.rendererApp))
 			}
 		}(cntxt.WithoutDeadline(ctx))
 	}
 
 	if err = os.RemoveAll(tempFolder); err != nil {
-		logger.Error("delete chunk folder `%s`: %s", tempFolder, err)
+		slog.Error("delete chunk folder", "err", err, "folder", tempFolder)
 	}
 
 	a.postUpload(w, r, request, fileName)
@@ -130,7 +130,7 @@ func (a App) mergeChunkFiles(directory, destination string) error {
 
 	defer func() {
 		if closeErr := writer.Close(); closeErr != nil {
-			logger.Error("close chunk's destination: %s", closeErr)
+			slog.Error("close chunk's destination", "err", closeErr)
 		}
 
 		if err == nil {
@@ -138,7 +138,7 @@ func (a App) mergeChunkFiles(directory, destination string) error {
 		}
 
 		if removeErr := os.Remove(destination); removeErr != nil {
-			logger.Error("remove chunk's destination `%s`: %s", destination, removeErr)
+			slog.Error("remove chunk's destination", "err", removeErr, "destination", destination)
 		}
 	}()
 
@@ -166,7 +166,7 @@ func browseChunkFiles(directory, destination string, writer io.Writer) error {
 
 		defer func() {
 			if closeErr := reader.Close(); closeErr != nil {
-				logger.Error("close chunk `%s`: %s", path, err)
+				slog.Error("close chunk", "err", err, "path", path)
 			}
 		}()
 
