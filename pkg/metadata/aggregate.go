@@ -8,11 +8,10 @@ import (
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/version"
-	"github.com/ViBiOh/httputils/v4/pkg/tracer"
+	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
 )
 
 var (
-	cacheDuration  = time.Hour * 96
 	aggregateRatio = 0.4
 
 	levels = []string{"city", "state", "country"}
@@ -27,7 +26,7 @@ func (a App) GetMetadataFor(ctx context.Context, item absto.Item) (metadata prov
 		return provider.Metadata{}, nil
 	}
 
-	ctx, end := tracer.StartSpan(ctx, a.tracer, "get_metadata")
+	ctx, end := telemetry.StartSpan(ctx, a.tracer, "get_metadata")
 	defer end(&err)
 
 	return a.exifCacheApp.Get(ctx, item)
@@ -36,7 +35,7 @@ func (a App) GetMetadataFor(ctx context.Context, item absto.Item) (metadata prov
 func (a App) GetAllMetadataFor(ctx context.Context, items ...absto.Item) (map[string]provider.Metadata, error) {
 	var err error
 
-	ctx, end := tracer.StartSpan(ctx, a.tracer, "get_all_metadata")
+	ctx, end := telemetry.StartSpan(ctx, a.tracer, "get_all_metadata")
 	defer end(&err)
 
 	exifs, err := a.exifCacheApp.List(ctx, onListError, items...)
@@ -61,7 +60,7 @@ func (a App) GetAggregateFor(ctx context.Context, item absto.Item) (aggregate pr
 		return provider.Aggregate{}, nil
 	}
 
-	ctx, end := tracer.StartSpan(ctx, a.tracer, "get_aggregate")
+	ctx, end := telemetry.StartSpan(ctx, a.tracer, "get_aggregate")
 	defer end(&err)
 
 	return a.aggregateCacheApp.Get(ctx, item)
@@ -70,7 +69,7 @@ func (a App) GetAggregateFor(ctx context.Context, item absto.Item) (aggregate pr
 func (a App) GetAllAggregateFor(ctx context.Context, items ...absto.Item) (map[string]provider.Aggregate, error) {
 	var err error
 
-	ctx, end := tracer.StartSpan(ctx, a.tracer, "get_all_aggregate")
+	ctx, end := telemetry.StartSpan(ctx, a.tracer, "get_all_aggregate")
 	defer end(&err)
 
 	exifs, err := a.aggregateCacheApp.List(ctx, onListError, items...)

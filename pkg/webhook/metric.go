@@ -1,9 +1,16 @@
 package webhook
 
-func (a *App) increaseMetric(code string) {
+import (
+	"context"
+
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/metric"
+)
+
+func (a *App) increaseMetric(ctx context.Context, code string) {
 	if a.counter == nil {
 		return
 	}
 
-	a.counter.WithLabelValues(code).Inc()
+	a.counter.Add(ctx, 1, metric.WithAttributes(attribute.String("code", code)))
 }

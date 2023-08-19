@@ -6,21 +6,17 @@ import (
 	"github.com/ViBiOh/fibr/pkg/exclusive"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/storage"
-	"github.com/prometheus/client_golang/prometheus"
 )
 
 type adapters struct {
-	prometheusRegisterer prometheus.Registerer
-	storageApp           model.Storage
-	filteredStorage      model.Storage
-	exclusiveApp         exclusive.App
-	eventBus             provider.EventBus
+	storageApp      model.Storage
+	filteredStorage model.Storage
+	exclusiveApp    exclusive.App
+	eventBus        provider.EventBus
 }
 
 func newAdapters(config configuration, clients client) (adapters, error) {
-	prometheusRegisterer := clients.prometheus.Registerer()
-
-	storageApp, err := absto.New(config.absto, clients.tracer.GetTracer("storage"))
+	storageApp, err := absto.New(config.absto, clients.telemetry.GetTracer("storage"))
 	if err != nil {
 		return adapters{}, err
 	}
@@ -30,7 +26,7 @@ func newAdapters(config configuration, clients client) (adapters, error) {
 		return adapters{}, err
 	}
 
-	eventBus, err := provider.NewEventBus(provider.MaxConcurrency, prometheusRegisterer, clients.tracer.GetTracer("bus"))
+	eventBus, err := provider.NewEventBus(provider.MaxConcurrency, clients.telemetry.GetMeterProvider(), clients.telemetry.GetTraceProvider())
 	if err != nil {
 		return adapters{}, err
 	}
@@ -41,10 +37,9 @@ func newAdapters(config configuration, clients client) (adapters, error) {
 	}
 
 	return adapters{
-		prometheusRegisterer: prometheusRegisterer,
-		storageApp:           storageApp,
-		filteredStorage:      filteredStorage,
-		exclusiveApp:         exclusiveApp,
-		eventBus:             eventBus,
+		storageApp:      storageApp,
+		filteredStorage: filteredStorage,
+		exclusiveApp:    exclusiveApp,
+		eventBus:        eventBus,
 	}, nil
 }

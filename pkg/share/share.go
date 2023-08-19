@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"log/slog"
 	"strings"
 	"sync"
 	"syscall"
@@ -15,7 +16,6 @@ import (
 	"github.com/ViBiOh/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/cntxt"
 	"github.com/ViBiOh/httputils/v4/pkg/cron"
-	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/redis"
 )
 
@@ -92,22 +92,22 @@ func (a *App) Start(ctx context.Context) {
 	defer close(a.done)
 
 	if err := a.loadShares(ctx); err != nil {
-		logger.Error("refresh shares: %s", err)
+		slog.Error("refresh shares", "err", err)
 		return
 	}
 
 	done, unsubscribe := redis.SubscribeFor(ctx, a.redisClient, a.pubsubChannel, a.PubSubHandle)
 	defer func() { <-done }()
 	defer func() {
-		logger.Info("Unsubscribing Share's PubSub...")
+		slog.Info("Unsubscribing Share's PubSub...")
 
 		if unsubscribeErr := unsubscribe(cntxt.WithoutDeadline(ctx)); unsubscribeErr != nil {
-			logger.Error("Share's unsubscribe: %s", unsubscribeErr)
+			slog.Error("Share's unsubscribe", "err", unsubscribeErr)
 		}
 	}()
 
 	purgeCron := cron.New().Each(time.Hour).OnError(func(err error) {
-		logger.Error("purge shares: %s", err)
+		slog.Error("purge shares", "err", err)
 	}).OnSignal(syscall.SIGUSR1)
 
 	if a.redisClient.Enabled() {
@@ -153,7 +153,7 @@ func (a *App) purgeExpiredShares(ctx context.Context) bool {
 			delete(a.shares, id)
 
 			if err := a.redisClient.PublishJSON(ctx, a.pubsubChannel, provider.Share{ID: id}); err != nil {
-				logger.WithField("fn", "share.purgeExpiredShares").WithField("item", id).Error("publish share purge: %s", err)
+				slog.Error("publish share purge", "err", err, "item", id, "fn", "share.purgeExpiredShares")
 			}
 
 			changed = true

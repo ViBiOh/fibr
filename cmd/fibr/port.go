@@ -25,13 +25,8 @@ func newPorts(config configuration, clients client, services services) ports {
 			name:      "http",
 			handler: httputils.Handler(
 				services.rendererApp.Handler(services.fibrApp.TemplateFunc),
-				clients.health, recoverer.Middleware, clients.prometheus.Middleware, clients.tracer.Middleware, owasp.New(config.owasp).Middleware,
+				clients.health, recoverer.Middleware, clients.telemetry.Middleware("http"), owasp.New(config.owasp).Middleware,
 			),
-		},
-		{
-			serverApp: server.New(config.promServer),
-			name:      "prometheus",
-			handler:   clients.prometheus.Handler(),
 		},
 	}
 }

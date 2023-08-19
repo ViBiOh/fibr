@@ -3,6 +3,7 @@ package webhook
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"net/url"
 	"path"
 	"strconv"
@@ -14,7 +15,6 @@ import (
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
-	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 )
 
@@ -45,13 +45,13 @@ func (a *App) EventConsumer(ctx context.Context, event provider.Event) {
 			statusCode, err = a.telegramHandle(ctx, webhook, event)
 
 		default:
-			logger.Warn("unknown kind `%d` for webhook", webhook.Kind)
+			slog.Warn("unknown kind for webhook", "kind", webhook.Kind)
 		}
 
-		a.increaseMetric(strconv.Itoa(statusCode))
+		a.increaseMetric(ctx, strconv.Itoa(statusCode))
 
 		if err != nil {
-			logger.Error("error while sending webhook: %s", err)
+			slog.Error("error while sending webhook", "err", err)
 		}
 	}
 
@@ -59,7 +59,7 @@ func (a *App) EventConsumer(ctx context.Context, event provider.Event) {
 		// Fire a goroutine to release the mutex lock
 		go func() {
 			if err := a.deleteItem(ctx, event.Item); err != nil {
-				logger.Error("delete webhooks for item: %s", err)
+				slog.Error("delete webhooks for item", "err", err)
 			}
 		}()
 	}

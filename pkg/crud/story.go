@@ -1,21 +1,21 @@
 package crud
 
 import (
+	"log/slog"
 	"net/http"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v4/pkg/concurrent"
-	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
-	"github.com/ViBiOh/httputils/v4/pkg/tracer"
+	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 )
 
 func (a App) story(r *http.Request, request provider.Request, item absto.Item, files []absto.Item) (renderer.Page, error) {
-	ctx, end := tracer.StartSpan(r.Context(), a.tracer, "story", trace.WithAttributes(attribute.String("item", item.Pathname)))
+	ctx, end := telemetry.StartSpan(r.Context(), a.tracer, "story", trace.WithAttributes(attribute.String("item", item.Pathname)))
 	defer end(nil)
 
 	items := make([]provider.StoryItem, 0, len(files))
@@ -30,7 +30,7 @@ func (a App) story(r *http.Request, request provider.Request, item absto.Item, f
 
 		directoryAggregate, err = a.metadataApp.GetAggregateFor(ctx, item)
 		if err != nil && !absto.IsNotExist(err) {
-			logger.WithField("fn", "crud.story").WithField("item", request.Path).Error("get aggregate: %s", err)
+			slog.Error("get aggregate", "err", err, "fn", "crud.story", "item", request.Path)
 		}
 	})
 
@@ -40,7 +40,7 @@ func (a App) story(r *http.Request, request provider.Request, item absto.Item, f
 
 		exifs, err = a.metadataApp.GetAllMetadataFor(ctx, files...)
 		if err != nil {
-			logger.WithField("fn", "crud.story").WithField("item", request.Path).Error("list exifs: %s", err)
+			slog.Error("list exifs", "err", err, "item", request.Path, "fn", "crud.story")
 		}
 	})
 

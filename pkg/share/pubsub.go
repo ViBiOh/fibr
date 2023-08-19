@@ -1,20 +1,21 @@
 package share
 
 import (
+	"log/slog"
+
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/v4/pkg/logger"
 )
 
 func (a *App) PubSubHandle(share provider.Share, err error) {
 	if err != nil {
-		logger.Error("Share's PubSub: %s", err)
+		slog.Error("Share's PubSub", "err", err)
 		return
 	}
 
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
-	logger.WithField("id", share.ID).Info("Share's PubSub")
+	slog.Info("Share's PubSub", "id", share.ID)
 
 	if share.Creation.IsZero() {
 		delete(a.shares, share.ID)

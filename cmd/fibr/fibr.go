@@ -5,7 +5,9 @@ import (
 	"embed"
 	"fmt"
 	"log"
+	"log/slog"
 	"net/http"
+	"os"
 
 	_ "net/http/pprof"
 
@@ -14,7 +16,6 @@ import (
 	basicMemory "github.com/ViBiOh/auth/v2/pkg/store/memory"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/alcotest"
-	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -23,7 +24,10 @@ var content embed.FS
 
 func newLoginApp(tracer trace.Tracer, basicConfig basicMemory.Config) provider.Auth {
 	basicApp, err := basicMemory.New(basicConfig)
-	logger.Fatal(err)
+	if err != nil {
+		slog.Error("auth memory", "err", err)
+		os.Exit(1)
+	}
 
 	basicProviderProvider := basic.New(basicApp, "fibr")
 	return authMiddleware.New(basicApp, tracer, basicProviderProvider)
@@ -45,19 +49,22 @@ func main() {
 
 	clients, err := newClient(ctx, config)
 	if err != nil {
-		logger.Fatal(fmt.Errorf("clients: %w", err))
+		slog.Error("clients", "err", err)
+		os.Exit(1)
 	}
 
 	defer clients.Close(ctx)
 
 	adapters, err := newAdapters(config, clients)
 	if err != nil {
-		logger.Fatal(fmt.Errorf("adapters: %w", err))
+		slog.Error("adapters", "err", err)
+		os.Exit(1)
 	}
 
 	services, err := newServices(config, clients, adapters)
 	if err != nil {
-		logger.Fatal(fmt.Errorf("services: %w", err))
+		slog.Error("services", "err", err)
+		os.Exit(1)
 	}
 
 	ports := newPorts(config, clients, services)

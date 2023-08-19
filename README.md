@@ -253,23 +253,13 @@ Usage of fibr:
   --loggerJson                                      [logger] Log format as JSON ${FIBR_LOGGER_JSON} (default false)
   --loggerLevel                       string        [logger] Logger level ${FIBR_LOGGER_LEVEL} (default "INFO")
   --loggerLevelKey                    string        [logger] Key for level in JSON ${FIBR_LOGGER_LEVEL_KEY} (default "level")
-  --loggerMessageKey                  string        [logger] Key for message in JSON ${FIBR_LOGGER_MESSAGE_KEY} (default "message")
+  --loggerMessageKey                  string        [logger] Key for message in JSON ${FIBR_LOGGER_MESSAGE_KEY} (default "msg")
   --loggerTimeKey                     string        [logger] Key for timestamp in JSON ${FIBR_LOGGER_TIME_KEY} (default "time")
   --minify                                          Minify HTML ${FIBR_MINIFY} (default true)
   --noAuth                                          [auth] Disable basic authentification ${FIBR_NO_AUTH} (default false)
   --okStatus                          int           [http] Healthy HTTP Status code ${FIBR_OK_STATUS} (default 204)
   --pathPrefix                        string        Root Path Prefix ${FIBR_PATH_PREFIX}
   --port                              uint          [server] Listen port (0 to disable) ${FIBR_PORT} (default 1080)
-  --prometheusAddress                 string        [prometheus] Listen address ${FIBR_PROMETHEUS_ADDRESS}
-  --prometheusCert                    string        [prometheus] Certificate file ${FIBR_PROMETHEUS_CERT}
-  --prometheusGzip                                  [prometheus] Enable gzip compression of metrics output ${FIBR_PROMETHEUS_GZIP} (default false)
-  --prometheusIdleTimeout             duration      [prometheus] Idle Timeout ${FIBR_PROMETHEUS_IDLE_TIMEOUT} (default 10s)
-  --prometheusIgnore                  string slice  [prometheus] Ignored path prefixe for metrics ${FIBR_PROMETHEUS_IGNORE}, as a string slice, environment variable separated by ","
-  --prometheusKey                     string        [prometheus] Key file ${FIBR_PROMETHEUS_KEY}
-  --prometheusPort                    uint          [prometheus] Listen port (0 to disable) ${FIBR_PROMETHEUS_PORT} (default 9090)
-  --prometheusReadTimeout             duration      [prometheus] Read Timeout ${FIBR_PROMETHEUS_READ_TIMEOUT} (default 5s)
-  --prometheusShutdownTimeout         duration      [prometheus] Shutdown Timeout ${FIBR_PROMETHEUS_SHUTDOWN_TIMEOUT} (default 5s)
-  --prometheusWriteTimeout            duration      [prometheus] Write Timeout ${FIBR_PROMETHEUS_WRITE_TIMEOUT} (default 10s)
   --publicURL                         string        Public URL ${FIBR_PUBLIC_URL} (default "http://localhost:1080")
   --readTimeout                       duration      [server] Read Timeout ${FIBR_READ_TIMEOUT} (default 2m0s)
   --redisAddress                      string slice  [redis] Redis Address host:port (blank to disable) ${FIBR_REDIS_ADDRESS}, as a string slice, environment variable separated by ","
@@ -282,7 +272,7 @@ Usage of fibr:
   --sanitizeOnStart                                 [crud] Sanitize on start ${FIBR_SANITIZE_ON_START} (default false)
   --sharePubSubChannel                string        [share] Channel name ${FIBR_SHARE_PUB_SUB_CHANNEL} (default "fibr:shares-channel")
   --shutdownTimeout                   duration      [server] Shutdown Timeout ${FIBR_SHUTDOWN_TIMEOUT} (default 10s)
-  --storageFileSystemDirectory        /data         [storage] Path to directory. Default is dynamic. /data on a server and Current Working Directory in a terminal. ${FIBR_STORAGE_FILE_SYSTEM_DIRECTORY} (default ${PWD})
+  --storageFileSystemDirectory        /data         [storage] Path to directory. Default is dynamic. /data on a server and Current Working Directory in a terminal. ${FIBR_STORAGE_FILE_SYSTEM_DIRECTORY} (default /Users/macbook/code/fibr)
   --storageObjectAccessKey            string        [storage] Storage Object Access Key ${FIBR_STORAGE_OBJECT_ACCESS_KEY}
   --storageObjectBucket               string        [storage] Storage Object Bucket ${FIBR_STORAGE_OBJECT_BUCKET}
   --storageObjectClass                string        [storage] Storage Object Class ${FIBR_STORAGE_OBJECT_CLASS}
@@ -291,6 +281,8 @@ Usage of fibr:
   --storageObjectSSL                                [storage] Use SSL ${FIBR_STORAGE_OBJECT_SSL} (default true)
   --storageObjectSecretAccess         string        [storage] Storage Object Secret Access ${FIBR_STORAGE_OBJECT_SECRET_ACCESS}
   --storagePartSize                   uint          [storage] PartSize configuration ${FIBR_STORAGE_PART_SIZE} (default 5242880)
+  --telemetryRate                     string        [telemetry] OpenTelemetry sample rate, 'always', 'never' or a float value ${FIBR_TELEMETRY_RATE} (default "always")
+  --telemetryURL                      string        [telemetry] OpenTelemetry gRPC endpoint (e.g. otel-exporter:4317) ${FIBR_TELEMETRY_URL}
   --temporaryFolder                   string        [crud] Temporary folder for chunk upload ${FIBR_TEMPORARY_FOLDER} (default "/tmp")
   --thumbnailAmqpExchange             string        [thumbnail] AMQP Exchange Name ${FIBR_THUMBNAIL_AMQP_EXCHANGE} (default "fibr")
   --thumbnailAmqpStreamRoutingKey     string        [thumbnail] AMQP Routing Key for stream ${FIBR_THUMBNAIL_AMQP_STREAM_ROUTING_KEY} (default "stream")
@@ -303,8 +295,6 @@ Usage of fibr:
   --thumbnailURL                      string        [thumbnail] Vith Thumbnail URL ${FIBR_THUMBNAIL_URL} (default "http://vith:1080")
   --thumbnailUser                     string        [thumbnail] Vith Thumbnail Basic Auth User ${FIBR_THUMBNAIL_USER}
   --title                             string        Application title ${FIBR_TITLE} (default "fibr")
-  --tracerRate                        string        [tracer] OpenTracing sample rate, 'always', 'never' or a float value ${FIBR_TRACER_RATE} (default "always")
-  --tracerURL                         string        [tracer] OpenTracing gRPC endpoint (e.g. otel-exporter:4317) ${FIBR_TRACER_URL}
   --url                               string        [alcotest] URL to check ${FIBR_URL}
   --userAgent                         string        [alcotest] User-Agent for check ${FIBR_USER_AGENT} (default "Alcotest")
   --webhookPubSubChannel              string        [webhook] Channel name ${FIBR_WEBHOOK_PUB_SUB_CHANNEL} (default "fibr:webhooks-channel")

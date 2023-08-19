@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"path"
 
@@ -15,19 +16,18 @@ import (
 	"github.com/ViBiOh/fibr/pkg/search"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v4/pkg/concurrent"
-	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
-	"github.com/ViBiOh/httputils/v4/pkg/tracer"
+	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 )
 
-func listLogger(pathname string) logger.Provider {
-	return logger.WithField("fn", "crud.list").WithField("item", pathname)
+func listLogger(pathname string) *slog.Logger {
+	return slog.With("fn", "crud.list").With("item", pathname)
 }
 
 func (a App) list(ctx context.Context, request provider.Request, message renderer.Message, item absto.Item, files []absto.Item) (renderer.Page, error) {
-	ctx, end := tracer.StartSpan(ctx, a.tracer, "list", trace.WithAttributes(attribute.String("item", item.Pathname)))
+	ctx, end := telemetry.StartSpan(ctx, a.tracer, "list", trace.WithAttributes(attribute.String("item", item.Pathname)))
 	defer end(nil)
 
 	wg := concurrent.NewLimiter(-1)
@@ -38,7 +38,7 @@ func (a App) list(ctx context.Context, request provider.Request, message rendere
 
 		directoryAggregate, err = a.metadataApp.GetAggregateFor(ctx, item)
 		if err != nil && !absto.IsNotExist(err) {
-			listLogger(item.Pathname).Error("get aggregate: %s", err)
+			listLogger(item.Pathname).Error("get aggregate", "err", err)
 		}
 	})
 
@@ -48,7 +48,7 @@ func (a App) list(ctx context.Context, request provider.Request, message rendere
 
 		aggregates, err = a.metadataApp.GetAllAggregateFor(ctx, files...)
 		if err != nil {
-			listLogger(item.Pathname).Error("list aggregates: %s", err)
+			listLogger(item.Pathname).Error("list aggregates", "err", err)
 		}
 	})
 
@@ -58,7 +58,7 @@ func (a App) list(ctx context.Context, request provider.Request, message rendere
 
 		metadatas, err = a.metadataApp.GetAllMetadataFor(ctx, files...)
 		if err != nil {
-			listLogger(item.Pathname).Error("list metadatas: %s", err)
+			listLogger(item.Pathname).Error("list metadatas", "err", err)
 		}
 	})
 
@@ -71,7 +71,7 @@ func (a App) list(ctx context.Context, request provider.Request, message rendere
 
 		thumbnails, err = a.thumbnailApp.ListDir(ctx, item)
 		if err != nil {
-			listLogger(item.Pathname).Error("list thumbnail: %s", err)
+			listLogger(item.Pathname).Error("list thumbnail", "err", err)
 			return
 		}
 	}()
@@ -85,7 +85,7 @@ func (a App) list(ctx context.Context, request provider.Request, message rendere
 
 		savedSearches, err = a.searchApp.List(ctx, item)
 		if err != nil {
-			listLogger(item.Pathname).Error("list saved searches: %s", err)
+			listLogger(item.Pathname).Error("list saved searches", "err", err)
 			return
 		}
 	}()
@@ -162,7 +162,7 @@ func (a App) Download(w http.ResponseWriter, r *http.Request, request provider.R
 	zipWriter := zip.NewWriter(w)
 	defer func() {
 		if closeErr := zipWriter.Close(); closeErr != nil {
-			logger.Error("close zip: %s", closeErr)
+			slog.Error("close zip", "err", closeErr)
 		}
 	}()
 
@@ -184,7 +184,7 @@ func (a App) zipItems(ctx context.Context, done <-chan struct{}, request provide
 	for _, item := range items {
 		select {
 		case <-done:
-			logger.Error("context is done for zipping files")
+			slog.Error("context is done for zipping files")
 			return nil
 		default:
 			relativeURL := request.RelativeURL(item)

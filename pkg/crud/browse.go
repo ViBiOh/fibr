@@ -2,6 +2,7 @@ package crud
 
 import (
 	"context"
+	"log/slog"
 	"net/http"
 	"sort"
 
@@ -9,14 +10,13 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/httputils/v4/pkg/concurrent"
-	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
-	"github.com/ViBiOh/httputils/v4/pkg/tracer"
+	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
 	"go.opentelemetry.io/otel/trace"
 )
 
 func (a App) browse(ctx context.Context, request provider.Request, item absto.Item, message renderer.Message) (renderer.Page, error) {
-	ctx, end := tracer.StartSpan(ctx, a.tracer, "browse", trace.WithSpanKind(trace.SpanKindInternal))
+	ctx, end := telemetry.StartSpan(ctx, a.tracer, "browse", trace.WithSpanKind(trace.SpanKindInternal))
 	defer end(nil)
 
 	var (
@@ -40,7 +40,7 @@ func (a App) browse(ctx context.Context, request provider.Request, item absto.It
 		var err error
 		metadata, err = a.metadataApp.GetMetadataFor(ctx, item)
 		if err != nil && !absto.IsNotExist(err) {
-			logger.WithField("item", item.Pathname).Error("load metadata: %s", err)
+			slog.Error("load metadata", "err", err, "item", item.Pathname)
 		}
 	})
 
@@ -67,13 +67,13 @@ func (a App) browse(ctx context.Context, request provider.Request, item absto.It
 }
 
 func (a App) getFilesPreviousAndNext(ctx context.Context, item absto.Item, request provider.Request) (items []absto.Item, previous provider.RenderItem, next provider.RenderItem) {
-	ctx, end := tracer.StartSpan(ctx, a.tracer, "get_previous_next", trace.WithSpanKind(trace.SpanKindInternal))
+	ctx, end := telemetry.StartSpan(ctx, a.tracer, "get_previous_next", trace.WithSpanKind(trace.SpanKindInternal))
 	defer end(nil)
 
 	var err error
 	items, err = a.storageApp.List(ctx, item.Dir())
 	if err != nil {
-		logger.WithField("item", item.Pathname).Error("list neighbors files: %s", err)
+		slog.Error("list neighbors files", "err", err, "item", item.Pathname)
 		return
 	}
 

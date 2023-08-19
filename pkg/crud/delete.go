@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/v4/pkg/cntxt"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
@@ -46,7 +47,7 @@ func (a App) Delete(w http.ResponseWriter, r *http.Request, request provider.Req
 		provider.SetPrefsCookie(w, request)
 	}
 
-	go a.pushEvent(provider.NewDeleteEvent(ctx, request, info, a.rendererApp))
+	go a.pushEvent(cntxt.WithoutDeadline(ctx), provider.NewDeleteEvent(ctx, request, info, a.rendererApp))
 
 	a.rendererApp.Redirect(w, r, fmt.Sprintf("?d=%s", request.Display), renderer.NewSuccessMessage("%s successfully deleted", info.Name()))
 }

@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"path"
 	"regexp"
@@ -17,7 +18,6 @@ import (
 	"unicode"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
-	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 	"github.com/rs/xid"
 	"github.com/zeebo/xxh3"
@@ -120,7 +120,7 @@ func SanitizeName(name string, removeSlash bool) (string, error) {
 
 func SafeWrite(w io.Writer, content string) {
 	if _, err := io.WriteString(w, content); err != nil {
-		logger.Error("write content: %s", err)
+		slog.Error("write content", "err", err)
 	}
 }
 
@@ -165,7 +165,7 @@ func SendLargeFile(ctx context.Context, storageApp absto.Storage, item absto.Ite
 
 func LogClose(closer io.Closer, fn, item string) {
 	if err := closer.Close(); err != nil {
-		logger.WithField("fn", fn).WithField("item", item).Error("close: %s", err)
+		slog.Error("close", "err", err, "fn", fn, "item", item)
 	}
 }
 

@@ -4,13 +4,13 @@ import (
 	"context"
 	"errors"
 	"flag"
+	"log/slog"
 	"time"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/exclusive"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/flags"
-	"github.com/ViBiOh/httputils/v4/pkg/logger"
 )
 
 type Renamer interface {
@@ -57,13 +57,13 @@ func (a App) Start(ctx context.Context) {
 	if err := a.exclusiveApp.Execute(ctx, "fibr:mutex:start", time.Hour, func(ctx context.Context) error {
 		return a.start(ctx)
 	}); err != nil {
-		logger.Error("start: %s", err)
+		slog.Error("start", "err", err)
 	}
 }
 
 func (a App) start(ctx context.Context) error {
-	logger.Info("Starting startup check...")
-	defer logger.Info("Ending startup check.")
+	slog.Info("Starting startup check...")
+	defer slog.Info("Ending startup check.")
 
 	done := ctx.Done()
 
@@ -81,7 +81,7 @@ func (a App) start(ctx context.Context) error {
 		if item.IsDir() {
 			directories = append(directories, item)
 		} else {
-			a.pushEvent(provider.NewStartEvent(ctx, item))
+			a.pushEvent(ctx, provider.NewStartEvent(ctx, item))
 		}
 
 		return nil
@@ -91,7 +91,7 @@ func (a App) start(ctx context.Context) error {
 	}
 
 	for _, directory := range directories {
-		a.pushEvent(provider.NewStartEvent(ctx, directory))
+		a.pushEvent(ctx, provider.NewStartEvent(ctx, directory))
 	}
 
 	return nil
@@ -100,7 +100,7 @@ func (a App) start(ctx context.Context) error {
 func (a App) sanitizeName(ctx context.Context, item absto.Item) absto.Item {
 	name, err := provider.SanitizeName(item.Pathname, false)
 	if err != nil {
-		logger.WithField("item", item.Pathname).Error("sanitize name: %s", err)
+		slog.Error("sanitize name", "err", err, "item", item.Pathname)
 		return item
 	}
 
@@ -109,15 +109,15 @@ func (a App) sanitizeName(ctx context.Context, item absto.Item) absto.Item {
 	}
 
 	if !a.sanitizeOnStart {
-		logger.Info("File with name `%s` should be renamed to `%s`", item.Pathname, name)
+		slog.Info("File should be renamed", "pathname", item.Pathname, "name", name)
 		return item
 	}
 
-	logger.Info("Renaming `%s` to `%s`", item.Pathname, name)
+	slog.Info("Renaming...", "pathname", item.Pathname, "name", name)
 
 	renamedItem, err := a.renamer.DoRename(ctx, item.Pathname, name, item)
 	if err != nil {
-		logger.Error("%s", err)
+		slog.Error("rename", "err", err)
 		return item
 	}
 

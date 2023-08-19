@@ -21,20 +21,17 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/health"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/owasp"
-	"github.com/ViBiOh/httputils/v4/pkg/prometheus"
 	"github.com/ViBiOh/httputils/v4/pkg/redis"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 	"github.com/ViBiOh/httputils/v4/pkg/server"
-	"github.com/ViBiOh/httputils/v4/pkg/tracer"
+	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
 )
 
 type configuration struct {
 	alcotest      alcotest.Config
 	logger        logger.Config
-	tracer        tracer.Config
-	prometheus    prometheus.Config
+	telemetry     telemetry.Config
 	appServer     server.Config
-	promServer    server.Config
 	health        health.Config
 	owasp         owasp.Config
 	basic         basicMemory.Config
@@ -60,12 +57,10 @@ func newConfig() (configuration, error) {
 
 	return configuration{
 		appServer:     server.Flags(fs, "", flags.NewOverride("ReadTimeout", time.Minute*2), flags.NewOverride("WriteTimeout", time.Minute*2)),
-		promServer:    server.Flags(fs, "prometheus", flags.NewOverride("Port", uint(9090)), flags.NewOverride("IdleTimeout", 10*time.Second), flags.NewOverride("ShutdownTimeout", 5*time.Second)),
 		health:        health.Flags(fs, ""),
 		alcotest:      alcotest.Flags(fs, ""),
 		logger:        logger.Flags(fs, "logger"),
-		tracer:        tracer.Flags(fs, "tracer"),
-		prometheus:    prometheus.Flags(fs, "prometheus", flags.NewOverride("Gzip", false)),
+		telemetry:     telemetry.Flags(fs, "telemetry"),
 		owasp:         owasp.Flags(fs, "", flags.NewOverride("FrameOptions", "SAMEORIGIN"), flags.NewOverride("Csp", "default-src 'self'; base-uri 'self'; script-src 'self' 'httputils-nonce' unpkg.com/webp-hero@0.0.2/dist-cjs/ unpkg.com/leaflet@1.9.4/dist/ unpkg.com/leaflet.markercluster@1.5.1/; style-src 'self' 'httputils-nonce' unpkg.com/leaflet@1.9.4/dist/ unpkg.com/leaflet.markercluster@1.5.1/; img-src 'self' data: a.tile.openstreetmap.org b.tile.openstreetmap.org c.tile.openstreetmap.org")),
 		basic:         basicMemory.Flags(fs, "auth", flags.NewOverride("Profiles", "1:admin")),
 		storage:       storage.Flags(fs, ""),

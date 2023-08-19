@@ -3,6 +3,7 @@ package fibr
 import (
 	"errors"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"path"
 	"strings"
@@ -12,7 +13,6 @@ import (
 	"github.com/ViBiOh/auth/v2/pkg/ident"
 	authModel "github.com/ViBiOh/auth/v2/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
@@ -139,5 +139,5 @@ func convertAuthenticationError(err error) error {
 }
 
 func logRequest(r *http.Request) {
-	logger.Warn("Unauthenticated request: %s %s from %s", r.Method, r.URL.String(), provider.GetIP(r))
+	slog.Warn("Unauthenticated request", "method", r.Method, "url", r.URL.String(), "ip", provider.GetIP(r))
 }

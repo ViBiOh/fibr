@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"mime/multipart"
 	"net/http"
 	"path"
@@ -11,10 +12,9 @@ import (
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/cntxt"
-	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
-	"github.com/ViBiOh/httputils/v4/pkg/tracer"
+	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
 )
 
 func (a App) saveUploadedFile(ctx context.Context, request provider.Request, inputName, rawSize string, file *multipart.Part) (fileName string, err error) {
@@ -36,9 +36,9 @@ func (a App) saveUploadedFile(ctx context.Context, request provider.Request, inp
 	if err == nil {
 		go func(ctx context.Context) {
 			if info, infoErr := a.storageApp.Stat(ctx, filePath); infoErr != nil {
-				logger.Error("get info for upload event: %s", infoErr)
+				slog.Error("get info for upload event", "err", infoErr)
 			} else {
-				a.pushEvent(provider.NewUploadEvent(ctx, request, info, a.bestSharePath(filePath), a.rendererApp))
+				a.pushEvent(ctx, provider.NewUploadEvent(ctx, request, info, a.bestSharePath(filePath), a.rendererApp))
 			}
 		}(cntxt.WithoutDeadline(ctx))
 	}
@@ -84,7 +84,7 @@ func (a App) upload(w http.ResponseWriter, r *http.Request, request provider.Req
 		return
 	}
 
-	ctx, end := tracer.StartSpan(r.Context(), a.tracer, "upload")
+	ctx, end := telemetry.StartSpan(r.Context(), a.tracer, "upload")
 	defer end(nil)
 
 	filename, err := a.saveUploadedFile(ctx, request, values["filename"], values["size"], file)
