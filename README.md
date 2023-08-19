@@ -156,7 +156,7 @@ For the last mile, Fibr can try to reverse geocoding the GPS data found in EXIF,
 
 ### Metrics
 
-Fibr exposes a lot of metrics on the [Prometheus endpoint](#endpoints). Common metrics are exposed: Golang statistics, HTTP statuses and response time, AMQP statuses and sidecars/metadatas actions.
+Fibr exposes a lot of metrics via OpenTelemetry gRPC mode. Common metrics are exposed: Golang statistics, HTTP statuses and response time, AMQP statuses and sidecars/metadatas actions.
 
 ## Getting started
 
@@ -206,7 +206,6 @@ You'll find a Kubernetes exemple in the [`infra/`](infra) folder, using my [`app
 - `GET /health`: healthcheck of server, always respond [`okStatus (default 204)`](#usage)
 - `GET /ready`: checks external dependencies availability and then respond [`okStatus (default 204)`](#usage) or `503` during [`graceDuration`](#usage) when `SIGTERM` is received
 - `GET /version`: value of `VERSION` environment variable
-- `GET /metrics`: Prometheus metrics, on a dedicated port [`prometheusPort (default 9090)`](#usage)
 
 ## Usage
 
