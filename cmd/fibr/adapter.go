@@ -16,7 +16,7 @@ type adapters struct {
 }
 
 func newAdapters(config configuration, clients client) (adapters, error) {
-	storageApp, err := absto.New(config.absto, clients.telemetry.GetTracer("storage"))
+	storageApp, err := absto.New(config.absto, clients.telemetry.TracerProvider().Tracer("absto"))
 	if err != nil {
 		return adapters{}, err
 	}
@@ -26,7 +26,7 @@ func newAdapters(config configuration, clients client) (adapters, error) {
 		return adapters{}, err
 	}
 
-	eventBus, err := provider.NewEventBus(provider.MaxConcurrency, clients.telemetry.GetMeterProvider(), clients.telemetry.GetTraceProvider())
+	eventBus, err := provider.NewEventBus(provider.MaxConcurrency, clients.telemetry.MeterProvider(), clients.telemetry.TracerProvider())
 	if err != nil {
 		return adapters{}, err
 	}

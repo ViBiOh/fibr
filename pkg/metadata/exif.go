@@ -125,7 +125,7 @@ func New(config Config, storageApp absto.Storage, meterProvider metric.MeterProv
 		}
 
 		return app.loadExif(ctx, item)
-	}, traceProvider.Tracer("exif_cache")).WithMaxConcurrency(provider.MaxConcurrency)
+	}, traceProvider).WithMaxConcurrency(provider.MaxConcurrency)
 
 	app.aggregateCacheApp = cache.New(redisClient, redisKey, func(ctx context.Context, item absto.Item) (provider.Aggregate, error) {
 		if !item.IsDir() {
@@ -133,7 +133,7 @@ func New(config Config, storageApp absto.Storage, meterProvider metric.MeterProv
 		}
 
 		return app.loadAggregate(ctx, item)
-	}, traceProvider.Tracer("aggregate_cache")).WithMaxConcurrency(provider.MaxConcurrency)
+	}, traceProvider).WithMaxConcurrency(provider.MaxConcurrency)
 
 	return app, nil
 }

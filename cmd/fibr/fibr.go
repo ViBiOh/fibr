@@ -22,7 +22,7 @@ import (
 //go:embed templates static
 var content embed.FS
 
-func newLoginApp(tracer trace.Tracer, basicConfig basicMemory.Config) provider.Auth {
+func newLoginApp(tracerProvider trace.TracerProvider, basicConfig basicMemory.Config) provider.Auth {
 	basicApp, err := basicMemory.New(basicConfig)
 	if err != nil {
 		slog.Error("auth memory", "err", err)
@@ -30,7 +30,7 @@ func newLoginApp(tracer trace.Tracer, basicConfig basicMemory.Config) provider.A
 	}
 
 	basicProviderProvider := basic.New(basicApp, "fibr")
-	return authMiddleware.New(basicApp, tracer, basicProviderProvider)
+	return authMiddleware.New(basicApp, tracerProvider, basicProviderProvider)
 }
 
 func main() {

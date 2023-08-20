@@ -147,7 +147,7 @@ func New(config Config, storage absto.Storage, redisClient redis.Client, meterPr
 
 	app.cacheApp = cache.New(redisClient, redisKey, func(ctx context.Context, pathname string) (absto.Item, error) {
 		return app.storageApp.Stat(ctx, pathname)
-	}, traceProvider.Tracer("thumbnail_cache")).WithMaxConcurrency(provider.MaxConcurrency)
+	}, traceProvider).WithMaxConcurrency(provider.MaxConcurrency)
 
 	return app, nil
 }

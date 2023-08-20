@@ -33,16 +33,16 @@ func newClient(ctx context.Context, config configuration) (client, error) {
 		return output, fmt.Errorf("telemetry: %w", err)
 	}
 
-	request.AddOpenTelemetryToDefaultClient(output.telemetry.GetMeterProvider(), output.telemetry.GetTraceProvider())
+	request.AddOpenTelemetryToDefaultClient(output.telemetry.MeterProvider(), output.telemetry.TracerProvider())
 
 	output.health = health.New(config.health)
 
-	output.redis, err = redis.New(config.redis, output.telemetry.GetMeterProvider(), output.telemetry.GetTraceProvider())
+	output.redis, err = redis.New(config.redis, output.telemetry.MeterProvider(), output.telemetry.TracerProvider())
 	if err != nil {
 		return output, fmt.Errorf("redis: %w", err)
 	}
 
-	output.amqp, err = amqp.New(config.amqp, output.telemetry.GetMeter("amqp"), output.telemetry.GetTracer("amqp"))
+	output.amqp, err = amqp.New(config.amqp, output.telemetry.MeterProvider(), output.telemetry.TracerProvider())
 	if err != nil && !errors.Is(err, amqp.ErrNoConfig) {
 		return output, fmt.Errorf("amqp: %w", err)
 	}

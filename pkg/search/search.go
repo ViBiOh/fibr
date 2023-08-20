@@ -22,14 +22,19 @@ type App struct {
 	thumbnailApp thumbnail.App
 }
 
-func New(storageApp absto.Storage, thumbnailApp thumbnail.App, exifApp provider.MetadataManager, exclusiveApp exclusive.App, tracer trace.Tracer) App {
-	return App{
-		tracer:       tracer,
+func New(storageApp absto.Storage, thumbnailApp thumbnail.App, exifApp provider.MetadataManager, exclusiveApp exclusive.App, tracerProvider trace.TracerProvider) App {
+	app := App{
 		storageApp:   storageApp,
 		thumbnailApp: thumbnailApp,
 		exifApp:      exifApp,
 		exclusiveApp: exclusiveApp,
 	}
+
+	if tracerProvider != nil {
+		app.tracer = tracerProvider.Tracer("search")
+	}
+
+	return app
 }
 
 func (a App) Files(r *http.Request, request provider.Request) (items []absto.Item, err error) {

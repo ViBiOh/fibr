@@ -56,11 +56,10 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 	}
 }
 
-func New(config Config, storageApp absto.Storage, filteredStorage absto.Storage, rendererApp *renderer.App, shareApp provider.ShareManager, webhookApp provider.WebhookManager, thumbnailApp thumbnail.App, exifApp provider.MetadataManager, searchApp search.App, eventProducer provider.EventProducer, tracer trace.Tracer) (App, error) {
+func New(config Config, storageApp absto.Storage, filteredStorage absto.Storage, rendererApp *renderer.App, shareApp provider.ShareManager, webhookApp provider.WebhookManager, thumbnailApp thumbnail.App, exifApp provider.MetadataManager, searchApp search.App, eventProducer provider.EventProducer, tracerProvider trace.TracerProvider) (App, error) {
 	app := App{
 		chunkUpload:     *config.chunkUpload,
 		temporaryFolder: strings.TrimSpace(*config.temporaryFolder),
-		tracer:          tracer,
 		pushEvent:       eventProducer,
 		rawStorageApp:   storageApp,
 		storageApp:      filteredStorage,
@@ -70,6 +69,10 @@ func New(config Config, storageApp absto.Storage, filteredStorage absto.Storage,
 		shareApp:        shareApp,
 		webhookApp:      webhookApp,
 		searchApp:       searchApp,
+	}
+
+	if tracerProvider != nil {
+		app.tracer = tracerProvider.Tracer("crud")
 	}
 
 	bcryptDuration, err := time.ParseDuration(strings.TrimSpace(*config.bcryptDuration))
