@@ -110,10 +110,10 @@ func (mr *StorageMockRecorder) Name() *gomock.Call {
 }
 
 // OpenFile mocks base method.
-func (m *Storage) OpenFile(arg0 context.Context, arg1 string, arg2 int, arg3 fs.FileMode) (*model.FileItem, error) {
+func (m *Storage) OpenFile(arg0 context.Context, arg1 string, arg2 int, arg3 fs.FileMode) (model.File, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "OpenFile", arg0, arg1, arg2, arg3)
-	ret0, _ := ret[0].(*model.FileItem)
+	ret0, _ := ret[0].(model.File)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

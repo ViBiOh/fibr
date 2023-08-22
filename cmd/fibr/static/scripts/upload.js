@@ -11,22 +11,22 @@ function eventNoop(e) {
   e.stopPropagation();
 }
 
-document.addEventListener('readystatechange', async (event) => {
-  if (event.target.readyState !== 'complete') {
+document.addEventListener("readystatechange", async (event) => {
+  if (event.target.readyState !== "complete") {
     return;
   }
 
-  const dropZone = document.getElementsByTagName('body')[0];
+  const dropZone = document.getElementsByTagName("body")[0];
 
-  dropZone.addEventListener('dragover', eventNoop);
-  dropZone.addEventListener('dragleave', eventNoop);
-  dropZone.addEventListener('drop', (e) => {
+  dropZone.addEventListener("dragover", eventNoop);
+  dropZone.addEventListener("dragleave", eventNoop);
+  dropZone.addEventListener("drop", (e) => {
     eventNoop(e);
 
-    window.location.hash = '#upload-modal';
+    window.location.hash = "#upload-modal";
     if (fileInput) {
       fileInput.files = e.dataTransfer.files;
-      fileInput.dispatchEvent(new Event('change'));
+      fileInput.dispatchEvent(new Event("change"));
     }
   });
 });
@@ -39,7 +39,7 @@ document.addEventListener('readystatechange', async (event) => {
 function bufferToHex(buffer) {
   return Array.prototype.map
     .call(new Uint8Array(buffer), (x) => `00${x.toString(16)}`.slice(-2))
-    .join('');
+    .join("");
 }
 
 /**
@@ -49,8 +49,8 @@ function bufferToHex(buffer) {
  */
 async function sha(data) {
   const buffer = await crypto.subtle.digest(
-    'SHA-256',
-    new TextEncoder('utf-8').encode(data),
+    "SHA-256",
+    new TextEncoder("utf-8").encode(data),
   );
   return bufferToHex(buffer);
 }
@@ -79,14 +79,14 @@ async function fileMessageId(file) {
  */
 function humanFileSize(number) {
   if (number < 1024) {
-    return number + 'bytes';
+    return number + "bytes";
   }
 
   if (number < 1048576) {
-    return (number / 1024).toFixed(0) + ' KB';
+    return (number / 1024).toFixed(0) + " KB";
   }
 
-  return (number / 1048576).toFixed(0) + ' MB';
+  return (number / 1048576).toFixed(0) + " MB";
 }
 
 /**
@@ -97,39 +97,39 @@ function humanFileSize(number) {
 async function addUploadItem(container, file) {
   const messageId = await fileMessageId(file);
 
-  const item = document.createElement('div');
+  const item = document.createElement("div");
   item.id = messageId;
-  item.classList.add('flex', 'flex-center', 'margin');
+  item.classList.add("flex", "flex-center", "margin");
 
-  const itemWrapper = document.createElement('div');
-  itemWrapper.classList.add('upload-item');
+  const itemWrapper = document.createElement("div");
+  itemWrapper.classList.add("upload-item");
   item.appendChild(itemWrapper);
 
-  const filename = document.createElement('input');
+  const filename = document.createElement("input");
   filename.id = `${messageId}-filename`;
-  filename.classList.add('upload-name', 'full');
-  filename.type = 'text';
+  filename.classList.add("upload-name", "full");
+  filename.type = "text";
   filename.value = file.name;
   itemWrapper.appendChild(filename);
 
-  const progressContainer = document.createElement('div');
-  progressContainer.classList.add('full', 'flex', 'flex-center');
+  const progressContainer = document.createElement("div");
+  progressContainer.classList.add("full", "flex", "flex-center");
 
-  const size = document.createElement('em');
+  const size = document.createElement("em");
   size.innerHTML = humanFileSize(file.size);
-  size.style.width = '8rem';
+  size.style.width = "8rem";
   progressContainer.appendChild(size);
 
-  const progress = document.createElement('progress');
-  progress.classList.add('flex-grow', 'margin-left');
+  const progress = document.createElement("progress");
+  progress.classList.add("flex-grow", "margin-left");
   progress.max = 100;
   progress.value = 0;
   progressContainer.appendChild(progress);
 
   itemWrapper.appendChild(progressContainer);
 
-  const status = document.createElement('span');
-  status.classList.add('upload-status');
+  const status = document.createElement("span");
+  status.classList.add("upload-status");
   item.appendChild(status);
 
   container.appendChild(item);
@@ -140,9 +140,9 @@ async function addUploadItem(container, file) {
  */
 function getFiles(event) {
   return [].filter
-    .call(event.target, (e) => e.nodeName.toLowerCase() === 'input')
+    .call(event.target, (e) => e.nodeName.toLowerCase() === "input")
     .reduce((acc, cur) => {
-      if (cur.type === 'file') {
+      if (cur.type === "file") {
         acc.files = cur.files;
       } else {
         acc[cur.name] = cur.value;
@@ -175,13 +175,13 @@ function clearUploadStatus(container) {
     return;
   }
 
-  const statusContainer = container.querySelector('.upload-status');
+  const statusContainer = container.querySelector(".upload-status");
   if (!statusContainer) {
     return;
   }
 
-  statusContainer.classList.remove('danger');
-  statusContainer.classList.remove('success');
+  statusContainer.classList.remove("danger");
+  statusContainer.classList.remove("success");
 }
 
 /**
@@ -196,7 +196,7 @@ async function setUploadStatus(container, content, style, title) {
     return;
   }
 
-  const statusContainer = container.querySelector('.upload-status');
+  const statusContainer = container.querySelector(".upload-status");
   if (!statusContainer) {
     return;
   }
@@ -226,7 +226,7 @@ let currentUpload = {};
 async function uploadFileByChunks(container, method, filename, file) {
   let progress;
   if (container) {
-    progress = container.querySelector('progress');
+    progress = container.querySelector("progress");
     clearUploadStatus(container);
   }
 
@@ -247,23 +247,23 @@ async function uploadFileByChunks(container, method, filename, file) {
       continue;
     }
 
-    if (typeof AbortController !== 'undefined') {
+    if (typeof AbortController !== "undefined") {
       aborter = new AbortController();
     }
 
     const formData = new FormData();
-    formData.append('method', method);
-    formData.append('filename', filename);
-    formData.append('file', currentUpload.chunks[i].content);
+    formData.append("method", method);
+    formData.append("filename", filename);
+    formData.append("file", currentUpload.chunks[i].content);
 
-    const response = await fetch('', {
-      method: 'POST',
-      credentials: 'same-origin',
+    const response = await fetch("", {
+      method: "POST",
+      credentials: "same-origin",
       signal: aborter.signal,
       headers: {
-        'X-Chunk-Upload': true,
-        'X-Chunk-Number': i + 1,
-        Accept: 'text/plain',
+        "X-Chunk-Upload": true,
+        "X-Chunk-Number": i + 1,
+        Accept: "text/plain",
       },
       body: formData,
     });
@@ -279,16 +279,16 @@ async function uploadFileByChunks(container, method, filename, file) {
   }
 
   const formData = new FormData();
-  formData.append('method', method);
-  formData.append('filename', filename);
-  formData.append('size', file.size);
+  formData.append("method", method);
+  formData.append("filename", filename);
+  formData.append("size", file.size);
 
-  const response = await fetch('', {
-    method: 'POST',
-    credentials: 'same-origin',
+  const response = await fetch("", {
+    method: "POST",
+    credentials: "same-origin",
     headers: {
-      'X-Chunk-Upload': true,
-      Accept: 'text/plain',
+      "X-Chunk-Upload": true,
+      Accept: "text/plain",
     },
     body: formData,
   });
@@ -313,15 +313,15 @@ async function uploadFileByChunks(container, method, filename, file) {
 async function uploadFileByXHR(container, method, filename, file) {
   let progress;
   if (container) {
-    progress = container.querySelector('progress');
+    progress = container.querySelector("progress");
     clearUploadStatus(container);
   }
 
   const formData = new FormData();
-  formData.append('method', method);
-  formData.append('filename', filename);
-  formData.append('size', file.size);
-  formData.append('file', file);
+  formData.append("method", method);
+  formData.append("filename", filename);
+  formData.append("size", file.size);
+  formData.append("file", file);
 
   return new Promise((resolve, reject) => {
     let xhr = new XMLHttpRequest();
@@ -329,17 +329,17 @@ async function uploadFileByXHR(container, method, filename, file) {
 
     if (progress) {
       xhr.upload.addEventListener(
-        'progress',
+        "progress",
         (e) => (progress.value = parseInt((e.loaded / e.total) * 100, 10)),
         false,
       );
     }
 
     xhr.addEventListener(
-      'readystatechange',
+      "readystatechange",
       (e) => {
         if (xhr.readyState === XMLHttpRequest.UNSENT) {
-          reject(new Error('request aborted'));
+          reject(new Error("request aborted"));
           xhr = undefined;
 
           return;
@@ -364,8 +364,8 @@ async function uploadFileByXHR(container, method, filename, file) {
       false,
     );
 
-    xhr.open('POST', '', true);
-    xhr.setRequestHeader('Accept', 'text/plain');
+    xhr.open("POST", "", true);
+    xhr.setRequestHeader("Accept", "text/plain");
     xhr.send(formData);
   });
 }
@@ -393,14 +393,14 @@ function sliceFileList(name, index) {
 async function upload(event) {
   event.preventDefault();
 
-  const uploadButton = document.getElementById('upload-button');
+  const uploadButton = document.getElementById("upload-button");
   if (uploadButton) {
     uploadButton.disabled = true;
-    replaceContent(uploadButton, generateThrobber(['throbber-white']));
+    replaceContent(uploadButton, generateThrobber(["throbber-white"]));
   }
 
   if (cancelButton) {
-    cancelButton.innerHTML = 'Cancel';
+    cancelButton.innerHTML = "Cancel";
   }
 
   const values = getFiles(event);
@@ -416,14 +416,14 @@ async function upload(event) {
       const filename = getFilename(messageId, file);
 
       await uploadFile(container, values.method, filename, file);
-      await setUploadStatus(container, '✓', 'success');
+      await setUploadStatus(container, "✓", "success");
     } catch (err) {
-      sliceFileList('file', i);
+      sliceFileList("file", i);
       if (uploadButton) {
         uploadButton.disabled = false;
-        uploadButton.innerHTML = 'Retry';
+        uploadButton.innerHTML = "Retry";
       }
-      await setUploadStatus(container, 'X', 'danger', err);
+      await setUploadStatus(container, "X", "danger", err);
 
       success = false;
       console.error(err);
@@ -435,9 +435,9 @@ async function upload(event) {
   }
 
   if (success) {
-    document.location.hash = '#upload-success';
+    document.location.hash = "#upload-success";
   } else if (cancelButton) {
-    cancelButton.innerHTML = 'Close';
+    cancelButton.innerHTML = "Close";
   }
 
   return false;
@@ -454,36 +454,34 @@ function abort(e) {
     aborter = undefined;
 
     if (cancelButton) {
-      cancelButton.innerHTML = 'Close';
+      cancelButton.innerHTML = "Close";
     }
   }
 
   return false;
 }
 
-document.addEventListener('readystatechange', async (event) => {
-  if (event.target.readyState !== 'complete') {
+document.addEventListener("readystatechange", async (event) => {
+  if (event.target.readyState !== "complete") {
     return;
   }
 
-  if (typeof chunkUpload !== 'undefined') {
-    if (chunkUpload) {
-      uploadFile = uploadFileByChunks;
-    } else {
-      uploadFile = uploadFileByXHR;
-    }
+  if (typeof chunkUpload !== "undefined" && chunkUpload) {
+    uploadFile = uploadFileByChunks;
+  } else {
+    uploadFile = uploadFileByXHR;
   }
 
-  fileInput = document.getElementById('file');
-  uploadList = document.getElementById('upload-list');
-  cancelButton = document.getElementById('upload-cancel');
+  fileInput = document.getElementById("file");
+  uploadList = document.getElementById("upload-list");
+  cancelButton = document.getElementById("upload-cancel");
 
   if (fileInput) {
-    fileInput.classList.add('opacity');
+    fileInput.classList.add("opacity");
     fileInput.multiple = true;
 
-    fileInput.addEventListener('change', () => {
-      window.location.hash = '#upload-modal';
+    fileInput.addEventListener("change", () => {
+      window.location.hash = "#upload-modal";
 
       replaceContent(uploadList);
 
@@ -492,9 +490,9 @@ document.addEventListener('readystatechange', async (event) => {
       }
     });
 
-    const uploadButtonLink = document.getElementById('upload-button-link');
+    const uploadButtonLink = document.getElementById("upload-button-link");
     if (uploadButtonLink) {
-      uploadButtonLink.addEventListener('click', (e) => {
+      uploadButtonLink.addEventListener("click", (e) => {
         eventNoop(e);
 
         fileInput.click();
@@ -502,22 +500,22 @@ document.addEventListener('readystatechange', async (event) => {
     }
   }
 
-  const fileInputLabel = document.getElementById('file-label');
+  const fileInputLabel = document.getElementById("file-label");
   if (fileInputLabel) {
-    fileInputLabel.classList.remove('hidden');
-    fileInputLabel.innerHTML = 'Choose files...';
+    fileInputLabel.classList.remove("hidden");
+    fileInputLabel.innerHTML = "Choose files...";
   }
 
   if (uploadList) {
-    uploadList.classList.remove('hidden');
+    uploadList.classList.remove("hidden");
   }
 
   if (cancelButton) {
-    cancelButton.addEventListener('click', goBack);
+    cancelButton.addEventListener("click", goBack);
   }
 
-  const form = document.getElementById('upload-form');
+  const form = document.getElementById("upload-form");
   if (form) {
-    form.addEventListener('submit', upload);
+    form.addEventListener("submit", upload);
   }
 });

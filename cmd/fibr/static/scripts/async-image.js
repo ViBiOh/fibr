@@ -1,7 +1,7 @@
 // from https://developers.google.com/speed/webp/faq#how_can_i_detect_browser_support_for_webp
 function isWebPCompatible() {
   const animatedImage =
-    'UklGRlIAAABXRUJQVlA4WAoAAAASAAAAAAAAAAAAQU5JTQYAAAD/////AABBTk1GJgAAAAAAAAAAAAAAAAAAAGQAAABWUDhMDQAAAC8AAAAQBxAREYiI/gcA';
+    "UklGRlIAAABXRUJQVlA4WAoAAAASAAAAAAAAAAAAQU5JTQYAAAD/////AABBTk1GJgAAAAAAAAAAAAAAAAAAAGQAAABWUDhMDQAAAC8AAAAQBxAREYiI/gcA";
 
   return new Promise((resolve, reject) => {
     const image = new Image();
@@ -79,7 +79,7 @@ function encode(content) {
     output.push(String.fromCharCode(rune));
   }
 
-  return btoa(output.join(''));
+  return btoa(output.join(""));
 }
 
 /**
@@ -87,24 +87,24 @@ function encode(content) {
  */
 async function fetchThumbnail() {
   let fetchURL = document.location.search;
-  if (fetchURL.includes('?')) {
-    if (!fetchURL.endsWith('&')) {
-      fetchURL += '&';
+  if (fetchURL.includes("?")) {
+    if (!fetchURL.endsWith("&")) {
+      fetchURL += "&";
     }
-    fetchURL += 'thumbnail';
+    fetchURL += "thumbnail";
   } else {
-    fetchURL += '?thumbnail';
+    fetchURL += "?thumbnail";
   }
 
-  const response = await fetch(fetchURL, { credentials: 'same-origin' });
+  const response = await fetch(fetchURL, { credentials: "same-origin" });
 
   if (response.status >= 400) {
-    throw new Error('unable to load thumbnails');
+    throw new Error("unable to load thumbnails");
   }
 
   let lazyImageObserver;
 
-  if (typeof lazyLoadThumbnail !== 'undefined' && lazyLoadThumbnail) {
+  if (typeof lazyLoadThumbnail !== "undefined" && lazyLoadThumbnail) {
     lazyImageObserver = new IntersectionObserver(async (entries, observer) => {
       for (const entry of entries) {
         if (!entry.isIntersecting) {
@@ -115,20 +115,20 @@ async function fetchThumbnail() {
         const parent = lazyImage.parentElement.parentElement;
 
         const storyThrobber = generateThrobber([
-          'throbber-white',
-          'throbber-overlay',
+          "throbber-white",
+          "throbber-overlay",
         ]);
         parent.appendChild(storyThrobber);
 
         lazyImage.addEventListener(
-          'load',
+          "load",
           () => parent.removeChild(storyThrobber),
           { once: true },
         );
 
         if (window.webpHero) {
           const response = await fetch(lazyImage.dataset.src, {
-            credentials: 'same-origin',
+            credentials: "same-origin",
           });
           const content = await response.arrayBuffer();
 
@@ -147,7 +147,7 @@ async function fetchThumbnail() {
   for await (let chunk of readChunk(response)) {
     const commaIndex = chunk.findIndex((element) => element === 44);
     if (commaIndex === -1) {
-      console.error('invalid line for thumbnail:', line);
+      console.error("invalid line for thumbnail:", line);
       continue;
     }
 
@@ -162,7 +162,7 @@ async function fetchThumbnail() {
     img.src = `data:image/webp;base64,${encode(chunk.slice(commaIndex + 1))}`;
     img.alt = picture.dataset.alt;
     img.dataset.src = picture.dataset.src;
-    img.classList.add('thumbnail', 'full', 'block');
+    img.classList.add("thumbnail", "full", "block");
 
     replaceContent(picture, img);
 
@@ -172,48 +172,48 @@ async function fetchThumbnail() {
   }
 }
 
-document.addEventListener('readystatechange', async (event) => {
-  if (event.target.readyState !== 'complete') {
+document.addEventListener("readystatechange", async (event) => {
+  if (event.target.readyState !== "complete") {
     return;
   }
 
   let dateTimeFormatter = new Intl.DateTimeFormat(navigator.language, {
-    dateStyle: 'full',
-    timeStyle: 'long',
+    dateStyle: "full",
+    timeStyle: "long",
   });
 
-  document.querySelectorAll('.date').forEach((item) => {
+  document.querySelectorAll(".date").forEach((item) => {
     item.innerHTML = dateTimeFormatter.format(new Date(item.innerHTML));
   });
 });
 
 document.addEventListener(
-  'readystatechange',
+  "readystatechange",
   async (event) => {
-    if (event.target.readyState !== 'complete') {
+    if (event.target.readyState !== "complete") {
       return;
     }
 
-    if (typeof hasThumbnail === 'undefined' || !hasThumbnail) {
+    if (typeof hasThumbnail === "undefined" || !hasThumbnail) {
       return;
     }
 
-    const thumbnailsElem = document.querySelectorAll('[data-thumbnail]');
+    const thumbnailsElem = document.querySelectorAll("[data-thumbnail]");
     if (!thumbnailsElem) {
       return;
     }
 
     thumbnailsElem.forEach((picture) => {
-      replaceContent(picture, generateThrobber(['throbber-white']));
+      replaceContent(picture, generateThrobber(["throbber-white"]));
     });
 
     try {
       await isWebPCompatible();
     } catch (e) {
       await resolveScript(
-        'https://unpkg.com/webp-hero@0.0.2/dist-cjs/webp-hero.bundle.js',
-        'sha512-DA6h9H5Sqn55/uVn4JI4aSPFnAWoCQYYDXUnvjOAMNVx11///hX4QaFbQt5yWsrIm9hSI5fLJYfRWt3KXneSXQ==',
-        'anonymous',
+        "https://unpkg.com/webp-hero@0.0.2/dist-cjs/webp-hero.bundle.js",
+        "sha512-DA6h9H5Sqn55/uVn4JI4aSPFnAWoCQYYDXUnvjOAMNVx11///hX4QaFbQt5yWsrIm9hSI5fLJYfRWt3KXneSXQ==",
+        "anonymous",
       );
     }
 

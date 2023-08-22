@@ -7,8 +7,8 @@
  */
 function resolveScript(src, integrity, crossorigin) {
   return new Promise((resolve, reject) => {
-    const script = document.createElement('script');
-    script.type = 'text/javascript';
+    const script = document.createElement("script");
+    script.type = "text/javascript";
     script.src = src;
     script.async = true;
     script.onload = resolve.bind(null, true);
@@ -19,7 +19,7 @@ function resolveScript(src, integrity, crossorigin) {
       script.crossOrigin = crossorigin;
     }
 
-    document.querySelector('head').appendChild(script);
+    document.querySelector("head").appendChild(script);
   });
 }
 
@@ -28,15 +28,15 @@ function resolveScript(src, integrity, crossorigin) {
  */
 window.onkeyup = (e) => {
   switch (e.key) {
-    case 'ArrowLeft':
+    case "ArrowLeft":
       goToPrevious();
       break;
 
-    case 'ArrowRight':
+    case "ArrowRight":
       goToNext();
       break;
 
-    case 'Escape':
+    case "Escape":
       goBack(e);
       break;
   }
@@ -46,12 +46,12 @@ function goBack(e) {
   const previousHash = document.location.hash;
 
   if (previousHash) {
-    if (typeof abort === 'function' && typeof aborter !== 'undefined') {
+    if (typeof abort === "function" && typeof aborter !== "undefined") {
       abort(e);
       return;
     }
 
-    document.location.hash = '';
+    document.location.hash = "";
 
     if (/success$/gim.test(previousHash)) {
       window.location.reload(true);
@@ -60,7 +60,7 @@ function goBack(e) {
     return;
   }
 
-  if (typeof parentPage === 'undefined') {
+  if (typeof parentPage === "undefined") {
     return;
   }
 
@@ -71,7 +71,7 @@ function goBack(e) {
  * Go to the previous item.
  */
 function goToPrevious() {
-  if (typeof previousFile === 'undefined') {
+  if (typeof previousFile === "undefined") {
     return;
   }
 
@@ -82,7 +82,7 @@ function goToPrevious() {
  * Go to the next item.
  */
 function goToNext() {
-  if (typeof nextFile === 'undefined') {
+  if (typeof nextFile === "undefined") {
     return;
   }
 

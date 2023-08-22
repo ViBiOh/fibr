@@ -16,7 +16,7 @@ type adapters struct {
 }
 
 func newAdapters(config configuration, clients client) (adapters, error) {
-	storageApp, err := absto.New(config.absto, clients.telemetry.TracerProvider().Tracer("absto"))
+	storageApp, err := absto.New(config.absto, clients.telemetry.TracerProvider())
 	if err != nil {
 		return adapters{}, err
 	}
