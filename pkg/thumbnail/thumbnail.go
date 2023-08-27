@@ -154,12 +154,12 @@ func New(config Config, storage absto.Storage, redisClient redis.Client, meterPr
 	return service, nil
 }
 
-func (a Service) LargeThumbnailSize() uint64 {
-	return a.largeSize
+func (s Service) LargeThumbnailSize() uint64 {
+	return s.largeSize
 }
 
-func (a Service) Stream(w http.ResponseWriter, r *http.Request, item absto.Item) {
-	reader, err := a.storage.ReadFrom(r.Context(), getStreamPath(item))
+func (s Service) Stream(w http.ResponseWriter, r *http.Request, item absto.Item) {
+	reader, err := s.storage.ReadFrom(r.Context(), getStreamPath(item))
 	if err != nil {
 		if absto.IsNotExist(err) {
 			w.WriteHeader(http.StatusNoContent)
@@ -176,24 +176,24 @@ func (a Service) Stream(w http.ResponseWriter, r *http.Request, item absto.Item)
 	http.ServeContent(w, r, item.Name(), item.Date, reader)
 }
 
-func (a Service) Serve(w http.ResponseWriter, r *http.Request, item absto.Item) {
-	if !a.CanHaveThumbnail(item) {
+func (s Service) Serve(w http.ResponseWriter, r *http.Request, item absto.Item) {
+	if !s.CanHaveThumbnail(item) {
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 
 	scale := SmallSize
 	if rawScale := r.URL.Query().Get("scale"); len(rawScale) > 0 {
-		if rawScale == "large" && a.largeSize > 0 {
-			scale = a.largeSize
+		if rawScale == "large" && s.largeSize > 0 {
+			scale = s.largeSize
 		}
 	}
 
 	ctx := r.Context()
 
-	name := a.PathForScale(item, scale)
+	name := s.PathForScale(item, scale)
 
-	reader, err := a.storage.ReadFrom(ctx, name)
+	reader, err := s.storage.ReadFrom(ctx, name)
 	if err != nil {
 		if absto.IsNotExist(err) {
 			w.WriteHeader(http.StatusNoContent)
@@ -214,20 +214,20 @@ func (a Service) Serve(w http.ResponseWriter, r *http.Request, item absto.Item) 
 	http.ServeContent(w, r, baseName, item.Date, reader)
 }
 
-func (a Service) List(w http.ResponseWriter, r *http.Request, item absto.Item, items []absto.Item) {
+func (s Service) List(w http.ResponseWriter, r *http.Request, item absto.Item, items []absto.Item) {
 	if len(items) == 0 {
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 
-	ctx, end := telemetry.StartSpan(r.Context(), a.tracer, "list", trace.WithSpanKind(trace.SpanKindInternal))
+	ctx, end := telemetry.StartSpan(r.Context(), s.tracer, "list", trace.WithSpanKind(trace.SpanKindInternal))
 	defer end(nil)
 
 	var hash string
 
 	if query.GetBool(r, "search") {
-		hash = a.thumbnailHash(ctx, items)
-	} else if thumbnails, err := a.ListDir(ctx, item); err != nil {
+		hash = s.thumbnailHash(ctx, items)
+	} else if thumbnails, err := s.ListDir(ctx, item); err != nil {
 		slog.Error("list thumbnails", "err", err, "item", item.Pathname)
 	} else {
 		hash = provider.RawHash(thumbnails)
@@ -256,7 +256,7 @@ func (a Service) List(w http.ResponseWriter, r *http.Request, item absto.Item, i
 	flusher, ok := w.(http.Flusher)
 
 	for _, item := range items {
-		a.encodeContent(ctx, w, isDone, item)
+		s.encodeContent(ctx, w, isDone, item)
 
 		if ok {
 			flusher.Flush()
@@ -264,16 +264,16 @@ func (a Service) List(w http.ResponseWriter, r *http.Request, item absto.Item, i
 	}
 }
 
-func (a Service) thumbnailHash(ctx context.Context, items []absto.Item) string {
-	ctx, end := telemetry.StartSpan(ctx, a.tracer, "hash", trace.WithSpanKind(trace.SpanKindInternal))
+func (s Service) thumbnailHash(ctx context.Context, items []absto.Item) string {
+	ctx, end := telemetry.StartSpan(ctx, s.tracer, "hash", trace.WithSpanKind(trace.SpanKindInternal))
 	defer end(nil)
 
 	ids := make([]string, len(items))
 	for index, item := range items {
-		ids[index] = a.PathForScale(item, SmallSize)
+		ids[index] = s.PathForScale(item, SmallSize)
 	}
 
-	thumbnails, err := a.cache.List(ctx, onCacheError, ids...)
+	thumbnails, err := s.cache.List(ctx, onCacheError, ids...)
 	if err != nil && !absto.IsNotExist(err) {
 		slog.Error("list thumbnails from cache", "err", err)
 	}
@@ -287,15 +287,15 @@ func (a Service) thumbnailHash(ctx context.Context, items []absto.Item) string {
 	return hasher.Sum()
 }
 
-func (a Service) encodeContent(ctx context.Context, w io.Writer, isDone func() bool, item absto.Item) {
+func (s Service) encodeContent(ctx context.Context, w io.Writer, isDone func() bool, item absto.Item) {
 	if item.IsDir() || isDone() {
 		return
 	}
 
-	ctx, end := telemetry.StartSpan(ctx, a.tracer, "encode", trace.WithSpanKind(trace.SpanKindInternal))
+	ctx, end := telemetry.StartSpan(ctx, s.tracer, "encode", trace.WithSpanKind(trace.SpanKindInternal))
 	defer end(nil)
 
-	reader, err := a.storage.ReadFrom(ctx, a.PathForScale(item, SmallSize))
+	reader, err := s.storage.ReadFrom(ctx, s.PathForScale(item, SmallSize))
 	if err != nil {
 		if !absto.IsNotExist(err) {
 			logEncodeContentError(item).Error("open", "err", err)
@@ -312,7 +312,7 @@ func (a Service) encodeContent(ctx context.Context, w io.Writer, isDone func() b
 	defer provider.BufferPool.Put(buffer)
 
 	if _, err = io.CopyBuffer(w, reader, buffer.Bytes()); err != nil {
-		if !absto.IsNotExist(a.storage.ConvertError(err)) {
+		if !absto.IsNotExist(s.storage.ConvertError(err)) {
 			logEncodeContentError(item).Error("copy", "err", err)
 		}
 	}

@@ -65,27 +65,27 @@ func (s Service) shouldGenerateStream(ctx context.Context, item absto.Item) (boo
 	return bitrate >= s.minBitrate, nil
 }
 
-func (a Service) generateStream(ctx context.Context, item absto.Item) error {
+func (s Service) generateStream(ctx context.Context, item absto.Item) error {
 	input := item.Pathname
 	output := getStreamPath(item)
 
 	req := model.NewRequest(input, getStreamPath(item), typeOfItem(item), SmallSize)
 
-	if a.amqpClient != nil {
-		a.increaseMetric(ctx, "stream", "publish")
+	if s.amqpClient != nil {
+		s.increaseMetric(ctx, "stream", "publish")
 
-		err := a.amqpClient.PublishJSON(ctx, req, a.amqpExchange, a.amqpStreamRoutingKey)
+		err := s.amqpClient.PublishJSON(ctx, req, s.amqpExchange, s.amqpStreamRoutingKey)
 		if err != nil {
-			a.increaseMetric(ctx, "stream", "error")
+			s.increaseMetric(ctx, "stream", "error")
 		}
 
 		return err
 	}
 
-	a.increaseMetric(ctx, "stream", "request")
+	s.increaseMetric(ctx, "stream", "request")
 
-	resp, err := a.vithRequest.Method(http.MethodPut).Path("%s?output=%s", input, url.QueryEscape(output)).Send(ctx, nil)
-	return a.handleVithResponse(ctx, err, resp.Body)
+	resp, err := s.vithRequest.Method(http.MethodPut).Path("%s?output=%s", input, url.QueryEscape(output)).Send(ctx, nil)
+	return s.handleVithResponse(ctx, err, resp.Body)
 }
 
 func (s Service) renameStream(ctx context.Context, old, new absto.Item) error {
