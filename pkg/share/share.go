@@ -23,9 +23,9 @@ type GetNow func() time.Time
 
 var shareFilename = provider.MetadataDirectoryName + "/shares.json"
 
-type App struct {
-	exclusiveApp  exclusive.App
-	storageApp    absto.Storage
+type Service struct {
+	exclusive     exclusive.Service
+	storage       absto.Storage
 	redisClient   redis.Client
 	done          chan struct{}
 	shares        map[string]provider.Share
@@ -35,37 +35,39 @@ type App struct {
 }
 
 type Config struct {
-	pubsubChannel *string
+	PubsubChannel string
 }
 
 func Flags(fs *flag.FlagSet, prefix string) Config {
-	return Config{
-		pubsubChannel: flags.New("PubSubChannel", "Channel name").Prefix(prefix).DocPrefix("share").String(fs, "fibr:shares-channel", nil),
-	}
+	var config Config
+
+	flags.New("PubSubChannel", "Channel name").Prefix(prefix).DocPrefix("share").StringVar(fs, &config.PubsubChannel, "fibr:shares-channel", nil)
+
+	return config
 }
 
-func New(config Config, storageApp absto.Storage, redisClient redis.Client, exclusiveApp exclusive.App) (*App, error) {
-	return &App{
+func New(config Config, storageService absto.Storage, redisClient redis.Client, exclusiveService exclusive.Service) (*Service, error) {
+	return &Service{
 		clock:         time.Now,
 		shares:        make(map[string]provider.Share),
 		done:          make(chan struct{}),
-		storageApp:    storageApp,
-		exclusiveApp:  exclusiveApp,
+		storage:       storageService,
+		exclusive:     exclusiveService,
 		redisClient:   redisClient,
-		pubsubChannel: strings.TrimSpace(*config.pubsubChannel),
+		pubsubChannel: config.PubsubChannel,
 	}, nil
 }
 
-func (a *App) Done() <-chan struct{} {
-	return a.done
+func (s *Service) Done() <-chan struct{} {
+	return s.done
 }
 
-func (a *App) Exclusive(ctx context.Context, name string, duration time.Duration, action func(ctx context.Context) error) (bool, error) {
-	return a.exclusiveApp.Try(ctx, "fibr:mutex:"+name, duration, func(ctx context.Context) error {
-		a.mutex.Lock()
-		defer a.mutex.Unlock()
+func (s *Service) Exclusive(ctx context.Context, name string, duration time.Duration, action func(ctx context.Context) error) (bool, error) {
+	return s.exclusive.Try(ctx, "fibr:mutex:"+name, duration, func(ctx context.Context) error {
+		s.mutex.Lock()
+		defer s.mutex.Unlock()
 
-		if err := a.refresh(ctx); err != nil {
+		if err := s.refresh(ctx); err != nil {
 			return fmt.Errorf("refresh shares: %w", err)
 		}
 
@@ -73,13 +75,13 @@ func (a *App) Exclusive(ctx context.Context, name string, duration time.Duration
 	})
 }
 
-func (a *App) Get(requestPath string) provider.Share {
+func (s *Service) Get(requestPath string) provider.Share {
 	cleanPath := strings.TrimPrefix(requestPath, "/")
 
-	a.mutex.RLock()
-	defer a.mutex.RUnlock()
+	s.mutex.RLock()
+	defer s.mutex.RUnlock()
 
-	for key, share := range a.shares {
+	for key, share := range s.shares {
 		if strings.HasPrefix(cleanPath, key) {
 			return share
 		}
@@ -88,15 +90,15 @@ func (a *App) Get(requestPath string) provider.Share {
 	return provider.Share{}
 }
 
-func (a *App) Start(ctx context.Context) {
-	defer close(a.done)
+func (s *Service) Start(ctx context.Context) {
+	defer close(s.done)
 
-	if err := a.loadShares(ctx); err != nil {
+	if err := s.loadShares(ctx); err != nil {
 		slog.Error("refresh shares", "err", err)
 		return
 	}
 
-	done, unsubscribe := redis.SubscribeFor(ctx, a.redisClient, a.pubsubChannel, a.PubSubHandle)
+	done, unsubscribe := redis.SubscribeFor(ctx, s.redisClient, s.pubsubChannel, s.PubSubHandle)
 	defer func() { <-done }()
 	defer func() {
 		slog.Info("Unsubscribing Share's PubSub...")
@@ -110,49 +112,49 @@ func (a *App) Start(ctx context.Context) {
 		slog.Error("purge shares", "err", err)
 	}).OnSignal(syscall.SIGUSR1)
 
-	if a.redisClient.Enabled() {
-		purgeCron.Exclusive(a, "purge", exclusive.Duration)
+	if s.redisClient.Enabled() {
+		purgeCron.Exclusive(s, "purge", exclusive.Duration)
 	}
 
-	purgeCron.Start(ctx, a.cleanShares)
+	purgeCron.Start(ctx, s.cleanShares)
 
 	<-ctx.Done()
 }
 
-func (a *App) loadShares(ctx context.Context) error {
-	a.mutex.Lock()
-	defer a.mutex.Unlock()
+func (s *Service) loadShares(ctx context.Context) error {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
 
-	return a.refresh(ctx)
+	return s.refresh(ctx)
 }
 
-func (a *App) refresh(ctx context.Context) error {
-	if shares, err := provider.LoadJSON[map[string]provider.Share](ctx, a.storageApp, shareFilename); err != nil {
+func (s *Service) refresh(ctx context.Context) error {
+	if shares, err := provider.LoadJSON[map[string]provider.Share](ctx, s.storage, shareFilename); err != nil {
 		if !absto.IsNotExist(err) {
 			return err
 		}
 
-		if err := a.storageApp.Mkdir(ctx, provider.MetadataDirectoryName, absto.DirectoryPerm); err != nil {
+		if err := s.storage.Mkdir(ctx, provider.MetadataDirectoryName, absto.DirectoryPerm); err != nil {
 			return fmt.Errorf("create dir: %w", err)
 		}
 
-		return provider.SaveJSON(ctx, a.storageApp, shareFilename, &a.shares)
+		return provider.SaveJSON(ctx, s.storage, shareFilename, &s.shares)
 	} else {
-		a.shares = shares
+		s.shares = shares
 	}
 
 	return nil
 }
 
-func (a *App) purgeExpiredShares(ctx context.Context) bool {
-	now := a.clock()
+func (s *Service) purgeExpiredShares(ctx context.Context) bool {
+	now := s.clock()
 	changed := false
 
-	for id, share := range a.shares {
+	for id, share := range s.shares {
 		if share.IsExpired(now) {
-			delete(a.shares, id)
+			delete(s.shares, id)
 
-			if err := a.redisClient.PublishJSON(ctx, a.pubsubChannel, provider.Share{ID: id}); err != nil {
+			if err := s.redisClient.PublishJSON(ctx, s.pubsubChannel, provider.Share{ID: id}); err != nil {
 				slog.Error("publish share purge", "err", err, "item", id, "fn", "share.purgeExpiredShares")
 			}
 
@@ -163,10 +165,10 @@ func (a *App) purgeExpiredShares(ctx context.Context) bool {
 	return changed
 }
 
-func (a *App) cleanShares(ctx context.Context) error {
-	if !a.purgeExpiredShares(ctx) {
+func (s *Service) cleanShares(ctx context.Context) error {
+	if !s.purgeExpiredShares(ctx) {
 		return nil
 	}
 
-	return provider.SaveJSON(ctx, a.storageApp, shareFilename, &a.shares)
+	return provider.SaveJSON(ctx, s.storage, shareFilename, &s.shares)
 }

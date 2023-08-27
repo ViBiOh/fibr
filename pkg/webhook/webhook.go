@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"log/slog"
-	"strings"
 	"sync"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
@@ -21,33 +20,35 @@ import (
 
 var webhookFilename = provider.MetadataDirectoryName + "/webhooks.json"
 
-type App struct {
-	exclusiveApp  exclusive.App
-	storageApp    absto.Storage
-	done          chan struct{}
-	webhooks      map[string]provider.Webhook
-	counter       metric.Int64Counter
-	redisClient   redis.Client
-	pubsubChannel string
-	rendererApp   *renderer.App
-	hmacSecret    []byte
-	thumbnailApp  thumbnail.App
-	mutex         sync.RWMutex
+type Service struct {
+	exclusiveService exclusive.Service
+	storage          absto.Storage
+	done             chan struct{}
+	webhooks         map[string]provider.Webhook
+	counter          metric.Int64Counter
+	redisClient      redis.Client
+	pubsubChannel    string
+	rendererService  *renderer.Service
+	hmacSecret       []byte
+	thumbnail        thumbnail.Service
+	mutex            sync.RWMutex
 }
 
 type Config struct {
-	hmacSecret    *string
-	pubsubChannel *string
+	HmacSecret    string
+	PubsubChannel string
 }
 
 func Flags(fs *flag.FlagSet, prefix string) Config {
-	return Config{
-		hmacSecret:    flags.New("Secret", "Secret for HMAC Signature").Prefix(prefix).DocPrefix("webhook").String(fs, "", nil),
-		pubsubChannel: flags.New("PubSubChannel", "Channel name").Prefix(prefix).DocPrefix("share").String(fs, "fibr:webhooks-channel", nil),
-	}
+	var config Config
+
+	flags.New("Secret", "Secret for HMAC Signature").Prefix(prefix).DocPrefix("webhook").StringVar(fs, &config.HmacSecret, "", nil)
+	flags.New("PubSubChannel", "Channel name").Prefix(prefix).DocPrefix("share").StringVar(fs, &config.PubsubChannel, "fibr:webhooks-channel", nil)
+
+	return config
 }
 
-func New(config Config, storageApp absto.Storage, meterProvider metric.MeterProvider, redisClient redis.Client, rendererApp *renderer.App, thumbnailApp thumbnail.App, exclusiveApp exclusive.App) *App {
+func New(config Config, storageService absto.Storage, meterProvider metric.MeterProvider, redisClient redis.Client, rendererService *renderer.Service, thumbnailService thumbnail.Service, exclusiveApp exclusive.Service) *Service {
 	var counter metric.Int64Counter
 	if meterProvider != nil {
 		meter := meterProvider.Meter("github.com/ViBiOh/fibr/pkg/webhook")
@@ -60,27 +61,27 @@ func New(config Config, storageApp absto.Storage, meterProvider metric.MeterProv
 		}
 	}
 
-	return &App{
-		done:          make(chan struct{}),
-		storageApp:    storageApp,
-		rendererApp:   rendererApp,
-		thumbnailApp:  thumbnailApp,
-		exclusiveApp:  exclusiveApp,
-		webhooks:      make(map[string]provider.Webhook),
-		counter:       counter,
-		hmacSecret:    []byte(*config.hmacSecret),
-		redisClient:   redisClient,
-		pubsubChannel: strings.TrimSpace(*config.pubsubChannel),
+	return &Service{
+		done:             make(chan struct{}),
+		storage:          storageService,
+		rendererService:  rendererService,
+		thumbnail:        thumbnailService,
+		exclusiveService: exclusiveApp,
+		webhooks:         make(map[string]provider.Webhook),
+		counter:          counter,
+		hmacSecret:       []byte(config.HmacSecret),
+		redisClient:      redisClient,
+		pubsubChannel:    config.PubsubChannel,
 	}
 }
 
-func (a *App) Done() <-chan struct{} {
-	return a.done
+func (s *Service) Done() <-chan struct{} {
+	return s.done
 }
 
-func (a *App) Exclusive(ctx context.Context, name string, action func(ctx context.Context) error) error {
-	return a.exclusiveApp.Execute(ctx, "fibr:mutex:"+name, exclusive.Duration, func(ctx context.Context) error {
-		if err := a.loadWebhooks(ctx); err != nil {
+func (s *Service) Exclusive(ctx context.Context, name string, action func(ctx context.Context) error) error {
+	return s.exclusiveService.Execute(ctx, "fibr:mutex:"+name, exclusive.Duration, func(ctx context.Context) error {
+		if err := s.loadWebhooks(ctx); err != nil {
 			return fmt.Errorf("refresh webhooks: %w", err)
 		}
 
@@ -88,15 +89,15 @@ func (a *App) Exclusive(ctx context.Context, name string, action func(ctx contex
 	})
 }
 
-func (a *App) Start(ctx context.Context) {
-	defer close(a.done)
+func (s *Service) Start(ctx context.Context) {
+	defer close(s.done)
 
-	if err := a.loadWebhooks(ctx); err != nil {
+	if err := s.loadWebhooks(ctx); err != nil {
 		slog.Error("refresh webhooks", "err", err)
 		return
 	}
 
-	done, unsubscribe := redis.SubscribeFor(ctx, a.redisClient, a.pubsubChannel, a.PubSubHandle)
+	done, unsubscribe := redis.SubscribeFor(ctx, s.redisClient, s.pubsubChannel, s.PubSubHandle)
 	defer func() { <-done }()
 	defer func() {
 		slog.Info("Unsubscribing Webhook's PubSub...")
@@ -109,22 +110,22 @@ func (a *App) Start(ctx context.Context) {
 	<-ctx.Done()
 }
 
-func (a *App) loadWebhooks(ctx context.Context) error {
-	a.mutex.Lock()
-	defer a.mutex.Unlock()
+func (s *Service) loadWebhooks(ctx context.Context) error {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
 
-	if webhooks, err := provider.LoadJSON[map[string]provider.Webhook](ctx, a.storageApp, webhookFilename); err != nil {
+	if webhooks, err := provider.LoadJSON[map[string]provider.Webhook](ctx, s.storage, webhookFilename); err != nil {
 		if !absto.IsNotExist(err) {
 			return err
 		}
 
-		if err := a.storageApp.Mkdir(ctx, provider.MetadataDirectoryName, absto.DirectoryPerm); err != nil {
+		if err := s.storage.Mkdir(ctx, provider.MetadataDirectoryName, absto.DirectoryPerm); err != nil {
 			return fmt.Errorf("create dir: %w", err)
 		}
 
-		return provider.SaveJSON(ctx, a.storageApp, webhookFilename, &a.webhooks)
+		return provider.SaveJSON(ctx, s.storage, webhookFilename, &s.webhooks)
 	} else {
-		a.webhooks = webhooks
+		s.webhooks = webhooks
 	}
 
 	return nil

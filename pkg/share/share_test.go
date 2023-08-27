@@ -15,18 +15,18 @@ func TestPurgeExpiredShares(t *testing.T) {
 	t.Parallel()
 
 	cases := map[string]struct {
-		instance *App
+		instance *Service
 		want     map[string]provider.Share
 	}{
 		"empty": {
-			&App{
+			&Service{
 				clock:  func() time.Time { return time.Date(2021, 0o5, 0o1, 14, 0o0, 0o0, 0, time.UTC) },
 				shares: make(map[string]provider.Share),
 			},
 			make(map[string]provider.Share),
 		},
 		"purge at boundaries": {
-			&App{
+			&Service{
 				clock: func() time.Time { return time.Date(2021, 0o5, 0o1, 14, 0o0, 0o0, 0, time.UTC) },
 				shares: map[string]provider.Share{
 					"1": {

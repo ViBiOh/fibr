@@ -26,8 +26,8 @@ func listLogger(pathname string) *slog.Logger {
 	return slog.With("fn", "crud.list").With("item", pathname)
 }
 
-func (a App) list(ctx context.Context, request provider.Request, message renderer.Message, item absto.Item, files []absto.Item) (renderer.Page, error) {
-	ctx, end := telemetry.StartSpan(ctx, a.tracer, "list", trace.WithAttributes(attribute.String("item", item.Pathname)))
+func (s Service) list(ctx context.Context, request provider.Request, message renderer.Message, item absto.Item, files []absto.Item) (renderer.Page, error) {
+	ctx, end := telemetry.StartSpan(ctx, s.tracer, "list", trace.WithAttributes(attribute.String("item", item.Pathname)))
 	defer end(nil)
 
 	wg := concurrent.NewLimiter(-1)
@@ -36,7 +36,7 @@ func (a App) list(ctx context.Context, request provider.Request, message rendere
 	wg.Go(func() {
 		var err error
 
-		directoryAggregate, err = a.metadataApp.GetAggregateFor(ctx, item)
+		directoryAggregate, err = s.metadata.GetAggregateFor(ctx, item)
 		if err != nil && !absto.IsNotExist(err) {
 			listLogger(item.Pathname).Error("get aggregate", "err", err)
 		}
@@ -46,7 +46,7 @@ func (a App) list(ctx context.Context, request provider.Request, message rendere
 	wg.Go(func() {
 		var err error
 
-		aggregates, err = a.metadataApp.GetAllAggregateFor(ctx, files...)
+		aggregates, err = s.metadata.GetAllAggregateFor(ctx, files...)
 		if err != nil {
 			listLogger(item.Pathname).Error("list aggregates", "err", err)
 		}
@@ -56,7 +56,7 @@ func (a App) list(ctx context.Context, request provider.Request, message rendere
 	wg.Go(func() {
 		var err error
 
-		metadatas, err = a.metadataApp.GetAllMetadataFor(ctx, files...)
+		metadatas, err = s.metadata.GetAllMetadataFor(ctx, files...)
 		if err != nil {
 			listLogger(item.Pathname).Error("list metadatas", "err", err)
 		}
@@ -69,7 +69,7 @@ func (a App) list(ctx context.Context, request provider.Request, message rendere
 
 		var err error
 
-		thumbnails, err = a.thumbnailApp.ListDir(ctx, item)
+		thumbnails, err = s.thumbnail.ListDir(ctx, item)
 		if err != nil {
 			listLogger(item.Pathname).Error("list thumbnail", "err", err)
 			return
@@ -83,7 +83,7 @@ func (a App) list(ctx context.Context, request provider.Request, message rendere
 
 		var err error
 
-		savedSearches, err = a.searchApp.List(ctx, item)
+		savedSearches, err = s.searchService.List(ctx, item)
 		if err != nil {
 			listLogger(item.Pathname).Error("list saved searches", "err", err)
 			return
@@ -108,7 +108,7 @@ func (a App) list(ctx context.Context, request provider.Request, message rendere
 	}
 
 	<-thumbnailDone
-	hasThumbnail, hasStory, cover := a.enrichThumbnail(ctx, directoryAggregate, items, thumbnails)
+	hasThumbnail, hasStory, cover := s.enrichThumbnail(ctx, directoryAggregate, items, thumbnails)
 
 	<-savedSearchDone
 
@@ -122,23 +122,23 @@ func (a App) list(ctx context.Context, request provider.Request, message rendere
 		"HasMap":        len(directoryAggregate.Location),
 		"HasThumbnail":  hasThumbnail,
 		"HasStory":      hasStory,
-		"ChunkUpload":   a.chunkUpload,
+		"ChunkUpload":   s.chunkUpload,
 	}
 
 	if request.CanShare {
-		content["Shares"] = a.shareApp.List()
+		content["Shares"] = s.share.List()
 	}
 
 	if request.CanWebhook {
-		content["Webhooks"] = a.webhookApp.List()
+		content["Webhooks"] = s.webhook.List()
 	}
 
 	return renderer.NewPage("files", http.StatusOK, content), nil
 }
 
-func (a App) enrichThumbnail(ctx context.Context, directoryAggregate provider.Aggregate, items []provider.RenderItem, thumbnails map[string]absto.Item) (hasThumbnail bool, hasStory bool, cover cover) {
+func (s Service) enrichThumbnail(ctx context.Context, directoryAggregate provider.Aggregate, items []provider.RenderItem, thumbnails map[string]absto.Item) (hasThumbnail bool, hasStory bool, cover cover) {
 	for index, item := range items {
-		if _, ok := thumbnails[a.thumbnailApp.Path(item.Item)]; !ok {
+		if _, ok := thumbnails[s.thumbnail.Path(item.Item)]; !ok {
 			continue
 		}
 
@@ -149,7 +149,7 @@ func (a App) enrichThumbnail(ctx context.Context, directoryAggregate provider.Ag
 		}
 
 		if !hasStory {
-			hasStory = a.thumbnailApp.HasLargeThumbnail(ctx, item.Item)
+			hasStory = s.thumbnail.HasLargeThumbnail(ctx, item.Item)
 		}
 
 		items[index].HasThumbnail = true
@@ -158,7 +158,7 @@ func (a App) enrichThumbnail(ctx context.Context, directoryAggregate provider.Ag
 	return
 }
 
-func (a App) Download(w http.ResponseWriter, r *http.Request, request provider.Request, items []absto.Item) {
+func (s Service) Download(w http.ResponseWriter, r *http.Request, request provider.Request, items []absto.Item) {
 	zipWriter := zip.NewWriter(w)
 	defer func() {
 		if closeErr := zipWriter.Close(); closeErr != nil {
@@ -175,12 +175,12 @@ func (a App) Download(w http.ResponseWriter, r *http.Request, request provider.R
 
 	ctx := r.Context()
 
-	if err := a.zipItems(ctx, ctx.Done(), request, zipWriter, items); err != nil {
-		a.error(w, r, request, err)
+	if err := s.zipItems(ctx, ctx.Done(), request, zipWriter, items); err != nil {
+		s.error(w, r, request, err)
 	}
 }
 
-func (a App) zipItems(ctx context.Context, done <-chan struct{}, request provider.Request, zipWriter *zip.Writer, items []absto.Item) (err error) {
+func (s Service) zipItems(ctx context.Context, done <-chan struct{}, request provider.Request, zipWriter *zip.Writer, items []absto.Item) (err error) {
 	for _, item := range items {
 		select {
 		case <-done:
@@ -190,20 +190,20 @@ func (a App) zipItems(ctx context.Context, done <-chan struct{}, request provide
 			relativeURL := request.RelativeURL(item)
 
 			if !item.IsDir() {
-				if err = a.addFileToZip(ctx, zipWriter, item, relativeURL); err != nil {
+				if err = s.addFileToZip(ctx, zipWriter, item, relativeURL); err != nil {
 					return
 				}
 				continue
 			}
 
 			var nestedItems []absto.Item
-			nestedItems, err = a.storageApp.List(ctx, request.SubPath(relativeURL))
+			nestedItems, err = s.storage.List(ctx, request.SubPath(relativeURL))
 			if err != nil {
 				err = fmt.Errorf("zip nested folder `%s`: %w", relativeURL, err)
 				return
 			}
 
-			if err = a.zipItems(ctx, done, request, zipWriter, nestedItems); err != nil {
+			if err = s.zipItems(ctx, done, request, zipWriter, nestedItems); err != nil {
 				return err
 			}
 		}
@@ -212,7 +212,7 @@ func (a App) zipItems(ctx context.Context, done <-chan struct{}, request provide
 	return nil
 }
 
-func (a App) addFileToZip(ctx context.Context, zipWriter *zip.Writer, item absto.Item, pathname string) (err error) {
+func (s Service) addFileToZip(ctx context.Context, zipWriter *zip.Writer, item absto.Item, pathname string) (err error) {
 	header := &zip.FileHeader{
 		Name:               pathname,
 		UncompressedSize64: uint64(item.Size()),
@@ -228,7 +228,7 @@ func (a App) addFileToZip(ctx context.Context, zipWriter *zip.Writer, item absto
 	}
 
 	var reader io.ReadCloser
-	reader, err = a.storageApp.ReadFrom(ctx, item.Pathname)
+	reader, err = s.storage.ReadFrom(ctx, item.Pathname)
 	if err != nil {
 		return fmt.Errorf("read: %w", err)
 	}

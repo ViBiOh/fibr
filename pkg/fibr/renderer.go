@@ -62,7 +62,7 @@ var FuncMap = template.FuncMap{
 	},
 }
 
-func (a App) TemplateFunc(w http.ResponseWriter, r *http.Request) (renderer.Page, error) {
+func (s Service) TemplateFunc(w http.ResponseWriter, r *http.Request) (renderer.Page, error) {
 	if !isMethodAllowed(r) {
 		return renderer.Page{}, model.WrapMethodNotAllowed(errors.New("you lack of method for calling me"))
 	}
@@ -75,11 +75,11 @@ func (a App) TemplateFunc(w http.ResponseWriter, r *http.Request) (renderer.Page
 		params := r.URL.Query()
 		params.Del("redirect")
 
-		a.rendererApp.Redirect(w, r, fmt.Sprintf("%s?%s", r.URL.Path, params.Encode()), renderer.ParseMessage(r))
+		s.renderer.Redirect(w, r, fmt.Sprintf("%s?%s", r.URL.Path, params.Encode()), renderer.ParseMessage(r))
 		return renderer.Page{}, nil
 	}
 
-	request, err := a.parseRequest(r)
+	request, err := s.parseRequest(r)
 	if err != nil {
 		if errors.Is(err, model.ErrUnauthorized) {
 			w.Header().Add("WWW-Authenticate", `Basic realm="fibr" charset="UTF-8"`)
@@ -89,15 +89,15 @@ func (a App) TemplateFunc(w http.ResponseWriter, r *http.Request) (renderer.Page
 
 	switch r.Method {
 	case http.MethodGet:
-		return a.crudApp.Get(w, r, request)
+		return s.crud.Get(w, r, request)
 	case http.MethodPost:
-		a.crudApp.Post(w, r, request)
+		s.crud.Post(w, r, request)
 	case http.MethodPut:
-		a.crudApp.Create(w, r, request)
+		s.crud.Create(w, r, request)
 	case http.MethodPatch:
-		a.crudApp.Rename(w, r, request)
+		s.crud.Rename(w, r, request)
 	case http.MethodDelete:
-		a.crudApp.Delete(w, r, request)
+		s.crud.Delete(w, r, request)
 	}
 
 	return renderer.Page{}, nil

@@ -14,33 +14,33 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-type App struct {
-	tracer       trace.Tracer
-	storageApp   absto.Storage
-	exifApp      provider.MetadataManager
-	exclusiveApp exclusive.App
-	thumbnailApp thumbnail.App
+type Service struct {
+	tracer    trace.Tracer
+	storage   absto.Storage
+	exif      provider.MetadataManager
+	exclusive exclusive.Service
+	thumbnail thumbnail.Service
 }
 
-func New(storageApp absto.Storage, thumbnailApp thumbnail.App, exifApp provider.MetadataManager, exclusiveApp exclusive.App, tracerProvider trace.TracerProvider) App {
-	app := App{
-		storageApp:   storageApp,
-		thumbnailApp: thumbnailApp,
-		exifApp:      exifApp,
-		exclusiveApp: exclusiveApp,
+func New(storageService absto.Storage, thumbnailService thumbnail.Service, exifService provider.MetadataManager, exclusiveService exclusive.Service, tracerProvider trace.TracerProvider) Service {
+	service := Service{
+		storage:   storageService,
+		thumbnail: thumbnailService,
+		exif:      exifService,
+		exclusive: exclusiveService,
 	}
 
 	if tracerProvider != nil {
-		app.tracer = tracerProvider.Tracer("search")
+		service.tracer = tracerProvider.Tracer("search")
 	}
 
-	return app
+	return service
 }
 
-func (a App) Files(r *http.Request, request provider.Request) (items []absto.Item, err error) {
+func (s Service) Files(r *http.Request, request provider.Request) (items []absto.Item, err error) {
 	params := r.URL.Query()
 
-	ctx, end := telemetry.StartSpan(r.Context(), a.tracer, "filter")
+	ctx, end := telemetry.StartSpan(r.Context(), s.tracer, "filter")
 	defer end(&err)
 
 	criterions, err := parseSearch(params, time.Now())
@@ -50,13 +50,13 @@ func (a App) Files(r *http.Request, request provider.Request) (items []absto.Ite
 
 	hasTags := criterions.hasTags()
 
-	err = a.storageApp.Walk(ctx, request.Filepath(), func(item absto.Item) error {
+	err = s.storage.Walk(ctx, request.Filepath(), func(item absto.Item) error {
 		if item.IsDir() || !criterions.match(item) {
 			return nil
 		}
 
 		if hasTags {
-			metadata, err := a.exifApp.GetMetadataFor(ctx, item)
+			metadata, err := s.exif.GetMetadataFor(ctx, item)
 			if err != nil {
 				slog.Error("get metadata", "err", err, "item", item.Pathname)
 			}

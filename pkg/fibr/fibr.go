@@ -17,25 +17,25 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
-type App struct {
-	loginApp    provider.Auth
-	crudApp     provider.Crud
-	shareApp    provider.ShareManager
-	webhookApp  provider.WebhookManager
-	rendererApp *renderer.App
+type Service struct {
+	login    provider.Auth
+	crud     provider.Crud
+	share    provider.ShareManager
+	webhook  provider.WebhookManager
+	renderer *renderer.Service
 }
 
-func New(crudApp provider.Crud, rendererApp *renderer.App, shareApp provider.ShareManager, webhookApp provider.WebhookManager, loginApp provider.Auth) App {
-	return App{
-		crudApp:     crudApp,
-		rendererApp: rendererApp,
-		shareApp:    shareApp,
-		webhookApp:  webhookApp,
-		loginApp:    loginApp,
+func New(crudService provider.Crud, rendererService *renderer.Service, shareService provider.ShareManager, webhookService provider.WebhookManager, loginService provider.Auth) Service {
+	return Service{
+		crud:     crudService,
+		renderer: rendererService,
+		share:    shareService,
+		webhook:  webhookService,
+		login:    loginService,
 	}
 }
 
-func (a App) parseRequest(r *http.Request) (provider.Request, error) {
+func (s Service) parseRequest(r *http.Request) (provider.Request, error) {
 	request := provider.Request{
 		Path:        r.URL.Path,
 		CanEdit:     false,
@@ -53,7 +53,7 @@ func (a App) parseRequest(r *http.Request) (provider.Request, error) {
 		request.Path = "/" + request.Path
 	}
 
-	if err := a.parseShare(&request, r.Header.Get("Authorization")); err != nil {
+	if err := s.parseShare(&request, r.Header.Get("Authorization")); err != nil {
 		logRequest(r)
 		return request, model.WrapUnauthorized(err)
 	}
@@ -68,7 +68,7 @@ func (a App) parseRequest(r *http.Request) (provider.Request, error) {
 		return request, nil
 	}
 
-	if a.loginApp == nil {
+	if s.login == nil {
 		request.CanEdit = true
 		request.CanShare = true
 		request.CanWebhook = true
@@ -76,13 +76,13 @@ func (a App) parseRequest(r *http.Request) (provider.Request, error) {
 		return request, nil
 	}
 
-	_, user, err := a.loginApp.IsAuthenticated(r)
+	_, user, err := s.login.IsAuthenticated(r)
 	if err != nil {
 		logRequest(r)
 		return request, convertAuthenticationError(err)
 	}
 
-	if a.loginApp.IsAuthorized(authModel.StoreUser(r.Context(), user), "admin") {
+	if s.login.IsAuthorized(authModel.StoreUser(r.Context(), user), "admin") {
 		request.CanEdit = true
 		request.CanShare = true
 		request.CanWebhook = true
@@ -101,8 +101,8 @@ func parsePreferences(r *http.Request) provider.Preferences {
 	return provider.ParsePreferences(cookieValue)
 }
 
-func (a App) parseShare(request *provider.Request, authorizationHeader string) error {
-	share := a.shareApp.Get(request.Filepath())
+func (s Service) parseShare(request *provider.Request, authorizationHeader string) error {
+	share := s.share.Get(request.Filepath())
 	if share.IsZero() {
 		return nil
 	}

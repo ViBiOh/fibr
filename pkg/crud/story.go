@@ -14,8 +14,8 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-func (a App) story(r *http.Request, request provider.Request, item absto.Item, files []absto.Item) (renderer.Page, error) {
-	ctx, end := telemetry.StartSpan(r.Context(), a.tracer, "story", trace.WithAttributes(attribute.String("item", item.Pathname)))
+func (s Service) story(r *http.Request, request provider.Request, item absto.Item, files []absto.Item) (renderer.Page, error) {
+	ctx, end := telemetry.StartSpan(r.Context(), s.tracer, "story", trace.WithAttributes(attribute.String("item", item.Pathname)))
 	defer end(nil)
 
 	items := make([]provider.StoryItem, 0, len(files))
@@ -28,7 +28,7 @@ func (a App) story(r *http.Request, request provider.Request, item absto.Item, f
 	wg.Go(func() {
 		var err error
 
-		directoryAggregate, err = a.metadataApp.GetAggregateFor(ctx, item)
+		directoryAggregate, err = s.metadata.GetAggregateFor(ctx, item)
 		if err != nil && !absto.IsNotExist(err) {
 			slog.Error("get aggregate", "err", err, "fn", "crud.story", "item", request.Path)
 		}
@@ -38,7 +38,7 @@ func (a App) story(r *http.Request, request provider.Request, item absto.Item, f
 	wg.Go(func() {
 		var err error
 
-		exifs, err = a.metadataApp.GetAllMetadataFor(ctx, files...)
+		exifs, err = s.metadata.GetAllMetadataFor(ctx, files...)
 		if err != nil {
 			slog.Error("list exifs", "err", err, "item", request.Path, "fn", "crud.story")
 		}
@@ -66,6 +66,6 @@ func (a App) story(r *http.Request, request provider.Request, item absto.Item, f
 		"Cover":              cover,
 		"Request":            request,
 		"HasMap":             hasMap,
-		"ThumbnailLargeSize": a.thumbnailApp.LargeThumbnailSize(),
+		"ThumbnailLargeSize": s.thumbnail.LargeThumbnailSize(),
 	}), nil
 }

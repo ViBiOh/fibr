@@ -14,11 +14,11 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func (a App) bestSharePath(pathname string) string {
+func (s Service) bestSharePath(pathname string) string {
 	var remainingPath string
 	var bestShare provider.Share
 
-	for _, share := range a.shareApp.List() {
+	for _, share := range s.share.List() {
 		if !strings.HasPrefix(pathname, share.Path) {
 			continue
 		}
@@ -62,26 +62,26 @@ func parseRights(value string) (edit, story bool, err error) {
 	}
 }
 
-func (a App) createShare(w http.ResponseWriter, r *http.Request, request provider.Request) {
+func (s Service) createShare(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	var err error
 
 	edit, story, err := parseRights(strings.TrimSpace(r.FormValue("rights")))
 	if err != nil {
-		a.error(w, r, request, model.WrapInvalid(err))
+		s.error(w, r, request, model.WrapInvalid(err))
 		return
 	}
 
 	duration, err := getFormDuration(r.FormValue("duration"))
 	if err != nil {
-		a.error(w, r, request, model.WrapInvalid(err))
+		s.error(w, r, request, model.WrapInvalid(err))
 		return
 	}
 
 	password := ""
 	if passwordValue := strings.TrimSpace(r.FormValue("password")); passwordValue != "" {
-		hash, err := bcrypt.GenerateFromPassword([]byte(passwordValue), a.bcryptCost)
+		hash, err := bcrypt.GenerateFromPassword([]byte(passwordValue), s.bcryptCost)
 		if err != nil {
-			a.error(w, r, request, model.WrapInternal(err))
+			s.error(w, r, request, model.WrapInternal(err))
 			return
 		}
 
@@ -90,19 +90,19 @@ func (a App) createShare(w http.ResponseWriter, r *http.Request, request provide
 
 	ctx := r.Context()
 
-	info, err := a.storageApp.Stat(ctx, request.Filepath())
+	info, err := s.storage.Stat(ctx, request.Filepath())
 	if err != nil {
 		if absto.IsNotExist(err) {
-			a.error(w, r, request, model.WrapNotFound(err))
+			s.error(w, r, request, model.WrapNotFound(err))
 		} else {
-			a.error(w, r, request, model.WrapInternal(err))
+			s.error(w, r, request, model.WrapInternal(err))
 		}
 		return
 	}
 
-	id, err := a.shareApp.Create(ctx, request.Filepath(), edit, story, password, info.IsDir(), duration)
+	id, err := s.share.Create(ctx, request.Filepath(), edit, story, password, info.IsDir(), duration)
 	if err != nil {
-		a.error(w, r, request, model.WrapInternal(err))
+		s.error(w, r, request, model.WrapInternal(err))
 		return
 	}
 
@@ -118,14 +118,14 @@ func (a App) createShare(w http.ResponseWriter, r *http.Request, request provide
 		redirection = fmt.Sprintf("%s/", path.Dir(redirection))
 	}
 
-	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/?d=%s#share-list", redirection, request.LayoutPath(redirection)), renderer.NewSuccessMessage("Share successfully created with ID: %s", id))
+	s.renderer.Redirect(w, r, fmt.Sprintf("%s/?d=%s#share-list", redirection, request.LayoutPath(redirection)), renderer.NewSuccessMessage("Share successfully created with ID: %s", id))
 }
 
-func (a App) deleteShare(w http.ResponseWriter, r *http.Request, request provider.Request) {
+func (s Service) deleteShare(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	id := r.FormValue("id")
 
-	if err := a.shareApp.Delete(r.Context(), id); err != nil {
-		a.error(w, r, request, model.WrapInternal(err))
+	if err := s.share.Delete(r.Context(), id); err != nil {
+		s.error(w, r, request, model.WrapInternal(err))
 		return
 	}
 
@@ -134,5 +134,5 @@ func (a App) deleteShare(w http.ResponseWriter, r *http.Request, request provide
 		return
 	}
 
-	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s?d=%s#share-list", request.Path, request.Display), renderer.NewSuccessMessage("Share with id %s successfully deleted", id))
+	s.renderer.Redirect(w, r, fmt.Sprintf("%s?d=%s#share-list", request.Path, request.Display), renderer.NewSuccessMessage("Share with id %s successfully deleted", id))
 }

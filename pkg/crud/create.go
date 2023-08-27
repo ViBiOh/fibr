@@ -12,68 +12,68 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
-func (a App) Create(w http.ResponseWriter, r *http.Request, request provider.Request) {
+func (s Service) Create(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !request.CanEdit {
-		a.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
+		s.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
 		return
 	}
 
 	name, err := checkFormName(r, "name")
 	if err != nil && !errors.Is(err, ErrEmptyName) {
-		a.error(w, r, request, err)
+		s.error(w, r, request, err)
 		return
 	}
 
 	name, err = provider.SanitizeName(name, false)
 	if err != nil {
-		a.error(w, r, request, model.WrapInternal(err))
+		s.error(w, r, request, model.WrapInternal(err))
 		return
 	}
 
 	pathname := request.SubPath(name)
 
-	if err = a.storageApp.Mkdir(r.Context(), pathname, absto.DirectoryPerm); err != nil {
-		a.error(w, r, request, model.WrapInternal(err))
+	if err = s.storage.Mkdir(r.Context(), pathname, absto.DirectoryPerm); err != nil {
+		s.error(w, r, request, model.WrapInternal(err))
 		return
 	}
 
-	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/?d=%s", name, request.Display), renderer.NewSuccessMessage("Directory %s successfully created", path.Base(pathname)))
+	s.renderer.Redirect(w, r, fmt.Sprintf("%s/?d=%s", name, request.Display), renderer.NewSuccessMessage("Directory %s successfully created", path.Base(pathname)))
 }
 
-func (a App) CreateSavedSearch(w http.ResponseWriter, r *http.Request, request provider.Request) {
+func (s Service) CreateSavedSearch(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !request.CanEdit {
-		a.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
+		s.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
 		return
 	}
 
 	name, err := checkFormName(r, "name")
 	if err != nil && !errors.Is(err, ErrEmptyName) {
-		a.error(w, r, request, err)
+		s.error(w, r, request, err)
 		return
 	}
 
 	name, err = provider.SanitizeName(name, false)
 	if err != nil {
-		a.error(w, r, request, model.WrapInternal(err))
+		s.error(w, r, request, model.WrapInternal(err))
 		return
 	}
 
 	ctx := r.Context()
 
-	item, err := a.storageApp.Stat(ctx, request.Filepath())
+	item, err := s.storage.Stat(ctx, request.Filepath())
 	if err != nil {
-		a.error(w, r, request, model.WrapNotFound(err))
+		s.error(w, r, request, model.WrapNotFound(err))
 		return
 	}
 
-	if err = a.searchApp.Add(ctx, item, provider.Search{
+	if err = s.searchService.Add(ctx, item, provider.Search{
 		ID:    provider.Hash(name),
 		Name:  name,
 		Query: r.URL.RawQuery,
 	}); err != nil {
-		a.error(w, r, request, fmt.Errorf("update: %w", err))
+		s.error(w, r, request, fmt.Errorf("update: %w", err))
 		return
 	}
 
-	a.rendererApp.Redirect(w, r, fmt.Sprintf("?%s", r.URL.RawQuery), renderer.NewSuccessMessage("Saved search %s successfully created", name))
+	s.renderer.Redirect(w, r, fmt.Sprintf("?%s", r.URL.RawQuery), renderer.NewSuccessMessage("Saved search %s successfully created", name))
 }

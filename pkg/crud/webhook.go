@@ -16,41 +16,41 @@ func generateTelegramURL(botToken, chatID string) string {
 	return fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage?chat_id=%s", url.PathEscape(botToken), url.QueryEscape(chatID))
 }
 
-func (a App) createWebhook(w http.ResponseWriter, r *http.Request, request provider.Request) {
+func (s Service) createWebhook(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	var err error
 	err = r.ParseForm()
 	if err != nil {
-		a.error(w, r, request, model.WrapInvalid(fmt.Errorf("parse form: %w", err)))
+		s.error(w, r, request, model.WrapInvalid(fmt.Errorf("parse form: %w", err)))
 		return
 	}
 
 	recursive, kind, webhookURL, eventTypes, err := checkWebhookForm(r)
 	if err != nil {
-		a.error(w, r, request, err)
+		s.error(w, r, request, err)
 		return
 	}
 
 	ctx := r.Context()
 
-	info, err := a.storageApp.Stat(ctx, request.Path)
+	info, err := s.storage.Stat(ctx, request.Path)
 	if err != nil {
 		if absto.IsNotExist(err) {
-			a.error(w, r, request, model.WrapNotFound(err))
+			s.error(w, r, request, model.WrapNotFound(err))
 		} else {
-			a.error(w, r, request, model.WrapInternal(err))
+			s.error(w, r, request, model.WrapInternal(err))
 		}
 
 		return
 	}
 
 	if !info.IsDir() {
-		a.error(w, r, request, model.WrapInvalid(errors.New("webhook are only available on directories")))
+		s.error(w, r, request, model.WrapInvalid(errors.New("webhook are only available on directories")))
 		return
 	}
 
-	id, err := a.webhookApp.Create(ctx, info.Pathname, recursive, kind, webhookURL, eventTypes)
+	id, err := s.webhook.Create(ctx, info.Pathname, recursive, kind, webhookURL, eventTypes)
 	if err != nil {
-		a.error(w, r, request, model.WrapInternal(err))
+		s.error(w, r, request, model.WrapInternal(err))
 		return
 	}
 
@@ -61,7 +61,7 @@ func (a App) createWebhook(w http.ResponseWriter, r *http.Request, request provi
 		return
 	}
 
-	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s?d=%s#webhook-list", request.Path, request.Display), renderer.NewSuccessMessage("Webhook successfully created with ID: %s", id))
+	s.renderer.Redirect(w, r, fmt.Sprintf("%s?d=%s#webhook-list", request.Path, request.Display), renderer.NewSuccessMessage("Webhook successfully created with ID: %s", id))
 }
 
 func checkWebhookForm(r *http.Request) (recursive bool, kind provider.WebhookKind, webhookURL string, eventTypes []provider.EventType, err error) {
@@ -118,11 +118,11 @@ func checkWebhookForm(r *http.Request) (recursive bool, kind provider.WebhookKin
 	return
 }
 
-func (a App) deleteWebhook(w http.ResponseWriter, r *http.Request, request provider.Request) {
+func (s Service) deleteWebhook(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	id := r.FormValue("id")
 
-	if err := a.webhookApp.Delete(r.Context(), id); err != nil {
-		a.error(w, r, request, model.WrapInternal(err))
+	if err := s.webhook.Delete(r.Context(), id); err != nil {
+		s.error(w, r, request, model.WrapInternal(err))
 		return
 	}
 
@@ -131,5 +131,5 @@ func (a App) deleteWebhook(w http.ResponseWriter, r *http.Request, request provi
 		return
 	}
 
-	a.rendererApp.Redirect(w, r, fmt.Sprintf("%s?d=%s#webhook-list", request.Path, request.Display), renderer.NewSuccessMessage("Webhook with id %s successfully deleted", id))
+	s.renderer.Redirect(w, r, fmt.Sprintf("%s?d=%s#webhook-list", request.Path, request.Display), renderer.NewSuccessMessage("Webhook with id %s successfully deleted", id))
 }

@@ -10,10 +10,10 @@ import (
 	absto "github.com/ViBiOh/absto/pkg/model"
 )
 
-func LoadJSON[T any](ctx context.Context, storageApp absto.Storage, filename string) (output T, err error) {
+func LoadJSON[T any](ctx context.Context, storageService absto.Storage, filename string) (output T, err error) {
 	var reader io.ReadCloser
 
-	reader, err = storageApp.ReadFrom(ctx, filename)
+	reader, err = storageService.ReadFrom(ctx, filename)
 	if err != nil {
 		err = fmt.Errorf("read: %w", err)
 		return
@@ -24,13 +24,13 @@ func LoadJSON[T any](ctx context.Context, storageApp absto.Storage, filename str
 	}()
 
 	if err = json.NewDecoder(reader).Decode(&output); err != nil {
-		err = fmt.Errorf("decode: %w", storageApp.ConvertError(err))
+		err = fmt.Errorf("decode: %w", storageService.ConvertError(err))
 	}
 
 	return
 }
 
-func SaveJSON[T any](ctx context.Context, storageApp absto.Storage, filename string, content T) error {
+func SaveJSON[T any](ctx context.Context, storageService absto.Storage, filename string, content T) error {
 	reader, writer := io.Pipe()
 
 	done := make(chan error)
@@ -45,5 +45,5 @@ func SaveJSON[T any](ctx context.Context, storageApp absto.Storage, filename str
 		done <- errors.Join(err, writer.Close())
 	}()
 
-	return errors.Join(storageApp.WriteTo(ctx, filename, reader, absto.WriteOpts{}), <-done)
+	return errors.Join(storageService.WriteTo(ctx, filename, reader, absto.WriteOpts{}), <-done)
 }

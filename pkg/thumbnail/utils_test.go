@@ -12,17 +12,17 @@ import (
 
 func TestCanHaveThumbnail(t *testing.T) {
 	cases := map[string]struct {
-		instance App
+		instance Service
 		input    absto.Item
 		want     bool
 	}{
 		"empty": {
-			App{},
+			Service{},
 			absto.Item{},
 			false,
 		},
 		"image": {
-			App{},
+			Service{},
 			absto.Item{
 				NameValue: "test.png",
 				Extension: ".png",
@@ -30,7 +30,7 @@ func TestCanHaveThumbnail(t *testing.T) {
 			true,
 		},
 		"pdf": {
-			App{},
+			Service{},
 			absto.Item{
 				NameValue: "test.pdf",
 				Extension: ".pdf",
@@ -38,7 +38,7 @@ func TestCanHaveThumbnail(t *testing.T) {
 			true,
 		},
 		"video": {
-			App{},
+			Service{},
 			absto.Item{
 				NameValue: "test.avi",
 				Extension: ".avi",
@@ -58,12 +58,12 @@ func TestCanHaveThumbnail(t *testing.T) {
 
 func TestHasThumbnail(t *testing.T) {
 	cases := map[string]struct {
-		instance App
+		instance Service
 		input    absto.Item
 		want     bool
 	}{
 		"not found": {
-			App{},
+			Service{},
 			absto.Item{
 				Pathname:   "path/to/error",
 				IsDirValue: true,
@@ -71,7 +71,7 @@ func TestHasThumbnail(t *testing.T) {
 			false,
 		},
 		"found": {
-			App{},
+			Service{},
 			absto.Item{
 				Pathname: "path/to/valid",
 			},
@@ -88,8 +88,8 @@ func TestHasThumbnail(t *testing.T) {
 			mockRedisClient := mocks.NewRedisClient(ctrl)
 			mockRedisClient.EXPECT().Enabled().Return(false)
 
-			tc.instance.storageApp = mockStorage
-			tc.instance.cacheApp = cache.New(mockRedisClient, nil, mockStorage.Stat, nil)
+			tc.instance.storage = mockStorage
+			tc.instance.cache = cache.New(mockRedisClient, nil, mockStorage.Stat, nil)
 
 			if intention == "found" {
 				mockStorage.EXPECT().Stat(gomock.Any(), gomock.Any()).Return(absto.Item{}, nil)
@@ -104,12 +104,12 @@ func TestHasThumbnail(t *testing.T) {
 
 func TestPathForScale(t *testing.T) {
 	cases := map[string]struct {
-		instance App
+		instance Service
 		input    absto.Item
 		want     string
 	}{
 		"simple": {
-			App{},
+			Service{},
 			absto.Item{
 				ID:       "dd29ecf524b030a65261e3059c48ab9e1ecb2585",
 				Pathname: "/path/to/file.png",

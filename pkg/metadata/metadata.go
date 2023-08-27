@@ -10,13 +10,13 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
-func (a App) Update(ctx context.Context, item absto.Item, opts ...provider.MetadataAction) (provider.Metadata, error) {
+func (s Service) Update(ctx context.Context, item absto.Item, opts ...provider.MetadataAction) (provider.Metadata, error) {
 	var output provider.Metadata
 
-	return output, a.exclusiveApp.Execute(ctx, "fibr:mutex:"+item.ID, exclusive.Duration, func(ctx context.Context) error {
+	return output, s.exclusive.Execute(ctx, "fibr:mutex:"+item.ID, exclusive.Duration, func(ctx context.Context) error {
 		var err error
 
-		metadata, err := a.GetMetadataFor(ctx, item)
+		metadata, err := s.GetMetadataFor(ctx, item)
 		if err != nil && !absto.IsNotExist(err) {
 			slog.Error("load metadata", "err", err, "item", item.Pathname)
 		}
@@ -25,7 +25,7 @@ func (a App) Update(ctx context.Context, item absto.Item, opts ...provider.Metad
 			metadata = opt(metadata)
 		}
 
-		if err = a.exifCacheApp.EvictOnSuccess(ctx, item, a.saveMetadata(ctx, item, metadata)); err != nil {
+		if err = s.exifCache.EvictOnSuccess(ctx, item, s.saveMetadata(ctx, item, metadata)); err != nil {
 			return fmt.Errorf("save metadata: %w", err)
 		}
 

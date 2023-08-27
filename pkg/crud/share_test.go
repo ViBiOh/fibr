@@ -14,26 +14,26 @@ func TestBestSharePath(t *testing.T) {
 	}
 
 	cases := map[string]struct {
-		instance App
+		instance Service
 		args     args
 		want     string
 	}{
 		"no share": {
-			App{},
+			Service{},
 			args{
 				pathname: "/website/index.html",
 			},
 			"",
 		},
 		"matching share": {
-			App{},
+			Service{},
 			args{
 				pathname: "/website/index.html",
 			},
 			"/abcdef123456/index.html",
 		},
 		"distance share": {
-			App{},
+			Service{},
 			args{
 				pathname: "/website/path/to/deep/folder/index.html",
 			},
@@ -48,7 +48,7 @@ func TestBestSharePath(t *testing.T) {
 
 			mockShare := mocks.NewShareManager(ctrl)
 
-			tc.instance.shareApp = mockShare
+			tc.instance.share = mockShare
 
 			switch intention {
 			case "no share":

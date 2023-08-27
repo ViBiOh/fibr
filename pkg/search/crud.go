@@ -38,8 +38,8 @@ func path(item absto.Item) string {
 	return fmt.Sprintf("%s%s.json", provider.MetadataDirectory(item), item.ID)
 }
 
-func (a App) List(ctx context.Context, item absto.Item) (Searches, error) {
-	searches, err := a.load(ctx, item)
+func (s Service) List(ctx context.Context, item absto.Item) (Searches, error) {
+	searches, err := s.load(ctx, item)
 	if err != nil {
 		return nil, fmt.Errorf("load: %w", err)
 	}
@@ -47,8 +47,8 @@ func (a App) List(ctx context.Context, item absto.Item) (Searches, error) {
 	return searches, nil
 }
 
-func (a App) Get(ctx context.Context, item absto.Item, name string) (provider.Search, error) {
-	searches, err := a.List(ctx, item)
+func (s Service) Get(ctx context.Context, item absto.Item, name string) (provider.Search, error) {
+	searches, err := s.List(ctx, item)
 	if err != nil {
 		return provider.Search{}, fmt.Errorf("list: %w", err)
 	}
@@ -56,17 +56,17 @@ func (a App) Get(ctx context.Context, item absto.Item, name string) (provider.Se
 	return searches[name], nil
 }
 
-func (a App) Add(ctx context.Context, item absto.Item, search provider.Search) error {
-	return a.update(ctx, item, DoAdd(search))
+func (s Service) Add(ctx context.Context, item absto.Item, search provider.Search) error {
+	return s.update(ctx, item, DoAdd(search))
 }
 
-func (a App) Delete(ctx context.Context, item absto.Item, name string) error {
-	return a.update(ctx, item, DoRemove(name))
+func (s Service) Delete(ctx context.Context, item absto.Item, name string) error {
+	return s.update(ctx, item, DoRemove(name))
 }
 
-func (a App) update(ctx context.Context, item absto.Item, opts ...SearchesOption) error {
-	return a.exclusiveApp.Execute(ctx, "fibr:mutex:"+item.ID, exclusive.Duration, func(ctx context.Context) error {
-		searches, err := a.load(ctx, item)
+func (s Service) update(ctx context.Context, item absto.Item, opts ...SearchesOption) error {
+	return s.exclusive.Execute(ctx, "fibr:mutex:"+item.ID, exclusive.Duration, func(ctx context.Context) error {
+		searches, err := s.load(ctx, item)
 		if err != nil {
 			return fmt.Errorf("load: %w", err)
 		}
@@ -75,7 +75,7 @@ func (a App) update(ctx context.Context, item absto.Item, opts ...SearchesOption
 			searches = opt(searches)
 		}
 
-		if err = a.save(ctx, item, searches); err != nil {
+		if err = s.save(ctx, item, searches); err != nil {
 			return fmt.Errorf("save: %w", err)
 		}
 
@@ -83,8 +83,8 @@ func (a App) update(ctx context.Context, item absto.Item, opts ...SearchesOption
 	})
 }
 
-func (a App) load(ctx context.Context, item absto.Item) (Searches, error) {
-	output, err := provider.LoadJSON[Searches](ctx, a.storageApp, path(item))
+func (s Service) load(ctx context.Context, item absto.Item) (Searches, error) {
+	output, err := provider.LoadJSON[Searches](ctx, s.storage, path(item))
 	if err != nil {
 		if !absto.IsNotExist(err) {
 			return nil, err
@@ -96,21 +96,21 @@ func (a App) load(ctx context.Context, item absto.Item) (Searches, error) {
 	return output, nil
 }
 
-func (a App) save(ctx context.Context, item absto.Item, content Searches) error {
+func (s Service) save(ctx context.Context, item absto.Item, content Searches) error {
 	filename := path(item)
 	dirname := filepath.Dir(filename)
 
-	if _, err := a.storageApp.Stat(ctx, dirname); err != nil {
+	if _, err := s.storage.Stat(ctx, dirname); err != nil {
 		if !absto.IsNotExist(err) {
 			return fmt.Errorf("check directory existence: %w", err)
 		}
 
-		if err = a.storageApp.Mkdir(ctx, dirname, absto.DirectoryPerm); err != nil {
+		if err = s.storage.Mkdir(ctx, dirname, absto.DirectoryPerm); err != nil {
 			return fmt.Errorf("create directory: %w", err)
 		}
 	}
 
-	if err := provider.SaveJSON(ctx, a.storageApp, filename, content); err != nil {
+	if err := provider.SaveJSON(ctx, s.storage, filename, content); err != nil {
 		return fmt.Errorf("save: %w", err)
 	}
 

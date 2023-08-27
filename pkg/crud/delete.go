@@ -11,24 +11,24 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
-func (a App) Delete(w http.ResponseWriter, r *http.Request, request provider.Request) {
+func (s Service) Delete(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !request.CanEdit {
-		a.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
+		s.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
 		return
 	}
 
 	name, err := checkFormName(r, "name")
 	if err != nil && !errors.Is(err, ErrEmptyName) {
-		a.error(w, r, request, err)
+		s.error(w, r, request, err)
 		return
 	}
 
 	ctx := r.Context()
 
 	pathname := request.SubPath(name)
-	info, err := a.storageApp.Stat(ctx, pathname)
+	info, err := s.storage.Stat(ctx, pathname)
 	if err != nil {
-		a.error(w, r, request, model.WrapNotFound(err))
+		s.error(w, r, request, model.WrapNotFound(err))
 		return
 	}
 
@@ -37,8 +37,8 @@ func (a App) Delete(w http.ResponseWriter, r *http.Request, request provider.Req
 		deletePath = provider.Dirname(deletePath)
 	}
 
-	if err = a.storageApp.RemoveAll(ctx, deletePath); err != nil {
-		a.error(w, r, request, model.WrapInternal(err))
+	if err = s.storage.RemoveAll(ctx, deletePath); err != nil {
+		s.error(w, r, request, model.WrapInternal(err))
 		return
 	}
 
@@ -47,35 +47,35 @@ func (a App) Delete(w http.ResponseWriter, r *http.Request, request provider.Req
 		provider.SetPrefsCookie(w, request)
 	}
 
-	go a.pushEvent(cntxt.WithoutDeadline(ctx), provider.NewDeleteEvent(ctx, request, info, a.rendererApp))
+	go s.pushEvent(cntxt.WithoutDeadline(ctx), provider.NewDeleteEvent(ctx, request, info, s.renderer))
 
-	a.rendererApp.Redirect(w, r, fmt.Sprintf("?d=%s", request.Display), renderer.NewSuccessMessage("%s successfully deleted", info.Name()))
+	s.renderer.Redirect(w, r, fmt.Sprintf("?d=%s", request.Display), renderer.NewSuccessMessage("%s successfully deleted", info.Name()))
 }
 
-func (a App) DeleteSavedSearch(w http.ResponseWriter, r *http.Request, request provider.Request) {
+func (s Service) DeleteSavedSearch(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !request.CanEdit {
-		a.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
+		s.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
 		return
 	}
 
 	name, err := checkFormName(r, "name")
 	if err != nil && !errors.Is(err, ErrEmptyName) {
-		a.error(w, r, request, err)
+		s.error(w, r, request, err)
 		return
 	}
 
 	ctx := r.Context()
 
-	item, err := a.storageApp.Stat(ctx, request.Filepath())
+	item, err := s.storage.Stat(ctx, request.Filepath())
 	if err != nil {
-		a.error(w, r, request, model.WrapNotFound(err))
+		s.error(w, r, request, model.WrapNotFound(err))
 		return
 	}
 
-	if err = a.searchApp.Delete(ctx, item, name); err != nil {
-		a.error(w, r, request, err)
+	if err = s.searchService.Delete(ctx, item, name); err != nil {
+		s.error(w, r, request, err)
 		return
 	}
 
-	a.rendererApp.Redirect(w, r, fmt.Sprintf("?d=%s", request.Display), renderer.NewSuccessMessage("%s successfully deleted", name))
+	s.renderer.Redirect(w, r, fmt.Sprintf("?d=%s", request.Display), renderer.NewSuccessMessage("%s successfully deleted", name))
 }

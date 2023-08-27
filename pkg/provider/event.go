@@ -166,53 +166,53 @@ func (e Event) GetTo() string {
 	return newName
 }
 
-func NewUploadEvent(ctx context.Context, request Request, item absto.Item, shareableURL string, rendererApp *renderer.App) Event {
+func NewUploadEvent(ctx context.Context, request Request, item absto.Item, shareableURL string, rendererService *renderer.Service) Event {
 	return Event{
 		Time:         time.Now(),
 		Type:         UploadEvent,
 		Item:         item,
 		TraceLink:    trace.LinkFromContext(ctx),
-		URL:          rendererApp.PublicURL(request.AbsoluteURL(item.Name())),
-		ShareableURL: rendererApp.PublicURL(shareableURL),
+		URL:          rendererService.PublicURL(request.AbsoluteURL(item.Name())),
+		ShareableURL: rendererService.PublicURL(shareableURL),
 		Metadata: map[string]string{
 			"force": "all",
 		},
 	}
 }
 
-func NewRenameEvent(ctx context.Context, old, new absto.Item, shareableURL string, rendererApp *renderer.App) Event {
+func NewRenameEvent(ctx context.Context, old, new absto.Item, shareableURL string, rendererService *renderer.Service) Event {
 	return Event{
 		Time:         time.Now(),
 		Type:         RenameEvent,
 		Item:         old,
 		TraceLink:    trace.LinkFromContext(ctx),
 		New:          &new,
-		URL:          rendererApp.PublicURL(new.Pathname),
-		ShareableURL: rendererApp.PublicURL(shareableURL),
+		URL:          rendererService.PublicURL(new.Pathname),
+		ShareableURL: rendererService.PublicURL(shareableURL),
 	}
 }
 
-func NewDescriptionEvent(ctx context.Context, item absto.Item, shareableURL string, description string, rendererApp *renderer.App) Event {
+func NewDescriptionEvent(ctx context.Context, item absto.Item, shareableURL string, description string, rendererService *renderer.Service) Event {
 	return Event{
 		Time:         time.Now(),
 		Type:         DescriptionEvent,
 		Item:         item,
 		TraceLink:    trace.LinkFromContext(ctx),
-		URL:          rendererApp.PublicURL(item.Pathname),
-		ShareableURL: rendererApp.PublicURL(shareableURL),
+		URL:          rendererService.PublicURL(item.Pathname),
+		ShareableURL: rendererService.PublicURL(shareableURL),
 		Metadata: map[string]string{
 			"description": description,
 		},
 	}
 }
 
-func NewDeleteEvent(ctx context.Context, request Request, item absto.Item, rendererApp *renderer.App) Event {
+func NewDeleteEvent(ctx context.Context, request Request, item absto.Item, rendererService *renderer.Service) Event {
 	return Event{
 		Time:      time.Now(),
 		Type:      DeleteEvent,
 		Item:      item,
 		TraceLink: trace.LinkFromContext(ctx),
-		URL:       rendererApp.PublicURL(request.AbsoluteURL("")),
+		URL:       rendererService.PublicURL(request.AbsoluteURL("")),
 	}
 }
 
@@ -320,7 +320,7 @@ func (e EventBus) Push(ctx context.Context, event Event) {
 	}
 }
 
-func (e EventBus) Start(ctx context.Context, storageApp absto.Storage, renamers []Renamer, consumers ...EventConsumer) {
+func (e EventBus) Start(ctx context.Context, storageService absto.Storage, renamers []Renamer, consumers ...EventConsumer) {
 	defer close(e.done)
 
 	go func() {
@@ -334,7 +334,7 @@ func (e EventBus) Start(ctx context.Context, storageApp absto.Storage, renamers 
 		ctx, end := telemetry.StartSpan(context.Background(), e.tracer, "event", trace.WithAttributes(attribute.String("type", event.Type.String())), trace.WithLinks(event.TraceLink))
 
 		if event.Type == RenameEvent && event.Item.IsDir() {
-			RenameDirectory(ctx, storageApp, renamers, event.Item, *event.New)
+			RenameDirectory(ctx, storageService, renamers, event.Item, *event.New)
 		}
 
 		for _, consumer := range consumers {
@@ -346,19 +346,19 @@ func (e EventBus) Start(ctx context.Context, storageApp absto.Storage, renamers 
 	}
 }
 
-func RenameDirectory(ctx context.Context, storageApp absto.Storage, renamers []Renamer, old, new absto.Item) {
-	if err := storageApp.Mkdir(ctx, MetadataDirectory(new), absto.DirectoryPerm); err != nil {
+func RenameDirectory(ctx context.Context, storageService absto.Storage, renamers []Renamer, old, new absto.Item) {
+	if err := storageService.Mkdir(ctx, MetadataDirectory(new), absto.DirectoryPerm); err != nil {
 		slog.Error("create new metadata directory", "err", err)
 		return
 	}
 
-	if err := storageApp.Walk(ctx, new.Pathname, func(item absto.Item) error {
+	if err := storageService.Walk(ctx, new.Pathname, func(item absto.Item) error {
 		oldItem := item
 		oldItem.Pathname = Join(old.Pathname, item.Name())
 		oldItem.ID = absto.ID(oldItem.Pathname)
 
 		if item.IsDir() && item.Pathname != new.Pathname {
-			RenameDirectory(ctx, storageApp, renamers, oldItem, item)
+			RenameDirectory(ctx, storageService, renamers, oldItem, item)
 			return nil
 		}
 
@@ -373,7 +373,7 @@ func RenameDirectory(ctx context.Context, storageApp absto.Storage, renamers []R
 		slog.Error("walk new metadata directory", "err", err)
 	}
 
-	if err := storageApp.RemoveAll(ctx, MetadataDirectory(old)); err != nil {
+	if err := storageService.RemoveAll(ctx, MetadataDirectory(old)); err != nil {
 		slog.Error("delete old metadata directory", "err", err)
 		return
 	}

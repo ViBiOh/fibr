@@ -27,11 +27,11 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-func (a App) getWithMessage(w http.ResponseWriter, r *http.Request, request provider.Request, message renderer.Message) (renderer.Page, error) {
+func (s Service) getWithMessage(w http.ResponseWriter, r *http.Request, request provider.Request, message renderer.Message) (renderer.Page, error) {
 	ctx := r.Context()
 
 	pathname := request.Filepath()
-	item, err := a.storageApp.Stat(ctx, pathname)
+	item, err := s.storage.Stat(ctx, pathname)
 
 	if err != nil && absto.IsNotExist(err) && provider.StreamExtensions[filepath.Ext(pathname)] {
 		if request.Share.File {
@@ -39,7 +39,7 @@ func (a App) getWithMessage(w http.ResponseWriter, r *http.Request, request prov
 			pathname = provider.Dirname(path.Dir(path.Dir(pathname))) + path.Base(pathname)
 		}
 
-		item, err = a.thumbnailApp.GetChunk(ctx, pathname)
+		item, err = s.thumbnail.GetChunk(ctx, pathname)
 	}
 
 	if err != nil {
@@ -51,42 +51,42 @@ func (a App) getWithMessage(w http.ResponseWriter, r *http.Request, request prov
 	}
 
 	if item.IsDir() && !strings.HasSuffix(r.URL.Path, "/") {
-		a.rendererApp.Redirect(w, r, fmt.Sprintf("%s/?d=%s", r.URL.Path, request.Display), renderer.Message{})
+		s.renderer.Redirect(w, r, fmt.Sprintf("%s/?d=%s", r.URL.Path, request.Display), renderer.Message{})
 		return renderer.Page{}, nil
 	}
 
 	if !item.IsDir() {
-		return a.handleFile(w, r, request, item, message)
+		return s.handleFile(w, r, request, item, message)
 	}
-	return a.handleDir(w, r, request, item, message)
+	return s.handleDir(w, r, request, item, message)
 }
 
-func (a App) handleFile(w http.ResponseWriter, r *http.Request, request provider.Request, item absto.Item, message renderer.Message) (renderer.Page, error) {
+func (s Service) handleFile(w http.ResponseWriter, r *http.Request, request provider.Request, item absto.Item, message renderer.Message) (renderer.Page, error) {
 	if query.GetBool(r, "thumbnail") {
-		a.thumbnailApp.Serve(w, r, item)
+		s.thumbnail.Serve(w, r, item)
 		return renderer.Page{}, nil
 	}
 
 	if query.GetBool(r, "stream") {
-		a.thumbnailApp.Stream(w, r, item)
+		s.thumbnail.Stream(w, r, item)
 		return renderer.Page{}, nil
 	}
 
 	if query.GetBool(r, "browser") {
 		provider.SetPrefsCookie(w, request)
 
-		go a.pushEvent(cntxt.WithoutDeadline(r.Context()), provider.NewAccessEvent(r.Context(), item, r))
+		go s.pushEvent(cntxt.WithoutDeadline(r.Context()), provider.NewAccessEvent(r.Context(), item, r))
 
-		return a.browse(r.Context(), request, item, message)
+		return s.browse(r.Context(), request, item, message)
 	}
 
-	return renderer.Page{}, a.serveFile(w, r, item)
+	return renderer.Page{}, s.serveFile(w, r, item)
 }
 
-func (a App) serveFile(w http.ResponseWriter, r *http.Request, item absto.Item) error {
+func (s Service) serveFile(w http.ResponseWriter, r *http.Request, item absto.Item) error {
 	var err error
 
-	ctx, end := telemetry.StartSpan(r.Context(), a.tracer, "file", trace.WithSpanKind(trace.SpanKindInternal))
+	ctx, end := telemetry.StartSpan(r.Context(), s.tracer, "file", trace.WithSpanKind(trace.SpanKindInternal))
 	defer end(&err)
 
 	etag, ok := provider.EtagMatch(w, r, provider.Hash(item.String()))
@@ -94,7 +94,7 @@ func (a App) serveFile(w http.ResponseWriter, r *http.Request, item absto.Item) 
 		return nil
 	}
 
-	file, err := a.storageApp.ReadFrom(ctx, item.Pathname)
+	file, err := s.storage.ReadFrom(ctx, item.Pathname)
 	if err != nil {
 		return fmt.Errorf("get reader for `%s`: %w", item.Pathname, err)
 	}
@@ -107,65 +107,65 @@ func (a App) serveFile(w http.ResponseWriter, r *http.Request, item absto.Item) 
 	return nil
 }
 
-func (a App) handleDir(w http.ResponseWriter, r *http.Request, request provider.Request, item absto.Item, message renderer.Message) (renderer.Page, error) {
+func (s Service) handleDir(w http.ResponseWriter, r *http.Request, request provider.Request, item absto.Item, message renderer.Message) (renderer.Page, error) {
 	if query.GetBool(r, "stats") {
-		return a.stats(r, request, message)
+		return s.stats(r, request, message)
 	}
 
-	items, err := a.listFiles(r, request, item)
+	items, err := s.listFiles(r, request, item)
 	if err != nil {
 		return errorReturn(request, err)
 	}
 
 	if query.GetBool(r, "geojson") {
-		a.serveGeoJSON(w, r, request, item, items)
+		s.serveGeoJSON(w, r, request, item, items)
 		return renderer.Page{}, nil
 	}
 
 	if query.GetBool(r, "thumbnail") {
-		a.thumbnailApp.List(w, r, item, items)
+		s.thumbnail.List(w, r, item, items)
 		return renderer.Page{}, nil
 	}
 
 	if query.GetBool(r, "download") {
-		a.Download(w, r, request, items)
+		s.Download(w, r, request, items)
 		return errorReturn(request, err)
 	}
 
-	go a.pushEvent(cntxt.WithoutDeadline(r.Context()), provider.NewAccessEvent(r.Context(), item, r))
+	go s.pushEvent(cntxt.WithoutDeadline(r.Context()), provider.NewAccessEvent(r.Context(), item, r))
 
 	if query.GetBool(r, "search") {
-		return a.search(r, request, item, items)
+		return s.search(r, request, item, items)
 	}
 
 	provider.SetPrefsCookie(w, request)
 
 	if request.IsStory() {
-		return a.story(r, request, item, items)
+		return s.story(r, request, item, items)
 	}
 
-	return a.list(r.Context(), request, message, item, items)
+	return s.list(r.Context(), request, message, item, items)
 }
 
-func (a App) listFiles(r *http.Request, request provider.Request, item absto.Item) (items []absto.Item, err error) {
-	ctx, end := telemetry.StartSpan(r.Context(), a.tracer, "files", trace.WithAttributes(attribute.String("item", item.Pathname)))
+func (s Service) listFiles(r *http.Request, request provider.Request, item absto.Item) (items []absto.Item, err error) {
+	ctx, end := telemetry.StartSpan(r.Context(), s.tracer, "files", trace.WithAttributes(attribute.String("item", item.Pathname)))
 	defer end(&err)
 
 	if query.GetBool(r, "search") {
-		items, err = a.searchApp.Files(r, request)
+		items, err = s.searchService.Files(r, request)
 	} else {
-		items, err = a.storageApp.List(ctx, request.Filepath())
+		items, err = s.storage.List(ctx, request.Filepath())
 	}
 
 	if request.IsStory() {
-		thumbnails, err := a.thumbnailApp.ListDirLarge(ctx, item)
+		thumbnails, err := s.thumbnail.ListDirLarge(ctx, item)
 		if err != nil {
 			slog.Error("list large thumbnails", "err", err, "item", item.Pathname)
 		}
 
 		storyItems := items[:0]
 		for _, item := range items {
-			if _, ok := thumbnails[a.thumbnailApp.PathForLarge(item)]; ok {
+			if _, ok := thumbnails[s.thumbnail.PathForLarge(item)]; ok {
 				storyItems = append(storyItems, item)
 			}
 		}
@@ -177,19 +177,19 @@ func (a App) listFiles(r *http.Request, request provider.Request, item absto.Ite
 	return items, err
 }
 
-func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provider.Request, item absto.Item, items []absto.Item) {
+func (s Service) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provider.Request, item absto.Item, items []absto.Item) {
 	if len(items) == 0 {
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 
-	ctx, end := telemetry.StartSpan(r.Context(), a.tracer, "geojson", trace.WithSpanKind(trace.SpanKindInternal))
+	ctx, end := telemetry.StartSpan(r.Context(), s.tracer, "geojson", trace.WithSpanKind(trace.SpanKindInternal))
 	defer end(nil)
 
 	var hash string
 	if query.GetBool(r, "search") {
-		hash = a.exifHash(ctx, items)
-	} else if exifs, err := a.metadataApp.ListDir(ctx, item); err != nil {
+		hash = s.exifHash(ctx, items)
+	} else if exifs, err := s.metadata.ListDir(ctx, item); err != nil {
 		slog.Error("list exifs", "err", err, "item", item.Pathname)
 	} else {
 		hash = provider.RawHash(exifs)
@@ -200,9 +200,9 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 		return
 	}
 
-	exifs, err := a.metadataApp.GetAllMetadataFor(ctx, items...)
+	exifs, err := s.metadata.GetAllMetadataFor(ctx, items...)
 	if err != nil {
-		a.error(w, r, request, err)
+		s.error(w, r, request, err)
 	}
 
 	w.Header().Add("Content-Type", "application/json; charset=utf-8")
@@ -210,10 +210,10 @@ func (a App) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provid
 	w.Header().Add("Etag", etag)
 	w.WriteHeader(http.StatusOK)
 
-	a.generateGeoJSON(ctx, w, request, items, exifs)
+	s.generateGeoJSON(ctx, w, request, items, exifs)
 }
 
-func (a App) generateGeoJSON(ctx context.Context, w io.Writer, request provider.Request, items []absto.Item, exifs map[string]provider.Metadata) {
+func (s Service) generateGeoJSON(ctx context.Context, w io.Writer, request provider.Request, items []absto.Item, exifs map[string]provider.Metadata) {
 	done := ctx.Done()
 	isDone := func() bool {
 		select {
@@ -290,11 +290,11 @@ func dichotomicFind(items []absto.Item, id string) absto.Item {
 	return absto.Item{}
 }
 
-func (a App) exifHash(ctx context.Context, items []absto.Item) string {
+func (s Service) exifHash(ctx context.Context, items []absto.Item) string {
 	hasher := hash.Stream()
 
 	for _, item := range items {
-		if info, err := a.storageApp.Stat(ctx, metadata.Path(item)); err == nil {
+		if info, err := s.storage.Stat(ctx, metadata.Path(item)); err == nil {
 			hasher.Write(info)
 		}
 	}
@@ -302,6 +302,6 @@ func (a App) exifHash(ctx context.Context, items []absto.Item) string {
 	return hasher.Sum()
 }
 
-func (a App) Get(w http.ResponseWriter, r *http.Request, request provider.Request) (renderer.Page, error) {
-	return a.getWithMessage(w, r, request, renderer.ParseMessage(r))
+func (s Service) Get(w http.ResponseWriter, r *http.Request, request provider.Request) (renderer.Page, error) {
+	return s.getWithMessage(w, r, request, renderer.ParseMessage(r))
 }

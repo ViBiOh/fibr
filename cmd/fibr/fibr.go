@@ -22,15 +22,15 @@ import (
 //go:embed templates static
 var content embed.FS
 
-func newLoginApp(tracerProvider trace.TracerProvider, basicConfig basicMemory.Config) provider.Auth {
-	basicApp, err := basicMemory.New(basicConfig)
+func newLoginService(tracerProvider trace.TracerProvider, basicConfig basicMemory.Config) provider.Auth {
+	basicService, err := basicMemory.New(basicConfig)
 	if err != nil {
 		slog.Error("auth memory", "err", err)
 		os.Exit(1)
 	}
 
-	basicProviderProvider := basic.New(basicApp, "fibr")
-	return authMiddleware.New(basicApp, tracerProvider, basicProviderProvider)
+	basicProviderProvider := basic.New(basicService, "fibr")
+	return authMiddleware.New(basicService, tracerProvider, basicProviderProvider)
 }
 
 func main() {
@@ -71,18 +71,18 @@ func main() {
 
 	endCtx := clients.health.End(ctx)
 
-	stopOnDone := Starters{services.amqpThumbnailApp, services.amqpExifApp, services.sanitizerApp}
+	stopOnDone := Starters{services.amqpThumbnail, services.amqpExif, services.sanitizer}
 	stopOnDone.Start(clients.health.Done(ctx))
 	defer stopOnDone.GracefulWait()
 
-	stopOnEnd := Starters{services.webhookApp, services.shareApp}
+	stopOnEnd := Starters{services.webhook, services.share}
 	stopOnEnd.Start(endCtx)
 	defer stopOnEnd.GracefulWait()
 
 	ports.Start(endCtx)
 	defer ports.GracefulWait()
 
-	go adapters.eventBus.Start(endCtx, adapters.storageApp, []provider.Renamer{services.thumbnailApp.Rename, services.metadataApp.Rename}, services.shareApp.EventConsumer, services.thumbnailApp.EventConsumer, services.metadataApp.EventConsumer, services.webhookApp.EventConsumer)
+	go adapters.eventBus.Start(endCtx, adapters.storage, []provider.Renamer{services.thumbnail.Rename, services.metadata.Rename}, services.share.EventConsumer, services.thumbnail.EventConsumer, services.metadata.EventConsumer, services.webhook.EventConsumer)
 
 	clients.health.WaitForTermination(ports.TerminateOnDone())
 }

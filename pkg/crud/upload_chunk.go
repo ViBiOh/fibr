@@ -18,23 +18,23 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
 )
 
-func (a App) uploadChunk(w http.ResponseWriter, r *http.Request, request provider.Request, fileName, chunkNumber string, file io.Reader) {
+func (s Service) uploadChunk(w http.ResponseWriter, r *http.Request, request provider.Request, fileName, chunkNumber string, file io.Reader) {
 	if file == nil {
-		a.error(w, r, request, model.WrapInvalid(errors.New("no file provided for save")))
+		s.error(w, r, request, model.WrapInvalid(errors.New("no file provided for save")))
 		return
 	}
 
 	fileName, err := safeFilename(fileName)
 	if err != nil {
-		a.error(w, r, request, model.WrapInvalid(err))
+		s.error(w, r, request, model.WrapInvalid(err))
 		return
 	}
 
-	tempDestination := filepath.Join(a.temporaryFolder, provider.Hash(fileName))
+	tempDestination := filepath.Join(s.temporaryFolder, provider.Hash(fileName))
 	tempFile := filepath.Join(tempDestination, chunkNumber)
 
 	if err = os.MkdirAll(tempDestination, absto.DirectoryPerm); err != nil {
-		a.error(w, r, request, model.WrapInternal(err))
+		s.error(w, r, request, model.WrapInternal(err))
 		return
 	}
 
@@ -59,58 +59,58 @@ func (a App) uploadChunk(w http.ResponseWriter, r *http.Request, request provide
 	}()
 
 	if _, err = io.Copy(writer, file); err != nil {
-		a.error(w, r, request, model.WrapInternal(err))
+		s.error(w, r, request, model.WrapInternal(err))
 		return
 	}
 
 	w.WriteHeader(http.StatusAccepted)
 }
 
-func (a App) mergeChunk(w http.ResponseWriter, r *http.Request, request provider.Request, values map[string]string) {
-	ctx, end := telemetry.StartSpan(r.Context(), a.tracer, "merge_chunk")
+func (s Service) mergeChunk(w http.ResponseWriter, r *http.Request, request provider.Request, values map[string]string) {
+	ctx, end := telemetry.StartSpan(r.Context(), s.tracer, "merge_chunk")
 	defer end(nil)
 
 	fileName, err := safeFilename(values["filename"])
 	if err != nil {
-		a.error(w, r, request, model.WrapInvalid(err))
+		s.error(w, r, request, model.WrapInvalid(err))
 		return
 	}
 
-	tempFolder := filepath.Join(a.temporaryFolder, provider.Hash(fileName))
+	tempFolder := filepath.Join(s.temporaryFolder, provider.Hash(fileName))
 	tempFile := filepath.Join(tempFolder, fileName)
 
-	if err := a.mergeChunkFiles(tempFolder, tempFile); err != nil {
-		a.error(w, r, request, model.WrapInternal(err))
+	if err := s.mergeChunkFiles(tempFolder, tempFile); err != nil {
+		s.error(w, r, request, model.WrapInternal(err))
 		return
 	}
 
 	var size int64
 	size, err = getUploadSize(values["size"])
 	if err != nil {
-		a.error(w, r, request, model.WrapInternal(err))
+		s.error(w, r, request, model.WrapInternal(err))
 		return
 	}
 
 	file, err := os.Open(tempFile)
 	if err != nil {
-		a.error(w, r, request, model.WrapInternal(err))
+		s.error(w, r, request, model.WrapInternal(err))
 		return
 	}
 
 	fileName, err = provider.SanitizeName(fileName, true)
 	if err != nil {
-		a.error(w, r, request, model.WrapInternal(err))
+		s.error(w, r, request, model.WrapInternal(err))
 		return
 	}
 	filePath := request.SubPath(fileName)
-	err = provider.WriteToStorage(ctx, a.storageApp, filePath, size, file)
+	err = provider.WriteToStorage(ctx, s.storage, filePath, size, file)
 
 	if err == nil {
 		go func(ctx context.Context) {
-			if info, infoErr := a.storageApp.Stat(ctx, filePath); infoErr != nil {
+			if info, infoErr := s.storage.Stat(ctx, filePath); infoErr != nil {
 				slog.Error("get info for upload event", "err", infoErr)
 			} else {
-				a.pushEvent(ctx, provider.NewUploadEvent(ctx, request, info, a.bestSharePath(filePath), a.rendererApp))
+				s.pushEvent(ctx, provider.NewUploadEvent(ctx, request, info, s.bestSharePath(filePath), s.renderer))
 			}
 		}(cntxt.WithoutDeadline(ctx))
 	}
@@ -119,10 +119,10 @@ func (a App) mergeChunk(w http.ResponseWriter, r *http.Request, request provider
 		slog.Error("delete chunk folder", "err", err, "folder", tempFolder)
 	}
 
-	a.postUpload(w, r, request, fileName)
+	s.postUpload(w, r, request, fileName)
 }
 
-func (a App) mergeChunkFiles(directory, destination string) error {
+func (s Service) mergeChunkFiles(directory, destination string) error {
 	writer, err := os.OpenFile(destination, os.O_RDWR|os.O_CREATE|os.O_TRUNC, absto.RegularFilePerm)
 	if err != nil {
 		return fmt.Errorf("open destination file `%s`: %w", destination, err)

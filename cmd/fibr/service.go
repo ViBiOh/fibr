@@ -15,75 +15,75 @@ import (
 )
 
 type services struct {
-	webhookApp       *webhook.App
-	shareApp         *share.App
-	sanitizerApp     sanitizer.App
-	fibrApp          fibr.App
-	rendererApp      *renderer.App
-	amqpThumbnailApp *amqphandler.App
-	amqpExifApp      *amqphandler.App
-	metadataApp      metadata.App
-	thumbnailApp     thumbnail.App
+	webhook       *webhook.Service
+	share         *share.Service
+	sanitizer     sanitizer.Service
+	fibr          fibr.Service
+	renderer      *renderer.Service
+	amqpThumbnail *amqphandler.Service
+	amqpExif      *amqphandler.Service
+	metadata      metadata.Service
+	thumbnail     thumbnail.Service
 }
 
 func newServices(config configuration, clients client, adapters adapters) (services, error) {
-	thumbnailApp, err := thumbnail.New(config.thumbnail, adapters.storageApp, clients.redis, clients.telemetry.MeterProvider(), clients.telemetry.TracerProvider(), clients.amqp)
+	thumbnailService, err := thumbnail.New(config.thumbnail, adapters.storage, clients.redis, clients.telemetry.MeterProvider(), clients.telemetry.TracerProvider(), clients.amqp)
 	if err != nil {
 		return services{}, err
 	}
 
-	rendererApp, err := renderer.New(config.renderer, content, fibr.FuncMap, clients.telemetry.MeterProvider(), clients.telemetry.TracerProvider())
+	rendererService, err := renderer.New(config.renderer, content, fibr.FuncMap, clients.telemetry.MeterProvider(), clients.telemetry.TracerProvider())
 	if err != nil {
 		return services{}, err
 	}
 
-	metadataApp, err := metadata.New(config.metadata, adapters.storageApp, clients.telemetry.MeterProvider(), clients.telemetry.TracerProvider(), clients.amqp, clients.redis, adapters.exclusiveApp)
+	metadataService, err := metadata.New(config.metadata, adapters.storage, clients.telemetry.MeterProvider(), clients.telemetry.TracerProvider(), clients.amqp, clients.redis, adapters.exclusiveService)
 	if err != nil {
 		return services{}, err
 	}
 
-	webhookApp := webhook.New(config.webhook, adapters.storageApp, clients.telemetry.MeterProvider(), clients.redis, rendererApp, thumbnailApp, adapters.exclusiveApp)
+	webhookService := webhook.New(config.webhook, adapters.storage, clients.telemetry.MeterProvider(), clients.redis, rendererService, thumbnailService, adapters.exclusiveService)
 
-	shareApp, err := share.New(config.share, adapters.storageApp, clients.redis, adapters.exclusiveApp)
+	shareService, err := share.New(config.share, adapters.storage, clients.redis, adapters.exclusiveService)
 	if err != nil {
 		return services{}, err
 	}
 
-	amqpThumbnailApp, err := amqphandler.New(config.amqpThumbnail, clients.amqp, clients.telemetry.MeterProvider(), clients.telemetry.TracerProvider(), thumbnailApp.AMQPHandler)
+	amqpThumbnailService, err := amqphandler.New(config.amqpThumbnail, clients.amqp, clients.telemetry.MeterProvider(), clients.telemetry.TracerProvider(), thumbnailService.AMQPHandler)
 	if err != nil {
 		return services{}, err
 	}
 
-	amqpExifApp, err := amqphandler.New(config.amqpExif, clients.amqp, clients.telemetry.MeterProvider(), clients.telemetry.TracerProvider(), metadataApp.AMQPHandler)
+	amqpExifService, err := amqphandler.New(config.amqpExif, clients.amqp, clients.telemetry.MeterProvider(), clients.telemetry.TracerProvider(), metadataService.AMQPHandler)
 	if err != nil {
 		return services{}, err
 	}
 
-	searchApp := search.New(adapters.filteredStorage, thumbnailApp, metadataApp, adapters.exclusiveApp, clients.telemetry.TracerProvider())
+	searchService := search.New(adapters.filteredStorage, thumbnailService, metadataService, adapters.exclusiveService, clients.telemetry.TracerProvider())
 
-	crudApp, err := crud.New(config.crud, adapters.storageApp, adapters.filteredStorage, rendererApp, shareApp, webhookApp, thumbnailApp, metadataApp, searchApp, adapters.eventBus.Push, clients.telemetry.TracerProvider())
+	crudService, err := crud.New(config.crud, adapters.storage, adapters.filteredStorage, rendererService, shareService, webhookService, thumbnailService, metadataService, searchService, adapters.eventBus.Push, clients.telemetry.TracerProvider())
 	if err != nil {
 		return services{}, err
 	}
 
-	sanitizerApp := sanitizer.New(config.sanitizer, adapters.filteredStorage, adapters.exclusiveApp, crudApp, adapters.eventBus.Push)
+	sanitizerService := sanitizer.New(config.sanitizer, adapters.filteredStorage, adapters.exclusiveService, crudService, adapters.eventBus.Push)
 
-	var middlewareApp provider.Auth
-	if !*config.disableAuth {
-		middlewareApp = newLoginApp(clients.telemetry.TracerProvider(), config.basic)
+	var middlewareService provider.Auth
+	if !config.disableAuth {
+		middlewareService = newLoginService(clients.telemetry.TracerProvider(), config.basic)
 	}
 
-	fibrApp := fibr.New(&crudApp, rendererApp, shareApp, webhookApp, middlewareApp)
+	fibrService := fibr.New(&crudService, rendererService, shareService, webhookService, middlewareService)
 
 	return services{
-		amqpThumbnailApp: amqpThumbnailApp,
-		amqpExifApp:      amqpExifApp,
-		fibrApp:          fibrApp,
-		sanitizerApp:     sanitizerApp,
-		rendererApp:      rendererApp,
-		webhookApp:       webhookApp,
-		shareApp:         shareApp,
-		thumbnailApp:     thumbnailApp,
-		metadataApp:      metadataApp,
+		amqpThumbnail: amqpThumbnailService,
+		amqpExif:      amqpExifService,
+		fibr:          fibrService,
+		sanitizer:     sanitizerService,
+		renderer:      rendererService,
+		webhook:       webhookService,
+		share:         shareService,
+		thumbnail:     thumbnailService,
+		metadata:      metadataService,
 	}, nil
 }

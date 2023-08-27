@@ -15,10 +15,10 @@ type entry struct {
 	Key   string
 }
 
-func (a App) stats(r *http.Request, request provider.Request, message renderer.Message) (renderer.Page, error) {
+func (s Service) stats(r *http.Request, request provider.Request, message renderer.Message) (renderer.Page, error) {
 	pathname := request.Filepath()
 
-	stats, err := a.computeStats(r.Context(), pathname)
+	stats, err := s.computeStats(r.Context(), pathname)
 	if err != nil {
 		return renderer.NewPage("", http.StatusInternalServerError, nil), err
 	}
@@ -42,10 +42,10 @@ func (a App) stats(r *http.Request, request provider.Request, message renderer.M
 	}), nil
 }
 
-func (a App) computeStats(ctx context.Context, pathname string) (map[string]uint64, error) {
+func (s Service) computeStats(ctx context.Context, pathname string) (map[string]uint64, error) {
 	var filesCount, directoriesCount, filesSize, metadataSize uint64
 
-	err := a.storageApp.Walk(ctx, pathname, func(item absto.Item) error {
+	err := s.storage.Walk(ctx, pathname, func(item absto.Item) error {
 		if item.IsDir() {
 			directoriesCount++
 		} else {
@@ -59,7 +59,7 @@ func (a App) computeStats(ctx context.Context, pathname string) (map[string]uint
 		return nil, fmt.Errorf("browse files: %w", err)
 	}
 
-	err = a.rawStorageApp.Walk(ctx, provider.MetadataDirectoryName+pathname, func(item absto.Item) error {
+	err = s.rawStorage.Walk(ctx, provider.MetadataDirectoryName+pathname, func(item absto.Item) error {
 		if !item.IsDir() {
 			metadataSize += uint64(item.Size())
 		}

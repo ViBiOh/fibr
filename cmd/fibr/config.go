@@ -28,34 +28,34 @@ import (
 )
 
 type configuration struct {
-	alcotest      alcotest.Config
-	logger        logger.Config
-	telemetry     telemetry.Config
-	appServer     server.Config
-	health        health.Config
-	owasp         owasp.Config
-	basic         basicMemory.Config
-	storage       storage.Config
-	crud          crud.Config
-	sanitizer     sanitizer.Config
-	share         share.Config
-	webhook       webhook.Config
-	renderer      renderer.Config
-	absto         absto.Config
 	thumbnail     thumbnail.Config
 	metadata      metadata.Config
+	telemetry     telemetry.Config
+	webhook       webhook.Config
+	alcotest      alcotest.Config
+	basic         basicMemory.Config
+	share         share.Config
+	storage       storage.Config
+	logger        logger.Config
+	renderer      renderer.Config
+	crud          crud.Config
+	owasp         owasp.Config
 	amqp          amqp.Config
+	absto         absto.Config
 	amqpThumbnail amqphandler.Config
 	amqpExif      amqphandler.Config
 	redis         redis.Config
-	disableAuth   *bool
+	appServer     server.Config
+	health        health.Config
+	sanitizer     sanitizer.Config
+	disableAuth   bool
 }
 
 func newConfig() (configuration, error) {
 	fs := flag.NewFlagSet("fibr", flag.ExitOnError)
 	fs.Usage = flags.Usage(fs)
 
-	return configuration{
+	config := configuration{
 		appServer:     server.Flags(fs, "", flags.NewOverride("ReadTimeout", time.Minute*2), flags.NewOverride("WriteTimeout", time.Minute*2)),
 		health:        health.Flags(fs, ""),
 		alcotest:      alcotest.Flags(fs, ""),
@@ -76,6 +76,9 @@ func newConfig() (configuration, error) {
 		amqpThumbnail: amqphandler.Flags(fs, "amqpThumbnail", flags.NewOverride("Exchange", "fibr"), flags.NewOverride("Queue", "fibr.thumbnail"), flags.NewOverride("RoutingKey", "thumbnail_output")),
 		amqpExif:      amqphandler.Flags(fs, "amqpExif", flags.NewOverride("Exchange", "fibr"), flags.NewOverride("Queue", "fibr.exif"), flags.NewOverride("RoutingKey", "exif_output")),
 		redis:         redis.Flags(fs, "redis", flags.NewOverride("Address", []string{})),
-		disableAuth:   flags.New("NoAuth", "Disable basic authentification").DocPrefix("auth").Bool(fs, false, nil),
-	}, fs.Parse(os.Args[1:])
+	}
+
+	flags.New("NoAuth", "Disable basic authentification").DocPrefix("auth").BoolVar(fs, &config.disableAuth, false, nil)
+
+	return config, fs.Parse(os.Args[1:])
 }

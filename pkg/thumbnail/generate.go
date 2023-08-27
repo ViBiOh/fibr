@@ -13,20 +13,18 @@ import (
 	vith "github.com/ViBiOh/vith/pkg/model"
 )
 
-const (
-	defaultTimeout = time.Minute * 2
-)
+const defaultTimeout = time.Minute * 2
 
-func (a App) generate(ctx context.Context, item absto.Item, scale uint64) (err error) {
+func (s Service) generate(ctx context.Context, item absto.Item, scale uint64) (err error) {
 	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
 	itemType := typeOfItem(item)
 
 	var resp *http.Response
-	resp, err = a.requestVith(ctx, item, scale)
+	resp, err = s.requestVith(ctx, item, scale)
 	if err != nil {
-		a.increaseMetric(ctx, itemType.String(), "error")
+		s.increaseMetric(ctx, itemType.String(), "error")
 		return fmt.Errorf("request thumbnailer: %w", err)
 	}
 
@@ -44,28 +42,28 @@ func (a App) generate(ctx context.Context, item absto.Item, scale uint64) (err e
 		return nil
 	}
 
-	err = provider.WriteToStorage(ctx, a.storageApp, a.PathForScale(item, scale), resp.ContentLength, resp.Body)
+	err = provider.WriteToStorage(ctx, s.storage, s.PathForScale(item, scale), resp.ContentLength, resp.Body)
 	if err == nil {
-		a.increaseMetric(ctx, itemType.String(), "save")
+		s.increaseMetric(ctx, itemType.String(), "save")
 	}
 
 	return err
 }
 
-func (a App) requestVith(ctx context.Context, item absto.Item, scale uint64) (*http.Response, error) {
+func (s Service) requestVith(ctx context.Context, item absto.Item, scale uint64) (*http.Response, error) {
 	itemType := typeOfItem(item)
-	outputName := a.PathForScale(item, scale)
+	outputName := s.PathForScale(item, scale)
 
-	if a.amqpClient != nil {
-		a.increaseMetric(ctx, itemType.String(), "publish")
-		return nil, a.amqpClient.PublishJSON(ctx, vith.NewRequest(item.Pathname, outputName, itemType, scale), a.amqpExchange, a.amqpThumbnailRoutingKey)
+	if s.amqpClient != nil {
+		s.increaseMetric(ctx, itemType.String(), "publish")
+		return nil, s.amqpClient.PublishJSON(ctx, vith.NewRequest(item.Pathname, outputName, itemType, scale), s.amqpExchange, s.amqpThumbnailRoutingKey)
 	}
 
-	a.increaseMetric(ctx, itemType.String(), "request")
+	s.increaseMetric(ctx, itemType.String(), "request")
 
-	if a.directAccess {
-		return a.vithRequest.Method(http.MethodGet).Path("%s?type=%s&scale=%d&output=%s", item.Pathname, itemType, scale, outputName).Send(ctx, nil)
+	if s.directAccess {
+		return s.vithRequest.Method(http.MethodGet).Path("%s?type=%s&scale=%d&output=%s", item.Pathname, itemType, scale, outputName).Send(ctx, nil)
 	}
 
-	return provider.SendLargeFile(ctx, a.storageApp, item, a.vithRequest.Method(http.MethodPost).Path("?type=%s&scale=%d", itemType, scale))
+	return provider.SendLargeFile(ctx, s.storage, item, s.vithRequest.Method(http.MethodPost).Path("?type=%s&scale=%d", itemType, scale))
 }

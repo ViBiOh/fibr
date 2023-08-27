@@ -11,50 +11,50 @@ import (
 	"github.com/ViBiOh/vith/pkg/model"
 )
 
-func (a App) CanHaveThumbnail(item absto.Item) bool {
-	return !item.IsDir() && provider.ThumbnailExtensions[item.Extension] && (a.maxSize == 0 || item.Size() < a.maxSize || a.directAccess)
+func (s Service) CanHaveThumbnail(item absto.Item) bool {
+	return !item.IsDir() && provider.ThumbnailExtensions[item.Extension] && (s.maxSize == 0 || item.Size() < s.maxSize || s.directAccess)
 }
 
-func (a App) HasLargeThumbnail(ctx context.Context, item absto.Item) bool {
-	if a.largeSize == 0 {
+func (s Service) HasLargeThumbnail(ctx context.Context, item absto.Item) bool {
+	if s.largeSize == 0 {
 		return false
 	}
 
-	return a.HasThumbnail(ctx, item, a.largeSize)
+	return s.HasThumbnail(ctx, item, s.largeSize)
 }
 
-func (a App) HasThumbnail(ctx context.Context, item absto.Item, scale uint64) bool {
+func (s Service) HasThumbnail(ctx context.Context, item absto.Item, scale uint64) bool {
 	if item.IsDir() {
 		return false
 	}
 
-	_, err := a.Info(ctx, a.PathForScale(item, scale))
+	_, err := s.Info(ctx, s.PathForScale(item, scale))
 	return err == nil
 }
 
-func (a App) Path(item absto.Item) string {
-	return a.PathForScale(item, SmallSize)
+func (s Service) Path(item absto.Item) string {
+	return s.PathForScale(item, SmallSize)
 }
 
-func (a App) PathForLarge(item absto.Item) string {
-	return a.PathForScale(item, a.largeSize)
+func (s Service) PathForLarge(item absto.Item) string {
+	return s.PathForScale(item, s.largeSize)
 }
 
-func (a App) PathForScale(item absto.Item, scale uint64) string {
+func (s Service) PathForScale(item absto.Item, scale uint64) string {
 	if item.IsDir() {
 		return provider.MetadataDirectory(item)
 	}
 
 	switch scale {
-	case a.largeSize:
+	case s.largeSize:
 		item.ID = item.ID + "_large"
 	}
 
 	return getThumbnailPathForExtension(item, "webp")
 }
 
-func (a App) GetChunk(ctx context.Context, pathname string) (absto.Item, error) {
-	return a.Info(ctx, provider.MetadataDirectoryName+pathname)
+func (s Service) GetChunk(ctx context.Context, pathname string) (absto.Item, error) {
+	return s.Info(ctx, provider.MetadataDirectoryName+pathname)
 }
 
 func getStreamPath(item absto.Item) string {
@@ -80,9 +80,9 @@ func redisKey(filename string) string {
 	return version.Redis("thumbnail:" + provider.Hash(filename))
 }
 
-func (a App) Info(ctx context.Context, pathname string) (item absto.Item, err error) {
-	ctx, end := telemetry.StartSpan(ctx, a.tracer, "info")
+func (s Service) Info(ctx context.Context, pathname string) (item absto.Item, err error) {
+	ctx, end := telemetry.StartSpan(ctx, s.tracer, "info")
 	defer end(&err)
 
-	return a.cacheApp.Get(ctx, pathname)
+	return s.cache.Get(ctx, pathname)
 }

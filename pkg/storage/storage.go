@@ -13,27 +13,29 @@ import (
 )
 
 type Config struct {
-	ignore *string
+	Ignore string
 }
 
 func Flags(fs *flag.FlagSet, prefix string) Config {
-	return Config{
-		ignore: flags.New("IgnorePattern", "Ignore pattern when listing files or directory").Prefix(prefix).DocPrefix("crud").String(fs, "", nil),
-	}
+	var config Config
+
+	flags.New("IgnorePattern", "Ignore pattern when listing files or directory").Prefix(prefix).DocPrefix("crud").StringVar(fs, &config.Ignore, "", nil)
+
+	return config
 }
 
 func Get(config Config, storage absto.Storage) (absto.Storage, error) {
 	var pattern *regexp.Regexp
 
-	if ignore := *config.ignore; len(ignore) != 0 {
+	if len(config.Ignore) != 0 {
 		var err error
 
-		pattern, err = regexp.Compile(ignore)
+		pattern, err = regexp.Compile(config.Ignore)
 		if err != nil {
 			return storage, fmt.Errorf("regexp compile: %w", err)
 		}
 
-		slog.Info("Ignoring files with pattern", "pattern", ignore)
+		slog.Info("Ignoring files with pattern", "pattern", config.Ignore)
 	}
 
 	return storage.WithIgnoreFn(func(item absto.Item) bool {

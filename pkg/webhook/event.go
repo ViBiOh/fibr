@@ -20,11 +20,11 @@ import (
 
 const pubsubThumbnailDiscordDelay = 10 * time.Second
 
-func (a *App) EventConsumer(ctx context.Context, event provider.Event) {
-	a.mutex.RLock()
-	defer a.mutex.RUnlock()
+func (s *Service) EventConsumer(ctx context.Context, event provider.Event) {
+	s.mutex.RLock()
+	defer s.mutex.RUnlock()
 
-	for _, webhook := range a.webhooks {
+	for _, webhook := range s.webhooks {
 		if !webhook.Match(event) {
 			continue
 		}
@@ -33,22 +33,22 @@ func (a *App) EventConsumer(ctx context.Context, event provider.Event) {
 
 		switch webhook.Kind {
 		case provider.Raw:
-			statusCode, err = a.rawHandle(ctx, webhook, event)
+			statusCode, err = s.rawHandle(ctx, webhook, event)
 
 		case provider.Discord:
-			statusCode, err = a.discordHandle(ctx, webhook, event)
+			statusCode, err = s.discordHandle(ctx, webhook, event)
 
 		case provider.Slack:
-			statusCode, err = a.slackHandle(ctx, webhook, event)
+			statusCode, err = s.slackHandle(ctx, webhook, event)
 
 		case provider.Telegram:
-			statusCode, err = a.telegramHandle(ctx, webhook, event)
+			statusCode, err = s.telegramHandle(ctx, webhook, event)
 
 		default:
 			slog.Warn("unknown kind for webhook", "kind", webhook.Kind)
 		}
 
-		a.increaseMetric(ctx, strconv.Itoa(statusCode))
+		s.increaseMetric(ctx, strconv.Itoa(statusCode))
 
 		if err != nil {
 			slog.Error("error while sending webhook", "err", err)
@@ -58,7 +58,7 @@ func (a *App) EventConsumer(ctx context.Context, event provider.Event) {
 	if event.Type == provider.DeleteEvent {
 		// Fire a goroutine to release the mutex lock
 		go func() {
-			if err := a.deleteItem(ctx, event.Item); err != nil {
+			if err := s.deleteItem(ctx, event.Item); err != nil {
 				slog.Error("delete webhooks for item", "err", err)
 			}
 		}()
@@ -78,13 +78,13 @@ func send(ctx context.Context, id string, req request.Request, payload any) (int
 	return resp.StatusCode, nil
 }
 
-func (a *App) rawHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
-	return send(ctx, webhook.ID, request.Post(webhook.URL).Header("User-Agent", "fibr-webhook").WithSignatureAuthorization("fibr", a.hmacSecret), event)
+func (s *Service) rawHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
+	return send(ctx, webhook.ID, request.Post(webhook.URL).Header("User-Agent", "fibr-webhook").WithSignatureAuthorization("fibr", s.hmacSecret), event)
 }
 
-func (a *App) discordHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
+func (s *Service) discordHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
 	if event.Type != provider.UploadEvent && event.Type != provider.RenameEvent && event.Type != provider.DescriptionEvent {
-		return send(ctx, webhook.ID, request.Post(webhook.URL), discord.NewDataResponse(a.eventText(event)))
+		return send(ctx, webhook.ID, request.Post(webhook.URL), discord.NewDataResponse(s.eventText(event)))
 	}
 
 	title := path.Base(path.Dir(event.Item.Pathname))
@@ -115,12 +115,12 @@ func (a *App) discordHandle(ctx context.Context, webhook provider.Webhook, event
 		Fields:      fields,
 	}
 
-	if a.redisClient != nil {
+	if s.redisClient != nil {
 		// Waiting a couple of seconds before checking for thumbnail
 		time.Sleep(pubsubThumbnailDiscordDelay)
 	}
 
-	if a.thumbnailApp.HasThumbnail(ctx, event.Item, thumbnail.SmallSize) {
+	if s.thumbnail.HasThumbnail(ctx, event.Item, thumbnail.SmallSize) {
 		thumbnailURL := event.GetURL() + "?thumbnail"
 
 		if _, ok := provider.VideoExtensions[event.Item.Extension]; ok {
@@ -133,9 +133,9 @@ func (a *App) discordHandle(ctx context.Context, webhook provider.Webhook, event
 	return send(ctx, webhook.ID, request.Post(webhook.URL), discord.NewDataResponse("").AddEmbed(embed))
 }
 
-func (a *App) slackHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
+func (s *Service) slackHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
 	if event.Type != provider.UploadEvent && event.Type != provider.RenameEvent && event.Type != provider.DescriptionEvent {
-		return send(ctx, webhook.ID, request.Post(webhook.URL), slack.NewResponse(a.eventText(event)))
+		return send(ctx, webhook.ID, request.Post(webhook.URL), slack.NewResponse(s.eventText(event)))
 	}
 
 	title := path.Base(path.Dir(event.Item.Pathname))
@@ -164,21 +164,21 @@ func (a *App) slackHandle(ctx context.Context, webhook provider.Webhook, event p
 		section = section.AddField(extraField)
 	}
 
-	if a.thumbnailApp.CanHaveThumbnail(event.Item) {
+	if s.thumbnail.CanHaveThumbnail(event.Item) {
 		section.Accessory = slack.NewAccessory(event.GetURL()+"?thumbnail", fmt.Sprintf("Thumbnail of %s", event.Item.Name()))
 	}
 
-	return send(ctx, webhook.ID, request.Post(webhook.URL), slack.NewResponse(a.eventText(event)).AddBlock(slack.NewSection(slack.NewText(fmt.Sprintf("*<%s|%s>*", contentURL, title)))).AddBlock(section))
+	return send(ctx, webhook.ID, request.Post(webhook.URL), slack.NewResponse(s.eventText(event)).AddBlock(slack.NewSection(slack.NewText(fmt.Sprintf("*<%s|%s>*", contentURL, title)))).AddBlock(section))
 }
 
-func (a *App) telegramHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
-	return send(ctx, webhook.ID, request.Post(fmt.Sprintf("%s&text=%s", webhook.URL, url.QueryEscape(a.eventText(event)))), nil)
+func (s *Service) telegramHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
+	return send(ctx, webhook.ID, request.Post(fmt.Sprintf("%s&text=%s", webhook.URL, url.QueryEscape(s.eventText(event)))), nil)
 }
 
-func (a *App) eventText(event provider.Event) string {
+func (s *Service) eventText(event provider.Event) string {
 	switch event.Type {
 	case provider.AccessEvent:
-		return a.accessEvent(event)
+		return s.accessEvent(event)
 	case provider.CreateDir:
 		return fmt.Sprintf("🗂 A directory `%s` has been created: %s", event.Item.Name(), event.GetURL())
 	case provider.UploadEvent:
@@ -197,9 +197,9 @@ func (a *App) eventText(event provider.Event) string {
 	}
 }
 
-func (a *App) accessEvent(event provider.Event) string {
+func (s *Service) accessEvent(event provider.Event) string {
 	content := strings.Builder{}
-	content.WriteString(fmt.Sprintf("💻 Someone connected to Fibr from %s at %s", a.rendererApp.PublicURL(event.URL), event.Time.Format(time.RFC3339)))
+	content.WriteString(fmt.Sprintf("💻 Someone connected to Fibr from %s at %s", s.rendererService.PublicURL(event.URL), event.Time.Format(time.RFC3339)))
 
 	if len(event.Metadata) > 0 {
 		content.WriteString("\n```\n")
@@ -214,11 +214,11 @@ func (a *App) accessEvent(event provider.Event) string {
 	return content.String()
 }
 
-func (a *App) deleteItem(ctx context.Context, item absto.Item) error {
-	return a.Exclusive(ctx, item.ID, func(_ context.Context) error {
-		for id, webhook := range a.webhooks {
+func (s *Service) deleteItem(ctx context.Context, item absto.Item) error {
+	return s.Exclusive(ctx, item.ID, func(_ context.Context) error {
+		for id, webhook := range s.webhooks {
 			if webhook.Pathname == item.Pathname {
-				if err := a.delete(ctx, id); err != nil {
+				if err := s.delete(ctx, id); err != nil {
 					return fmt.Errorf("delete webhook `%s`: %w", id, err)
 				}
 			}

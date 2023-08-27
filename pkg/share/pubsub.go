@@ -6,20 +6,20 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
-func (a *App) PubSubHandle(share provider.Share, err error) {
+func (s *Service) PubSubHandle(share provider.Share, err error) {
 	if err != nil {
 		slog.Error("Share's PubSub", "err", err)
 		return
 	}
 
-	a.mutex.Lock()
-	defer a.mutex.Unlock()
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
 
 	slog.Info("Share's PubSub", "id", share.ID)
 
 	if share.Creation.IsZero() {
-		delete(a.shares, share.ID)
+		delete(s.shares, share.ID)
 	} else {
-		a.shares[share.ID] = share
+		s.shares[share.ID] = share
 	}
 }

@@ -75,8 +75,8 @@ func BenchmarkServeGeoJSON(b *testing.B) {
 
 	mockExif.EXPECT().ListDir(gomock.Any(), gomock.Any()).Return(items, nil).AnyTimes()
 
-	instance := App{
-		metadataApp: mockExif,
+	instance := Service{
+		metadata: mockExif,
 	}
 
 	r := httptest.NewRequest(http.MethodGet, "/", nil)

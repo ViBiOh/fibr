@@ -30,16 +30,16 @@ const SmallSize uint64 = 150
 
 var cacheDuration = fmt.Sprintf("private, max-age=%.0f", (time.Minute * 5).Seconds())
 
-type App struct {
-	redisClient     redis.Client
-	tracer          trace.Tracer
-	storageApp      absto.Storage
-	smallStorageApp absto.Storage
-	largeStorageApp absto.Storage
-	pathnameInput   chan absto.Item
-	metric          metric.Int64Counter
+type Service struct {
+	redisClient   redis.Client
+	tracer        trace.Tracer
+	storage       absto.Storage
+	smallStorage  absto.Storage
+	largeStorage  absto.Storage
+	pathnameInput chan absto.Item
+	metric        metric.Int64Counter
 
-	cacheApp *cache.App[string, absto.Item]
+	cache *cache.Cache[string, absto.Item]
 
 	amqpClient              *amqp.Client
 	amqpThumbnailRoutingKey string
@@ -55,82 +55,84 @@ type App struct {
 }
 
 type Config struct {
-	vithURL  *string
-	vithUser *string
-	vithPass *string
+	VithURL  string
+	VithUser string
+	VithPass string
 
-	amqpExchange            *string
-	amqpStreamRoutingKey    *string
-	amqpThumbnailRoutingKey *string
+	AmqpExchange            string
+	AmqpStreamRoutingKey    string
+	AmqpThumbnailRoutingKey string
 
-	maxSize      *int64
-	minBitrate   *uint64
-	directAccess *bool
+	MaxSize      int64
+	MinBitrate   uint64
+	DirectAccess bool
 
-	largeSize *uint64
+	LargeSize uint64
 }
 
 func Flags(fs *flag.FlagSet, prefix string) Config {
-	return Config{
-		vithURL:  flags.New("URL", "Vith Thumbnail URL").Prefix(prefix).DocPrefix("thumbnail").String(fs, "http://vith:1080", nil),
-		vithUser: flags.New("User", "Vith Thumbnail Basic Auth User").Prefix(prefix).DocPrefix("thumbnail").String(fs, "", nil),
-		vithPass: flags.New("Password", "Vith Thumbnail Basic Auth Password").Prefix(prefix).DocPrefix("thumbnail").String(fs, "", nil),
+	var config Config
 
-		directAccess: flags.New("DirectAccess", "Use Vith with direct access to filesystem (no large file upload, send a GET request, Basic Auth recommended)").Prefix(prefix).DocPrefix("thumbnail").Bool(fs, false, nil),
-		maxSize:      flags.New("MaxSize", "Maximum file size (in bytes) for generating thumbnail (0 to no limit). Not used if DirectAccess enabled.").Prefix(prefix).DocPrefix("thumbnail").Int64(fs, 1024*1024*200, nil),
-		minBitrate:   flags.New("MinBitrate", "Minimal video bitrate (in bits per second) to generate a streamable version (in HLS), if DirectAccess enabled").Prefix(prefix).DocPrefix("thumbnail").Uint64(fs, 80*1000*1000, nil),
+	flags.New("URL", "Vith Thumbnail URL").Prefix(prefix).DocPrefix("thumbnail").StringVar(fs, &config.VithURL, "http://vith:1080", nil)
+	flags.New("User", "Vith Thumbnail Basic Auth User").Prefix(prefix).DocPrefix("thumbnail").StringVar(fs, &config.VithUser, "", nil)
+	flags.New("Password", "Vith Thumbnail Basic Auth Password").Prefix(prefix).DocPrefix("thumbnail").StringVar(fs, &config.VithPass, "", nil)
 
-		amqpExchange:            flags.New("AmqpExchange", "AMQP Exchange Name").Prefix(prefix).DocPrefix("thumbnail").String(fs, "fibr", nil),
-		amqpStreamRoutingKey:    flags.New("AmqpStreamRoutingKey", "AMQP Routing Key for stream").Prefix(prefix).DocPrefix("thumbnail").String(fs, "stream", nil),
-		amqpThumbnailRoutingKey: flags.New("AmqpThumbnailRoutingKey", "AMQP Routing Key for thumbnail").Prefix(prefix).DocPrefix("thumbnail").String(fs, "thumbnail", nil),
+	flags.New("DirectAccess", "Use Vith with direct access to filesystem (no large file upload, send a GET request, Basic Auth recommended)").Prefix(prefix).DocPrefix("thumbnail").BoolVar(fs, &config.DirectAccess, false, nil)
+	flags.New("MaxSize", "Maximum file size (in bytes) for generating thumbnail (0 to no limit). Not used if DirectAccess enabled.").Prefix(prefix).DocPrefix("thumbnail").Int64Var(fs, &config.MaxSize, 1024*1024*200, nil)
+	flags.New("MinBitrate", "Minimal video bitrate (in bits per second) to generate a streamable version (in HLS), if DirectAccess enabled").Prefix(prefix).DocPrefix("thumbnail").Uint64Var(fs, &config.MinBitrate, 80*1000*1000, nil)
 
-		largeSize: flags.New("LargeSize", "Size of large thumbnail for story display (thumbnail are always squared). 0 to disable").Prefix(prefix).DocPrefix("thumbnail").Uint64(fs, 800, nil),
-	}
+	flags.New("AmqpExchange", "AMQP Exchange Name").Prefix(prefix).DocPrefix("thumbnail").StringVar(fs, &config.AmqpExchange, "fibr", nil)
+	flags.New("AmqpStreamRoutingKey", "AMQP Routing Key for stream").Prefix(prefix).DocPrefix("thumbnail").StringVar(fs, &config.AmqpStreamRoutingKey, "stream", nil)
+	flags.New("AmqpThumbnailRoutingKey", "AMQP Routing Key for thumbnail").Prefix(prefix).DocPrefix("thumbnail").StringVar(fs, &config.AmqpThumbnailRoutingKey, "thumbnail", nil)
+
+	flags.New("LargeSize", "Size of large thumbnail for story display (thumbnail are always squared). 0 to disable").Prefix(prefix).DocPrefix("thumbnail").Uint64Var(fs, &config.LargeSize, 800, nil)
+
+	return config
 }
 
-func New(config Config, storage absto.Storage, redisClient redis.Client, meterProvider metric.MeterProvider, traceProvider trace.TracerProvider, amqpClient *amqp.Client) (App, error) {
+func New(config Config, storage absto.Storage, redisClient redis.Client, meterProvider metric.MeterProvider, traceProvider trace.TracerProvider, amqpClient *amqp.Client) (Service, error) {
 	var amqpExchange string
+
 	if amqpClient != nil {
-		amqpExchange = strings.TrimSpace(*config.amqpExchange)
+		amqpExchange = config.AmqpExchange
 
 		if err := amqpClient.Publisher(amqpExchange, "direct", nil); err != nil {
-			return App{}, fmt.Errorf("configure amqp: %w", err)
+			return Service{}, fmt.Errorf("configure amqp: %w", err)
 		}
 	}
 
-	largeSize := *config.largeSize
 	var sizes []uint64
-	if largeSize > 0 {
-		sizes = []uint64{SmallSize, largeSize}
+	if config.LargeSize > 0 {
+		sizes = []uint64{SmallSize, config.LargeSize}
 	} else {
 		sizes = []uint64{SmallSize}
 	}
 
-	app := App{
-		vithRequest: request.New().URL(*config.vithURL).BasicAuth(*config.vithUser, *config.vithPass).WithClient(provider.SlowClient),
+	service := Service{
+		vithRequest: request.New().URL(config.VithURL).BasicAuth(config.VithUser, config.VithPass).WithClient(provider.SlowClient),
 
-		maxSize:      *config.maxSize,
-		minBitrate:   *config.minBitrate,
-		directAccess: *config.directAccess,
+		maxSize:      config.MaxSize,
+		minBitrate:   config.MinBitrate,
+		directAccess: config.DirectAccess,
 
 		redisClient: redisClient,
 		tracer:      traceProvider.Tracer("thumbnail"),
 
 		amqpExchange:            amqpExchange,
-		amqpStreamRoutingKey:    strings.TrimSpace(*config.amqpStreamRoutingKey),
-		amqpThumbnailRoutingKey: strings.TrimSpace(*config.amqpThumbnailRoutingKey),
+		amqpStreamRoutingKey:    config.AmqpStreamRoutingKey,
+		amqpThumbnailRoutingKey: config.AmqpThumbnailRoutingKey,
 
-		storageApp: storage,
-		smallStorageApp: storage.WithIgnoreFn(func(item absto.Item) bool {
+		storage: storage,
+		smallStorage: storage.WithIgnoreFn(func(item absto.Item) bool {
 			return !strings.HasSuffix(item.Name(), ".webp") || strings.HasSuffix(item.Name(), "_large.webp")
 		}),
-		largeStorageApp: storage.WithIgnoreFn(func(item absto.Item) bool {
+		largeStorage: storage.WithIgnoreFn(func(item absto.Item) bool {
 			return !strings.HasSuffix(item.Name(), "_large.webp")
 		}),
 		amqpClient:    amqpClient,
 		pathnameInput: make(chan absto.Item, provider.MaxConcurrency),
 
-		largeSize: largeSize,
+		largeSize: config.LargeSize,
 		sizes:     sizes,
 	}
 
@@ -139,25 +141,25 @@ func New(config Config, storage absto.Storage, redisClient redis.Client, meterPr
 
 		var err error
 
-		app.metric, err = meter.Int64Counter("fibr_thumbnail")
+		service.metric, err = meter.Int64Counter("fibr_thumbnail")
 		if err != nil {
-			return app, fmt.Errorf("create thumbnail counter: %w", err)
+			return service, fmt.Errorf("create thumbnail counter: %w", err)
 		}
 	}
 
-	app.cacheApp = cache.New(redisClient, redisKey, func(ctx context.Context, pathname string) (absto.Item, error) {
-		return app.storageApp.Stat(ctx, pathname)
+	service.cache = cache.New(redisClient, redisKey, func(ctx context.Context, pathname string) (absto.Item, error) {
+		return service.storage.Stat(ctx, pathname)
 	}, traceProvider).WithMaxConcurrency(provider.MaxConcurrency)
 
-	return app, nil
+	return service, nil
 }
 
-func (a App) LargeThumbnailSize() uint64 {
+func (a Service) LargeThumbnailSize() uint64 {
 	return a.largeSize
 }
 
-func (a App) Stream(w http.ResponseWriter, r *http.Request, item absto.Item) {
-	reader, err := a.storageApp.ReadFrom(r.Context(), getStreamPath(item))
+func (a Service) Stream(w http.ResponseWriter, r *http.Request, item absto.Item) {
+	reader, err := a.storage.ReadFrom(r.Context(), getStreamPath(item))
 	if err != nil {
 		if absto.IsNotExist(err) {
 			w.WriteHeader(http.StatusNoContent)
@@ -174,7 +176,7 @@ func (a App) Stream(w http.ResponseWriter, r *http.Request, item absto.Item) {
 	http.ServeContent(w, r, item.Name(), item.Date, reader)
 }
 
-func (a App) Serve(w http.ResponseWriter, r *http.Request, item absto.Item) {
+func (a Service) Serve(w http.ResponseWriter, r *http.Request, item absto.Item) {
 	if !a.CanHaveThumbnail(item) {
 		w.WriteHeader(http.StatusNoContent)
 		return
@@ -191,7 +193,7 @@ func (a App) Serve(w http.ResponseWriter, r *http.Request, item absto.Item) {
 
 	name := a.PathForScale(item, scale)
 
-	reader, err := a.storageApp.ReadFrom(ctx, name)
+	reader, err := a.storage.ReadFrom(ctx, name)
 	if err != nil {
 		if absto.IsNotExist(err) {
 			w.WriteHeader(http.StatusNoContent)
@@ -212,7 +214,7 @@ func (a App) Serve(w http.ResponseWriter, r *http.Request, item absto.Item) {
 	http.ServeContent(w, r, baseName, item.Date, reader)
 }
 
-func (a App) List(w http.ResponseWriter, r *http.Request, item absto.Item, items []absto.Item) {
+func (a Service) List(w http.ResponseWriter, r *http.Request, item absto.Item, items []absto.Item) {
 	if len(items) == 0 {
 		w.WriteHeader(http.StatusNoContent)
 		return
@@ -262,7 +264,7 @@ func (a App) List(w http.ResponseWriter, r *http.Request, item absto.Item, items
 	}
 }
 
-func (a App) thumbnailHash(ctx context.Context, items []absto.Item) string {
+func (a Service) thumbnailHash(ctx context.Context, items []absto.Item) string {
 	ctx, end := telemetry.StartSpan(ctx, a.tracer, "hash", trace.WithSpanKind(trace.SpanKindInternal))
 	defer end(nil)
 
@@ -271,7 +273,7 @@ func (a App) thumbnailHash(ctx context.Context, items []absto.Item) string {
 		ids[index] = a.PathForScale(item, SmallSize)
 	}
 
-	thumbnails, err := a.cacheApp.List(ctx, onCacheError, ids...)
+	thumbnails, err := a.cache.List(ctx, onCacheError, ids...)
 	if err != nil && !absto.IsNotExist(err) {
 		slog.Error("list thumbnails from cache", "err", err)
 	}
@@ -285,7 +287,7 @@ func (a App) thumbnailHash(ctx context.Context, items []absto.Item) string {
 	return hasher.Sum()
 }
 
-func (a App) encodeContent(ctx context.Context, w io.Writer, isDone func() bool, item absto.Item) {
+func (a Service) encodeContent(ctx context.Context, w io.Writer, isDone func() bool, item absto.Item) {
 	if item.IsDir() || isDone() {
 		return
 	}
@@ -293,7 +295,7 @@ func (a App) encodeContent(ctx context.Context, w io.Writer, isDone func() bool,
 	ctx, end := telemetry.StartSpan(ctx, a.tracer, "encode", trace.WithSpanKind(trace.SpanKindInternal))
 	defer end(nil)
 
-	reader, err := a.storageApp.ReadFrom(ctx, a.PathForScale(item, SmallSize))
+	reader, err := a.storage.ReadFrom(ctx, a.PathForScale(item, SmallSize))
 	if err != nil {
 		if !absto.IsNotExist(err) {
 			logEncodeContentError(item).Error("open", "err", err)
@@ -310,7 +312,7 @@ func (a App) encodeContent(ctx context.Context, w io.Writer, isDone func() bool,
 	defer provider.BufferPool.Put(buffer)
 
 	if _, err = io.CopyBuffer(w, reader, buffer.Bytes()); err != nil {
-		if !absto.IsNotExist(a.storageApp.ConvertError(err)) {
+		if !absto.IsNotExist(a.storage.ConvertError(err)) {
 			logEncodeContentError(item).Error("copy", "err", err)
 		}
 	}

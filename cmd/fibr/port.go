@@ -11,9 +11,9 @@ import (
 )
 
 type port struct {
-	handler   http.Handler
-	name      string
-	serverApp server.App
+	handler http.Handler
+	name    string
+	server  server.Server
 }
 
 type ports []port
@@ -21,10 +21,10 @@ type ports []port
 func newPorts(config configuration, clients client, services services) ports {
 	return ports{
 		{
-			serverApp: server.New(config.appServer),
-			name:      "http",
+			server: server.New(config.appServer),
+			name:   "http",
 			handler: httputils.Handler(
-				services.rendererApp.Handler(services.fibrApp.TemplateFunc),
+				services.renderer.Handler(services.fibr.TemplateFunc),
 				clients.health, recoverer.Middleware, clients.telemetry.Middleware("http"), owasp.New(config.owasp).Middleware,
 			),
 		},
@@ -33,16 +33,16 @@ func newPorts(config configuration, clients client, services services) ports {
 
 func (p ports) Start(ctx context.Context) {
 	for _, instance := range p {
-		go instance.serverApp.Start(ctx, instance.name, instance.handler)
+		go instance.server.Start(ctx, instance.name, instance.handler)
 	}
 }
 
 func (p ports) TerminateOnDone() <-chan struct{} {
-	return p[0].serverApp.Done()
+	return p[0].server.Done()
 }
 
 func (p ports) GracefulWait() {
 	for _, instance := range p {
-		<-instance.serverApp.Done()
+		<-instance.server.Done()
 	}
 }

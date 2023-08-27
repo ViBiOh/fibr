@@ -17,7 +17,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
 )
 
-func (a App) saveUploadedFile(ctx context.Context, request provider.Request, inputName, rawSize string, file *multipart.Part) (fileName string, err error) {
+func (s Service) saveUploadedFile(ctx context.Context, request provider.Request, inputName, rawSize string, file *multipart.Part) (fileName string, err error) {
 	var filePath string
 
 	fileName, filePath, err = getUploadNameAndPath(request, inputName, file)
@@ -31,14 +31,14 @@ func (a App) saveUploadedFile(ctx context.Context, request provider.Request, inp
 		return "", fmt.Errorf("get upload size: %w", err)
 	}
 
-	err = provider.WriteToStorage(ctx, a.storageApp, filePath, size, file)
+	err = provider.WriteToStorage(ctx, s.storage, filePath, size, file)
 
 	if err == nil {
 		go func(ctx context.Context) {
-			if info, infoErr := a.storageApp.Stat(ctx, filePath); infoErr != nil {
+			if info, infoErr := s.storage.Stat(ctx, filePath); infoErr != nil {
 				slog.Error("get info for upload event", "err", infoErr)
 			} else {
-				a.pushEvent(ctx, provider.NewUploadEvent(ctx, request, info, a.bestSharePath(filePath), a.rendererApp))
+				s.pushEvent(ctx, provider.NewUploadEvent(ctx, request, info, s.bestSharePath(filePath), s.renderer))
 			}
 		}(cntxt.WithoutDeadline(ctx))
 	}
@@ -78,25 +78,25 @@ func getUploadSize(rawSize string) (int64, error) {
 	return size, nil
 }
 
-func (a App) upload(w http.ResponseWriter, r *http.Request, request provider.Request, values map[string]string, file *multipart.Part) {
+func (s Service) upload(w http.ResponseWriter, r *http.Request, request provider.Request, values map[string]string, file *multipart.Part) {
 	if file == nil {
-		a.error(w, r, request, model.WrapInvalid(errors.New("no file provided for save")))
+		s.error(w, r, request, model.WrapInvalid(errors.New("no file provided for save")))
 		return
 	}
 
-	ctx, end := telemetry.StartSpan(r.Context(), a.tracer, "upload")
+	ctx, end := telemetry.StartSpan(r.Context(), s.tracer, "upload")
 	defer end(nil)
 
-	filename, err := a.saveUploadedFile(ctx, request, values["filename"], values["size"], file)
+	filename, err := s.saveUploadedFile(ctx, request, values["filename"], values["size"], file)
 	if err != nil {
-		a.error(w, r, request, model.WrapInternal(err))
+		s.error(w, r, request, model.WrapInternal(err))
 		return
 	}
 
-	a.postUpload(w, r, request, filename)
+	s.postUpload(w, r, request, filename)
 }
 
-func (a App) postUpload(w http.ResponseWriter, r *http.Request, request provider.Request, fileName string) {
+func (s Service) postUpload(w http.ResponseWriter, r *http.Request, request provider.Request, fileName string) {
 	if r.Header.Get("Accept") == "text/plain" {
 		w.WriteHeader(http.StatusCreated)
 		provider.SafeWrite(w, fileName)
@@ -104,5 +104,5 @@ func (a App) postUpload(w http.ResponseWriter, r *http.Request, request provider
 		return
 	}
 
-	a.rendererApp.Redirect(w, r, fmt.Sprintf("?d=%s", request.Display), renderer.NewSuccessMessage("File %s successfully uploaded", fileName))
+	s.renderer.Redirect(w, r, fmt.Sprintf("?d=%s", request.Display), renderer.NewSuccessMessage("File %s successfully uploaded", fileName))
 }

@@ -11,10 +11,10 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
-func (a App) AMQPHandler(ctx context.Context, message amqp.Delivery) error {
+func (s Service) AMQPHandler(ctx context.Context, message amqp.Delivery) error {
 	var err error
 
-	ctx, end := telemetry.StartSpan(ctx, a.tracer, "amqp")
+	ctx, end := telemetry.StartSpan(ctx, s.tracer, "amqp")
 	defer end(&err)
 
 	var resp provider.ExifResponse
@@ -28,10 +28,10 @@ func (a App) AMQPHandler(ctx context.Context, message amqp.Delivery) error {
 		return nil
 	}
 
-	metadata, err := a.Update(ctx, resp.Item, provider.ReplaceExif(resp.Exif))
+	metadata, err := s.Update(ctx, resp.Item, provider.ReplaceExif(resp.Exif))
 	if err != nil {
 		return fmt.Errorf("update: %w", err)
 	}
 
-	return a.processMetadata(ctx, resp.Item, metadata, true)
+	return s.processMetadata(ctx, resp.Item, metadata, true)
 }

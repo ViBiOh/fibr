@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
-	"strings"
 	"time"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
@@ -26,58 +25,60 @@ var (
 	ErrAbsoluteFolder = errors.New("folder has to be absolute")
 )
 
-type App struct {
+type Service struct {
 	tracer          trace.Tracer
-	rawStorageApp   absto.Storage
-	storageApp      absto.Storage
-	shareApp        provider.ShareManager
-	webhookApp      provider.WebhookManager
-	metadataApp     provider.MetadataManager
-	searchApp       search.App
+	rawStorage      absto.Storage
+	storage         absto.Storage
+	share           provider.ShareManager
+	webhook         provider.WebhookManager
+	metadata        provider.MetadataManager
+	searchService   search.Service
 	pushEvent       provider.EventProducer
 	temporaryFolder string
-	rendererApp     *renderer.App
-	thumbnailApp    thumbnail.App
+	renderer        *renderer.Service
+	thumbnail       thumbnail.Service
 	bcryptCost      int
 	chunkUpload     bool
 }
 
 type Config struct {
-	bcryptDuration  *string
-	temporaryFolder *string
-	chunkUpload     *bool
+	BcryptDuration  string
+	TemporaryFolder string
+	ChunkUpload     bool
 }
 
 func Flags(fs *flag.FlagSet, prefix string) Config {
-	return Config{
-		bcryptDuration:  flags.New("BcryptDuration", "Wanted bcrypt duration for calculating effective cost").Prefix(prefix).DocPrefix("crud").String(fs, "0.25s", nil),
-		chunkUpload:     flags.New("ChunkUpload", "Use chunk upload in browser").Prefix(prefix).DocPrefix("crud").Bool(fs, false, nil),
-		temporaryFolder: flags.New("TemporaryFolder", "Temporary folder for chunk upload").Prefix(prefix).DocPrefix("crud").String(fs, "/tmp", nil),
-	}
+	var config Config
+
+	flags.New("BcryptDuration", "Wanted bcrypt duration for calculating effective cost").Prefix(prefix).DocPrefix("crud").StringVar(fs, &config.BcryptDuration, "0.25s", nil)
+	flags.New("ChunkUpload", "Use chunk upload in browser").Prefix(prefix).DocPrefix("crud").BoolVar(fs, &config.ChunkUpload, false, nil)
+	flags.New("TemporaryFolder", "Temporary folder for chunk upload").Prefix(prefix).DocPrefix("crud").StringVar(fs, &config.TemporaryFolder, "/tmp", nil)
+
+	return config
 }
 
-func New(config Config, storageApp absto.Storage, filteredStorage absto.Storage, rendererApp *renderer.App, shareApp provider.ShareManager, webhookApp provider.WebhookManager, thumbnailApp thumbnail.App, exifApp provider.MetadataManager, searchApp search.App, eventProducer provider.EventProducer, tracerProvider trace.TracerProvider) (App, error) {
-	app := App{
-		chunkUpload:     *config.chunkUpload,
-		temporaryFolder: strings.TrimSpace(*config.temporaryFolder),
+func New(config Config, storageService absto.Storage, filteredStorage absto.Storage, rendererService *renderer.Service, shareService provider.ShareManager, webhookService provider.WebhookManager, thumbnailService thumbnail.Service, exifService provider.MetadataManager, searchService search.Service, eventProducer provider.EventProducer, tracerProvider trace.TracerProvider) (Service, error) {
+	service := Service{
+		chunkUpload:     config.ChunkUpload,
+		temporaryFolder: config.TemporaryFolder,
 		pushEvent:       eventProducer,
-		rawStorageApp:   storageApp,
-		storageApp:      filteredStorage,
-		rendererApp:     rendererApp,
-		thumbnailApp:    thumbnailApp,
-		metadataApp:     exifApp,
-		shareApp:        shareApp,
-		webhookApp:      webhookApp,
-		searchApp:       searchApp,
+		rawStorage:      storageService,
+		storage:         filteredStorage,
+		renderer:        rendererService,
+		thumbnail:       thumbnailService,
+		metadata:        exifService,
+		share:           shareService,
+		webhook:         webhookService,
+		searchService:   searchService,
 	}
 
 	if tracerProvider != nil {
-		app.tracer = tracerProvider.Tracer("crud")
+		service.tracer = tracerProvider.Tracer("crud")
 	}
 
-	bcryptDuration, err := time.ParseDuration(strings.TrimSpace(*config.bcryptDuration))
+	bcryptDuration, err := time.ParseDuration(config.BcryptDuration)
 	if err != nil {
-		return app, fmt.Errorf("parse bcrypt duration: %w", err)
+		return service, fmt.Errorf("parse bcrypt duration: %w", err)
 	}
 
 	bcryptCost, err := bcrypt.FindBestCost(bcryptDuration)
@@ -86,11 +87,11 @@ func New(config Config, storageApp absto.Storage, filteredStorage absto.Storage,
 	}
 	slog.Info("Best bcrypt cost computed", "cost", bcryptCost)
 
-	app.bcryptCost = bcryptCost
+	service.bcryptCost = bcryptCost
 
-	return app, nil
+	return service, nil
 }
 
-func (a App) error(w http.ResponseWriter, r *http.Request, request provider.Request, err error) {
-	a.rendererApp.Error(w, r, map[string]any{"Request": request}, err)
+func (s Service) error(w http.ResponseWriter, r *http.Request, request provider.Request, err error) {
+	s.renderer.Error(w, r, map[string]any{"Request": request}, err)
 }

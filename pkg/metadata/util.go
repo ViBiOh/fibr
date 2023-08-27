@@ -9,8 +9,8 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
-func (a App) CanHaveExif(item absto.Item) bool {
-	return provider.ThumbnailExtensions[item.Extension] && (a.maxSize == 0 || item.Size() < a.maxSize || a.directAccess)
+func (s Service) CanHaveExif(item absto.Item) bool {
+	return provider.ThumbnailExtensions[item.Extension] && (s.maxSize == 0 || item.Size() < s.maxSize || s.directAccess)
 }
 
 func Path(item absto.Item) string {
@@ -21,13 +21,13 @@ func Path(item absto.Item) string {
 	return fmt.Sprintf("%s%s.json", provider.MetadataDirectory(item), item.ID)
 }
 
-func (a App) hasMetadata(ctx context.Context, item absto.Item) bool {
+func (s Service) hasMetadata(ctx context.Context, item absto.Item) bool {
 	if item.IsDir() {
-		_, err := a.GetAggregateFor(ctx, item)
+		_, err := s.GetAggregateFor(ctx, item)
 		return err == nil
 	}
 
-	data, err := a.GetMetadataFor(ctx, item)
+	data, err := s.GetMetadataFor(ctx, item)
 	if err != nil {
 		return false
 	}
@@ -35,40 +35,40 @@ func (a App) hasMetadata(ctx context.Context, item absto.Item) bool {
 	return data.HasData()
 }
 
-func (a App) loadExif(ctx context.Context, item absto.Item) (provider.Metadata, error) {
-	return loadMetadata[provider.Metadata](ctx, a.storageApp, item)
+func (s Service) loadExif(ctx context.Context, item absto.Item) (provider.Metadata, error) {
+	return loadMetadata[provider.Metadata](ctx, s.storage, item)
 }
 
-func (a App) loadAggregate(ctx context.Context, item absto.Item) (provider.Aggregate, error) {
-	return loadMetadata[provider.Aggregate](ctx, a.storageApp, item)
+func (s Service) loadAggregate(ctx context.Context, item absto.Item) (provider.Aggregate, error) {
+	return loadMetadata[provider.Aggregate](ctx, s.storage, item)
 }
 
-func loadMetadata[T any](ctx context.Context, storageApp absto.Storage, item absto.Item) (T, error) {
-	return provider.LoadJSON[T](ctx, storageApp, Path(item))
+func loadMetadata[T any](ctx context.Context, storageService absto.Storage, item absto.Item) (T, error) {
+	return provider.LoadJSON[T](ctx, storageService, Path(item))
 }
 
-func (a App) saveMetadata(ctx context.Context, item absto.Item, data any) error {
+func (s Service) saveMetadata(ctx context.Context, item absto.Item, data any) error {
 	filename := Path(item)
 	dirname := filepath.Dir(filename)
 
-	if _, err := a.storageApp.Stat(ctx, dirname); err != nil {
+	if _, err := s.storage.Stat(ctx, dirname); err != nil {
 		if !absto.IsNotExist(err) {
 			return fmt.Errorf("check directory existence: %w", err)
 		}
 
-		if err = a.storageApp.Mkdir(ctx, dirname, absto.DirectoryPerm); err != nil {
+		if err = s.storage.Mkdir(ctx, dirname, absto.DirectoryPerm); err != nil {
 			return fmt.Errorf("create directory: %w", err)
 		}
 	}
 
-	if err := provider.SaveJSON(ctx, a.storageApp, filename, data); err != nil {
+	if err := provider.SaveJSON(ctx, s.storage, filename, data); err != nil {
 		return fmt.Errorf("save: %w", err)
 	}
 
 	if item.IsDir() {
-		a.increaseAggregate(ctx, "save")
+		s.increaseAggregate(ctx, "save")
 	} else {
-		a.increaseExif(ctx, "save")
+		s.increaseExif(ctx, "save")
 	}
 
 	return nil

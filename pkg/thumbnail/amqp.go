@@ -11,8 +11,8 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
-func (a App) AMQPHandler(ctx context.Context, message amqp.Delivery) (err error) {
-	ctx, end := telemetry.StartSpan(ctx, a.tracer, "amqp")
+func (s Service) AMQPHandler(ctx context.Context, message amqp.Delivery) (err error) {
+	ctx, end := telemetry.StartSpan(ctx, s.tracer, "amqp")
 	defer end(&err)
 
 	var req vith.Request
@@ -20,10 +20,10 @@ func (a App) AMQPHandler(ctx context.Context, message amqp.Delivery) (err error)
 		return fmt.Errorf("decode: %w", err)
 	}
 
-	key := redisKey(a.PathForScale(absto.Item{
+	key := redisKey(s.PathForScale(absto.Item{
 		ID:       absto.ID(req.Input),
 		Pathname: req.Input,
 	}, req.Scale))
 
-	return a.redisClient.Delete(ctx, key)
+	return s.redisClient.Delete(ctx, key)
 }

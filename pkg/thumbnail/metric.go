@@ -7,10 +7,10 @@ import (
 	"go.opentelemetry.io/otel/metric"
 )
 
-func (a App) increaseMetric(ctx context.Context, itemType, state string) {
-	if a.metric == nil {
+func (s Service) increaseMetric(ctx context.Context, itemType, state string) {
+	if s.metric == nil {
 		return
 	}
 
-	a.metric.Add(ctx, 1, metric.WithAttributes(attribute.String("type", itemType), attribute.String("state", state)))
+	s.metric.Add(ctx, 1, metric.WithAttributes(attribute.String("type", itemType), attribute.String("state", state)))
 }

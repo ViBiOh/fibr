@@ -9,8 +9,8 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
-func (a App) EventConsumer(ctx context.Context, e provider.Event) {
-	if !a.enabled() {
+func (s Service) EventConsumer(ctx context.Context, e provider.Event) {
+	if !s.enabled() {
 		return
 	}
 
@@ -18,18 +18,18 @@ func (a App) EventConsumer(ctx context.Context, e provider.Event) {
 
 	switch e.Type {
 	case provider.StartEvent:
-		if err = a.handleStartEvent(ctx, e); err != nil {
+		if err = s.handleStartEvent(ctx, e); err != nil {
 			getEventLogger(e.Item).Error("start: %s", err)
 		}
 	case provider.UploadEvent:
-		if err = a.handleUploadEvent(ctx, e.Item, true); err != nil {
+		if err = s.handleUploadEvent(ctx, e.Item, true); err != nil {
 			getEventLogger(e.Item).Error("upload: %s", err)
 		}
 	case provider.RenameEvent:
 		if !e.Item.IsDir() {
-			err = a.Rename(ctx, e.Item, *e.New)
+			err = s.Rename(ctx, e.Item, *e.New)
 			if err == nil {
-				err = a.aggregateOnRename(ctx, e.Item, *e.New)
+				err = s.aggregateOnRename(ctx, e.Item, *e.New)
 			}
 		}
 
@@ -37,18 +37,18 @@ func (a App) EventConsumer(ctx context.Context, e provider.Event) {
 			getEventLogger(e.Item).Error("rename: %s", err)
 		}
 	case provider.DeleteEvent:
-		if err := a.delete(ctx, e.Item); err != nil {
+		if err := s.delete(ctx, e.Item); err != nil {
 			getEventLogger(e.Item).Error("delete: %s", err)
 		}
 	}
 }
 
-func (a App) Rename(ctx context.Context, old, new absto.Item) error {
-	if err := a.storageApp.Rename(ctx, Path(old), Path(new)); err != nil && !absto.IsNotExist(err) {
+func (s Service) Rename(ctx context.Context, old, new absto.Item) error {
+	if err := s.storage.Rename(ctx, Path(old), Path(new)); err != nil && !absto.IsNotExist(err) {
 		return fmt.Errorf("rename exif: %w", err)
 	}
 
-	if err := a.redisClient.Delete(ctx, redisKey(old)); err != nil {
+	if err := s.redisClient.Delete(ctx, redisKey(old)); err != nil {
 		return fmt.Errorf("cache: %s", err)
 	}
 
@@ -59,11 +59,11 @@ func getEventLogger(item absto.Item) *slog.Logger {
 	return slog.With("fn", "exif.EventConsumer").With("item", item.Pathname)
 }
 
-func (a App) handleStartEvent(ctx context.Context, event provider.Event) error {
+func (s Service) handleStartEvent(ctx context.Context, event provider.Event) error {
 	forced := event.IsForcedFor("exif")
 
 	if event.GetMetadata("force") == "cache" {
-		if err := a.redisClient.Delete(ctx, redisKey(event.Item)); err != nil {
+		if err := s.redisClient.Delete(ctx, redisKey(event.Item)); err != nil {
 			slog.Error("flush cache", "err", err, "fn", "exif.startEvent", "item", event.Item.Pathname)
 		}
 
@@ -73,33 +73,33 @@ func (a App) handleStartEvent(ctx context.Context, event provider.Event) error {
 	}
 
 	item := event.Item
-	if !forced && a.hasMetadata(ctx, item) {
+	if !forced && s.hasMetadata(ctx, item) {
 		slog.Debug("has metadata", "item", item.Pathname)
 		return nil
 	}
 
 	if item.IsDir() {
 		if len(item.Pathname) != 0 {
-			return a.aggregate(ctx, item)
+			return s.aggregate(ctx, item)
 		}
 
 		return nil
 	}
 
-	return a.handleUploadEvent(ctx, item, false)
+	return s.handleUploadEvent(ctx, item, false)
 }
 
-func (a App) handleUploadEvent(ctx context.Context, item absto.Item, aggregate bool) error {
-	if !a.CanHaveExif(item) {
+func (s Service) handleUploadEvent(ctx context.Context, item absto.Item, aggregate bool) error {
+	if !s.CanHaveExif(item) {
 		slog.Debug("can't have exif", "item", item.Pathname)
 		return nil
 	}
 
-	if a.amqpClient != nil {
-		return a.publishExifRequest(ctx, item)
+	if s.amqpClient != nil {
+		return s.publishExifRequest(ctx, item)
 	}
 
-	metadata, err := a.extractAndSaveExif(ctx, item)
+	metadata, err := s.extractAndSaveExif(ctx, item)
 	if err != nil {
 		return fmt.Errorf("extract and save exif: %w", err)
 	}
@@ -108,11 +108,11 @@ func (a App) handleUploadEvent(ctx context.Context, item absto.Item, aggregate b
 		return nil
 	}
 
-	return a.processMetadata(ctx, item, metadata, aggregate)
+	return s.processMetadata(ctx, item, metadata, aggregate)
 }
 
-func (a App) processMetadata(ctx context.Context, item absto.Item, exif provider.Metadata, aggregate bool) error {
-	if err := a.updateDate(ctx, item, exif); err != nil {
+func (s Service) processMetadata(ctx context.Context, item absto.Item, exif provider.Metadata, aggregate bool) error {
+	if err := s.updateDate(ctx, item, exif); err != nil {
 		return fmt.Errorf("update date: %w", err)
 	}
 
@@ -120,20 +120,20 @@ func (a App) processMetadata(ctx context.Context, item absto.Item, exif provider
 		return nil
 	}
 
-	if err := a.aggregate(ctx, item); err != nil {
+	if err := s.aggregate(ctx, item); err != nil {
 		return fmt.Errorf("aggregate folder: %w", err)
 	}
 
 	return nil
 }
 
-func (a App) aggregateOnRename(ctx context.Context, old, new absto.Item) error {
-	oldDir, err := a.getDirOf(ctx, old)
+func (s Service) aggregateOnRename(ctx context.Context, old, new absto.Item) error {
+	oldDir, err := s.getDirOf(ctx, old)
 	if err != nil {
 		return fmt.Errorf("get old directory: %w", err)
 	}
 
-	newDir, err := a.getDirOf(ctx, new)
+	newDir, err := s.getDirOf(ctx, new)
 	if err != nil {
 		return fmt.Errorf("get new directory: %w", err)
 	}
@@ -142,28 +142,28 @@ func (a App) aggregateOnRename(ctx context.Context, old, new absto.Item) error {
 		return nil
 	}
 
-	if err = a.aggregate(ctx, oldDir); err != nil {
+	if err = s.aggregate(ctx, oldDir); err != nil {
 		return fmt.Errorf("aggregate old directory: %w", err)
 	}
 
-	if err = a.aggregate(ctx, newDir); err != nil {
+	if err = s.aggregate(ctx, newDir); err != nil {
 		return fmt.Errorf("aggregate new directory: %w", err)
 	}
 
 	return nil
 }
 
-func (a App) delete(ctx context.Context, item absto.Item) error {
-	if err := a.storageApp.RemoveAll(ctx, Path(item)); err != nil {
+func (s Service) delete(ctx context.Context, item absto.Item) error {
+	if err := s.storage.RemoveAll(ctx, Path(item)); err != nil {
 		return fmt.Errorf("delete: %w", err)
 	}
 
-	if err := a.redisClient.Delete(ctx, redisKey(item)); err != nil {
+	if err := s.redisClient.Delete(ctx, redisKey(item)); err != nil {
 		return fmt.Errorf("cache: %s", err)
 	}
 
 	if !item.IsDir() {
-		if err := a.aggregate(ctx, item); err != nil {
+		if err := s.aggregate(ctx, item); err != nil {
 			return fmt.Errorf("aggregate directory: %w", err)
 		}
 	}

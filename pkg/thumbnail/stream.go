@@ -14,14 +14,14 @@ import (
 	"github.com/ViBiOh/vith/pkg/model"
 )
 
-func (a App) HasStream(ctx context.Context, item absto.Item) bool {
-	_, err := a.Info(ctx, getStreamPath(item))
+func (s Service) HasStream(ctx context.Context, item absto.Item) bool {
+	_, err := s.Info(ctx, getStreamPath(item))
 	return err == nil
 }
 
-func (a App) handleVithResponse(ctx context.Context, err error, body io.ReadCloser) error {
+func (s Service) handleVithResponse(ctx context.Context, err error, body io.ReadCloser) error {
 	if err != nil {
-		a.increaseMetric(ctx, "stream", "error")
+		s.increaseMetric(ctx, "stream", "error")
 		return fmt.Errorf("send request: %w", err)
 	}
 
@@ -32,16 +32,16 @@ func (a App) handleVithResponse(ctx context.Context, err error, body io.ReadClos
 	return nil
 }
 
-func (a App) shouldGenerateStream(ctx context.Context, item absto.Item) (bool, error) {
-	if !a.directAccess {
+func (s Service) shouldGenerateStream(ctx context.Context, item absto.Item) (bool, error) {
+	if !s.directAccess {
 		return false, nil
 	}
 
-	a.increaseMetric(ctx, "stream", "bitrate")
+	s.increaseMetric(ctx, "stream", "bitrate")
 
-	resp, err := a.vithRequest.Method(http.MethodHead).Path("%s?type=%s", item.Pathname, typeOfItem(item)).Send(ctx, nil)
+	resp, err := s.vithRequest.Method(http.MethodHead).Path("%s?type=%s", item.Pathname, typeOfItem(item)).Send(ctx, nil)
 	if err != nil {
-		a.increaseMetric(ctx, "stream", "error")
+		s.increaseMetric(ctx, "stream", "error")
 		return false, fmt.Errorf("retrieve metadata: %w", err)
 	}
 
@@ -52,7 +52,7 @@ func (a App) shouldGenerateStream(ctx context.Context, item absto.Item) (bool, e
 
 	bitrate, err := strconv.ParseUint(rawBitrate, 10, 64)
 	if err != nil {
-		a.increaseMetric(ctx, "stream", "error")
+		s.increaseMetric(ctx, "stream", "error")
 		return false, fmt.Errorf("parse bitrate: %w", err)
 	}
 
@@ -62,10 +62,10 @@ func (a App) shouldGenerateStream(ctx context.Context, item absto.Item) (bool, e
 
 	slog.Debug("Bitrate", "bitrate", bitrate, "item", item.Pathname)
 
-	return bitrate >= a.minBitrate, nil
+	return bitrate >= s.minBitrate, nil
 }
 
-func (a App) generateStream(ctx context.Context, item absto.Item) error {
+func (a Service) generateStream(ctx context.Context, item absto.Item) error {
 	input := item.Pathname
 	output := getStreamPath(item)
 
@@ -88,16 +88,16 @@ func (a App) generateStream(ctx context.Context, item absto.Item) error {
 	return a.handleVithResponse(ctx, err, resp.Body)
 }
 
-func (a App) renameStream(ctx context.Context, old, new absto.Item) error {
-	a.increaseMetric(ctx, "stream", "rename")
+func (s Service) renameStream(ctx context.Context, old, new absto.Item) error {
+	s.increaseMetric(ctx, "stream", "rename")
 
-	resp, err := a.vithRequest.Method(http.MethodPatch).Path("%s?to=%s&type=%s", getStreamPath(old), url.QueryEscape(getStreamPath(new)), typeOfItem(old)).Send(ctx, nil)
-	return a.handleVithResponse(ctx, err, resp.Body)
+	resp, err := s.vithRequest.Method(http.MethodPatch).Path("%s?to=%s&type=%s", getStreamPath(old), url.QueryEscape(getStreamPath(new)), typeOfItem(old)).Send(ctx, nil)
+	return s.handleVithResponse(ctx, err, resp.Body)
 }
 
-func (a App) deleteStream(ctx context.Context, item absto.Item) error {
-	a.increaseMetric(ctx, "stream", "delete")
+func (s Service) deleteStream(ctx context.Context, item absto.Item) error {
+	s.increaseMetric(ctx, "stream", "delete")
 
-	resp, err := a.vithRequest.Method(http.MethodDelete).Path("%s?type=%s", getStreamPath(item), typeOfItem(item)).Send(ctx, nil)
-	return a.handleVithResponse(ctx, err, resp.Body)
+	resp, err := s.vithRequest.Method(http.MethodDelete).Path("%s?type=%s", getStreamPath(item), typeOfItem(item)).Send(ctx, nil)
+	return s.handleVithResponse(ctx, err, resp.Body)
 }

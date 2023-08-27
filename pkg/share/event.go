@@ -11,43 +11,43 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
-func (a *App) EventConsumer(ctx context.Context, e provider.Event) {
+func (s *Service) EventConsumer(ctx context.Context, e provider.Event) {
 	switch e.Type {
 	case provider.RenameEvent:
-		if err := a.renameItem(ctx, e.Item, *e.New); err != nil {
+		if err := s.renameItem(ctx, e.Item, *e.New); err != nil {
 			slog.Error("rename share", "err", err)
 		}
 	case provider.DeleteEvent:
-		if err := a.deleteItem(ctx, e.Item); err != nil {
+		if err := s.deleteItem(ctx, e.Item); err != nil {
 			slog.Error("delete share", "err", err)
 		}
 	}
 }
 
-func (a *App) renameItem(ctx context.Context, old, new absto.Item) error {
-	_, err := a.Exclusive(ctx, old.ID, exclusive.Duration, func(ctx context.Context) error {
-		for id, share := range a.shares {
+func (s *Service) renameItem(ctx context.Context, old, new absto.Item) error {
+	_, err := s.Exclusive(ctx, old.ID, exclusive.Duration, func(ctx context.Context) error {
+		for id, share := range s.shares {
 			if strings.HasPrefix(share.Path, old.Pathname) {
 				share.Path = strings.Replace(share.Path, old.Pathname, new.Pathname, 1)
-				a.shares[id] = share
+				s.shares[id] = share
 
-				if err := a.redisClient.PublishJSON(ctx, a.pubsubChannel, share); err != nil {
+				if err := s.redisClient.PublishJSON(ctx, s.pubsubChannel, share); err != nil {
 					return fmt.Errorf("publish share rename: %w", err)
 				}
 			}
 		}
 
-		return provider.SaveJSON(ctx, a.storageApp, shareFilename, a.shares)
+		return provider.SaveJSON(ctx, s.storage, shareFilename, s.shares)
 	})
 
 	return err
 }
 
-func (a *App) deleteItem(ctx context.Context, item absto.Item) error {
-	_, err := a.Exclusive(ctx, item.ID, exclusive.Duration, func(_ context.Context) error {
-		for id, share := range a.shares {
+func (s *Service) deleteItem(ctx context.Context, item absto.Item) error {
+	_, err := s.Exclusive(ctx, item.ID, exclusive.Duration, func(_ context.Context) error {
+		for id, share := range s.shares {
 			if strings.HasPrefix(share.Path, item.Pathname) {
-				if err := a.delete(ctx, id); err != nil {
+				if err := s.delete(ctx, id); err != nil {
 					return fmt.Errorf("delete share `%s`: %w", id, err)
 				}
 			}

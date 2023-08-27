@@ -7,7 +7,7 @@ import (
 )
 
 func BenchmarkList(b *testing.B) {
-	instance := &App{
+	instance := &Service{
 		webhooks: map[string]provider.Webhook{
 			"abcdef123456": {
 				ID:       "abcdef123456",

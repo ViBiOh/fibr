@@ -9,27 +9,27 @@ import (
 
 const Duration = time.Second * 10
 
-type App struct {
+type Service struct {
 	redisClient redis.Client
 }
 
-func New(redisClient redis.Client) App {
-	return App{
+func New(redisClient redis.Client) Service {
+	return Service{
 		redisClient: redisClient,
 	}
 }
 
-func (a App) Enabled() bool {
-	return a.redisClient != nil && a.redisClient.Enabled()
+func (s Service) Enabled() bool {
+	return s.redisClient != nil && s.redisClient.Enabled()
 }
 
-func (a App) Execute(ctx context.Context, name string, duration time.Duration, action func(context.Context) error) error {
-	if !a.Enabled() {
+func (s Service) Execute(ctx context.Context, name string, duration time.Duration, action func(context.Context) error) error {
+	if !s.Enabled() {
 		return action(ctx)
 	}
 
 exclusive:
-	acquired, err := a.redisClient.Exclusive(ctx, name, duration, action)
+	acquired, err := s.redisClient.Exclusive(ctx, name, duration, action)
 	if err != nil {
 		return err
 	}
@@ -42,10 +42,10 @@ exclusive:
 	return nil
 }
 
-func (a App) Try(ctx context.Context, name string, duration time.Duration, action func(context.Context) error) (bool, error) {
-	if !a.Enabled() {
+func (s Service) Try(ctx context.Context, name string, duration time.Duration, action func(context.Context) error) (bool, error) {
+	if !s.Enabled() {
 		return true, action(ctx)
 	}
 
-	return a.redisClient.Exclusive(ctx, name, duration, action)
+	return s.redisClient.Exclusive(ctx, name, duration, action)
 }

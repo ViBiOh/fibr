@@ -51,13 +51,13 @@ func TestParseShare(t *testing.T) {
 	}
 
 	cases := map[string]struct {
-		instance App
+		instance Service
 		args     args
 		want     *provider.Request
 		wantErr  error
 	}{
 		"no share": {
-			App{},
+			Service{},
 			args{
 				request: &provider.Request{
 					Path:     "/",
@@ -75,7 +75,7 @@ func TestParseShare(t *testing.T) {
 			nil,
 		},
 		"passwordless": {
-			App{},
+			Service{},
 			args{
 				request: &provider.Request{
 					Path:     "/a1b2c3d4f5/index.html",
@@ -94,7 +94,7 @@ func TestParseShare(t *testing.T) {
 			nil,
 		},
 		"empty password": {
-			App{},
+			Service{},
 			args{
 				request: &provider.Request{
 					Path:     "/f5d4c3b2a1/index.html",
@@ -112,7 +112,7 @@ func TestParseShare(t *testing.T) {
 			errors.New("empty authorization header"),
 		},
 		"valid": {
-			App{},
+			Service{},
 			args{
 				request: &provider.Request{
 					Path:     "/f5d4c3b2a1/index.html",
@@ -139,7 +139,7 @@ func TestParseShare(t *testing.T) {
 			defer ctrl.Finish()
 
 			shareMock := mocks.NewShareManager(ctrl)
-			tc.instance.shareApp = shareMock
+			tc.instance.share = shareMock
 
 			switch intention {
 			case "passwordless":
@@ -229,13 +229,13 @@ func TestParseRequest(t *testing.T) {
 	}
 
 	cases := map[string]struct {
-		instance App
+		instance Service
 		args     args
 		want     provider.Request
 		wantErr  error
 	}{
 		"error": {
-			App{},
+			Service{},
 			args{
 				r: httptest.NewRequest(http.MethodGet, "/f5d4c3b2a1/", nil),
 			},
@@ -248,7 +248,7 @@ func TestParseRequest(t *testing.T) {
 			httpModel.ErrUnauthorized,
 		},
 		"share": {
-			App{},
+			Service{},
 			args{
 				r: httptest.NewRequest(http.MethodGet, "/a1b2c3d4f5/", nil),
 			},
@@ -262,7 +262,7 @@ func TestParseRequest(t *testing.T) {
 			nil,
 		},
 		"no auth": {
-			App{},
+			Service{},
 			args{
 				r: httptest.NewRequest(http.MethodGet, "/", nil),
 			},
@@ -276,7 +276,7 @@ func TestParseRequest(t *testing.T) {
 			nil,
 		},
 		"invalid auth": {
-			App{},
+			Service{},
 			args{
 				r: httptest.NewRequest(http.MethodGet, invalidPath, nil),
 			},
@@ -290,7 +290,7 @@ func TestParseRequest(t *testing.T) {
 			httpModel.ErrUnauthorized,
 		},
 		"non admin user": {
-			App{},
+			Service{},
 			args{
 				r: httptest.NewRequest(http.MethodGet, "/guest", nil),
 			},
@@ -305,7 +305,7 @@ func TestParseRequest(t *testing.T) {
 			nil,
 		},
 		"admin user": {
-			App{},
+			Service{},
 			args{
 				r: httptest.NewRequest(http.MethodGet, adminPath, nil),
 			},
@@ -320,7 +320,7 @@ func TestParseRequest(t *testing.T) {
 			nil,
 		},
 		"empty cookie": {
-			App{},
+			Service{},
 			args{
 				r: adminRequestWithEmptyCookie,
 			},
@@ -335,7 +335,7 @@ func TestParseRequest(t *testing.T) {
 			nil,
 		},
 		"cookie value": {
-			App{},
+			Service{},
 			args{
 				r: adminRequestWithCookie,
 			},
@@ -367,9 +367,9 @@ func TestParseRequest(t *testing.T) {
 			webhookMock := mocks.NewWebhookManager(ctrl)
 			loginMock := mocks.NewAuth(ctrl)
 
-			tc.instance.crudApp = crudMock
-			tc.instance.shareApp = shareMock
-			tc.instance.webhookApp = webhookMock
+			tc.instance.crud = crudMock
+			tc.instance.share = shareMock
+			tc.instance.webhook = webhookMock
 
 			switch intention {
 			case "no auth":
@@ -388,14 +388,14 @@ func TestParseRequest(t *testing.T) {
 
 			switch intention {
 			case "invalid auth":
-				tc.instance.loginApp = loginMock
+				tc.instance.login = loginMock
 				loginMock.EXPECT().IsAuthenticated(gomock.Any()).Return(nil, authModel.User{}, errors.New("invalid auth"))
 			case "non admin user":
-				tc.instance.loginApp = loginMock
+				tc.instance.login = loginMock
 				loginMock.EXPECT().IsAuthenticated(gomock.Any()).Return(nil, authModel.User{}, nil)
 				loginMock.EXPECT().IsAuthorized(gomock.Any(), gomock.Any()).Return(false)
 			case "admin user":
-				tc.instance.loginApp = loginMock
+				tc.instance.login = loginMock
 				loginMock.EXPECT().IsAuthenticated(gomock.Any()).Return(nil, authModel.User{}, nil)
 				loginMock.EXPECT().IsAuthorized(gomock.Any(), gomock.Any()).Return(true)
 			}

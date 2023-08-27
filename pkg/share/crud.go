@@ -11,23 +11,23 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
-func (a *App) generateID() (string, error) {
+func (s *Service) generateID() (string, error) {
 	for {
 		idSha := provider.Hash(provider.Identifier())[:8]
 
-		if _, ok := a.shares[idSha]; !ok {
+		if _, ok := s.shares[idSha]; !ok {
 			return idSha, nil
 		}
 	}
 }
 
-func (a *App) List() (output []provider.Share) {
-	a.mutex.RLock()
-	defer a.mutex.RUnlock()
+func (s *Service) List() (output []provider.Share) {
+	s.mutex.RLock()
+	defer s.mutex.RUnlock()
 
-	output = make([]provider.Share, 0, len(a.shares))
+	output = make([]provider.Share, 0, len(s.shares))
 
-	for _, value := range a.shares {
+	for _, value := range s.shares {
 		index := sort.Search(len(output), func(i int) bool {
 			return output[i].ID > value.ID
 		})
@@ -40,12 +40,12 @@ func (a *App) List() (output []provider.Share) {
 	return output
 }
 
-func (a *App) Create(ctx context.Context, filepath string, edit, story bool, password string, isDir bool, duration time.Duration) (string, error) {
+func (s *Service) Create(ctx context.Context, filepath string, edit, story bool, password string, isDir bool, duration time.Duration) (string, error) {
 	var id string
 
-	_, err := a.Exclusive(ctx, "create", exclusive.Duration, func(ctx context.Context) error {
+	_, err := s.Exclusive(ctx, "create", exclusive.Duration, func(ctx context.Context) error {
 		var err error
-		id, err = a.generateID()
+		id, err = s.generateID()
 		if err != nil {
 			return fmt.Errorf("generate id: %w", err)
 		}
@@ -58,17 +58,17 @@ func (a *App) Create(ctx context.Context, filepath string, edit, story bool, pas
 			Story:    story,
 			Password: password,
 			File:     !isDir,
-			Creation: a.clock(),
+			Creation: s.clock(),
 			Duration: duration,
 		}
 
-		a.shares[id] = share
+		s.shares[id] = share
 
-		if err = provider.SaveJSON(ctx, a.storageApp, shareFilename, a.shares); err != nil {
+		if err = provider.SaveJSON(ctx, s.storage, shareFilename, s.shares); err != nil {
 			return fmt.Errorf("save shares: %w", err)
 		}
 
-		if err = a.redisClient.PublishJSON(ctx, a.pubsubChannel, share); err != nil {
+		if err = s.redisClient.PublishJSON(ctx, s.pubsubChannel, share); err != nil {
 			return fmt.Errorf("publish share creation: %w", err)
 		}
 
@@ -78,22 +78,22 @@ func (a *App) Create(ctx context.Context, filepath string, edit, story bool, pas
 	return id, err
 }
 
-func (a *App) Delete(ctx context.Context, id string) error {
-	_, err := a.Exclusive(ctx, id, exclusive.Duration, func(_ context.Context) error {
-		return a.delete(ctx, id)
+func (s *Service) Delete(ctx context.Context, id string) error {
+	_, err := s.Exclusive(ctx, id, exclusive.Duration, func(_ context.Context) error {
+		return s.delete(ctx, id)
 	})
 
 	return err
 }
 
-func (a *App) delete(ctx context.Context, id string) error {
-	delete(a.shares, id)
+func (s *Service) delete(ctx context.Context, id string) error {
+	delete(s.shares, id)
 
-	if err := provider.SaveJSON(ctx, a.storageApp, shareFilename, a.shares); err != nil {
+	if err := provider.SaveJSON(ctx, s.storage, shareFilename, s.shares); err != nil {
 		return fmt.Errorf("save shares: %w", err)
 	}
 
-	if err := a.redisClient.PublishJSON(ctx, a.pubsubChannel, provider.Share{ID: id}); err != nil {
+	if err := s.redisClient.PublishJSON(ctx, s.pubsubChannel, provider.Share{ID: id}); err != nil {
 		return fmt.Errorf("publish share deletion: %w", err)
 	}
 

@@ -17,51 +17,53 @@ type Renamer interface {
 	DoRename(ctx context.Context, oldPath, newPath string, oldItem absto.Item) (absto.Item, error)
 }
 
-type App struct {
+type Service struct {
 	done            chan struct{}
-	storageApp      absto.Storage
-	exclusiveApp    exclusive.App
+	storage         absto.Storage
+	exclusive       exclusive.Service
 	pushEvent       provider.EventProducer
 	renamer         Renamer
 	sanitizeOnStart bool
 }
 
 type Config struct {
-	sanitizeOnStart *bool
+	SanitizeOnStart bool
 }
 
 func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) Config {
-	return Config{
-		sanitizeOnStart: flags.New("SanitizeOnStart", "Sanitize on start").Prefix(prefix).DocPrefix("crud").Bool(fs, false, nil),
-	}
+	var config Config
+
+	flags.New("SanitizeOnStart", "Sanitize on start").Prefix(prefix).DocPrefix("crud").BoolVar(fs, &config.SanitizeOnStart, false, nil)
+
+	return config
 }
 
-func New(config Config, storageApp absto.Storage, exclusiveApp exclusive.App, renamer Renamer, pushEvent provider.EventProducer) App {
-	return App{
+func New(config Config, storageService absto.Storage, exclusiveService exclusive.Service, renamer Renamer, pushEvent provider.EventProducer) Service {
+	return Service{
 		done:            make(chan struct{}),
-		storageApp:      storageApp,
-		exclusiveApp:    exclusiveApp,
+		storage:         storageService,
+		exclusive:       exclusiveService,
 		renamer:         renamer,
 		pushEvent:       pushEvent,
-		sanitizeOnStart: *config.sanitizeOnStart,
+		sanitizeOnStart: config.SanitizeOnStart,
 	}
 }
 
-func (a App) Done() <-chan struct{} {
-	return a.done
+func (s Service) Done() <-chan struct{} {
+	return s.done
 }
 
-func (a App) Start(ctx context.Context) {
-	defer close(a.done)
+func (s Service) Start(ctx context.Context) {
+	defer close(s.done)
 
-	if err := a.exclusiveApp.Execute(ctx, "fibr:mutex:start", time.Hour, func(ctx context.Context) error {
-		return a.start(ctx)
+	if err := s.exclusive.Execute(ctx, "fibr:mutex:start", time.Hour, func(ctx context.Context) error {
+		return s.start(ctx)
 	}); err != nil {
 		slog.Error("start", "err", err)
 	}
 }
 
-func (a App) start(ctx context.Context) error {
+func (s Service) start(ctx context.Context) error {
 	slog.Info("Starting startup check...")
 	defer slog.Info("Ending startup check.")
 
@@ -69,19 +71,19 @@ func (a App) start(ctx context.Context) error {
 
 	var directories []absto.Item
 
-	err := a.storageApp.Walk(ctx, "", func(item absto.Item) error {
+	err := s.storage.Walk(ctx, "", func(item absto.Item) error {
 		select {
 		case <-done:
 			return errors.New("server is shutting down")
 		default:
 		}
 
-		item = a.sanitizeName(ctx, item)
+		item = s.sanitizeName(ctx, item)
 
 		if item.IsDir() {
 			directories = append(directories, item)
 		} else {
-			a.pushEvent(ctx, provider.NewStartEvent(ctx, item))
+			s.pushEvent(ctx, provider.NewStartEvent(ctx, item))
 		}
 
 		return nil
@@ -91,13 +93,13 @@ func (a App) start(ctx context.Context) error {
 	}
 
 	for _, directory := range directories {
-		a.pushEvent(ctx, provider.NewStartEvent(ctx, directory))
+		s.pushEvent(ctx, provider.NewStartEvent(ctx, directory))
 	}
 
 	return nil
 }
 
-func (a App) sanitizeName(ctx context.Context, item absto.Item) absto.Item {
+func (s Service) sanitizeName(ctx context.Context, item absto.Item) absto.Item {
 	name, err := provider.SanitizeName(item.Pathname, false)
 	if err != nil {
 		slog.Error("sanitize name", "err", err, "item", item.Pathname)
@@ -108,14 +110,14 @@ func (a App) sanitizeName(ctx context.Context, item absto.Item) absto.Item {
 		return item
 	}
 
-	if !a.sanitizeOnStart {
+	if !s.sanitizeOnStart {
 		slog.Info("File should be renamed", "pathname", item.Pathname, "name", name)
 		return item
 	}
 
 	slog.Info("Renaming...", "pathname", item.Pathname, "name", name)
 
-	renamedItem, err := a.renamer.DoRename(ctx, item.Pathname, name, item)
+	renamedItem, err := s.renamer.DoRename(ctx, item.Pathname, name, item)
 	if err != nil {
 		slog.Error("rename", "err", err)
 		return item

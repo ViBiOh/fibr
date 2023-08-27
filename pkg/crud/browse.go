@@ -15,8 +15,8 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-func (a App) browse(ctx context.Context, request provider.Request, item absto.Item, message renderer.Message) (renderer.Page, error) {
-	ctx, end := telemetry.StartSpan(ctx, a.tracer, "browse", trace.WithSpanKind(trace.SpanKindInternal))
+func (s Service) browse(ctx context.Context, request provider.Request, item absto.Item, message renderer.Message) (renderer.Page, error) {
+	ctx, end := telemetry.StartSpan(ctx, s.tracer, "browse", trace.WithSpanKind(trace.SpanKindInternal))
 	defer end(nil)
 
 	var (
@@ -30,7 +30,7 @@ func (a App) browse(ctx context.Context, request provider.Request, item absto.It
 
 	if request.Share.IsZero() || !request.Share.File {
 		wg.Go(func() {
-			files, previous, next = a.getFilesPreviousAndNext(ctx, item, request)
+			files, previous, next = s.getFilesPreviousAndNext(ctx, item, request)
 		})
 	} else {
 		files = []absto.Item{item}
@@ -38,7 +38,7 @@ func (a App) browse(ctx context.Context, request provider.Request, item absto.It
 
 	wg.Go(func() {
 		var err error
-		metadata, err = a.metadataApp.GetMetadataFor(ctx, item)
+		metadata, err = s.metadata.GetMetadataFor(ctx, item)
 		if err != nil && !absto.IsNotExist(err) {
 			slog.Error("load metadata", "err", err, "item", item.Pathname)
 		}
@@ -47,7 +47,7 @@ func (a App) browse(ctx context.Context, request provider.Request, item absto.It
 	wg.Wait()
 
 	renderItem := provider.StorageToRender(item, request)
-	if a.thumbnailApp.CanHaveThumbnail(item) && a.thumbnailApp.HasThumbnail(ctx, item, thumbnail.SmallSize) {
+	if s.thumbnail.CanHaveThumbnail(item) && s.thumbnail.HasThumbnail(ctx, item, thumbnail.SmallSize) {
 		renderItem.HasThumbnail = true
 	}
 
@@ -55,8 +55,8 @@ func (a App) browse(ctx context.Context, request provider.Request, item absto.It
 		"Paths":     getPathParts(request),
 		"File":      renderItem,
 		"Exif":      metadata,
-		"Cover":     a.getCover(ctx, request, files),
-		"HasStream": renderItem.IsVideo() && a.thumbnailApp.HasStream(ctx, item),
+		"Cover":     s.getCover(ctx, request, files),
+		"HasStream": renderItem.IsVideo() && s.thumbnail.HasStream(ctx, item),
 
 		"Previous": previous,
 		"Next":     next,
@@ -66,12 +66,12 @@ func (a App) browse(ctx context.Context, request provider.Request, item absto.It
 	}), nil
 }
 
-func (a App) getFilesPreviousAndNext(ctx context.Context, item absto.Item, request provider.Request) (items []absto.Item, previous provider.RenderItem, next provider.RenderItem) {
-	ctx, end := telemetry.StartSpan(ctx, a.tracer, "get_previous_next", trace.WithSpanKind(trace.SpanKindInternal))
+func (s Service) getFilesPreviousAndNext(ctx context.Context, item absto.Item, request provider.Request) (items []absto.Item, previous provider.RenderItem, next provider.RenderItem) {
+	ctx, end := telemetry.StartSpan(ctx, s.tracer, "get_previous_next", trace.WithSpanKind(trace.SpanKindInternal))
 	defer end(nil)
 
 	var err error
-	items, err = a.storageApp.List(ctx, item.Dir())
+	items, err = s.storage.List(ctx, item.Dir())
 	if err != nil {
 		slog.Error("list neighbors files", "err", err, "item", item.Pathname)
 		return

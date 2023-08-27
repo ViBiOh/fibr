@@ -25,17 +25,17 @@ import (
 
 var errInvalidItemType = errors.New("invalid item type")
 
-type App struct {
-	tracer            trace.Tracer
-	storageApp        absto.Storage
-	listStorageApp    absto.Storage
-	exifMetric        metric.Int64Counter
-	aggregateMetric   metric.Int64Counter
-	exifCacheApp      *cache.App[absto.Item, provider.Metadata]
-	aggregateCacheApp *cache.App[absto.Item, provider.Aggregate]
+type Service struct {
+	tracer          trace.Tracer
+	storage         absto.Storage
+	listStorage     absto.Storage
+	exifMetric      metric.Int64Counter
+	aggregateMetric metric.Int64Counter
+	exifCache       *cache.Cache[absto.Item, provider.Metadata]
+	aggregateCache  *cache.Cache[absto.Item, provider.Aggregate]
 
-	exclusiveApp exclusive.App
-	redisClient  redis.Client
+	exclusive   exclusive.Service
+	redisClient redis.Client
 
 	amqpClient     *amqpclient.Client
 	amqpExchange   string
@@ -48,57 +48,59 @@ type App struct {
 }
 
 type Config struct {
-	exifURL  *string
-	exifUser *string
-	exifPass *string
+	ExifURL  string
+	ExifUser string
+	ExifPass string
 
-	amqpExchange   *string
-	amqpRoutingKey *string
+	AmqpExchange   string
+	AmqpRoutingKey string
 
-	maxSize      *int
-	directAccess *bool
+	MaxSize      int64
+	DirectAccess bool
 }
 
 func Flags(fs *flag.FlagSet, prefix string) Config {
-	return Config{
-		exifURL:  flags.New("URL", "Exif Tool URL (exas)").Prefix(prefix).DocPrefix("exif").String(fs, "http://exas:1080", nil),
-		exifUser: flags.New("User", "Exif Tool URL Basic User").Prefix(prefix).DocPrefix("exif").String(fs, "", nil),
-		exifPass: flags.New("Password", "Exif Tool URL Basic Password").Prefix(prefix).DocPrefix("exif").String(fs, "", nil),
+	var config Config
 
-		directAccess: flags.New("DirectAccess", "Use Exas with direct access to filesystem (no large file upload, send a GET request, Basic Auth recommended)").Prefix(prefix).DocPrefix("exif").Bool(fs, false, nil),
-		maxSize:      flags.New("MaxSize", "Max file size (in bytes) for extracting exif (0 to no limit). Not used if DirectAccess enabled.").Prefix(prefix).DocPrefix("exif").Int(fs, 1024*1024*200, nil),
+	flags.New("URL", "Exif Tool URL (exas)").Prefix(prefix).DocPrefix("exif").StringVar(fs, &config.ExifURL, "http://exas:1080", nil)
+	flags.New("User", "Exif Tool URL Basic User").Prefix(prefix).DocPrefix("exif").StringVar(fs, &config.ExifUser, "", nil)
+	flags.New("Password", "Exif Tool URL Basic Password").Prefix(prefix).DocPrefix("exif").StringVar(fs, &config.ExifPass, "", nil)
 
-		amqpExchange:   flags.New("AmqpExchange", "AMQP Exchange Name").Prefix(prefix).DocPrefix("exif").String(fs, "fibr", nil),
-		amqpRoutingKey: flags.New("AmqpRoutingKey", "AMQP Routing Key for exif").Prefix(prefix).DocPrefix("exif").String(fs, "exif_input", nil),
-	}
+	flags.New("DirectAccess", "Use Exas with direct access to filesystem (no large file upload, send a GET request, Basic Auth recommended)").Prefix(prefix).DocPrefix("exif").BoolVar(fs, &config.DirectAccess, false, nil)
+	flags.New("MaxSize", "Max file size (in bytes) for extracting exif (0 to no limit). Not used if DirectAccess enabled.").Prefix(prefix).DocPrefix("exif").Int64Var(fs, &config.MaxSize, 1024*1024*200, nil)
+
+	flags.New("AmqpExchange", "AMQP Exchange Name").Prefix(prefix).DocPrefix("exif").StringVar(fs, &config.AmqpExchange, "fibr", nil)
+	flags.New("AmqpRoutingKey", "AMQP Routing Key for exif").Prefix(prefix).DocPrefix("exif").StringVar(fs, &config.AmqpRoutingKey, "exif_input", nil)
+
+	return config
 }
 
-func New(config Config, storageApp absto.Storage, meterProvider metric.MeterProvider, traceProvider trace.TracerProvider, amqpClient *amqpclient.Client, redisClient redis.Client, exclusiveApp exclusive.App) (App, error) {
+func New(config Config, storageService absto.Storage, meterProvider metric.MeterProvider, traceProvider trace.TracerProvider, amqpClient *amqpclient.Client, redisClient redis.Client, exclusiveService exclusive.Service) (Service, error) {
 	var amqpExchange string
 
 	if amqpClient != nil {
-		amqpExchange = strings.TrimSpace(*config.amqpExchange)
+		amqpExchange = config.AmqpExchange
 
 		if err := amqpClient.Publisher(amqpExchange, "direct", nil); err != nil {
-			return App{}, fmt.Errorf("configure amqp: %w", err)
+			return Service{}, fmt.Errorf("configure amqp: %w", err)
 		}
 	}
 
-	app := App{
-		exifRequest:  request.New().URL(strings.TrimSpace(*config.exifURL)).BasicAuth(strings.TrimSpace(*config.exifUser), *config.exifPass),
-		directAccess: *config.directAccess,
-		maxSize:      int64(*config.maxSize),
+	service := Service{
+		exifRequest:  request.New().URL(config.ExifURL).BasicAuth(config.ExifUser, config.ExifPass),
+		directAccess: config.DirectAccess,
+		maxSize:      config.MaxSize,
 
 		redisClient: redisClient,
 
 		amqpClient:     amqpClient,
 		amqpExchange:   amqpExchange,
-		amqpRoutingKey: strings.TrimSpace(*config.amqpRoutingKey),
+		amqpRoutingKey: config.AmqpRoutingKey,
 
-		tracer:       traceProvider.Tracer("exif"),
-		exclusiveApp: exclusiveApp,
-		storageApp:   storageApp,
-		listStorageApp: storageApp.WithIgnoreFn(func(item absto.Item) bool {
+		tracer:    traceProvider.Tracer("exif"),
+		exclusive: exclusiveService,
+		storage:   storageService,
+		listStorage: storageService.WithIgnoreFn(func(item absto.Item) bool {
 			return !strings.HasSuffix(item.Name(), ".json")
 		}),
 	}
@@ -108,74 +110,74 @@ func New(config Config, storageApp absto.Storage, meterProvider metric.MeterProv
 
 		var err error
 
-		app.exifMetric, err = meter.Int64Counter("fibr.exif")
+		service.exifMetric, err = meter.Int64Counter("fibr.exif")
 		if err != nil {
 			slog.Error("create exif counter", "err", err)
 		}
 
-		app.aggregateMetric, err = meter.Int64Counter("fibr.aggregate")
+		service.aggregateMetric, err = meter.Int64Counter("fibr.aggregate")
 		if err != nil {
 			slog.Error("create aggregate counter", "err", err)
 		}
 	}
 
-	app.exifCacheApp = cache.New(redisClient, redisKey, func(ctx context.Context, item absto.Item) (provider.Metadata, error) {
+	service.exifCache = cache.New(redisClient, redisKey, func(ctx context.Context, item absto.Item) (provider.Metadata, error) {
 		if item.IsDir() {
 			return provider.Metadata{}, errInvalidItemType
 		}
 
-		return app.loadExif(ctx, item)
+		return service.loadExif(ctx, item)
 	}, traceProvider).WithMaxConcurrency(provider.MaxConcurrency)
 
-	app.aggregateCacheApp = cache.New(redisClient, redisKey, func(ctx context.Context, item absto.Item) (provider.Aggregate, error) {
+	service.aggregateCache = cache.New(redisClient, redisKey, func(ctx context.Context, item absto.Item) (provider.Aggregate, error) {
 		if !item.IsDir() {
 			return provider.Aggregate{}, errInvalidItemType
 		}
 
-		return app.loadAggregate(ctx, item)
+		return service.loadAggregate(ctx, item)
 	}, traceProvider).WithMaxConcurrency(provider.MaxConcurrency)
 
-	return app, nil
+	return service, nil
 }
 
-func (a App) ListDir(ctx context.Context, item absto.Item) ([]absto.Item, error) {
+func (s Service) ListDir(ctx context.Context, item absto.Item) ([]absto.Item, error) {
 	if !item.IsDir() {
 		return nil, nil
 	}
 
-	exifs, err := a.listStorageApp.List(ctx, provider.MetadataDirectory(item))
+	exifs, err := s.listStorage.List(ctx, provider.MetadataDirectory(item))
 	if err != nil && !absto.IsNotExist(err) {
 		return exifs, err
 	}
 	return exifs, nil
 }
 
-func (a App) enabled() bool {
-	return !a.exifRequest.IsZero()
+func (s Service) enabled() bool {
+	return !s.exifRequest.IsZero()
 }
 
-func (a App) extractAndSaveExif(ctx context.Context, item absto.Item) (provider.Metadata, error) {
-	exif, err := a.extractExif(ctx, item)
+func (s Service) extractAndSaveExif(ctx context.Context, item absto.Item) (provider.Metadata, error) {
+	exif, err := s.extractExif(ctx, item)
 	if err != nil {
 		return provider.Metadata{}, fmt.Errorf("extract exif: %w", err)
 	}
 
-	return a.Update(ctx, item, provider.ReplaceExif(exif))
+	return s.Update(ctx, item, provider.ReplaceExif(exif))
 }
 
-func (a App) extractExif(ctx context.Context, item absto.Item) (exif exas.Exif, err error) {
+func (s Service) extractExif(ctx context.Context, item absto.Item) (exif exas.Exif, err error) {
 	var resp *http.Response
 
-	a.increaseExif(ctx, "request")
+	s.increaseExif(ctx, "request")
 
-	if a.directAccess {
-		resp, err = a.exifRequest.Method(http.MethodGet).Path(item.Pathname).Send(ctx, nil)
+	if s.directAccess {
+		resp, err = s.exifRequest.Method(http.MethodGet).Path(item.Pathname).Send(ctx, nil)
 	} else {
-		resp, err = provider.SendLargeFile(ctx, a.storageApp, item, a.exifRequest.Method(http.MethodPost))
+		resp, err = provider.SendLargeFile(ctx, s.storage, item, s.exifRequest.Method(http.MethodPost))
 	}
 
 	if err != nil {
-		a.increaseExif(ctx, "error")
+		s.increaseExif(ctx, "error")
 		err = fmt.Errorf("fetch exif: %w", err)
 		return
 	}
@@ -187,8 +189,8 @@ func (a App) extractExif(ctx context.Context, item absto.Item) (exif exas.Exif, 
 	return
 }
 
-func (a App) publishExifRequest(ctx context.Context, item absto.Item) error {
-	a.increaseExif(ctx, "publish")
+func (s Service) publishExifRequest(ctx context.Context, item absto.Item) error {
+	s.increaseExif(ctx, "publish")
 
-	return a.amqpClient.PublishJSON(ctx, item, a.amqpExchange, a.amqpRoutingKey)
+	return s.amqpClient.PublishJSON(ctx, item, s.amqpExchange, s.amqpRoutingKey)
 }

@@ -8,23 +8,23 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
-func (a *App) generateID() (string, error) {
+func (s *Service) generateID() (string, error) {
 	for {
 		idSha := provider.Hash(provider.Identifier())[:8]
 
-		if _, ok := a.webhooks[idSha]; !ok {
+		if _, ok := s.webhooks[idSha]; !ok {
 			return idSha, nil
 		}
 	}
 }
 
-func (a *App) List() (output []provider.Webhook) {
-	a.mutex.RLock()
-	defer a.mutex.RUnlock()
+func (s *Service) List() (output []provider.Webhook) {
+	s.mutex.RLock()
+	defer s.mutex.RUnlock()
 
-	output = make([]provider.Webhook, 0, len(a.webhooks))
+	output = make([]provider.Webhook, 0, len(s.webhooks))
 
-	for _, value := range a.webhooks {
+	for _, value := range s.webhooks {
 		index := sort.Search(len(output), func(i int) bool {
 			return output[i].ID > value.ID
 		})
@@ -37,11 +37,11 @@ func (a *App) List() (output []provider.Webhook) {
 	return output
 }
 
-func (a *App) Create(ctx context.Context, pathname string, recursive bool, kind provider.WebhookKind, url string, types []provider.EventType) (string, error) {
+func (s *Service) Create(ctx context.Context, pathname string, recursive bool, kind provider.WebhookKind, url string, types []provider.EventType) (string, error) {
 	var id string
 
-	return id, a.Exclusive(ctx, "create", func(ctx context.Context) (err error) {
-		id, err = a.generateID()
+	return id, s.Exclusive(ctx, "create", func(ctx context.Context) (err error) {
+		id, err = s.generateID()
 		if err != nil {
 			return fmt.Errorf("generate id: %w", err)
 		}
@@ -55,13 +55,13 @@ func (a *App) Create(ctx context.Context, pathname string, recursive bool, kind 
 			Types:     types,
 		}
 
-		a.webhooks[id] = webhook
+		s.webhooks[id] = webhook
 
-		if err = provider.SaveJSON(ctx, a.storageApp, webhookFilename, a.webhooks); err != nil {
+		if err = provider.SaveJSON(ctx, s.storage, webhookFilename, s.webhooks); err != nil {
 			return fmt.Errorf("save webhooks: %w", err)
 		}
 
-		if err = a.redisClient.PublishJSON(ctx, a.pubsubChannel, webhook); err != nil {
+		if err = s.redisClient.PublishJSON(ctx, s.pubsubChannel, webhook); err != nil {
 			return fmt.Errorf("publish webhook creation: %w", err)
 		}
 
@@ -69,20 +69,20 @@ func (a *App) Create(ctx context.Context, pathname string, recursive bool, kind 
 	})
 }
 
-func (a *App) Delete(ctx context.Context, id string) error {
-	return a.Exclusive(ctx, id, func(_ context.Context) error {
-		return a.delete(ctx, id)
+func (s *Service) Delete(ctx context.Context, id string) error {
+	return s.Exclusive(ctx, id, func(_ context.Context) error {
+		return s.delete(ctx, id)
 	})
 }
 
-func (a *App) delete(ctx context.Context, id string) error {
-	delete(a.webhooks, id)
+func (s *Service) delete(ctx context.Context, id string) error {
+	delete(s.webhooks, id)
 
-	if err := provider.SaveJSON(ctx, a.storageApp, webhookFilename, a.webhooks); err != nil {
+	if err := provider.SaveJSON(ctx, s.storage, webhookFilename, s.webhooks); err != nil {
 		return fmt.Errorf("save webhooks: %w", err)
 	}
 
-	if err := a.redisClient.PublishJSON(ctx, a.pubsubChannel, provider.Webhook{ID: id}); err != nil {
+	if err := s.redisClient.PublishJSON(ctx, s.pubsubChannel, provider.Webhook{ID: id}); err != nil {
 		return fmt.Errorf("publish webhook deletion: %w", err)
 	}
 

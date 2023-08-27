@@ -6,20 +6,20 @@ import (
 	absto "github.com/ViBiOh/absto/pkg/model"
 )
 
-func (a App) ListDirLarge(ctx context.Context, item absto.Item) (map[string]absto.Item, error) {
-	return a.listDirectoryForScale(ctx, item, a.largeStorageApp)
+func (s Service) ListDirLarge(ctx context.Context, item absto.Item) (map[string]absto.Item, error) {
+	return s.listDirectoryForScale(ctx, item, s.largeStorage)
 }
 
-func (a App) ListDir(ctx context.Context, item absto.Item) (map[string]absto.Item, error) {
-	return a.listDirectoryForScale(ctx, item, a.smallStorageApp)
+func (s Service) ListDir(ctx context.Context, item absto.Item) (map[string]absto.Item, error) {
+	return s.listDirectoryForScale(ctx, item, s.smallStorage)
 }
 
-func (a App) listDirectoryForScale(ctx context.Context, item absto.Item, storageApp absto.Storage) (map[string]absto.Item, error) {
+func (s Service) listDirectoryForScale(ctx context.Context, item absto.Item, storageService absto.Storage) (map[string]absto.Item, error) {
 	if !item.IsDir() {
 		return nil, nil
 	}
 
-	list, err := storageApp.List(ctx, a.Path(item))
+	list, err := storageService.List(ctx, s.Path(item))
 	if err != nil && !absto.IsNotExist(err) {
 		return nil, err
 	}

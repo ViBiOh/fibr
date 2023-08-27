@@ -15,9 +15,9 @@ import (
 
 type client struct {
 	redis     redis.Client
-	telemetry telemetry.App
+	telemetry telemetry.Service
 	amqp      *amqp.Client
-	health    *health.App
+	health    *health.Service
 }
 
 func newClient(ctx context.Context, config configuration) (client, error) {

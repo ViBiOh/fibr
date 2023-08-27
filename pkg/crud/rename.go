@@ -14,17 +14,17 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
-func (a App) DoRename(ctx context.Context, oldPath, newPath string, oldItem absto.Item) (absto.Item, error) {
-	if err := a.storageApp.Rename(ctx, oldPath, newPath); err != nil {
+func (s Service) DoRename(ctx context.Context, oldPath, newPath string, oldItem absto.Item) (absto.Item, error) {
+	if err := s.storage.Rename(ctx, oldPath, newPath); err != nil {
 		return absto.Item{}, fmt.Errorf("rename: %w", err)
 	}
 
-	newItem, err := a.storageApp.Stat(ctx, newPath)
+	newItem, err := s.storage.Stat(ctx, newPath)
 	if err != nil {
 		return absto.Item{}, fmt.Errorf("get info of new item: %w", err)
 	}
 
-	go a.pushEvent(cntxt.WithoutDeadline(ctx), provider.NewRenameEvent(ctx, oldItem, newItem, a.bestSharePath(newPath), a.rendererApp))
+	go s.pushEvent(cntxt.WithoutDeadline(ctx), provider.NewRenameEvent(ctx, oldItem, newItem, s.bestSharePath(newPath), s.renderer))
 
 	return newItem, nil
 }
@@ -60,15 +60,15 @@ func parseRenameParams(r *http.Request, request provider.Request) (string, strin
 	return oldPath, newPath, newFolder, newName, cover, nil
 }
 
-func (a App) Rename(w http.ResponseWriter, r *http.Request, request provider.Request) {
+func (s Service) Rename(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !request.CanEdit {
-		a.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
+		s.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
 		return
 	}
 
 	oldPath, newPath, newFolder, newName, cover, err := parseRenameParams(r, request)
 	if err != nil {
-		a.error(w, r, request, err)
+		s.error(w, r, request, err)
 		return
 	}
 
@@ -78,20 +78,20 @@ func (a App) Rename(w http.ResponseWriter, r *http.Request, request provider.Req
 	var newItem absto.Item
 
 	if !strings.EqualFold(oldPath, newPath) {
-		if _, err := a.checkFile(ctx, newPath, false); err != nil {
-			a.error(w, r, request, err)
+		if _, err := s.checkFile(ctx, newPath, false); err != nil {
+			s.error(w, r, request, err)
 			return
 		}
 
-		oldItem, err = a.checkFile(ctx, oldPath, true)
+		oldItem, err = s.checkFile(ctx, oldPath, true)
 		if err != nil {
-			a.error(w, r, request, err)
+			s.error(w, r, request, err)
 			return
 		}
 
-		newItem, err = a.DoRename(ctx, oldPath, newPath, oldItem)
+		newItem, err = s.DoRename(ctx, oldPath, newPath, oldItem)
 		if err != nil {
-			a.error(w, r, request, model.WrapInternal(err))
+			s.error(w, r, request, model.WrapInternal(err))
 			return
 		}
 
@@ -100,17 +100,17 @@ func (a App) Rename(w http.ResponseWriter, r *http.Request, request provider.Req
 			provider.SetPrefsCookie(w, request)
 		}
 	} else {
-		newItem, err = a.checkFile(ctx, oldPath, true)
+		newItem, err = s.checkFile(ctx, oldPath, true)
 		if err != nil {
-			a.error(w, r, request, err)
+			s.error(w, r, request, err)
 			return
 		}
 	}
 
 	if !newItem.IsDir() {
 		if cover {
-			if err := a.updateCover(ctx, newItem); err != nil {
-				a.error(w, r, request, model.WrapInternal(err))
+			if err := s.updateCover(ctx, newItem); err != nil {
+				s.error(w, r, request, model.WrapInternal(err))
 				return
 			}
 		}
@@ -121,8 +121,8 @@ func (a App) Rename(w http.ResponseWriter, r *http.Request, request provider.Req
 			tags = strings.Split(rawTags, " ")
 		}
 
-		if _, err = a.metadataApp.Update(ctx, newItem, provider.ReplaceTags(tags)); err != nil {
-			a.error(w, r, request, model.WrapInternal(err))
+		if _, err = s.metadata.Update(ctx, newItem, provider.ReplaceTags(tags)); err != nil {
+			s.error(w, r, request, model.WrapInternal(err))
 			return
 		}
 	}
@@ -137,7 +137,7 @@ func (a App) Rename(w http.ResponseWriter, r *http.Request, request provider.Req
 		message = fmt.Sprintf("%s successfully updated", newItem.Name())
 	}
 
-	a.rendererApp.Redirect(w, r, fmt.Sprintf("?d=%s", request.Display), renderer.NewSuccessMessage(message))
+	s.renderer.Redirect(w, r, fmt.Sprintf("?d=%s", request.Display), renderer.NewSuccessMessage(message))
 }
 
 func getNewFolder(r *http.Request) (string, error) {
@@ -158,8 +158,8 @@ func getNewName(r *http.Request) (string, error) {
 	return provider.SanitizeName(newName, true)
 }
 
-func (a App) checkFile(ctx context.Context, pathname string, shouldExist bool) (info absto.Item, err error) {
-	info, err = a.storageApp.Stat(ctx, pathname)
+func (s Service) checkFile(ctx context.Context, pathname string, shouldExist bool) (info absto.Item, err error) {
+	info, err = s.storage.Stat(ctx, pathname)
 
 	if err == nil {
 		if !shouldExist {
@@ -178,20 +178,20 @@ func (a App) checkFile(ctx context.Context, pathname string, shouldExist bool) (
 	return
 }
 
-func (a App) updateCover(ctx context.Context, item absto.Item) error {
-	directory, err := a.storageApp.Stat(ctx, item.Dir())
+func (s Service) updateCover(ctx context.Context, item absto.Item) error {
+	directory, err := s.storage.Stat(ctx, item.Dir())
 	if err != nil {
 		return fmt.Errorf("get directory: %w", err)
 	}
 
-	aggregate, err := a.metadataApp.GetAggregateFor(ctx, directory)
+	aggregate, err := s.metadata.GetAggregateFor(ctx, directory)
 	if err != nil && !absto.IsNotExist(err) {
 		return fmt.Errorf("get aggregate: %w", err)
 	}
 
 	aggregate.Cover = item.Name()
 
-	if err := a.metadataApp.SaveAggregateFor(ctx, directory, aggregate); err != nil {
+	if err := s.metadata.SaveAggregateFor(ctx, directory, aggregate); err != nil {
 		return fmt.Errorf("save aggregate: %w", err)
 	}
 

@@ -9,19 +9,19 @@ import (
 )
 
 type adapters struct {
-	storageApp      model.Storage
-	filteredStorage model.Storage
-	exclusiveApp    exclusive.App
-	eventBus        provider.EventBus
+	storage          model.Storage
+	filteredStorage  model.Storage
+	exclusiveService exclusive.Service
+	eventBus         provider.EventBus
 }
 
 func newAdapters(config configuration, clients client) (adapters, error) {
-	storageApp, err := absto.New(config.absto, clients.telemetry.TracerProvider())
+	storageService, err := absto.New(config.absto, clients.telemetry.TracerProvider())
 	if err != nil {
 		return adapters{}, err
 	}
 
-	filteredStorage, err := storage.Get(config.storage, storageApp)
+	filteredStorage, err := storage.Get(config.storage, storageService)
 	if err != nil {
 		return adapters{}, err
 	}
@@ -31,15 +31,15 @@ func newAdapters(config configuration, clients client) (adapters, error) {
 		return adapters{}, err
 	}
 
-	var exclusiveApp exclusive.App
+	var exclusiveService exclusive.Service
 	if clients.redis.Enabled() {
-		exclusiveApp = exclusive.New(clients.redis)
+		exclusiveService = exclusive.New(clients.redis)
 	}
 
 	return adapters{
-		storageApp:      storageApp,
-		filteredStorage: filteredStorage,
-		exclusiveApp:    exclusiveApp,
-		eventBus:        eventBus,
+		storage:          storageService,
+		filteredStorage:  filteredStorage,
+		exclusiveService: exclusiveService,
+		eventBus:         eventBus,
 	}, nil
 }

@@ -10,11 +10,11 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
 )
 
-func (a App) search(r *http.Request, request provider.Request, item absto.Item, files []absto.Item) (renderer.Page, error) {
-	ctx, end := telemetry.StartSpan(r.Context(), a.tracer, "search")
+func (s Service) search(r *http.Request, request provider.Request, item absto.Item, files []absto.Item) (renderer.Page, error) {
+	ctx, end := telemetry.StartSpan(r.Context(), s.tracer, "search")
 	defer end(nil)
 
-	metadatas, err := a.metadataApp.GetAllMetadataFor(ctx, files...)
+	metadatas, err := s.metadata.GetAllMetadataFor(ctx, files...)
 	if err != nil {
 		listLogger(item.Pathname).Error("list metadatas: %s", err)
 	}
@@ -30,7 +30,7 @@ func (a App) search(r *http.Request, request provider.Request, item absto.Item, 
 		metadata := metadatas[item.ID]
 		renderItem.Tags = metadata.Tags
 
-		if renderWithThumbnail && a.thumbnailApp.CanHaveThumbnail(item) && a.thumbnailApp.HasThumbnail(ctx, item, thumbnail.SmallSize) {
+		if renderWithThumbnail && s.thumbnail.CanHaveThumbnail(item) && s.thumbnail.HasThumbnail(ctx, item, thumbnail.SmallSize) {
 			renderItem.HasThumbnail = true
 		}
 
@@ -44,7 +44,7 @@ func (a App) search(r *http.Request, request provider.Request, item absto.Item, 
 	return renderer.NewPage("search", http.StatusOK, map[string]any{
 		"Paths":   getPathParts(request),
 		"Files":   items,
-		"Cover":   a.getCover(ctx, request, files),
+		"Cover":   s.getCover(ctx, request, files),
 		"Search":  r.URL.Query(),
 		"Request": request,
 		"HasMap":  hasMap,

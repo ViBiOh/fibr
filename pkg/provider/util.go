@@ -132,8 +132,8 @@ func DoneWriter(isDone func() bool, w io.Writer, content string) {
 	SafeWrite(w, content)
 }
 
-func SendLargeFile(ctx context.Context, storageApp absto.Storage, item absto.Item, req request.Request) (*http.Response, error) {
-	file, err := storageApp.ReadFrom(ctx, item.Pathname) // will be closed by `PipeWriter`
+func SendLargeFile(ctx context.Context, storageService absto.Storage, item absto.Item, req request.Request) (*http.Response, error) {
+	file, err := storageService.ReadFrom(ctx, item.Pathname) // will be closed by `PipeWriter`
 	if err != nil {
 		return nil, fmt.Errorf("get reader: %w", err)
 	}
@@ -169,17 +169,17 @@ func LogClose(closer io.Closer, fn, item string) {
 	}
 }
 
-func WriteToStorage(ctx context.Context, storageApp absto.Storage, output string, size int64, reader io.Reader) error {
+func WriteToStorage(ctx context.Context, storageService absto.Storage, output string, size int64, reader io.Reader) error {
 	var err error
 	directory := path.Dir(output)
 
-	if err = storageApp.Mkdir(ctx, directory, absto.DirectoryPerm); err != nil {
+	if err = storageService.Mkdir(ctx, directory, absto.DirectoryPerm); err != nil {
 		return fmt.Errorf("create directory: %w", err)
 	}
 
-	err = storageApp.WriteTo(ctx, output, reader, absto.WriteOpts{Size: size})
+	err = storageService.WriteTo(ctx, output, reader, absto.WriteOpts{Size: size})
 	if err != nil {
-		if removeErr := storageApp.RemoveAll(ctx, output); removeErr != nil {
+		if removeErr := storageService.RemoveAll(ctx, output); removeErr != nil {
 			err = errors.Join(err, fmt.Errorf("remove: %w", removeErr))
 		}
 	}

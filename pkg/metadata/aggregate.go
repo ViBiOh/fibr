@@ -21,24 +21,24 @@ func redisKey(item absto.Item) string {
 	return version.Redis("exif:" + item.ID)
 }
 
-func (a App) GetMetadataFor(ctx context.Context, item absto.Item) (metadata provider.Metadata, err error) {
+func (s Service) GetMetadataFor(ctx context.Context, item absto.Item) (metadata provider.Metadata, err error) {
 	if item.IsDir() {
 		return provider.Metadata{}, nil
 	}
 
-	ctx, end := telemetry.StartSpan(ctx, a.tracer, "get_metadata")
+	ctx, end := telemetry.StartSpan(ctx, s.tracer, "get_metadata")
 	defer end(&err)
 
-	return a.exifCacheApp.Get(ctx, item)
+	return s.exifCache.Get(ctx, item)
 }
 
-func (a App) GetAllMetadataFor(ctx context.Context, items ...absto.Item) (map[string]provider.Metadata, error) {
+func (s Service) GetAllMetadataFor(ctx context.Context, items ...absto.Item) (map[string]provider.Metadata, error) {
 	var err error
 
-	ctx, end := telemetry.StartSpan(ctx, a.tracer, "get_all_metadata")
+	ctx, end := telemetry.StartSpan(ctx, s.tracer, "get_all_metadata")
 	defer end(&err)
 
-	exifs, err := a.exifCacheApp.List(ctx, onListError, items...)
+	exifs, err := s.exifCache.List(ctx, onListError, items...)
 	if err != nil {
 		return nil, fmt.Errorf("list: %w", err)
 	}
@@ -55,24 +55,24 @@ func (a App) GetAllMetadataFor(ctx context.Context, items ...absto.Item) (map[st
 	return output, nil
 }
 
-func (a App) GetAggregateFor(ctx context.Context, item absto.Item) (aggregate provider.Aggregate, err error) {
+func (s Service) GetAggregateFor(ctx context.Context, item absto.Item) (aggregate provider.Aggregate, err error) {
 	if !item.IsDir() {
 		return provider.Aggregate{}, nil
 	}
 
-	ctx, end := telemetry.StartSpan(ctx, a.tracer, "get_aggregate")
+	ctx, end := telemetry.StartSpan(ctx, s.tracer, "get_aggregate")
 	defer end(&err)
 
-	return a.aggregateCacheApp.Get(ctx, item)
+	return s.aggregateCache.Get(ctx, item)
 }
 
-func (a App) GetAllAggregateFor(ctx context.Context, items ...absto.Item) (map[string]provider.Aggregate, error) {
+func (s Service) GetAllAggregateFor(ctx context.Context, items ...absto.Item) (map[string]provider.Aggregate, error) {
 	var err error
 
-	ctx, end := telemetry.StartSpan(ctx, a.tracer, "get_all_aggregate")
+	ctx, end := telemetry.StartSpan(ctx, s.tracer, "get_all_aggregate")
 	defer end(&err)
 
-	exifs, err := a.aggregateCacheApp.List(ctx, onListError, items...)
+	exifs, err := s.aggregateCache.List(ctx, onListError, items...)
 	if err != nil {
 		return nil, fmt.Errorf("list: %w", err)
 	}
@@ -89,13 +89,13 @@ func (a App) GetAllAggregateFor(ctx context.Context, items ...absto.Item) (map[s
 	return output, nil
 }
 
-func (a App) SaveAggregateFor(ctx context.Context, item absto.Item, aggregate provider.Aggregate) error {
-	return a.aggregateCacheApp.EvictOnSuccess(ctx, item, a.saveMetadata(ctx, item, aggregate))
+func (s Service) SaveAggregateFor(ctx context.Context, item absto.Item, aggregate provider.Aggregate) error {
+	return s.aggregateCache.EvictOnSuccess(ctx, item, s.saveMetadata(ctx, item, aggregate))
 }
 
-func (a App) aggregate(ctx context.Context, item absto.Item) error {
+func (s Service) aggregate(ctx context.Context, item absto.Item) error {
 	if !item.IsDir() {
-		file, err := a.getDirOf(ctx, item)
+		file, err := s.getDirOf(ctx, item)
 		if err != nil {
 			return fmt.Errorf("get directory: %w", err)
 		}
@@ -103,25 +103,25 @@ func (a App) aggregate(ctx context.Context, item absto.Item) error {
 		item = file
 	}
 
-	if err := a.computeAndSaveAggregate(ctx, item); err != nil {
+	if err := s.computeAndSaveAggregate(ctx, item); err != nil {
 		return fmt.Errorf("compute aggregate: %w", err)
 	}
 
 	return nil
 }
 
-func (a App) computeAndSaveAggregate(ctx context.Context, dir absto.Item) error {
+func (s Service) computeAndSaveAggregate(ctx context.Context, dir absto.Item) error {
 	directoryAggregate := newAggregate()
 	var minDate, maxDate time.Time
 
-	previousAggregate, _ := a.GetAggregateFor(ctx, dir)
+	previousAggregate, _ := s.GetAggregateFor(ctx, dir)
 
-	err := a.storageApp.Walk(ctx, dir.Pathname, func(item absto.Item) error {
+	err := s.storage.Walk(ctx, dir.Pathname, func(item absto.Item) error {
 		if item.Pathname == dir.Pathname {
 			return nil
 		}
 
-		exifData, err := a.GetMetadataFor(ctx, item)
+		exifData, err := s.GetMetadataFor(ctx, item)
 		if err != nil {
 			if absto.IsNotExist(err) {
 				return nil
@@ -144,7 +144,7 @@ func (a App) computeAndSaveAggregate(ctx context.Context, dir absto.Item) error 
 		return fmt.Errorf("aggregate: %w", err)
 	}
 
-	return a.SaveAggregateFor(ctx, dir, provider.Aggregate{
+	return s.SaveAggregateFor(ctx, dir, provider.Aggregate{
 		Cover:    previousAggregate.Cover,
 		Location: directoryAggregate.value(),
 		Start:    minDate,
@@ -164,6 +164,6 @@ func aggregateDate(min, max, current time.Time) (time.Time, time.Time) {
 	return min, max
 }
 
-func (a App) getDirOf(ctx context.Context, item absto.Item) (absto.Item, error) {
-	return a.storageApp.Stat(ctx, item.Dir())
+func (s Service) getDirOf(ctx context.Context, item absto.Item) (absto.Item, error) {
+	return s.storage.Stat(ctx, item.Dir())
 }

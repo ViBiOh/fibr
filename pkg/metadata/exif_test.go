@@ -37,15 +37,15 @@ func TestFlags(t *testing.T) {
 
 func TestEnabled(t *testing.T) {
 	cases := map[string]struct {
-		instance App
+		instance Service
 		want     bool
 	}{
 		"disabled": {
-			App{},
+			Service{},
 			false,
 		},
 		"enabled": {
-			App{
+			Service{
 				exifRequest: request.New().URL("http://localhost"),
 			},
 			true,

@@ -9,8 +9,8 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
-func (a App) EventConsumer(ctx context.Context, e provider.Event) {
-	if a.vithRequest.IsZero() && a.amqpClient == nil {
+func (s Service) EventConsumer(ctx context.Context, e provider.Event) {
+	if s.vithRequest.IsZero() && s.amqpClient == nil {
 		return
 	}
 
@@ -18,36 +18,36 @@ func (a App) EventConsumer(ctx context.Context, e provider.Event) {
 	case provider.StartEvent:
 		fallthrough
 	case provider.UploadEvent:
-		a.generateItem(ctx, e)
+		s.generateItem(ctx, e)
 	case provider.RenameEvent:
 		if !e.Item.IsDir() {
-			if err := a.Rename(ctx, e.Item, *e.New); err != nil {
+			if err := s.Rename(ctx, e.Item, *e.New); err != nil {
 				slog.Error("rename item", "err", err)
 			}
 		}
 	case provider.DeleteEvent:
-		a.delete(ctx, e.Item)
+		s.delete(ctx, e.Item)
 	}
 }
 
-func (a App) Rename(ctx context.Context, old, new absto.Item) error {
+func (s Service) Rename(ctx context.Context, old, new absto.Item) error {
 	if old.IsDir() {
 		return nil
 	}
 
-	for _, size := range a.sizes {
-		oldFilename := a.PathForScale(old, size)
+	for _, size := range s.sizes {
+		oldFilename := s.PathForScale(old, size)
 
-		if err := a.storageApp.Rename(ctx, oldFilename, a.PathForScale(new, size)); err != nil && !absto.IsNotExist(err) {
+		if err := s.storage.Rename(ctx, oldFilename, s.PathForScale(new, size)); err != nil && !absto.IsNotExist(err) {
 			return fmt.Errorf("rename thumbnail: %w", err)
 		}
 
-		if err := a.redisClient.Delete(ctx, redisKey(oldFilename)); err != nil {
+		if err := s.redisClient.Delete(ctx, redisKey(oldFilename)); err != nil {
 			slog.Error("delete cache", "err", err)
 		}
 
-		if provider.VideoExtensions[old.Extension] != "" && a.HasStream(ctx, old) {
-			if err := a.renameStream(ctx, old, new); err != nil {
+		if provider.VideoExtensions[old.Extension] != "" && s.HasStream(ctx, old) {
+			if err := s.renameStream(ctx, old, new); err != nil {
 				return fmt.Errorf("rename stream: %w", err)
 			}
 		}
@@ -56,16 +56,16 @@ func (a App) Rename(ctx context.Context, old, new absto.Item) error {
 	return nil
 }
 
-func (a App) generateItem(ctx context.Context, event provider.Event) {
-	if !a.CanHaveThumbnail(event.Item) {
+func (s Service) generateItem(ctx context.Context, event provider.Event) {
+	if !s.CanHaveThumbnail(event.Item) {
 		return
 	}
 
 	forced := event.IsForcedFor("thumbnail")
 
-	for _, size := range a.sizes {
+	for _, size := range s.sizes {
 		if event.GetMetadata("force") == "cache" {
-			if err := a.redisClient.Delete(ctx, redisKey(a.PathForScale(event.Item, size))); err != nil {
+			if err := s.redisClient.Delete(ctx, redisKey(s.PathForScale(event.Item, size))); err != nil {
 				slog.Error("flush cache for scale", "err", err, "fn", "thumbnail.generate", "scale", size, "item", event.Item.Pathname)
 			}
 
@@ -74,51 +74,51 @@ func (a App) generateItem(ctx context.Context, event provider.Event) {
 			}
 		}
 
-		if !forced && a.HasThumbnail(ctx, event.Item, size) {
+		if !forced && s.HasThumbnail(ctx, event.Item, size) {
 			continue
 		}
 
-		if err := a.cacheApp.EvictOnSuccess(ctx, a.PathForScale(event.Item, size), a.generate(ctx, event.Item, size)); err != nil {
+		if err := s.cache.EvictOnSuccess(ctx, s.PathForScale(event.Item, size), s.generate(ctx, event.Item, size)); err != nil {
 			slog.Error("generate for scale %d: %s", "err", err, "scale", size, "item", event.Item.Pathname, "fn", "thumbnail.generate")
 		}
 	}
 
-	if provider.VideoExtensions[event.Item.Extension] != "" && (forced || !a.HasStream(ctx, event.Item)) {
-		a.generateStreamIfNeeded(ctx, event)
+	if provider.VideoExtensions[event.Item.Extension] != "" && (forced || !s.HasStream(ctx, event.Item)) {
+		s.generateStreamIfNeeded(ctx, event)
 	}
 }
 
-func (a App) generateStreamIfNeeded(ctx context.Context, event provider.Event) {
-	if needStream, err := a.shouldGenerateStream(ctx, event.Item); err != nil {
+func (s Service) generateStreamIfNeeded(ctx context.Context, event provider.Event) {
+	if needStream, err := s.shouldGenerateStream(ctx, event.Item); err != nil {
 		slog.Error("determine if stream generation is possible", "err", err)
 	} else if needStream {
-		if err = a.cacheApp.EvictOnSuccess(ctx, getStreamPath(event.Item), a.generateStream(ctx, event.Item)); err != nil {
+		if err = s.cache.EvictOnSuccess(ctx, getStreamPath(event.Item), s.generateStream(ctx, event.Item)); err != nil {
 			slog.Error("generate stream", "err", err)
 		}
 	}
 }
 
-func (a App) delete(ctx context.Context, item absto.Item) {
+func (s Service) delete(ctx context.Context, item absto.Item) {
 	if item.IsDir() {
-		if err := a.storageApp.RemoveAll(ctx, provider.MetadataDirectory(item)); err != nil {
+		if err := s.storage.RemoveAll(ctx, provider.MetadataDirectory(item)); err != nil {
 			slog.Error("delete thumbnail folder", "err", err)
 		}
 		return
 	}
 
-	for _, size := range a.sizes {
-		filename := a.PathForScale(item, size)
+	for _, size := range s.sizes {
+		filename := s.PathForScale(item, size)
 
-		if err := a.storageApp.RemoveAll(ctx, filename); err != nil {
+		if err := s.storage.RemoveAll(ctx, filename); err != nil {
 			slog.Error("delete thumbnail", "err", err)
 		}
 
-		if err := a.redisClient.Delete(ctx, redisKey(filename)); err != nil {
+		if err := s.redisClient.Delete(ctx, redisKey(filename)); err != nil {
 			slog.Error("delete cache", "err", err)
 		}
 
-		if provider.VideoExtensions[item.Extension] != "" && a.HasStream(ctx, item) {
-			if err := a.deleteStream(ctx, item); err != nil {
+		if provider.VideoExtensions[item.Extension] != "" && s.HasStream(ctx, item) {
+			if err := s.deleteStream(ctx, item); err != nil {
 				slog.Error("delete stream", "err", err)
 			}
 		}
