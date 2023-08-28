@@ -127,8 +127,6 @@ func (s *Service) discordHandle(ctx context.Context, webhook provider.Webhook, e
 			thumbnailURL += "&scale=large"
 		}
 
-		slog.Info("Discord with thumbnail", "url", thumbnailURL)
-
 		embed.Thumbnail = discord.NewImage(thumbnailURL)
 	}
 
