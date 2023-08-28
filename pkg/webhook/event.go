@@ -15,6 +15,7 @@ import (
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
+	"github.com/ViBiOh/httputils/v4/pkg/cache"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 )
 
@@ -120,7 +121,7 @@ func (s *Service) discordHandle(ctx context.Context, webhook provider.Webhook, e
 		time.Sleep(pubsubThumbnailDiscordDelay)
 	}
 
-	if s.thumbnail.HasThumbnail(ctx, event.Item, thumbnail.SmallSize) {
+	if s.thumbnail.HasThumbnail(cache.Bypass(ctx), event.Item, thumbnail.SmallSize) {
 		thumbnailURL := event.GetURL() + "?thumbnail"
 
 		if _, ok := provider.VideoExtensions[event.Item.Extension]; ok {
