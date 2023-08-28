@@ -79,7 +79,7 @@ func (s Service) generateItem(ctx context.Context, event provider.Event) {
 		}
 
 		if err := s.cache.EvictOnSuccess(ctx, s.PathForScale(event.Item, size), s.generate(ctx, event.Item, size)); err != nil {
-			slog.Error("generate for scale %d: %s", "err", err, "scale", size, "item", event.Item.Pathname, "fn", "thumbnail.generate")
+			slog.Error("generate for scale", "err", err, "scale", size, "item", event.Item.Pathname, "fn", "thumbnail.generate")
 		}
 	}
 
