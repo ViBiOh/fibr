@@ -28,26 +28,26 @@ import (
 )
 
 type configuration struct {
-	thumbnail     thumbnail.Config
-	metadata      metadata.Config
-	telemetry     telemetry.Config
-	webhook       webhook.Config
-	alcotest      alcotest.Config
-	basic         basicMemory.Config
-	share         share.Config
-	storage       storage.Config
-	logger        logger.Config
-	renderer      renderer.Config
-	crud          crud.Config
-	owasp         owasp.Config
-	amqp          amqp.Config
-	absto         absto.Config
-	amqpThumbnail amqphandler.Config
-	amqpExif      amqphandler.Config
-	redis         redis.Config
-	appServer     server.Config
-	health        health.Config
-	sanitizer     sanitizer.Config
+	thumbnail     *thumbnail.Config
+	metadata      *metadata.Config
+	telemetry     *telemetry.Config
+	webhook       *webhook.Config
+	alcotest      *alcotest.Config
+	basic         *basicMemory.Config
+	share         *share.Config
+	storage       *storage.Config
+	logger        *logger.Config
+	renderer      *renderer.Config
+	crud          *crud.Config
+	owasp         *owasp.Config
+	amqp          *amqp.Config
+	absto         *absto.Config
+	amqpThumbnail *amqphandler.Config
+	amqpExif      *amqphandler.Config
+	redis         *redis.Config
+	appServer     *server.Config
+	health        *health.Config
+	sanitizer     *sanitizer.Config
 	disableAuth   bool
 }
 

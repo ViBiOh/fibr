@@ -70,7 +70,7 @@ type Config struct {
 	LargeSize uint64
 }
 
-func Flags(fs *flag.FlagSet, prefix string) Config {
+func Flags(fs *flag.FlagSet, prefix string) *Config {
 	var config Config
 
 	flags.New("URL", "Vith Thumbnail URL").Prefix(prefix).DocPrefix("thumbnail").StringVar(fs, &config.VithURL, "http://vith:1080", nil)
@@ -87,10 +87,10 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 
 	flags.New("LargeSize", "Size of large thumbnail for story display (thumbnail are always squared). 0 to disable").Prefix(prefix).DocPrefix("thumbnail").Uint64Var(fs, &config.LargeSize, 800, nil)
 
-	return config
+	return &config
 }
 
-func New(config Config, storage absto.Storage, redisClient redis.Client, meterProvider metric.MeterProvider, traceProvider trace.TracerProvider, amqpClient *amqp.Client) (Service, error) {
+func New(config *Config, storage absto.Storage, redisClient redis.Client, meterProvider metric.MeterProvider, traceProvider trace.TracerProvider, amqpClient *amqp.Client) (Service, error) {
 	var amqpExchange string
 
 	if amqpClient != nil {

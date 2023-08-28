@@ -16,15 +16,15 @@ type Config struct {
 	Ignore string
 }
 
-func Flags(fs *flag.FlagSet, prefix string) Config {
+func Flags(fs *flag.FlagSet, prefix string) *Config {
 	var config Config
 
 	flags.New("IgnorePattern", "Ignore pattern when listing files or directory").Prefix(prefix).DocPrefix("crud").StringVar(fs, &config.Ignore, "", nil)
 
-	return config
+	return &config
 }
 
-func Get(config Config, storage absto.Storage) (absto.Storage, error) {
+func Get(config *Config, storage absto.Storage) (absto.Storage, error) {
 	var pattern *regexp.Regexp
 
 	if len(config.Ignore) != 0 {

@@ -47,17 +47,17 @@ type Config struct {
 	ChunkUpload     bool
 }
 
-func Flags(fs *flag.FlagSet, prefix string) Config {
+func Flags(fs *flag.FlagSet, prefix string) *Config {
 	var config Config
 
 	flags.New("BcryptDuration", "Wanted bcrypt duration for calculating effective cost").Prefix(prefix).DocPrefix("crud").StringVar(fs, &config.BcryptDuration, "0.25s", nil)
 	flags.New("ChunkUpload", "Use chunk upload in browser").Prefix(prefix).DocPrefix("crud").BoolVar(fs, &config.ChunkUpload, false, nil)
 	flags.New("TemporaryFolder", "Temporary folder for chunk upload").Prefix(prefix).DocPrefix("crud").StringVar(fs, &config.TemporaryFolder, "/tmp", nil)
 
-	return config
+	return &config
 }
 
-func New(config Config, storageService absto.Storage, filteredStorage absto.Storage, rendererService *renderer.Service, shareService provider.ShareManager, webhookService provider.WebhookManager, thumbnailService thumbnail.Service, exifService provider.MetadataManager, searchService search.Service, eventProducer provider.EventProducer, tracerProvider trace.TracerProvider) (Service, error) {
+func New(config *Config, storageService absto.Storage, filteredStorage absto.Storage, rendererService *renderer.Service, shareService provider.ShareManager, webhookService provider.WebhookManager, thumbnailService thumbnail.Service, exifService provider.MetadataManager, searchService search.Service, eventProducer provider.EventProducer, tracerProvider trace.TracerProvider) (Service, error) {
 	service := Service{
 		chunkUpload:     config.ChunkUpload,
 		temporaryFolder: config.TemporaryFolder,

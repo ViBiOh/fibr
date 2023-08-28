@@ -30,15 +30,15 @@ type Config struct {
 	SanitizeOnStart bool
 }
 
-func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) Config {
+func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) *Config {
 	var config Config
 
 	flags.New("SanitizeOnStart", "Sanitize on start").Prefix(prefix).DocPrefix("crud").BoolVar(fs, &config.SanitizeOnStart, false, nil)
 
-	return config
+	return &config
 }
 
-func New(config Config, storageService absto.Storage, exclusiveService exclusive.Service, renamer Renamer, pushEvent provider.EventProducer) Service {
+func New(config *Config, storageService absto.Storage, exclusiveService exclusive.Service, renamer Renamer, pushEvent provider.EventProducer) Service {
 	return Service{
 		done:            make(chan struct{}),
 		storage:         storageService,

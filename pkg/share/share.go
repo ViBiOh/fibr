@@ -38,15 +38,15 @@ type Config struct {
 	PubsubChannel string
 }
 
-func Flags(fs *flag.FlagSet, prefix string) Config {
+func Flags(fs *flag.FlagSet, prefix string) *Config {
 	var config Config
 
 	flags.New("PubSubChannel", "Channel name").Prefix(prefix).DocPrefix("share").StringVar(fs, &config.PubsubChannel, "fibr:shares-channel", nil)
 
-	return config
+	return &config
 }
 
-func New(config Config, storageService absto.Storage, redisClient redis.Client, exclusiveService exclusive.Service) (*Service, error) {
+func New(config *Config, storageService absto.Storage, redisClient redis.Client, exclusiveService exclusive.Service) (*Service, error) {
 	return &Service{
 		clock:         time.Now,
 		shares:        make(map[string]provider.Share),

@@ -59,7 +59,7 @@ type Config struct {
 	DirectAccess bool
 }
 
-func Flags(fs *flag.FlagSet, prefix string) Config {
+func Flags(fs *flag.FlagSet, prefix string) *Config {
 	var config Config
 
 	flags.New("URL", "Exif Tool URL (exas)").Prefix(prefix).DocPrefix("exif").StringVar(fs, &config.ExifURL, "http://exas:1080", nil)
@@ -72,10 +72,10 @@ func Flags(fs *flag.FlagSet, prefix string) Config {
 	flags.New("AmqpExchange", "AMQP Exchange Name").Prefix(prefix).DocPrefix("exif").StringVar(fs, &config.AmqpExchange, "fibr", nil)
 	flags.New("AmqpRoutingKey", "AMQP Routing Key for exif").Prefix(prefix).DocPrefix("exif").StringVar(fs, &config.AmqpRoutingKey, "exif_input", nil)
 
-	return config
+	return &config
 }
 
-func New(config Config, storageService absto.Storage, meterProvider metric.MeterProvider, traceProvider trace.TracerProvider, amqpClient *amqpclient.Client, redisClient redis.Client, exclusiveService exclusive.Service) (Service, error) {
+func New(config *Config, storageService absto.Storage, meterProvider metric.MeterProvider, traceProvider trace.TracerProvider, amqpClient *amqpclient.Client, redisClient redis.Client, exclusiveService exclusive.Service) (Service, error) {
 	var amqpExchange string
 
 	if amqpClient != nil {

@@ -39,16 +39,16 @@ type Config struct {
 	PubsubChannel string
 }
 
-func Flags(fs *flag.FlagSet, prefix string) Config {
+func Flags(fs *flag.FlagSet, prefix string) *Config {
 	var config Config
 
 	flags.New("Secret", "Secret for HMAC Signature").Prefix(prefix).DocPrefix("webhook").StringVar(fs, &config.HmacSecret, "", nil)
 	flags.New("PubSubChannel", "Channel name").Prefix(prefix).DocPrefix("share").StringVar(fs, &config.PubsubChannel, "fibr:webhooks-channel", nil)
 
-	return config
+	return &config
 }
 
-func New(config Config, storageService absto.Storage, meterProvider metric.MeterProvider, redisClient redis.Client, rendererService *renderer.Service, thumbnailService thumbnail.Service, exclusiveApp exclusive.Service) *Service {
+func New(config *Config, storageService absto.Storage, meterProvider metric.MeterProvider, redisClient redis.Client, rendererService *renderer.Service, thumbnailService thumbnail.Service, exclusiveApp exclusive.Service) *Service {
 	var counter metric.Int64Counter
 	if meterProvider != nil {
 		meter := meterProvider.Meter("github.com/ViBiOh/fibr/pkg/webhook")

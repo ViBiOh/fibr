@@ -22,7 +22,7 @@ import (
 //go:embed templates static
 var content embed.FS
 
-func newLoginService(tracerProvider trace.TracerProvider, basicConfig basicMemory.Config) provider.Auth {
+func newLoginService(tracerProvider trace.TracerProvider, basicConfig *basicMemory.Config) provider.Auth {
 	basicService, err := basicMemory.New(basicConfig)
 	if err != nil {
 		slog.Error("auth memory", "err", err)
