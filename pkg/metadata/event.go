@@ -19,11 +19,11 @@ func (s Service) EventConsumer(ctx context.Context, e provider.Event) {
 	switch e.Type {
 	case provider.StartEvent:
 		if err = s.handleStartEvent(ctx, e); err != nil {
-			getEventLogger(e.Item).Error("start: %s", err)
+			getEventLogger(e.Item).Error("start", "err", err)
 		}
 	case provider.UploadEvent:
 		if err = s.handleUploadEvent(ctx, e.Item, true); err != nil {
-			getEventLogger(e.Item).Error("upload: %s", err)
+			getEventLogger(e.Item).Error("upload", "err", err)
 		}
 	case provider.RenameEvent:
 		if !e.Item.IsDir() {
@@ -34,11 +34,11 @@ func (s Service) EventConsumer(ctx context.Context, e provider.Event) {
 		}
 
 		if err != nil {
-			getEventLogger(e.Item).Error("rename: %s", err)
+			getEventLogger(e.Item).Error("rename", "err", err)
 		}
 	case provider.DeleteEvent:
 		if err := s.delete(ctx, e.Item); err != nil {
-			getEventLogger(e.Item).Error("delete: %s", err)
+			getEventLogger(e.Item).Error("delete", "err", err)
 		}
 	}
 }

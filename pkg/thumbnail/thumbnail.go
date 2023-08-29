@@ -8,6 +8,7 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"path"
 	"strings"
 	"time"
 
@@ -204,14 +205,12 @@ func (s Service) Serve(w http.ResponseWriter, r *http.Request, item absto.Item) 
 		return
 	}
 
-	baseName := name
-
 	defer provider.LogClose(reader, "thumbnail.Serve", item.Pathname)
 
 	w.Header().Add("Cache-Control", cacheDuration)
-	w.Header().Add("Content-Disposition", fmt.Sprintf("inline; filename=%s", baseName))
+	w.Header().Add("Content-Disposition", fmt.Sprintf("inline; filename=%s", path.Base(name)))
 
-	http.ServeContent(w, r, baseName, item.Date, reader)
+	http.ServeContent(w, r, name, item.Date, reader)
 }
 
 func (s Service) List(w http.ResponseWriter, r *http.Request, item absto.Item, items []absto.Item) {
