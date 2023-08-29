@@ -80,7 +80,7 @@ spec:
     ingress:
       enabled: true
       sticky: true
-      compress: true
+      compress: false
       hosts:
         - fibr.vibioh.fr
     pprof:
