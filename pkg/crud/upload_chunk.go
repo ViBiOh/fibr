@@ -102,18 +102,22 @@ func (s Service) mergeChunk(w http.ResponseWriter, r *http.Request, request prov
 		s.error(w, r, request, model.WrapInternal(err))
 		return
 	}
+
 	filePath := request.SubPath(fileName)
 	err = provider.WriteToStorage(ctx, s.storage, filePath, size, file)
 
-	if err == nil {
-		go func(ctx context.Context) {
-			if info, infoErr := s.storage.Stat(ctx, filePath); infoErr != nil {
-				slog.Error("get info for upload event", "err", infoErr)
-			} else {
-				s.pushEvent(ctx, provider.NewUploadEvent(ctx, request, info, s.bestSharePath(filePath), s.renderer))
-			}
-		}(cntxt.WithoutDeadline(ctx))
+	if err != nil {
+		s.error(w, r, request, model.WrapInternal(err))
+		return
 	}
+
+	go func(ctx context.Context) {
+		if info, infoErr := s.storage.Stat(ctx, filePath); infoErr != nil {
+			slog.Error("get info for upload event", "err", infoErr)
+		} else {
+			s.pushEvent(ctx, provider.NewUploadEvent(ctx, request, info, s.bestSharePath(filePath), s.renderer))
+		}
+	}(cntxt.WithoutDeadline(ctx))
 
 	if err = os.RemoveAll(tempFolder); err != nil {
 		slog.Error("delete chunk folder", "err", err, "folder", tempFolder)

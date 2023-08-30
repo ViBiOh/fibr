@@ -102,16 +102,16 @@ func (s Service) save(ctx context.Context, item absto.Item, content Searches) er
 
 	if _, err := s.storage.Stat(ctx, dirname); err != nil {
 		if !absto.IsNotExist(err) {
-			return fmt.Errorf("check directory existence: %w", err)
+			return fmt.Errorf("check directory `%s` existence: %w", dirname, err)
 		}
 
 		if err = s.storage.Mkdir(ctx, dirname, absto.DirectoryPerm); err != nil {
-			return fmt.Errorf("create directory: %w", err)
+			return fmt.Errorf("create directory `%s`: %w", dirname, err)
 		}
 	}
 
 	if err := provider.SaveJSON(ctx, s.storage, filename, content); err != nil {
-		return fmt.Errorf("save: %w", err)
+		return fmt.Errorf("save `%s`: %w", filename, err)
 	}
 
 	return nil
