@@ -8,6 +8,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"syscall"
 
 	_ "net/http/pprof"
 
@@ -84,5 +85,5 @@ func main() {
 
 	go adapters.eventBus.Start(endCtx, adapters.storage, []provider.Renamer{services.thumbnail.Rename, services.metadata.Rename}, services.share.EventConsumer, services.thumbnail.EventConsumer, services.metadata.EventConsumer, services.webhook.EventConsumer)
 
-	clients.health.WaitForTermination(ports.TerminateOnDone())
+	clients.health.WaitForTermination(ports.TerminateOnDone(), syscall.SIGTERM)
 }
