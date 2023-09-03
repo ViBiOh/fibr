@@ -244,7 +244,7 @@ Usage of fibr:
   --exifURL                           string        [exif] Exif Tool URL (exas) ${FIBR_EXIF_URL} (default "http://exas:1080")
   --exifUser                          string        [exif] Exif Tool URL Basic User ${FIBR_EXIF_USER}
   --frameOptions                      string        [owasp] X-Frame-Options ${FIBR_FRAME_OPTIONS} (default "SAMEORIGIN")
-  --graceDuration                     duration      [http] Grace duration when SIGTERM received ${FIBR_GRACE_DURATION} (default 30s)
+  --graceDuration                     duration      [http] Grace duration when signal received ${FIBR_GRACE_DURATION} (default 30s)
   --hsts                                            [owasp] Indicate Strict Transport Security ${FIBR_HSTS} (default true)
   --idleTimeout                       duration      [server] Idle Timeout ${FIBR_IDLE_TIMEOUT} (default 2m0s)
   --ignorePattern                     string        [crud] Ignore pattern when listing files or directory ${FIBR_IGNORE_PATTERN}
@@ -262,7 +262,6 @@ Usage of fibr:
   --publicURL                         string        Public URL ${FIBR_PUBLIC_URL} (default "http://localhost:1080")
   --readTimeout                       duration      [server] Read Timeout ${FIBR_READ_TIMEOUT} (default 2m0s)
   --redisAddress                      string slice  [redis] Redis Address host:port (blank to disable) ${FIBR_REDIS_ADDRESS}, as a string slice, environment variable separated by ","
-  --redisAlias                        string        [redis] Connection alias, for metric ${FIBR_REDIS_ALIAS}
   --redisDatabase                     int           [redis] Redis Database ${FIBR_REDIS_DATABASE} (default 0)
   --redisMinIdleConn                  int           [redis] Redis Minimum Idle Connections ${FIBR_REDIS_MIN_IDLE_CONN} (default 0)
   --redisPassword                     string        [redis] Redis Password, if any ${FIBR_REDIS_PASSWORD}
