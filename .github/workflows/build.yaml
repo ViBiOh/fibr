@@ -80,7 +80,7 @@ jobs:
           curl --disable --silent --show-error --location --max-time 30 -o mime.types "https://svn.apache.org/viewvc/httpd/httpd/trunk/docs/conf/mime.types?view=co"
           DOCKER_IMAGE="${{ secrets.DOCKER_USER }}/$(make name)" IMAGE_VERSION="$(make version)" ./scripts/release build
       - name: Setup Docker
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
       - name: Setup DockerHub
         if: env.DOCKER_USER && env.DOCKER_PASS
         env:
