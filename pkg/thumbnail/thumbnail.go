@@ -272,7 +272,7 @@ func (s Service) thumbnailHash(ctx context.Context, items []absto.Item) string {
 		ids[index] = s.PathForScale(item, SmallSize)
 	}
 
-	thumbnails, err := s.cache.List(ctx, onCacheError, ids...)
+	thumbnails, err := s.cache.List(ctx, ids...)
 	if err != nil && !absto.IsNotExist(err) {
 		slog.Error("list thumbnails from cache", "err", err)
 	}
