@@ -61,15 +61,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	services, err := newServices(config, clients, adapters)
+	endCtx := clients.health.End(ctx)
+
+	services, err := newServices(endCtx, config, clients, adapters)
 	if err != nil {
 		slog.Error("services", "err", err)
 		os.Exit(1)
 	}
 
 	ports := newPorts(config, clients, services)
-
-	endCtx := clients.health.End(ctx)
 
 	stopOnDone := Starters{services.amqpThumbnail, services.amqpExif, services.sanitizer}
 	stopOnDone.Start(clients.health.Done(ctx))

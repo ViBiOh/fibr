@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+
 	"github.com/ViBiOh/fibr/pkg/crud"
 	"github.com/ViBiOh/fibr/pkg/fibr"
 	"github.com/ViBiOh/fibr/pkg/metadata"
@@ -26,7 +28,7 @@ type services struct {
 	thumbnail     thumbnail.Service
 }
 
-func newServices(config configuration, clients client, adapters adapters) (services, error) {
+func newServices(ctx context.Context, config configuration, clients client, adapters adapters) (services, error) {
 	thumbnailService, err := thumbnail.New(config.thumbnail, adapters.storage, clients.redis, clients.telemetry.MeterProvider(), clients.telemetry.TracerProvider(), clients.amqp)
 	if err != nil {
 		return services{}, err
@@ -37,7 +39,7 @@ func newServices(config configuration, clients client, adapters adapters) (servi
 		return services{}, err
 	}
 
-	metadataService, err := metadata.New(config.metadata, adapters.storage, clients.telemetry.MeterProvider(), clients.telemetry.TracerProvider(), clients.amqp, clients.redis, adapters.exclusiveService)
+	metadataService, err := metadata.New(ctx, config.metadata, adapters.storage, clients.telemetry.MeterProvider(), clients.telemetry.TracerProvider(), clients.amqp, clients.redis, adapters.exclusiveService)
 	if err != nil {
 		return services{}, err
 	}

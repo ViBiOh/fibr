@@ -75,7 +75,7 @@ func Flags(fs *flag.FlagSet, prefix string) *Config {
 	return &config
 }
 
-func New(config *Config, storageService absto.Storage, meterProvider metric.MeterProvider, traceProvider trace.TracerProvider, amqpClient *amqpclient.Client, redisClient redis.Client, exclusiveService exclusive.Service) (Service, error) {
+func New(ctx context.Context, config *Config, storageService absto.Storage, meterProvider metric.MeterProvider, traceProvider trace.TracerProvider, amqpClient *amqpclient.Client, redisClient redis.Client, exclusiveService exclusive.Service) (Service, error) {
 	var amqpExchange string
 
 	if amqpClient != nil {
@@ -127,7 +127,7 @@ func New(config *Config, storageService absto.Storage, meterProvider metric.Mete
 		}
 
 		return service.loadExif(ctx, item)
-	}, traceProvider).WithMaxConcurrency(provider.MaxConcurrency)
+	}, traceProvider).WithMaxConcurrency(provider.MaxConcurrency).WithClientSideCaching(ctx, "fibr_exif")
 
 	service.aggregateCache = cache.New(redisClient, redisKey, func(ctx context.Context, item absto.Item) (provider.Aggregate, error) {
 		if !item.IsDir() {
@@ -135,7 +135,7 @@ func New(config *Config, storageService absto.Storage, meterProvider metric.Mete
 		}
 
 		return service.loadAggregate(ctx, item)
-	}, traceProvider).WithMaxConcurrency(provider.MaxConcurrency)
+	}, traceProvider).WithMaxConcurrency(provider.MaxConcurrency).WithClientSideCaching(ctx, "fibr_aggregate")
 
 	return service, nil
 }
