@@ -91,7 +91,7 @@ func Flags(fs *flag.FlagSet, prefix string) *Config {
 	return &config
 }
 
-func New(config *Config, storage absto.Storage, redisClient redis.Client, meterProvider metric.MeterProvider, traceProvider trace.TracerProvider, amqpClient *amqp.Client) (Service, error) {
+func New(ctx context.Context, config *Config, storage absto.Storage, redisClient redis.Client, meterProvider metric.MeterProvider, traceProvider trace.TracerProvider, amqpClient *amqp.Client) (Service, error) {
 	var amqpExchange string
 
 	if amqpClient != nil {
@@ -150,7 +150,9 @@ func New(config *Config, storage absto.Storage, redisClient redis.Client, meterP
 
 	service.cache = cache.New(redisClient, redisKey, func(ctx context.Context, pathname string) (absto.Item, error) {
 		return service.storage.Stat(ctx, pathname)
-	}, traceProvider).WithMaxConcurrency(provider.MaxConcurrency)
+	}, traceProvider).
+		WithMaxConcurrency(provider.MaxConcurrency).
+		WithClientSideCaching(ctx, "fibr_thumbnail")
 
 	return service, nil
 }

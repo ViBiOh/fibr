@@ -127,7 +127,9 @@ func New(ctx context.Context, config *Config, storageService absto.Storage, mete
 		}
 
 		return service.loadExif(ctx, item)
-	}, traceProvider).WithMaxConcurrency(provider.MaxConcurrency).WithClientSideCaching(ctx, "fibr_exif")
+	}, traceProvider).
+		WithMaxConcurrency(provider.MaxConcurrency).
+		WithClientSideCaching(ctx, "fibr_exif")
 
 	service.aggregateCache = cache.New(redisClient, redisKey, func(ctx context.Context, item absto.Item) (provider.Aggregate, error) {
 		if !item.IsDir() {
@@ -135,7 +137,9 @@ func New(ctx context.Context, config *Config, storageService absto.Storage, mete
 		}
 
 		return service.loadAggregate(ctx, item)
-	}, traceProvider).WithMaxConcurrency(provider.MaxConcurrency).WithClientSideCaching(ctx, "fibr_aggregate")
+	}, traceProvider).
+		WithMaxConcurrency(provider.MaxConcurrency).
+		WithClientSideCaching(ctx, "fibr_aggregate")
 
 	return service, nil
 }

@@ -29,7 +29,7 @@ type services struct {
 }
 
 func newServices(ctx context.Context, config configuration, clients client, adapters adapters) (services, error) {
-	thumbnailService, err := thumbnail.New(config.thumbnail, adapters.storage, clients.redis, clients.telemetry.MeterProvider(), clients.telemetry.TracerProvider(), clients.amqp)
+	thumbnailService, err := thumbnail.New(ctx, config.thumbnail, adapters.storage, clients.redis, clients.telemetry.MeterProvider(), clients.telemetry.TracerProvider(), clients.amqp)
 	if err != nil {
 		return services{}, err
 	}
