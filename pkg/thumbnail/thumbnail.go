@@ -152,7 +152,7 @@ func New(ctx context.Context, config *Config, storage absto.Storage, redisClient
 		return service.storage.Stat(ctx, pathname)
 	}, traceProvider).
 		WithMaxConcurrency(provider.MaxConcurrency).
-		WithClientSideCaching(ctx, "fibr_thumbnail")
+		WithClientSideCaching(ctx, "fibr_thumbnail", provider.MaxClientSideCaching)
 
 	return service, nil
 }

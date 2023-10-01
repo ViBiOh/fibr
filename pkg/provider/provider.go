@@ -9,6 +9,7 @@ import (
 const (
 	MetadataDirectoryName = "/.fibr"
 	MaxConcurrency        = 6
+	MaxClientSideCaching  = 2000
 )
 
 var (
