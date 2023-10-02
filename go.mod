@@ -10,7 +10,7 @@ require (
 	github.com/ViBiOh/auth/v2 v2.16.1
 	github.com/ViBiOh/exas v0.7.1
 	github.com/ViBiOh/flags v1.4.1
-	github.com/ViBiOh/httputils/v4 v4.66.4
+	github.com/ViBiOh/httputils/v4 v4.66.5
 	github.com/ViBiOh/vith v0.6.0
 	github.com/rabbitmq/amqp091-go v1.8.1
 	github.com/redis/go-redis/v9 v9.2.1
