@@ -97,8 +97,7 @@ func (s *Service) Start(ctx context.Context) {
 		return
 	}
 
-	done, unsubscribe := redis.SubscribeFor(ctx, s.redisClient, s.pubsubChannel, s.PubSubHandle)
-	defer func() { <-done }()
+	unsubscribe := redis.SubscribeFor(ctx, s.redisClient, s.pubsubChannel, s.PubSubHandle)
 	defer func() {
 		slog.Info("Unsubscribing Webhook's PubSub...")
 
