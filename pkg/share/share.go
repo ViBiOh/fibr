@@ -14,7 +14,6 @@ import (
 	"github.com/ViBiOh/fibr/pkg/exclusive"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/flags"
-	"github.com/ViBiOh/httputils/v4/pkg/cntxt"
 	"github.com/ViBiOh/httputils/v4/pkg/cron"
 	"github.com/ViBiOh/httputils/v4/pkg/redis"
 )
@@ -98,14 +97,7 @@ func (s *Service) Start(ctx context.Context) {
 		return
 	}
 
-	unsubscribe := redis.SubscribeFor(ctx, s.redisClient, s.pubsubChannel, s.PubSubHandle)
-	defer func() {
-		slog.Info("Unsubscribing Share's PubSub...")
-
-		if unsubscribeErr := unsubscribe(cntxt.WithoutDeadline(ctx)); unsubscribeErr != nil {
-			slog.Error("Share's unsubscribe", "err", unsubscribeErr)
-		}
-	}()
+	go redis.SubscribeFor(ctx, s.redisClient, s.pubsubChannel, s.PubSubHandle)
 
 	purgeCron := cron.New().Each(time.Hour).OnError(func(err error) {
 		slog.Error("purge shares", "err", err)
