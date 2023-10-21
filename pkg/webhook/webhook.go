@@ -12,7 +12,6 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/flags"
-	"github.com/ViBiOh/httputils/v4/pkg/cntxt"
 	"github.com/ViBiOh/httputils/v4/pkg/redis"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 	"go.opentelemetry.io/otel/metric"
@@ -97,16 +96,7 @@ func (s *Service) Start(ctx context.Context) {
 		return
 	}
 
-	unsubscribe := redis.SubscribeFor(ctx, s.redisClient, s.pubsubChannel, s.PubSubHandle)
-	defer func() {
-		slog.Info("Unsubscribing Webhook's PubSub...")
-
-		if unsubscribeErr := unsubscribe(cntxt.WithoutDeadline(ctx)); unsubscribeErr != nil {
-			slog.Error("Webhook's unsubscribe", "err", unsubscribeErr)
-		}
-	}()
-
-	<-ctx.Done()
+	redis.SubscribeFor(ctx, s.redisClient, s.pubsubChannel, s.PubSubHandle)
 }
 
 func (s *Service) loadWebhooks(ctx context.Context) error {
