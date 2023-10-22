@@ -85,12 +85,9 @@ func main() {
 
 	appServer := server.New(config.appServer)
 
-	go appServer.Start(endCtx, "http", httputils.Handler(
-		services.renderer.Handler(services.fibr.TemplateFunc),
-		clients.health, recoverer.Middleware, clients.telemetry.Middleware("http"), owasp.New(config.owasp).Middleware,
-	))
+	go appServer.Start(endCtx, httputils.Handler(services.renderer.Handler(services.fibr.TemplateFunc), clients.health, recoverer.Middleware, clients.telemetry.Middleware("http"), owasp.New(config.owasp).Middleware))
 
 	clients.health.WaitForTermination(appServer.Done())
 
-	appServer.Stop(ctx)
+	server.GracefulWait(appServer.Done())
 }
