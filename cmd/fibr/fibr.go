@@ -16,6 +16,10 @@ import (
 	basicMemory "github.com/ViBiOh/auth/v2/pkg/store/memory"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/alcotest"
+	"github.com/ViBiOh/httputils/v4/pkg/httputils"
+	"github.com/ViBiOh/httputils/v4/pkg/owasp"
+	"github.com/ViBiOh/httputils/v4/pkg/recoverer"
+	"github.com/ViBiOh/httputils/v4/pkg/server"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -61,7 +65,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	endCtx := clients.health.End(ctx)
+	endCtx := clients.health.EndCtx()
 
 	services, err := newServices(endCtx, config, clients, adapters)
 	if err != nil {
@@ -69,20 +73,24 @@ func main() {
 		os.Exit(1)
 	}
 
-	ports := newPorts(config, clients, services)
-
 	stopOnDone := Starters{services.amqpThumbnail, services.amqpExif, services.sanitizer}
-	stopOnDone.Start(clients.health.Done(ctx))
+	stopOnDone.Start(clients.health.DoneCtx())
 	defer stopOnDone.GracefulWait()
 
 	stopOnEnd := Starters{services.webhook, services.share}
 	stopOnEnd.Start(endCtx)
 	defer stopOnEnd.GracefulWait()
 
-	ports.Start(endCtx)
-	defer ports.GracefulWait()
-
 	go adapters.eventBus.Start(endCtx, adapters.storage, []provider.Renamer{services.thumbnail.Rename, services.metadata.Rename}, services.share.EventConsumer, services.thumbnail.EventConsumer, services.metadata.EventConsumer, services.webhook.EventConsumer)
 
-	clients.health.WaitForTermination(ports.TerminateOnDone())
+	appServer := server.New(config.appServer)
+
+	go appServer.Start(endCtx, "http", httputils.Handler(
+		services.renderer.Handler(services.fibr.TemplateFunc),
+		clients.health, recoverer.Middleware, clients.telemetry.Middleware("http"), owasp.New(config.owasp).Middleware,
+	))
+
+	clients.health.WaitForTermination(appServer.Done())
+
+	appServer.Stop(ctx)
 }
