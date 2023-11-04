@@ -71,10 +71,10 @@
   <div class="content">
     <div id="menu" class="flex flex-center">
       <a id="list-display" class="button button-icon" href="?d=list&{{ raw .Search.Encode }}" title="List layout">
-        <img class="icon" src="{{ url "/svg/list?fill=aliceblue" }}" alt="list">
+        <img class="icon" src="{{ url "/svg/list?fill=silver" }}" alt="list">
       </a>
       <a id="grid-display" class="button button-icon" href="?d=grid&{{ raw .Search.Encode }}" title="Grid layout">
-        <img class="icon" src="{{ url "/svg/grid?fill=aliceblue" }}" alt="grid">
+        <img class="icon" src="{{ url "/svg/grid?fill=silver" }}" alt="grid">
       </a>
 
       <span class="padding-left">
@@ -85,13 +85,13 @@
 
       {{ if gt (len .Files) 0 }}
         <a class="padding" href="?download&{{ raw .Search.Encode }}" title="Download results in an archive" download>
-          <img class="icon" src="{{ url "/svg/download?fill=aliceblue" }}" alt="download">
+          <img class="icon" src="{{ url "/svg/download?fill=silver" }}" alt="download">
         </a>
       {{ end }}
 
       {{ if .HasMap }}
         <a class="padding" href="#map" title="View on map">
-          <img class="icon" src="{{ url "/svg/map?fill=aliceblue" }}" alt="map">
+          <img class="icon" src="{{ url "/svg/map?fill=silver" }}" alt="map">
         </a>
       {{ end }}
     </div>
@@ -113,18 +113,18 @@
                 <img class="icon icon-overlay" src="{{ url "/svg/play?fill=rgba(39,39,39,0.8)" }}" alt="play icon" title="Play video">
               {{ end }}
             {{ else }}
-              <img class="icon {{ if eq $root.Request.Display "grid" }}icon-large{{ end }}" src="{{ url "/svg/" }}{{ if .IsDir }}folder{{ else }}{{ iconFromExtension . }}{{ end }}?fill=aliceblue" alt="{{ if .IsDir }}folder{{ else }}file{{ end }}">
+              <img class="icon {{ if eq $root.Request.Display "grid" }}icon-large{{ end }}" src="{{ url "/svg/" }}{{ if .IsDir }}folder{{ else }}{{ iconFromExtension . }}{{ end }}?fill=silver" alt="{{ if .IsDir }}folder{{ else }}file{{ end }}">
               <span class="filename ellipsis {{ if eq $root.Request.Display "list" }}padding-left{{ end }}">{{ .URL }}</span>
             {{ end }}
 
             <a href="{{ .URL }}?download" class="button button-icon file-download" title="Download {{ .Name }}" download="{{ .Name }}">
-              <img class="icon" src="{{ url "/svg/download?fill=aliceblue" }}" alt="download">
+              <img class="icon" src="{{ url "/svg/download?fill=silver" }}" alt="download">
             </a>
           </a>
 
           {{ if .Tags }}
             {{- if eq $root.Request.Display "grid" -}}
-              <img class="icon tags" src="{{ url "/svg/tag" }}?fill=aliceblue" alt="tag" title="#{{ join .Tags " #" }}">
+              <img class="icon tags" src="{{ url "/svg/tag" }}?fill=silver" alt="tag" title="#{{ join .Tags " #" }}">
             {{ else }}
               <em class="tags ellipsis padding-left">
                 #{{ join .Tags " #" }}

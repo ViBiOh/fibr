@@ -9,18 +9,18 @@
     const lazyLoadThumbnail = true;
   </script>
 
-  <link rel="preload" as="image" href="{{ url "/svg/link?fill=%23272727" }}">
+  <link rel="preload" as="image" href="{{ url "/svg/link?fill=%23000000" }}">
 
   {{ if .Request.CanEdit }}
-    <link rel="preload" as="image" href="{{ url "/svg/upload?fill=aliceblue" }}">
+    <link rel="preload" as="image" href="{{ url "/svg/upload?fill=silver" }}">
 
     {{ template "upload-modal" . }}
   {{ end }}
 
   {{ if not .Request.Share.Story }}
-    <link rel="preload" as="image" href="{{ url "/svg/list?fill=aliceblue" }}">
-    <link rel="preload" as="image" href="{{ url "/svg/grid?fill=aliceblue" }}">
-    <link rel="preload" as="image" href="{{ url "/svg/image?fill=aliceblue" }}">
+    <link rel="preload" as="image" href="{{ url "/svg/list?fill=silver" }}">
+    <link rel="preload" as="image" href="{{ url "/svg/grid?fill=silver" }}">
+    <link rel="preload" as="image" href="{{ url "/svg/image?fill=silver" }}">
   {{ end }}
 
   {{ if not .Request.Share.Story }}
@@ -156,26 +156,26 @@
     {{ if not .Request.Share.Story }}
       <div id="menu" class="flex flex-center">
         <a id="list-display" class="button button-icon" href="?d=list" title="List layout">
-          <img class="icon" src="{{ url "/svg/list?fill=aliceblue" }}" alt="list">
+          <img class="icon" src="{{ url "/svg/list?fill=silver" }}" alt="list">
         </a>
         <a id="grid-display" class="button button-icon" href="?d=grid" title="Grid layout">
-          <img class="icon" src="{{ url "/svg/grid?fill=aliceblue" }}" alt="grid">
+          <img class="icon" src="{{ url "/svg/grid?fill=silver" }}" alt="grid">
         </a>
         <a id="story-display" class="button button-icon" href="?d=story" title="Story layout">
-          <img class="icon" src="{{ url "/svg/image?fill=aliceblue" }}" alt="picture">
+          <img class="icon" src="{{ url "/svg/image?fill=silver" }}" alt="picture">
         </a>
 
         <span class="flex-grow"></span>
 
         {{ if .Request.CanEdit }}
           <a id="upload-button-link" href="#upload-modal" class="button button-icon" title="Upload file">
-            <img class="icon" src="{{ url "/svg/upload?fill=aliceblue" }}" alt="upload">
+            <img class="icon" src="{{ url "/svg/upload?fill=silver" }}" alt="upload">
           </a>
         {{ end }}
 
         {{ if .HasMap }}
           <a class="padding" href="#map" title="View on map">
-            <img class="icon" src="{{ url "/svg/map?fill=aliceblue" }}" alt="map">
+            <img class="icon" src="{{ url "/svg/map?fill=silver" }}" alt="map">
           </a>
         {{ end }}
       </div>
@@ -196,7 +196,7 @@
             {{ if or (.Exif.Geocode.HasAddress) (not .Exif.Date.IsZero) }}
               <p class="context">
                 {{ if .Exif.Geocode.HasAddress }}
-                  <img class="icon margin-right-half" src="{{ url "/svg/location?fill=%23272727" }}" alt="location">
+                  <img class="icon margin-right-half" src="{{ url "/svg/location?fill=%23000000" }}" alt="location">
                   <span class="location">
                     {{ if index .Exif.Geocode.Address "city_district" }}
                       {{ index .Exif.Geocode.Address "city_district" }},
@@ -213,7 +213,7 @@
                 </span>
 
                 {{ if not .Exif.Date.IsZero }}
-                  <img class="icon margin-right-half{{ if .Exif.Geocode.HasAddress }} margin-left-half{{ end }}" src="{{ url "/svg/calendar?fill=%23272727" }}" alt="calendar">
+                  <img class="icon margin-right-half{{ if .Exif.Geocode.HasAddress }} margin-left-half{{ end }}" src="{{ url "/svg/calendar?fill=%23000000" }}" alt="calendar">
                   <span class="date">{{ .Exif.Date.Format "2006-01-02T15:04:05Z07:00" }}</span>
                 {{ end }}
               </p>
@@ -221,7 +221,7 @@
 
             {{ if index .Exif.Data "Model" }}
               <p class="context">
-                <img class="icon margin-right-half" src="{{ url "/svg/camera?fill=%23272727" }}" alt="camera">
+                <img class="icon margin-right-half" src="{{ url "/svg/camera?fill=%23000000" }}" alt="camera">
                 {{ index .Exif.Data "Model" }}
               </p>
             {{ end }}
@@ -237,11 +237,11 @@
 
             {{ if $root.Request.CanEdit }}
               <a href="#desc-modal-{{ .ID }}" class="button button-icon desc-edit" title="Edit description">
-                <img class="icon" src="{{ url "/svg/pencil-alt?fill=%23272727" }}" alt="edit description">
+                <img class="icon" src="{{ url "/svg/pencil-alt?fill=%23000000" }}" alt="edit description">
               </a>
             {{ end }}
             <a href="#{{ .ID }}" class="button button-icon permalink" title="Link to image">
-              <img class="icon" src="{{ url "/svg/link?fill=%23272727" }}" alt="link">
+              <img class="icon" src="{{ url "/svg/link?fill=%23000000" }}" alt="link">
             </a>
           </div>
         </li>
