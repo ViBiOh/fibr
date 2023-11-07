@@ -17,7 +17,7 @@ var (
 	AudioExtensions   = map[string]bool{".mp3": true}
 	CodeExtensions    = map[string]bool{".html": true, ".css": true, ".js": true, ".jsx": true, ".json": true, ".yml": true, ".yaml": true, ".toml": true, ".md": true, ".go": true, ".py": true, ".java": true, ".xml": true}
 	ExcelExtensions   = map[string]bool{".xls": true, ".xlsx": true, ".xlsm": true}
-	ImageExtensions   = map[string]bool{".jpg": true, ".jpeg": true, ".png": true, ".gif": true, ".svg": true, ".tiff": true, ".webp": true, ".heic": true}
+	ImageExtensions   = map[string]bool{".jpg": true, ".jpeg": true, ".png": true, ".gif": true, ".svg": true, ".tiff": true, ".webp": true, ".heic": true, ".dng": true}
 	PdfExtensions     = map[string]bool{".pdf": true}
 	VideoExtensions   = map[string]string{".mp4": "video/mp4", ".mov": "video/mp4", ".avi": "video/x-msvideo", ".ogg": "video/ogg", ".mkv": "video/x-matroska"}
 	StreamExtensions  = map[string]bool{".ts": true}
