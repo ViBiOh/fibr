@@ -18,8 +18,6 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 )
 
-const pubsubThumbnailDiscordDelay = 10 * time.Second
-
 func (s *Service) EventConsumer(ctx context.Context, event provider.Event) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
@@ -113,11 +111,6 @@ func (s *Service) discordHandle(ctx context.Context, webhook provider.Webhook, e
 		Description: description,
 		URL:         contentURL,
 		Fields:      fields,
-	}
-
-	if s.redisClient != nil {
-		// Waiting a couple of seconds before checking for thumbnail
-		time.Sleep(pubsubThumbnailDiscordDelay)
 	}
 
 	if s.thumbnail.HasThumbnail(ctx, event.Item, thumbnail.SmallSize) {
