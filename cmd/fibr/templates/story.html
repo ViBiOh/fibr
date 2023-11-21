@@ -222,7 +222,7 @@
             {{ if index .Exif.Data "Model" }}
               <p class="context">
                 <img class="icon margin-right-half" src="{{ url "/svg/camera?fill=%23000000" }}" alt="camera">
-                {{ index .Exif.Data "Model" }}
+                {{ index .Exif.Data "Model" }}{{- if index .Exif.Data "FocalLength" }}, {{ index .Exif.Data "FocalLength" }}{{ end }}{{- if index .Exif.Data "Aperture" }} f/{{ index .Exif.Data "Aperture" }}{{ end }}
               </p>
             {{ end }}
 
