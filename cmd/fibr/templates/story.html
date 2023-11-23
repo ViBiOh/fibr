@@ -222,7 +222,17 @@
             {{ if index .Exif.Data "Model" }}
               <p class="context">
                 <img class="icon margin-right-half" src="{{ url "/svg/camera?fill=%23000000" }}" alt="camera">
-                {{ index .Exif.Data "Model" }}{{- if index .Exif.Data "FocalLength" }}, {{ index .Exif.Data "FocalLength" }}{{ end }}{{- if index .Exif.Data "Aperture" }} f/{{ index .Exif.Data "Aperture" }}{{ end }}
+                {{ index .Exif.Data "Model" }}
+
+                {{ if index .Exif.Data "FocalLength" }}
+                  <img class="icon margin-right-half" src="{{ url "/svg/lens?fill=%23000000" }}" alt="lens">
+                  {{ index .Exif.Data "FocalLength" }}
+                {{ end }}
+
+                {{ if index .Exif.Data "Aperture" }}
+                  <img class="icon margin-right-half" src="{{ url "/svg/aperture?fill=%23000000" }}" alt="aperture">
+                  f/{{ index .Exif.Data "Aperture" }}
+                {{ end }}
               </p>
             {{ end }}
 
