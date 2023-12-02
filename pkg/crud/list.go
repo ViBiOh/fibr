@@ -38,7 +38,7 @@ func (s Service) list(ctx context.Context, request provider.Request, message ren
 
 		directoryAggregate, err = s.metadata.GetAggregateFor(ctx, item)
 		if err != nil && !absto.IsNotExist(err) {
-			listLogger(item.Pathname).Error("get aggregate", "err", err)
+			listLogger(item.Pathname).ErrorContext(ctx, "get aggregate", "err", err)
 		}
 	})
 
@@ -48,7 +48,7 @@ func (s Service) list(ctx context.Context, request provider.Request, message ren
 
 		aggregates, err = s.metadata.GetAllAggregateFor(ctx, files...)
 		if err != nil {
-			listLogger(item.Pathname).Error("list aggregates", "err", err)
+			listLogger(item.Pathname).ErrorContext(ctx, "list aggregates", "err", err)
 		}
 	})
 
@@ -58,7 +58,7 @@ func (s Service) list(ctx context.Context, request provider.Request, message ren
 
 		metadatas, err = s.metadata.GetAllMetadataFor(ctx, files...)
 		if err != nil {
-			listLogger(item.Pathname).Error("list metadatas", "err", err)
+			listLogger(item.Pathname).ErrorContext(ctx, "list metadatas", "err", err)
 		}
 	})
 
@@ -71,7 +71,7 @@ func (s Service) list(ctx context.Context, request provider.Request, message ren
 
 		thumbnails, err = s.thumbnail.ListDir(ctx, item)
 		if err != nil {
-			listLogger(item.Pathname).Error("list thumbnail", "err", err)
+			listLogger(item.Pathname).ErrorContext(ctx, "list thumbnail", "err", err)
 			return
 		}
 	}()
@@ -85,7 +85,7 @@ func (s Service) list(ctx context.Context, request provider.Request, message ren
 
 		savedSearches, err = s.searchService.List(ctx, item)
 		if err != nil {
-			listLogger(item.Pathname).Error("list saved searches", "err", err)
+			listLogger(item.Pathname).ErrorContext(ctx, "list saved searches", "err", err)
 			return
 		}
 	}()
@@ -160,9 +160,12 @@ func (s Service) enrichThumbnail(ctx context.Context, directoryAggregate provide
 
 func (s Service) Download(w http.ResponseWriter, r *http.Request, request provider.Request, items []absto.Item) {
 	zipWriter := zip.NewWriter(w)
+
+	ctx := r.Context()
+
 	defer func() {
 		if closeErr := zipWriter.Close(); closeErr != nil {
-			slog.Error("close zip", "err", closeErr)
+			slog.ErrorContext(ctx, "close zip", "err", closeErr)
 		}
 	}()
 
@@ -173,8 +176,6 @@ func (s Service) Download(w http.ResponseWriter, r *http.Request, request provid
 
 	w.Header().Add("Content-Disposition", fmt.Sprintf("attachment; filename=%s.zip", filename))
 
-	ctx := r.Context()
-
 	if err := s.zipItems(ctx, ctx.Done(), request, zipWriter, items); err != nil {
 		s.error(w, r, request, err)
 	}
@@ -184,7 +185,7 @@ func (s Service) zipItems(ctx context.Context, done <-chan struct{}, request pro
 	for _, item := range items {
 		select {
 		case <-done:
-			slog.Error("context is done for zipping files")
+			slog.ErrorContext(ctx, "context is done for zipping files")
 			return nil
 		default:
 			relativeURL := request.RelativeURL(item)

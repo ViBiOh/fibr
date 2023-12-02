@@ -16,7 +16,7 @@ func (s Service) search(r *http.Request, request provider.Request, item absto.It
 
 	metadatas, err := s.metadata.GetAllMetadataFor(ctx, files...)
 	if err != nil {
-		listLogger(item.Pathname).Error("list metadatas: %s", err)
+		listLogger(item.Pathname).ErrorContext(ctx, "list metadatas: %s", err)
 	}
 
 	items := make([]provider.RenderItem, len(files))

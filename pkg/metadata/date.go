@@ -11,7 +11,7 @@ import (
 
 func (s Service) updateDate(ctx context.Context, item absto.Item, data provider.Metadata) error {
 	if data.Date.IsZero() || item.Date.Equal(data.Date) {
-		slog.Debug("no exif date or already equal", "item", item.Pathname, "item_date", item.Date.String(), "exif_date", data.Date.String())
+		slog.DebugContext(ctx, "no exif date or already equal", "item", item.Pathname, "item_date", item.Date.String(), "exif_date", data.Date.String())
 		return nil
 	}
 

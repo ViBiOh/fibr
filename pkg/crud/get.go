@@ -99,7 +99,7 @@ func (s Service) serveFile(w http.ResponseWriter, r *http.Request, item absto.It
 		return fmt.Errorf("get reader for `%s`: %w", item.Pathname, err)
 	}
 
-	defer provider.LogClose(file, "crud.serveFile", item.Pathname)
+	defer provider.LogClose(ctx, file, "crud.serveFile", item.Pathname)
 
 	w.Header().Add("Etag", etag)
 
@@ -190,7 +190,7 @@ func (s Service) serveGeoJSON(w http.ResponseWriter, r *http.Request, request pr
 	if query.GetBool(r, "search") {
 		hash = s.exifHash(ctx, items)
 	} else if exifs, err := s.metadata.ListDir(ctx, item); err != nil {
-		slog.Error("list exifs", "err", err, "item", item.Pathname)
+		slog.ErrorContext(ctx, "list exifs", "err", err, "item", item.Pathname)
 	} else {
 		hash = provider.RawHash(exifs)
 	}
@@ -229,7 +229,7 @@ func (s Service) generateGeoJSON(ctx context.Context, w io.Writer, request provi
 	var commaNeeded bool
 	encoder := json.NewEncoder(w)
 
-	provider.SafeWrite(w, `{"type":"FeatureCollection","features":[`)
+	provider.SafeWrite(ctx, w, `{"type":"FeatureCollection","features":[`)
 
 	point := geo.NewPoint(geo.NewPosition(0, 0))
 	feature := geo.NewFeature(&point, map[string]any{})
@@ -249,7 +249,7 @@ func (s Service) generateGeoJSON(ctx context.Context, w io.Writer, request provi
 		}
 
 		if commaNeeded {
-			provider.DoneWriter(isDone, w, ",")
+			provider.DoneWriter(ctx, isDone, w, ",")
 		} else {
 			commaNeeded = true
 		}
@@ -261,11 +261,11 @@ func (s Service) generateGeoJSON(ctx context.Context, w io.Writer, request provi
 		feature.Properties["date"] = exif.Date.Format(time.RFC850)
 
 		if err := encoder.Encode(feature); err != nil {
-			slog.Error("encode feature", "err", err, "item", item.Pathname)
+			slog.ErrorContext(ctx, "encode feature", "err", err, "item", item.Pathname)
 		}
 	}
 
-	provider.SafeWrite(w, "]}")
+	provider.SafeWrite(ctx, w, "]}")
 }
 
 func dichotomicFind(items []absto.Item, id string) absto.Item {

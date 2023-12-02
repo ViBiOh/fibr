@@ -139,5 +139,5 @@ func convertAuthenticationError(err error) error {
 }
 
 func logRequest(r *http.Request) {
-	slog.Warn("Unauthenticated request", "method", r.Method, "url", r.URL.String(), "ip", provider.GetIP(r))
+	slog.WarnContext(r.Context(), "Unauthenticated request", "method", r.Method, "url", r.URL.String(), "ip", provider.GetIP(r))
 }

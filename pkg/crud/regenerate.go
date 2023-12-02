@@ -48,7 +48,7 @@ func (s Service) regenerate(w http.ResponseWriter, r *http.Request, request prov
 			return nil
 		})
 		if err != nil {
-			slog.Error("regenerate", "err", err, "pathname", pathname)
+			slog.ErrorContext(ctx, "regenerate", "err", err, "pathname", pathname)
 		}
 
 		for _, directory := range directories {

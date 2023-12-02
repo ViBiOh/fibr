@@ -19,11 +19,11 @@ func (s Service) EventConsumer(ctx context.Context, e provider.Event) {
 	switch e.Type {
 	case provider.StartEvent:
 		if err = s.handleStartEvent(ctx, e); err != nil {
-			getEventLogger(e.Item).Error("start", "err", err)
+			getEventLogger(e.Item).ErrorContext(ctx, "start", "err", err)
 		}
 	case provider.UploadEvent:
 		if err = s.handleUploadEvent(ctx, e.Item, true); err != nil {
-			getEventLogger(e.Item).Error("upload", "err", err)
+			getEventLogger(e.Item).ErrorContext(ctx, "upload", "err", err)
 		}
 	case provider.RenameEvent:
 		if !e.Item.IsDir() {
@@ -34,11 +34,11 @@ func (s Service) EventConsumer(ctx context.Context, e provider.Event) {
 		}
 
 		if err != nil {
-			getEventLogger(e.Item).Error("rename", "err", err)
+			getEventLogger(e.Item).ErrorContext(ctx, "rename", "err", err)
 		}
 	case provider.DeleteEvent:
 		if err := s.delete(ctx, e.Item); err != nil {
-			getEventLogger(e.Item).Error("delete", "err", err)
+			getEventLogger(e.Item).ErrorContext(ctx, "delete", "err", err)
 		}
 	}
 }
@@ -64,7 +64,7 @@ func (s Service) handleStartEvent(ctx context.Context, event provider.Event) err
 
 	if event.GetMetadata("force") == "cache" {
 		if err := s.redisClient.Delete(ctx, redisKey(event.Item)); err != nil {
-			slog.Error("flush cache", "err", err, "fn", "exif.startEvent", "item", event.Item.Pathname)
+			slog.ErrorContext(ctx, "flush cache", "err", err, "fn", "exif.startEvent", "item", event.Item.Pathname)
 		}
 
 		if !forced {
@@ -74,7 +74,7 @@ func (s Service) handleStartEvent(ctx context.Context, event provider.Event) err
 
 	item := event.Item
 	if !forced && s.hasMetadata(ctx, item) {
-		slog.Debug("has metadata", "item", item.Pathname)
+		slog.DebugContext(ctx, "has metadata", "item", item.Pathname)
 		return nil
 	}
 
@@ -91,7 +91,7 @@ func (s Service) handleStartEvent(ctx context.Context, event provider.Event) err
 
 func (s Service) handleUploadEvent(ctx context.Context, item absto.Item, aggregate bool) error {
 	if !s.CanHaveExif(item) {
-		slog.Debug("can't have exif", "item", item.Pathname)
+		slog.DebugContext(ctx, "can't have exif", "item", item.Pathname)
 		return nil
 	}
 

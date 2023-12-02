@@ -92,7 +92,7 @@ func (s *Service) Start(ctx context.Context) {
 	defer close(s.done)
 
 	if err := s.loadWebhooks(ctx); err != nil {
-		slog.Error("refresh webhooks", "err", err)
+		slog.ErrorContext(ctx, "refresh webhooks", "err", err)
 		return
 	}
 

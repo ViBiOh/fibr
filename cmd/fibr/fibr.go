@@ -53,7 +53,7 @@ func main() {
 
 	clients, err := newClient(ctx, config)
 	if err != nil {
-		slog.Error("clients", "err", err)
+		slog.ErrorContext(ctx, "clients", "err", err)
 		os.Exit(1)
 	}
 
@@ -61,7 +61,7 @@ func main() {
 
 	adapters, err := newAdapters(config, clients)
 	if err != nil {
-		slog.Error("adapters", "err", err)
+		slog.ErrorContext(ctx, "adapters", "err", err)
 		os.Exit(1)
 	}
 
@@ -69,7 +69,7 @@ func main() {
 
 	services, err := newServices(endCtx, config, clients, adapters)
 	if err != nil {
-		slog.Error("services", "err", err)
+		slog.ErrorContext(ctx, "services", "err", err)
 		os.Exit(1)
 	}
 

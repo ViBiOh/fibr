@@ -162,18 +162,20 @@ func (s Service) LargeThumbnailSize() uint64 {
 }
 
 func (s Service) Stream(w http.ResponseWriter, r *http.Request, item absto.Item) {
-	reader, err := s.storage.ReadFrom(r.Context(), getStreamPath(item))
+	ctx := r.Context()
+
+	reader, err := s.storage.ReadFrom(ctx, getStreamPath(item))
 	if err != nil {
 		if absto.IsNotExist(err) {
 			w.WriteHeader(http.StatusNoContent)
 			return
 		}
 
-		httperror.InternalServerError(w, err)
+		httperror.InternalServerError(ctx, w, err)
 		return
 	}
 
-	defer provider.LogClose(reader, "thumbnail.Stream", item.Pathname)
+	defer provider.LogClose(ctx, reader, "thumbnail.Stream", item.Pathname)
 
 	w.Header().Add("Content-Type", "application/x-mpegURL")
 	http.ServeContent(w, r, item.Name(), item.Date, reader)
@@ -202,12 +204,12 @@ func (s Service) Serve(w http.ResponseWriter, r *http.Request, item absto.Item) 
 			w.WriteHeader(http.StatusNoContent)
 		}
 
-		httperror.InternalServerError(w, err)
+		httperror.InternalServerError(ctx, w, err)
 
 		return
 	}
 
-	defer provider.LogClose(reader, "thumbnail.Serve", item.Pathname)
+	defer provider.LogClose(ctx, reader, "thumbnail.Serve", item.Pathname)
 
 	w.Header().Add("Cache-Control", cacheDuration)
 	w.Header().Add("Content-Disposition", fmt.Sprintf("inline; filename=%s", path.Base(name)))
@@ -229,7 +231,7 @@ func (s Service) List(w http.ResponseWriter, r *http.Request, item absto.Item, i
 	if query.GetBool(r, "search") {
 		hash = s.thumbnailHash(ctx, items)
 	} else if thumbnails, err := s.ListDir(ctx, item); err != nil {
-		slog.Error("list thumbnails", "err", err, "item", item.Pathname)
+		slog.ErrorContext(ctx, "list thumbnails", "err", err, "item", item.Pathname)
 	} else {
 		hash = provider.RawHash(thumbnails)
 	}
@@ -276,7 +278,7 @@ func (s Service) thumbnailHash(ctx context.Context, items []absto.Item) string {
 
 	thumbnails, err := s.cache.List(ctx, ids...)
 	if err != nil && !absto.IsNotExist(err) {
-		slog.Error("list thumbnails from cache", "err", err)
+		slog.ErrorContext(ctx, "list thumbnails from cache", "err", err)
 	}
 
 	hasher := hash.Stream()
@@ -299,26 +301,26 @@ func (s Service) encodeContent(ctx context.Context, w io.Writer, isDone func() b
 	reader, err := s.storage.ReadFrom(ctx, s.PathForScale(item, SmallSize))
 	if err != nil {
 		if !absto.IsNotExist(err) {
-			logEncodeContentError(item).Error("open", "err", err)
+			logEncodeContentError(item).ErrorContext(ctx, "open", "err", err)
 		}
 
 		return
 	}
-	defer provider.LogClose(reader, "thumbnail.encodeContent", item.Pathname)
+	defer provider.LogClose(ctx, reader, "thumbnail.encodeContent", item.Pathname)
 
-	provider.DoneWriter(isDone, w, item.ID)
-	provider.DoneWriter(isDone, w, `,`)
+	provider.DoneWriter(ctx, isDone, w, item.ID)
+	provider.DoneWriter(ctx, isDone, w, `,`)
 
 	buffer := provider.BufferPool.Get().(*bytes.Buffer)
 	defer provider.BufferPool.Put(buffer)
 
 	if _, err = io.CopyBuffer(w, reader, buffer.Bytes()); err != nil {
 		if !absto.IsNotExist(s.storage.ConvertError(err)) {
-			logEncodeContentError(item).Error("copy", "err", err)
+			logEncodeContentError(item).ErrorContext(ctx, "copy", "err", err)
 		}
 	}
 
-	provider.DoneWriter(isDone, w, "\x1c\x17\x04\x1c")
+	provider.DoneWriter(ctx, isDone, w, "\x1c\x17\x04\x1c")
 }
 
 func logEncodeContentError(item absto.Item) *slog.Logger {

@@ -307,14 +307,14 @@ func (e EventBus) Push(ctx context.Context, event Event) {
 	select {
 	case <-e.closed:
 		e.increaseMetric(ctx, event, "refused")
-		slog.Error("bus is closed")
+		slog.ErrorContext(ctx, "bus is closed")
 	default:
 	}
 
 	select {
 	case <-e.closed:
 		e.increaseMetric(ctx, event, "refused")
-		slog.Error("bus is closed")
+		slog.ErrorContext(ctx, "bus is closed")
 	case e.bus <- event:
 		e.increaseMetric(ctx, event, "push")
 	}
@@ -348,7 +348,7 @@ func (e EventBus) Start(ctx context.Context, storageService absto.Storage, renam
 
 func RenameDirectory(ctx context.Context, storageService absto.Storage, renamers []Renamer, old, new absto.Item) {
 	if err := storageService.Mkdir(ctx, MetadataDirectory(new), absto.DirectoryPerm); err != nil {
-		slog.Error("create new metadata directory", "err", err)
+		slog.ErrorContext(ctx, "create new metadata directory", "err", err)
 		return
 	}
 
@@ -364,17 +364,17 @@ func RenameDirectory(ctx context.Context, storageService absto.Storage, renamers
 
 		for _, renamer := range renamers {
 			if err := renamer(ctx, oldItem, item); err != nil {
-				slog.Error("rename metadata", "err", err, "old", oldItem.Pathname, "new", item.Pathname)
+				slog.ErrorContext(ctx, "rename metadata", "err", err, "old", oldItem.Pathname, "new", item.Pathname)
 			}
 		}
 
 		return nil
 	}); err != nil {
-		slog.Error("walk new metadata directory", "err", err)
+		slog.ErrorContext(ctx, "walk new metadata directory", "err", err)
 	}
 
 	if err := storageService.RemoveAll(ctx, MetadataDirectory(old)); err != nil {
-		slog.Error("delete old metadata directory", "err", err)
+		slog.ErrorContext(ctx, "delete old metadata directory", "err", err)
 		return
 	}
 }

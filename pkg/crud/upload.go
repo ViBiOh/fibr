@@ -36,7 +36,7 @@ func (s Service) saveUploadedFile(ctx context.Context, request provider.Request,
 	if err == nil {
 		go func(ctx context.Context) {
 			if info, infoErr := s.storage.Stat(ctx, filePath); infoErr != nil {
-				slog.Error("get info for upload event", "err", infoErr)
+				slog.ErrorContext(ctx, "get info for upload event", "err", infoErr)
 			} else {
 				s.pushEvent(ctx, provider.NewUploadEvent(ctx, request, info, s.bestSharePath(filePath), s.renderer))
 			}
@@ -99,7 +99,7 @@ func (s Service) upload(w http.ResponseWriter, r *http.Request, request provider
 func (s Service) postUpload(w http.ResponseWriter, r *http.Request, request provider.Request, fileName string) {
 	if r.Header.Get("Accept") == "text/plain" {
 		w.WriteHeader(http.StatusCreated)
-		provider.SafeWrite(w, fileName)
+		provider.SafeWrite(r.Context(), w, fileName)
 
 		return
 	}

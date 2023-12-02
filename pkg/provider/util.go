@@ -118,18 +118,18 @@ func SanitizeName(name string, removeSlash bool) (string, error) {
 	return strings.Replace(sanitized, "__", "_", -1), nil
 }
 
-func SafeWrite(w io.Writer, content string) {
+func SafeWrite(ctx context.Context, w io.Writer, content string) {
 	if _, err := io.WriteString(w, content); err != nil {
-		slog.Error("write content", "err", err)
+		slog.ErrorContext(ctx, "write content", "err", err)
 	}
 }
 
-func DoneWriter(isDone func() bool, w io.Writer, content string) {
+func DoneWriter(ctx context.Context, isDone func() bool, w io.Writer, content string) {
 	if isDone() {
 		return
 	}
 
-	SafeWrite(w, content)
+	SafeWrite(ctx, w, content)
 }
 
 func SendLargeFile(ctx context.Context, storageService absto.Storage, item absto.Item, req request.Request) (*http.Response, error) {
@@ -140,7 +140,7 @@ func SendLargeFile(ctx context.Context, storageService absto.Storage, item absto
 
 	reader, writer := io.Pipe()
 	go func() {
-		defer LogClose(file, "provider.SendLargeFile", item.Pathname)
+		defer LogClose(ctx, file, "provider.SendLargeFile", item.Pathname)
 
 		buffer := BufferPool.Get().(*bytes.Buffer)
 		defer BufferPool.Put(buffer)
@@ -163,9 +163,9 @@ func SendLargeFile(ctx context.Context, storageService absto.Storage, item absto
 	return request.DoWithClient(SlowClient, r)
 }
 
-func LogClose(closer io.Closer, fn, item string) {
+func LogClose(ctx context.Context, closer io.Closer, fn, item string) {
 	if err := closer.Close(); err != nil {
-		slog.Error("close", "err", err, "fn", fn, "item", item)
+		slog.ErrorContext(ctx, "close", "err", err, "fn", fn, "item", item)
 	}
 }
 

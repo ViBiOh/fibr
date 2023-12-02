@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"context"
 	"io"
 	"testing"
 )
@@ -92,7 +93,7 @@ func TestSafeWrite(t *testing.T) {
 
 	for intention, tc := range cases {
 		t.Run(intention, func(t *testing.T) {
-			SafeWrite(tc.args.writer, tc.args.content)
+			SafeWrite(context.Background(), tc.args.writer, tc.args.content)
 		})
 	}
 }

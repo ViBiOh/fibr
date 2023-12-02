@@ -108,7 +108,7 @@ func (s Service) createShare(w http.ResponseWriter, r *http.Request, request pro
 
 	if r.Header.Get("Accept") == "text/plain" {
 		w.WriteHeader(http.StatusCreated)
-		provider.SafeWrite(w, id)
+		provider.SafeWrite(ctx, w, id)
 
 		return
 	}

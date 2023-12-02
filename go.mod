@@ -5,12 +5,12 @@ go 1.21
 toolchain go1.21.0
 
 require (
-	github.com/ViBiOh/ChatPotte v0.3.3
+	github.com/ViBiOh/ChatPotte v0.4.0
 	github.com/ViBiOh/absto v1.7.4
-	github.com/ViBiOh/auth/v2 v2.16.1
+	github.com/ViBiOh/auth/v2 v2.17.0
 	github.com/ViBiOh/exas v0.7.1
 	github.com/ViBiOh/flags v1.4.1
-	github.com/ViBiOh/httputils/v4 v4.69.0
+	github.com/ViBiOh/httputils/v4 v4.69.3
 	github.com/ViBiOh/vith v0.6.0
 	github.com/rabbitmq/amqp091-go v1.9.0
 	github.com/redis/go-redis/v9 v9.3.0
