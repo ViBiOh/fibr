@@ -8,7 +8,7 @@ import (
 
 func (s *Service) PubSubHandle(webhook provider.Webhook, err error) {
 	if err != nil {
-		slog.Error("Webhook's PubSub", "err", err)
+		slog.Error("Webhook's PubSub", "error", err)
 		return
 	}
 

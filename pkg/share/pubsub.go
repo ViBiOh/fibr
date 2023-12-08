@@ -8,7 +8,7 @@ import (
 
 func (s *Service) PubSubHandle(share provider.Share, err error) {
 	if err != nil {
-		slog.Error("Share's PubSub", "err", err)
+		slog.Error("Share's PubSub", "error", err)
 		return
 	}
 

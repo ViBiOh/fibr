@@ -36,7 +36,7 @@ func (s Service) saveUploadedFile(ctx context.Context, request provider.Request,
 	if err == nil {
 		go func(ctx context.Context) {
 			if info, infoErr := s.storage.Stat(ctx, filePath); infoErr != nil {
-				slog.ErrorContext(ctx, "get info for upload event", "err", infoErr)
+				slog.ErrorContext(ctx, "get info for upload event", "error", infoErr)
 			} else {
 				s.pushEvent(ctx, provider.NewUploadEvent(ctx, request, info, s.bestSharePath(filePath), s.renderer))
 			}

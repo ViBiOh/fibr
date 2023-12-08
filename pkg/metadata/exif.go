@@ -112,12 +112,12 @@ func New(ctx context.Context, config *Config, storageService absto.Storage, mete
 
 		service.exifMetric, err = meter.Int64Counter("fibr.exif")
 		if err != nil {
-			slog.ErrorContext(ctx, "create exif counter", "err", err)
+			slog.ErrorContext(ctx, "create exif counter", "error", err)
 		}
 
 		service.aggregateMetric, err = meter.Int64Counter("fibr.aggregate")
 		if err != nil {
-			slog.ErrorContext(ctx, "create aggregate counter", "err", err)
+			slog.ErrorContext(ctx, "create aggregate counter", "error", err)
 		}
 	}
 

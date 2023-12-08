@@ -348,7 +348,7 @@ func (e EventBus) Start(ctx context.Context, storageService absto.Storage, renam
 
 func RenameDirectory(ctx context.Context, storageService absto.Storage, renamers []Renamer, old, new absto.Item) {
 	if err := storageService.Mkdir(ctx, MetadataDirectory(new), absto.DirectoryPerm); err != nil {
-		slog.ErrorContext(ctx, "create new metadata directory", "err", err)
+		slog.ErrorContext(ctx, "create new metadata directory", "error", err)
 		return
 	}
 
@@ -364,17 +364,17 @@ func RenameDirectory(ctx context.Context, storageService absto.Storage, renamers
 
 		for _, renamer := range renamers {
 			if err := renamer(ctx, oldItem, item); err != nil {
-				slog.ErrorContext(ctx, "rename metadata", "err", err, "old", oldItem.Pathname, "new", item.Pathname)
+				slog.ErrorContext(ctx, "rename metadata", "error", err, "old", oldItem.Pathname, "new", item.Pathname)
 			}
 		}
 
 		return nil
 	}); err != nil {
-		slog.ErrorContext(ctx, "walk new metadata directory", "err", err)
+		slog.ErrorContext(ctx, "walk new metadata directory", "error", err)
 	}
 
 	if err := storageService.RemoveAll(ctx, MetadataDirectory(old)); err != nil {
-		slog.ErrorContext(ctx, "delete old metadata directory", "err", err)
+		slog.ErrorContext(ctx, "delete old metadata directory", "error", err)
 		return
 	}
 }

@@ -22,7 +22,7 @@ func (s Service) EventConsumer(ctx context.Context, e provider.Event) {
 	case provider.RenameEvent:
 		if !e.Item.IsDir() {
 			if err := s.Rename(ctx, e.Item, *e.New); err != nil {
-				slog.ErrorContext(ctx, "rename item", "err", err)
+				slog.ErrorContext(ctx, "rename item", "error", err)
 			}
 		}
 	case provider.DeleteEvent:
@@ -43,7 +43,7 @@ func (s Service) Rename(ctx context.Context, old, new absto.Item) error {
 		}
 
 		if err := s.redisClient.Delete(ctx, redisKey(oldFilename)); err != nil {
-			slog.ErrorContext(ctx, "delete cache", "err", err)
+			slog.ErrorContext(ctx, "delete cache", "error", err)
 		}
 
 		if provider.VideoExtensions[old.Extension] != "" && s.HasStream(ctx, old) {
@@ -66,7 +66,7 @@ func (s Service) generateItem(ctx context.Context, event provider.Event) {
 	for _, size := range s.sizes {
 		if event.GetMetadata("force") == "cache" {
 			if err := s.redisClient.Delete(ctx, redisKey(s.PathForScale(event.Item, size))); err != nil {
-				slog.ErrorContext(ctx, "flush cache for scale", "err", err, "fn", "thumbnail.generate", "scale", size, "item", event.Item.Pathname)
+				slog.ErrorContext(ctx, "flush cache for scale", "error", err, "fn", "thumbnail.generate", "scale", size, "item", event.Item.Pathname)
 			}
 
 			if !forced {
@@ -79,7 +79,7 @@ func (s Service) generateItem(ctx context.Context, event provider.Event) {
 		}
 
 		if err := s.cache.EvictOnSuccess(ctx, s.PathForScale(event.Item, size), s.generate(ctx, event.Item, size)); err != nil {
-			slog.ErrorContext(ctx, "generate for scale", "err", err, "scale", size, "item", event.Item.Pathname, "fn", "thumbnail.generate")
+			slog.ErrorContext(ctx, "generate for scale", "error", err, "scale", size, "item", event.Item.Pathname, "fn", "thumbnail.generate")
 		}
 	}
 
@@ -90,10 +90,10 @@ func (s Service) generateItem(ctx context.Context, event provider.Event) {
 
 func (s Service) generateStreamIfNeeded(ctx context.Context, event provider.Event) {
 	if needStream, err := s.shouldGenerateStream(ctx, event.Item); err != nil {
-		slog.ErrorContext(ctx, "determine if stream generation is possible", "err", err)
+		slog.ErrorContext(ctx, "determine if stream generation is possible", "error", err)
 	} else if needStream {
 		if err = s.cache.EvictOnSuccess(ctx, getStreamPath(event.Item), s.generateStream(ctx, event.Item)); err != nil {
-			slog.ErrorContext(ctx, "generate stream", "err", err)
+			slog.ErrorContext(ctx, "generate stream", "error", err)
 		}
 	}
 }
@@ -101,7 +101,7 @@ func (s Service) generateStreamIfNeeded(ctx context.Context, event provider.Even
 func (s Service) delete(ctx context.Context, item absto.Item) {
 	if item.IsDir() {
 		if err := s.storage.RemoveAll(ctx, provider.MetadataDirectory(item)); err != nil {
-			slog.ErrorContext(ctx, "delete thumbnail folder", "err", err)
+			slog.ErrorContext(ctx, "delete thumbnail folder", "error", err)
 		}
 		return
 	}
@@ -110,16 +110,16 @@ func (s Service) delete(ctx context.Context, item absto.Item) {
 		filename := s.PathForScale(item, size)
 
 		if err := s.storage.RemoveAll(ctx, filename); err != nil {
-			slog.ErrorContext(ctx, "delete thumbnail", "err", err)
+			slog.ErrorContext(ctx, "delete thumbnail", "error", err)
 		}
 
 		if err := s.redisClient.Delete(ctx, redisKey(filename)); err != nil {
-			slog.ErrorContext(ctx, "delete cache", "err", err)
+			slog.ErrorContext(ctx, "delete cache", "error", err)
 		}
 
 		if provider.VideoExtensions[item.Extension] != "" && s.HasStream(ctx, item) {
 			if err := s.deleteStream(ctx, item); err != nil {
-				slog.ErrorContext(ctx, "delete stream", "err", err)
+				slog.ErrorContext(ctx, "delete stream", "error", err)
 			}
 		}
 	}

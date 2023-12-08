@@ -19,11 +19,11 @@ func (s Service) EventConsumer(ctx context.Context, e provider.Event) {
 	switch e.Type {
 	case provider.StartEvent:
 		if err = s.handleStartEvent(ctx, e); err != nil {
-			getEventLogger(e.Item).ErrorContext(ctx, "start", "err", err)
+			getEventLogger(e.Item).ErrorContext(ctx, "start", "error", err)
 		}
 	case provider.UploadEvent:
 		if err = s.handleUploadEvent(ctx, e.Item, true); err != nil {
-			getEventLogger(e.Item).ErrorContext(ctx, "upload", "err", err)
+			getEventLogger(e.Item).ErrorContext(ctx, "upload", "error", err)
 		}
 	case provider.RenameEvent:
 		if !e.Item.IsDir() {
@@ -34,11 +34,11 @@ func (s Service) EventConsumer(ctx context.Context, e provider.Event) {
 		}
 
 		if err != nil {
-			getEventLogger(e.Item).ErrorContext(ctx, "rename", "err", err)
+			getEventLogger(e.Item).ErrorContext(ctx, "rename", "error", err)
 		}
 	case provider.DeleteEvent:
 		if err := s.delete(ctx, e.Item); err != nil {
-			getEventLogger(e.Item).ErrorContext(ctx, "delete", "err", err)
+			getEventLogger(e.Item).ErrorContext(ctx, "delete", "error", err)
 		}
 	}
 }
@@ -64,7 +64,7 @@ func (s Service) handleStartEvent(ctx context.Context, event provider.Event) err
 
 	if event.GetMetadata("force") == "cache" {
 		if err := s.redisClient.Delete(ctx, redisKey(event.Item)); err != nil {
-			slog.ErrorContext(ctx, "flush cache", "err", err, "fn", "exif.startEvent", "item", event.Item.Pathname)
+			slog.ErrorContext(ctx, "flush cache", "error", err, "fn", "exif.startEvent", "item", event.Item.Pathname)
 		}
 
 		if !forced {

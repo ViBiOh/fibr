@@ -56,7 +56,7 @@ func New(config *Config, storageService absto.Storage, meterProvider metric.Mete
 
 		counter, err = meter.Int64Counter("fibr.webhook")
 		if err != nil {
-			slog.Error("create webhook counter", "err", err)
+			slog.Error("create webhook counter", "error", err)
 		}
 	}
 
@@ -92,7 +92,7 @@ func (s *Service) Start(ctx context.Context) {
 	defer close(s.done)
 
 	if err := s.loadWebhooks(ctx); err != nil {
-		slog.ErrorContext(ctx, "refresh webhooks", "err", err)
+		slog.ErrorContext(ctx, "refresh webhooks", "error", err)
 		return
 	}
 

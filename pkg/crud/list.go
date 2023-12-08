@@ -38,7 +38,7 @@ func (s Service) list(ctx context.Context, request provider.Request, message ren
 
 		directoryAggregate, err = s.metadata.GetAggregateFor(ctx, item)
 		if err != nil && !absto.IsNotExist(err) {
-			listLogger(item.Pathname).ErrorContext(ctx, "get aggregate", "err", err)
+			listLogger(item.Pathname).ErrorContext(ctx, "get aggregate", "error", err)
 		}
 	})
 
@@ -48,7 +48,7 @@ func (s Service) list(ctx context.Context, request provider.Request, message ren
 
 		aggregates, err = s.metadata.GetAllAggregateFor(ctx, files...)
 		if err != nil {
-			listLogger(item.Pathname).ErrorContext(ctx, "list aggregates", "err", err)
+			listLogger(item.Pathname).ErrorContext(ctx, "list aggregates", "error", err)
 		}
 	})
 
@@ -58,7 +58,7 @@ func (s Service) list(ctx context.Context, request provider.Request, message ren
 
 		metadatas, err = s.metadata.GetAllMetadataFor(ctx, files...)
 		if err != nil {
-			listLogger(item.Pathname).ErrorContext(ctx, "list metadatas", "err", err)
+			listLogger(item.Pathname).ErrorContext(ctx, "list metadatas", "error", err)
 		}
 	})
 
@@ -71,7 +71,7 @@ func (s Service) list(ctx context.Context, request provider.Request, message ren
 
 		thumbnails, err = s.thumbnail.ListDir(ctx, item)
 		if err != nil {
-			listLogger(item.Pathname).ErrorContext(ctx, "list thumbnail", "err", err)
+			listLogger(item.Pathname).ErrorContext(ctx, "list thumbnail", "error", err)
 			return
 		}
 	}()
@@ -85,7 +85,7 @@ func (s Service) list(ctx context.Context, request provider.Request, message ren
 
 		savedSearches, err = s.searchService.List(ctx, item)
 		if err != nil {
-			listLogger(item.Pathname).ErrorContext(ctx, "list saved searches", "err", err)
+			listLogger(item.Pathname).ErrorContext(ctx, "list saved searches", "error", err)
 			return
 		}
 	}()
@@ -165,7 +165,7 @@ func (s Service) Download(w http.ResponseWriter, r *http.Request, request provid
 
 	defer func() {
 		if closeErr := zipWriter.Close(); closeErr != nil {
-			slog.ErrorContext(ctx, "close zip", "err", closeErr)
+			slog.ErrorContext(ctx, "close zip", "error", closeErr)
 		}
 	}()
 

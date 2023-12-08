@@ -59,7 +59,7 @@ func (s Service) Start(ctx context.Context) {
 	if err := s.exclusive.Execute(ctx, "fibr:mutex:start", time.Hour, func(ctx context.Context) error {
 		return s.start(ctx)
 	}); err != nil {
-		slog.ErrorContext(ctx, "start", "err", err)
+		slog.ErrorContext(ctx, "start", "error", err)
 	}
 }
 
@@ -102,7 +102,7 @@ func (s Service) start(ctx context.Context) error {
 func (s Service) sanitizeName(ctx context.Context, item absto.Item) absto.Item {
 	name, err := provider.SanitizeName(item.Pathname, false)
 	if err != nil {
-		slog.ErrorContext(ctx, "sanitize name", "err", err, "item", item.Pathname)
+		slog.ErrorContext(ctx, "sanitize name", "error", err, "item", item.Pathname)
 		return item
 	}
 
@@ -119,7 +119,7 @@ func (s Service) sanitizeName(ctx context.Context, item absto.Item) absto.Item {
 
 	renamedItem, err := s.renamer.DoRename(ctx, item.Pathname, name, item)
 	if err != nil {
-		slog.ErrorContext(ctx, "rename", "err", err)
+		slog.ErrorContext(ctx, "rename", "error", err)
 		return item
 	}
 

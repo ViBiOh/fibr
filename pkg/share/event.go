@@ -15,11 +15,11 @@ func (s *Service) EventConsumer(ctx context.Context, e provider.Event) {
 	switch e.Type {
 	case provider.RenameEvent:
 		if err := s.renameItem(ctx, e.Item, *e.New); err != nil {
-			slog.ErrorContext(ctx, "rename share", "err", err)
+			slog.ErrorContext(ctx, "rename share", "error", err)
 		}
 	case provider.DeleteEvent:
 		if err := s.deleteItem(ctx, e.Item); err != nil {
-			slog.ErrorContext(ctx, "delete share", "err", err)
+			slog.ErrorContext(ctx, "delete share", "error", err)
 		}
 	}
 }

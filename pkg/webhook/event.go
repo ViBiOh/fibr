@@ -48,7 +48,7 @@ func (s *Service) EventConsumer(ctx context.Context, event provider.Event) {
 		s.increaseMetric(ctx, strconv.Itoa(statusCode))
 
 		if err != nil {
-			slog.ErrorContext(ctx, "error while sending webhook", "err", err)
+			slog.ErrorContext(ctx, "error while sending webhook", "error", err)
 		}
 	}
 
@@ -56,7 +56,7 @@ func (s *Service) EventConsumer(ctx context.Context, event provider.Event) {
 		// Fire a goroutine to release the mutex lock
 		go func() {
 			if err := s.deleteItem(ctx, event.Item); err != nil {
-				slog.ErrorContext(ctx, "delete webhooks for item", "err", err)
+				slog.ErrorContext(ctx, "delete webhooks for item", "error", err)
 			}
 		}()
 	}

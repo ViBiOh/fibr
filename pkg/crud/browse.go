@@ -40,7 +40,7 @@ func (s Service) browse(ctx context.Context, request provider.Request, item abst
 		var err error
 		metadata, err = s.metadata.GetMetadataFor(ctx, item)
 		if err != nil && !absto.IsNotExist(err) {
-			slog.ErrorContext(ctx, "load metadata", "err", err, "item", item.Pathname)
+			slog.ErrorContext(ctx, "load metadata", "error", err, "item", item.Pathname)
 		}
 	})
 
@@ -73,7 +73,7 @@ func (s Service) getFilesPreviousAndNext(ctx context.Context, item absto.Item, r
 	var err error
 	items, err = s.storage.List(ctx, item.Dir())
 	if err != nil {
-		slog.ErrorContext(ctx, "list neighbors files", "err", err, "item", item.Pathname)
+		slog.ErrorContext(ctx, "list neighbors files", "error", err, "item", item.Pathname)
 		return
 	}
 

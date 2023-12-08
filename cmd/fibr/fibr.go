@@ -29,7 +29,7 @@ var content embed.FS
 func newLoginService(tracerProvider trace.TracerProvider, basicConfig *basicMemory.Config) provider.Auth {
 	basicService, err := basicMemory.New(basicConfig)
 	if err != nil {
-		slog.Error("auth memory", "err", err)
+		slog.Error("auth memory", "error", err)
 		os.Exit(1)
 	}
 
@@ -53,7 +53,7 @@ func main() {
 
 	clients, err := newClient(ctx, config)
 	if err != nil {
-		slog.ErrorContext(ctx, "clients", "err", err)
+		slog.ErrorContext(ctx, "clients", "error", err)
 		os.Exit(1)
 	}
 
@@ -61,7 +61,7 @@ func main() {
 
 	adapters, err := newAdapters(config, clients)
 	if err != nil {
-		slog.ErrorContext(ctx, "adapters", "err", err)
+		slog.ErrorContext(ctx, "adapters", "error", err)
 		os.Exit(1)
 	}
 
@@ -69,7 +69,7 @@ func main() {
 
 	services, err := newServices(endCtx, config, clients, adapters)
 	if err != nil {
-		slog.ErrorContext(ctx, "services", "err", err)
+		slog.ErrorContext(ctx, "services", "error", err)
 		os.Exit(1)
 	}
 

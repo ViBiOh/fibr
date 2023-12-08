@@ -120,7 +120,7 @@ func SanitizeName(name string, removeSlash bool) (string, error) {
 
 func SafeWrite(ctx context.Context, w io.Writer, content string) {
 	if _, err := io.WriteString(w, content); err != nil {
-		slog.ErrorContext(ctx, "write content", "err", err)
+		slog.ErrorContext(ctx, "write content", "error", err)
 	}
 }
 
@@ -165,7 +165,7 @@ func SendLargeFile(ctx context.Context, storageService absto.Storage, item absto
 
 func LogClose(ctx context.Context, closer io.Closer, fn, item string) {
 	if err := closer.Close(); err != nil {
-		slog.ErrorContext(ctx, "close", "err", err, "fn", fn, "item", item)
+		slog.ErrorContext(ctx, "close", "error", err, "fn", fn, "item", item)
 	}
 }
 

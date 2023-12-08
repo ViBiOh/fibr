@@ -83,7 +83,7 @@ func New(config *Config, storageService absto.Storage, filteredStorage absto.Sto
 
 	bcryptCost, err := bcrypt.FindBestCost(bcryptDuration)
 	if err != nil {
-		slog.Error("find best bcrypt cost", "err", err)
+		slog.Error("find best bcrypt cost", "error", err)
 	}
 	slog.Info("Best bcrypt cost computed", "cost", bcryptCost)
 

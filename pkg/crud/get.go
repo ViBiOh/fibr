@@ -160,7 +160,7 @@ func (s Service) listFiles(r *http.Request, request provider.Request, item absto
 	if request.IsStory() {
 		thumbnails, err := s.thumbnail.ListDirLarge(ctx, item)
 		if err != nil {
-			slog.Error("list large thumbnails", "err", err, "item", item.Pathname)
+			slog.Error("list large thumbnails", "error", err, "item", item.Pathname)
 		}
 
 		storyItems := items[:0]
@@ -190,7 +190,7 @@ func (s Service) serveGeoJSON(w http.ResponseWriter, r *http.Request, request pr
 	if query.GetBool(r, "search") {
 		hash = s.exifHash(ctx, items)
 	} else if exifs, err := s.metadata.ListDir(ctx, item); err != nil {
-		slog.ErrorContext(ctx, "list exifs", "err", err, "item", item.Pathname)
+		slog.ErrorContext(ctx, "list exifs", "error", err, "item", item.Pathname)
 	} else {
 		hash = provider.RawHash(exifs)
 	}
@@ -261,7 +261,7 @@ func (s Service) generateGeoJSON(ctx context.Context, w io.Writer, request provi
 		feature.Properties["date"] = exif.Date.Format(time.RFC850)
 
 		if err := encoder.Encode(feature); err != nil {
-			slog.ErrorContext(ctx, "encode feature", "err", err, "item", item.Pathname)
+			slog.ErrorContext(ctx, "encode feature", "error", err, "item", item.Pathname)
 		}
 	}
 

@@ -231,7 +231,7 @@ func (s Service) List(w http.ResponseWriter, r *http.Request, item absto.Item, i
 	if query.GetBool(r, "search") {
 		hash = s.thumbnailHash(ctx, items)
 	} else if thumbnails, err := s.ListDir(ctx, item); err != nil {
-		slog.ErrorContext(ctx, "list thumbnails", "err", err, "item", item.Pathname)
+		slog.ErrorContext(ctx, "list thumbnails", "error", err, "item", item.Pathname)
 	} else {
 		hash = provider.RawHash(thumbnails)
 	}
@@ -278,7 +278,7 @@ func (s Service) thumbnailHash(ctx context.Context, items []absto.Item) string {
 
 	thumbnails, err := s.cache.List(ctx, ids...)
 	if err != nil && !absto.IsNotExist(err) {
-		slog.ErrorContext(ctx, "list thumbnails from cache", "err", err)
+		slog.ErrorContext(ctx, "list thumbnails from cache", "error", err)
 	}
 
 	hasher := hash.Stream()
@@ -301,7 +301,7 @@ func (s Service) encodeContent(ctx context.Context, w io.Writer, isDone func() b
 	reader, err := s.storage.ReadFrom(ctx, s.PathForScale(item, SmallSize))
 	if err != nil {
 		if !absto.IsNotExist(err) {
-			logEncodeContentError(item).ErrorContext(ctx, "open", "err", err)
+			logEncodeContentError(item).ErrorContext(ctx, "open", "error", err)
 		}
 
 		return
@@ -316,7 +316,7 @@ func (s Service) encodeContent(ctx context.Context, w io.Writer, isDone func() b
 
 	if _, err = io.CopyBuffer(w, reader, buffer.Bytes()); err != nil {
 		if !absto.IsNotExist(s.storage.ConvertError(err)) {
-			logEncodeContentError(item).ErrorContext(ctx, "copy", "err", err)
+			logEncodeContentError(item).ErrorContext(ctx, "copy", "error", err)
 		}
 	}
 
