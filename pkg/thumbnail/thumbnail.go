@@ -295,9 +295,6 @@ func (s Service) encodeContent(ctx context.Context, w io.Writer, isDone func() b
 		return
 	}
 
-	ctx, end := telemetry.StartSpan(ctx, s.tracer, "encode", trace.WithSpanKind(trace.SpanKindInternal))
-	defer end(nil)
-
 	reader, err := s.storage.ReadFrom(ctx, s.PathForScale(item, SmallSize))
 	if err != nil {
 		if !absto.IsNotExist(err) {
