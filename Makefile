@@ -34,7 +34,7 @@ version:
 ## version-full: Output last commit sha
 .PHONY: version-full
 version-full:
-	@printf "$(shell git rev-parse --short HEAD)"
+	@printf "$(shell git rev-parse HEAD)"
 
 ## version-date: Output last commit date
 .PHONY: version-date
