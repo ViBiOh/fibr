@@ -9,11 +9,11 @@ require (
 	github.com/ViBiOh/absto v1.7.4
 	github.com/ViBiOh/auth/v2 v2.17.0
 	github.com/ViBiOh/exas v0.7.1
-	github.com/ViBiOh/flags v1.4.1
-	github.com/ViBiOh/httputils/v4 v4.69.10
+	github.com/ViBiOh/flags v1.5.0
+	github.com/ViBiOh/httputils/v4 v4.70.0
 	github.com/ViBiOh/vith v0.6.0
 	github.com/rabbitmq/amqp091-go v1.9.0
-	github.com/redis/go-redis/v9 v9.3.0
+	github.com/redis/go-redis/v9 v9.3.1
 	github.com/rs/xid v1.5.0
 	github.com/zeebo/xxh3 v1.0.2
 	go.opentelemetry.io/otel v1.21.0
@@ -46,8 +46,8 @@ require (
 	github.com/redis/go-redis/extra/rediscmd/v9 v9.0.5 // indirect
 	github.com/redis/go-redis/extra/redisotel/v9 v9.0.5 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
-	github.com/tdewolff/minify/v2 v2.20.9 // indirect
-	github.com/tdewolff/parse/v2 v2.7.6 // indirect
+	github.com/tdewolff/minify/v2 v2.20.10 // indirect
+	github.com/tdewolff/parse/v2 v2.7.7 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.46.1 // indirect
 	go.opentelemetry.io/contrib/instrumentation/runtime v0.46.1 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc v0.44.0 // indirect
@@ -61,7 +61,7 @@ require (
 	golang.org/x/term v0.15.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20231212172506-995d672761c0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20231212172506-995d672761c0 // indirect
-	google.golang.org/grpc v1.60.0 // indirect
+	google.golang.org/grpc v1.60.1 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 )
