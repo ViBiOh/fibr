@@ -218,6 +218,7 @@ Usage of fibr:
   --address                           string        [server] Listen address ${FIBR_ADDRESS}
   --amqpExifExchange                  string        [amqpExif] Exchange name ${FIBR_AMQP_EXIF_EXCHANGE} (default "fibr")
   --amqpExifExclusive                               [amqpExif] Queue exclusive mode (for fanout exchange) ${FIBR_AMQP_EXIF_EXCLUSIVE} (default false)
+  --amqpExifInactiveTimeout           duration      [amqpExif] When inactive during the given timeout, stop listening ${FIBR_AMQP_EXIF_INACTIVE_TIMEOUT} (default 0s)
   --amqpExifMaxRetry                  uint          [amqpExif] Max send retries ${FIBR_AMQP_EXIF_MAX_RETRY} (default 3)
   --amqpExifQueue                     string        [amqpExif] Queue name ${FIBR_AMQP_EXIF_QUEUE} (default "fibr.exif")
   --amqpExifRetryInterval             duration      [amqpExif] Interval duration when send fails ${FIBR_AMQP_EXIF_RETRY_INTERVAL} (default 1h0m0s)
@@ -225,6 +226,7 @@ Usage of fibr:
   --amqpPrefetch                      int           [amqp] Prefetch count for QoS ${FIBR_AMQP_PREFETCH} (default 1)
   --amqpThumbnailExchange             string        [amqpThumbnail] Exchange name ${FIBR_AMQP_THUMBNAIL_EXCHANGE} (default "fibr")
   --amqpThumbnailExclusive                          [amqpThumbnail] Queue exclusive mode (for fanout exchange) ${FIBR_AMQP_THUMBNAIL_EXCLUSIVE} (default false)
+  --amqpThumbnailInactiveTimeout      duration      [amqpThumbnail] When inactive during the given timeout, stop listening ${FIBR_AMQP_THUMBNAIL_INACTIVE_TIMEOUT} (default 0s)
   --amqpThumbnailMaxRetry             uint          [amqpThumbnail] Max send retries ${FIBR_AMQP_THUMBNAIL_MAX_RETRY} (default 3)
   --amqpThumbnailQueue                string        [amqpThumbnail] Queue name ${FIBR_AMQP_THUMBNAIL_QUEUE} (default "fibr.thumbnail")
   --amqpThumbnailRetryInterval        duration      [amqpThumbnail] Interval duration when send fails ${FIBR_AMQP_THUMBNAIL_RETRY_INTERVAL} (default 1h0m0s)
@@ -282,6 +284,7 @@ Usage of fibr:
   --storagePartSize                   uint          [storage] PartSize configuration ${FIBR_STORAGE_PART_SIZE} (default 5242880)
   --telemetryRate                     string        [telemetry] OpenTelemetry sample rate, 'always', 'never' or a float value ${FIBR_TELEMETRY_RATE} (default "always")
   --telemetryURL                      string        [telemetry] OpenTelemetry gRPC endpoint (e.g. otel-exporter:4317) ${FIBR_TELEMETRY_URL}
+  --telemetryUint64                                 [telemetry] Change OpenTelemetry Trace ID format to an unsigned int 64 ${FIBR_TELEMETRY_UINT64} (default true)
   --temporaryFolder                   string        [crud] Temporary folder for chunk upload ${FIBR_TEMPORARY_FOLDER} (default "/tmp")
   --thumbnailAmqpExchange             string        [thumbnail] AMQP Exchange Name ${FIBR_THUMBNAIL_AMQP_EXCHANGE} (default "fibr")
   --thumbnailAmqpStreamRoutingKey     string        [thumbnail] AMQP Routing Key for stream ${FIBR_THUMBNAIL_AMQP_STREAM_ROUTING_KEY} (default "stream")
