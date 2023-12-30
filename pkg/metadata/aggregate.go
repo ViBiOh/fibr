@@ -29,12 +29,7 @@ func (s Service) GetMetadataFor(ctx context.Context, item absto.Item) (metadata 
 	ctx, end := telemetry.StartSpan(ctx, s.tracer, "get_metadata")
 	defer end(&err)
 
-	metadata, err = s.exifCache.Get(ctx, item)
-	if absto.IsNotExist(err) {
-		err = nil
-	}
-
-	return metadata, err
+	return s.exifCache.Get(ctx, item)
 }
 
 func (s Service) GetAllMetadataFor(ctx context.Context, items ...absto.Item) (map[string]provider.Metadata, error) {
@@ -68,12 +63,7 @@ func (s Service) GetAggregateFor(ctx context.Context, item absto.Item) (aggregat
 	ctx, end := telemetry.StartSpan(ctx, s.tracer, "get_aggregate")
 	defer end(&err)
 
-	aggregate, err = s.aggregateCache.Get(ctx, item)
-	if absto.IsNotExist(err) {
-		err = nil
-	}
-
-	return aggregate, err
+	return s.aggregateCache.Get(ctx, item)
 }
 
 func (s Service) GetAllAggregateFor(ctx context.Context, items ...absto.Item) (map[string]provider.Aggregate, error) {
