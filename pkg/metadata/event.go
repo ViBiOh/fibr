@@ -21,21 +21,27 @@ func (s Service) EventConsumer(ctx context.Context, e provider.Event) {
 		if err = s.handleStartEvent(ctx, e); err != nil {
 			getEventLogger(e.Item).ErrorContext(ctx, "start", "error", err)
 		}
+
 	case provider.UploadEvent:
 		if err = s.handleUploadEvent(ctx, e.Item, true); err != nil {
 			getEventLogger(e.Item).ErrorContext(ctx, "upload", "error", err)
 		}
+
 	case provider.RenameEvent:
-		if !e.Item.IsDir() {
-			err = s.Rename(ctx, e.Item, *e.New)
-			if err == nil {
-				err = s.aggregateOnRename(ctx, e.Item, *e.New)
-			}
+		if e.Item.IsDir() {
+			// Dir are handled on the event bus
+			return
+		}
+
+		err = s.Rename(ctx, e.Item, *e.New)
+		if err == nil {
+			err = s.aggregateOnRename(ctx, e.Item, *e.New)
 		}
 
 		if err != nil {
 			getEventLogger(e.Item).ErrorContext(ctx, "rename", "error", err)
 		}
+
 	case provider.DeleteEvent:
 		if err := s.delete(ctx, e.Item); err != nil {
 			getEventLogger(e.Item).ErrorContext(ctx, "delete", "error", err)

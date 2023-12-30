@@ -20,10 +20,13 @@ func (s Service) EventConsumer(ctx context.Context, e provider.Event) {
 	case provider.UploadEvent:
 		s.generateItem(ctx, e)
 	case provider.RenameEvent:
-		if !e.Item.IsDir() {
-			if err := s.Rename(ctx, e.Item, *e.New); err != nil {
-				slog.ErrorContext(ctx, "rename item", "error", err)
-			}
+		if e.Item.IsDir() {
+			// Dir are handled on the event bus
+			return
+		}
+
+		if err := s.Rename(ctx, e.Item, *e.New); err != nil {
+			slog.ErrorContext(ctx, "rename item", "error", err)
 		}
 	case provider.DeleteEvent:
 		s.delete(ctx, e.Item)
