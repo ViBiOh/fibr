@@ -7,6 +7,7 @@ import (
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/v4/pkg/cache"
 )
 
 func (s Service) EventConsumer(ctx context.Context, e provider.Event) {
@@ -79,7 +80,7 @@ func (s Service) handleStartEvent(ctx context.Context, event provider.Event) err
 	}
 
 	item := event.Item
-	if !forced && s.hasMetadata(ctx, item) {
+	if !forced && s.hasMetadata(cache.Bypass(ctx), item) {
 		slog.DebugContext(ctx, "has metadata", "item", item.Pathname)
 		return nil
 	}
