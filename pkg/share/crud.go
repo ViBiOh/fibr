@@ -94,7 +94,7 @@ func (s *Service) UpdatePassword(ctx context.Context, id, password string) error
 			return fmt.Errorf("save shares: %w", err)
 		}
 
-		if err := s.redisClient.PublishJSON(ctx, s.pubsubChannel, provider.Share{ID: id}); err != nil {
+		if err := s.redisClient.PublishJSON(ctx, s.pubsubChannel, share); err != nil {
 			return fmt.Errorf("publish share deletion: %w", err)
 		}
 
