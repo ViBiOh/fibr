@@ -105,9 +105,10 @@ build-web:
 ## run: Locally run the application, e.g. node index.js, python -m myapp, go run myapp etc ...
 .PHONY: run
 run:
+	go install "github.com/ViBiOh/auth/v2/cmd/argon@latest"
 	$(MAIN_RUNNER) \
 		-ignorePattern ".git|node_modules" \
-		-authUsers "1:`htpasswd -nBb admin admin`"
+		-authUsers "1:admin:`argon password`"
 
 ## config: Create local configuration
 .PHONY: config
@@ -119,4 +120,4 @@ config:
 config-compose:
 	@printf "DATA_USER_ID=%s\n" "$(shell id -u)" > .env.compose
 	@printf "DATA_DIR=%s\n" "$(shell pwd)" >> .env.compose
-	@printf "BASIC_USERS=1:%b\n" '$(shell htpasswd -nBb admin password | sed 's|\$$|\$$\$$|g')' >> .env.compose
+	@printf "BASIC_USERS=1:admin:%s\n" '$(shell argon password | sed 's|\$$|\$$\$$|g')' >> .env.compose

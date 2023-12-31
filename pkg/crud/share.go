@@ -8,10 +8,10 @@ import (
 	"strings"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
+	"github.com/ViBiOh/auth/v2/pkg/argon"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
-	"golang.org/x/crypto/bcrypt"
 )
 
 func (s Service) bestSharePath(pathname string) string {
@@ -79,13 +79,13 @@ func (s Service) createShare(w http.ResponseWriter, r *http.Request, request pro
 
 	password := ""
 	if passwordValue := strings.TrimSpace(r.FormValue("password")); passwordValue != "" {
-		hash, err := bcrypt.GenerateFromPassword([]byte(passwordValue), s.bcryptCost)
+		hash, err := argon.GenerateFromPassword(passwordValue)
 		if err != nil {
 			s.error(w, r, request, model.WrapInternal(err))
 			return
 		}
 
-		password = string(hash)
+		password = hash
 	}
 
 	ctx := r.Context()

@@ -32,6 +32,7 @@ type ShareManager interface {
 	List() []Share
 	Get(string) Share
 	Create(context.Context, string, bool, bool, string, bool, time.Duration) (string, error)
+	UpdatePassword(context.Context, string, string) error
 	Delete(context.Context, string) error
 }
 

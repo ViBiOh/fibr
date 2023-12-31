@@ -134,16 +134,16 @@ Fibr provides [OpenGraph metadatas](https://ogp.me) to have nice preview of link
 
 You can start `fibr` with no user, with the `-noAuth` option. Although available, I don't recommend using it in public Internet. Anybody has access to the _root folder_ for viewing, uploading, deleting or sharing content with anybody.
 
-Users are set with the `-authUsers` option and are in the form `[id]:[login]:[bcrypted password]`.
+Users are set with the `-authUsers` option and are in the form `[id]:[login]:[argon encoded has]`.
 
 - `id` is used to add profile to your user
 - `login` is the user for Basic Auth prompt
-- `bcrypted password` is the password for Basic Auth prompt, [encrypted with `bcrypt`](https://en.wikipedia.org/wiki/Bcrypt)
+- `argon encoded hash` is the password for Basic Auth prompt, [encoded hash with `argon2id`](https://en.wikipedia.org/wiki/Argon2)
 
-You can easily encrypt your `login:password` value with [`htpasswd`](https://httpd.apache.org/docs/2.4/programs/htpasswd.html)
+You can easily hash your password value with my own [`argon CLI`](https://github.com/ViBiOh/auth/blob/main/cmd/argon/argon.go) or [online](https://argon2.online)
 
 ```bash
-htpasswd -nBb login password
+argon password
 ```
 
 In order to work, your user **must have** `admin` profile sets with the `-authProfiles` option.
@@ -192,7 +192,7 @@ docker run -d \
 
 For prod-ready run with thumbnails generation of image, PDF and videos, _this is the recommended approach_.
 
-You can inspire yourself from the [docker-compose.yaml](docker-compose.yaml) file I personnaly used. Beware of `-authUsers` option: bcrypted passwords contain dollar sign, which `docker-compose` tries to resolve as a shell variable, [you must escape it](https://docs.docker.com/compose/compose-file/compose-file-v2/#variable-substitution).
+You can inspire yourself from the [docker-compose.yaml](docker-compose.yaml) file I personnaly used. Beware of `-authUsers` option: hashed passwords contain dollar sign, which `docker-compose` tries to resolve as a shell variable, [you must escape it](https://docs.docker.com/compose/compose-file/compose-file-v2/#variable-substitution).
 
 ```bash
 make config-compose
@@ -234,7 +234,6 @@ Usage of fibr:
   --amqpURI                           string        [amqp] Address in the form amqps?://<user>:<password>@<address>:<port>/<vhost> ${FIBR_AMQP_URI}
   --authProfiles                      string        [auth] Users profiles in the form 'id:profile1|profile2,id2:profile1' ${FIBR_AUTH_PROFILES} (default "1:admin")
   --authUsers                         string        [auth] Users credentials in the form 'id:login:password,id2:login2:password2' ${FIBR_AUTH_USERS}
-  --bcryptDuration                    string        [crud] Wanted bcrypt duration for calculating effective cost ${FIBR_BCRYPT_DURATION} (default "0.25s")
   --cert                              string        [server] Certificate file ${FIBR_CERT}
   --chunkUpload                                     [crud] Use chunk upload in browser ${FIBR_CHUNK_UPLOAD} (default false)
   --csp                               string        [owasp] Content-Security-Policy ${FIBR_CSP} (default "default-src 'self'; base-uri 'self'; script-src 'self' 'httputils-nonce' unpkg.com/webp-hero@0.0.2/dist-cjs/ unpkg.com/leaflet@1.9.4/dist/ unpkg.com/leaflet.markercluster@1.5.1/; style-src 'self' 'httputils-nonce' unpkg.com/leaflet@1.9.4/dist/ unpkg.com/leaflet.markercluster@1.5.1/; img-src 'self' data: a.tile.openstreetmap.org b.tile.openstreetmap.org c.tile.openstreetmap.org")

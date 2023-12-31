@@ -5,6 +5,7 @@
 //
 //	mockgen -source metadata.go -destination ../mocks/metadata.go -package mocks -mock_names MetadataManager=MetadataManager
 //
+
 // Package mocks is a generated GoMock package.
 package mocks
 

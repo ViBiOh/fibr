@@ -5,6 +5,7 @@
 //
 //	mockgen -destination ../mocks/storage.go -package mocks -mock_names Storage=Storage github.com/ViBiOh/absto/pkg/model Storage
 //
+
 // Package mocks is a generated GoMock package.
 package mocks
 
@@ -111,21 +112,6 @@ func (m *Storage) Name() string {
 func (mr *StorageMockRecorder) Name() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Name", reflect.TypeOf((*Storage)(nil).Name))
-}
-
-// OpenFile mocks base method.
-func (m *Storage) OpenFile(arg0 context.Context, arg1 string, arg2 int, arg3 fs.FileMode) (model.File, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "OpenFile", arg0, arg1, arg2, arg3)
-	ret0, _ := ret[0].(model.File)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// OpenFile indicates an expected call of OpenFile.
-func (mr *StorageMockRecorder) OpenFile(arg0, arg1, arg2, arg3 any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OpenFile", reflect.TypeOf((*Storage)(nil).OpenFile), arg0, arg1, arg2, arg3)
 }
 
 // Path mocks base method.

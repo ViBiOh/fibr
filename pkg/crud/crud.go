@@ -3,17 +3,13 @@ package crud
 import (
 	"errors"
 	"flag"
-	"fmt"
-	"log/slog"
 	"net/http"
-	"time"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/search"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/flags"
-	"github.com/ViBiOh/httputils/v4/pkg/bcrypt"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -37,12 +33,10 @@ type Service struct {
 	temporaryFolder string
 	renderer        *renderer.Service
 	thumbnail       thumbnail.Service
-	bcryptCost      int
 	chunkUpload     bool
 }
 
 type Config struct {
-	BcryptDuration  string
 	TemporaryFolder string
 	ChunkUpload     bool
 }
@@ -50,7 +44,6 @@ type Config struct {
 func Flags(fs *flag.FlagSet, prefix string) *Config {
 	var config Config
 
-	flags.New("BcryptDuration", "Wanted bcrypt duration for calculating effective cost").Prefix(prefix).DocPrefix("crud").StringVar(fs, &config.BcryptDuration, "0.25s", nil)
 	flags.New("ChunkUpload", "Use chunk upload in browser").Prefix(prefix).DocPrefix("crud").BoolVar(fs, &config.ChunkUpload, false, nil)
 	flags.New("TemporaryFolder", "Temporary folder for chunk upload").Prefix(prefix).DocPrefix("crud").StringVar(fs, &config.TemporaryFolder, "/tmp", nil)
 
@@ -75,19 +68,6 @@ func New(config *Config, storageService absto.Storage, filteredStorage absto.Sto
 	if tracerProvider != nil {
 		service.tracer = tracerProvider.Tracer("crud")
 	}
-
-	bcryptDuration, err := time.ParseDuration(config.BcryptDuration)
-	if err != nil {
-		return service, fmt.Errorf("parse bcrypt duration: %w", err)
-	}
-
-	bcryptCost, err := bcrypt.FindBestCost(bcryptDuration)
-	if err != nil {
-		slog.Error("find best bcrypt cost", "error", err)
-	}
-	slog.Info("Best bcrypt cost computed", "cost", bcryptCost)
-
-	service.bcryptCost = bcryptCost
 
 	return service, nil
 }

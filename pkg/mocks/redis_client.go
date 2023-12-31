@@ -5,6 +5,7 @@
 //
 //	mockgen -destination ../mocks/redis_client.go -package mocks -mock_names Client=RedisClient github.com/ViBiOh/httputils/v4/pkg/redis Client
 //
+
 // Package mocks is a generated GoMock package.
 package mocks
 

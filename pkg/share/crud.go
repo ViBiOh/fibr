@@ -7,6 +7,7 @@ import (
 	"sort"
 	"time"
 
+	"github.com/ViBiOh/auth/v2/pkg/argon"
 	"github.com/ViBiOh/fibr/pkg/exclusive"
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
@@ -76,6 +77,31 @@ func (s *Service) Create(ctx context.Context, filepath string, edit, story bool,
 	})
 
 	return id, err
+}
+
+func (s *Service) UpdatePassword(ctx context.Context, id, password string) error {
+	_, err := s.Exclusive(ctx, id, exclusive.Duration, func(_ context.Context) error {
+		hashed, err := argon.GenerateFromPassword(password)
+		if err != nil {
+			return fmt.Errorf("hash password: %w", err)
+		}
+
+		share := s.shares[id]
+		share.Password = hashed
+		s.shares[id] = share
+
+		if err := provider.SaveJSON(ctx, s.storage, shareFilename, s.shares); err != nil {
+			return fmt.Errorf("save shares: %w", err)
+		}
+
+		if err := s.redisClient.PublishJSON(ctx, s.pubsubChannel, provider.Share{ID: id}); err != nil {
+			return fmt.Errorf("publish share deletion: %w", err)
+		}
+
+		return nil
+	})
+
+	return err
 }
 
 func (s *Service) Delete(ctx context.Context, id string) error {

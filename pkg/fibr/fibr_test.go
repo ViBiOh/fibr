@@ -1,6 +1,7 @@
 package fibr
 
 import (
+	"context"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -10,6 +11,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/ViBiOh/auth/v2/pkg/argon"
 	"github.com/ViBiOh/auth/v2/pkg/auth"
 	"github.com/ViBiOh/auth/v2/pkg/ident"
 	authModel "github.com/ViBiOh/auth/v2/pkg/model"
@@ -17,7 +19,6 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 	httpModel "github.com/ViBiOh/httputils/v4/pkg/model"
 	"go.uber.org/mock/gomock"
-	"golang.org/x/crypto/bcrypt"
 )
 
 var (
@@ -32,7 +33,7 @@ var (
 		Path:     "/public",
 	}
 
-	passwordHash, _ = bcrypt.GenerateFromPassword([]byte("password"), 10)
+	passwordHash, _ = argon.GenerateFromPassword("password")
 
 	passwordShare = provider.Share{
 		ID:       "f5d4c3b2a1",
@@ -152,7 +153,7 @@ func TestParseShare(t *testing.T) {
 				shareMock.EXPECT().Get(gomock.Any()).Return(provider.Share{})
 			}
 
-			gotErr := tc.instance.parseShare(tc.args.request, tc.args.authorizationHeader)
+			gotErr := tc.instance.parseShare(context.Background(), tc.args.request, tc.args.authorizationHeader)
 
 			failed := false
 

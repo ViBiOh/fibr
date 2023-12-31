@@ -5,6 +5,7 @@
 //
 //	mockgen -source interfaces.go -destination ../mocks/interfaces.go -package mocks -mock_names Crud=Crud,Auth=Auth,ShareManager=ShareManager,WebhookManager=WebhookManager
 //
+
 // Package mocks is a generated GoMock package.
 package mocks
 
@@ -238,6 +239,20 @@ func (m *ShareManager) List() []provider.Share {
 func (mr *ShareManagerMockRecorder) List() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*ShareManager)(nil).List))
+}
+
+// UpdatePassword mocks base method.
+func (m *ShareManager) UpdatePassword(arg0 context.Context, arg1, arg2 string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdatePassword", arg0, arg1, arg2)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdatePassword indicates an expected call of UpdatePassword.
+func (mr *ShareManagerMockRecorder) UpdatePassword(arg0, arg1, arg2 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdatePassword", reflect.TypeOf((*ShareManager)(nil).UpdatePassword), arg0, arg1, arg2)
 }
 
 // WebhookManager is a mock of WebhookManager interface.

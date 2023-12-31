@@ -1,6 +1,7 @@
 package fibr
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -53,7 +54,7 @@ func (s Service) parseRequest(r *http.Request) (provider.Request, error) {
 		request.Path = "/" + request.Path
 	}
 
-	if err := s.parseShare(&request, r.Header.Get("Authorization")); err != nil {
+	if err := s.parseShare(r.Context(), &request, r.Header.Get("Authorization")); err != nil {
 		logRequest(r)
 		return request, model.WrapUnauthorized(err)
 	}
@@ -101,13 +102,13 @@ func parsePreferences(r *http.Request) provider.Preferences {
 	return provider.ParsePreferences(cookieValue)
 }
 
-func (s Service) parseShare(request *provider.Request, authorizationHeader string) error {
+func (s Service) parseShare(ctx context.Context, request *provider.Request, authorizationHeader string) error {
 	share := s.share.Get(request.Filepath())
 	if share.IsZero() {
 		return nil
 	}
 
-	if err := share.CheckPassword(authorizationHeader); err != nil {
+	if err := share.CheckPassword(ctx, authorizationHeader, s.share); err != nil {
 		return err
 	}
 

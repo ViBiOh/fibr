@@ -1,18 +1,19 @@
 package provider
 
 import (
+	"context"
 	"encoding/base64"
 	"errors"
 	"fmt"
 	"testing"
 
-	"golang.org/x/crypto/bcrypt"
+	"github.com/ViBiOh/auth/v2/pkg/argon"
 )
 
 func TestCheckPassword(t *testing.T) {
-	password, err := bcrypt.GenerateFromPassword([]byte("test"), bcrypt.DefaultCost)
+	password, err := argon.GenerateFromPassword("test")
 	if err != nil {
-		t.Errorf("create bcrypted password: %s", err)
+		t.Errorf("create argon password: %s", err)
 	}
 
 	cases := map[string]struct {
@@ -71,7 +72,7 @@ func TestCheckPassword(t *testing.T) {
 
 	for intention, tc := range cases {
 		t.Run(intention, func(t *testing.T) {
-			err := tc.share.CheckPassword(tc.header)
+			err := tc.share.CheckPassword(context.Background(), tc.header, nil)
 
 			failed := false
 
