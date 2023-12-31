@@ -232,8 +232,8 @@ Usage of fibr:
   --amqpThumbnailRetryInterval        duration      [amqpThumbnail] Interval duration when send fails ${FIBR_AMQP_THUMBNAIL_RETRY_INTERVAL} (default 1h0m0s)
   --amqpThumbnailRoutingKey           string        [amqpThumbnail] RoutingKey name ${FIBR_AMQP_THUMBNAIL_ROUTING_KEY} (default "thumbnail_output")
   --amqpURI                           string        [amqp] Address in the form amqps?://<user>:<password>@<address>:<port>/<vhost> ${FIBR_AMQP_URI}
-  --authProfiles                      string        [auth] Users profiles in the form 'id:profile1|profile2,id2:profile1' ${FIBR_AUTH_PROFILES} (default "1:admin")
-  --authUsers                         string        [auth] Users credentials in the form 'id:login:password,id2:login2:password2' ${FIBR_AUTH_USERS}
+  --authProfiles                      string slice  [auth] Users profiles in the form 'id:profile1|profile2' ${FIBR_AUTH_PROFILES}, as a string slice, environment variable separated by "," (default [1:admin])
+  --authUsers                         string slice  [auth] Users credentials in the form 'id:login:password' ${FIBR_AUTH_USERS}, as a string slice, environment variable separated by "|"
   --cert                              string        [server] Certificate file ${FIBR_CERT}
   --chunkUpload                                     [crud] Use chunk upload in browser ${FIBR_CHUNK_UPLOAD} (default false)
   --csp                               string        [owasp] Content-Security-Policy ${FIBR_CSP} (default "default-src 'self'; base-uri 'self'; script-src 'self' 'httputils-nonce' unpkg.com/webp-hero@0.0.2/dist-cjs/ unpkg.com/leaflet@1.9.4/dist/ unpkg.com/leaflet.markercluster@1.5.1/; style-src 'self' 'httputils-nonce' unpkg.com/leaflet@1.9.4/dist/ unpkg.com/leaflet.markercluster@1.5.1/; img-src 'self' data: a.tile.openstreetmap.org b.tile.openstreetmap.org c.tile.openstreetmap.org")

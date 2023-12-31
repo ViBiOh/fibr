@@ -7,7 +7,7 @@ toolchain go1.21.0
 require (
 	github.com/ViBiOh/ChatPotte v0.4.0
 	github.com/ViBiOh/absto v1.7.4
-	github.com/ViBiOh/auth/v2 v2.18.0
+	github.com/ViBiOh/auth/v2 v2.18.1
 	github.com/ViBiOh/exas v0.7.1
 	github.com/ViBiOh/flags v1.5.0
 	github.com/ViBiOh/httputils/v4 v4.70.2
