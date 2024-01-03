@@ -14,6 +14,7 @@ import (
 	"time"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
+	"github.com/ViBiOh/fibr/pkg/fibr"
 	"github.com/ViBiOh/fibr/pkg/geo"
 	"github.com/ViBiOh/fibr/pkg/metadata"
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -118,16 +119,19 @@ func (s Service) handleDir(w http.ResponseWriter, r *http.Request, request provi
 	}
 
 	if query.GetBool(r, "geojson") {
+		fibr.SetRouteTag(r.Context(), "GET geojson")
 		s.serveGeoJSON(w, r, request, item, items)
 		return renderer.Page{}, nil
 	}
 
 	if query.GetBool(r, "thumbnail") {
+		fibr.SetRouteTag(r.Context(), "GET thumbnail")
 		s.thumbnail.List(w, r, item, items)
 		return renderer.Page{}, nil
 	}
 
 	if query.GetBool(r, "download") {
+		fibr.SetRouteTag(r.Context(), "GET download")
 		s.Download(w, r, request, items)
 		return errorReturn(request, err)
 	}
@@ -135,15 +139,18 @@ func (s Service) handleDir(w http.ResponseWriter, r *http.Request, request provi
 	go s.pushEvent(cntxt.WithoutDeadline(r.Context()), provider.NewAccessEvent(r.Context(), item, r))
 
 	if query.GetBool(r, "search") {
+		fibr.SetRouteTag(r.Context(), "GET search")
 		return s.search(r, request, item, items)
 	}
 
 	provider.SetPrefsCookie(w, request)
 
 	if request.IsStory() {
+		fibr.SetRouteTag(r.Context(), "GET story")
 		return s.story(r, request, item, items)
 	}
 
+	fibr.SetRouteTag(r.Context(), "GET directory")
 	return s.list(r.Context(), request, message, item, items)
 }
 

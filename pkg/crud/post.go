@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/ViBiOh/fibr/pkg/fibr"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/cntxt"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
@@ -53,6 +54,8 @@ func parseMultipart(r *http.Request) (map[string]string, *multipart.Part, error)
 func (s Service) Post(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	contentType := r.Header.Get("Content-Type")
 
+	fibr.SetRouteTag(r.Context(), "POST")
+
 	if contentType == "application/x-www-form-urlencoded" {
 		s.handleFormURLEncoded(w, r, request)
 		return
@@ -71,11 +74,17 @@ func (s Service) handleFormURLEncoded(w http.ResponseWriter, r *http.Request, re
 
 	switch r.FormValue("type") {
 	case "share":
+		fibr.SetRouteTag(r.Context(), "POST share")
 		s.handlePostShare(w, r, request, method)
+
 	case "webhook":
+		fibr.SetRouteTag(r.Context(), "POST webhook")
 		s.handlePostWebhook(w, r, request, method)
+
 	case "description":
+		fibr.SetRouteTag(r.Context(), "POST description")
 		s.handlePostDescription(w, r, request)
+
 	default:
 		s.handlePost(w, r, request, method)
 	}
@@ -107,11 +116,14 @@ func (s Service) handleMultipart(w http.ResponseWriter, r *http.Request, request
 
 			chunkNumber = fmt.Sprintf("%010d", chunkNumberValue)
 
+			fibr.SetRouteTag(r.Context(), "POST chunk")
 			s.uploadChunk(w, r, request, values["filename"], chunkNumber, file)
 		} else {
+			fibr.SetRouteTag(r.Context(), "POST merge")
 			s.mergeChunk(w, r, request, values)
 		}
 	} else {
+		fibr.SetRouteTag(r.Context(), "POST upload")
 		s.upload(w, r, request, values, file)
 	}
 }

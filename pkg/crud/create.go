@@ -7,12 +7,15 @@ import (
 	"path"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
+	"github.com/ViBiOh/fibr/pkg/fibr"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
 func (s Service) Create(w http.ResponseWriter, r *http.Request, request provider.Request) {
+	fibr.SetRouteTag(r.Context(), "PUT mkdir")
+
 	if !request.CanEdit {
 		s.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
 		return

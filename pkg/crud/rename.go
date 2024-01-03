@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
+	"github.com/ViBiOh/fibr/pkg/fibr"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/cntxt"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
@@ -61,6 +62,8 @@ func parseRenameParams(r *http.Request, request provider.Request) (string, strin
 }
 
 func (s Service) Rename(w http.ResponseWriter, r *http.Request, request provider.Request) {
+	fibr.SetRouteTag(r.Context(), "PATCH rename")
+
 	if !request.CanEdit {
 		s.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
 		return

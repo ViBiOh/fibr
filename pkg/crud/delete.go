@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/ViBiOh/fibr/pkg/fibr"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/cntxt"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
@@ -12,6 +13,8 @@ import (
 )
 
 func (s Service) Delete(w http.ResponseWriter, r *http.Request, request provider.Request) {
+	fibr.SetRouteTag(r.Context(), "DELETE")
+
 	if !request.CanEdit {
 		s.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
 		return
