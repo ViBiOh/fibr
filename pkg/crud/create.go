@@ -14,7 +14,7 @@ import (
 )
 
 func (s Service) Create(w http.ResponseWriter, r *http.Request, request provider.Request) {
-	fibr.SetRouteTag(r.Context(), "PUT mkdir")
+	fibr.SetRouteTag(r.Context(), "/mkdir")
 
 	if !request.CanEdit {
 		s.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))

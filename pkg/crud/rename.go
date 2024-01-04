@@ -62,7 +62,7 @@ func parseRenameParams(r *http.Request, request provider.Request) (string, strin
 }
 
 func (s Service) Rename(w http.ResponseWriter, r *http.Request, request provider.Request) {
-	fibr.SetRouteTag(r.Context(), "PATCH rename")
+	fibr.SetRouteTag(r.Context(), "/rename")
 
 	if !request.CanEdit {
 		s.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))

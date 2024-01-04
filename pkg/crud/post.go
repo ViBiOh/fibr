@@ -54,8 +54,6 @@ func parseMultipart(r *http.Request) (map[string]string, *multipart.Part, error)
 func (s Service) Post(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	contentType := r.Header.Get("Content-Type")
 
-	fibr.SetRouteTag(r.Context(), "POST")
-
 	if contentType == "application/x-www-form-urlencoded" {
 		s.handleFormURLEncoded(w, r, request)
 		return
@@ -74,15 +72,15 @@ func (s Service) handleFormURLEncoded(w http.ResponseWriter, r *http.Request, re
 
 	switch r.FormValue("type") {
 	case "share":
-		fibr.SetRouteTag(r.Context(), "POST share")
+		fibr.SetRouteTag(r.Context(), "/share")
 		s.handlePostShare(w, r, request, method)
 
 	case "webhook":
-		fibr.SetRouteTag(r.Context(), "POST webhook")
+		fibr.SetRouteTag(r.Context(), "/webhook")
 		s.handlePostWebhook(w, r, request, method)
 
 	case "description":
-		fibr.SetRouteTag(r.Context(), "POST description")
+		fibr.SetRouteTag(r.Context(), "/description")
 		s.handlePostDescription(w, r, request)
 
 	default:
@@ -116,14 +114,14 @@ func (s Service) handleMultipart(w http.ResponseWriter, r *http.Request, request
 
 			chunkNumber = fmt.Sprintf("%010d", chunkNumberValue)
 
-			fibr.SetRouteTag(r.Context(), "POST chunk")
+			fibr.SetRouteTag(r.Context(), "/chunk")
 			s.uploadChunk(w, r, request, values["filename"], chunkNumber, file)
 		} else {
-			fibr.SetRouteTag(r.Context(), "POST merge")
+			fibr.SetRouteTag(r.Context(), "/merge")
 			s.mergeChunk(w, r, request, values)
 		}
 	} else {
-		fibr.SetRouteTag(r.Context(), "POST upload")
+		fibr.SetRouteTag(r.Context(), "/upload")
 		s.upload(w, r, request, values, file)
 	}
 }
