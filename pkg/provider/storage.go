@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"context"
 	"mime"
 	"strconv"
 	"strings"
@@ -8,6 +9,14 @@ import (
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 )
+
+func IgnoreNotExistsErr[K comparable](_ context.Context, _ K, err error) error {
+	if absto.IsNotExist(err) {
+		return nil
+	}
+
+	return err
+}
 
 func lowerString(first, second string) bool {
 	return strings.Compare(strings.ToLower(first), strings.ToLower(second)) < 0

@@ -38,7 +38,7 @@ func (s Service) GetAllMetadataFor(ctx context.Context, items ...absto.Item) (ma
 	ctx, end := telemetry.StartSpan(ctx, s.tracer, "get_all_metadata")
 	defer end(&err)
 
-	exifs, err := s.exifCache.List(ctx, provider.KeepOnlyFile(items)...)
+	exifs, err := s.exifCache.List(ctx, provider.IgnoreNotExistsErr[absto.Item], provider.KeepOnlyFile(items)...)
 	if err != nil {
 		return nil, fmt.Errorf("list: %w", err)
 	}
@@ -72,7 +72,7 @@ func (s Service) GetAllAggregateFor(ctx context.Context, items ...absto.Item) (m
 	ctx, end := telemetry.StartSpan(ctx, s.tracer, "get_all_aggregate")
 	defer end(&err)
 
-	exifs, err := s.aggregateCache.List(ctx, provider.KeepOnlyDir(items)...)
+	exifs, err := s.aggregateCache.List(ctx, provider.IgnoreNotExistsErr[absto.Item], provider.KeepOnlyDir(items)...)
 	if err != nil {
 		return nil, fmt.Errorf("list: %w", err)
 	}
