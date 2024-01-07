@@ -68,6 +68,7 @@ func (s Service) TemplateFunc(w http.ResponseWriter, r *http.Request) (renderer.
 	}
 
 	if r.URL.Path == "/sitemap.xml" {
+		SetRouteTag(r.Context(), "/sitemap.xml")
 		return renderer.NewPage("sitemap", http.StatusOK, nil), nil
 	}
 
