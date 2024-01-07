@@ -63,16 +63,19 @@ func (s Service) getWithMessage(w http.ResponseWriter, r *http.Request, request 
 
 func (s Service) handleFile(w http.ResponseWriter, r *http.Request, request provider.Request, item absto.Item, message renderer.Message) (renderer.Page, error) {
 	if query.GetBool(r, "thumbnail") {
+		telemetry.SetRouteTag(r.Context(), "/thumbnail")
 		s.thumbnail.Serve(w, r, item)
 		return renderer.Page{}, nil
 	}
 
 	if query.GetBool(r, "stream") {
+		telemetry.SetRouteTag(r.Context(), "/stream")
 		s.thumbnail.Stream(w, r, item)
 		return renderer.Page{}, nil
 	}
 
 	if query.GetBool(r, "browser") {
+		telemetry.SetRouteTag(r.Context(), "/browse")
 		provider.SetPrefsCookie(w, request)
 
 		go s.pushEvent(cntxt.WithoutDeadline(r.Context()), provider.NewAccessEvent(r.Context(), item, r))
@@ -80,6 +83,7 @@ func (s Service) handleFile(w http.ResponseWriter, r *http.Request, request prov
 		return s.browse(r.Context(), request, item, message)
 	}
 
+	telemetry.SetRouteTag(r.Context(), "/download")
 	return renderer.Page{}, s.serveFile(w, r, item)
 }
 
@@ -118,19 +122,19 @@ func (s Service) handleDir(w http.ResponseWriter, r *http.Request, request provi
 	}
 
 	if query.GetBool(r, "geojson") {
-		telemetry.SetRouteTag(r.Context(), "/geojson")
+		telemetry.SetRouteTag(r.Context(), "/geojsons")
 		s.serveGeoJSON(w, r, request, item, items)
 		return renderer.Page{}, nil
 	}
 
 	if query.GetBool(r, "thumbnail") {
-		telemetry.SetRouteTag(r.Context(), "/thumbnail")
+		telemetry.SetRouteTag(r.Context(), "/thumbnails")
 		s.thumbnail.List(w, r, item, items)
 		return renderer.Page{}, nil
 	}
 
 	if query.GetBool(r, "download") {
-		telemetry.SetRouteTag(r.Context(), "/download")
+		telemetry.SetRouteTag(r.Context(), "/downloads")
 		s.Download(w, r, request, items)
 		return errorReturn(request, err)
 	}
@@ -138,14 +142,14 @@ func (s Service) handleDir(w http.ResponseWriter, r *http.Request, request provi
 	go s.pushEvent(cntxt.WithoutDeadline(r.Context()), provider.NewAccessEvent(r.Context(), item, r))
 
 	if query.GetBool(r, "search") {
-		telemetry.SetRouteTag(r.Context(), "/search")
+		telemetry.SetRouteTag(r.Context(), "/searches")
 		return s.search(r, request, item, items)
 	}
 
 	provider.SetPrefsCookie(w, request)
 
 	if request.IsStory() {
-		telemetry.SetRouteTag(r.Context(), "/story")
+		telemetry.SetRouteTag(r.Context(), "/stories")
 		return s.story(r, request, item, items)
 	}
 
