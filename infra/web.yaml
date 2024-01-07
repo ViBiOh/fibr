@@ -74,11 +74,5 @@ spec:
       allowPrivilegeEscalation: false
     autoscaling:
       enabled: false
-    ingress:
-      enabled: false
-      sticky: true
-      compress: false
-      hosts:
-        - fibr.vibioh.fr
     pprof:
       enabled: true
