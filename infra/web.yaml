@@ -75,7 +75,7 @@ spec:
     autoscaling:
       enabled: false
     ingress:
-      enabled: true
+      enabled: false
       sticky: true
       compress: false
       hosts:
