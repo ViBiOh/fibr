@@ -11,6 +11,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/query"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
+	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
 )
 
 var FuncMap = template.FuncMap{
@@ -68,7 +69,7 @@ func (s Service) TemplateFunc(w http.ResponseWriter, r *http.Request) (renderer.
 	}
 
 	if r.URL.Path == "/sitemap.xml" {
-		SetRouteTag(r.Context(), "/sitemap.xml")
+		telemetry.SetRouteTag(r.Context(), "/sitemap.xml")
 		return renderer.NewPage("sitemap", http.StatusOK, nil), nil
 	}
 

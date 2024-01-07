@@ -8,11 +8,11 @@ import (
 	"strings"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
-	"github.com/ViBiOh/fibr/pkg/fibr"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/cntxt"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
+	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
 )
 
 func (s Service) DoRename(ctx context.Context, oldPath, newPath string, oldItem absto.Item) (absto.Item, error) {
@@ -62,7 +62,7 @@ func parseRenameParams(r *http.Request, request provider.Request) (string, strin
 }
 
 func (s Service) Rename(w http.ResponseWriter, r *http.Request, request provider.Request) {
-	fibr.SetRouteTag(r.Context(), "/rename")
+	telemetry.SetRouteTag(r.Context(), "/rename")
 
 	if !request.CanEdit {
 		s.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))

@@ -9,11 +9,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ViBiOh/fibr/pkg/fibr"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/cntxt"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
+	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
 )
 
 func parseMultipart(r *http.Request) (map[string]string, *multipart.Part, error) {
@@ -72,15 +72,15 @@ func (s Service) handleFormURLEncoded(w http.ResponseWriter, r *http.Request, re
 
 	switch r.FormValue("type") {
 	case "share":
-		fibr.SetRouteTag(r.Context(), "/share")
+		telemetry.SetRouteTag(r.Context(), "/share")
 		s.handlePostShare(w, r, request, method)
 
 	case "webhook":
-		fibr.SetRouteTag(r.Context(), "/webhook")
+		telemetry.SetRouteTag(r.Context(), "/webhook")
 		s.handlePostWebhook(w, r, request, method)
 
 	case "description":
-		fibr.SetRouteTag(r.Context(), "/description")
+		telemetry.SetRouteTag(r.Context(), "/description")
 		s.handlePostDescription(w, r, request)
 
 	default:
@@ -114,14 +114,14 @@ func (s Service) handleMultipart(w http.ResponseWriter, r *http.Request, request
 
 			chunkNumber = fmt.Sprintf("%010d", chunkNumberValue)
 
-			fibr.SetRouteTag(r.Context(), "/chunk")
+			telemetry.SetRouteTag(r.Context(), "/chunk")
 			s.uploadChunk(w, r, request, values["filename"], chunkNumber, file)
 		} else {
-			fibr.SetRouteTag(r.Context(), "/merge")
+			telemetry.SetRouteTag(r.Context(), "/merge")
 			s.mergeChunk(w, r, request, values)
 		}
 	} else {
-		fibr.SetRouteTag(r.Context(), "/upload")
+		telemetry.SetRouteTag(r.Context(), "/upload")
 		s.upload(w, r, request, values, file)
 	}
 }
