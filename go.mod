@@ -13,7 +13,7 @@ require (
 	github.com/ViBiOh/httputils/v4 v4.71.0
 	github.com/ViBiOh/vith v0.6.0
 	github.com/rabbitmq/amqp091-go v1.9.0
-	github.com/redis/go-redis/v9 v9.3.1
+	github.com/redis/go-redis/v9 v9.4.0
 	github.com/rs/xid v1.5.0
 	github.com/zeebo/xxh3 v1.0.2
 	go.opentelemetry.io/otel v1.21.0
