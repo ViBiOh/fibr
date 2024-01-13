@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log/slog"
 	"net/http"
 	"path"
 	"strings"
@@ -55,7 +54,6 @@ func (s Service) parseRequest(r *http.Request) (provider.Request, error) {
 	}
 
 	if err := s.parseShare(r.Context(), &request, r.Header.Get("Authorization")); err != nil {
-		logRequest(r)
 		return request, model.WrapUnauthorized(err)
 	}
 
@@ -79,7 +77,6 @@ func (s Service) parseRequest(r *http.Request) (provider.Request, error) {
 
 	_, user, err := s.login.IsAuthenticated(r)
 	if err != nil {
-		logRequest(r)
 		return request, convertAuthenticationError(err)
 	}
 
@@ -137,8 +134,4 @@ func convertAuthenticationError(err error) error {
 	}
 
 	return model.WrapUnauthorized(err)
-}
-
-func logRequest(r *http.Request) {
-	slog.WarnContext(r.Context(), "Unauthenticated request", "method", r.Method, "url", r.URL.String(), "ip", provider.GetIP(r))
 }

@@ -21,11 +21,6 @@ var (
 	LayoutPathsCookieName = "layout_paths"
 
 	preferencesPathSeparator = "|"
-	ipHeaders                = []string{
-		"Cf-Connecting-Ip",
-		"X-Forwarded-For",
-		"X-Real-Ip",
-	}
 )
 
 func ParseDisplay(input string) Display {
@@ -248,14 +243,4 @@ func SetPrefsCookie(w http.ResponseWriter, request Request) {
 	request.Preferences.SetCookie(w)
 
 	w.Header().Add("content-language", "en")
-}
-
-func GetIP(r *http.Request) string {
-	for _, header := range ipHeaders {
-		if ip := r.Header.Get(header); len(ip) != 0 {
-			return ip
-		}
-	}
-
-	return r.RemoteAddr
 }
