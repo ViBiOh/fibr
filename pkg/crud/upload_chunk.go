@@ -46,7 +46,7 @@ func (s Service) uploadChunk(w http.ResponseWriter, r *http.Request, request pro
 
 	defer func() {
 		if closeErr := writer.Close(); closeErr != nil {
-			slog.ErrorContext(r.Context(), "close chunk writer", "error", closeErr)
+			slog.LogAttrs(r.Context(), slog.LevelError, "close chunk writer", slog.Any("error", closeErr))
 		}
 
 		if err == nil {
@@ -54,7 +54,7 @@ func (s Service) uploadChunk(w http.ResponseWriter, r *http.Request, request pro
 		}
 
 		if removeErr := os.Remove(tempFile); removeErr != nil {
-			slog.ErrorContext(r.Context(), "remove chunk file", "error", removeErr, "file", tempFile)
+			slog.LogAttrs(r.Context(), slog.LevelError, "remove chunk file", slog.String("file", tempFile), slog.Any("error", removeErr))
 		}
 	}()
 
@@ -113,14 +113,14 @@ func (s Service) mergeChunk(w http.ResponseWriter, r *http.Request, request prov
 
 	go func(ctx context.Context) {
 		if info, infoErr := s.storage.Stat(ctx, filePath); infoErr != nil {
-			slog.ErrorContext(ctx, "get info for upload event", "error", infoErr)
+			slog.LogAttrs(ctx, slog.LevelError, "get info for upload event", slog.Any("error", infoErr))
 		} else {
 			s.pushEvent(ctx, provider.NewUploadEvent(ctx, request, info, s.bestSharePath(filePath), s.renderer))
 		}
 	}(cntxt.WithoutDeadline(ctx))
 
 	if err = os.RemoveAll(tempFolder); err != nil {
-		slog.ErrorContext(ctx, "delete chunk folder", "error", err, "folder", tempFolder)
+		slog.LogAttrs(ctx, slog.LevelError, "delete chunk folder", slog.String("folder", tempFolder), slog.Any("error", err))
 	}
 
 	s.postUpload(w, r, request, fileName)
@@ -134,7 +134,7 @@ func (s Service) mergeChunkFiles(ctx context.Context, directory, destination str
 
 	defer func() {
 		if closeErr := writer.Close(); closeErr != nil {
-			slog.ErrorContext(ctx, "close chunk's destination", "error", closeErr)
+			slog.LogAttrs(ctx, slog.LevelError, "close chunk's destination", slog.Any("error", closeErr))
 		}
 
 		if err == nil {
@@ -142,7 +142,7 @@ func (s Service) mergeChunkFiles(ctx context.Context, directory, destination str
 		}
 
 		if removeErr := os.Remove(destination); removeErr != nil {
-			slog.ErrorContext(ctx, "remove chunk's destination", "error", removeErr, "destination", destination)
+			slog.LogAttrs(ctx, slog.LevelError, "remove chunk's destination", slog.String("destination", destination), slog.Any("error", removeErr))
 		}
 	}()
 
@@ -170,7 +170,7 @@ func browseChunkFiles(ctx context.Context, directory, destination string, writer
 
 		defer func() {
 			if closeErr := reader.Close(); closeErr != nil {
-				slog.ErrorContext(ctx, "close chunk", "error", err, "path", path)
+				slog.LogAttrs(ctx, slog.LevelError, "close chunk", slog.String("path", path), slog.Any("error", err))
 			}
 		}()
 

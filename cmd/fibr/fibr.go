@@ -30,7 +30,7 @@ var content embed.FS
 func newLoginService(tracerProvider trace.TracerProvider, basicConfig *basicMemory.Config) provider.Auth {
 	basicService, err := basicMemory.New(basicConfig)
 	if err != nil {
-		slog.Error("auth memory", "error", err)
+		slog.LogAttrs(context.Background(), slog.LevelError, "auth memory", slog.Any("error", err))
 		os.Exit(1)
 	}
 

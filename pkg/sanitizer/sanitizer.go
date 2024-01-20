@@ -59,7 +59,7 @@ func (s Service) Start(ctx context.Context) {
 	if err := s.exclusive.Execute(ctx, "fibr:mutex:start", time.Hour, func(ctx context.Context) error {
 		return s.start(ctx)
 	}); err != nil {
-		slog.ErrorContext(ctx, "start", "error", err)
+		slog.LogAttrs(ctx, slog.LevelError, "start", slog.Any("error", err))
 	}
 }
 
@@ -102,7 +102,7 @@ func (s Service) start(ctx context.Context) error {
 func (s Service) sanitizeName(ctx context.Context, item absto.Item) absto.Item {
 	name, err := provider.SanitizeName(item.Pathname, false)
 	if err != nil {
-		slog.ErrorContext(ctx, "sanitize name", "error", err, "item", item.Pathname)
+		slog.LogAttrs(ctx, slog.LevelError, "sanitize name", slog.String("item", item.Pathname), slog.Any("error", err))
 		return item
 	}
 
@@ -111,15 +111,15 @@ func (s Service) sanitizeName(ctx context.Context, item absto.Item) absto.Item {
 	}
 
 	if !s.sanitizeOnStart {
-		slog.InfoContext(ctx, "File should be renamed", "pathname", item.Pathname, "name", name)
+		slog.LogAttrs(ctx, slog.LevelInfo, "File should be renamed", slog.String("pathname", item.Pathname), slog.String("name", name))
 		return item
 	}
 
-	slog.InfoContext(ctx, "Renaming...", "pathname", item.Pathname, "name", name)
+	slog.LogAttrs(ctx, slog.LevelInfo, "Renaming...", slog.String("pathname", item.Pathname), slog.String("name", name))
 
 	renamedItem, err := s.renamer.DoRename(ctx, item.Pathname, name, item)
 	if err != nil {
-		slog.ErrorContext(ctx, "rename", "error", err)
+		slog.LogAttrs(ctx, slog.LevelError, "rename", slog.Any("error", err))
 		return item
 	}
 

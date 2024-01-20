@@ -24,7 +24,7 @@ func (s Service) AMQPHandler(ctx context.Context, message amqp.Delivery) error {
 	}
 
 	if resp.Exif.IsZero() {
-		slog.DebugContext(ctx, "no exif", "item", resp.Item.Pathname)
+		slog.LogAttrs(ctx, slog.LevelDebug, "no exif", slog.String("item", resp.Item.Pathname))
 		return nil
 	}
 

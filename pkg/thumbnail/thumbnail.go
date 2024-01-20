@@ -231,7 +231,7 @@ func (s Service) List(w http.ResponseWriter, r *http.Request, item absto.Item, i
 	if query.GetBool(r, "search") {
 		hash = s.thumbnailHash(ctx, items)
 	} else if thumbnails, err := s.ListDir(ctx, item); err != nil {
-		slog.ErrorContext(ctx, "list thumbnails", "error", err, "item", item.Pathname)
+		slog.LogAttrs(ctx, slog.LevelError, "list thumbnails", slog.String("item", item.Pathname), slog.Any("error", err))
 	} else {
 		hash = provider.RawHash(thumbnails)
 	}
@@ -278,7 +278,7 @@ func (s Service) thumbnailHash(ctx context.Context, items []absto.Item) string {
 
 	thumbnails, err := s.cache.List(ctx, provider.IgnoreNotExistsErr[string], ids...)
 	if err != nil && !absto.IsNotExist(err) {
-		slog.ErrorContext(ctx, "list thumbnails from cache", "error", err)
+		slog.LogAttrs(ctx, slog.LevelError, "list thumbnails from cache", slog.Any("error", err))
 	}
 
 	hasher := hash.Stream()

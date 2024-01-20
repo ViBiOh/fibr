@@ -71,7 +71,7 @@ func (s Service) handleStartEvent(ctx context.Context, event provider.Event) err
 
 	if event.GetMetadata("force") == "cache" {
 		if err := s.redisClient.Delete(ctx, redisKey(event.Item)); err != nil {
-			slog.ErrorContext(ctx, "flush cache", "error", err, "fn", "exif.startEvent", "item", event.Item.Pathname)
+			slog.LogAttrs(ctx, slog.LevelError, "flush cache", slog.String("fn", "exif.startEvent"), slog.String("item", event.Item.Pathname), slog.Any("error", err))
 		}
 
 		if !forced {
@@ -81,7 +81,7 @@ func (s Service) handleStartEvent(ctx context.Context, event provider.Event) err
 
 	item := event.Item
 	if !forced && s.hasMetadata(cache.Bypass(ctx), item) {
-		slog.DebugContext(ctx, "has metadata", "item", item.Pathname)
+		slog.LogAttrs(ctx, slog.LevelDebug, "has metadata", slog.String("item", item.Pathname))
 		return nil
 	}
 
@@ -98,7 +98,7 @@ func (s Service) handleStartEvent(ctx context.Context, event provider.Event) err
 
 func (s Service) handleUploadEvent(ctx context.Context, item absto.Item, aggregate bool) error {
 	if !s.CanHaveExif(item) {
-		slog.DebugContext(ctx, "can't have exif", "item", item.Pathname)
+		slog.LogAttrs(ctx, slog.LevelDebug, "can't have exif", slog.String("item", item.Pathname))
 		return nil
 	}
 

@@ -58,7 +58,7 @@ func (s Service) Files(r *http.Request, request provider.Request) (items []absto
 		if hasTags {
 			metadata, err := s.exif.GetMetadataFor(ctx, item)
 			if err != nil {
-				slog.ErrorContext(ctx, "get metadata", "error", err, "item", item.Pathname)
+				slog.LogAttrs(ctx, slog.LevelError, "get metadata", slog.String("item", item.Pathname), slog.Any("error", err))
 			}
 
 			if !criterions.matchTags(metadata) {

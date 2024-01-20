@@ -30,7 +30,7 @@ func (s Service) story(r *http.Request, request provider.Request, item absto.Ite
 
 		directoryAggregate, err = s.metadata.GetAggregateFor(ctx, item)
 		if err != nil && !absto.IsNotExist(err) {
-			slog.ErrorContext(ctx, "get aggregate", "error", err, "fn", "crud.story", "item", request.Path)
+			slog.LogAttrs(ctx, slog.LevelError, "get aggregate", slog.String("fn", "crud.story"), slog.String("item", request.Path), slog.Any("error", err))
 		}
 	})
 
@@ -40,7 +40,7 @@ func (s Service) story(r *http.Request, request provider.Request, item absto.Ite
 
 		exifs, err = s.metadata.GetAllMetadataFor(ctx, files...)
 		if err != nil {
-			slog.ErrorContext(ctx, "list exifs", "error", err, "item", request.Path, "fn", "crud.story")
+			slog.LogAttrs(ctx, slog.LevelError, "list exifs", slog.String("fn", "crud.story"), slog.String("item", request.Path), slog.Any("error", err))
 		}
 	})
 

@@ -42,13 +42,13 @@ func (s *Service) EventConsumer(ctx context.Context, event provider.Event) {
 			statusCode, err = s.telegramHandle(ctx, webhook, event)
 
 		default:
-			slog.WarnContext(ctx, "unknown kind for webhook", "kind", webhook.Kind)
+			slog.LogAttrs(ctx, slog.LevelWarn, "unknown kind for webhook", slog.String("kind", webhook.Kind.String()))
 		}
 
 		s.increaseMetric(ctx, strconv.Itoa(statusCode))
 
 		if err != nil {
-			slog.ErrorContext(ctx, "error while sending webhook", "error", err)
+			slog.LogAttrs(ctx, slog.LevelError, "error while sending webhook", slog.Any("error", err))
 		}
 	}
 
@@ -56,7 +56,7 @@ func (s *Service) EventConsumer(ctx context.Context, event provider.Event) {
 		// Fire a goroutine to release the mutex lock
 		go func() {
 			if err := s.deleteItem(ctx, event.Item); err != nil {
-				slog.ErrorContext(ctx, "delete webhooks for item", "error", err)
+				slog.LogAttrs(ctx, slog.LevelError, "delete webhooks for item", slog.Any("error", err))
 			}
 		}()
 	}

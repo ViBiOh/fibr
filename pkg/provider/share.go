@@ -74,7 +74,7 @@ func (s Share) CheckPassword(ctx context.Context, authorizationHeader string, sh
 	default:
 		if bcrypt.CompareHashAndPassword([]byte(s.Password), []byte(password)) == nil {
 			if err := shareApp.UpdatePassword(ctx, s.ID, password); err != nil {
-				slog.ErrorContext(ctx, "update password", "error", err)
+				slog.LogAttrs(ctx, slog.LevelError, "update password", slog.Any("error", err))
 			}
 
 			return nil

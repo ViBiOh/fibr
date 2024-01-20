@@ -60,7 +60,7 @@ func (s Service) shouldGenerateStream(ctx context.Context, item absto.Item) (boo
 		return false, fmt.Errorf("discard body: %w", err)
 	}
 
-	slog.DebugContext(ctx, "Bitrate", "bitrate", bitrate, "item", item.Pathname)
+	slog.LogAttrs(ctx, slog.LevelDebug, "Bitrate", slog.Uint64("bitrate", bitrate), slog.String("item", item.Pathname))
 
 	return bitrate >= s.minBitrate, nil
 }

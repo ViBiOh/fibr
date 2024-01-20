@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log/slog"
@@ -35,7 +36,7 @@ func Get(config *Config, storage absto.Storage) (absto.Storage, error) {
 			return storage, fmt.Errorf("regexp compile: %w", err)
 		}
 
-		slog.Info("Ignoring files with pattern", "pattern", config.Ignore)
+		slog.LogAttrs(context.Background(), slog.LevelInfo, "Ignoring files with pattern", slog.String("pattern", config.Ignore))
 	}
 
 	return storage.WithIgnoreFn(func(item absto.Item) bool {

@@ -165,7 +165,7 @@ func (s Service) Download(w http.ResponseWriter, r *http.Request, request provid
 
 	defer func() {
 		if closeErr := zipWriter.Close(); closeErr != nil {
-			slog.ErrorContext(ctx, "close zip", "error", closeErr)
+			slog.LogAttrs(ctx, slog.LevelError, "close zip", slog.Any("error", closeErr))
 		}
 	}()
 

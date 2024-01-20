@@ -93,14 +93,14 @@ func (s *Service) Start(ctx context.Context) {
 	defer close(s.done)
 
 	if err := s.loadShares(ctx); err != nil {
-		slog.ErrorContext(ctx, "refresh shares", "error", err)
+		slog.LogAttrs(ctx, slog.LevelError, "refresh shares", slog.Any("error", err))
 		return
 	}
 
 	go redis.SubscribeFor(ctx, s.redisClient, s.pubsubChannel, s.PubSubHandle)
 
 	purgeCron := cron.New().Each(time.Hour).OnError(func(ctx context.Context, err error) {
-		slog.ErrorContext(ctx, "purge shares", "error", err)
+		slog.LogAttrs(ctx, slog.LevelError, "purge shares", slog.Any("error", err))
 	}).OnSignal(syscall.SIGUSR1)
 
 	if s.redisClient.Enabled() {
@@ -146,7 +146,7 @@ func (s *Service) purgeExpiredShares(ctx context.Context) bool {
 			delete(s.shares, id)
 
 			if err := s.redisClient.PublishJSON(ctx, s.pubsubChannel, provider.Share{ID: id}); err != nil {
-				slog.ErrorContext(ctx, "publish share purge", "error", err, "item", id, "fn", "share.purgeExpiredShares")
+				slog.LogAttrs(ctx, slog.LevelError, "publish share purge", slog.String("fn", "share.purgeExpiredShares"), slog.String("item", id), slog.Any("error", err))
 			}
 
 			changed = true

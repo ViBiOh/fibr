@@ -18,7 +18,7 @@ func (s Service) Update(ctx context.Context, item absto.Item, opts ...provider.M
 
 		metadata, err := s.GetMetadataFor(ctx, item)
 		if err != nil && !absto.IsNotExist(err) {
-			slog.ErrorContext(ctx, "load metadata", "error", err, "item", item.Pathname)
+			slog.LogAttrs(ctx, slog.LevelError, "load metadata", slog.String("item", item.Pathname), slog.Any("error", err))
 		}
 
 		for _, opt := range opts {
