@@ -57,6 +57,10 @@ func (s Service) parseRequest(r *http.Request) (provider.Request, error) {
 		return request, model.WrapUnauthorized(err)
 	}
 
+	if len(r.URL.Query().Get("d")) == 0 {
+		request.Display = request.LayoutPath(request.AbsoluteURL(""))
+	}
+
 	request = request.UpdatePreferences()
 
 	if !request.Share.IsZero() {
