@@ -202,10 +202,10 @@ func (s Service) Serve(w http.ResponseWriter, r *http.Request, item absto.Item) 
 	if err != nil {
 		if absto.IsNotExist(err) {
 			w.WriteHeader(http.StatusNoContent)
+			return
 		}
 
 		httperror.InternalServerError(ctx, w, err)
-
 		return
 	}
 
