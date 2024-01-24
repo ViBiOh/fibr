@@ -40,7 +40,6 @@ func (s Service) parseRequest(r *http.Request) (provider.Request, error) {
 		Path:        r.URL.Path,
 		CanEdit:     false,
 		CanShare:    false,
-		Display:     provider.ParseDisplay(r.URL.Query().Get("d")),
 		Preferences: parsePreferences(r),
 	}
 
@@ -57,8 +56,12 @@ func (s Service) parseRequest(r *http.Request) (provider.Request, error) {
 		return request, model.WrapUnauthorized(err)
 	}
 
-	if len(r.URL.Query().Get("d")) == 0 {
-		request.Display = request.LayoutPath(request.AbsoluteURL(""))
+	if len(request.Display) == 0 {
+		if displayParam := r.URL.Query().Get("d"); len(displayParam) == 0 {
+			request.Display = request.LayoutPath(request.AbsoluteURL(""))
+		} else {
+			request.Display = provider.ParseDisplay(displayParam)
+		}
 	}
 
 	request = request.UpdatePreferences()
