@@ -242,7 +242,6 @@ func TestParseRequest(t *testing.T) {
 			},
 			provider.Request{
 				Path:     "/f5d4c3b2a1/",
-				Display:  provider.DefaultDisplay,
 				CanEdit:  false,
 				CanShare: false,
 			},
