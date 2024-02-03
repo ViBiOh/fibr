@@ -105,7 +105,6 @@ func (s Service) mergeChunk(w http.ResponseWriter, r *http.Request, request prov
 
 	filePath := request.SubPath(fileName)
 	err = provider.WriteToStorage(ctx, s.storage, filePath, size, file)
-
 	if err != nil {
 		s.error(w, r, request, model.WrapInternal(err))
 		return

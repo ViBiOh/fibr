@@ -66,7 +66,6 @@ func (s Service) computeStats(ctx context.Context, pathname string) (map[string]
 
 		return nil
 	})
-
 	if err != nil {
 		return nil, fmt.Errorf("browse metadatas: %w", err)
 	}
