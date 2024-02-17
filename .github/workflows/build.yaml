@@ -38,7 +38,7 @@ jobs:
       - name: Setup Golang
         uses: actions/setup-go@v5
         with:
-          go-version: "^1.21"
+          go-version: "^1.22"
 
       - name: Build
         run: |
@@ -71,7 +71,7 @@ jobs:
       - name: Setup Golang
         uses: actions/setup-go@v5
         with:
-          go-version: "^1.21"
+          go-version: "^1.22"
       - name: Build
         env:
           GO_ARCHS: linux/amd64 linux/arm linux/arm64 darwin/amd64 darwin/arm64
