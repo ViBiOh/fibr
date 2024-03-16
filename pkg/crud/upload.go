@@ -97,9 +97,11 @@ func (s Service) upload(w http.ResponseWriter, r *http.Request, request provider
 }
 
 func (s Service) postUpload(w http.ResponseWriter, r *http.Request, request provider.Request, fileName string) {
+	ctx := r.Context()
+
 	if r.Header.Get("Accept") == "text/plain" {
 		w.WriteHeader(http.StatusCreated)
-		provider.SafeWrite(r.Context(), w, fileName)
+		provider.SafeWrite(ctx, w, fileName)
 
 		return
 	}

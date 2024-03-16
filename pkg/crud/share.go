@@ -122,9 +122,10 @@ func (s Service) createShare(w http.ResponseWriter, r *http.Request, request pro
 }
 
 func (s Service) deleteShare(w http.ResponseWriter, r *http.Request, request provider.Request) {
+	ctx := r.Context()
 	id := r.FormValue("id")
 
-	if err := s.share.Delete(r.Context(), id); err != nil {
+	if err := s.share.Delete(ctx, id); err != nil {
 		s.error(w, r, request, model.WrapInternal(err))
 		return
 	}

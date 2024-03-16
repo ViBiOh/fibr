@@ -68,8 +68,10 @@ func (s Service) TemplateFunc(w http.ResponseWriter, r *http.Request) (renderer.
 		return renderer.Page{}, model.WrapMethodNotAllowed(errors.New("you lack of method for calling me"))
 	}
 
+	ctx := r.Context()
+
 	if r.URL.Path == "/sitemap.xml" {
-		telemetry.SetRouteTag(r.Context(), "/sitemap.xml")
+		telemetry.SetRouteTag(ctx, "/sitemap.xml")
 		return renderer.NewPage("sitemap", http.StatusOK, nil), nil
 	}
 

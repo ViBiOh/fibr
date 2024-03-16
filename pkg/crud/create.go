@@ -14,7 +14,9 @@ import (
 )
 
 func (s Service) Create(w http.ResponseWriter, r *http.Request, request provider.Request) {
-	telemetry.SetRouteTag(r.Context(), "/mkdir")
+	ctx := r.Context()
+
+	telemetry.SetRouteTag(ctx, "/mkdir")
 
 	if !request.CanEdit {
 		s.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
@@ -35,7 +37,7 @@ func (s Service) Create(w http.ResponseWriter, r *http.Request, request provider
 
 	pathname := request.SubPath(name)
 
-	if err = s.storage.Mkdir(r.Context(), pathname, absto.DirectoryPerm); err != nil {
+	if err = s.storage.Mkdir(ctx, pathname, absto.DirectoryPerm); err != nil {
 		s.error(w, r, request, model.WrapInternal(err))
 		return
 	}

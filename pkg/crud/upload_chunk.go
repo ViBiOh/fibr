@@ -19,6 +19,8 @@ import (
 )
 
 func (s Service) uploadChunk(w http.ResponseWriter, r *http.Request, request provider.Request, fileName, chunkNumber string, file io.Reader) {
+	ctx := r.Context()
+
 	if file == nil {
 		s.error(w, r, request, model.WrapInvalid(errors.New("no file provided for save")))
 		return
@@ -46,7 +48,7 @@ func (s Service) uploadChunk(w http.ResponseWriter, r *http.Request, request pro
 
 	defer func() {
 		if closeErr := writer.Close(); closeErr != nil {
-			slog.LogAttrs(r.Context(), slog.LevelError, "close chunk writer", slog.Any("error", closeErr))
+			slog.LogAttrs(ctx, slog.LevelError, "close chunk writer", slog.Any("error", closeErr))
 		}
 
 		if err == nil {
@@ -54,7 +56,7 @@ func (s Service) uploadChunk(w http.ResponseWriter, r *http.Request, request pro
 		}
 
 		if removeErr := os.Remove(tempFile); removeErr != nil {
-			slog.LogAttrs(r.Context(), slog.LevelError, "remove chunk file", slog.String("file", tempFile), slog.Any("error", removeErr))
+			slog.LogAttrs(ctx, slog.LevelError, "remove chunk file", slog.String("file", tempFile), slog.Any("error", removeErr))
 		}
 	}()
 

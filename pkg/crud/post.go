@@ -68,19 +68,20 @@ func (s Service) Post(w http.ResponseWriter, r *http.Request, request provider.R
 }
 
 func (s Service) handleFormURLEncoded(w http.ResponseWriter, r *http.Request, request provider.Request) {
+	ctx := r.Context()
 	method := r.FormValue("method")
 
 	switch r.FormValue("type") {
 	case "share":
-		telemetry.SetRouteTag(r.Context(), "/share")
+		telemetry.SetRouteTag(ctx, "/share")
 		s.handlePostShare(w, r, request, method)
 
 	case "webhook":
-		telemetry.SetRouteTag(r.Context(), "/webhook")
+		telemetry.SetRouteTag(ctx, "/webhook")
 		s.handlePostWebhook(w, r, request, method)
 
 	case "description":
-		telemetry.SetRouteTag(r.Context(), "/description")
+		telemetry.SetRouteTag(ctx, "/description")
 		s.handlePostDescription(w, r, request)
 
 	default:
@@ -89,6 +90,8 @@ func (s Service) handleFormURLEncoded(w http.ResponseWriter, r *http.Request, re
 }
 
 func (s Service) handleMultipart(w http.ResponseWriter, r *http.Request, request provider.Request) {
+	ctx := r.Context()
+
 	if !request.CanEdit {
 		s.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
 		return
@@ -114,14 +117,14 @@ func (s Service) handleMultipart(w http.ResponseWriter, r *http.Request, request
 
 			chunkNumber = fmt.Sprintf("%010d", chunkNumberValue)
 
-			telemetry.SetRouteTag(r.Context(), "/chunk")
+			telemetry.SetRouteTag(ctx, "/chunk")
 			s.uploadChunk(w, r, request, values["filename"], chunkNumber, file)
 		} else {
-			telemetry.SetRouteTag(r.Context(), "/merge")
+			telemetry.SetRouteTag(ctx, "/merge")
 			s.mergeChunk(w, r, request, values)
 		}
 	} else {
-		telemetry.SetRouteTag(r.Context(), "/upload")
+		telemetry.SetRouteTag(ctx, "/upload")
 		s.upload(w, r, request, values, file)
 	}
 }

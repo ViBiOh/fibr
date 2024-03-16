@@ -62,7 +62,8 @@ func parseRenameParams(r *http.Request, request provider.Request) (string, strin
 }
 
 func (s Service) Rename(w http.ResponseWriter, r *http.Request, request provider.Request) {
-	telemetry.SetRouteTag(r.Context(), "/rename")
+	ctx := r.Context()
+	telemetry.SetRouteTag(ctx, "/rename")
 
 	if !request.CanEdit {
 		s.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
@@ -74,8 +75,6 @@ func (s Service) Rename(w http.ResponseWriter, r *http.Request, request provider
 		s.error(w, r, request, err)
 		return
 	}
-
-	ctx := r.Context()
 
 	var oldItem absto.Item
 	var newItem absto.Item

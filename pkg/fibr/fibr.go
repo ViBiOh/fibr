@@ -36,6 +36,8 @@ func New(crudService provider.Crud, rendererService *renderer.Service, shareServ
 }
 
 func (s Service) parseRequest(r *http.Request) (provider.Request, error) {
+	ctx := r.Context()
+
 	request := provider.Request{
 		Path:        r.URL.Path,
 		CanEdit:     false,
@@ -52,7 +54,7 @@ func (s Service) parseRequest(r *http.Request) (provider.Request, error) {
 		request.Path = "/" + request.Path
 	}
 
-	if err := s.parseShare(r.Context(), &request, r.Header.Get("Authorization")); err != nil {
+	if err := s.parseShare(ctx, &request, r.Header.Get("Authorization")); err != nil {
 		return request, model.WrapUnauthorized(err)
 	}
 
@@ -87,7 +89,7 @@ func (s Service) parseRequest(r *http.Request) (provider.Request, error) {
 		return request, convertAuthenticationError(err)
 	}
 
-	if s.login.IsAuthorized(authModel.StoreUser(r.Context(), user), "admin") {
+	if s.login.IsAuthorized(authModel.StoreUser(ctx, user), "admin") {
 		request.CanEdit = true
 		request.CanShare = true
 		request.CanWebhook = true

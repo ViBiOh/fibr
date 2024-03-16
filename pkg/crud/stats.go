@@ -16,9 +16,10 @@ type entry struct {
 }
 
 func (s Service) stats(r *http.Request, request provider.Request, message renderer.Message) (renderer.Page, error) {
+	ctx := r.Context()
 	pathname := request.Filepath()
 
-	stats, err := s.computeStats(r.Context(), pathname)
+	stats, err := s.computeStats(ctx, pathname)
 	if err != nil {
 		return renderer.NewPage("", http.StatusInternalServerError, nil), err
 	}

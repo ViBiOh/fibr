@@ -62,28 +62,30 @@ func (s Service) getWithMessage(w http.ResponseWriter, r *http.Request, request 
 }
 
 func (s Service) handleFile(w http.ResponseWriter, r *http.Request, request provider.Request, item absto.Item, message renderer.Message) (renderer.Page, error) {
+	ctx := r.Context()
+
 	if query.GetBool(r, "thumbnail") {
-		telemetry.SetRouteTag(r.Context(), "/thumbnail")
+		telemetry.SetRouteTag(ctx, "/thumbnail")
 		s.thumbnail.Serve(w, r, item)
 		return renderer.Page{}, nil
 	}
 
 	if query.GetBool(r, "stream") {
-		telemetry.SetRouteTag(r.Context(), "/stream")
+		telemetry.SetRouteTag(ctx, "/stream")
 		s.thumbnail.Stream(w, r, item)
 		return renderer.Page{}, nil
 	}
 
 	if query.GetBool(r, "browser") {
-		telemetry.SetRouteTag(r.Context(), "/browse")
+		telemetry.SetRouteTag(ctx, "/browse")
 		provider.SetPrefsCookie(w, request)
 
-		go s.pushEvent(cntxt.WithoutDeadline(r.Context()), provider.NewAccessEvent(r.Context(), item, r))
+		go s.pushEvent(cntxt.WithoutDeadline(ctx), provider.NewAccessEvent(ctx, item, r))
 
-		return s.browse(r.Context(), request, item, message)
+		return s.browse(ctx, request, item, message)
 	}
 
-	telemetry.SetRouteTag(r.Context(), "/download")
+	telemetry.SetRouteTag(ctx, "/download")
 	return renderer.Page{}, s.serveFile(w, r, item)
 }
 
@@ -112,6 +114,8 @@ func (s Service) serveFile(w http.ResponseWriter, r *http.Request, item absto.It
 }
 
 func (s Service) handleDir(w http.ResponseWriter, r *http.Request, request provider.Request, item absto.Item, message renderer.Message) (renderer.Page, error) {
+	ctx := r.Context()
+
 	if query.GetBool(r, "stats") {
 		return s.stats(r, request, message)
 	}
@@ -122,39 +126,39 @@ func (s Service) handleDir(w http.ResponseWriter, r *http.Request, request provi
 	}
 
 	if query.GetBool(r, "geojson") {
-		telemetry.SetRouteTag(r.Context(), "/geojsons")
+		telemetry.SetRouteTag(ctx, "/geojsons")
 		s.serveGeoJSON(w, r, request, item, items)
 		return renderer.Page{}, nil
 	}
 
 	if query.GetBool(r, "thumbnail") {
-		telemetry.SetRouteTag(r.Context(), "/thumbnails")
+		telemetry.SetRouteTag(ctx, "/thumbnails")
 		s.thumbnail.List(w, r, item, items)
 		return renderer.Page{}, nil
 	}
 
 	if query.GetBool(r, "download") {
-		telemetry.SetRouteTag(r.Context(), "/downloads")
+		telemetry.SetRouteTag(ctx, "/downloads")
 		s.Download(w, r, request, items)
 		return errorReturn(request, err)
 	}
 
-	go s.pushEvent(cntxt.WithoutDeadline(r.Context()), provider.NewAccessEvent(r.Context(), item, r))
+	go s.pushEvent(cntxt.WithoutDeadline(ctx), provider.NewAccessEvent(ctx, item, r))
 
 	if query.GetBool(r, "search") {
-		telemetry.SetRouteTag(r.Context(), "/searches")
+		telemetry.SetRouteTag(ctx, "/searches")
 		return s.search(r, request, item, items)
 	}
 
 	provider.SetPrefsCookie(w, request)
 
 	if request.IsStory() {
-		telemetry.SetRouteTag(r.Context(), "/stories")
+		telemetry.SetRouteTag(ctx, "/stories")
 		return s.story(r, request, item, items)
 	}
 
-	telemetry.SetRouteTag(r.Context(), "/directory")
-	return s.list(r.Context(), request, message, item, items)
+	telemetry.SetRouteTag(ctx, "/directory")
+	return s.list(ctx, request, message, item, items)
 }
 
 func (s Service) listFiles(r *http.Request, request provider.Request, item absto.Item) (items []absto.Item, err error) {

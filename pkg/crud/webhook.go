@@ -119,9 +119,10 @@ func checkWebhookForm(r *http.Request) (recursive bool, kind provider.WebhookKin
 }
 
 func (s Service) deleteWebhook(w http.ResponseWriter, r *http.Request, request provider.Request) {
+	ctx := r.Context()
 	id := r.FormValue("id")
 
-	if err := s.webhook.Delete(r.Context(), id); err != nil {
+	if err := s.webhook.Delete(ctx, id); err != nil {
 		s.error(w, r, request, model.WrapInternal(err))
 		return
 	}
