@@ -1,0 +1,44 @@
+---
+name: Datadog Static Analysis
+
+permissions:
+  actions: none
+  checks: none
+  contents: read
+  deployments: none
+  issues: none
+  packages: none
+  pages: none
+  pull-requests: none
+  repository-projects: none
+  security-events: none
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  static-analysis:
+    runs-on: ubuntu-latest
+    name: Datadog Static Analyzer
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Check code meets quality and security standards
+        id: datadog-static-analysis
+        uses: DataDog/datadog-static-analyzer-github-action@v1
+        with:
+          dd_api_key: ${{ secrets.DD_API_KEY }}
+          dd_app_key: ${{ secrets.DD_APP_KEY }}
+          dd_service: mjml-api
+          dd_env: ci
+          dd_site: datadoghq.eu
+          cpu_count: 2

@@ -1,0 +1,43 @@
+---
+name: Datadog Software Composition Analysis
+
+permissions:
+  actions: none
+  checks: none
+  contents: read
+  deployments: none
+  issues: none
+  packages: none
+  pages: none
+  pull-requests: none
+  repository-projects: none
+  security-events: none
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  software-composition-analysis:
+    runs-on: ubuntu-latest
+    name: Datadog SBOM Generation and Upload
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Check imported libraries are secure and compliant
+        id: datadog-software-composition-analysis
+        uses: DataDog/datadog-sca-github-action@main
+        with:
+          dd_api_key: ${{ secrets.DD_API_KEY }}
+          dd_app_key: ${{ secrets.DD_APP_KEY }}
+          dd_service: mjml-api
+          dd_env: ci
+          dd_site: datadoghq.eu
