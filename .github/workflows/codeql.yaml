@@ -2,9 +2,9 @@
 name: CodeQL
 
 permissions:
-  actions: none
+  actions: read
   checks: none
-  contents: none
+  contents: read
   deployments: none
   issues: none
   packages: none
@@ -26,24 +26,23 @@ on:
 jobs:
   analyze:
     name: Analyze
-    runs-on: ubuntu-latest
+    runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
+    timeout-minutes: ${{ (matrix.language == 'swift' && 120) || 360 }}
     strategy:
       fail-fast: false
       matrix:
         language:
           - go
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Setup Golang
-        uses: actions/setup-go@v5
-        with:
-          go-version: "^1.22"
-      - name: Setup CodeQL
+      - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
-      - name: Build
-        run: make build
-      - name: CodeQL
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+      - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{matrix.language}}"
