@@ -25,11 +25,11 @@ spec:
     nameOverride: fibr
     image:
       name: vibioh/fibr
-      tag: "202403300954" # {"$imagepolicy": "default:flux-fibr-web:tag"}
+      tag: "202404032053" # {"$imagepolicy": "default:flux-fibr-web:tag"}
     labels:
       tags.datadoghq.com/env: "production"
       tags.datadoghq.com/service: "fibr"
-      tags.datadoghq.com/version: "202403300954" # {"$imagepolicy": "default:flux-fibr-web:tag"}
+      tags.datadoghq.com/version: "202404032053" # {"$imagepolicy": "default:flux-fibr-web:tag"}
     volumes:
       - name: data
         persistentVolumeClaim:
