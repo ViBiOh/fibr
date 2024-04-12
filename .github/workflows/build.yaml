@@ -61,9 +61,9 @@ jobs:
         env:
           GO_ARCHS: linux/amd64 linux/arm linux/arm64 darwin/amd64 darwin/arm64
         run: |
-          curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap" | bash -s -- "-c" "release"
+          curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap.sh" | bash -s -- "-c" "release.sh"
           curl --disable --silent --show-error --location --max-time 30 -o mime.types "https://svn.apache.org/viewvc/httpd/httpd/trunk/docs/conf/mime.types?view=co"
-          ./scripts/release build
+          ./scripts/release.sh build
       - name: Setup Docker
         uses: docker/setup-buildx-action@v3
       - name: Setup DockerHub
@@ -81,7 +81,7 @@ jobs:
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
           DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
         run: |
-          RELEASE_NEED_WAIT=true DOCKER_IMAGE="${{ secrets.DOCKER_USER }}/$(make name)" IMAGE_VERSION="$(make version)" GIT_SHA="$(make version-full)" ./scripts/release docker
+          RELEASE_NEED_WAIT=true DOCKER_IMAGE="${{ secrets.DOCKER_USER }}/$(make name)" IMAGE_VERSION="$(make version)" GIT_SHA="$(make version-full)" ./scripts/release.sh docker
 
   publish:
     name: Publish
@@ -96,8 +96,8 @@ jobs:
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
           DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
         run: |
-          curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap" | bash -s -- "-c" "docker_promote"
-          scripts/docker_promote -d "$(make version-date)" "${{ secrets.DOCKER_USER }}/$(make name)" "$(make version)"
+          curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap.sh" | bash -s -- "-c" "docker_promote.sh"
+          scripts/docker_promote.sh -d "$(make version-date)" "${{ secrets.DOCKER_USER }}/$(make name)" "$(make version)"
       - name: Flux
         env:
           FLUX_TOKEN: ${{ secrets.FLUX_TOKEN }}

@@ -52,7 +52,7 @@ app: init dev
 ## init: Bootstrap your application. e.g. fetch some data files, make some API calls, request user input etc...
 .PHONY: init
 init:
-	@curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap" | bash -s -- "-c" "git_hooks" "coverage" "release"
+	@curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap.sh" | bash -s -- "-c" "git_hooks" "coverage.sh"
 	go install "github.com/golangci/golangci-lint/cmd/golangci-lint@latest"
 	go install "golang.org/x/tools/cmd/goimports@latest"
 	go install "golang.org/x/tools/go/analysis/passes/fieldalignment/cmd/fieldalignment@master"
@@ -81,7 +81,7 @@ mocks:
 ## test: Shortcut to launch all the test tasks (unit, functional and integration).
 .PHONY: test
 test:
-	scripts/coverage
+	scripts/coverage.sh
 	$(MAKE) bench
 
 ## bench: Shortcut to launch benchmark tests.

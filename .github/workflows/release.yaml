@@ -53,14 +53,14 @@ jobs:
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
           GO_ARCHS: linux/amd64 linux/arm linux/arm64 darwin/amd64 darwin/arm64
         run: |
-          curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap" | bash -s -- "-c" "release"
+          curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap.sh" | bash -s -- "-c" "release.sh"
           export GIT_TAG="$(basename ${{ github.ref }})"
-          scripts/release build assets clean
+          scripts/release.sh build assets clean
       - name: Docker
         if: ${{ env.docker_user != '' }}
         env:
           DOCKER_USER: ${{ env.docker_user }}
           DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
         run: |
-          curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap" | bash -s -- "-c" "docker_promote"
-          scripts/docker_promote "${{ env.DOCKER_USER }}/$(make name)" "$(make version-date)" "$(basename ${{ github.ref }})"
+          curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap.sh" | bash -s -- "-c" "docker_promote.sh"
+          scripts/docker_promote.sh "${{ env.DOCKER_USER }}/$(make name)" "$(make version-date)" "$(basename ${{ github.ref }})"
