@@ -51,7 +51,7 @@ type configuration struct {
 	disableAuth   bool
 }
 
-func newConfig() (configuration, error) {
+func newConfig() configuration {
 	fs := flag.NewFlagSet("fibr", flag.ExitOnError)
 	fs.Usage = flags.Usage(fs)
 
@@ -80,5 +80,7 @@ func newConfig() (configuration, error) {
 
 	flags.New("NoAuth", "Disable basic authentification").DocPrefix("auth").BoolVar(fs, &config.disableAuth, false, nil)
 
-	return config, fs.Parse(os.Args[1:])
+	_ = fs.Parse(os.Args[1:])
+
+	return config
 }

@@ -4,7 +4,6 @@ import (
 	"context"
 	"embed"
 	"fmt"
-	"log"
 	"log/slog"
 	"net/http"
 	"os"
@@ -39,11 +38,7 @@ func newLoginService(tracerProvider trace.TracerProvider, basicConfig *basicMemo
 }
 
 func main() {
-	config, err := newConfig()
-	if err != nil {
-		log.Fatal(fmt.Errorf("config: %s", err))
-	}
-
+	config := newConfig()
 	alcotest.DoAndExit(config.alcotest)
 
 	go func() {
