@@ -18,7 +18,6 @@ Web File Browser and Manager.
 ![](docs/photos.png)
 
 [![Build](https://github.com/ViBiOh/fibr/workflows/Build/badge.svg)](https://github.com/ViBiOh/fibr/actions)
-[![codecov](https://codecov.io/gh/ViBiOh/fibr/branch/main/graph/badge.svg)](https://codecov.io/gh/ViBiOh/fibr)
 
 Thanks to [FontAwesome](https://fontawesome.com) and [Lucide](https://lucide.dev) for providing awesome svg icons.
 
