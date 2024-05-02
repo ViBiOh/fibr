@@ -68,6 +68,8 @@ func main() {
 	stopOnEnd.Start(endCtx)
 	defer stopOnEnd.GracefulWait()
 
+	go clients.pprof.Start(clients.health.DoneCtx())
+
 	go adapters.eventBus.Start(endCtx, adapters.storage, []provider.Renamer{services.thumbnail.Rename, services.metadata.Rename}, services.share.EventConsumer, services.thumbnail.EventConsumer, services.metadata.EventConsumer, services.webhook.EventConsumer)
 
 	appServer := server.New(config.appServer)

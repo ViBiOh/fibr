@@ -8,6 +8,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/amqp"
 	"github.com/ViBiOh/httputils/v4/pkg/health"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
+	"github.com/ViBiOh/httputils/v4/pkg/pprof"
 	"github.com/ViBiOh/httputils/v4/pkg/redis"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
@@ -18,6 +19,7 @@ type client struct {
 	amqp      *amqp.Client
 	health    *health.Service
 	telemetry telemetry.Service
+	pprof     pprof.Service
 }
 
 func newClient(ctx context.Context, config configuration) (client, error) {
@@ -32,6 +34,9 @@ func newClient(ctx context.Context, config configuration) (client, error) {
 	if err != nil {
 		return output, fmt.Errorf("telemetry: %w", err)
 	}
+
+	service, version, env := output.telemetry.GetServiceVersionAndEnv()
+	output.pprof = pprof.New(config.pprof, service, version, env)
 
 	logger.AddOpenTelemetryToDefaultLogger(output.telemetry)
 	request.AddOpenTelemetryToDefaultClient(output.telemetry.MeterProvider(), output.telemetry.TracerProvider())
