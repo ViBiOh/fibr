@@ -82,7 +82,6 @@ func TestHasThumbnail(t *testing.T) {
 	for intention, tc := range cases {
 		t.Run(intention, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
 
 			mockStorage := mocks.NewStorage(ctrl)
 			mockRedisClient := mocks.NewRedisClient(ctrl)

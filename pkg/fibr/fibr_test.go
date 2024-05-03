@@ -137,7 +137,6 @@ func TestParseShare(t *testing.T) {
 	for intention, tc := range cases {
 		t.Run(intention, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
 
 			shareMock := mocks.NewShareManager(ctrl)
 			tc.instance.share = shareMock
@@ -360,7 +359,6 @@ func TestParseRequest(t *testing.T) {
 	for intention, tc := range cases {
 		t.Run(intention, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
 
 			crudMock := mocks.NewCrud(ctrl)
 			shareMock := mocks.NewShareManager(ctrl)

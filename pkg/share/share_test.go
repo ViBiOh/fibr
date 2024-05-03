@@ -71,7 +71,6 @@ func TestPurgeExpiredShares(t *testing.T) {
 			t.Parallel()
 
 			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
 			redisMocks := mocks.NewRedisClient(ctrl)
 
 			testCase.instance.redisClient = redisMocks

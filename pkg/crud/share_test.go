@@ -44,7 +44,6 @@ func TestBestSharePath(t *testing.T) {
 	for intention, tc := range cases {
 		t.Run(intention, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
 
 			mockShare := mocks.NewShareManager(ctrl)
 

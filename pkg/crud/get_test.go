@@ -39,7 +39,6 @@ func BenchmarkServeGeoJSON(b *testing.B) {
 	}
 
 	ctrl := gomock.NewController(b)
-	defer ctrl.Finish()
 
 	mockExif := mocks.NewMetadataManager(ctrl)
 
