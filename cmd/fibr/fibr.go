@@ -3,9 +3,7 @@ package main
 import (
 	"context"
 	"embed"
-	"fmt"
 	"log/slog"
-	"net/http"
 	"os"
 
 	_ "net/http/pprof"
@@ -41,16 +39,13 @@ func main() {
 	config := newConfig()
 	alcotest.DoAndExit(config.alcotest)
 
-	go func() {
-		fmt.Println(http.ListenAndServe("localhost:9999", http.DefaultServeMux))
-	}()
-
 	ctx := context.Background()
 
 	clients, err := newClient(ctx, config)
 	logger.FatalfOnErr(ctx, err, "clients")
 
 	defer clients.Close(ctx)
+	go clients.Start()
 
 	adapters, err := newAdapters(config, clients)
 	logger.FatalfOnErr(ctx, err, "adapters")
@@ -67,8 +62,6 @@ func main() {
 	stopOnEnd := Starters{services.webhook, services.share}
 	stopOnEnd.Start(endCtx)
 	defer stopOnEnd.GracefulWait()
-
-	go clients.pprof.Start(clients.health.DoneCtx())
 
 	go adapters.eventBus.Start(endCtx, adapters.storage, []provider.Renamer{services.thumbnail.Rename, services.metadata.Rename}, services.share.EventConsumer, services.thumbnail.EventConsumer, services.metadata.EventConsumer, services.webhook.EventConsumer)
 

@@ -94,5 +94,3 @@ spec:
       allowPrivilegeEscalation: false
     autoscaling:
       enabled: false
-    pprof:
-      enabled: true

@@ -132,7 +132,7 @@ Fibr provides [OpenGraph metadatas](https://ogp.me) to have nice preview of link
 
 You can start `fibr` with no user, with the `-noAuth` option. Although available, I don't recommend using it in public Internet. Anybody has access to the _root folder_ for viewing, uploading, deleting or sharing content with anybody.
 
-Users are set with the `-authUsers` option and are in the form `[id]:[login]:[argon encoded has]`.
+Users are set with the `-authUsers` option and are in the form `[id]:[login]:[argon encoded hash]`.
 
 - `id` is used to add profile to your user
 - `login` is the user for Basic Auth prompt
@@ -260,6 +260,7 @@ Usage of fibr:
   --pathPrefix                        string        Root Path Prefix ${FIBR_PATH_PREFIX}
   --port                              uint          [server] Listen port (0 to disable) ${FIBR_PORT} (default 1080)
   --pprofAgent                        string        [pprof] URL of the Datadog Trace Agent (e.g. http://datadog.observability:8126) ${FIBR_PPROF_AGENT}
+  --pprofPort                         int           [pprof] Port of the HTTP server (0 to disable) ${FIBR_PPROF_PORT} (default 0)
   --publicURL                         string        Public URL ${FIBR_PUBLIC_URL} (default "http://localhost:1080")
   --readTimeout                       duration      [server] Read Timeout ${FIBR_READ_TIMEOUT} (default 2m0s)
   --redisAddress                      string slice  [redis] Redis Address host:port (blank to disable) ${FIBR_REDIS_ADDRESS}, as a string slice, environment variable separated by ","

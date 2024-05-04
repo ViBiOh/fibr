@@ -1,6 +1,8 @@
 package crud
 
 import (
+	"fmt"
+	"log/slog"
 	"net/http"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
@@ -16,7 +18,7 @@ func (s Service) search(r *http.Request, request provider.Request, item absto.It
 
 	metadatas, err := s.metadata.GetAllMetadataFor(ctx, files...)
 	if err != nil {
-		listLogger(item.Pathname).ErrorContext(ctx, "list metadatas: %s", err)
+		listLogger(item.Pathname).LogAttrs(ctx, slog.LevelError, fmt.Sprintf("list metadatas: %s", err))
 	}
 
 	items := make([]provider.RenderItem, len(files))
