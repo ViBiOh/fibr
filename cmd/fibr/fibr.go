@@ -6,8 +6,6 @@ import (
 	"log/slog"
 	"os"
 
-	_ "net/http/pprof"
-
 	"github.com/ViBiOh/auth/v2/pkg/ident/basic"
 	authMiddleware "github.com/ViBiOh/auth/v2/pkg/middleware"
 	basicMemory "github.com/ViBiOh/auth/v2/pkg/store/memory"
