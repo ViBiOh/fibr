@@ -14,7 +14,6 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/httputils"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/owasp"
-	"github.com/ViBiOh/httputils/v4/pkg/recoverer"
 	"github.com/ViBiOh/httputils/v4/pkg/server"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -65,7 +64,7 @@ func main() {
 
 	appServer := server.New(config.appServer)
 
-	go appServer.Start(endCtx, httputils.Handler(services.renderer.Handler(services.fibr.TemplateFunc), clients.health, recoverer.Middleware, clients.telemetry.Middleware("http"), owasp.New(config.owasp).Middleware))
+	go appServer.Start(endCtx, httputils.Handler(services.renderer.Handler(services.fibr.TemplateFunc), clients.health, clients.telemetry.Middleware("http"), owasp.New(config.owasp).Middleware))
 
 	clients.health.WaitForTermination(appServer.Done())
 
