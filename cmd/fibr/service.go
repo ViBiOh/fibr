@@ -34,7 +34,7 @@ func newServices(ctx context.Context, config configuration, clients client, adap
 		return services{}, err
 	}
 
-	rendererService, err := renderer.New(config.renderer, content, fibr.FuncMap, clients.telemetry.MeterProvider(), clients.telemetry.TracerProvider())
+	rendererService, err := renderer.New(ctx, config.renderer, content, fibr.FuncMap, clients.telemetry.MeterProvider(), clients.telemetry.TracerProvider())
 	if err != nil {
 		return services{}, err
 	}
