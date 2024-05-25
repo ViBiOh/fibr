@@ -1,12 +1,12 @@
 package crud
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/v4/pkg/cntxt"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
@@ -47,7 +47,7 @@ func (s Service) Delete(w http.ResponseWriter, r *http.Request, request provider
 		provider.SetPrefsCookie(w, request)
 	}
 
-	go s.pushEvent(cntxt.WithoutDeadline(ctx), provider.NewDeleteEvent(ctx, request, info, s.renderer))
+	go s.pushEvent(context.WithoutCancel(ctx), provider.NewDeleteEvent(ctx, request, info, s.renderer))
 
 	s.renderer.Redirect(w, r, fmt.Sprintf("?d=%s", request.Display), renderer.NewSuccessMessage("%s successfully deleted", info.Name()))
 }

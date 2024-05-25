@@ -11,7 +11,6 @@ import (
 	"strconv"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/v4/pkg/cntxt"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
@@ -40,7 +39,7 @@ func (s Service) saveUploadedFile(ctx context.Context, request provider.Request,
 			} else {
 				s.pushEvent(ctx, provider.NewUploadEvent(ctx, request, info, s.bestSharePath(filePath), s.renderer))
 			}
-		}(cntxt.WithoutDeadline(ctx))
+		}(context.WithoutCancel(ctx))
 	}
 
 	return fileName, err
