@@ -67,5 +67,6 @@ func (s Service) story(r *http.Request, request provider.Request, item absto.Ite
 		"Request":            request,
 		"HasMap":             hasMap,
 		"ThumbnailLargeSize": s.thumbnail.LargeThumbnailSize(),
+		"ChunkUpload":        s.chunkUpload,
 	}), nil
 }
