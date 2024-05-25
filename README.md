@@ -150,6 +150,8 @@ In order to work, your user **must have** `admin` profile sets with the `-authPr
 
 With help of different sidecars, Fibr can generate image, video and PDF thumbnails. These sidecars can be self hosted with ease. It can also extract and enrich content displayed by looking at [EXIF Data](https://en.wikipedia.org/wiki/Exif), also with the help of a little sidecar. These behaviours are opt-out (if you remove the `url` of the service, Fibr will do nothing).
 
+For the last mile, Fibr can try to reverse geocoding the GPS data found in EXIF, using [Open Street Map](https://wiki.openstreetmap.org/wiki/Nominatim). Self-hosting this kind of service can be complicated and calling a third-party party with such sensible datas is an opt-in decision.
+
 ### Metrics
 
 Fibr exposes a lot of metrics via OpenTelemetry gRPC mode. Common metrics are exposed: Golang statistics, HTTP statuses and response time, AMQP statuses and sidecars/metadatas actions.

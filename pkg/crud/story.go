@@ -53,7 +53,7 @@ func (s Service) story(r *http.Request, request provider.Request, item absto.Ite
 
 		exif := exifs[file.ID]
 
-		if !hasMap && exif.Coordinates != nil {
+		if !hasMap && exif.Geocode.HasCoordinates() {
 			hasMap = true
 		}
 

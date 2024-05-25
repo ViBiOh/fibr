@@ -45,20 +45,29 @@ func BenchmarkServeGeoJSON(b *testing.B) {
 	mockExif.EXPECT().GetAllMetadataFor(gomock.Any(), gomock.Any()).Return(map[string]provider.Metadata{
 		"9012": {
 			Exif: exas.Exif{
-				Coordinates: &exas.LatLng{1.0, 1.0},
-				Date:        time.Date(2022, 0o2, 22, 22, 0o2, 22, 0, time.UTC),
+				Geocode: exas.Geocode{
+					Latitude:  1.0,
+					Longitude: 1.0,
+				},
+				Date: time.Date(2022, 0o2, 22, 22, 0o2, 22, 0, time.UTC),
 			},
 		},
 		"5678": {
 			Exif: exas.Exif{
-				Coordinates: &exas.LatLng{1.0, 1.0},
-				Date:        time.Date(2022, 0o2, 22, 22, 0o2, 22, 0, time.UTC),
+				Geocode: exas.Geocode{
+					Latitude:  1.0,
+					Longitude: 1.0,
+				},
+				Date: time.Date(2022, 0o2, 22, 22, 0o2, 22, 0, time.UTC),
 			},
 		},
 		"1234": {
 			Exif: exas.Exif{
-				Coordinates: &exas.LatLng{1.0, 1.0},
-				Date:        time.Date(2022, 0o2, 22, 22, 0o2, 22, 0, time.UTC),
+				Geocode: exas.Geocode{
+					Latitude:  1.0,
+					Longitude: 1.0,
+				},
+				Date: time.Date(2022, 0o2, 22, 22, 0o2, 22, 0, time.UTC),
 			},
 		},
 	}, nil).AnyTimes()

@@ -48,6 +48,7 @@ services:
     environment:
       EXAS_AMQP_URI: 'amqp://guest:guest@rabbit:5672/'
       EXAS_AMQP_WAIT_TIMEOUT: '30s'
+      EXAS_GEOCODE_URL: 'https://nominatim.openstreetmap.org'
       EXAS_STORAGE_FILE_SYSTEM_DIRECTORY: '/data'
     volumes:
       - '${DATA_DIR}:/data'

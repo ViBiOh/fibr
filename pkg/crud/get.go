@@ -252,7 +252,7 @@ func (s Service) generateGeoJSON(ctx context.Context, w io.Writer, request provi
 			return
 		}
 
-		if exif.Coordinates == nil {
+		if !exif.Geocode.HasCoordinates() {
 			continue
 		}
 
@@ -267,8 +267,8 @@ func (s Service) generateGeoJSON(ctx context.Context, w io.Writer, request provi
 			commaNeeded = true
 		}
 
-		point.Coordinates.Latitude = exif.Coordinates[0]
-		point.Coordinates.Longitude = exif.Coordinates[1]
+		point.Coordinates.Latitude = exif.Geocode.Latitude
+		point.Coordinates.Longitude = exif.Geocode.Longitude
 
 		feature.Properties["url"] = request.RelativeURL(item)
 		feature.Properties["date"] = exif.Date.Format(time.RFC850)

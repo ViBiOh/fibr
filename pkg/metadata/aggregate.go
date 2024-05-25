@@ -11,6 +11,12 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
 )
 
+var (
+	aggregateRatio = 0.4
+
+	levels = []string{"city", "state", "country"}
+)
+
 func redisKey(item absto.Item) string {
 	return version.Redis("exif:" + item.ID)
 }
@@ -105,6 +111,7 @@ func (s Service) aggregate(ctx context.Context, item absto.Item) error {
 }
 
 func (s Service) computeAndSaveAggregate(ctx context.Context, dir absto.Item) error {
+	directoryAggregate := newAggregate()
 	var minDate, maxDate time.Time
 
 	previousAggregate, _ := s.GetAggregateFor(ctx, dir)
@@ -127,6 +134,10 @@ func (s Service) computeAndSaveAggregate(ctx context.Context, dir absto.Item) er
 			minDate, maxDate = aggregateDate(minDate, maxDate, exifData.Date)
 		}
 
+		if exifData.Geocode.HasAddress() {
+			directoryAggregate.ingest(exifData.Geocode)
+		}
+
 		return nil
 	})
 	if err != nil {
@@ -134,9 +145,10 @@ func (s Service) computeAndSaveAggregate(ctx context.Context, dir absto.Item) er
 	}
 
 	return s.SaveAggregateFor(ctx, dir, provider.Aggregate{
-		Cover: previousAggregate.Cover,
-		Start: minDate,
-		End:   maxDate,
+		Cover:    previousAggregate.Cover,
+		Location: directoryAggregate.value(),
+		Start:    minDate,
+		End:      maxDate,
 	})
 }
 
