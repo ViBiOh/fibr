@@ -193,27 +193,19 @@
           </a>
 
           <div class="description relative">
-            {{ if or (.Exif.Geocode.HasAddress) (not .Exif.Date.IsZero) }}
+            {{ if or (.Exif.HasAddress) (not .Exif.Date.IsZero) }}
               <p class="context">
-                {{ if .Exif.Geocode.HasAddress }}
+                {{ if .Exif.HasAddress }}
                   <img class="icon margin-right-half" src="{{ url "/svg/location?fill=%23000000" }}" alt="location">
                   <span>
-                    {{ if index .Exif.Geocode.Address "city_district" }}
-                      {{ index .Exif.Geocode.Address "city_district" }},
-                    {{ else }}
-                      {{ if index .Exif.Geocode.Address "village" }}
-                        {{ index .Exif.Geocode.Address "village" }},
-                      {{ else }}
-                        {{ if index .Exif.Geocode.Address "county" }}
-                          {{ index .Exif.Geocode.Address "county" }},
-                        {{- end }}
-                      {{- end }}
-                    {{- end }} {{ index .Exif.Geocode.Address "country" }}
+                    {{ if .Exif.GetCity }}
+                      {{ .Exif.GetCity }},
+                    {{- end }} {{ .Exif.GetCountry }}
                   {{ end }}
                 </span>
 
                 {{ if not .Exif.Date.IsZero }}
-                  <img class="icon margin-right-half{{ if .Exif.Geocode.HasAddress }} margin-left-half{{ end }}" src="{{ url "/svg/calendar?fill=%23000000" }}" alt="calendar">
+                  <img class="icon margin-right-half{{ if .Exif.HasAddress }} margin-left-half{{ end }}" src="{{ url "/svg/calendar?fill=%23000000" }}" alt="calendar">
                   <span class="date">{{ .Exif.Date.Format "2006-01-02T15:04:05Z07:00" }}</span>
                 {{ end }}
               </p>

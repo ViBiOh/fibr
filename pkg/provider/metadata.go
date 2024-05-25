@@ -16,9 +16,9 @@ type ExifResponse struct {
 }
 
 type Metadata struct {
+	exas.Exif
 	Description string   `json:"description,omitempty"`
 	Tags        []string `json:"tags,omitempty"`
-	exas.Exif
 }
 
 type Aggregate struct {

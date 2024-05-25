@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	cacheVersion = provider.Hash("vibioh/fibr/3")[:8]
+	cacheVersion = provider.Hash("vibioh/fibr/4")[:8]
 	cachePrefix  = "fibr:" + cacheVersion
 )
 

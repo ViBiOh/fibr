@@ -23,16 +23,15 @@
             </p>
           {{ end }}
 
-          {{ if or .Exif.Geocode.HasAddress .Exif.Geocode.HasCoordinates }}
+          {{ if or .Exif.Coordinates .Exif.HasAddress }}
             <p class="padding no-margin code">
-              {{ if .Exif.Geocode.HasCoordinates }}
-                <strong>Coordinates:</strong> <a class="primary" href="http://www.openstreetmap.org/?mlat={{ .Exif.Geocode.Latitude }}&mlon={{ .Exif.Geocode.Longitude }}&zoom=16">{{ .Exif.Geocode.Latitude }},{{ .Exif.Geocode.Longitude }}</a><br>
+              {{ if .Exif.Coordinates }}
+                <strong>Coordinates:</strong> <a class="primary" href="http://www.openstreetmap.org/?mlat={{ index .Exif.Coordinates 0 }}&mlon={{ index .Exif.Coordinates 1 }}&zoom=16">{{ index .Exif.Coordinates 0 }},{{ index .Exif.Coordinates 1 }}</a><br>
               {{ end }}
 
               <strong>Location</strong><br>
-              {{ range $key, $value := .Exif.Geocode.Address }}
-                  <em>{{ $key }}:</em> {{ $value }}<br>
-              {{ end }}
+                <em>City:</em> {{ .Exif.GetCity }}<br>
+                <em>Country:</em> {{ .Exif.GetCountry }}<br>
             </p>
           {{ end }}
 

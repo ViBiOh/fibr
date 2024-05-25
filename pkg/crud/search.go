@@ -38,7 +38,7 @@ func (s Service) search(r *http.Request, request provider.Request, item absto.It
 
 		items[i] = renderItem
 
-		if !hasMap && metadata.Geocode.Longitude != 0 && metadata.Geocode.Latitude != 0 {
+		if !hasMap && metadata.Coordinates != nil {
 			hasMap = true
 		}
 	}
