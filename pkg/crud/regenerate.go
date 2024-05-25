@@ -8,7 +8,6 @@ import (
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/v4/pkg/cntxt"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
@@ -54,7 +53,7 @@ func (s Service) regenerate(w http.ResponseWriter, r *http.Request, request prov
 		for _, directory := range directories {
 			s.pushEvent(ctx, provider.NewStartEvent(ctx, directory))
 		}
-	}(cntxt.WithoutDeadline(ctx))
+	}(context.WithoutCancel(ctx))
 
 	s.renderer.Redirect(w, r, "?stats", renderer.NewSuccessMessage("Regeneration of %s in progress...", subset))
 }

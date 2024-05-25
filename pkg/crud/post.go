@@ -1,6 +1,7 @@
 package crud
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -10,7 +11,6 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/v4/pkg/cntxt"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
@@ -188,7 +188,7 @@ func (s Service) handlePostDescription(w http.ResponseWriter, r *http.Request, r
 		return
 	}
 
-	go s.pushEvent(cntxt.WithoutDeadline(ctx), provider.NewDescriptionEvent(ctx, item, s.bestSharePath(item.Pathname), description, s.renderer))
+	go s.pushEvent(context.WithoutCancel(ctx), provider.NewDescriptionEvent(ctx, item, s.bestSharePath(item.Pathname), description, s.renderer))
 
 	s.renderer.Redirect(w, r, fmt.Sprintf("?d=%s#%s", request.Display, item.ID), renderer.NewSuccessMessage("Description successfully edited"))
 }

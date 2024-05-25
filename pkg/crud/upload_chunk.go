@@ -13,7 +13,6 @@ import (
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/v4/pkg/cntxt"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
 )
@@ -118,7 +117,7 @@ func (s Service) mergeChunk(w http.ResponseWriter, r *http.Request, request prov
 		} else {
 			s.pushEvent(ctx, provider.NewUploadEvent(ctx, request, info, s.bestSharePath(filePath), s.renderer))
 		}
-	}(cntxt.WithoutDeadline(ctx))
+	}(context.WithoutCancel(ctx))
 
 	if err = os.RemoveAll(tempFolder); err != nil {
 		slog.LogAttrs(ctx, slog.LevelError, "delete chunk folder", slog.String("folder", tempFolder), slog.Any("error", err))

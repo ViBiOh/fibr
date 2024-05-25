@@ -17,7 +17,6 @@ import (
 	"github.com/ViBiOh/fibr/pkg/geo"
 	"github.com/ViBiOh/fibr/pkg/metadata"
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"github.com/ViBiOh/httputils/v4/pkg/cntxt"
 	"github.com/ViBiOh/httputils/v4/pkg/hash"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/query"
@@ -80,7 +79,7 @@ func (s Service) handleFile(w http.ResponseWriter, r *http.Request, request prov
 		telemetry.SetRouteTag(ctx, "/browse")
 		provider.SetPrefsCookie(w, request)
 
-		go s.pushEvent(cntxt.WithoutDeadline(ctx), provider.NewAccessEvent(ctx, item, r))
+		go s.pushEvent(context.WithoutCancel(ctx), provider.NewAccessEvent(ctx, item, r))
 
 		return s.browse(ctx, request, item, message)
 	}
@@ -143,7 +142,7 @@ func (s Service) handleDir(w http.ResponseWriter, r *http.Request, request provi
 		return errorReturn(request, err)
 	}
 
-	go s.pushEvent(cntxt.WithoutDeadline(ctx), provider.NewAccessEvent(ctx, item, r))
+	go s.pushEvent(context.WithoutCancel(ctx), provider.NewAccessEvent(ctx, item, r))
 
 	if query.GetBool(r, "search") {
 		telemetry.SetRouteTag(ctx, "/searches")
