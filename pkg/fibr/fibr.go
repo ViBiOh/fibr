@@ -11,8 +11,10 @@ import (
 
 	"github.com/ViBiOh/auth/v2/pkg/auth"
 	"github.com/ViBiOh/auth/v2/pkg/ident"
+	authMiddleware "github.com/ViBiOh/auth/v2/pkg/middleware"
 	authModel "github.com/ViBiOh/auth/v2/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/httputils/v4/pkg/httperror"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
@@ -140,6 +142,10 @@ func convertAuthenticationError(err error) error {
 
 	if errors.Is(err, ident.ErrMalformedAuth) {
 		return model.WrapInvalid(err)
+	}
+
+	if errors.Is(err, authMiddleware.ErrEmptyAuth) {
+		return errors.Join(err, httperror.ErrNoLog)
 	}
 
 	return model.WrapUnauthorized(err)
