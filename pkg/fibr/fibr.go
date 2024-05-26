@@ -145,7 +145,7 @@ func convertAuthenticationError(err error) error {
 	}
 
 	if errors.Is(err, authMiddleware.ErrEmptyAuth) {
-		return errors.Join(err, httperror.ErrNoLog)
+		err = errors.Join(err, httperror.ErrNoLog)
 	}
 
 	return model.WrapUnauthorized(err)
