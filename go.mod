@@ -10,7 +10,7 @@ require (
 	github.com/ViBiOh/auth/v2 v2.18.4
 	github.com/ViBiOh/exas v0.8.1
 	github.com/ViBiOh/flags v1.5.0
-	github.com/ViBiOh/httputils/v4 v4.76.1
+	github.com/ViBiOh/httputils/v4 v4.76.2
 	github.com/ViBiOh/vith v0.6.0
 	github.com/rabbitmq/amqp091-go v1.10.0
 	github.com/redis/go-redis/v9 v9.5.1
@@ -43,7 +43,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/redis/go-redis/extra/rediscmd/v9 v9.0.5 // indirect
 	github.com/redis/go-redis/extra/redisotel/v9 v9.0.5 // indirect
-	github.com/tdewolff/minify/v2 v2.20.31 // indirect
+	github.com/tdewolff/minify/v2 v2.20.32 // indirect
 	github.com/tdewolff/parse/v2 v2.7.14 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.52.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/runtime v0.52.0 // indirect
