@@ -39,7 +39,7 @@ Fibr creates a `.fibr` folder in _root folder_ for storing its metadata: shares'
 
 ### Sidecars
 
-Fibr generates thumbnails of images, PDF and videos when these [mime-types are detected](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types) and sidecars are provided. Sidecars are [h2non/imaginary](https://github.com/h2non/imaginary), [ViBiOh/vith](https://github.com/vibioh/vith) and [ViBiOh/exas](https://github.com/vibioh/exas). Thumbnails are generated in [WebP](https://developers.google.com/speed/webp/) format, in their animated format for video thumbnail.
+Fibr generates thumbnails of images, PDF and videos when these [mime-types are detected](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types) and sidecars are provided. Sidecars are [ViBiOh/vith](https://github.com/vibioh/vith) and [ViBiOh/exas](https://github.com/vibioh/exas). Thumbnails are generated in [WebP](https://developers.google.com/speed/webp/) format, in their animated format for video thumbnail.
 
 You can refer to these projects for installing and configuring them and set `-thumbnailURL` and `-exifURL` options.
 

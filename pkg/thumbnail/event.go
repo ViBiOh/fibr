@@ -60,7 +60,7 @@ func (s Service) Rename(ctx context.Context, old, new absto.Item) error {
 }
 
 func (s Service) generateItem(ctx context.Context, event provider.Event) {
-	if !s.CanHaveThumbnail(event.Item) {
+	if !s.CanGenerateThumbnail(event.Item) {
 		return
 	}
 

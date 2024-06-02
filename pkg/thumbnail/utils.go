@@ -15,6 +15,10 @@ func (s Service) CanHaveThumbnail(item absto.Item) bool {
 	return !item.IsDir() && provider.ThumbnailExtensions[item.Extension] && (s.maxSize == 0 || item.Size() < s.maxSize || s.directAccess)
 }
 
+func (s Service) CanGenerateThumbnail(item absto.Item) bool {
+	return !item.IsDir() && provider.VithExtensions[item.Extension] && (s.maxSize == 0 || item.Size() < s.maxSize || s.directAccess)
+}
+
 func (s Service) HasLargeThumbnail(ctx context.Context, item absto.Item) bool {
 	if s.largeSize == 0 {
 		return false
@@ -69,8 +73,6 @@ func typeOfItem(item absto.Item) model.ItemType {
 	itemType := model.TypeVideo
 	if _, ok := provider.ImageExtensions[item.Extension]; ok {
 		itemType = model.TypeImage
-	} else if _, ok := provider.PdfExtensions[item.Extension]; ok {
-		itemType = model.TypePDF
 	}
 
 	return itemType

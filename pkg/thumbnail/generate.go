@@ -10,6 +10,7 @@ import (
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
+	"github.com/ViBiOh/vith/pkg/model"
 	vith "github.com/ViBiOh/vith/pkg/model"
 )
 
@@ -22,7 +23,7 @@ func (s Service) generate(ctx context.Context, item absto.Item, scale uint64) (e
 	itemType := typeOfItem(item)
 
 	var resp *http.Response
-	resp, err = s.requestVith(ctx, item, scale)
+	resp, err = s.requestVith(ctx, item, itemType, scale)
 	if err != nil {
 		s.increaseMetric(ctx, itemType.String(), "error")
 		return fmt.Errorf("request thumbnailer: %w", err)
@@ -50,8 +51,7 @@ func (s Service) generate(ctx context.Context, item absto.Item, scale uint64) (e
 	return err
 }
 
-func (s Service) requestVith(ctx context.Context, item absto.Item, scale uint64) (*http.Response, error) {
-	itemType := typeOfItem(item)
+func (s Service) requestVith(ctx context.Context, item absto.Item, itemType model.ItemType, scale uint64) (*http.Response, error) {
 	outputName := s.PathForScale(item, scale)
 
 	if s.amqpClient != nil {
