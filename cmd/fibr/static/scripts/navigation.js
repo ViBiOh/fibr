@@ -5,10 +5,10 @@
  * @param {String} crossorigin Crossorigin of script
  * @return Promise when script is either loaded or on error
  */
-function resolveScript(src, integrity, crossorigin) {
+function resolveScript(src, integrity, crossorigin, type = "text/javascript") {
   return new Promise((resolve, reject) => {
     const script = document.createElement("script");
-    script.type = "text/javascript";
+    script.type = type;
     script.src = src;
     script.async = true;
     script.onload = resolve.bind(null, true);

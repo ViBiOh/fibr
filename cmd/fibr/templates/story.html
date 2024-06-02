@@ -71,7 +71,7 @@
       flex-wrap: wrap;
       justify-content: center;
       margin: 0 auto 3rem;
-      max-width: {{ .ThumbnailLargeSize }}px;
+      max-width: {{ .ThumbnailSize }}px;
     }
 
     .file::before {
@@ -147,8 +147,8 @@
       left: 0;
       pointer-events: none;
       position: absolute;
-      top: calc(({{ .ThumbnailLargeSize }}px - 1rem) / 2);
-      width: {{ .ThumbnailLargeSize }}px;
+      top: calc(({{ .ThumbnailSize }}px - 1rem) / 2);
+      width: {{ .ThumbnailSize }}px;
     }
   </style>
 

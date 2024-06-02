@@ -3,6 +3,7 @@ package thumbnail
 import (
 	"bytes"
 	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -23,6 +24,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/redis"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
+	"github.com/ViBiOh/vith/pkg/model"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -215,6 +217,77 @@ func (s Service) Serve(w http.ResponseWriter, r *http.Request, item absto.Item) 
 	w.Header().Add("Content-Disposition", fmt.Sprintf("inline; filename=%s", path.Base(name)))
 
 	http.ServeContent(w, r, name, item.Date, reader)
+}
+
+func (s Service) Save(w http.ResponseWriter, r *http.Request, fibrRequest provider.Request) {
+	ctx := r.Context()
+
+	if !fibrRequest.CanEdit {
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+
+	item, err := s.storage.Stat(ctx, fibrRequest.Filepath())
+	if err != nil {
+		if absto.IsNotExist(err) {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+
+		httperror.InternalServerError(ctx, w, err)
+		return
+	}
+
+	payload, err := io.ReadAll(r.Body)
+	if err != nil {
+		httperror.InternalServerError(ctx, w, err)
+		return
+	}
+
+	for _, size := range s.sizes {
+		ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
+		defer cancel()
+
+		itemType := model.TypeImage
+
+		req, err := s.vithRequest.Method(http.MethodPost).Path("?type=%s&scale=%d", itemType, size).Build(ctx, io.NopCloser(bytes.NewReader(payload)))
+		if err != nil {
+			httperror.InternalServerError(ctx, w, err)
+			return
+		}
+		req.ContentLength = int64(len(payload))
+
+		resp, err := request.DoWithClient(provider.SlowClient, req)
+		if err != nil {
+			s.increaseMetric(ctx, itemType.String(), "error")
+
+			httperror.InternalServerError(ctx, w, err)
+			return
+		}
+
+		if resp == nil {
+			return
+		}
+
+		defer func() {
+			if closeErr := request.DiscardBody(resp.Body); closeErr != nil {
+				err = errors.Join(err, fmt.Errorf("close: %w", closeErr))
+			}
+		}()
+
+		if resp.StatusCode == http.StatusNoContent {
+			return
+		}
+
+		if err = provider.WriteToStorage(ctx, s.storage, s.PathForScale(item, size), resp.ContentLength, resp.Body); err != nil {
+			httperror.InternalServerError(ctx, w, err)
+			return
+		}
+
+		s.increaseMetric(ctx, itemType.String(), "save")
+	}
+
+	w.WriteHeader(http.StatusCreated)
 }
 
 func (s Service) List(w http.ResponseWriter, r *http.Request, item absto.Item, items []absto.Item) {

@@ -61,12 +61,12 @@ func (s Service) story(r *http.Request, request provider.Request, item absto.Ite
 	}
 
 	return renderer.NewPage("story", http.StatusOK, map[string]any{
-		"Paths":              getPathParts(request),
-		"Files":              items,
-		"Cover":              cover,
-		"Request":            request,
-		"HasMap":             hasMap,
-		"ThumbnailLargeSize": s.thumbnail.LargeThumbnailSize(),
-		"ChunkUpload":        s.chunkUpload,
+		"Paths":         getPathParts(request),
+		"Files":         items,
+		"Cover":         cover,
+		"Request":       request,
+		"HasMap":        hasMap,
+		"ThumbnailSize": s.thumbnail.LargeThumbnailSize(),
+		"ChunkUpload":   s.chunkUpload,
 	}), nil
 }

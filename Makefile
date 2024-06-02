@@ -99,7 +99,7 @@ build:
 build-web:
 	go install "github.com/tdewolff/minify/v2/cmd/minify@latest"
 	rm -f "cmd/fibr/static/scripts/index.min.js" "cmd/fibr/static/styles/main.min.css"
-	minify --bundle --all --recursive --output "cmd/fibr/static/scripts/index.min.js" "cmd/fibr/static/scripts/"
+	minify --bundle --all --recursive --output "cmd/fibr/static/scripts/index.min.js" "cmd/fibr/static/scripts/"*.js
 	minify --bundle --all --recursive --output "cmd/fibr/static/styles/main.min.css" "cmd/fibr/static/styles/"
 
 ## run: Locally run the application, e.g. node index.js, python -m myapp, go run myapp etc ...

@@ -102,6 +102,11 @@ func (r RenderItem) IsVideo() bool {
 	return ok
 }
 
+func (r RenderItem) IsPDF() bool {
+	_, ok := PdfExtensions[r.Extension]
+	return ok
+}
+
 func (r RenderItem) Mime() string {
 	if mimeType, ok := VideoExtensions[r.Extension]; ok {
 		return mimeType

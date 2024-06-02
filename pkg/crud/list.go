@@ -122,6 +122,7 @@ func (s Service) list(ctx context.Context, request provider.Request, message ren
 		"HasMap":        len(directoryAggregate.Location),
 		"HasThumbnail":  hasThumbnail,
 		"HasStory":      hasStory,
+		"ThumbnailSize": thumbnail.SmallSize,
 		"ChunkUpload":   s.chunkUpload,
 	}
 

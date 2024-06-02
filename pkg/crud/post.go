@@ -12,6 +12,7 @@ import (
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
+	"github.com/ViBiOh/httputils/v4/pkg/query"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
 )
@@ -53,6 +54,11 @@ func parseMultipart(r *http.Request) (map[string]string, *multipart.Part, error)
 
 func (s Service) Post(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	contentType := r.Header.Get("Content-Type")
+
+	if query.GetBool(r, "thumbnail") {
+		s.thumbnail.Save(w, r, request)
+		return
+	}
 
 	if contentType == "application/x-www-form-urlencoded" {
 		s.handleFormURLEncoded(w, r, request)

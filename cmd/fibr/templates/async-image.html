@@ -13,3 +13,7 @@
     </noscript>
   </picture>
 {{ end }}
+
+{{ define "async-pdf-item" }}
+  <span data-pdf-thumbnail data-src="{{ .URL }}"></span>
+{{ end }}

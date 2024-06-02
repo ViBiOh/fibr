@@ -226,6 +226,8 @@
         </li>
       {{ end }}
 
+      {{ $needPDF := false }}
+
       {{ range .Files }}
         <li class="file relative {{ if not .HasThumbnail }}padding-half{{ end }}">
           <a class="filelink center ellipsis" href="{{ .URL }}{{ if .IsDir }}?d={{ $root.Request.LayoutPath ($root.Request.AbsoluteURL .URL) }}{{ else }}?browser{{ end }}" title="{{ .Name }}">
@@ -242,6 +244,11 @@
             {{ else }}
               <img class="icon {{ if eq $root.Request.Display "grid" }}icon-large{{ end }}" src="{{ url "/svg/" }}{{ if .IsDir }}folder{{ else }}{{ iconFromExtension . }}{{ end }}?fill=silver" alt="{{ if .IsDir }}folder{{ else }}file{{ end }}">
               <span class="filename ellipsis {{ if eq $root.Request.Display "list" }}padding-left{{ end }}">{{ .Name }}</span>
+            {{ end }}
+
+            {{ if and (not .HasThumbnail) .IsPDF }}
+              {{ $needPDF = true }}
+              {{ template "async-pdf-item" . }}
             {{ end }}
 
             <a href="{{ .URL }}?download" class="button button-icon file-download" title="Download {{ .Name }}" download="{{ .Name }}">
@@ -338,6 +345,17 @@
       {{ if and (eq .Request.Display "grid") .HasThumbnail }}
         <script type="text/javascript" nonce="{{ .nonce }}">
           const hasThumbnail = true;
+        </script>
+      {{ end }}
+
+      {{ if and (eq .Request.Display "grid") $needPDF }}
+        <script type="text/javascript" nonce="{{ .nonce }}">
+          document.addEventListener("readystatechange", (event) => {
+            if (event.target.readyState !== "complete") {
+              return;
+            }
+            resolveScript("/scripts/pdf.mjs", "", "", "module");
+          });
         </script>
       {{ end }}
     </ul>
