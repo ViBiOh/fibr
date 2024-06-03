@@ -15,16 +15,25 @@ if (thumbnailsElem) {
         body: blob,
       });
 
-      const output = await response.text();
       if (response.status >= 400) {
-        console.error(output);
+        console.error(await response.text());
+        return;
       }
     });
   });
 }
 
 async function getPageThumbnail(url, onBlob) {
-  const doc = await pdfjs.getDocument(url).promise;
+  const response = await fetch(url, {
+    credentials: "same-origin",
+  });
+
+  if (response.status >= 400) {
+    console.error(await response.text());
+    return;
+  }
+
+  const doc = await pdfjs.getDocument(await response.arrayBuffer()).promise;
   const page = await doc.getPage(1);
 
   const viewport = page.getViewport({ scale: 1 });
