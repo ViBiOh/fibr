@@ -71,8 +71,13 @@ func getThumbnailPathForExtension(item absto.Item, extension string) string {
 
 func typeOfItem(item absto.Item) model.ItemType {
 	itemType := model.TypeVideo
+
 	if _, ok := provider.ImageExtensions[item.Extension]; ok {
 		itemType = model.TypeImage
+	}
+
+	if _, ok := provider.PdfExtensions[item.Extension]; ok {
+		itemType = model.TypePDF
 	}
 
 	return itemType

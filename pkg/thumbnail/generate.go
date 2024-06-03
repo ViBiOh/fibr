@@ -14,7 +14,10 @@ import (
 	vith "github.com/ViBiOh/vith/pkg/model"
 )
 
-const defaultTimeout = time.Minute * 2
+const (
+	defaultTimeout = time.Minute * 2
+	quickTimeout   = time.Second * 30
+)
 
 func (s Service) generate(ctx context.Context, item absto.Item, scale uint64) (err error) {
 	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)

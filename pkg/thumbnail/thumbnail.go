@@ -220,12 +220,13 @@ func (s Service) Serve(w http.ResponseWriter, r *http.Request, item absto.Item) 
 }
 
 func (s Service) Save(w http.ResponseWriter, r *http.Request, fibrRequest provider.Request) {
+	ctx := r.Context()
+	telemetry.SetRouteTag(ctx, "/save")
+
 	if !fibrRequest.CanEdit {
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}
-
-	ctx := r.Context()
 
 	item, err := s.storage.Stat(ctx, fibrRequest.Filepath())
 	if err != nil {
@@ -244,50 +245,80 @@ func (s Service) Save(w http.ResponseWriter, r *http.Request, fibrRequest provid
 		return
 	}
 
-	for _, size := range s.sizes {
-		ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
-		defer cancel()
+	itemType := typeOfItem(item)
 
-		itemType := model.TypeImage
+	if err := s.generateImageThumbnail(ctx, item, payload); err != nil {
+		s.increaseMetric(ctx, itemType.String(), "error")
+		httperror.InternalServerError(ctx, w, err)
+		return
+	}
 
-		req, err := s.vithRequest.Method(http.MethodPost).Path("?type=%s&scale=%d", itemType, size).Build(ctx, io.NopCloser(bytes.NewReader(payload)))
-		if err != nil {
-			httperror.InternalServerError(ctx, w, err)
+	s.increaseMetric(ctx, itemType.String(), "save")
+	w.WriteHeader(http.StatusCreated)
+}
+
+func (s Service) generateImageThumbnail(ctx context.Context, item absto.Item, payload []byte) (err error) {
+	var createdFiles []string
+	defer func() {
+		if err == nil {
 			return
 		}
+
+		ctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), quickTimeout)
+		defer cancel()
+
+		for _, file := range createdFiles {
+			if removeErr := s.storage.RemoveAll(ctx, file); removeErr != nil {
+				err = errors.Join(err, fmt.Errorf("clean `%s` thumbnail: %w", file, removeErr))
+			}
+		}
+	}()
+
+	ctx, cancel := context.WithTimeout(ctx, quickTimeout)
+	defer cancel()
+
+	itemType := model.TypeImage
+
+	for _, size := range s.sizes {
+		var req *http.Request
+
+		req, err = s.vithRequest.Method(http.MethodPost).Path("?type=%s&scale=%d", itemType, size).Build(ctx, io.NopCloser(bytes.NewReader(payload)))
+		if err != nil {
+			err = fmt.Errorf("build %d: %w", size, err)
+			return
+		}
+
 		req.ContentLength = int64(len(payload))
 
-		resp, err := request.DoWithClient(provider.SlowClient, req)
-		if err != nil {
-			s.increaseMetric(ctx, itemType.String(), "error")
+		var resp *http.Response
 
-			httperror.InternalServerError(ctx, w, err)
+		resp, err = request.DoWithClient(provider.SlowClient, req)
+		if err != nil {
+			err = fmt.Errorf("do %d: %w", size, err)
 			return
 		}
 
 		if resp == nil {
+			err = fmt.Errorf("no body %d", size)
 			return
 		}
 
-		defer func() {
-			if closeErr := request.DiscardBody(resp.Body); closeErr != nil {
-				err = errors.Join(err, fmt.Errorf("close: %w", closeErr))
-			}
-		}()
+		filename := s.PathForScale(item, size)
 
-		if resp.StatusCode == http.StatusNoContent {
+		if err = provider.WriteToStorage(ctx, s.storage, filename, resp.ContentLength, resp.Body); err != nil {
+			err = fmt.Errorf("write %d: %w", size, err)
 			return
 		}
 
-		if err = provider.WriteToStorage(ctx, s.storage, s.PathForScale(item, size), resp.ContentLength, resp.Body); err != nil {
-			httperror.InternalServerError(ctx, w, err)
+		if err = request.DiscardBody(resp.Body); err != nil {
+			err = fmt.Errorf("close %d: %w", size, err)
 			return
 		}
 
-		s.increaseMetric(ctx, itemType.String(), "save")
+		createdFiles = append(createdFiles, filename)
 	}
 
-	w.WriteHeader(http.StatusCreated)
+	return
 }
 
 func (s Service) List(w http.ResponseWriter, r *http.Request, item absto.Item, items []absto.Item) {
