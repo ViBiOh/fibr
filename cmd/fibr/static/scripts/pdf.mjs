@@ -7,7 +7,7 @@ if (thumbnailsElem) {
     import.meta.url,
   ).toString();
 
-  thumbnailsElem.forEach(async (item) => {
+  for (const item of thumbnailsElem) {
     await getPageThumbnail(item.dataset.src, async (blob) => {
       const response = await fetch(`${item.dataset.src}?thumbnail`, {
         method: "POST",
@@ -20,7 +20,7 @@ if (thumbnailsElem) {
         return;
       }
     });
-  });
+  }
 }
 
 async function getPageThumbnail(url, onBlob) {
