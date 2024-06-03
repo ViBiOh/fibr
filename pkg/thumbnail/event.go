@@ -60,15 +60,17 @@ func (s Service) Rename(ctx context.Context, old, new absto.Item) error {
 }
 
 func (s Service) generateItem(ctx context.Context, event provider.Event) {
-	if !s.CanGenerateThumbnail(event.Item) {
+	if !s.CanHaveThumbnail(event.Item) {
 		return
 	}
 
 	forced := event.IsForcedFor("thumbnail")
 
 	for _, size := range s.sizes {
+		pathForScale := s.PathForScale(event.Item, size)
+
 		if event.GetMetadata("force") == "cache" {
-			if err := s.redisClient.Delete(ctx, redisKey(s.PathForScale(event.Item, size))); err != nil {
+			if err := s.redisClient.Delete(ctx, redisKey(pathForScale)); err != nil {
 				slog.LogAttrs(ctx, slog.LevelError, "flush cache for scale", slog.String("fn", "thumbnail.generate"), slog.Uint64("scale", size), slog.String("item", event.Item.Pathname), slog.Any("error", err))
 			}
 
@@ -77,11 +79,21 @@ func (s Service) generateItem(ctx context.Context, event provider.Event) {
 			}
 		}
 
+		if !s.CanGenerateThumbnail(event.Item) {
+			if forced {
+				if err := s.cache.EvictOnSuccess(ctx, pathForScale, s.storage.RemoveAll(ctx, pathForScale)); err != nil {
+					slog.LogAttrs(ctx, slog.LevelError, "remove for scale", slog.String("fn", "thumbnail.generate"), slog.Uint64("scale", size), slog.String("item", event.Item.Pathname), slog.Any("error", err))
+				}
+			}
+
+			continue
+		}
+
 		if !forced && s.HasThumbnail(ctx, event.Item, size) {
 			continue
 		}
 
-		if err := s.cache.EvictOnSuccess(ctx, s.PathForScale(event.Item, size), s.generate(ctx, event.Item, size)); err != nil {
+		if err := s.cache.EvictOnSuccess(ctx, pathForScale, s.generate(ctx, event.Item, size)); err != nil {
 			slog.LogAttrs(ctx, slog.LevelError, "generate for scale", slog.String("fn", "thumbnail.generate"), slog.Uint64("scale", size), slog.String("item", event.Item.Pathname), slog.Any("error", err))
 		}
 	}

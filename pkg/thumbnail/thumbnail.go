@@ -220,12 +220,12 @@ func (s Service) Serve(w http.ResponseWriter, r *http.Request, item absto.Item) 
 }
 
 func (s Service) Save(w http.ResponseWriter, r *http.Request, fibrRequest provider.Request) {
-	ctx := r.Context()
-
 	if !fibrRequest.CanEdit {
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}
+
+	ctx := r.Context()
 
 	item, err := s.storage.Stat(ctx, fibrRequest.Filepath())
 	if err != nil {
