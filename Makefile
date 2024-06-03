@@ -54,6 +54,8 @@ app: init dev
 init:
 	@curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap.sh" | bash -s -- "-c" "git_hooks" "coverage.sh"
 	go install "github.com/golangci/golangci-lint/cmd/golangci-lint@latest"
+	go install "github.com/tdewolff/minify/v2/cmd/minify@latest"
+	go install "github.com/ViBiOh/auth/v2/cmd/argon@latest"
 	go install "golang.org/x/tools/cmd/goimports@latest"
 	go install "golang.org/x/tools/go/analysis/passes/fieldalignment/cmd/fieldalignment@master"
 	go install "mvdan.cc/gofumpt@latest"
@@ -97,7 +99,6 @@ build:
 ## build: Build the application.
 .PHONY: build-web
 build-web:
-	go install "github.com/tdewolff/minify/v2/cmd/minify@latest"
 	rm -f "cmd/fibr/static/scripts/index.min.js" "cmd/fibr/static/styles/main.min.css"
 	minify --bundle --all --recursive --output "cmd/fibr/static/scripts/index.min.js" "cmd/fibr/static/scripts/"*.js
 	minify --bundle --all --recursive --output "cmd/fibr/static/styles/main.min.css" "cmd/fibr/static/styles/"
@@ -105,7 +106,6 @@ build-web:
 ## run: Locally run the application, e.g. node index.js, python -m myapp, go run myapp etc ...
 .PHONY: run
 run:
-	go install "github.com/ViBiOh/auth/v2/cmd/argon@latest"
 	$(MAIN_RUNNER) \
 		-ignorePattern ".git|node_modules" \
 		-authUsers "1:admin:`argon password`"

@@ -75,7 +75,7 @@ async function* readChunk(response) {
 function encode(content) {
   const output = [];
 
-  for (let rune of content) {
+  for (const rune of content) {
     output.push(String.fromCharCode(rune));
   }
 
@@ -144,7 +144,7 @@ async function fetchThumbnail() {
     });
   }
 
-  for await (let chunk of readChunk(response)) {
+  for await (const chunk of readChunk(response)) {
     const commaIndex = chunk.findIndex((element) => element === 44);
     if (commaIndex === -1) {
       console.error("invalid line for thumbnail:", line);
@@ -177,7 +177,7 @@ document.addEventListener("readystatechange", async (event) => {
     return;
   }
 
-  let dateTimeFormatter = new Intl.DateTimeFormat(navigator.language, {
+  const dateTimeFormatter = new Intl.DateTimeFormat(navigator.language, {
     dateStyle: "full",
     timeStyle: "long",
   });
