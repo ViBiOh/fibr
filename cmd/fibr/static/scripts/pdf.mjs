@@ -1,26 +1,23 @@
 import * as pdfjs from "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.3.136/+esm";
 
-const thumbnailsElem = document.querySelectorAll("[data-pdf-thumbnail]");
-if (thumbnailsElem) {
-  pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-    "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.3.136/build/pdf.worker.min.mjs",
-    import.meta.url,
-  ).toString();
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.3.136/build/pdf.worker.min.mjs",
+  import.meta.url,
+).toString();
 
-  for (const item of thumbnailsElem) {
-    await getPageThumbnail(item.dataset.src, async (blob) => {
-      const response = await fetch(`${item.dataset.src}?thumbnail`, {
-        method: "POST",
-        credentials: "same-origin",
-        body: blob,
-      });
-
-      if (response.status >= 400) {
-        console.error(await response.text());
-        return;
-      }
+for (const item of document.querySelectorAll("[data-pdf-thumbnail]")) {
+  await getPageThumbnail(item.dataset.src, async (blob) => {
+    const response = await fetch(`${item.dataset.src}?thumbnail`, {
+      method: "POST",
+      credentials: "same-origin",
+      body: blob,
     });
-  }
+
+    if (response.status >= 400) {
+      console.error(await response.text());
+      return;
+    }
+  });
 }
 
 async function getPageThumbnail(url, onBlob) {
