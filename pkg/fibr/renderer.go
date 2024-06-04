@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/ViBiOh/auth/v2/pkg/middleware"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/query"
@@ -88,7 +89,16 @@ func (s Service) TemplateFunc(w http.ResponseWriter, r *http.Request) (renderer.
 		if errors.Is(err, model.ErrUnauthorized) {
 			w.Header().Add("WWW-Authenticate", `Basic realm="fibr" charset="UTF-8"`)
 		}
-		return renderer.NewPage("", 0, map[string]any{"Request": request}), err
+
+		content := map[string]any{"Request": request}
+
+		if errors.Is(err, middleware.ErrEmptyAuth) {
+			s.renderer.Error(w, r, content, err, renderer.WithNoLog())
+
+			return renderer.Page{}, nil
+		}
+
+		return renderer.NewPage("", 0, content), err
 	}
 
 	switch r.Method {
