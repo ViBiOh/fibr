@@ -20,7 +20,7 @@ require (
 	go.opentelemetry.io/otel/metric v1.27.0
 	go.opentelemetry.io/otel/trace v1.27.0
 	go.uber.org/mock v0.4.0
-	golang.org/x/crypto v0.23.0
+	golang.org/x/crypto v0.24.0
 	golang.org/x/text v0.16.0
 )
 
@@ -55,7 +55,7 @@ require (
 	go.opentelemetry.io/proto/otlp v1.2.0 // indirect
 	golang.org/x/net v0.25.0 // indirect
 	golang.org/x/sys v0.21.0 // indirect
-	golang.org/x/term v0.20.0 // indirect
+	golang.org/x/term v0.21.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240528184218-531527333157 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240528184218-531527333157 // indirect
 	google.golang.org/grpc v1.64.0 // indirect
