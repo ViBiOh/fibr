@@ -29,28 +29,32 @@ import (
 )
 
 type configuration struct {
-	thumbnail     *thumbnail.Config
-	metadata      *metadata.Config
-	telemetry     *telemetry.Config
-	pprof         *pprof.Config
-	webhook       *webhook.Config
-	alcotest      *alcotest.Config
+	logger    *logger.Config
+	alcotest  *alcotest.Config
+	telemetry *telemetry.Config
+	pprof     *pprof.Config
+	health    *health.Config
+
+	server   *server.Config
+	owasp    *owasp.Config
+	renderer *renderer.Config
+
 	basic         *basicMemory.Config
-	share         *share.Config
-	storage       *storage.Config
-	logger        *logger.Config
-	renderer      *renderer.Config
-	crud          *crud.Config
-	owasp         *owasp.Config
-	amqp          *amqp.Config
 	absto         *absto.Config
+	storage       *storage.Config
+	redis         *redis.Config
+	amqp          *amqp.Config
 	amqpThumbnail *amqphandler.Config
 	amqpExif      *amqphandler.Config
-	redis         *redis.Config
-	appServer     *server.Config
-	health        *health.Config
-	sanitizer     *sanitizer.Config
-	disableAuth   bool
+
+	crud      *crud.Config
+	sanitizer *sanitizer.Config
+	metadata  *metadata.Config
+	thumbnail *thumbnail.Config
+	webhook   *webhook.Config
+	share     *share.Config
+
+	disableAuth bool
 }
 
 func newConfig() configuration {
@@ -58,27 +62,30 @@ func newConfig() configuration {
 	fs.Usage = flags.Usage(fs)
 
 	config := configuration{
-		appServer:     server.Flags(fs, "", flags.NewOverride("ReadTimeout", time.Minute*2), flags.NewOverride("WriteTimeout", time.Minute*2)),
-		health:        health.Flags(fs, ""),
-		alcotest:      alcotest.Flags(fs, ""),
-		logger:        logger.Flags(fs, "logger"),
-		telemetry:     telemetry.Flags(fs, "telemetry"),
-		pprof:         pprof.Flags(fs, "pprof"),
-		owasp:         owasp.Flags(fs, "", flags.NewOverride("FrameOptions", "SAMEORIGIN"), flags.NewOverride("Csp", "default-src 'self'; base-uri 'self'; script-src 'self' 'httputils-nonce' unpkg.com/webp-hero@0.0.2/dist-cjs/ unpkg.com/leaflet@1.9.4/dist/ unpkg.com/leaflet.markercluster@1.5.1/ cdn.jsdelivr.net/npm/pdfjs-dist@4.3.136/; style-src 'self' 'httputils-nonce' unpkg.com/leaflet@1.9.4/dist/ unpkg.com/leaflet.markercluster@1.5.1/; img-src 'self' data: a.tile.openstreetmap.org b.tile.openstreetmap.org c.tile.openstreetmap.org; worker-src blob:")),
+		logger:    logger.Flags(fs, "logger"),
+		alcotest:  alcotest.Flags(fs, ""),
+		telemetry: telemetry.Flags(fs, "telemetry"),
+		pprof:     pprof.Flags(fs, "pprof"),
+		health:    health.Flags(fs, ""),
+
+		server:   server.Flags(fs, "", flags.NewOverride("ReadTimeout", time.Minute*2), flags.NewOverride("WriteTimeout", time.Minute*2)),
+		owasp:    owasp.Flags(fs, "", flags.NewOverride("FrameOptions", "SAMEORIGIN"), flags.NewOverride("Csp", "default-src 'self'; base-uri 'self'; script-src 'self' 'httputils-nonce' unpkg.com/webp-hero@0.0.2/dist-cjs/ unpkg.com/leaflet@1.9.4/dist/ unpkg.com/leaflet.markercluster@1.5.1/ cdn.jsdelivr.net/npm/pdfjs-dist@4.3.136/; style-src 'self' 'httputils-nonce' unpkg.com/leaflet@1.9.4/dist/ unpkg.com/leaflet.markercluster@1.5.1/; img-src 'self' data: a.tile.openstreetmap.org b.tile.openstreetmap.org c.tile.openstreetmap.org; worker-src blob:")),
+		renderer: renderer.Flags(fs, "", flags.NewOverride("PublicURL", "http://localhost:1080"), flags.NewOverride("Title", "fibr")),
+
 		basic:         basicMemory.Flags(fs, "auth", flags.NewOverride("Profiles", []string{"1:admin"})),
-		storage:       storage.Flags(fs, ""),
-		crud:          crud.Flags(fs, ""),
-		sanitizer:     sanitizer.Flags(fs, ""),
-		share:         share.Flags(fs, "share"),
-		webhook:       webhook.Flags(fs, "webhook"),
-		renderer:      renderer.Flags(fs, "", flags.NewOverride("PublicURL", "http://localhost:1080"), flags.NewOverride("Title", "fibr")),
 		absto:         absto.Flags(fs, "storage"),
-		thumbnail:     thumbnail.Flags(fs, "thumbnail"),
-		metadata:      metadata.Flags(fs, "exif"),
+		storage:       storage.Flags(fs, ""),
+		redis:         redis.Flags(fs, "redis", flags.NewOverride("Address", []string{})),
 		amqp:          amqp.Flags(fs, "amqp"),
 		amqpThumbnail: amqphandler.Flags(fs, "amqpThumbnail", flags.NewOverride("Exchange", "fibr"), flags.NewOverride("Queue", "fibr.thumbnail"), flags.NewOverride("RoutingKey", "thumbnail_output")),
 		amqpExif:      amqphandler.Flags(fs, "amqpExif", flags.NewOverride("Exchange", "fibr"), flags.NewOverride("Queue", "fibr.exif"), flags.NewOverride("RoutingKey", "exif_output")),
-		redis:         redis.Flags(fs, "redis", flags.NewOverride("Address", []string{})),
+
+		crud:      crud.Flags(fs, ""),
+		sanitizer: sanitizer.Flags(fs, ""),
+		metadata:  metadata.Flags(fs, "exif"),
+		thumbnail: thumbnail.Flags(fs, "thumbnail"),
+		webhook:   webhook.Flags(fs, "webhook"),
+		share:     share.Flags(fs, "share"),
 	}
 
 	flags.New("NoAuth", "Disable basic authentification").DocPrefix("auth").BoolVar(fs, &config.disableAuth, false, nil)

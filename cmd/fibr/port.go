@@ -4,10 +4,10 @@ import (
 	"net/http"
 )
 
-func newPort(services services) http.Handler {
+func newPort(config configuration, services services) http.Handler {
 	mux := http.NewServeMux()
 
-	services.renderer.Register(mux, services.fibr.TemplateFunc)
+	mux.Handle(config.renderer.PathPrefix+"/", services.renderer.NewServeMux(services.fibr.TemplateFunc))
 
 	return mux
 }
