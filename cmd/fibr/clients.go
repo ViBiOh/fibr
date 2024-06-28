@@ -24,10 +24,8 @@ type clients struct {
 }
 
 func newClients(ctx context.Context, config configuration) (clients, error) {
-	var (
-		output clients
-		err    error
-	)
+	var output clients
+	var err error
 
 	logger.Init(ctx, config.logger)
 

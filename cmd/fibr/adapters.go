@@ -14,24 +14,22 @@ type adapters struct {
 }
 
 func newAdapters(config configuration, clients clients) (adapters, error) {
-	storageService, err := absto.New(config.absto, clients.telemetry.TracerProvider())
+	var output adapters
+	var err error
+
+	output.storage, err = absto.New(config.absto, clients.telemetry.TracerProvider())
 	if err != nil {
-		return adapters{}, err
+		return output, err
 	}
 
-	filteredStorage, err := storage.Get(config.storage, storageService)
+	output.filteredStorage, err = storage.Get(config.storage, output.storage)
 	if err != nil {
-		return adapters{}, err
+		return output, err
 	}
 
-	var exclusiveService exclusive.Service
 	if clients.redis.Enabled() {
-		exclusiveService = exclusive.New(clients.redis)
+		output.exclusiveService = exclusive.New(clients.redis)
 	}
 
-	return adapters{
-		storage:          storageService,
-		filteredStorage:  filteredStorage,
-		exclusiveService: exclusiveService,
-	}, nil
+	return output, nil
 }

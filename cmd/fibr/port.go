@@ -2,12 +2,17 @@ package main
 
 import (
 	"net/http"
+
+	"github.com/ViBiOh/httputils/v4/pkg/httputils"
 )
 
-func newPort(config configuration, services services) http.Handler {
+func newPort(clients clients, services services) http.Handler {
 	mux := http.NewServeMux()
 
-	mux.Handle(config.renderer.PathPrefix+"/", services.renderer.NewServeMux(services.fibr.TemplateFunc))
+	services.renderer.RegisterMux(mux, services.fibr.TemplateFunc)
 
-	return mux
+	return httputils.Handler(mux, clients.health,
+		clients.telemetry.Middleware("http"),
+		services.owasp.Middleware,
+	)
 }
