@@ -71,7 +71,7 @@ func newServices(ctx context.Context, config configuration, clients clients, ada
 		return output, err
 	}
 
-	webhookService := webhook.New(config.webhook, adapters.storage, clients.telemetry.MeterProvider(), clients.redis, output.renderer, output.thumbnail, adapters.exclusiveService)
+	output.webhook = webhook.New(config.webhook, adapters.storage, clients.telemetry.MeterProvider(), clients.redis, output.renderer, output.thumbnail, adapters.exclusiveService)
 
 	output.share, err = share.New(config.share, adapters.storage, clients.redis, adapters.exclusiveService)
 	if err != nil {
@@ -90,7 +90,7 @@ func newServices(ctx context.Context, config configuration, clients clients, ada
 
 	searchService := search.New(adapters.filteredStorage, output.thumbnail, output.metadata, adapters.exclusiveService, clients.telemetry.TracerProvider())
 
-	crudService, err := crud.New(config.crud, adapters.storage, adapters.filteredStorage, output.renderer, output.share, webhookService, output.thumbnail, output.metadata, searchService, output.eventBus.Push, clients.telemetry.TracerProvider())
+	crudService, err := crud.New(config.crud, adapters.storage, adapters.filteredStorage, output.renderer, output.share, output.webhook, output.thumbnail, output.metadata, searchService, output.eventBus.Push, clients.telemetry.TracerProvider())
 	if err != nil {
 		return output, err
 	}
@@ -102,7 +102,7 @@ func newServices(ctx context.Context, config configuration, clients clients, ada
 		middlewareService = newLoginService(clients.telemetry.TracerProvider(), config.basic)
 	}
 
-	output.fibr = fibr.New(&crudService, output.renderer, output.share, webhookService, middlewareService)
+	output.fibr = fibr.New(&crudService, output.renderer, output.share, output.webhook, middlewareService)
 
 	return output, nil
 }
