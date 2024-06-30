@@ -26,14 +26,12 @@ func main() {
 	services, err := newServices(ctx, config, clients, adapters)
 	logger.FatalfOnErr(ctx, err, "services")
 
-	endCtx := clients.health.EndCtx()
-
-	go services.Start(adapters, clients.health.DoneCtx(), endCtx)
+	go services.Start(adapters, clients.health.DoneCtx(), clients.health.EndCtx())
 	defer services.Close()
 
 	port := newPort(clients, services)
 
-	go services.server.Start(endCtx, port)
+	go services.server.Start(clients.health.EndCtx(), port)
 
 	clients.health.WaitForTermination(services.server.Done())
 	server.GracefulWait(services.server.Done())
