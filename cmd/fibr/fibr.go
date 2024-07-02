@@ -23,7 +23,7 @@ func main() {
 	adapters, err := newAdapters(config, clients)
 	logger.FatalfOnErr(ctx, err, "adapters")
 
-	services, err := newServices(ctx, config, clients, adapters)
+	services, err := newServices(clients.health.EndCtx(), config, clients, adapters)
 	logger.FatalfOnErr(ctx, err, "services")
 
 	go services.Start(adapters, clients.health.DoneCtx(), clients.health.EndCtx())
