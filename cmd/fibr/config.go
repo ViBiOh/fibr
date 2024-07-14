@@ -54,7 +54,8 @@ type configuration struct {
 	webhook   *webhook.Config
 	share     *share.Config
 
-	disableAuth bool
+	disableAuth           bool
+	disableStorageTracing bool
 }
 
 func newConfig() configuration {
@@ -89,6 +90,7 @@ func newConfig() configuration {
 	}
 
 	flags.New("NoAuth", "Disable basic authentification").DocPrefix("auth").BoolVar(fs, &config.disableAuth, false, nil)
+	flags.New("NoStorageTrace", "Disable tracing for storage").DocPrefix("storage").BoolVar(fs, &config.disableStorageTracing, false, nil)
 
 	_ = fs.Parse(os.Args[1:])
 

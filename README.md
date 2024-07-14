@@ -256,6 +256,7 @@ Usage of fibr:
   --minify                                          Minify HTML ${FIBR_MINIFY} (default true)
   --name                              string        [server] Name ${FIBR_NAME} (default "http")
   --noAuth                                          [auth] Disable basic authentification ${FIBR_NO_AUTH} (default false)
+  --noStorageTrace                                  [storage] Disable tracing for storage ${FIBR_NO_STORAGE_TRACE} (default false)
   --okStatus                          int           [http] Healthy HTTP Status code ${FIBR_OK_STATUS} (default 204)
   --pathPrefix                        string        Root Path Prefix ${FIBR_PATH_PREFIX}
   --port                              uint          [server] Listen port (0 to disable) ${FIBR_PORT} (default 1080)

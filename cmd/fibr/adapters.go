@@ -17,7 +17,13 @@ func newAdapters(config configuration, clients clients) (adapters, error) {
 	var output adapters
 	var err error
 
-	output.storage, err = absto.New(config.absto, clients.telemetry.TracerProvider())
+	tracerProvider := clients.telemetry.TracerProvider()
+
+	if config.disableStorageTracing {
+		tracerProvider = nil
+	}
+
+	output.storage, err = absto.New(config.absto, tracerProvider)
 	if err != nil {
 		return output, err
 	}

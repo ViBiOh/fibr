@@ -64,6 +64,7 @@ spec:
       FIBR_EXIF_URL: http://exas
       FIBR_IGNORE_PATTERN: ".st(folder|ignore)"
       FIBR_LOGGER_JSON: "true"
+      FIBR_NO_STORAGE_TRACE: "true"
       FIBR_PPROF_AGENT: http://datadog.observability:8126
       FIBR_PUBLIC_URL: https://fibr.vibioh.fr
       FIBR_REDIS_ADDRESS: redis:6379
