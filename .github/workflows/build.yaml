@@ -97,6 +97,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Publish
+        if: env.DOCKER_USER && env.DOCKER_PASS
         env:
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
           DOCKER_PASS: ${{ secrets.DOCKER_PASS }}

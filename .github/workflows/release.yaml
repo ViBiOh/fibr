@@ -58,9 +58,9 @@ jobs:
           export GIT_TAG="$(basename ${{ github.ref }})"
           scripts/release.sh build assets clean
       - name: Docker
-        if: ${{ env.docker_user != '' }}
+        if: env.DOCKER_USER && env.DOCKER_PASS
         env:
-          DOCKER_USER: ${{ env.docker_user }}
+          DOCKER_USER: ${{ secrets.DOCKER_USER }}
           DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
         run: |
           curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap.sh" | bash -s -- "-c" "docker_promote.sh"
