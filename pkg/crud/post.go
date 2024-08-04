@@ -17,6 +17,8 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
 )
 
+var ErrFileAlreadyExists = errors.New("file already exists")
+
 func parseMultipart(r *http.Request) (map[string]string, *multipart.Part, error) {
 	reader, err := r.MultipartReader()
 	if err != nil {
@@ -112,6 +114,19 @@ func (s Service) handleMultipart(w http.ResponseWriter, r *http.Request, request
 	if values["method"] != http.MethodPost {
 		s.error(w, r, request, model.WrapMethodNotAllowed(fmt.Errorf("unknown method `%s` for multipart", values["method"])))
 		return
+	}
+
+	if values["allow_overwrite"] != "true" {
+		fileName, err := safeFilename(values["filename"])
+		if err != nil {
+			s.error(w, r, request, model.WrapInvalid(err))
+			return
+		}
+
+		if _, err := s.storage.Stat(ctx, request.SubPath(fileName)); err == nil {
+			s.error(w, r, request, model.WrapInvalid(ErrFileAlreadyExists))
+			return
+		}
 	}
 
 	if len(r.Header.Get("X-Chunk-Upload")) != 0 {
