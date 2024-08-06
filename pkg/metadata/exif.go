@@ -186,7 +186,8 @@ func (s Service) extractExif(ctx context.Context, item absto.Item) (exif exas.Ex
 		return
 	}
 
-	if err = httpjson.Read(resp, &exif); err != nil {
+	exif, err = httpjson.Read[exas.Exif](resp)
+	if err != nil {
 		err = fmt.Errorf("read exif: %w", err)
 	}
 
