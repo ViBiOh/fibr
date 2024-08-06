@@ -116,7 +116,7 @@ func (s Service) handleMultipart(w http.ResponseWriter, r *http.Request, request
 		return
 	}
 
-	if values["allow_overwrite"] != "true" {
+	if values["overwrite"] != "true" {
 		fileName, err := safeFilename(values["filename"])
 		if err != nil {
 			s.error(w, r, request, model.WrapInvalid(err))

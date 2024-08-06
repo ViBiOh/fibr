@@ -99,7 +99,7 @@ async function addUploadItem(container, file) {
 
   const item = document.createElement("div");
   item.id = messageId;
-  item.classList.add("flex", "flex-center", "margin");
+  item.classList.add("flex", "flex-center", "margin", "align-baseline");
 
   const itemWrapper = document.createElement("div");
   itemWrapper.classList.add("upload-item");
@@ -187,11 +187,12 @@ function clearUploadStatus(container) {
 /**
  * Add upload message for file
  * @param {Element} container Container of file status
+ * @param {String}  messageId Identifier of message
  * @param {Element} content   Content of message
  * @param {String}  style     Style of status
  * @param {String}  title     Title of status
  */
-async function setUploadStatus(container, content, style, title) {
+async function setUploadStatus(container, messageId, content, style, title) {
   if (!container) {
     return;
   }
@@ -206,6 +207,34 @@ async function setUploadStatus(container, content, style, title) {
 
   if (title) {
     statusContainer.title = title;
+
+    if (
+      String(title).includes("file already exists") &&
+      !container.querySelector("#overwrite-" + messageId)
+    ) {
+      const itemContainer = container.querySelector(".upload-item");
+      if (!itemContainer) {
+        return;
+      }
+
+      const overwriteContainer = document.createElement("p");
+      itemContainer.appendChild(overwriteContainer);
+
+      overwriteContainer.classList.add("flex", "no-margin");
+
+      const checkbox = document.createElement("input");
+      overwriteContainer.appendChild(checkbox);
+
+      checkbox.id = "overwrite-" + messageId;
+      checkbox.type = "checkbox";
+      checkbox.name = "overwrite";
+
+      const label = document.createElement("label");
+      overwriteContainer.appendChild(label);
+
+      label.htmlFor = "overwrite-" + messageId;
+      label.innerHTML = "Overwrite";
+    }
   }
 }
 
@@ -221,9 +250,16 @@ let currentUpload = {};
  * @param  {String}  method    Method for uploading
  * @param  {String}  filename  Name of file uploaded
  * @param  {File}    file      File to upload
+ * @param  {Boolean} overwrite Overwrite filed
  * @return {Promise}           Promise of upload
  */
-async function uploadFileByChunks(container, method, filename, file) {
+async function uploadFileByChunks(
+  container,
+  method,
+  filename,
+  file,
+  overwrite,
+) {
   let progress;
   if (container) {
     progress = container.querySelector("progress");
@@ -254,6 +290,7 @@ async function uploadFileByChunks(container, method, filename, file) {
     const formData = new FormData();
     formData.append("method", method);
     formData.append("filename", filename);
+    formData.append("overwrite", overwrite);
     formData.append("file", currentUpload.chunks[i].content);
 
     const response = await fetch("", {
@@ -281,6 +318,7 @@ async function uploadFileByChunks(container, method, filename, file) {
   const formData = new FormData();
   formData.append("method", method);
   formData.append("filename", filename);
+  formData.append("overwrite", overwrite);
   formData.append("size", file.size);
 
   const response = await fetch("", {
@@ -308,9 +346,10 @@ async function uploadFileByChunks(container, method, filename, file) {
  * @param  {String}  method    Method for uploading
  * @param  {String}  filename  Name of file uploaded
  * @param  {File}    file      File to upload
+ * @param  {Boolean} overwrite Overwrite filed
  * @return {Promise}           Promise of upload
  */
-async function uploadFileByXHR(container, method, filename, file) {
+async function uploadFileByXHR(container, method, filename, file, overwrite) {
   let progress;
   if (container) {
     progress = container.querySelector("progress");
@@ -321,6 +360,7 @@ async function uploadFileByXHR(container, method, filename, file) {
   formData.append("method", method);
   formData.append("filename", filename);
   formData.append("size", file.size);
+  formData.append("overwrite", overwrite);
   formData.append("file", file);
 
   return new Promise((resolve, reject) => {
@@ -414,16 +454,19 @@ async function upload(event) {
 
     try {
       const filename = getFilename(messageId, file);
+      const overwrite = document.getElementById(
+        "overwrite-" + messageId,
+      )?.checked;
 
-      await uploadFile(container, values.method, filename, file);
-      await setUploadStatus(container, "✓", "success");
+      await uploadFile(container, values.method, filename, file, overwrite);
+      await setUploadStatus(container, messageId, "✓", "success");
     } catch (err) {
       sliceFileList("file", i);
       if (uploadButton) {
         uploadButton.disabled = false;
         uploadButton.innerHTML = "Retry";
       }
-      await setUploadStatus(container, "X", "danger", err);
+      await setUploadStatus(container, messageId, "X", "danger", err);
 
       success = false;
       console.error(err);
