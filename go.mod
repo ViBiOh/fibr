@@ -1,8 +1,8 @@
 module github.com/ViBiOh/fibr
 
-go 1.22
+go 1.23
 
-toolchain go1.22.0
+toolchain go1.23.0
 
 require (
 	github.com/ViBiOh/ChatPotte v0.6.0
