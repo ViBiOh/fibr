@@ -138,7 +138,7 @@ func (s Service) Rename(w http.ResponseWriter, r *http.Request, request provider
 		message = fmt.Sprintf("%s successfully updated", newItem.Name())
 	}
 
-	s.renderer.Redirect(w, r, fmt.Sprintf("?d=%s", request.Display), renderer.NewSuccessMessage(message))
+	s.renderer.Redirect(w, r, fmt.Sprintf("?d=%s", request.Display), renderer.NewSuccessMessage("%s", message))
 }
 
 func getNewFolder(r *http.Request) (string, error) {
