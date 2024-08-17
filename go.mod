@@ -9,7 +9,7 @@ require (
 	github.com/ViBiOh/absto v1.7.16
 	github.com/ViBiOh/auth/v2 v2.20.1
 	github.com/ViBiOh/exas v0.8.1
-	github.com/ViBiOh/flags v1.5.0
+	github.com/ViBiOh/flags v1.6.0
 	github.com/ViBiOh/httputils/v4 v4.79.2
 	github.com/ViBiOh/vith v0.6.0
 	github.com/rabbitmq/amqp091-go v1.10.0
