@@ -6,10 +6,10 @@ github.com/ViBiOh/auth/v2 v2.20.1 h1:2sNenkD9Oixkmvxmy+ohbvsoYWzGE2twUDtX5lSEEIM
 github.com/ViBiOh/auth/v2 v2.20.1/go.mod h1:rlWvZC4jKIZvNMSX1dCybYu+XdF8kEsUqBk2kEEvLQ4=
 github.com/ViBiOh/exas v0.8.1 h1:bXrWK99ze7MLMfjD+pp/NHngOSkR1eqcCVWlNNxLT/M=
 github.com/ViBiOh/exas v0.8.1/go.mod h1:aldybvPY4yJQlvUpq6GJluGxH+7prpaJjDQ03t3VvCw=
-github.com/ViBiOh/flags v1.5.0 h1:nwuFS8tAwtV6rTPpv2pCB+r12WjZYLjluW7yT+SeVpQ=
-github.com/ViBiOh/flags v1.5.0/go.mod h1:39UMuTnKsIp6walgD8dK99KRCb4DJt9vPtbWehHh1T0=
-github.com/ViBiOh/httputils/v4 v4.79.2 h1:vBjtMYs8JpeijOjWXE5mZJyeg1wxyO/EAUj5dFPS7Qs=
-github.com/ViBiOh/httputils/v4 v4.79.2/go.mod h1:l0WipAwSfPBFg6D2VwJoD3QYxse+wd7NG4vft654al0=
+github.com/ViBiOh/flags v1.6.0 h1:f69V4ROK5XHAV71cL1yVP2UC/8xKiKJvunvgrtW/qsg=
+github.com/ViBiOh/flags v1.6.0/go.mod h1:sbFyRQ7u5xzCssqGHn/hLSTlxmMYKe09WaPneJxHveA=
+github.com/ViBiOh/httputils/v4 v4.80.0 h1:M9tgoWCefgdPuhbY+zlwUnYCQua5JFR/0z0kjfb/4SA=
+github.com/ViBiOh/httputils/v4 v4.80.0/go.mod h1:zOjwblE4GO9gTyv+QS30hAgqnoDqw3OLGYnY6RhTGpM=
 github.com/ViBiOh/vith v0.6.0 h1:bdLmwgqUEWi3ivShtAhtM9gOZlWQzvZi2Z5b0BRSB1U=
 github.com/ViBiOh/vith v0.6.0/go.mod h1:eRqtDU2uB8g85vll4spbnCV93DHyHNAYwXCMIBH1GuQ=
 github.com/bsm/ginkgo/v2 v2.12.0 h1:Ny8MWAHyOepLGlLKYmXG4IEkioBysk6GpaRTLC8zwWs=
