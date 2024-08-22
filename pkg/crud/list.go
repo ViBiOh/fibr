@@ -10,6 +10,7 @@ import (
 	"log/slog"
 	"net/http"
 	"path"
+	"syscall"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
@@ -183,11 +184,18 @@ func (s Service) Download(w http.ResponseWriter, r *http.Request, request provid
 }
 
 func (s Service) zipItems(ctx context.Context, done <-chan struct{}, request provider.Request, zipWriter *zip.Writer, items []absto.Item) (err error) {
+	defer func() {
+		if errors.Is(err, syscall.ECONNRESET) {
+			err = nil
+		}
+	}()
+
 	for _, item := range items {
 		select {
 		case <-done:
 			slog.ErrorContext(ctx, "context is done for zipping files")
 			return nil
+
 		default:
 			relativeURL := request.RelativeURL(item)
 
@@ -195,6 +203,7 @@ func (s Service) zipItems(ctx context.Context, done <-chan struct{}, request pro
 				if err = s.addFileToZip(ctx, zipWriter, item, relativeURL); err != nil {
 					return
 				}
+
 				continue
 			}
 
