@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"path"
 	"strings"
+	"syscall"
 	"time"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
@@ -416,7 +417,7 @@ func (s Service) encodeContent(ctx context.Context, w io.Writer, isDone func() b
 	defer provider.BufferPool.Put(buffer)
 
 	if _, err = io.CopyBuffer(w, reader, buffer.Bytes()); err != nil {
-		if !absto.IsNotExist(s.storage.ConvertError(err)) {
+		if !absto.IsNotExist(s.storage.ConvertError(err)) && !errors.Is(err, syscall.ECONNRESET) {
 			logEncodeContentError(item).ErrorContext(ctx, "copy", "error", err)
 		}
 	}
