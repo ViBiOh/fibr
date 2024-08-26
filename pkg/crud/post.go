@@ -124,7 +124,7 @@ func (s Service) handleMultipart(w http.ResponseWriter, r *http.Request, request
 		}
 
 		if _, err := s.storage.Stat(ctx, request.SubPath(fileName)); err == nil {
-			s.error(w, r, request, model.WrapInvalid(ErrFileAlreadyExists))
+			s.error(w, r, request, model.WrapInvalid(fmt.Errorf("filename `%s`: %w", fileName, ErrFileAlreadyExists)))
 			return
 		}
 	}
