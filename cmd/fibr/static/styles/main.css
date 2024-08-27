@@ -48,6 +48,7 @@ input {
 
 input[type="file"] {
   color: var(--white);
+  width: 80%;
 }
 
 a {

@@ -116,15 +116,24 @@ func (s Service) handleMultipart(w http.ResponseWriter, r *http.Request, request
 		return
 	}
 
+	fileName, filePath, err := getUploadNameAndPath(request, values["filename"], file)
+	if err != nil {
+		s.error(w, r, request, model.WrapInvalid(fmt.Errorf("get upload name: %w", err)))
+		return
+	}
+
 	if values["overwrite"] != "true" {
-		_, filePath, err := getUploadNameAndPath(request, values["filename"], file)
-		if err != nil {
-			s.error(w, r, request, model.WrapInvalid(err))
+		if _, err := s.storage.Stat(ctx, filePath); err == nil {
+			s.error(w, r, request, model.WrapInvalid(fmt.Errorf("filepath `%s`: %w", filePath, ErrFileAlreadyExists)))
 			return
 		}
+	}
 
-		if _, err := s.storage.Stat(ctx, filePath); err == nil {
-			s.error(w, r, request, model.WrapInvalid(fmt.Errorf("filename `%s`: %w", filePath, ErrFileAlreadyExists)))
+	var size int64
+	if rawSize := values["size"]; len(rawSize) == 0 {
+		size, err = getUploadSize(rawSize)
+		if err != nil {
+			s.error(w, r, request, model.WrapInvalid(fmt.Errorf("get upload size `%s`: %w", rawSize, err)))
 			return
 		}
 	}
@@ -139,14 +148,14 @@ func (s Service) handleMultipart(w http.ResponseWriter, r *http.Request, request
 			chunkNumber = fmt.Sprintf("%010d", chunkNumberValue)
 
 			telemetry.SetRouteTag(ctx, "/chunk")
-			s.uploadChunk(w, r, request, values["filename"], chunkNumber, file)
+			s.uploadChunk(w, r, request, fileName, chunkNumber, file)
 		} else {
 			telemetry.SetRouteTag(ctx, "/merge")
-			s.mergeChunk(w, r, request, values)
+			s.mergeChunk(w, r, request, fileName, filePath, size)
 		}
 	} else {
 		telemetry.SetRouteTag(ctx, "/upload")
-		s.upload(w, r, request, values, file)
+		s.upload(w, r, request, fileName, filePath, size, file)
 	}
 }
 

@@ -25,22 +25,16 @@ func (s Service) uploadChunk(w http.ResponseWriter, r *http.Request, request pro
 		return
 	}
 
-	fileName, err := safeFilename(fileName)
-	if err != nil {
-		s.error(w, r, request, model.WrapInvalid(err))
-		return
-	}
-
 	tempDestination := filepath.Join(s.temporaryFolder, provider.Hash(fileName))
 	tempFile := filepath.Join(tempDestination, chunkNumber)
 
-	if err = os.MkdirAll(tempDestination, absto.DirectoryPerm); err != nil {
+	if err := os.MkdirAll(tempDestination, absto.DirectoryPerm); err != nil {
 		s.error(w, r, request, model.WrapInternal(err))
 		return
 	}
 
 	var writer *os.File
-	writer, err = os.OpenFile(tempFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, absto.RegularFilePerm)
+	writer, err := os.OpenFile(tempFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, absto.RegularFilePerm)
 	if err != nil {
 		return
 	}
@@ -67,46 +61,29 @@ func (s Service) uploadChunk(w http.ResponseWriter, r *http.Request, request pro
 	w.WriteHeader(http.StatusAccepted)
 }
 
-func (s Service) mergeChunk(w http.ResponseWriter, r *http.Request, request provider.Request, values map[string]string) {
-	ctx, end := telemetry.StartSpan(r.Context(), s.tracer, "merge_chunk")
-	defer end(nil)
+func (s Service) mergeChunk(w http.ResponseWriter, r *http.Request, request provider.Request, fileName, filePath string, size int64) {
+	var err error
 
-	fileName, err := safeFilename(values["filename"])
-	if err != nil {
-		s.error(w, r, request, model.WrapInvalid(err))
-		return
-	}
+	ctx, end := telemetry.StartSpan(r.Context(), s.tracer, "merge_chunk")
+	defer end(&err)
 
 	tempFolder := filepath.Join(s.temporaryFolder, provider.Hash(fileName))
 	tempFile := filepath.Join(tempFolder, fileName)
 
-	if err := s.mergeChunkFiles(ctx, tempFolder, tempFile); err != nil {
+	if err = s.mergeChunkFiles(ctx, tempFolder, tempFile); err != nil {
 		s.error(w, r, request, model.WrapInternal(err))
 		return
 	}
 
-	var size int64
-	size, err = getUploadSize(values["size"])
+	var file *os.File
+
+	file, err = os.Open(tempFile)
 	if err != nil {
 		s.error(w, r, request, model.WrapInternal(err))
 		return
 	}
 
-	file, err := os.Open(tempFile)
-	if err != nil {
-		s.error(w, r, request, model.WrapInternal(err))
-		return
-	}
-
-	fileName, err = provider.SanitizeName(fileName, true)
-	if err != nil {
-		s.error(w, r, request, model.WrapInternal(err))
-		return
-	}
-
-	filePath := request.SubPath(fileName)
-	err = provider.WriteToStorage(ctx, s.storage, filePath, size, file)
-	if err != nil {
+	if err = provider.WriteToStorage(ctx, s.storage, filePath, size, file); err != nil {
 		s.error(w, r, request, model.WrapInternal(err))
 		return
 	}
@@ -180,17 +157,4 @@ func browseChunkFiles(ctx context.Context, directory, destination string, writer
 
 		return nil
 	})
-}
-
-func safeFilename(fileName string) (string, error) {
-	if err := absto.ValidPath(fileName); err != nil {
-		return fileName, err
-	}
-
-	output, err := provider.SanitizeName(fileName, true)
-	if err != nil {
-		return fileName, fmt.Errorf("sanitize: %w", err)
-	}
-
-	return output, nil
 }

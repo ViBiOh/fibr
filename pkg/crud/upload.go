@@ -10,27 +10,15 @@ import (
 	"path"
 	"strconv"
 
+	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
 )
 
-func (s Service) saveUploadedFile(ctx context.Context, request provider.Request, inputName, rawSize string, file *multipart.Part) (fileName string, err error) {
-	var filePath string
-
-	fileName, filePath, err = getUploadNameAndPath(request, inputName, file)
-	if err != nil {
-		return "", fmt.Errorf("get upload name: %w", err)
-	}
-
-	var size int64
-	size, err = getUploadSize(rawSize)
-	if err != nil {
-		return "", fmt.Errorf("get upload size: %w", err)
-	}
-
-	err = provider.WriteToStorage(ctx, s.storage, filePath, size, file)
+func (s Service) saveUploadedFile(ctx context.Context, request provider.Request, filePath string, size int64, file *multipart.Part) error {
+	err := provider.WriteToStorage(ctx, s.storage, filePath, size, file)
 
 	if err == nil {
 		go func(ctx context.Context) {
@@ -42,7 +30,7 @@ func (s Service) saveUploadedFile(ctx context.Context, request provider.Request,
 		}(context.WithoutCancel(ctx))
 	}
 
-	return fileName, err
+	return err
 }
 
 func getUploadNameAndPath(request provider.Request, inputName string, part *multipart.Part) (fileName string, filePath string, err error) {
@@ -56,10 +44,14 @@ func getUploadNameAndPath(request provider.Request, inputName string, part *mult
 		fileName = part.FileName()
 	}
 
-	fileName, err = provider.SanitizeName(fileName, true)
-	if err != nil {
+	if err = absto.ValidPath(fileName); err != nil {
 		return
 	}
+
+	if fileName, err = provider.SanitizeName(fileName, true); err != nil {
+		return
+	}
+
 	filePath = request.SubPath(fileName)
 
 	return
@@ -77,22 +69,23 @@ func getUploadSize(rawSize string) (int64, error) {
 	return size, nil
 }
 
-func (s Service) upload(w http.ResponseWriter, r *http.Request, request provider.Request, values map[string]string, file *multipart.Part) {
+func (s Service) upload(w http.ResponseWriter, r *http.Request, request provider.Request, fileName, filePath string, size int64, file *multipart.Part) {
 	if file == nil {
 		s.error(w, r, request, model.WrapInvalid(errors.New("no file provided for save")))
 		return
 	}
 
-	ctx, end := telemetry.StartSpan(r.Context(), s.tracer, "upload")
-	defer end(nil)
+	var err error
 
-	filename, err := s.saveUploadedFile(ctx, request, values["filename"], values["size"], file)
-	if err != nil {
+	ctx, end := telemetry.StartSpan(r.Context(), s.tracer, "upload")
+	defer end(&err)
+
+	if err = s.saveUploadedFile(ctx, request, filePath, size, file); err != nil {
 		s.error(w, r, request, model.WrapInternal(err))
 		return
 	}
 
-	s.postUpload(w, r, request, filename)
+	s.postUpload(w, r, request, fileName)
 }
 
 func (s Service) postUpload(w http.ResponseWriter, r *http.Request, request provider.Request, fileName string) {
