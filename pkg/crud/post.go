@@ -117,14 +117,14 @@ func (s Service) handleMultipart(w http.ResponseWriter, r *http.Request, request
 	}
 
 	if values["overwrite"] != "true" {
-		fileName, err := safeFilename(values["filename"])
+		_, filePath, err := getUploadNameAndPath(request, values["filename"], file)
 		if err != nil {
 			s.error(w, r, request, model.WrapInvalid(err))
 			return
 		}
 
-		if _, err := s.storage.Stat(ctx, request.SubPath(fileName)); err == nil {
-			s.error(w, r, request, model.WrapInvalid(fmt.Errorf("filename `%s`: %w", fileName, ErrFileAlreadyExists)))
+		if _, err := s.storage.Stat(ctx, filePath); err == nil {
+			s.error(w, r, request, model.WrapInvalid(fmt.Errorf("filename `%s`: %w", filePath, ErrFileAlreadyExists)))
 			return
 		}
 	}
