@@ -25,7 +25,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/redis"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
-	"github.com/ViBiOh/vith/pkg/model"
+	"github.com/ViBiOh/vignet/pkg/model"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -50,18 +50,18 @@ type Service struct {
 	amqpExchange            string
 	amqpStreamRoutingKey    string
 
-	sizes        []uint64
-	vithRequest  request.Request
-	largeSize    uint64
-	maxSize      int64
-	minBitrate   uint64
-	directAccess bool
+	sizes         []uint64
+	vignetRequest request.Request
+	largeSize     uint64
+	maxSize       int64
+	minBitrate    uint64
+	directAccess  bool
 }
 
 type Config struct {
-	VithURL  string
-	VithUser string
-	VithPass string
+	VignetURL  string
+	VignetUser string
+	VignetPass string
 
 	AmqpExchange            string
 	AmqpStreamRoutingKey    string
@@ -77,11 +77,11 @@ type Config struct {
 func Flags(fs *flag.FlagSet, prefix string) *Config {
 	var config Config
 
-	flags.New("URL", "Vith Thumbnail URL").Prefix(prefix).DocPrefix("thumbnail").StringVar(fs, &config.VithURL, "http://vith:1080", nil)
-	flags.New("User", "Vith Thumbnail Basic Auth User").Prefix(prefix).DocPrefix("thumbnail").StringVar(fs, &config.VithUser, "", nil)
-	flags.New("Password", "Vith Thumbnail Basic Auth Password").Prefix(prefix).DocPrefix("thumbnail").StringVar(fs, &config.VithPass, "", nil)
+	flags.New("URL", "Vignet Thumbnail URL").Prefix(prefix).DocPrefix("thumbnail").StringVar(fs, &config.VignetURL, "http://vignet:1080", nil)
+	flags.New("User", "Vignet Thumbnail Basic Auth User").Prefix(prefix).DocPrefix("thumbnail").StringVar(fs, &config.VignetUser, "", nil)
+	flags.New("Password", "Vignet Thumbnail Basic Auth Password").Prefix(prefix).DocPrefix("thumbnail").StringVar(fs, &config.VignetPass, "", nil)
 
-	flags.New("DirectAccess", "Use Vith with direct access to filesystem (no large file upload, send a GET request, Basic Auth recommended)").Prefix(prefix).DocPrefix("thumbnail").BoolVar(fs, &config.DirectAccess, false, nil)
+	flags.New("DirectAccess", "Use Vignet with direct access to filesystem (no large file upload, send a GET request, Basic Auth recommended)").Prefix(prefix).DocPrefix("thumbnail").BoolVar(fs, &config.DirectAccess, false, nil)
 	flags.New("MaxSize", "Maximum file size (in bytes) for generating thumbnail (0 to no limit). Not used if DirectAccess enabled.").Prefix(prefix).DocPrefix("thumbnail").Int64Var(fs, &config.MaxSize, 1024*1024*200, nil)
 	flags.New("MinBitrate", "Minimal video bitrate (in bits per second) to generate a streamable version (in HLS), if DirectAccess enabled").Prefix(prefix).DocPrefix("thumbnail").Uint64Var(fs, &config.MinBitrate, 80*1000*1000, nil)
 
@@ -113,7 +113,7 @@ func New(ctx context.Context, config *Config, storage absto.Storage, redisClient
 	}
 
 	service := Service{
-		vithRequest: request.New().URL(config.VithURL).BasicAuth(config.VithUser, config.VithPass).WithClient(provider.SlowClient),
+		vignetRequest: request.New().URL(config.VignetURL).BasicAuth(config.VignetUser, config.VignetPass).WithClient(provider.SlowClient),
 
 		maxSize:      config.MaxSize,
 		minBitrate:   config.MinBitrate,
@@ -283,7 +283,7 @@ func (s Service) generateImageThumbnail(ctx context.Context, item absto.Item, pa
 	for _, size := range s.sizes {
 		var req *http.Request
 
-		req, err = s.vithRequest.Method(http.MethodPost).Path("?type=%s&scale=%d", itemType, size).Build(ctx, io.NopCloser(bytes.NewReader(payload)))
+		req, err = s.vignetRequest.Method(http.MethodPost).Path("?type=%s&scale=%d", itemType, size).Build(ctx, io.NopCloser(bytes.NewReader(payload)))
 		if err != nil {
 			err = fmt.Errorf("build %d: %w", size, err)
 			return

@@ -8,7 +8,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/version"
 	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
-	"github.com/ViBiOh/vith/pkg/model"
+	"github.com/ViBiOh/vignet/pkg/model"
 )
 
 func (s Service) CanHaveThumbnail(item absto.Item) bool {
@@ -16,7 +16,7 @@ func (s Service) CanHaveThumbnail(item absto.Item) bool {
 }
 
 func (s Service) CanGenerateThumbnail(item absto.Item) bool {
-	return !item.IsDir() && provider.VithExtensions[item.Extension] && (s.maxSize == 0 || item.Size() < s.maxSize || s.directAccess)
+	return !item.IsDir() && provider.VignetExtensions[item.Extension] && (s.maxSize == 0 || item.Size() < s.maxSize || s.directAccess)
 }
 
 func (s Service) HasLargeThumbnail(ctx context.Context, item absto.Item) bool {
@@ -74,10 +74,6 @@ func typeOfItem(item absto.Item) model.ItemType {
 
 	if _, ok := provider.ImageExtensions[item.Extension]; ok {
 		itemType = model.TypeImage
-	}
-
-	if _, ok := provider.PdfExtensions[item.Extension]; ok {
-		itemType = model.TypePDF
 	}
 
 	return itemType

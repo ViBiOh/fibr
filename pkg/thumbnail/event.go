@@ -10,7 +10,7 @@ import (
 )
 
 func (s Service) EventConsumer(ctx context.Context, e provider.Event) {
-	if s.vithRequest.IsZero() && s.amqpClient == nil {
+	if s.vignetRequest.IsZero() && s.amqpClient == nil {
 		return
 	}
 

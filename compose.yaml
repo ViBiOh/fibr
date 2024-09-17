@@ -1,22 +1,22 @@
 ---
-version: '3.9'
+version: "3.9"
 
 services:
   service:
     image: vibioh/fibr
     environment:
-      FIBR_AUTH_USERS: '${BASIC_USERS}'
-      FIBR_AMQP_URI: 'amqp://guest:guest@rabbit:5672/'
-      FIBR_AMQP_WAIT_TIMEOUT: '30s'
-      FIBR_CHUNK_UPLOAD: 'true'
-      FIBR_EXIF_DIRECT_ACCESS: 'true'
+      FIBR_AUTH_USERS: "${BASIC_USERS}"
+      FIBR_AMQP_URI: "amqp://guest:guest@rabbit:5672/"
+      FIBR_AMQP_WAIT_TIMEOUT: "30s"
+      FIBR_CHUNK_UPLOAD: "true"
+      FIBR_EXIF_DIRECT_ACCESS: "true"
       FIBR_REDIS_ADDRESS: redis:6379
-      FIBR_THUMBNAIL_DIRECT_ACCESS: 'true'
+      FIBR_THUMBNAIL_DIRECT_ACCESS: "true"
     ports:
-      - '1080:1080/tcp'
+      - "1080:1080/tcp"
     volumes:
-      - '${DATA_DIR}:/data'
-      - '/tmp:/tmp'
+      - "${DATA_DIR}:/data"
+      - "/tmp:/tmp"
     entrypoint:
       - /wait
       - -timeout
@@ -30,7 +30,7 @@ services:
     depends_on:
       - redis
       - rabbit
-    user: '${DATA_USER_ID}'
+    user: "${DATA_USER_ID}"
     read_only: true
 
   redis:
@@ -46,12 +46,12 @@ services:
   exas:
     image: vibioh/exas
     environment:
-      EXAS_AMQP_URI: 'amqp://guest:guest@rabbit:5672/'
-      EXAS_AMQP_WAIT_TIMEOUT: '30s'
-      EXAS_GEOCODE_URL: 'https://nominatim.openstreetmap.org'
-      EXAS_STORAGE_FILE_SYSTEM_DIRECTORY: '/data'
+      EXAS_AMQP_URI: "amqp://guest:guest@rabbit:5672/"
+      EXAS_AMQP_WAIT_TIMEOUT: "30s"
+      EXAS_GEOCODE_URL: "https://nominatim.openstreetmap.org"
+      EXAS_STORAGE_FILE_SYSTEM_DIRECTORY: "/data"
     volumes:
-      - '${DATA_DIR}:/data'
+      - "${DATA_DIR}:/data"
     entrypoint:
       - /wait
       - -timeout
@@ -62,17 +62,17 @@ services:
       - /exas
     depends_on:
       - rabbit
-    user: '${DATA_USER_ID}'
+    user: "${DATA_USER_ID}"
     read_only: true
 
-  vith:
-    image: vibioh/vith
+  vignet:
+    image: vibioh/vignet
     environment:
-      VITH_AMQP_URI: 'amqp://guest:guest@rabbit:5672/'
-      VITH_AMQP_WAIT_TIMEOUT: '30s'
-      VITH_STORAGE_FILE_SYSTEM_DIRECTORY: '/data'
+      VIGNET_AMQP_URI: "amqp://guest:guest@rabbit:5672/"
+      VIGNET_AMQP_WAIT_TIMEOUT: "30s"
+      VIGNET_STORAGE_FILE_SYSTEM_DIRECTORY: "/data"
     volumes:
-      - '${DATA_DIR}:/data'
+      - "${DATA_DIR}:/data"
     entrypoint:
       - /wait
       - -timeout
@@ -80,9 +80,9 @@ services:
       - -address
       - tcp:service:1080
       - -next
-      - /vith
+      - /vignet
     depends_on:
       - rabbit
       - image
-    user: '${DATA_USER_ID}'
+    user: "${DATA_USER_ID}"
     read_only: true

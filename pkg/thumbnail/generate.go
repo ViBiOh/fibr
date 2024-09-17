@@ -10,8 +10,8 @@ import (
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
-	"github.com/ViBiOh/vith/pkg/model"
-	vith "github.com/ViBiOh/vith/pkg/model"
+	"github.com/ViBiOh/vignet/pkg/model"
+	vignet "github.com/ViBiOh/vignet/pkg/model"
 )
 
 const (
@@ -26,7 +26,7 @@ func (s Service) generate(ctx context.Context, item absto.Item, scale uint64) (e
 	itemType := typeOfItem(item)
 
 	var resp *http.Response
-	resp, err = s.requestVith(ctx, item, itemType, scale)
+	resp, err = s.requestVignet(ctx, item, itemType, scale)
 	if err != nil {
 		s.increaseMetric(ctx, itemType.String(), "error")
 		return fmt.Errorf("request thumbnailer: %w", err)
@@ -54,19 +54,19 @@ func (s Service) generate(ctx context.Context, item absto.Item, scale uint64) (e
 	return err
 }
 
-func (s Service) requestVith(ctx context.Context, item absto.Item, itemType model.ItemType, scale uint64) (*http.Response, error) {
+func (s Service) requestVignet(ctx context.Context, item absto.Item, itemType model.ItemType, scale uint64) (*http.Response, error) {
 	outputName := s.PathForScale(item, scale)
 
 	if s.amqpClient != nil {
 		s.increaseMetric(ctx, itemType.String(), "publish")
-		return nil, s.amqpClient.PublishJSON(ctx, vith.NewRequest(item.Pathname, outputName, itemType, scale), s.amqpExchange, s.amqpThumbnailRoutingKey)
+		return nil, s.amqpClient.PublishJSON(ctx, vignet.NewRequest(item.Pathname, outputName, itemType, scale), s.amqpExchange, s.amqpThumbnailRoutingKey)
 	}
 
 	s.increaseMetric(ctx, itemType.String(), "request")
 
 	if s.directAccess {
-		return s.vithRequest.Method(http.MethodGet).Path("%s?type=%s&scale=%d&output=%s", item.Pathname, itemType, scale, outputName).Send(ctx, nil)
+		return s.vignetRequest.Method(http.MethodGet).Path("%s?type=%s&scale=%d&output=%s", item.Pathname, itemType, scale, outputName).Send(ctx, nil)
 	}
 
-	return provider.SendLargeFile(ctx, s.storage, item, s.vithRequest.Method(http.MethodPost).Path("?type=%s&scale=%d", itemType, scale))
+	return provider.SendLargeFile(ctx, s.storage, item, s.vignetRequest.Method(http.MethodPost).Path("?type=%s&scale=%d", itemType, scale))
 }

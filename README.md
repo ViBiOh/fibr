@@ -39,7 +39,7 @@ Fibr creates a `.fibr` folder in _root folder_ for storing its metadata: shares'
 
 ### Sidecars
 
-Fibr generates thumbnails of images, PDF and videos when these [mime-types are detected](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types) and sidecars are provided. Sidecars are [ViBiOh/vith](https://github.com/vibioh/vith) and [ViBiOh/exas](https://github.com/vibioh/exas). Thumbnails are generated in [WebP](https://developers.google.com/speed/webp/) format, in their animated format for video thumbnail.
+Fibr generates thumbnails of images, PDF and videos when these [mime-types are detected](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types) and sidecars are provided. Sidecars are [ViBiOh/vignet](https://github.com/vibioh/vignet) and [ViBiOh/exas](https://github.com/vibioh/exas). Thumbnails are generated in [WebP](https://developers.google.com/speed/webp/) format, in their animated format for video thumbnail.
 
 You can refer to these projects for installing and configuring them and set `-thumbnailURL` and `-exifURL` options.
 
@@ -47,9 +47,9 @@ Sidecars may have constraints regarding concurrent work (e.g. HLS conversion is 
 
 #### HTTP Live Streaming
 
-Fibr has a special treatment for videos, that can be very large sometimes. With the help of the `vith` sidecar, it can convert a video to its [HLS version](https://en.wikipedia.org/wiki/HTTP_Live_Streaming). It keeps the original video as is, and stores streamable version in the metadatas directory. It's a basic conversion into the appropriate format: no resolution, frame-per-second or any quality specifications are changed. Conversion is done where this two requirements are met altogether:
+Fibr has a special treatment for videos, that can be very large sometimes. With the help of the `vignet` sidecar, it can convert a video to its [HLS version](https://en.wikipedia.org/wiki/HTTP_Live_Streaming). It keeps the original video as is, and stores streamable version in the metadatas directory. It's a basic conversion into the appropriate format: no resolution, frame-per-second or any quality specifications are changed. Conversion is done where this two requirements are met altogether:
 
-- `vith` is configured with direct access to the filesystem (see [`vith`documentation about configuring `WorkDir`](https://github.com/vibioh/vith#usage) and [`fibr` configuration](#usage) for enabling it). Direct access disable large file transfer in the network.
+- `vignet` is configured with direct access to the filesystem (see [`vignet`documentation about configuring `WorkDir`](https://github.com/vibioh/vignet#usage) and [`fibr` configuration](#usage) for enabling it). Direct access disable large file transfer in the network.
 - the video bitrate is above [`thumbnailMinBitrate (default 80000000)`](#usage)
 
 ### Chunk upload
@@ -289,13 +289,13 @@ Usage of fibr:
   --thumbnailAmqpExchange             string        [thumbnail] AMQP Exchange Name ${FIBR_THUMBNAIL_AMQP_EXCHANGE} (default "fibr")
   --thumbnailAmqpStreamRoutingKey     string        [thumbnail] AMQP Routing Key for stream ${FIBR_THUMBNAIL_AMQP_STREAM_ROUTING_KEY} (default "stream")
   --thumbnailAmqpThumbnailRoutingKey  string        [thumbnail] AMQP Routing Key for thumbnail ${FIBR_THUMBNAIL_AMQP_THUMBNAIL_ROUTING_KEY} (default "thumbnail")
-  --thumbnailDirectAccess                           [thumbnail] Use Vith with direct access to filesystem (no large file upload, send a GET request, Basic Auth recommended) ${FIBR_THUMBNAIL_DIRECT_ACCESS} (default false)
+  --thumbnailDirectAccess                           [thumbnail] Use Vignet with direct access to filesystem (no large file upload, send a GET request, Basic Auth recommended) ${FIBR_THUMBNAIL_DIRECT_ACCESS} (default false)
   --thumbnailLargeSize                uint          [thumbnail] Size of large thumbnail for story display (thumbnail are always squared). 0 to disable ${FIBR_THUMBNAIL_LARGE_SIZE} (default 800)
   --thumbnailMaxSize                  int           [thumbnail] Maximum file size (in bytes) for generating thumbnail (0 to no limit). Not used if DirectAccess enabled. ${FIBR_THUMBNAIL_MAX_SIZE} (default 209715200)
   --thumbnailMinBitrate               uint          [thumbnail] Minimal video bitrate (in bits per second) to generate a streamable version (in HLS), if DirectAccess enabled ${FIBR_THUMBNAIL_MIN_BITRATE} (default 80000000)
-  --thumbnailPassword                 string        [thumbnail] Vith Thumbnail Basic Auth Password ${FIBR_THUMBNAIL_PASSWORD}
-  --thumbnailURL                      string        [thumbnail] Vith Thumbnail URL ${FIBR_THUMBNAIL_URL} (default "http://vith:1080")
-  --thumbnailUser                     string        [thumbnail] Vith Thumbnail Basic Auth User ${FIBR_THUMBNAIL_USER}
+  --thumbnailPassword                 string        [thumbnail] Vignet Thumbnail Basic Auth Password ${FIBR_THUMBNAIL_PASSWORD}
+  --thumbnailURL                      string        [thumbnail] Vignet Thumbnail URL ${FIBR_THUMBNAIL_URL} (default "http://vignet:1080")
+  --thumbnailUser                     string        [thumbnail] Vignet Thumbnail Basic Auth User ${FIBR_THUMBNAIL_USER}
   --title                             string        Application title ${FIBR_TITLE} (default "fibr")
   --url                               string        [alcotest] URL to check ${FIBR_URL}
   --userAgent                         string        [alcotest] User-Agent for check ${FIBR_USER_AGENT} (default "Alcotest")
