@@ -133,6 +133,10 @@ func New(ctx context.Context, config *Config, storageService absto.Storage, mete
 			metadata.Tags[index] = unique.Make(tag).Value()
 		}
 
+		for key, value := range metadata.Exif.Data {
+			metadata.Exif.Data[key] = unique.Make(value).Value()
+		}
+
 		return metadata, err
 	}, traceProvider).
 		WithMaxConcurrency(provider.MaxConcurrency).
