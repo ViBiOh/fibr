@@ -134,7 +134,10 @@ func New(ctx context.Context, config *Config, storageService absto.Storage, mete
 		}
 
 		for key, value := range metadata.Exif.Data {
-			metadata.Exif.Data[key] = unique.Make(value).Value()
+			switch value.(type) {
+			case string:
+				metadata.Exif.Data[key] = unique.Make(value).Value()
+			}
 		}
 
 		return metadata, err
