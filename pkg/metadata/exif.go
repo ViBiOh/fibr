@@ -8,6 +8,7 @@ import (
 	"log/slog"
 	"net/http"
 	"strings"
+	"unique"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	exas "github.com/ViBiOh/exas/pkg/model"
@@ -126,7 +127,13 @@ func New(ctx context.Context, config *Config, storageService absto.Storage, mete
 			return provider.Metadata{}, errInvalidItemType
 		}
 
-		return service.loadExif(ctx, item)
+		metadata, err := service.loadExif(ctx, item)
+
+		for index, tag := range metadata.Tags {
+			metadata.Tags[index] = unique.Make(tag).Value()
+		}
+
+		return metadata, err
 	}, traceProvider).
 		WithMaxConcurrency(provider.MaxConcurrency).
 		WithClientSideCaching(ctx, "fibr_exif", provider.MaxClientSideCaching)
