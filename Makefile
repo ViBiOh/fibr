@@ -79,6 +79,7 @@ mocks:
 	go install "go.uber.org/mock/mockgen@latest"
 	find . -name "mocks" -type d -exec rm -r "{}" \+
 	go generate -run mockgen $(PACKAGES)
+	fieldalignment -fix -test=false $(PACKAGES) || true
 
 ## test: Shortcut to launch all the test tasks (unit, functional and integration).
 .PHONY: test
