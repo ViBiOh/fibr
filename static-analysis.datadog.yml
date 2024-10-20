@@ -1,3 +1,4 @@
 ---
 rulesets:
   - docker-best-practices # ensure best practices are followed
+  - go-best-practices # ensure best practices are followed
