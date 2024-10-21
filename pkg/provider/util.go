@@ -46,7 +46,7 @@ var (
 
 	BufferPool = sync.Pool{
 		New: func() any {
-			return bytes.NewBuffer(make([]byte, 4*1024))
+			return bytes.NewBuffer(make([]byte, 32*1024))
 		},
 	}
 
