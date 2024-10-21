@@ -228,7 +228,7 @@ func (s Service) addFileToZip(ctx context.Context, zipWriter *zip.Writer, item a
 		Name:               pathname,
 		UncompressedSize64: uint64(item.Size()),
 		Modified:           item.Date,
-		Method:             zip.Deflate,
+		Method:             zip.Store,
 	}
 	header.SetMode(absto.RegularFilePerm)
 
