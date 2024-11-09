@@ -38,7 +38,9 @@ func (s Service) GetAllMetadataFor(ctx context.Context, items ...absto.Item) (ma
 	ctx, end := telemetry.StartSpan(ctx, s.tracer, "get_all_metadata")
 	defer end(&err)
 
-	exifs, err := s.exifCache.List(ctx, provider.IgnoreNotExistsErr[absto.Item], provider.KeepOnlyFile(items)...)
+	items = provider.KeepOnlyFile(items)
+
+	exifs, err := s.exifCache.List(ctx, provider.IgnoreNotExistsErr[absto.Item], items...)
 	if err != nil {
 		return nil, fmt.Errorf("list: %w", err)
 	}
