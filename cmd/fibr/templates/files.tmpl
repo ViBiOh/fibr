@@ -83,12 +83,14 @@
       .file-download,
       .file-edit,
       .file-delete,
+      .search-delete,
       .file-share {
         display: none;
       }
 
       .file-edit,
       .file-delete,
+      .search-delete,
       .file-share {
         margin-left: 0.5rem;
       }
@@ -96,6 +98,7 @@
       .file:hover .file-download,
       .file:hover .file-edit,
       .file:hover .file-delete,
+      .file:hover .search-delete,
       .file:hover .file-share {
         display: inline-block;
       }
@@ -103,6 +106,7 @@
       .file-download .icon,
       .file-edit .icon,
       .file-delete .icon,
+      .search-delete .icon,
       .file-share .icon {
         margin: 0;
       }
@@ -111,6 +115,7 @@
         .file-download,
         .file-edit,
         .file-delete,
+        .search-delete,
         .file-share {
           display: inline-block;
         }
@@ -123,6 +128,7 @@
       .file-download,
       .file-edit,
       .file-delete,
+      .search-delete,
       .file-share {
         background-color: var(--dark);
         display: none;
@@ -157,8 +163,9 @@
 
       #files > *:hover .file-edit,
       #files > *:hover .file-download,
-      #files > *:hover .file-share,
-      #files > *:hover .file-delete {
+      #files > *:hover .file-delete,
+      #files > *:hover .search-delete,
+      #files > *:hover .file-share {
         display: block;
       }
     {{ end }}
