@@ -150,6 +150,11 @@
         top: 4.5rem;
       }
 
+      .search-delete {
+        right: 0.5rem;
+        top: 0.5rem;
+      }
+
       #files > *:hover .file-edit,
       #files > *:hover .file-download,
       #files > *:hover .file-share,
@@ -218,7 +223,7 @@
             <span class="filename ellipsis {{ if eq $root.Request.Display "list" }}padding-left{{ end }}">{{ .Name }}</span>
 
             {{ if $root.Request.CanEdit }}
-              <a href="#delete-saved-search-modal-{{ .ID }}" class="button button-icon file-delete" title="Delete">
+              <a href="#delete-saved-search-modal-{{ .ID }}" class="button button-icon search-delete" title="Delete">
                 <img class="icon icon-square" src="{{ url "/svg/times?fill=crimson" }}" alt="delete">
               </a>
             {{ end }}
