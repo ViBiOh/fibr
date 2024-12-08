@@ -242,6 +242,7 @@ Usage of fibr:
   --exifPassword                      string        [exif] Exif Tool URL Basic Password ${FIBR_EXIF_PASSWORD}
   --exifURL                           string        [exif] Exif Tool URL (exas) ${FIBR_EXIF_URL} (default "http://exas:1080")
   --exifUser                          string        [exif] Exif Tool URL Basic User ${FIBR_EXIF_USER}
+  --extension                         string        Go Template Extension ${FIBR_EXTENSION} (default "tmpl")
   --frameOptions                      string        [owasp] X-Frame-Options ${FIBR_FRAME_OPTIONS} (default "SAMEORIGIN")
   --graceDuration                     duration      [http] Grace duration when signal received ${FIBR_GRACE_DURATION} (default 30s)
   --hsts                                            [owasp] Indicate Strict Transport Security ${FIBR_HSTS} (default true)
