@@ -3,7 +3,6 @@ package fibr
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 	"path"
 	"strings"
@@ -120,7 +119,7 @@ func (s Service) parseShare(ctx context.Context, request *provider.Request, auth
 
 	request.Share = share
 	request.CanEdit = share.Edit
-	request.Path = strings.TrimPrefix(request.Path, fmt.Sprintf("/%s", share.ID))
+	request.Path = strings.TrimPrefix(request.Path, "/"+share.ID)
 
 	if share.Story {
 		request.Display = provider.StoryDisplay
@@ -128,6 +127,10 @@ func (s Service) parseShare(ctx context.Context, request *provider.Request, auth
 
 	if share.File {
 		request.Path = ""
+	}
+
+	if request.Path == "/" && request.Item == share.ID {
+		request.Item = ""
 	}
 
 	return nil
