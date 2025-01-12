@@ -121,7 +121,6 @@ func (s Service) parseShare(ctx context.Context, request *provider.Request, auth
 	request.Share = share
 	request.CanEdit = share.Edit
 	request.Path = strings.TrimPrefix(request.Path, fmt.Sprintf("/%s", share.ID))
-	request.Item = path.Base(request.Path)
 
 	if share.Story {
 		request.Display = provider.StoryDisplay
