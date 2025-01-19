@@ -8,7 +8,7 @@ import (
 	exas "github.com/ViBiOh/exas/pkg/model"
 )
 
-//go:generate mockgen -source metadata.go -destination ../mocks/metadata.go -package mocks -mock_names MetadataManager=MetadataManager
+//go:generate mockgen -source $GOFILE -destination ../mocks/$GOFILE -package mocks -mock_names MetadataManager=MetadataManager
 
 type ExifResponse struct {
 	Exif exas.Exif  `json:"exif"`

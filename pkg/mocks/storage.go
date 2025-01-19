@@ -22,6 +22,7 @@ import (
 
 // Storage is a mock of Storage interface.
 type Storage struct {
+	isgomock struct{}
 	ctrl     *gomock.Controller
 	recorder *StorageMockRecorder
 }
@@ -44,17 +45,17 @@ func (m *Storage) EXPECT() *StorageMockRecorder {
 }
 
 // ConvertError mocks base method.
-func (m *Storage) ConvertError(arg0 error) error {
+func (m *Storage) ConvertError(err error) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ConvertError", arg0)
+	ret := m.ctrl.Call(m, "ConvertError", err)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // ConvertError indicates an expected call of ConvertError.
-func (mr *StorageMockRecorder) ConvertError(arg0 any) *gomock.Call {
+func (mr *StorageMockRecorder) ConvertError(err any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ConvertError", reflect.TypeOf((*Storage)(nil).ConvertError), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ConvertError", reflect.TypeOf((*Storage)(nil).ConvertError), err)
 }
 
 // Enabled mocks base method.
@@ -72,32 +73,32 @@ func (mr *StorageMockRecorder) Enabled() *gomock.Call {
 }
 
 // List mocks base method.
-func (m *Storage) List(arg0 context.Context, arg1 string) ([]model.Item, error) {
+func (m *Storage) List(ctx context.Context, name string) ([]model.Item, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "List", arg0, arg1)
+	ret := m.ctrl.Call(m, "List", ctx, name)
 	ret0, _ := ret[0].([]model.Item)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // List indicates an expected call of List.
-func (mr *StorageMockRecorder) List(arg0, arg1 any) *gomock.Call {
+func (mr *StorageMockRecorder) List(ctx, name any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*Storage)(nil).List), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*Storage)(nil).List), ctx, name)
 }
 
 // Mkdir mocks base method.
-func (m *Storage) Mkdir(arg0 context.Context, arg1 string, arg2 fs.FileMode) error {
+func (m *Storage) Mkdir(ctx context.Context, name string, perm fs.FileMode) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Mkdir", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "Mkdir", ctx, name, perm)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Mkdir indicates an expected call of Mkdir.
-func (mr *StorageMockRecorder) Mkdir(arg0, arg1, arg2 any) *gomock.Call {
+func (mr *StorageMockRecorder) Mkdir(ctx, name, perm any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Mkdir", reflect.TypeOf((*Storage)(nil).Mkdir), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Mkdir", reflect.TypeOf((*Storage)(nil).Mkdir), ctx, name, perm)
 }
 
 // Name mocks base method.
@@ -115,129 +116,129 @@ func (mr *StorageMockRecorder) Name() *gomock.Call {
 }
 
 // Path mocks base method.
-func (m *Storage) Path(arg0 string) string {
+func (m *Storage) Path(name string) string {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Path", arg0)
+	ret := m.ctrl.Call(m, "Path", name)
 	ret0, _ := ret[0].(string)
 	return ret0
 }
 
 // Path indicates an expected call of Path.
-func (mr *StorageMockRecorder) Path(arg0 any) *gomock.Call {
+func (mr *StorageMockRecorder) Path(name any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Path", reflect.TypeOf((*Storage)(nil).Path), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Path", reflect.TypeOf((*Storage)(nil).Path), name)
 }
 
 // ReadFrom mocks base method.
-func (m *Storage) ReadFrom(arg0 context.Context, arg1 string) (model.ReadAtSeekCloser, error) {
+func (m *Storage) ReadFrom(ctx context.Context, name string) (model.ReadAtSeekCloser, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ReadFrom", arg0, arg1)
+	ret := m.ctrl.Call(m, "ReadFrom", ctx, name)
 	ret0, _ := ret[0].(model.ReadAtSeekCloser)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ReadFrom indicates an expected call of ReadFrom.
-func (mr *StorageMockRecorder) ReadFrom(arg0, arg1 any) *gomock.Call {
+func (mr *StorageMockRecorder) ReadFrom(ctx, name any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReadFrom", reflect.TypeOf((*Storage)(nil).ReadFrom), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReadFrom", reflect.TypeOf((*Storage)(nil).ReadFrom), ctx, name)
 }
 
 // RemoveAll mocks base method.
-func (m *Storage) RemoveAll(arg0 context.Context, arg1 string) error {
+func (m *Storage) RemoveAll(ctx context.Context, name string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RemoveAll", arg0, arg1)
+	ret := m.ctrl.Call(m, "RemoveAll", ctx, name)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // RemoveAll indicates an expected call of RemoveAll.
-func (mr *StorageMockRecorder) RemoveAll(arg0, arg1 any) *gomock.Call {
+func (mr *StorageMockRecorder) RemoveAll(ctx, name any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveAll", reflect.TypeOf((*Storage)(nil).RemoveAll), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveAll", reflect.TypeOf((*Storage)(nil).RemoveAll), ctx, name)
 }
 
 // Rename mocks base method.
-func (m *Storage) Rename(arg0 context.Context, arg1, arg2 string) error {
+func (m *Storage) Rename(ctx context.Context, oldName, newName string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Rename", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "Rename", ctx, oldName, newName)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Rename indicates an expected call of Rename.
-func (mr *StorageMockRecorder) Rename(arg0, arg1, arg2 any) *gomock.Call {
+func (mr *StorageMockRecorder) Rename(ctx, oldName, newName any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Rename", reflect.TypeOf((*Storage)(nil).Rename), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Rename", reflect.TypeOf((*Storage)(nil).Rename), ctx, oldName, newName)
 }
 
 // Stat mocks base method.
-func (m *Storage) Stat(arg0 context.Context, arg1 string) (model.Item, error) {
+func (m *Storage) Stat(ctx context.Context, name string) (model.Item, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Stat", arg0, arg1)
+	ret := m.ctrl.Call(m, "Stat", ctx, name)
 	ret0, _ := ret[0].(model.Item)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Stat indicates an expected call of Stat.
-func (mr *StorageMockRecorder) Stat(arg0, arg1 any) *gomock.Call {
+func (mr *StorageMockRecorder) Stat(ctx, name any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Stat", reflect.TypeOf((*Storage)(nil).Stat), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Stat", reflect.TypeOf((*Storage)(nil).Stat), ctx, name)
 }
 
 // UpdateDate mocks base method.
-func (m *Storage) UpdateDate(arg0 context.Context, arg1 string, arg2 time.Time) error {
+func (m *Storage) UpdateDate(ctx context.Context, name string, date time.Time) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateDate", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "UpdateDate", ctx, name, date)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // UpdateDate indicates an expected call of UpdateDate.
-func (mr *StorageMockRecorder) UpdateDate(arg0, arg1, arg2 any) *gomock.Call {
+func (mr *StorageMockRecorder) UpdateDate(ctx, name, date any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDate", reflect.TypeOf((*Storage)(nil).UpdateDate), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDate", reflect.TypeOf((*Storage)(nil).UpdateDate), ctx, name, date)
 }
 
 // Walk mocks base method.
-func (m *Storage) Walk(arg0 context.Context, arg1 string, arg2 func(model.Item) error) error {
+func (m *Storage) Walk(ctx context.Context, name string, walkFn func(model.Item) error) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Walk", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "Walk", ctx, name, walkFn)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Walk indicates an expected call of Walk.
-func (mr *StorageMockRecorder) Walk(arg0, arg1, arg2 any) *gomock.Call {
+func (mr *StorageMockRecorder) Walk(ctx, name, walkFn any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Walk", reflect.TypeOf((*Storage)(nil).Walk), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Walk", reflect.TypeOf((*Storage)(nil).Walk), ctx, name, walkFn)
 }
 
 // WithIgnoreFn mocks base method.
-func (m *Storage) WithIgnoreFn(arg0 func(model.Item) bool) model.Storage {
+func (m *Storage) WithIgnoreFn(ignoreFn func(model.Item) bool) model.Storage {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "WithIgnoreFn", arg0)
+	ret := m.ctrl.Call(m, "WithIgnoreFn", ignoreFn)
 	ret0, _ := ret[0].(model.Storage)
 	return ret0
 }
 
 // WithIgnoreFn indicates an expected call of WithIgnoreFn.
-func (mr *StorageMockRecorder) WithIgnoreFn(arg0 any) *gomock.Call {
+func (mr *StorageMockRecorder) WithIgnoreFn(ignoreFn any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WithIgnoreFn", reflect.TypeOf((*Storage)(nil).WithIgnoreFn), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WithIgnoreFn", reflect.TypeOf((*Storage)(nil).WithIgnoreFn), ignoreFn)
 }
 
 // WriteTo mocks base method.
-func (m *Storage) WriteTo(arg0 context.Context, arg1 string, arg2 io.Reader, arg3 model.WriteOpts) error {
+func (m *Storage) WriteTo(ctx context.Context, name string, reader io.Reader, opts model.WriteOpts) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "WriteTo", arg0, arg1, arg2, arg3)
+	ret := m.ctrl.Call(m, "WriteTo", ctx, name, reader, opts)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // WriteTo indicates an expected call of WriteTo.
-func (mr *StorageMockRecorder) WriteTo(arg0, arg1, arg2, arg3 any) *gomock.Call {
+func (mr *StorageMockRecorder) WriteTo(ctx, name, reader, opts any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteTo", reflect.TypeOf((*Storage)(nil).WriteTo), arg0, arg1, arg2, arg3)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteTo", reflect.TypeOf((*Storage)(nil).WriteTo), ctx, name, reader, opts)
 }

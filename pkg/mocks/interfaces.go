@@ -24,6 +24,7 @@ import (
 
 // Crud is a mock of Crud interface.
 type Crud struct {
+	isgomock struct{}
 	ctrl     *gomock.Controller
 	recorder *CrudMockRecorder
 }
@@ -110,6 +111,7 @@ func (mr *CrudMockRecorder) Rename(arg0, arg1, arg2 any) *gomock.Call {
 
 // Auth is a mock of Auth interface.
 type Auth struct {
+	isgomock struct{}
 	ctrl     *gomock.Controller
 	recorder *AuthMockRecorder
 }
@@ -163,6 +165,7 @@ func (mr *AuthMockRecorder) IsAuthorized(arg0, arg1 any) *gomock.Call {
 
 // ShareManager is a mock of ShareManager interface.
 type ShareManager struct {
+	isgomock struct{}
 	ctrl     *gomock.Controller
 	recorder *ShareManagerMockRecorder
 }
@@ -257,6 +260,7 @@ func (mr *ShareManagerMockRecorder) UpdatePassword(arg0, arg1, arg2 any) *gomock
 
 // WebhookManager is a mock of WebhookManager interface.
 type WebhookManager struct {
+	isgomock struct{}
 	ctrl     *gomock.Controller
 	recorder *WebhookManagerMockRecorder
 }

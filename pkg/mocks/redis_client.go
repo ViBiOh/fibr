@@ -20,6 +20,7 @@ import (
 
 // RedisClient is a mock of Client interface.
 type RedisClient struct {
+	isgomock struct{}
 	ctrl     *gomock.Controller
 	recorder *RedisClientMockRecorder
 }
@@ -54,10 +55,10 @@ func (mr *RedisClientMockRecorder) Close(arg0 any) *gomock.Call {
 }
 
 // Delete mocks base method.
-func (m *RedisClient) Delete(arg0 context.Context, arg1 ...string) error {
+func (m *RedisClient) Delete(ctx context.Context, keys ...string) error {
 	m.ctrl.T.Helper()
-	varargs := []any{arg0}
-	for _, a := range arg1 {
+	varargs := []any{ctx}
+	for _, a := range keys {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Delete", varargs...)
@@ -66,24 +67,24 @@ func (m *RedisClient) Delete(arg0 context.Context, arg1 ...string) error {
 }
 
 // Delete indicates an expected call of Delete.
-func (mr *RedisClientMockRecorder) Delete(arg0 any, arg1 ...any) *gomock.Call {
+func (mr *RedisClientMockRecorder) Delete(ctx any, keys ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{arg0}, arg1...)
+	varargs := append([]any{ctx}, keys...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*RedisClient)(nil).Delete), varargs...)
 }
 
 // DeletePattern mocks base method.
-func (m *RedisClient) DeletePattern(arg0 context.Context, arg1 string) error {
+func (m *RedisClient) DeletePattern(ctx context.Context, pattern string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeletePattern", arg0, arg1)
+	ret := m.ctrl.Call(m, "DeletePattern", ctx, pattern)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // DeletePattern indicates an expected call of DeletePattern.
-func (mr *RedisClientMockRecorder) DeletePattern(arg0, arg1 any) *gomock.Call {
+func (mr *RedisClientMockRecorder) DeletePattern(ctx, pattern any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeletePattern", reflect.TypeOf((*RedisClient)(nil).DeletePattern), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeletePattern", reflect.TypeOf((*RedisClient)(nil).DeletePattern), ctx, pattern)
 }
 
 // Enabled mocks base method.
@@ -101,25 +102,25 @@ func (mr *RedisClientMockRecorder) Enabled() *gomock.Call {
 }
 
 // Exclusive mocks base method.
-func (m *RedisClient) Exclusive(arg0 context.Context, arg1 string, arg2 time.Duration, arg3 func(context.Context) error) (bool, error) {
+func (m *RedisClient) Exclusive(ctx context.Context, name string, timeout time.Duration, action func(context.Context) error) (bool, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Exclusive", arg0, arg1, arg2, arg3)
+	ret := m.ctrl.Call(m, "Exclusive", ctx, name, timeout, action)
 	ret0, _ := ret[0].(bool)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Exclusive indicates an expected call of Exclusive.
-func (mr *RedisClientMockRecorder) Exclusive(arg0, arg1, arg2, arg3 any) *gomock.Call {
+func (mr *RedisClientMockRecorder) Exclusive(ctx, name, timeout, action any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Exclusive", reflect.TypeOf((*RedisClient)(nil).Exclusive), arg0, arg1, arg2, arg3)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Exclusive", reflect.TypeOf((*RedisClient)(nil).Exclusive), ctx, name, timeout, action)
 }
 
 // Expire mocks base method.
-func (m *RedisClient) Expire(arg0 context.Context, arg1 time.Duration, arg2 ...string) error {
+func (m *RedisClient) Expire(ctx context.Context, ttl time.Duration, keys ...string) error {
 	m.ctrl.T.Helper()
-	varargs := []any{arg0, arg1}
-	for _, a := range arg2 {
+	varargs := []any{ctx, ttl}
+	for _, a := range keys {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Expire", varargs...)
@@ -128,9 +129,9 @@ func (m *RedisClient) Expire(arg0 context.Context, arg1 time.Duration, arg2 ...s
 }
 
 // Expire indicates an expected call of Expire.
-func (mr *RedisClientMockRecorder) Expire(arg0, arg1 any, arg2 ...any) *gomock.Call {
+func (mr *RedisClientMockRecorder) Expire(ctx, ttl any, keys ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{arg0, arg1}, arg2...)
+	varargs := append([]any{ctx, ttl}, keys...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Expire", reflect.TypeOf((*RedisClient)(nil).Expire), varargs...)
 }
 
@@ -149,25 +150,25 @@ func (mr *RedisClientMockRecorder) FlushAll(arg0 any) *gomock.Call {
 }
 
 // Load mocks base method.
-func (m *RedisClient) Load(arg0 context.Context, arg1 string) ([]byte, error) {
+func (m *RedisClient) Load(ctx context.Context, key string) ([]byte, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Load", arg0, arg1)
+	ret := m.ctrl.Call(m, "Load", ctx, key)
 	ret0, _ := ret[0].([]byte)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Load indicates an expected call of Load.
-func (mr *RedisClientMockRecorder) Load(arg0, arg1 any) *gomock.Call {
+func (mr *RedisClientMockRecorder) Load(ctx, key any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Load", reflect.TypeOf((*RedisClient)(nil).Load), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Load", reflect.TypeOf((*RedisClient)(nil).Load), ctx, key)
 }
 
 // LoadMany mocks base method.
-func (m *RedisClient) LoadMany(arg0 context.Context, arg1 ...string) ([]string, error) {
+func (m *RedisClient) LoadMany(ctx context.Context, keys ...string) ([]string, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{arg0}
-	for _, a := range arg1 {
+	varargs := []any{ctx}
+	for _, a := range keys {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "LoadMany", varargs...)
@@ -177,24 +178,24 @@ func (m *RedisClient) LoadMany(arg0 context.Context, arg1 ...string) ([]string, 
 }
 
 // LoadMany indicates an expected call of LoadMany.
-func (mr *RedisClientMockRecorder) LoadMany(arg0 any, arg1 ...any) *gomock.Call {
+func (mr *RedisClientMockRecorder) LoadMany(ctx any, keys ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{arg0}, arg1...)
+	varargs := append([]any{ctx}, keys...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoadMany", reflect.TypeOf((*RedisClient)(nil).LoadMany), varargs...)
 }
 
 // Ping mocks base method.
-func (m *RedisClient) Ping(arg0 context.Context) error {
+func (m *RedisClient) Ping(ctx context.Context) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Ping", arg0)
+	ret := m.ctrl.Call(m, "Ping", ctx)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Ping indicates an expected call of Ping.
-func (mr *RedisClientMockRecorder) Ping(arg0 any) *gomock.Call {
+func (mr *RedisClientMockRecorder) Ping(ctx any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Ping", reflect.TypeOf((*RedisClient)(nil).Ping), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Ping", reflect.TypeOf((*RedisClient)(nil).Ping), ctx)
 }
 
 // Pipeline mocks base method.
@@ -212,112 +213,112 @@ func (mr *RedisClientMockRecorder) Pipeline() *gomock.Call {
 }
 
 // Publish mocks base method.
-func (m *RedisClient) Publish(arg0 context.Context, arg1 string, arg2 any) error {
+func (m *RedisClient) Publish(ctx context.Context, channel string, value any) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Publish", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "Publish", ctx, channel, value)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Publish indicates an expected call of Publish.
-func (mr *RedisClientMockRecorder) Publish(arg0, arg1, arg2 any) *gomock.Call {
+func (mr *RedisClientMockRecorder) Publish(ctx, channel, value any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Publish", reflect.TypeOf((*RedisClient)(nil).Publish), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Publish", reflect.TypeOf((*RedisClient)(nil).Publish), ctx, channel, value)
 }
 
 // PublishJSON mocks base method.
-func (m *RedisClient) PublishJSON(arg0 context.Context, arg1 string, arg2 any) error {
+func (m *RedisClient) PublishJSON(ctx context.Context, channel string, value any) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "PublishJSON", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "PublishJSON", ctx, channel, value)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // PublishJSON indicates an expected call of PublishJSON.
-func (mr *RedisClientMockRecorder) PublishJSON(arg0, arg1, arg2 any) *gomock.Call {
+func (mr *RedisClientMockRecorder) PublishJSON(ctx, channel, value any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PublishJSON", reflect.TypeOf((*RedisClient)(nil).PublishJSON), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PublishJSON", reflect.TypeOf((*RedisClient)(nil).PublishJSON), ctx, channel, value)
 }
 
 // Pull mocks base method.
-func (m *RedisClient) Pull(arg0 context.Context, arg1 string, arg2 func(string, error)) {
+func (m *RedisClient) Pull(ctx context.Context, key string, handler func(string, error)) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "Pull", arg0, arg1, arg2)
+	m.ctrl.Call(m, "Pull", ctx, key, handler)
 }
 
 // Pull indicates an expected call of Pull.
-func (mr *RedisClientMockRecorder) Pull(arg0, arg1, arg2 any) *gomock.Call {
+func (mr *RedisClientMockRecorder) Pull(ctx, key, handler any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Pull", reflect.TypeOf((*RedisClient)(nil).Pull), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Pull", reflect.TypeOf((*RedisClient)(nil).Pull), ctx, key, handler)
 }
 
 // Push mocks base method.
-func (m *RedisClient) Push(arg0 context.Context, arg1 string, arg2 any) error {
+func (m *RedisClient) Push(ctx context.Context, key string, value any) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Push", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "Push", ctx, key, value)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Push indicates an expected call of Push.
-func (mr *RedisClientMockRecorder) Push(arg0, arg1, arg2 any) *gomock.Call {
+func (mr *RedisClientMockRecorder) Push(ctx, key, value any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Push", reflect.TypeOf((*RedisClient)(nil).Push), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Push", reflect.TypeOf((*RedisClient)(nil).Push), ctx, key, value)
 }
 
 // Scan mocks base method.
-func (m *RedisClient) Scan(arg0 context.Context, arg1 string, arg2 chan<- string, arg3 int64) error {
+func (m *RedisClient) Scan(ctx context.Context, pattern string, output chan<- string, pageSize int64) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Scan", arg0, arg1, arg2, arg3)
+	ret := m.ctrl.Call(m, "Scan", ctx, pattern, output, pageSize)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Scan indicates an expected call of Scan.
-func (mr *RedisClientMockRecorder) Scan(arg0, arg1, arg2, arg3 any) *gomock.Call {
+func (mr *RedisClientMockRecorder) Scan(ctx, pattern, output, pageSize any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Scan", reflect.TypeOf((*RedisClient)(nil).Scan), arg0, arg1, arg2, arg3)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Scan", reflect.TypeOf((*RedisClient)(nil).Scan), ctx, pattern, output, pageSize)
 }
 
 // Store mocks base method.
-func (m *RedisClient) Store(arg0 context.Context, arg1 string, arg2 any, arg3 time.Duration) error {
+func (m *RedisClient) Store(ctx context.Context, key string, value any, ttl time.Duration) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Store", arg0, arg1, arg2, arg3)
+	ret := m.ctrl.Call(m, "Store", ctx, key, value, ttl)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Store indicates an expected call of Store.
-func (mr *RedisClientMockRecorder) Store(arg0, arg1, arg2, arg3 any) *gomock.Call {
+func (mr *RedisClientMockRecorder) Store(ctx, key, value, ttl any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Store", reflect.TypeOf((*RedisClient)(nil).Store), arg0, arg1, arg2, arg3)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Store", reflect.TypeOf((*RedisClient)(nil).Store), ctx, key, value, ttl)
 }
 
 // StoreMany mocks base method.
-func (m *RedisClient) StoreMany(arg0 context.Context, arg1 map[string]any, arg2 time.Duration) error {
+func (m *RedisClient) StoreMany(ctx context.Context, values map[string]any, ttl time.Duration) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "StoreMany", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "StoreMany", ctx, values, ttl)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // StoreMany indicates an expected call of StoreMany.
-func (mr *RedisClientMockRecorder) StoreMany(arg0, arg1, arg2 any) *gomock.Call {
+func (mr *RedisClientMockRecorder) StoreMany(ctx, values, ttl any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StoreMany", reflect.TypeOf((*RedisClient)(nil).StoreMany), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StoreMany", reflect.TypeOf((*RedisClient)(nil).StoreMany), ctx, values, ttl)
 }
 
 // Subscribe mocks base method.
-func (m *RedisClient) Subscribe(arg0 context.Context, arg1 string) (<-chan *redis.Message, func(context.Context)) {
+func (m *RedisClient) Subscribe(ctx context.Context, channel string) (<-chan *redis.Message, func(context.Context)) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Subscribe", arg0, arg1)
+	ret := m.ctrl.Call(m, "Subscribe", ctx, channel)
 	ret0, _ := ret[0].(<-chan *redis.Message)
 	ret1, _ := ret[1].(func(context.Context))
 	return ret0, ret1
 }
 
 // Subscribe indicates an expected call of Subscribe.
-func (mr *RedisClientMockRecorder) Subscribe(arg0, arg1 any) *gomock.Call {
+func (mr *RedisClientMockRecorder) Subscribe(ctx, channel any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Subscribe", reflect.TypeOf((*RedisClient)(nil).Subscribe), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Subscribe", reflect.TypeOf((*RedisClient)(nil).Subscribe), ctx, channel)
 }
