@@ -2,8 +2,8 @@ github.com/ViBiOh/ChatPotte v0.7.7 h1:DB6jkor/6l8XIe2obDJMMbEp0GtChzcKlP1JU4TU5U
 github.com/ViBiOh/ChatPotte v0.7.7/go.mod h1:+lKl0aiTgnc5oCNlYwRe7esir4OeorHfFePBEVUHvEE=
 github.com/ViBiOh/absto v1.7.21 h1:vMvZlOw4WWt41Wq6COvy00+wMv4DmKBEXJkSKdVaUEY=
 github.com/ViBiOh/absto v1.7.21/go.mod h1:Kiw+cWeGkxif5dbMsD17+L/rDX/AFBwvfaGcYLQSto0=
-github.com/ViBiOh/auth/v2 v2.20.8 h1:7vshbnjl66ZXJpMwVLQMh6SSLi84IkLJXh3bAdtPKl0=
-github.com/ViBiOh/auth/v2 v2.20.8/go.mod h1:/e5YLjsxghTlydJ13WvlgDT92tX6VRWfJmeXZw5sY/A=
+github.com/ViBiOh/auth/v2 v2.20.9 h1:0cZsYw7lp/kULDM+OMnIBI0VsITp3Kp4SUM010r6DdI=
+github.com/ViBiOh/auth/v2 v2.20.9/go.mod h1:JeCy1K1Tfssg3RgOXX5Nz24KUT3YuqzX5ItBc73ZRCk=
 github.com/ViBiOh/exas v0.8.1 h1:bXrWK99ze7MLMfjD+pp/NHngOSkR1eqcCVWlNNxLT/M=
 github.com/ViBiOh/exas v0.8.1/go.mod h1:aldybvPY4yJQlvUpq6GJluGxH+7prpaJjDQ03t3VvCw=
 github.com/ViBiOh/flags v1.6.0 h1:f69V4ROK5XHAV71cL1yVP2UC/8xKiKJvunvgrtW/qsg=
