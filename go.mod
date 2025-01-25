@@ -6,7 +6,7 @@ toolchain go1.23.0
 
 require (
 	github.com/ViBiOh/ChatPotte v0.7.7
-	github.com/ViBiOh/absto v1.7.21
+	github.com/ViBiOh/absto v1.7.22
 	github.com/ViBiOh/auth/v2 v2.20.9
 	github.com/ViBiOh/exas v0.8.1
 	github.com/ViBiOh/flags v1.6.0
@@ -40,7 +40,7 @@ require (
 	github.com/klauspost/compress v1.17.11 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.9 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
-	github.com/minio/minio-go/v7 v7.0.82 // indirect
+	github.com/minio/minio-go/v7 v7.0.84 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/redis/go-redis/extra/rediscmd/v9 v9.7.0 // indirect
 	github.com/redis/go-redis/extra/redisotel/v9 v9.7.0 // indirect
