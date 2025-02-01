@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: app
-      version: "0.1.2"
+      version: "0.1.7"
       sourceRef:
         kind: HelmRepository
         name: vibioh
@@ -95,3 +95,10 @@ spec:
       allowPrivilegeEscalation: false
     autoscaling:
       enabled: false
+    ingress:
+      enabled: true
+      compress: true
+      tls:
+        enabled: true
+      hosts:
+        - fibr.vibioh.fr
