@@ -5,7 +5,7 @@ go 1.23
 toolchain go1.23.0
 
 require (
-	github.com/ViBiOh/ChatPotte v0.7.7
+	github.com/ViBiOh/ChatPotte v0.8.0
 	github.com/ViBiOh/absto v1.7.23
 	github.com/ViBiOh/auth/v2 v2.20.9
 	github.com/ViBiOh/exas v0.8.1
