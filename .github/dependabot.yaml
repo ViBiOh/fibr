@@ -8,12 +8,16 @@ updates:
     commit-message:
       prefix: ci
       include: scope
+    assignees:
+      - ViBiOh
   - package-ecosystem: gomod
     directory: /
     schedule:
       interval: weekly
-      time: '06:00'
+      time: "06:00"
       day: saturday
     commit-message:
       prefix: chore
       include: scope
+    assignees:
+      - ViBiOh
