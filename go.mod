@@ -2,11 +2,9 @@ module github.com/ViBiOh/fibr
 
 go 1.24
 
-toolchain go1.24.0
-
 require (
 	github.com/ViBiOh/ChatPotte v0.8.0
-	github.com/ViBiOh/absto v1.7.23
+	github.com/ViBiOh/absto v1.7.24
 	github.com/ViBiOh/auth/v2 v2.20.10
 	github.com/ViBiOh/exas v0.8.1
 	github.com/ViBiOh/flags v1.6.0
@@ -37,10 +35,11 @@ require (
 	github.com/goccy/go-json v0.10.5 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.26.3 // indirect
-	github.com/klauspost/compress v1.17.11 // indirect
+	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.10 // indirect
+	github.com/minio/crc64nvme v1.0.1 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
-	github.com/minio/minio-go/v7 v7.0.84 // indirect
+	github.com/minio/minio-go/v7 v7.0.87 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/redis/go-redis/extra/rediscmd/v9 v9.7.1 // indirect
 	github.com/redis/go-redis/extra/redisotel/v9 v9.7.1 // indirect
