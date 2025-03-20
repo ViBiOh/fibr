@@ -73,7 +73,7 @@ func newServices(ctx context.Context, config configuration, clients clients, ada
 
 	output.webhook = webhook.New(config.webhook, adapters.storage, clients.telemetry.MeterProvider(), clients.redis, output.renderer, output.thumbnail, adapters.exclusiveService)
 
-	output.share, err = share.New(config.share, adapters.storage, clients.redis, adapters.exclusiveService)
+	output.share, err = share.New(config.share, clients.telemetry.TracerProvider(), adapters.storage, clients.redis, adapters.exclusiveService)
 	if err != nil {
 		return output, err
 	}

@@ -16,6 +16,7 @@ import (
 	"github.com/ViBiOh/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/cron"
 	"github.com/ViBiOh/httputils/v4/pkg/redis"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type GetNow func() time.Time
@@ -29,6 +30,7 @@ type Service struct {
 	done          chan struct{}
 	shares        map[string]provider.Share
 	clock         GetNow
+	cron          *cron.Cron
 	pubsubChannel string
 	mutex         sync.RWMutex
 }
@@ -45,9 +47,10 @@ func Flags(fs *flag.FlagSet, prefix string) *Config {
 	return &config
 }
 
-func New(config *Config, storageService absto.Storage, redisClient redis.Client, exclusiveService exclusive.Service) (*Service, error) {
+func New(config *Config, tracerProvider trace.TracerProvider, storageService absto.Storage, redisClient redis.Client, exclusiveService exclusive.Service) (*Service, error) {
 	return &Service{
 		clock:         time.Now,
+		cron:          cron.New().WithTracerProvider(tracerProvider),
 		shares:        make(map[string]provider.Share),
 		done:          make(chan struct{}),
 		storage:       storageService,
@@ -99,7 +102,7 @@ func (s *Service) Start(ctx context.Context) {
 
 	go redis.SubscribeFor(ctx, s.redisClient, s.pubsubChannel, s.PubSubHandle)
 
-	purgeCron := cron.New().Each(time.Hour).OnError(func(ctx context.Context, err error) {
+	purgeCron := s.cron.Each(time.Hour).OnError(func(ctx context.Context, err error) {
 		slog.LogAttrs(ctx, slog.LevelError, "purge shares", slog.Any("error", err))
 	}).OnSignal(syscall.SIGUSR1)
 
