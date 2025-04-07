@@ -58,10 +58,13 @@ jobs:
           export GIT_TAG="$(basename ${{ github.ref }})"
           scripts/release.sh build assets clean
       - name: Docker
-        if: env.DOCKER_USER && env.DOCKER_PASS
+        if: env.DOCKER_REGISTRY && env.SCW_SECRET_KEY
         env:
-          DOCKER_USER: ${{ secrets.DOCKER_USER }}
-          DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
+          DOCKER_REGISTRY: ${{ vars.DOCKER_REGISTRY }}
+          DOCKER_NAMESPACE: ${{ vars.DOCKER_NAMESPACE }}
+          SCW_ACCESS_KEY: ${{ secrets.SCW_ACCESS_KEY }}
+          SCW_SECRET_KEY: ${{ secrets.SCW_SECRET_KEY }}
         run: |
           curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap.sh" | bash -s -- "-c" "docker_promote.sh"
-          scripts/docker_promote.sh "${{ env.DOCKER_USER }}/$(make name)" "$(make version-date)" "$(basename ${{ github.ref }})"
+          docker login "${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}" -u nologin --password-stdin <<< "${SCW_SECRET_KEY}"
+          scripts/docker_promote.sh "${DOCKER_NAMESPACE}/$(make name)" "$(make version-date)" "$(basename ${{ github.ref }})"

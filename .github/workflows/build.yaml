@@ -71,22 +71,16 @@ jobs:
           ./scripts/release.sh build
       - name: Setup Docker
         uses: docker/setup-buildx-action@v3
-      - name: Setup DockerHub
-        if: env.DOCKER_USER && env.DOCKER_PASS
-        env:
-          DOCKER_USER: ${{ secrets.DOCKER_USER }}
-          DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USER }}
-          password: ${{ secrets.DOCKER_PASS }}
       - name: Docker
-        if: env.DOCKER_USER && env.DOCKER_PASS
+        if: env.SCW_SECRET_KEY
         env:
-          DOCKER_USER: ${{ secrets.DOCKER_USER }}
-          DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
+          DOCKER_REGISTRY: ${{ vars.DOCKER_REGISTRY }}
+          DOCKER_NAMESPACE: ${{ vars.DOCKER_NAMESPACE }}
+          SCW_SECRET_KEY: ${{ secrets.SCW_SECRET_KEY }}
         run: |
-          RELEASE_NEED_WAIT=true DOCKER_IMAGE="${{ secrets.DOCKER_USER }}/$(make name)" IMAGE_VERSION="$(make version)" GIT_SHA="$(make version-full)" ./scripts/release.sh docker
+          curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap.sh" | bash -s -- "-c" "release.sh"
+          docker login "${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}" -u nologin --password-stdin <<< "${SCW_SECRET_KEY}"
+          RELEASE_NEED_WAIT=true DOCKER_IMAGE="${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/$(make name)" IMAGE_VERSION="$(make version)" GIT_SHA="$(make version-full)" ./scripts/release.sh docker
 
   publish:
     name: Publish
@@ -97,13 +91,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Publish
-        if: env.DOCKER_USER && env.DOCKER_PASS
+        if: env.SCW_SECRET_KEY
         env:
-          DOCKER_USER: ${{ secrets.DOCKER_USER }}
-          DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
+          DOCKER_REGISTRY: ${{ vars.DOCKER_REGISTRY }}
+          DOCKER_NAMESPACE: ${{ vars.DOCKER_NAMESPACE }}
+          SCW_ACCESS_KEY: ${{ secrets.SCW_ACCESS_KEY }}
+          SCW_SECRET_KEY: ${{ secrets.SCW_SECRET_KEY }}
         run: |
           curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap.sh" | bash -s -- "-c" "docker_promote.sh"
-          scripts/docker_promote.sh -d "$(make version-date)" "${{ secrets.DOCKER_USER }}/$(make name)" "$(make version)"
+          docker login "${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}" -u nologin --password-stdin <<< "${SCW_SECRET_KEY}"
+          scripts/docker_promote.sh -d "$(make version-date)" "${DOCKER_NAMESPACE}/$(make name)" "$(make version)"
       - name: Flux
         env:
           FLUX_TOKEN: ${{ secrets.FLUX_TOKEN }}
