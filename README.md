@@ -138,7 +138,7 @@ Users are set with the `-authUsers` option and are in the form `[id]:[login]:[ar
 - `login` is the user for Basic Auth prompt
 - `argon encoded hash` is the password for Basic Auth prompt, [encoded hash with `argon2id`](https://en.wikipedia.org/wiki/Argon2)
 
-You can easily hash your password value with my own [`argon CLI`](https://github.com/ViBiOh/auth/blob/main/cmd/argon/argon.go) or [online](https://argon2.online)
+You can easily hash your password value with my own [`argon CLI`](https://github.com/ViBiOh/auth/blob/main/cmd/argon/argon.go) or [online](https://argon2.online).
 
 ```bash
 argon password
