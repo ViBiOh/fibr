@@ -102,7 +102,7 @@ jobs:
           docker login "${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}" -u nologin --password-stdin <<< "${SCW_SECRET_KEY}"
           scripts/docker_promote.sh -d "$(make version-date)" "${DOCKER_NAMESPACE}/$(make name)" "$(make version)"
       - name: Flux
-        if: emv.FLUX_WEBHOOK_URL
+        if: env.FLUX_WEBHOOK_URL
         env:
           FLUX_TOKEN: ${{ secrets.FLUX_TOKEN }}
           FLUX_WEBHOOK_URL: ${{ secrets.FLUX_WEBHOOK_URL }}
