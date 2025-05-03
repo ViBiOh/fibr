@@ -8,16 +8,16 @@ require (
 	github.com/ViBiOh/auth/v2 v2.20.12
 	github.com/ViBiOh/exas v0.8.1
 	github.com/ViBiOh/flags v1.6.0
-	github.com/ViBiOh/httputils/v4 v4.81.9
+	github.com/ViBiOh/httputils/v4 v4.81.10
 	github.com/ViBiOh/vignet v0.0.1
 	github.com/rabbitmq/amqp091-go v1.10.0
-	github.com/redis/go-redis/v9 v9.7.3
+	github.com/redis/go-redis/v9 v9.8.0
 	github.com/rs/xid v1.6.0
 	github.com/zeebo/xxh3 v1.0.2
 	go.opentelemetry.io/otel v1.35.0
 	go.opentelemetry.io/otel/metric v1.35.0
 	go.opentelemetry.io/otel/trace v1.35.0
-	go.uber.org/mock v0.5.1
+	go.uber.org/mock v0.5.2
 	golang.org/x/crypto v0.37.0
 	golang.org/x/text v0.24.0
 )
@@ -41,9 +41,9 @@ require (
 	github.com/minio/md5-simd v1.1.2 // indirect
 	github.com/minio/minio-go/v7 v7.0.91 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
-	github.com/redis/go-redis/extra/rediscmd/v9 v9.7.3 // indirect
-	github.com/redis/go-redis/extra/redisotel/v9 v9.7.3 // indirect
-	github.com/tdewolff/minify/v2 v2.23.1 // indirect
+	github.com/redis/go-redis/extra/rediscmd/v9 v9.8.0 // indirect
+	github.com/redis/go-redis/extra/redisotel/v9 v9.8.0 // indirect
+	github.com/tdewolff/minify/v2 v2.23.3 // indirect
 	github.com/tdewolff/parse/v2 v2.7.23 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.60.0 // indirect
@@ -57,8 +57,8 @@ require (
 	golang.org/x/net v0.39.0 // indirect
 	golang.org/x/sys v0.32.0 // indirect
 	golang.org/x/term v0.31.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20250409194420-de1ac958c67a // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250409194420-de1ac958c67a // indirect
-	google.golang.org/grpc v1.71.1 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20250428153025-10db94c68c34 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250428153025-10db94c68c34 // indirect
+	google.golang.org/grpc v1.72.0 // indirect
 	google.golang.org/protobuf v1.36.6 // indirect
 )
