@@ -19,7 +19,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.35.0
 	go.uber.org/mock v0.5.2
 	golang.org/x/crypto v0.37.0
-	golang.org/x/text v0.24.0
+	golang.org/x/text v0.25.0
 )
 
 require (
