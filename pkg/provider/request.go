@@ -44,7 +44,7 @@ type DisplayPreferences map[string]Display
 func ParseDisplayPreferences(value string) map[string]Display {
 	output := make(DisplayPreferences)
 
-	for _, part := range strings.Split(value, ",") {
+	for part := range strings.SplitSeq(value, ",") {
 		parts := strings.SplitN(part, preferencesPathSeparator, 2)
 		if len(parts) == 2 {
 			output[parts[0]] = ParseDisplay(parts[1])
