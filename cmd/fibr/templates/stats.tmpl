@@ -106,8 +106,6 @@
           const payload = await response.text();
           throw new Error(`unable to register push: ${payload}`);
         }
-
-        console.log("ok")
       }
 
       async function registerWorker() {
