@@ -9,8 +9,6 @@ self.addEventListener("activate", function (event) {
 self.addEventListener("push", function (event) {
   event.waitUntil(
     self.clients.matchAll().then(function (clientList) {
-      console.log(clientList);
-
       var focused = clientList.some(function (client) {
         return client.focused;
       });
@@ -36,13 +34,11 @@ self.addEventListener("push", function (event) {
 self.addEventListener("notificationclick", function (event) {
   event.waitUntil(
     self.clients.matchAll().then(function (clientList) {
-      console.log(clientList);
-
       if (clientList.length > 0) {
         return clientList[0].focus();
       }
 
-      return self.clients.openWindow("https://ketchup.vibioh.fr");
+      return self.clients.openWindow("https://vibioh.fr");
     }),
   );
 });

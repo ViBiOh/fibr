@@ -17,7 +17,7 @@ func (s Subscription) decodedPublicKey() ([]byte, error) {
 }
 
 func (s Subscription) decodedAuth() ([]byte, error) {
-	return decodeKey(s.PublicKey)
+	return decodeKey(s.Auth)
 }
 
 func decodeKey(key string) ([]byte, error) {

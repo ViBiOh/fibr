@@ -34,7 +34,12 @@ const (
 	defaultTTL    = "259200" // 3 days
 	jwtDuration   = time.Hour * 4
 	saltSize      = 16
-	maxRecordSize = 4096
+	maxRecordSize = uint32(4096)
+)
+
+var (
+	webpushHeader        = []byte("WebPush: info\x00")
+	contentEncryptionKey = []byte("Content-Encoding: aes128gcm\x00")
 )
 
 var (
@@ -150,50 +155,48 @@ func (s *Service) encryptContent(subscription Subscription, content any) ([]byte
 
 	hash := sha256.New
 
-	prkInfoBuf := bytes.NewBuffer([]byte("WebPush: info\x00"))
+	prkInfoBuf := bytes.NewBuffer(webpushHeader)
 	prkInfoBuf.Write(subscriptionPublicKey)
 	prkInfoBuf.Write(localPublicKey)
 
 	prkHKDF := hkdf.New(hash, sharedSecret, subscriptionAuth, prkInfoBuf.Bytes())
-	ikm, err := getHKDFKey(prkHKDF, 32)
+	ikm, err := getFirstBytes(prkHKDF, 32)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get ikm: %w", err)
 	}
 
-	contentEncryptionKeyInfo := []byte("Content-Encoding: aes128gcm\x00")
-	contentHKDF := hkdf.New(hash, ikm, salt, contentEncryptionKeyInfo)
-	contentEncryptionKey, err := getHKDFKey(contentHKDF, 16)
+	contentHKDF := hkdf.New(hash, ikm, salt, contentEncryptionKey)
+	contentEncryptionKey, err := getFirstBytes(contentHKDF, 16)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get encryption key: %w", err)
 	}
 
 	nonceInfo := []byte("Content-Encoding: nonce\x00")
 	nonceHKDF := hkdf.New(hash, ikm, salt, nonceInfo)
-	nonce, err := getHKDFKey(nonceHKDF, 12)
+	nonce, err := getFirstBytes(nonceHKDF, 12)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get nonce: %w", err)
 	}
 
 	block, err := aes.NewCipher(contentEncryptionKey)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("create cipher: %w", err)
 	}
 
 	aesgcm, err := cipher.NewGCM(block)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("create gcm: %w", err)
 	}
 
 	recordLength := int(maxRecordSize) - 16
+	output := bytes.NewBuffer(salt)
 
-	recordBuf := bytes.NewBuffer(salt)
+	recordSize := make([]byte, 4)
+	binary.BigEndian.PutUint32(recordSize, maxRecordSize)
 
-	rs := make([]byte, 4)
-	binary.BigEndian.PutUint32(rs, uint32(maxRecordSize))
-
-	recordBuf.Write(rs)
-	recordBuf.Write([]byte{byte(len(localPublicKey))})
-	recordBuf.Write(localPublicKey)
+	output.Write(recordSize)
+	output.Write([]byte{byte(len(localPublicKey))})
+	output.Write(localPublicKey)
 
 	payload, err := json.Marshal(content)
 	if err != nil {
@@ -201,38 +204,31 @@ func (s *Service) encryptContent(subscription Subscription, content any) ([]byte
 	}
 
 	dataBuf := bytes.NewBuffer(payload)
-
 	dataBuf.Write([]byte("\x02"))
-	if err := pad(dataBuf, recordLength-recordBuf.Len()); err != nil {
+	if err := fillPadding(dataBuf, recordLength-output.Len()); err != nil {
 		return nil, err
 	}
 
 	ciphertext := aesgcm.Seal(nil, nonce, dataBuf.Bytes(), nil)
-	recordBuf.Write(ciphertext)
+	output.Write(ciphertext)
 
-	return recordBuf.Bytes(), nil
+	return output.Bytes(), nil
 }
 
-func getHKDFKey(hkdf io.Reader, length int) ([]byte, error) {
+func getFirstBytes(reader io.Reader, length int) ([]byte, error) {
 	key := make([]byte, length)
-	n, err := io.ReadFull(hkdf, key)
-	if n != len(key) || err != nil {
-		return key, err
-	}
 
-	return key, nil
+	_, err := io.ReadFull(reader, key)
+	return key, err
 }
 
-func pad(payload *bytes.Buffer, maxPadLen int) error {
+func fillPadding(payload *bytes.Buffer, maxPadLen int) error {
 	payloadLen := payload.Len()
 	if payloadLen > maxPadLen {
 		return ErrMaxPadExceeded
 	}
 
-	padLen := maxPadLen - payloadLen
-
-	padding := make([]byte, padLen)
-	payload.Write(padding)
+	payload.Write(make([]byte, maxPadLen-payloadLen))
 
 	return nil
 }
@@ -240,7 +236,7 @@ func pad(payload *bytes.Buffer, maxPadLen int) error {
 func (s *Service) generateJWT(subscription Subscription, duration time.Duration) (string, error) {
 	parsedEndpoint, err := url.Parse(subscription.Endpoint)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("parse endpoint URL: %w", err)
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodES256, jwt.MapClaims{
@@ -249,9 +245,7 @@ func (s *Service) generateJWT(subscription Subscription, duration time.Duration)
 		"sub": "mailto:bob@vibioh.fr",
 	})
 
-	privateKey := s.getPrivateKey()
-
-	jwtString, err := token.SignedString(privateKey)
+	jwtString, err := token.SignedString(s.getPrivateKey())
 	if err != nil {
 		return "", fmt.Errorf("sign with private key: %w", err)
 	}
