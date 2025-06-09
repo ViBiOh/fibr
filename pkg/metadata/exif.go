@@ -76,18 +76,18 @@ func Flags(fs *flag.FlagSet, prefix string) *Config {
 	return &config
 }
 
-func New(ctx context.Context, config *Config, storageService absto.Storage, meterProvider metric.MeterProvider, traceProvider trace.TracerProvider, amqpClient *amqpclient.Client, redisClient redis.Client, exclusiveService exclusive.Service) (Service, error) {
+func New(ctx context.Context, config *Config, storageService absto.Storage, meterProvider metric.MeterProvider, traceProvider trace.TracerProvider, amqpClient *amqpclient.Client, redisClient redis.Client, exclusiveService exclusive.Service) (*Service, error) {
 	var amqpExchange string
 
 	if amqpClient != nil {
 		amqpExchange = config.AmqpExchange
 
 		if err := amqpClient.Publisher(amqpExchange, "direct", nil); err != nil {
-			return Service{}, fmt.Errorf("configure amqp: %w", err)
+			return nil, fmt.Errorf("configure amqp: %w", err)
 		}
 	}
 
-	service := Service{
+	service := &Service{
 		exifRequest:  request.New().URL(config.ExifURL).BasicAuth(config.ExifUser, config.ExifPass),
 		directAccess: config.DirectAccess,
 		maxSize:      config.MaxSize,
@@ -158,7 +158,7 @@ func New(ctx context.Context, config *Config, storageService absto.Storage, mete
 	return service, nil
 }
 
-func (s Service) ListDir(ctx context.Context, item absto.Item) ([]absto.Item, error) {
+func (s *Service) ListDir(ctx context.Context, item absto.Item) ([]absto.Item, error) {
 	if !item.IsDir() {
 		return nil, nil
 	}
@@ -170,11 +170,11 @@ func (s Service) ListDir(ctx context.Context, item absto.Item) ([]absto.Item, er
 	return exifs, nil
 }
 
-func (s Service) enabled() bool {
+func (s *Service) enabled() bool {
 	return !s.exifRequest.IsZero()
 }
 
-func (s Service) extractAndSaveExif(ctx context.Context, item absto.Item) (provider.Metadata, error) {
+func (s *Service) extractAndSaveExif(ctx context.Context, item absto.Item) (provider.Metadata, error) {
 	exif, err := s.extractExif(ctx, item)
 	if err != nil {
 		return provider.Metadata{}, fmt.Errorf("extract exif: %w", err)
@@ -183,7 +183,7 @@ func (s Service) extractAndSaveExif(ctx context.Context, item absto.Item) (provi
 	return s.Update(ctx, item, provider.ReplaceExif(exif))
 }
 
-func (s Service) extractExif(ctx context.Context, item absto.Item) (exif exas.Exif, err error) {
+func (s *Service) extractExif(ctx context.Context, item absto.Item) (exif exas.Exif, err error) {
 	var resp *http.Response
 
 	s.increaseExif(ctx, "request")
@@ -208,7 +208,7 @@ func (s Service) extractExif(ctx context.Context, item absto.Item) (exif exas.Ex
 	return
 }
 
-func (s Service) publishExifRequest(ctx context.Context, item absto.Item) error {
+func (s *Service) publishExifRequest(ctx context.Context, item absto.Item) error {
 	s.increaseExif(ctx, "publish")
 
 	return s.amqpClient.PublishJSON(ctx, item, s.amqpExchange, s.amqpRoutingKey)

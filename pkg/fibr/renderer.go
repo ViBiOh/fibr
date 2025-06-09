@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"slices"
 	"strings"
 
 	"github.com/ViBiOh/auth/v2/pkg/middleware"
@@ -32,13 +33,7 @@ var FuncMap = template.FuncMap{
 		return a + b
 	},
 	"contains": func(arr []string, value string) bool {
-		for _, item := range arr {
-			if item == value {
-				return true
-			}
-		}
-
-		return false
+		return slices.Contains(arr, value)
 	},
 	"iconFromExtension": func(file provider.RenderItem) string {
 		switch {

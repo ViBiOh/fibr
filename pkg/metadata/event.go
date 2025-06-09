@@ -10,7 +10,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/cache"
 )
 
-func (s Service) EventConsumer(ctx context.Context, e provider.Event) {
+func (s *Service) EventConsumer(ctx context.Context, e provider.Event) {
 	if !s.enabled() {
 		return
 	}
@@ -50,7 +50,7 @@ func (s Service) EventConsumer(ctx context.Context, e provider.Event) {
 	}
 }
 
-func (s Service) Rename(ctx context.Context, old, new absto.Item) error {
+func (s *Service) Rename(ctx context.Context, old, new absto.Item) error {
 	if err := s.storage.Rename(ctx, Path(old), Path(new)); err != nil && !absto.IsNotExist(err) {
 		return fmt.Errorf("rename exif: %w", err)
 	}
@@ -66,7 +66,7 @@ func getEventLogger(item absto.Item) *slog.Logger {
 	return slog.With("fn", "exif.EventConsumer").With("item", item.Pathname)
 }
 
-func (s Service) handleStartEvent(ctx context.Context, event provider.Event) error {
+func (s *Service) handleStartEvent(ctx context.Context, event provider.Event) error {
 	forced := event.IsForcedFor("exif")
 
 	if event.GetMetadata("force") == "cache" {
@@ -96,7 +96,7 @@ func (s Service) handleStartEvent(ctx context.Context, event provider.Event) err
 	return s.handleUploadEvent(ctx, item, false)
 }
 
-func (s Service) handleUploadEvent(ctx context.Context, item absto.Item, aggregate bool) error {
+func (s *Service) handleUploadEvent(ctx context.Context, item absto.Item, aggregate bool) error {
 	if !s.CanHaveExif(item) {
 		slog.LogAttrs(ctx, slog.LevelDebug, "can't have exif", slog.String("item", item.Pathname))
 		return nil
@@ -118,7 +118,7 @@ func (s Service) handleUploadEvent(ctx context.Context, item absto.Item, aggrega
 	return s.processMetadata(ctx, item, metadata, aggregate)
 }
 
-func (s Service) processMetadata(ctx context.Context, item absto.Item, exif provider.Metadata, aggregate bool) error {
+func (s *Service) processMetadata(ctx context.Context, item absto.Item, exif provider.Metadata, aggregate bool) error {
 	if err := s.updateDate(ctx, item, exif); err != nil {
 		return fmt.Errorf("update date: %w", err)
 	}
@@ -134,7 +134,7 @@ func (s Service) processMetadata(ctx context.Context, item absto.Item, exif prov
 	return nil
 }
 
-func (s Service) aggregateOnRename(ctx context.Context, old, new absto.Item) error {
+func (s *Service) aggregateOnRename(ctx context.Context, old, new absto.Item) error {
 	oldDir, err := s.getDirOf(ctx, old)
 	if err != nil {
 		return fmt.Errorf("get old directory: %w", err)
@@ -160,7 +160,7 @@ func (s Service) aggregateOnRename(ctx context.Context, old, new absto.Item) err
 	return nil
 }
 
-func (s Service) delete(ctx context.Context, item absto.Item) error {
+func (s *Service) delete(ctx context.Context, item absto.Item) error {
 	if err := s.storage.RemoveAll(ctx, Path(item)); err != nil {
 		return fmt.Errorf("delete: %w", err)
 	}

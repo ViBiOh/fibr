@@ -9,6 +9,7 @@ import (
 	basicMemory "github.com/ViBiOh/auth/v2/pkg/store/memory"
 	"github.com/ViBiOh/fibr/pkg/crud"
 	"github.com/ViBiOh/fibr/pkg/metadata"
+	"github.com/ViBiOh/fibr/pkg/push"
 	"github.com/ViBiOh/fibr/pkg/sanitizer"
 	"github.com/ViBiOh/fibr/pkg/share"
 	"github.com/ViBiOh/fibr/pkg/storage"
@@ -53,6 +54,7 @@ type configuration struct {
 	thumbnail *thumbnail.Config
 	webhook   *webhook.Config
 	share     *share.Config
+	push      *push.Config
 
 	disableAuth           bool
 	disableStorageTracing bool
@@ -70,7 +72,7 @@ func newConfig() configuration {
 		health:    health.Flags(fs, ""),
 
 		server:   server.Flags(fs, "", flags.NewOverride("ReadTimeout", time.Minute*2), flags.NewOverride("WriteTimeout", time.Minute*2)),
-		owasp:    owasp.Flags(fs, "", flags.NewOverride("FrameOptions", "SAMEORIGIN"), flags.NewOverride("Csp", "default-src 'self'; base-uri 'self'; script-src 'self' 'httputils-nonce' unpkg.com/webp-hero@0.0.2/dist-cjs/ unpkg.com/leaflet@1.9.4/dist/ unpkg.com/leaflet.markercluster@1.5.1/ cdn.jsdelivr.net/npm/pdfjs-dist@5.3.31/; style-src 'self' 'httputils-nonce' unpkg.com/leaflet@1.9.4/dist/ unpkg.com/leaflet.markercluster@1.5.1/; img-src 'self' data: a.tile.openstreetmap.org b.tile.openstreetmap.org c.tile.openstreetmap.org; worker-src blob:")),
+		owasp:    owasp.Flags(fs, "", flags.NewOverride("FrameOptions", "SAMEORIGIN"), flags.NewOverride("Csp", "default-src 'self'; base-uri 'self'; script-src 'self' 'httputils-nonce' unpkg.com/webp-hero@0.0.2/dist-cjs/ unpkg.com/leaflet@1.9.4/dist/ unpkg.com/leaflet.markercluster@1.5.1/ cdn.jsdelivr.net/npm/pdfjs-dist@5.3.31/; style-src 'self' 'httputils-nonce' unpkg.com/leaflet@1.9.4/dist/ unpkg.com/leaflet.markercluster@1.5.1/; img-src 'self' data: a.tile.openstreetmap.org b.tile.openstreetmap.org c.tile.openstreetmap.org; worker-src 'self' blob:")),
 		renderer: renderer.Flags(fs, "", flags.NewOverride("PublicURL", "http://localhost:1080"), flags.NewOverride("Title", "fibr")),
 
 		basic:         basicMemory.Flags(fs, "auth", flags.NewOverride("Profiles", []string{"1:admin"})),
@@ -87,6 +89,7 @@ func newConfig() configuration {
 		thumbnail: thumbnail.Flags(fs, "thumbnail"),
 		webhook:   webhook.Flags(fs, "webhook"),
 		share:     share.Flags(fs, "share"),
+		push:      push.Flags(fs, "push"),
 	}
 
 	flags.New("NoAuth", "Disable basic authentification").DocPrefix("auth").BoolVar(fs, &config.disableAuth, false, nil)

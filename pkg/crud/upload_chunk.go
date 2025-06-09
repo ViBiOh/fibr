@@ -17,7 +17,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
 )
 
-func (s Service) uploadChunk(w http.ResponseWriter, r *http.Request, request provider.Request, fileName, chunkNumber string, file io.Reader) {
+func (s *Service) uploadChunk(w http.ResponseWriter, r *http.Request, request provider.Request, fileName, chunkNumber string, file io.Reader) {
 	ctx := r.Context()
 
 	if file == nil {
@@ -61,7 +61,7 @@ func (s Service) uploadChunk(w http.ResponseWriter, r *http.Request, request pro
 	w.WriteHeader(http.StatusAccepted)
 }
 
-func (s Service) mergeChunk(w http.ResponseWriter, r *http.Request, request provider.Request, fileName, filePath string, size int64) {
+func (s *Service) mergeChunk(w http.ResponseWriter, r *http.Request, request provider.Request, fileName, filePath string, size int64) {
 	var err error
 
 	ctx, end := telemetry.StartSpan(r.Context(), s.tracer, "merge_chunk")
@@ -103,7 +103,7 @@ func (s Service) mergeChunk(w http.ResponseWriter, r *http.Request, request prov
 	s.postUpload(w, r, request, fileName)
 }
 
-func (s Service) mergeChunkFiles(ctx context.Context, directory, destination string) error {
+func (s *Service) mergeChunkFiles(ctx context.Context, directory, destination string) error {
 	writer, err := os.OpenFile(destination, os.O_RDWR|os.O_CREATE|os.O_TRUNC, absto.RegularFilePerm)
 	if err != nil {
 		return fmt.Errorf("open destination file `%s`: %w", destination, err)

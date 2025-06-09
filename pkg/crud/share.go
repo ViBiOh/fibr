@@ -14,7 +14,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
-func (s Service) bestSharePath(pathname string) string {
+func (s *Service) bestSharePath(pathname string) string {
 	var remainingPath string
 	var bestShare provider.Share
 
@@ -62,7 +62,7 @@ func parseRights(value string) (edit, story bool, err error) {
 	}
 }
 
-func (s Service) createShare(w http.ResponseWriter, r *http.Request, request provider.Request) {
+func (s *Service) createShare(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	var err error
 
 	edit, story, err := parseRights(strings.TrimSpace(r.FormValue("rights")))
@@ -121,7 +121,7 @@ func (s Service) createShare(w http.ResponseWriter, r *http.Request, request pro
 	s.renderer.Redirect(w, r, fmt.Sprintf("%s/?d=%s#share-list", redirection, request.LayoutPath(redirection)), renderer.NewSuccessMessage("Share successfully created with ID: %s", id))
 }
 
-func (s Service) deleteShare(w http.ResponseWriter, r *http.Request, request provider.Request) {
+func (s *Service) deleteShare(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	ctx := r.Context()
 	id := r.FormValue("id")
 

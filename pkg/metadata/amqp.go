@@ -11,7 +11,7 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
-func (s Service) AMQPHandler(ctx context.Context, message amqp.Delivery) error {
+func (s *Service) AMQPHandler(ctx context.Context, message amqp.Delivery) error {
 	var err error
 
 	ctx, end := telemetry.StartSpan(ctx, s.tracer, "amqp")

@@ -128,6 +128,13 @@ Fibr provides [OpenGraph metadatas](https://ogp.me) to have nice preview of link
 
 ![](docs/opengraph.png)
 
+### Push notification
+
+```bash
+npm install web-push -g
+web-push generate-vapid-keys
+```
+
 ### Users
 
 You can start `fibr` with no user, with the `-noAuth` option. Although available, I don't recommend using it in public Internet. Anybody has access to the _root folder_ for viewing, uploading, deleting or sharing content with anybody.

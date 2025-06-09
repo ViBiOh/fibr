@@ -54,11 +54,16 @@ func parseMultipart(r *http.Request) (map[string]string, *multipart.Part, error)
 	}
 }
 
-func (s Service) Post(w http.ResponseWriter, r *http.Request, request provider.Request) {
+func (s *Service) Post(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	contentType := r.Header.Get("Content-Type")
 
 	if query.GetBool(r, "thumbnail") {
 		s.thumbnail.Save(w, r, request)
+		return
+	}
+
+	if query.GetBool(r, "push") {
+		s.pushService.Handle(w, r, request)
 		return
 	}
 
@@ -75,7 +80,7 @@ func (s Service) Post(w http.ResponseWriter, r *http.Request, request provider.R
 	s.error(w, r, request, model.WrapMethodNotAllowed(fmt.Errorf("unknown content-type %s", contentType)))
 }
 
-func (s Service) handleFormURLEncoded(w http.ResponseWriter, r *http.Request, request provider.Request) {
+func (s *Service) handleFormURLEncoded(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	ctx := r.Context()
 	method := r.FormValue("method")
 
@@ -97,7 +102,7 @@ func (s Service) handleFormURLEncoded(w http.ResponseWriter, r *http.Request, re
 	}
 }
 
-func (s Service) handleMultipart(w http.ResponseWriter, r *http.Request, request provider.Request) {
+func (s *Service) handleMultipart(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	ctx := r.Context()
 
 	if !request.CanEdit {
@@ -159,7 +164,7 @@ func (s Service) handleMultipart(w http.ResponseWriter, r *http.Request, request
 	}
 }
 
-func (s Service) handlePostShare(w http.ResponseWriter, r *http.Request, request provider.Request, method string) {
+func (s *Service) handlePostShare(w http.ResponseWriter, r *http.Request, request provider.Request, method string) {
 	if !request.CanShare {
 		s.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
 		return
@@ -175,7 +180,7 @@ func (s Service) handlePostShare(w http.ResponseWriter, r *http.Request, request
 	}
 }
 
-func (s Service) handlePostWebhook(w http.ResponseWriter, r *http.Request, request provider.Request, method string) {
+func (s *Service) handlePostWebhook(w http.ResponseWriter, r *http.Request, request provider.Request, method string) {
 	if !request.CanWebhook {
 		s.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
 		return
@@ -191,7 +196,7 @@ func (s Service) handlePostWebhook(w http.ResponseWriter, r *http.Request, reque
 	}
 }
 
-func (s Service) handlePostDescription(w http.ResponseWriter, r *http.Request, request provider.Request) {
+func (s *Service) handlePostDescription(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !request.CanEdit {
 		s.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
 		return
@@ -223,7 +228,7 @@ func (s Service) handlePostDescription(w http.ResponseWriter, r *http.Request, r
 	s.renderer.Redirect(w, r, fmt.Sprintf("?d=%s#%s", request.Display, item.ID), renderer.NewSuccessMessage("Description successfully edited"))
 }
 
-func (s Service) handlePost(w http.ResponseWriter, r *http.Request, request provider.Request, method string) {
+func (s *Service) handlePost(w http.ResponseWriter, r *http.Request, request provider.Request, method string) {
 	if !request.CanEdit {
 		s.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
 		return

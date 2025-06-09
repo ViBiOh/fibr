@@ -14,7 +14,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-func (s Service) story(r *http.Request, request provider.Request, item absto.Item, files []absto.Item) (renderer.Page, error) {
+func (s *Service) story(r *http.Request, request provider.Request, item absto.Item, files []absto.Item) (renderer.Page, error) {
 	ctx, end := telemetry.StartSpan(r.Context(), s.tracer, "story", trace.WithAttributes(attribute.String("item", item.Pathname)))
 	defer end(nil)
 

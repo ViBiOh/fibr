@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"embed"
+	"errors"
 	"log/slog"
 	"os"
 
@@ -13,6 +14,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/fibr"
 	"github.com/ViBiOh/fibr/pkg/metadata"
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/fibr/pkg/push"
 	"github.com/ViBiOh/fibr/pkg/sanitizer"
 	"github.com/ViBiOh/fibr/pkg/search"
 	"github.com/ViBiOh/fibr/pkg/share"
@@ -40,7 +42,7 @@ type services struct {
 	amqpThumbnail *amqphandler.Service
 	amqpExif      *amqphandler.Service
 	sanitizer     sanitizer.Service
-	metadata      metadata.Service
+	metadata      *metadata.Service
 	thumbnail     thumbnail.Service
 }
 
@@ -88,9 +90,14 @@ func newServices(ctx context.Context, config configuration, clients clients, ada
 		return output, err
 	}
 
+	pushService, err := push.New(config.push, adapters.storage, adapters.exclusiveService)
+	if err != nil && !errors.Is(err, push.ErrNoConfig) {
+		return output, err
+	}
+
 	searchService := search.New(adapters.filteredStorage, output.thumbnail, output.metadata, adapters.exclusiveService, clients.telemetry.TracerProvider())
 
-	crudService, err := crud.New(config.crud, adapters.storage, adapters.filteredStorage, output.renderer, output.share, output.webhook, output.thumbnail, output.metadata, searchService, output.eventBus.Push, clients.telemetry.TracerProvider())
+	crudService, err := crud.New(config.crud, adapters.storage, adapters.filteredStorage, output.renderer, output.share, output.webhook, output.thumbnail, output.metadata, searchService, pushService, output.eventBus.Push, clients.telemetry.TracerProvider())
 	if err != nil {
 		return output, err
 	}
@@ -102,7 +109,7 @@ func newServices(ctx context.Context, config configuration, clients clients, ada
 		middlewareService = newLoginService(clients.telemetry.TracerProvider(), config.basic)
 	}
 
-	output.fibr = fibr.New(&crudService, output.renderer, output.share, output.webhook, middlewareService)
+	output.fibr = fibr.New(crudService, output.renderer, output.share, output.webhook, middlewareService)
 
 	return output, nil
 }

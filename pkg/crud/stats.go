@@ -15,7 +15,7 @@ type entry struct {
 	Key   string
 }
 
-func (s Service) stats(r *http.Request, request provider.Request, message renderer.Message) (renderer.Page, error) {
+func (s *Service) stats(r *http.Request, request provider.Request, message renderer.Message) (renderer.Page, error) {
 	ctx := r.Context()
 	pathname := request.Filepath()
 
@@ -36,14 +36,15 @@ func (s Service) stats(r *http.Request, request provider.Request, message render
 	}
 
 	return renderer.NewPage("stats", http.StatusOK, map[string]any{
-		"Paths":   getPathParts(request),
-		"Request": request,
-		"Message": message,
-		"Stats":   entries,
+		"Paths":    getPathParts(request),
+		"Request":  request,
+		"Message":  message,
+		"Stats":    entries,
+		"VapidKey": s.pushService.GetPublicKey(),
 	}), nil
 }
 
-func (s Service) computeStats(ctx context.Context, pathname string) (map[string]uint64, error) {
+func (s *Service) computeStats(ctx context.Context, pathname string) (map[string]uint64, error) {
 	var filesCount, directoriesCount, filesSize, metadataSize uint64
 
 	err := s.storage.Walk(ctx, pathname, func(item absto.Item) error {

@@ -9,7 +9,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
-func (s Service) CanHaveExif(item absto.Item) bool {
+func (s *Service) CanHaveExif(item absto.Item) bool {
 	return provider.ThumbnailExtensions[item.Extension] && (s.maxSize == 0 || item.Size() < s.maxSize || s.directAccess)
 }
 
@@ -21,7 +21,7 @@ func Path(item absto.Item) string {
 	return fmt.Sprintf("%s%s.json", provider.MetadataDirectory(item), item.ID)
 }
 
-func (s Service) hasMetadata(ctx context.Context, item absto.Item) bool {
+func (s *Service) hasMetadata(ctx context.Context, item absto.Item) bool {
 	if item.IsDir() {
 		_, err := s.GetAggregateFor(ctx, item)
 		return err == nil
@@ -35,11 +35,11 @@ func (s Service) hasMetadata(ctx context.Context, item absto.Item) bool {
 	return data.HasData()
 }
 
-func (s Service) loadExif(ctx context.Context, item absto.Item) (provider.Metadata, error) {
+func (s *Service) loadExif(ctx context.Context, item absto.Item) (provider.Metadata, error) {
 	return loadMetadata[provider.Metadata](ctx, s.storage, item)
 }
 
-func (s Service) loadAggregate(ctx context.Context, item absto.Item) (provider.Aggregate, error) {
+func (s *Service) loadAggregate(ctx context.Context, item absto.Item) (provider.Aggregate, error) {
 	return loadMetadata[provider.Aggregate](ctx, s.storage, item)
 }
 
@@ -47,7 +47,7 @@ func loadMetadata[T any](ctx context.Context, storageService absto.Storage, item
 	return provider.LoadJSON[T](ctx, storageService, Path(item))
 }
 
-func (s Service) saveMetadata(ctx context.Context, item absto.Item, data any) error {
+func (s *Service) saveMetadata(ctx context.Context, item absto.Item, data any) error {
 	filename := Path(item)
 	dirname := filepath.Dir(filename)
 

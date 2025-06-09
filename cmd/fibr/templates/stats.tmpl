@@ -46,5 +46,96 @@
     </form>
   {{ end }}
 
+  <a id="service-worker">Register service worker</a>
+
+  <script type="text/javascript" nonce="{{ .nonce }}">
+    const serviceWorkerBtn = document.getElementById("service-worker");
+    console.log(serviceWorkerBtn);
+
+    if (serviceWorkerBtn) {
+      function generateKey(keyName, subscription) {
+        var rawKey;
+        rawKey = subscription.getKey ? subscription.getKey(keyName) : "";
+        return rawKey
+          ? btoa(String.fromCharCode.apply(null, new Uint8Array(rawKey)))
+          : "";
+      }
+
+      function urlBase64ToUint8Array(base64String) {
+        var padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+        var base64 = (base64String + padding)
+          .replace(/\-/g, "+")
+          .replace(/_/g, "/");
+
+        var rawData = window.atob(base64);
+        var outputArray = new Uint8Array(rawData.length);
+
+        for (var i = 0; i < rawData.length; ++i) {
+          outputArray[i] = rawData.charCodeAt(i);
+        }
+
+        return outputArray;
+      }
+
+      async function generatePublicKey(subscription) {
+        return generateKey("p256dh", subscription);
+      }
+
+      async function generateAuthKey(subscription) {
+        return generateKey("auth", subscription);
+      }
+
+      async function registerPush(subscription) {
+        const publicKey = await generatePublicKey(subscription);
+        const authKey = await generateAuthKey(subscription);
+
+        const response = await fetch("?push", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            endpoint: subscription.endpoint,
+            publicKey: publicKey,
+            auth: authKey
+          })
+        });
+
+        if (response.status >= 400) {
+          const payload = await response.text();
+          throw new Error(`unable to register push: ${payload}`);
+        }
+
+        console.log("ok")
+      }
+
+      async function registerWorker() {
+        navigator.serviceWorker.register("/service-worker.js", {
+          scope: "/",
+        });
+
+        const registration = await navigator.serviceWorker.ready;
+
+        let subscription = await registration.pushManager.getSubscription();
+        if (!subscription) {
+          subscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array("{{ .VapidKey }}"),
+          });
+        }
+
+        const result = await registerPush(subscription);
+        console.log("result", typeof result, result);
+      }
+
+      if ("serviceWorker" in navigator) {
+        serviceWorkerBtn.addEventListener("click", registerWorker);
+      } else {
+        console.error("Service workers are not supported");
+      }
+    }
+  </script>
+
   {{ template "footer" . }}
 {{ end }}

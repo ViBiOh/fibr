@@ -11,7 +11,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
-func (s Service) Delete(w http.ResponseWriter, r *http.Request, request provider.Request) {
+func (s *Service) Delete(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !request.CanEdit {
 		s.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
 		return
@@ -52,7 +52,7 @@ func (s Service) Delete(w http.ResponseWriter, r *http.Request, request provider
 	s.renderer.Redirect(w, r, fmt.Sprintf("?d=%s", request.Display), renderer.NewSuccessMessage("%s successfully deleted", info.Name()))
 }
 
-func (s Service) DeleteSavedSearch(w http.ResponseWriter, r *http.Request, request provider.Request) {
+func (s *Service) DeleteSavedSearch(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !request.CanEdit {
 		s.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
 		return

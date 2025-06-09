@@ -15,7 +15,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-func (s Service) browse(ctx context.Context, request provider.Request, item absto.Item, message renderer.Message) (renderer.Page, error) {
+func (s *Service) browse(ctx context.Context, request provider.Request, item absto.Item, message renderer.Message) (renderer.Page, error) {
 	ctx, end := telemetry.StartSpan(ctx, s.tracer, "browse", trace.WithSpanKind(trace.SpanKindInternal))
 	defer end(nil)
 
@@ -66,7 +66,7 @@ func (s Service) browse(ctx context.Context, request provider.Request, item abst
 	}), nil
 }
 
-func (s Service) getFilesPreviousAndNext(ctx context.Context, item absto.Item, request provider.Request) (items []absto.Item, previous provider.RenderItem, next provider.RenderItem) {
+func (s *Service) getFilesPreviousAndNext(ctx context.Context, item absto.Item, request provider.Request) (items []absto.Item, previous provider.RenderItem, next provider.RenderItem) {
 	ctx, end := telemetry.StartSpan(ctx, s.tracer, "get_previous_next", trace.WithSpanKind(trace.SpanKindInternal))
 	defer end(nil)
 

@@ -26,7 +26,7 @@ func (c cover) IsZero() bool {
 	return c.Img.IsZero()
 }
 
-func (s Service) getCover(ctx context.Context, request provider.Request, files []absto.Item) (output cover) {
+func (s *Service) getCover(ctx context.Context, request provider.Request, files []absto.Item) (output cover) {
 	for _, file := range files {
 		if s.thumbnail.HasThumbnail(ctx, file, thumbnail.SmallSize) {
 			output = newCover(provider.StorageToRender(file, request), thumbnail.SmallSize)

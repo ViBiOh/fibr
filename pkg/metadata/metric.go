@@ -7,7 +7,7 @@ import (
 	"go.opentelemetry.io/otel/metric"
 )
 
-func (s Service) increaseExif(ctx context.Context, state string) {
+func (s *Service) increaseExif(ctx context.Context, state string) {
 	if s.exifMetric == nil {
 		return
 	}
@@ -15,7 +15,7 @@ func (s Service) increaseExif(ctx context.Context, state string) {
 	s.exifMetric.Add(ctx, 1, metric.WithAttributes(attribute.String("state", state)))
 }
 
-func (s Service) increaseAggregate(ctx context.Context, state string) {
+func (s *Service) increaseAggregate(ctx context.Context, state string) {
 	if s.aggregateMetric == nil {
 		return
 	}

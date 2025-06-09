@@ -27,7 +27,7 @@ func listLogger(pathname string) *slog.Logger {
 	return slog.With("fn", "crud.list").With("item", pathname)
 }
 
-func (s Service) list(ctx context.Context, request provider.Request, message renderer.Message, item absto.Item, files []absto.Item) (renderer.Page, error) {
+func (s *Service) list(ctx context.Context, request provider.Request, message renderer.Message, item absto.Item, files []absto.Item) (renderer.Page, error) {
 	ctx, end := telemetry.StartSpan(ctx, s.tracer, "list", trace.WithAttributes(attribute.String("item", item.Pathname)))
 	defer end(nil)
 
@@ -138,7 +138,7 @@ func (s Service) list(ctx context.Context, request provider.Request, message ren
 	return renderer.NewPage("files", http.StatusOK, content), nil
 }
 
-func (s Service) enrichThumbnail(ctx context.Context, directoryAggregate provider.Aggregate, items []provider.RenderItem, thumbnails map[string]absto.Item) (hasThumbnail bool, hasStory bool, cover cover) {
+func (s *Service) enrichThumbnail(ctx context.Context, directoryAggregate provider.Aggregate, items []provider.RenderItem, thumbnails map[string]absto.Item) (hasThumbnail bool, hasStory bool, cover cover) {
 	for index, item := range items {
 		if _, ok := thumbnails[s.thumbnail.Path(item.Item)]; !ok {
 			continue
@@ -160,7 +160,7 @@ func (s Service) enrichThumbnail(ctx context.Context, directoryAggregate provide
 	return
 }
 
-func (s Service) Download(w http.ResponseWriter, r *http.Request, request provider.Request, items []absto.Item) {
+func (s *Service) Download(w http.ResponseWriter, r *http.Request, request provider.Request, items []absto.Item) {
 	zipWriter := zip.NewWriter(w)
 
 	ctx := r.Context()
@@ -183,7 +183,7 @@ func (s Service) Download(w http.ResponseWriter, r *http.Request, request provid
 	}
 }
 
-func (s Service) zipItems(ctx context.Context, done <-chan struct{}, request provider.Request, zipWriter *zip.Writer, items []absto.Item) (err error) {
+func (s *Service) zipItems(ctx context.Context, done <-chan struct{}, request provider.Request, zipWriter *zip.Writer, items []absto.Item) (err error) {
 	defer func() {
 		if errors.Is(err, syscall.ECONNRESET) {
 			err = nil
@@ -223,7 +223,7 @@ func (s Service) zipItems(ctx context.Context, done <-chan struct{}, request pro
 	return nil
 }
 
-func (s Service) addFileToZip(ctx context.Context, zipWriter *zip.Writer, item absto.Item, pathname string) (err error) {
+func (s *Service) addFileToZip(ctx context.Context, zipWriter *zip.Writer, item absto.Item, pathname string) (err error) {
 	header := &zip.FileHeader{
 		Name:               pathname,
 		UncompressedSize64: uint64(item.Size()),

@@ -12,7 +12,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
 )
 
-func (s Service) search(r *http.Request, request provider.Request, item absto.Item, files []absto.Item) (renderer.Page, error) {
+func (s *Service) search(r *http.Request, request provider.Request, item absto.Item, files []absto.Item) (renderer.Page, error) {
 	ctx, end := telemetry.StartSpan(r.Context(), s.tracer, "search")
 	defer end(nil)
 

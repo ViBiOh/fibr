@@ -10,7 +10,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
-func (s Service) Update(ctx context.Context, item absto.Item, opts ...provider.MetadataAction) (provider.Metadata, error) {
+func (s *Service) Update(ctx context.Context, item absto.Item, opts ...provider.MetadataAction) (provider.Metadata, error) {
 	var output provider.Metadata
 
 	return output, s.exclusive.Execute(ctx, "fibr:mutex:"+item.ID, exclusive.Duration, func(ctx context.Context) error {

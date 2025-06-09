@@ -17,7 +17,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
 )
 
-func (s Service) saveUploadedFile(ctx context.Context, request provider.Request, filePath string, size int64, file *multipart.Part) error {
+func (s *Service) saveUploadedFile(ctx context.Context, request provider.Request, filePath string, size int64, file *multipart.Part) error {
 	err := provider.WriteToStorage(ctx, s.storage, filePath, size, file)
 
 	if err == nil {
@@ -69,7 +69,7 @@ func getUploadSize(rawSize string) (int64, error) {
 	return size, nil
 }
 
-func (s Service) upload(w http.ResponseWriter, r *http.Request, request provider.Request, fileName, filePath string, size int64, file *multipart.Part) {
+func (s *Service) upload(w http.ResponseWriter, r *http.Request, request provider.Request, fileName, filePath string, size int64, file *multipart.Part) {
 	if file == nil {
 		s.error(w, r, request, model.WrapInvalid(errors.New("no file provided for save")))
 		return
@@ -88,7 +88,7 @@ func (s Service) upload(w http.ResponseWriter, r *http.Request, request provider
 	s.postUpload(w, r, request, fileName)
 }
 
-func (s Service) postUpload(w http.ResponseWriter, r *http.Request, request provider.Request, fileName string) {
+func (s *Service) postUpload(w http.ResponseWriter, r *http.Request, request provider.Request, fileName string) {
 	ctx := r.Context()
 
 	if r.Header.Get("Accept") == "text/plain" {

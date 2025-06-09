@@ -14,7 +14,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
 )
 
-func (s Service) DoRename(ctx context.Context, oldPath, newPath string, oldItem absto.Item) (absto.Item, error) {
+func (s *Service) DoRename(ctx context.Context, oldPath, newPath string, oldItem absto.Item) (absto.Item, error) {
 	if err := s.storage.Rename(ctx, oldPath, newPath); err != nil {
 		return absto.Item{}, fmt.Errorf("rename: %w", err)
 	}
@@ -60,7 +60,7 @@ func parseRenameParams(r *http.Request, request provider.Request) (string, strin
 	return oldPath, newPath, newFolder, newName, cover, nil
 }
 
-func (s Service) Rename(w http.ResponseWriter, r *http.Request, request provider.Request) {
+func (s *Service) Rename(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	ctx := r.Context()
 	telemetry.SetRouteTag(ctx, "/rename")
 
@@ -159,7 +159,7 @@ func getNewName(r *http.Request) (string, error) {
 	return provider.SanitizeName(newName, true)
 }
 
-func (s Service) checkFile(ctx context.Context, pathname string, shouldExist bool) (info absto.Item, err error) {
+func (s *Service) checkFile(ctx context.Context, pathname string, shouldExist bool) (info absto.Item, err error) {
 	info, err = s.storage.Stat(ctx, pathname)
 
 	if err == nil {
@@ -179,7 +179,7 @@ func (s Service) checkFile(ctx context.Context, pathname string, shouldExist boo
 	return
 }
 
-func (s Service) updateCover(ctx context.Context, item absto.Item) error {
+func (s *Service) updateCover(ctx context.Context, item absto.Item) error {
 	directory, err := s.storage.Stat(ctx, item.Dir())
 	if err != nil {
 		return fmt.Errorf("get directory: %w", err)

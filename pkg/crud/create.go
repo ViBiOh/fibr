@@ -13,7 +13,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
 )
 
-func (s Service) Create(w http.ResponseWriter, r *http.Request, request provider.Request) {
+func (s *Service) Create(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	ctx := r.Context()
 
 	telemetry.SetRouteTag(ctx, "/mkdir")
@@ -45,7 +45,7 @@ func (s Service) Create(w http.ResponseWriter, r *http.Request, request provider
 	s.renderer.Redirect(w, r, fmt.Sprintf("%s/?d=%s", name, request.Display), renderer.NewSuccessMessage("Directory %s successfully created", path.Base(pathname)))
 }
 
-func (s Service) CreateSavedSearch(w http.ResponseWriter, r *http.Request, request provider.Request) {
+func (s *Service) CreateSavedSearch(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	if !request.CanEdit {
 		s.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
 		return

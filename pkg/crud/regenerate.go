@@ -12,7 +12,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
-func (s Service) regenerate(w http.ResponseWriter, r *http.Request, request provider.Request) {
+func (s *Service) regenerate(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	pathname := request.Filepath()
 	ctx := r.Context()
 

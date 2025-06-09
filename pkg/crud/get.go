@@ -26,7 +26,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-func (s Service) getWithMessage(w http.ResponseWriter, r *http.Request, request provider.Request, message renderer.Message) (renderer.Page, error) {
+func (s *Service) getWithMessage(w http.ResponseWriter, r *http.Request, request provider.Request, message renderer.Message) (renderer.Page, error) {
 	ctx := r.Context()
 
 	pathname := request.Filepath()
@@ -60,7 +60,7 @@ func (s Service) getWithMessage(w http.ResponseWriter, r *http.Request, request 
 	return s.handleDir(w, r, request, item, message)
 }
 
-func (s Service) handleFile(w http.ResponseWriter, r *http.Request, request provider.Request, item absto.Item, message renderer.Message) (renderer.Page, error) {
+func (s *Service) handleFile(w http.ResponseWriter, r *http.Request, request provider.Request, item absto.Item, message renderer.Message) (renderer.Page, error) {
 	ctx := r.Context()
 
 	if query.GetBool(r, "thumbnail") {
@@ -88,7 +88,7 @@ func (s Service) handleFile(w http.ResponseWriter, r *http.Request, request prov
 	return renderer.Page{}, s.serveFile(w, r, item)
 }
 
-func (s Service) serveFile(w http.ResponseWriter, r *http.Request, item absto.Item) error {
+func (s *Service) serveFile(w http.ResponseWriter, r *http.Request, item absto.Item) error {
 	var err error
 
 	ctx, end := telemetry.StartSpan(r.Context(), s.tracer, "file", trace.WithSpanKind(trace.SpanKindInternal))
@@ -112,7 +112,7 @@ func (s Service) serveFile(w http.ResponseWriter, r *http.Request, item absto.It
 	return nil
 }
 
-func (s Service) handleDir(w http.ResponseWriter, r *http.Request, request provider.Request, item absto.Item, message renderer.Message) (renderer.Page, error) {
+func (s *Service) handleDir(w http.ResponseWriter, r *http.Request, request provider.Request, item absto.Item, message renderer.Message) (renderer.Page, error) {
 	ctx := r.Context()
 
 	if query.GetBool(r, "stats") {
@@ -160,7 +160,7 @@ func (s Service) handleDir(w http.ResponseWriter, r *http.Request, request provi
 	return s.list(ctx, request, message, item, items)
 }
 
-func (s Service) listFiles(r *http.Request, request provider.Request, item absto.Item) (items []absto.Item, err error) {
+func (s *Service) listFiles(r *http.Request, request provider.Request, item absto.Item) (items []absto.Item, err error) {
 	ctx, end := telemetry.StartSpan(r.Context(), s.tracer, "files", trace.WithAttributes(attribute.String("item", item.Pathname)))
 	defer end(&err)
 
@@ -190,7 +190,7 @@ func (s Service) listFiles(r *http.Request, request provider.Request, item absto
 	return items, err
 }
 
-func (s Service) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provider.Request, item absto.Item, items []absto.Item) {
+func (s *Service) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provider.Request, item absto.Item, items []absto.Item) {
 	if len(items) == 0 {
 		w.WriteHeader(http.StatusNoContent)
 		return
@@ -226,7 +226,7 @@ func (s Service) serveGeoJSON(w http.ResponseWriter, r *http.Request, request pr
 	s.generateGeoJSON(ctx, w, request, items, exifs)
 }
 
-func (s Service) generateGeoJSON(ctx context.Context, w io.Writer, request provider.Request, items []absto.Item, exifs map[string]provider.Metadata) {
+func (s *Service) generateGeoJSON(ctx context.Context, w io.Writer, request provider.Request, items []absto.Item, exifs map[string]provider.Metadata) {
 	done := ctx.Done()
 	isDone := func() bool {
 		select {
@@ -303,7 +303,7 @@ func dichotomicFind(items []absto.Item, id string) absto.Item {
 	return absto.Item{}
 }
 
-func (s Service) exifHash(ctx context.Context, items []absto.Item) string {
+func (s *Service) exifHash(ctx context.Context, items []absto.Item) string {
 	hasher := hash.Stream()
 
 	for _, item := range items {
@@ -315,6 +315,6 @@ func (s Service) exifHash(ctx context.Context, items []absto.Item) string {
 	return hasher.Sum()
 }
 
-func (s Service) Get(w http.ResponseWriter, r *http.Request, request provider.Request) (renderer.Page, error) {
+func (s *Service) Get(w http.ResponseWriter, r *http.Request, request provider.Request) (renderer.Page, error) {
 	return s.getWithMessage(w, r, request, renderer.ParseMessage(r))
 }

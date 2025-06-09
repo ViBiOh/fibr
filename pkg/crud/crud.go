@@ -7,6 +7,7 @@ import (
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/fibr/pkg/push"
 	"github.com/ViBiOh/fibr/pkg/search"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/flags"
@@ -29,6 +30,7 @@ type Service struct {
 	webhook         provider.WebhookManager
 	metadata        provider.MetadataManager
 	searchService   search.Service
+	pushService     *push.Service
 	pushEvent       provider.EventProducer
 	temporaryFolder string
 	renderer        *renderer.Service
@@ -50,8 +52,8 @@ func Flags(fs *flag.FlagSet, prefix string) *Config {
 	return &config
 }
 
-func New(config *Config, storageService absto.Storage, filteredStorage absto.Storage, rendererService *renderer.Service, shareService provider.ShareManager, webhookService provider.WebhookManager, thumbnailService thumbnail.Service, exifService provider.MetadataManager, searchService search.Service, eventProducer provider.EventProducer, tracerProvider trace.TracerProvider) (Service, error) {
-	service := Service{
+func New(config *Config, storageService absto.Storage, filteredStorage absto.Storage, rendererService *renderer.Service, shareService provider.ShareManager, webhookService provider.WebhookManager, thumbnailService thumbnail.Service, exifService provider.MetadataManager, searchService search.Service, pushService *push.Service, eventProducer provider.EventProducer, tracerProvider trace.TracerProvider) (*Service, error) {
+	service := &Service{
 		chunkUpload:     config.ChunkUpload,
 		temporaryFolder: config.TemporaryFolder,
 		pushEvent:       eventProducer,
@@ -63,6 +65,7 @@ func New(config *Config, storageService absto.Storage, filteredStorage absto.Sto
 		share:           shareService,
 		webhook:         webhookService,
 		searchService:   searchService,
+		pushService:     pushService,
 	}
 
 	if tracerProvider != nil {
@@ -72,6 +75,6 @@ func New(config *Config, storageService absto.Storage, filteredStorage absto.Sto
 	return service, nil
 }
 
-func (s Service) error(w http.ResponseWriter, r *http.Request, request provider.Request, err error) {
+func (s *Service) error(w http.ResponseWriter, r *http.Request, request provider.Request, err error) {
 	s.renderer.Error(w, r, map[string]any{"Request": request}, err)
 }

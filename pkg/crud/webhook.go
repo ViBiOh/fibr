@@ -16,7 +16,7 @@ func generateTelegramURL(botToken, chatID string) string {
 	return fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage?chat_id=%s", url.PathEscape(botToken), url.QueryEscape(chatID))
 }
 
-func (s Service) createWebhook(w http.ResponseWriter, r *http.Request, request provider.Request) {
+func (s *Service) createWebhook(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	var err error
 	err = r.ParseForm()
 	if err != nil {
@@ -118,7 +118,7 @@ func checkWebhookForm(r *http.Request) (recursive bool, kind provider.WebhookKin
 	return
 }
 
-func (s Service) deleteWebhook(w http.ResponseWriter, r *http.Request, request provider.Request) {
+func (s *Service) deleteWebhook(w http.ResponseWriter, r *http.Request, request provider.Request) {
 	ctx := r.Context()
 	id := r.FormValue("id")
 
