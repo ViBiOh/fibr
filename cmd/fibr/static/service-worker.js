@@ -11,6 +11,7 @@ self.addEventListener("push", async function (event) {
 
   return self.registration.showNotification("FIle BRowser", {
     icon: "/images/favicon/favicon-32x32.png",
+    image: payload.image,
     body: payload.description,
     data: {
       url: payload.url,

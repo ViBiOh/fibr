@@ -167,13 +167,17 @@ func (e Event) GetTo() string {
 }
 
 func NewUploadEvent(ctx context.Context, request Request, item absto.Item, shareableURL string, rendererService *renderer.Service) Event {
+	if len(shareableURL) != 0 {
+		shareableURL = rendererService.PublicURL(shareableURL)
+	}
+
 	return Event{
 		Time:         time.Now(),
 		Type:         UploadEvent,
 		Item:         item,
 		TraceLink:    trace.LinkFromContext(ctx),
 		URL:          rendererService.PublicURL(request.AbsoluteURL(item.Name())),
-		ShareableURL: rendererService.PublicURL(shareableURL),
+		ShareableURL: shareableURL,
 		Metadata: map[string]string{
 			"force": "all",
 		},
@@ -181,6 +185,10 @@ func NewUploadEvent(ctx context.Context, request Request, item absto.Item, share
 }
 
 func NewRenameEvent(ctx context.Context, old, new absto.Item, shareableURL string, rendererService *renderer.Service) Event {
+	if len(shareableURL) != 0 {
+		shareableURL = rendererService.PublicURL(shareableURL)
+	}
+
 	return Event{
 		Time:         time.Now(),
 		Type:         RenameEvent,
@@ -188,18 +196,22 @@ func NewRenameEvent(ctx context.Context, old, new absto.Item, shareableURL strin
 		TraceLink:    trace.LinkFromContext(ctx),
 		New:          &new,
 		URL:          rendererService.PublicURL(new.Pathname),
-		ShareableURL: rendererService.PublicURL(shareableURL),
+		ShareableURL: shareableURL,
 	}
 }
 
 func NewDescriptionEvent(ctx context.Context, item absto.Item, shareableURL string, description string, rendererService *renderer.Service) Event {
+	if len(shareableURL) != 0 {
+		shareableURL = rendererService.PublicURL(shareableURL)
+	}
+
 	return Event{
 		Time:         time.Now(),
 		Type:         DescriptionEvent,
 		Item:         item,
 		TraceLink:    trace.LinkFromContext(ctx),
 		URL:          rendererService.PublicURL(item.Pathname),
-		ShareableURL: rendererService.PublicURL(shareableURL),
+		ShareableURL: shareableURL,
 		Metadata: map[string]string{
 			"description": description,
 		},
