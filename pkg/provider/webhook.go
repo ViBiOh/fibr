@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"slices"
 	"strings"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
@@ -16,9 +17,10 @@ const (
 	Discord
 	Slack
 	Telegram
+	Push
 )
 
-var WebhookKindValues = []string{"raw", "discord", "slack", "telegram"}
+var WebhookKindValues = []string{"raw", "discord", "slack", "telegram", "push"}
 
 func ParseWebhookKind(value string) (WebhookKind, error) {
 	for i, short := range WebhookKindValues {
@@ -75,13 +77,7 @@ func (w Webhook) Match(e Event) bool {
 }
 
 func (w Webhook) hasType(eventType EventType) bool {
-	for _, t := range w.Types {
-		if t == eventType {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(w.Types, eventType)
 }
 
 func (w Webhook) matchItem(item absto.Item) bool {

@@ -11,6 +11,10 @@
 {{ end }}
 
 {{ define "webhook-form" }}
+  <script type="text/javascript" nonce="{{ .nonce }}">
+    const vapidKey = "{{ .VapidKey }}";
+  </script>
+
   <input type="hidden" name="type" value="webhook" />
   <input type="hidden" name="method" value="POST" />
 
@@ -47,11 +51,22 @@
       </label>
       <input id="webhook-kind-telegram" type="radio" name="kind" value="telegram">
     </span>
+
+    <span id="push-webhook-selector" class="flex-grow center hidden">
+      <label for="webhook-kind-push" class="block">
+        <img class="icon icon-large clickable" src="{{ url "/svg/push?fill=silver" }}" alt="push logo" title="push">
+      </label>
+      <input id="webhook-kind-push" type="radio" name="kind" value="push">
+    </span>
   </p>
 
-  <p class="padding no-margin">
+  <p id="webhook-url-wrapper" class="padding no-margin">
     <label id="webhook-url-label" for="webhook-url" class="block">URL</label>
     <input id="webhook-url" class="full" type="text" name="url" value="" placeholder="http://website.com/fibr" />
+  </p>
+
+  <p id="webhook-push-wrapper" class="padding no-margin hidden">
+    <span id="service-worker-register" class="center button bg-grey">Register push worker</span>
   </p>
 
   <p id="telegram-chat-id" class="padding no-margin hidden">

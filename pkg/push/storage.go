@@ -2,6 +2,7 @@ package push
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
@@ -9,7 +10,25 @@ import (
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
-var subscriptionsFilename = "subscriptions.json"
+var (
+	subscriptionsFilename = "subscriptions.json"
+	ErrNotFound           = errors.New("subscription not found")
+)
+
+func (s *Service) Find(ctx context.Context, item absto.Item, url string) (Subscription, error) {
+	subscriptions, err := s.get(ctx, item)
+	if err != nil {
+		return Subscription{}, fmt.Errorf("get: %w", err)
+	}
+
+	for _, sub := range subscriptions {
+		if sub.Endpoint == url {
+			return sub, nil
+		}
+	}
+
+	return Subscription{}, ErrNotFound
+}
 
 func (s *Service) Add(ctx context.Context, item absto.Item, subscription Subscription) error {
 	return s.exclusive.Execute(ctx, "fibr:mutex:push:"+item.ID, exclusive.Duration, func(ctx context.Context) error {
@@ -20,10 +39,6 @@ func (s *Service) Add(ctx context.Context, item absto.Item, subscription Subscri
 
 		for _, sub := range subscriptions {
 			if sub.Auth == subscription.Auth && sub.PublicKey == subscription.PublicKey {
-				if err := s.Notify(ctx, subscription, "coucou"); err != nil {
-					fmt.Println(err)
-				}
-
 				return nil
 			}
 		}

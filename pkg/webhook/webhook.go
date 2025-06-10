@@ -10,6 +10,7 @@ import (
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/exclusive"
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/fibr/pkg/push"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/redis"
@@ -28,6 +29,7 @@ type Service struct {
 	redisClient      redis.Client
 	pubsubChannel    string
 	rendererService  *renderer.Service
+	push             *push.Service
 	hmacSecret       []byte
 	thumbnail        thumbnail.Service
 	mutex            sync.RWMutex
@@ -47,7 +49,7 @@ func Flags(fs *flag.FlagSet, prefix string) *Config {
 	return &config
 }
 
-func New(config *Config, storageService absto.Storage, meterProvider metric.MeterProvider, redisClient redis.Client, rendererService *renderer.Service, thumbnailService thumbnail.Service, exclusiveApp exclusive.Service) *Service {
+func New(config *Config, storageService absto.Storage, meterProvider metric.MeterProvider, redisClient redis.Client, rendererService *renderer.Service, pushService *push.Service, thumbnailService thumbnail.Service, exclusiveApp exclusive.Service) *Service {
 	var counter metric.Int64Counter
 	if meterProvider != nil {
 		meter := meterProvider.Meter("github.com/ViBiOh/fibr/pkg/webhook")
@@ -65,6 +67,7 @@ func New(config *Config, storageService absto.Storage, meterProvider metric.Mete
 		storage:          storageService,
 		rendererService:  rendererService,
 		thumbnail:        thumbnailService,
+		push:             pushService,
 		exclusiveService: exclusiveApp,
 		webhooks:         make(map[string]provider.Webhook),
 		counter:          counter,

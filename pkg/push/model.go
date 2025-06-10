@@ -33,12 +33,9 @@ func decodeKey(key string) ([]byte, error) {
 	return base64.URLEncoding.DecodeString(buffer.String())
 }
 
-type PushNotification struct {
-	Endpoint string   `json:"endpoint"`
-	Keys     PushKeys `json:"keys"`
-}
-
-type PushKeys struct {
-	PublicKey string `json:"p256dh"`
-	Auth      string `json:"auth"`
+type Notification struct {
+	Title       string `json:"title"`
+	URL         string `json:"url"`
+	Description string `json:"description"`
+	Image       string `json:"image"`
 }

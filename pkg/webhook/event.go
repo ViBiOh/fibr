@@ -14,6 +14,7 @@ import (
 	"github.com/ViBiOh/ChatPotte/slack"
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/fibr/pkg/push"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 )
 
@@ -25,6 +26,7 @@ func (s *Service) EventConsumer(ctx context.Context, event provider.Event) {
 		if !webhook.Match(event) {
 			continue
 		}
+
 		var statusCode int
 		var err error
 
@@ -40,6 +42,9 @@ func (s *Service) EventConsumer(ctx context.Context, event provider.Event) {
 
 		case provider.Telegram:
 			statusCode, err = s.telegramHandle(ctx, webhook, event)
+
+		case provider.Push:
+			statusCode, err = s.pushHandle(ctx, webhook, event)
 
 		default:
 			slog.LogAttrs(ctx, slog.LevelWarn, "unknown kind for webhook", slog.String("kind", webhook.Kind.String()))
@@ -123,6 +128,54 @@ func (s *Service) discordHandle(ctx context.Context, webhook provider.Webhook, e
 	}
 
 	return send(ctx, webhook.ID, request.Post(webhook.URL), discord.NewDataResponse("").AddEmbed(embed))
+}
+
+func (s *Service) pushHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
+	if event.Type != provider.UploadEvent && event.Type != provider.RenameEvent && event.Type != provider.DescriptionEvent {
+		return 0, nil
+	}
+
+	subscription, err := s.push.Find(ctx, event.Item, webhook.URL)
+	if err != nil {
+		return 0, fmt.Errorf("find subscription: %w", err)
+	}
+
+	title := path.Base(path.Dir(event.Item.Pathname))
+	if title == "/" {
+		title = "fibr"
+	}
+
+	var contentURL, description string
+
+	switch event.Type {
+	case provider.UploadEvent:
+		description = "💾 A file has been uploaded"
+		contentURL = event.BrowserURL()
+	case provider.RenameEvent:
+		description = "✏️ An item has been renamed"
+		contentURL = event.BrowserURL()
+	case provider.DescriptionEvent:
+		description = "💬 " + event.Metadata["description"]
+		contentURL = event.StoryURL(event.Item.ID)
+	}
+
+	notification := push.Notification{
+		Title:       title,
+		Description: description,
+		URL:         contentURL,
+	}
+
+	if s.thumbnail.CanHaveThumbnail(event.Item) {
+		thumbnailURL := event.GetURL() + "?thumbnail"
+
+		if _, ok := provider.VideoExtensions[event.Item.Extension]; ok {
+			thumbnailURL += "&scale=large"
+		}
+
+		notification.Image = thumbnailURL
+	}
+
+	return s.push.Notify(ctx, subscription, notification)
 }
 
 func (s *Service) slackHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {

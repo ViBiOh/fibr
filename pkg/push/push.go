@@ -91,36 +91,34 @@ func (s *Service) GetPublicKey() string {
 	return s.publicKey
 }
 
-func (s *Service) Notify(ctx context.Context, subscription Subscription, content any) error {
+func (s *Service) Notify(ctx context.Context, subscription Subscription, notification Notification) (int, error) {
 	if len(subscription.Auth) == 0 || len(subscription.PublicKey) == 0 {
-		return ErrNoEncryptionPossible
+		return 0, ErrNoEncryptionPossible
 	}
 
-	encrypted, err := s.encryptContent(subscription, content)
+	encrypted, err := s.encryptContent(subscription, notification)
 	if err != nil {
-		return fmt.Errorf("encrypt: %w", err)
+		return 0, fmt.Errorf("encrypt: %w", err)
 	}
 
 	authorization, err := s.generateJWT(subscription, jwtDuration)
 	if err != nil {
-		return fmt.Errorf("generate jwt: %w", err)
+		return 0, fmt.Errorf("generate jwt: %w", err)
 	}
 
-	_, err = request.Post(subscription.Endpoint).
+	res, err := request.Post(subscription.Endpoint).
 		Header("TTL", defaultTTL).
 		Header("Content-Type", "application/octet-stream").
 		Header("Content-Length", strconv.Itoa(len(encrypted))).
 		Header("Content-Encoding", "aes128gcm").
 		Header("Authorization", authorization).
+		Header("Urgency", "normal").
 		Send(ctx, io.NopCloser(bytes.NewBuffer(encrypted)))
-	if err != nil {
-		return fmt.Errorf("send notification: %w", err)
-	}
 
-	return nil
+	return res.StatusCode, err
 }
 
-func (s *Service) encryptContent(subscription Subscription, content any) ([]byte, error) {
+func (s *Service) encryptContent(subscription Subscription, notification Notification) ([]byte, error) {
 	subscriptionAuth, err := subscription.decodedAuth()
 	if err != nil {
 		return nil, fmt.Errorf("decode auth: %w", err)
@@ -198,9 +196,9 @@ func (s *Service) encryptContent(subscription Subscription, content any) ([]byte
 	output.Write([]byte{byte(len(localPublicKey))})
 	output.Write(localPublicKey)
 
-	payload, err := json.Marshal(content)
+	payload, err := json.Marshal(notification)
 	if err != nil {
-		return nil, fmt.Errorf("marshal content: %w", err)
+		return nil, fmt.Errorf("marshal notification: %w", err)
 	}
 
 	dataBuf := bytes.NewBuffer(payload)

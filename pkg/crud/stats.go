@@ -36,11 +36,10 @@ func (s *Service) stats(r *http.Request, request provider.Request, message rende
 	}
 
 	return renderer.NewPage("stats", http.StatusOK, map[string]any{
-		"Paths":    getPathParts(request),
-		"Request":  request,
-		"Message":  message,
-		"Stats":    entries,
-		"VapidKey": s.pushService.GetPublicKey(),
+		"Paths":   getPathParts(request),
+		"Request": request,
+		"Message": message,
+		"Stats":   entries,
 	}), nil
 }
 

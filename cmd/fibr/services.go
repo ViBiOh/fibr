@@ -73,7 +73,12 @@ func newServices(ctx context.Context, config configuration, clients clients, ada
 		return output, err
 	}
 
-	output.webhook = webhook.New(config.webhook, adapters.storage, clients.telemetry.MeterProvider(), clients.redis, output.renderer, output.thumbnail, adapters.exclusiveService)
+	pushService, err := push.New(config.push, adapters.storage, adapters.exclusiveService)
+	if err != nil && !errors.Is(err, push.ErrNoConfig) {
+		return output, err
+	}
+
+	output.webhook = webhook.New(config.webhook, adapters.storage, clients.telemetry.MeterProvider(), clients.redis, output.renderer, pushService, output.thumbnail, adapters.exclusiveService)
 
 	output.share, err = share.New(config.share, clients.telemetry.TracerProvider(), adapters.storage, clients.redis, adapters.exclusiveService)
 	if err != nil {
@@ -87,11 +92,6 @@ func newServices(ctx context.Context, config configuration, clients clients, ada
 
 	output.amqpExif, err = amqphandler.New(config.amqpExif, clients.amqp, clients.telemetry.MeterProvider(), clients.telemetry.TracerProvider(), output.metadata.AMQPHandler)
 	if err != nil {
-		return output, err
-	}
-
-	pushService, err := push.New(config.push, adapters.storage, adapters.exclusiveService)
-	if err != nil && !errors.Is(err, push.ErrNoConfig) {
 		return output, err
 	}
 

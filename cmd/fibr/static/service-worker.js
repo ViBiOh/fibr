@@ -6,39 +6,18 @@ self.addEventListener("activate", function (event) {
   event.waitUntil(self.clients.claim());
 });
 
-self.addEventListener("push", function (event) {
-  event.waitUntil(
-    self.clients.matchAll().then(function (clientList) {
-      var focused = clientList.some(function (client) {
-        return client.focused;
-      });
+self.addEventListener("push", async function (event) {
+  const payload = await event.data.json();
 
-      var notificationMessage;
-      if (focused) {
-        notificationMessage = "You're still here, thanks!";
-      } else if (clientList.length > 0) {
-        notificationMessage =
-          "You haven't closed the page, " + "click here to focus it!";
-      } else {
-        notificationMessage =
-          "You have closed the page, " + "click here to re-open it!";
-      }
-
-      return self.registration.showNotification("FIle BrowseR", {
-        body: notificationMessage,
-      });
-    }),
-  );
+  return self.registration.showNotification("FIle BRowser", {
+    icon: "/images/favicon/favicon-32x32.png",
+    body: payload.description,
+    data: {
+      url: payload.url,
+    },
+  });
 });
 
 self.addEventListener("notificationclick", function (event) {
-  event.waitUntil(
-    self.clients.matchAll().then(function (clientList) {
-      if (clientList.length > 0) {
-        return clientList[0].focus();
-      }
-
-      return self.clients.openWindow("https://vibioh.fr");
-    }),
-  );
+  return self.clients.openWindow(event.notification.data.url);
 });

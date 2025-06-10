@@ -125,6 +125,7 @@ func (s *Service) list(ctx context.Context, request provider.Request, message re
 		"HasStory":      hasStory,
 		"ThumbnailSize": thumbnail.SmallSize,
 		"ChunkUpload":   s.chunkUpload,
+		"VapidKey":      s.pushService.GetPublicKey(),
 	}
 
 	if request.CanShare {
