@@ -16,7 +16,7 @@
       <h2 class="header">Share {{ .Name }}</h2>
 
       <form method="post" action="{{ .URL }}">
-        {{ template "share-form" . }}
+        {{ template "share-form" .ID }}
       </form>
     </div>
   </div>
@@ -28,7 +28,7 @@
 
   <p class="padding no-margin center">
     <label for="rights">Rights</label>
-    <select id="rights" aria-label="Share's rights" name="rights">
+    <select id="rights-{{ . }}" aria-label="Share's rights" name="rights">
       <option value="edit">Edit</option>
       <option value="read">Read only</option>
       <option value="story">Story only</option>
@@ -37,12 +37,12 @@
 
   <p class="padding no-margin">
     <label for="password" class="block">Password protection</label>
-    <input id="password" class="full" type="text" name="password" value="" placeholder="Password" />
+    <input id="password-{{ . }}" class="full" type="text" name="password" value="" placeholder="Password" />
   </p>
 
   <p class="padding no-margin">
     <label for="duration" class="block">Duration</label>
-    <input id="duration" class="full" type="number" name="duration" value="" placeholder="Duration (in hours)" />
+    <input id="duration-{{ . }}" class="full" type="number" name="duration" value="" placeholder="Duration (in hours)" />
   </p>
 
   {{ template "form_buttons" "Share" }}

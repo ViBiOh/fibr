@@ -43,7 +43,7 @@ var (
 )
 
 var (
-	ErrNoConfig             = errors.New("vapid key not sed")
+	ErrNoConfig             = errors.New("vapid key not set")
 	ErrMaxPadExceeded       = errors.New("payload has exceeded the maximum length")
 	ErrNoEncryptionPossible = errors.New("no encryption possible for subscription")
 )
@@ -88,10 +88,18 @@ func New(config *Config, storageService absto.Storage, exclusiveService exclusiv
 }
 
 func (s *Service) GetPublicKey() string {
+	if s == nil {
+		return ""
+	}
+
 	return s.publicKey
 }
 
 func (s *Service) Notify(ctx context.Context, subscription Subscription, notification Notification) (int, error) {
+	if s == nil {
+		return 0, ErrNoConfig
+	}
+
 	if len(subscription.Auth) == 0 || len(subscription.PublicKey) == 0 {
 		return 0, ErrNoEncryptionPossible
 	}
