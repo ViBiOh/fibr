@@ -30,6 +30,11 @@ func (s *Service) createWebhook(w http.ResponseWriter, r *http.Request, request 
 		return
 	}
 
+	if !request.CanWebhook && kind != provider.Push {
+		s.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
+		return
+	}
+
 	ctx := r.Context()
 
 	info, err := s.storage.Stat(ctx, request.Path)
@@ -123,6 +128,11 @@ func checkWebhookForm(r *http.Request) (recursive bool, kind provider.WebhookKin
 }
 
 func (s *Service) deleteWebhook(w http.ResponseWriter, r *http.Request, request provider.Request) {
+	if !request.CanWebhook {
+		s.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
+		return
+	}
+
 	ctx := r.Context()
 	id := r.FormValue("id")
 

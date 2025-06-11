@@ -181,11 +181,6 @@ func (s *Service) handlePostShare(w http.ResponseWriter, r *http.Request, reques
 }
 
 func (s *Service) handlePostWebhook(w http.ResponseWriter, r *http.Request, request provider.Request, method string) {
-	if !request.CanWebhook {
-		s.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
-		return
-	}
-
 	switch method {
 	case http.MethodPost:
 		s.createWebhook(w, r, request)
