@@ -37,7 +37,7 @@ func (s *Service) createWebhook(w http.ResponseWriter, r *http.Request, request 
 
 	ctx := r.Context()
 
-	info, err := s.storage.Stat(ctx, request.Path)
+	info, err := s.storage.Stat(ctx, request.Filepath())
 	if err != nil {
 		if absto.IsNotExist(err) {
 			s.error(w, r, request, model.WrapNotFound(err))
