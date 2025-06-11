@@ -1,0 +1,30 @@
+{{ define "push-form" }}
+  <script type="text/javascript" nonce="{{ .nonce }}">
+    const vapidKey = "{{ .VapidKey }}";
+  </script>
+
+  <div id="push-form" class="modal push-form">
+    <div class="modal-content">
+      <h2 class="header">Push Notification</h2>
+
+      <form id="push-form" method="post" action="#">
+        <input type="hidden" name="type" value="webhook" />
+        <input type="hidden" name="method" value="POST" />
+        <input type="hidden" name="kind" value="push" />
+        <input type="hidden" name="types" value="upload" />
+        <input id="push-url" type="hidden" name="url" value="" />
+
+        <p class="padding no-margin center">
+          <input id="push-recursive" type="checkbox" name="recursive" value="true" />
+          <label for="push-recursive">Recursive on children folders</label>
+        </p>
+
+        <p class="padding no-margin center">
+          <span id="worker-register" class="button bg-grey">Register push worker</span>
+        </p>
+
+        {{ template "form_buttons" "Subscribe" }}
+      </form>
+    </div>
+  </div>
+{{ end }}

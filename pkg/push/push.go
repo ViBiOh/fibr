@@ -19,12 +19,14 @@ import (
 	"io"
 	"math/big"
 	"net/url"
+	"path"
 	"strconv"
 	"time"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/exclusive"
 	"github.com/ViBiOh/flags"
+	"github.com/ViBiOh/httputils/v4/pkg/hash"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/hkdf"
@@ -121,6 +123,7 @@ func (s *Service) Notify(ctx context.Context, subscription Subscription, notific
 		Header("Content-Encoding", "aes128gcm").
 		Header("Authorization", authorization).
 		Header("Urgency", "normal").
+		Header("Topic", hash.String(path.Dir(notification.URL))).
 		Send(ctx, io.NopCloser(bytes.NewBuffer(encrypted)))
 
 	return res.StatusCode, err

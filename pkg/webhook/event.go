@@ -135,7 +135,7 @@ func (s *Service) pushHandle(ctx context.Context, webhook provider.Webhook, even
 		return 0, nil
 	}
 
-	subscription, err := s.push.Find(ctx, event.Item, webhook.URL)
+	subscription, err := s.push.Find(ctx, webhook.URL)
 	if err != nil {
 		return 0, fmt.Errorf("find subscription: %w", err)
 	}

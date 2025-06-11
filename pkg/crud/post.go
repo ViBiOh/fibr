@@ -63,7 +63,7 @@ func (s *Service) Post(w http.ResponseWriter, r *http.Request, request provider.
 	}
 
 	if query.GetBool(r, "push") {
-		s.pushService.Handle(w, r, request)
+		s.pushService.Handle(w, r)
 		return
 	}
 

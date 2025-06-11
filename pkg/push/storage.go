@@ -11,12 +11,12 @@ import (
 )
 
 var (
-	subscriptionsFilename = "subscriptions.json"
+	subscriptionsFilename = provider.MetadataDirectoryName + "/subscriptions.json"
 	ErrNotFound           = errors.New("subscription not found")
 )
 
-func (s *Service) Find(ctx context.Context, item absto.Item, url string) (Subscription, error) {
-	subscriptions, err := s.get(ctx, item)
+func (s *Service) Find(ctx context.Context, url string) (Subscription, error) {
+	subscriptions, err := s.get(ctx)
 	if err != nil {
 		return Subscription{}, fmt.Errorf("get: %w", err)
 	}
@@ -30,9 +30,9 @@ func (s *Service) Find(ctx context.Context, item absto.Item, url string) (Subscr
 	return Subscription{}, ErrNotFound
 }
 
-func (s *Service) Add(ctx context.Context, item absto.Item, subscription Subscription) error {
-	return s.exclusive.Execute(ctx, "fibr:mutex:push:"+item.ID, exclusive.Duration, func(ctx context.Context) error {
-		subscriptions, err := s.get(ctx, item)
+func (s *Service) Add(ctx context.Context, subscription Subscription) error {
+	return s.exclusive.Execute(ctx, "fibr:mutex:push", exclusive.Duration, func(ctx context.Context) error {
+		subscriptions, err := s.get(ctx)
 		if err != nil {
 			return fmt.Errorf("get subscriptions: %w", err)
 		}
@@ -45,12 +45,12 @@ func (s *Service) Add(ctx context.Context, item absto.Item, subscription Subscri
 
 		subscriptions = append(subscriptions, subscription)
 
-		return s.save(ctx, item, subscriptions)
+		return s.save(ctx, subscriptions)
 	})
 }
 
-func (s *Service) get(ctx context.Context, item absto.Item) ([]Subscription, error) {
-	subscriptions, err := provider.LoadJSON[[]Subscription](ctx, s.storage, provider.MetadataDirectory(item)+subscriptionsFilename)
+func (s *Service) get(ctx context.Context) ([]Subscription, error) {
+	subscriptions, err := provider.LoadJSON[[]Subscription](ctx, s.storage, subscriptionsFilename)
 	if err != nil && !absto.IsNotExist(err) {
 		return nil, err
 	}
@@ -58,6 +58,6 @@ func (s *Service) get(ctx context.Context, item absto.Item) ([]Subscription, err
 	return subscriptions, nil
 }
 
-func (s *Service) save(ctx context.Context, item absto.Item, subscriptions []Subscription) error {
-	return provider.SaveJSON(ctx, s.storage, provider.MetadataDirectory(item)+subscriptionsFilename, subscriptions)
+func (s *Service) save(ctx context.Context, subscriptions []Subscription) error {
+	return provider.SaveJSON(ctx, s.storage, subscriptionsFilename, subscriptions)
 }

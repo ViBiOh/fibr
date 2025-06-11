@@ -1,0 +1,8 @@
+#push-form:target {
+  display: flex;
+  z-index: 5;
+}
+
+#push-form:target ~ .content {
+  pointer-events: none;
+}

@@ -48,6 +48,7 @@
     {{ end }}
   {{ end }}
 
+  {{ template "push-form" . }}
   {{ template "search-modal" . }}
   {{ template "items-style" . }}
 
@@ -66,6 +67,7 @@
     .edit-modal:target,
     .share-form:target,
     .webhook-form:target,
+    .push-form:target,
     .folder-modal:target {
       display: flex;
       z-index: 5;
@@ -75,6 +77,7 @@
     .edit-modal:target ~ .content,
     .share-form:target ~ .content,
     .webhook-form:target ~ .content,
+    .push-form:target ~ .content,
     .folder-modal:target ~ .content {
       pointer-events: none;
     }
@@ -187,6 +190,10 @@
 
       <span class="padding-left {{ if .Request.CanEdit }}hide-s{{ end }}">{{ len .Files }}<span {{ if .Request.CanEdit }}class="hide-xs"{{ end }}> element{{ if gt (len .Files) 1 }}s{{ end }}</span></span>
       <span class="flex-grow"></span>
+
+      <a href="#push-form" class="button button-icon" title="Push Notification">
+        <img class="icon" src="{{ url "/svg/push?fill=silver" }}" alt="notification">
+      </a>
 
       {{ if .Request.CanEdit }}
         <a id="upload-button-link" href="#upload-modal" class="button button-icon" title="Upload file">
