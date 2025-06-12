@@ -191,7 +191,7 @@
       <span class="padding-left {{ if .Request.CanEdit }}hide-s{{ end }}">{{ len .Files }}<span {{ if .Request.CanEdit }}class="hide-xs"{{ end }}> element{{ if gt (len .Files) 1 }}s{{ end }}</span></span>
       <span class="flex-grow"></span>
 
-      <a href="#push-form" class="button button-icon" title="Push Notification">
+      <a id="push-form-button" href="#push-form" class="button button-icon hidden" title="Push Notification">
         <img class="icon" src="{{ url "/svg/push?fill=silver" }}" alt="notification">
       </a>
 

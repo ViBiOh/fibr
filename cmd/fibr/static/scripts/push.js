@@ -9,6 +9,7 @@ document.addEventListener("readystatechange", async (event) => {
   }
 
   const urlInput = document.getElementById("push-url");
+  const pushFormButton = document.getElementById("push-form-button");
   const workerRegister = document.getElementById("worker-register");
   const workerRegisterWrapper = document.getElementById(
     "worker-register-wrapper",
@@ -120,7 +121,7 @@ document.addEventListener("readystatechange", async (event) => {
   }
 
   if (canNotificationBeEnabled()) {
-    pushForm.classList.remove("hidden");
+    pushFormButton.classList.remove("hidden");
     const button = pushForm.querySelector("button.bg-primary");
 
     if (button) {
