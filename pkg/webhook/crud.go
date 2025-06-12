@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"sort"
+	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
@@ -53,6 +54,7 @@ func (s *Service) Create(ctx context.Context, pathname string, recursive bool, k
 			Kind:      kind,
 			URL:       url,
 			Types:     types,
+			Created:   time.Now(),
 		}
 
 		for existingID, existing := range s.webhooks {

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"slices"
 	"strings"
+	"time"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 )
@@ -60,6 +61,7 @@ func (r *WebhookKind) UnmarshalJSON(b []byte) error {
 }
 
 type Webhook struct {
+	Created   time.Time   `json:"created"`
 	ID        string      `json:"id"`
 	Pathname  string      `json:"pathname"`
 	URL       string      `json:"url"`
