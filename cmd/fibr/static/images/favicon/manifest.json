@@ -1,19 +1,21 @@
 {
-  "name": "FIle BRowser",
-  "short_name": "fibr",
+  "background_color": "#000000",
+  "display": "standalone",
   "icons": [
     {
-      "src": "/images/favicon/android-chrome-192x192.png",
       "sizes": "192x192",
+      "src": "/images/favicon/android-chrome-192x192.png",
       "type": "image/png"
     },
     {
-      "src": "/images/favicon/android-chrome-512x512.png",
       "sizes": "512x512",
+      "src": "/images/favicon/android-chrome-512x512.png",
       "type": "image/png"
     }
   ],
+  "manifest_version": 2,
+  "name": "FIle BRowser",
+  "short_name": "fibr",
   "theme_color": "#000000",
-  "background_color": "#000000",
-  "display": "standalone"
+  "version": "2"
 }
