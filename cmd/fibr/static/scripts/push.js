@@ -1,11 +1,18 @@
-document.addEventListener("readystatechange", (event) => {
+document.addEventListener("readystatechange", async (event) => {
   if (event.target.readyState !== "complete") {
     return;
   }
 
   const pushForm = document.getElementById("push-form");
+  if (!pushForm) {
+    return;
+  }
+
   const urlInput = document.getElementById("push-url");
   const workerRegister = document.getElementById("worker-register");
+  const workerRegisterWrapper = document.getElementById(
+    "worker-register-wrapper",
+  );
 
   function generateKey(keyName, subscription) {
     const rawKey = subscription.getKey ? subscription.getKey(keyName) : "";
@@ -64,10 +71,7 @@ document.addEventListener("readystatechange", (event) => {
   async function registerWorker() {
     navigator.serviceWorker.register("/service-worker.js", { scope: `./` });
 
-    let registration = await navigator.serviceWorker.ready;
-    registration = await registration.update();
-
-    let subscription = await registration.pushManager.getSubscription();
+    let subscription = await connectToWorker();
     if (!subscription) {
       subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
@@ -80,19 +84,57 @@ document.addEventListener("readystatechange", (event) => {
     return subscription;
   }
 
-  if ("serviceWorker" in navigator) {
+  function canNotificationBeEnabled() {
+    if (!("serviceWorker" in navigator)) {
+      return false;
+    }
+
+    if (/iphone|ipad/i.test(navigator.userAgent)) {
+      return window.navigator.standalone === true;
+    }
+
+    return true;
+  }
+
+  async function connectToWorker() {
+    let registration = await navigator.serviceWorker.ready;
+    registration = await registration.update();
+
+    return await registration.pushManager.getSubscription();
+  }
+
+  async function getSubscription() {
+    const timeout = new Promise(function (resolve, reject) {
+      setTimeout(() => {
+        reject("Timeout!");
+      }, 1000);
+    });
+
+    return Promise.race([connectToWorker(), timeout]);
+  }
+
+  function setupSubscription(subscription) {
+    workerRegisterWrapper.classList.add("hidden");
+    urlInput.value = subscription.endpoint;
+    button.disabled = false;
+  }
+
+  if (canNotificationBeEnabled()) {
+    pushForm.classList.remove("hidden");
     const button = pushForm.querySelector("button.bg-primary");
+
     if (button) {
       button.disabled = true;
 
-      workerRegister.addEventListener("click", async () => {
-        const subscription = await registerWorker();
+      const subscription = await getSubscription();
 
-        urlInput.value = subscription.endpoint;
-
-        workerRegister.classList.add("hidden");
-        button.disabled = false;
-      });
+      if (subscription) {
+        setupSubscription(subscription);
+      } else {
+        workerRegister.addEventListener("click", async () => {
+          setupSubscription(await registerWorker());
+        });
+      }
     }
   }
 });

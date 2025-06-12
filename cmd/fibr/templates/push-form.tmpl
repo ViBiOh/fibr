@@ -3,7 +3,7 @@
     const vapidKey = "{{ .VapidKey }}";
   </script>
 
-  <div id="push-form" class="modal push-form">
+  <div id="push-form" class="modal push-form hidden">
     <div class="modal-content">
       <h2 class="header">Push Notification</h2>
 
@@ -19,7 +19,7 @@
           <label for="push-recursive">Recursive on children folders</label>
         </p>
 
-        <p class="padding no-margin center">
+        <p id="worker-register-wrapper" class="padding no-margin center">
           <span id="worker-register" class="button bg-grey">Register push worker</span>
         </p>
 

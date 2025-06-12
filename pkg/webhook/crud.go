@@ -55,6 +55,13 @@ func (s *Service) Create(ctx context.Context, pathname string, recursive bool, k
 			Types:     types,
 		}
 
+		for existingID, existing := range s.webhooks {
+			if webhook.Similar(existing) {
+				id = existingID
+				return nil
+			}
+		}
+
 		s.webhooks[id] = webhook
 
 		if err = provider.SaveJSON(ctx, s.storage, webhookFilename, s.webhooks); err != nil {

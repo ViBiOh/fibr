@@ -68,6 +68,24 @@ type Webhook struct {
 	Recursive bool        `json:"recursive"`
 }
 
+func (w Webhook) Similar(other Webhook) bool {
+	if w.Pathname != other.Pathname || w.Kind != other.Kind || w.URL != other.URL || w.Recursive != other.Recursive {
+		return false
+	}
+
+	if len(w.Types) != len(other.Types) {
+		return false
+	}
+
+	for _, eventType := range w.Types {
+		if !slices.Contains(other.Types, eventType) {
+			return false
+		}
+	}
+
+	return true
+}
+
 func (w Webhook) Match(e Event) bool {
 	if !w.hasType(e.Type) {
 		return false
