@@ -107,9 +107,9 @@ document.addEventListener("readystatechange", async (event) => {
   }
 
   async function getSubscription() {
-    const timeout = new Promise(function (resolve, reject) {
+    const timeout = new Promise((resolve) => {
       setTimeout(() => {
-        reject("Timeout!");
+        resolve(null);
       }, 1000);
     });
 
