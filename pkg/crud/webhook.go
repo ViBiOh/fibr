@@ -68,6 +68,7 @@ func (s *Service) createWebhook(w http.ResponseWriter, r *http.Request, request 
 
 	if kind == provider.Push {
 		s.renderer.Redirect(w, r, fmt.Sprintf("%s?d=%s", request.AbsoluteURL(""), request.Display), renderer.NewSuccessMessage("Push notification registered!"))
+		return
 	}
 
 	s.renderer.Redirect(w, r, fmt.Sprintf("%s?d=%s#webhook-list", request.AbsoluteURL(""), request.Display), renderer.NewSuccessMessage("Webhook successfully created with ID: %s", id))
