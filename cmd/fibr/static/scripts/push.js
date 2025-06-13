@@ -125,7 +125,6 @@ document.addEventListener("readystatechange", async (event) => {
   }
 
   function setupSubscription(subscription) {
-    workerRegisterWrapper.classList.add("hidden");
     urlInput.value = subscription.endpoint;
     submitButton.disabled = false;
   }
@@ -139,8 +138,10 @@ document.addEventListener("readystatechange", async (event) => {
     if (subscription && subscription.endpoint) {
       setupSubscription(subscription);
     } else {
+      workerRegisterWrapper.classList.remove("hidden");
       workerRegister.addEventListener("click", async () => {
         setupSubscription(await registerWorker());
+        workerRegisterWrapper.classList.add("hidden");
       });
     }
   }
