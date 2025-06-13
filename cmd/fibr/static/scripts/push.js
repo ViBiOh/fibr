@@ -136,7 +136,7 @@ document.addEventListener("readystatechange", async (event) => {
 
     const subscription = await getSubscriptionWithTimeout();
 
-    if (subscription && subsription.endpoint) {
+    if (subscription && subscription.endpoint) {
       setupSubscription(subscription);
     } else {
       workerRegister.addEventListener("click", async () => {
