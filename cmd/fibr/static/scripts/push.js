@@ -8,6 +8,8 @@ document.addEventListener("readystatechange", async (event) => {
     return;
   }
 
+  const submitButton = pushForm.querySelector("button.bg-primary");
+
   const urlInput = document.getElementById("push-url");
   const pushFormButton = document.getElementById("push-form-button");
   const workerRegister = document.getElementById("worker-register");
@@ -117,25 +119,21 @@ document.addEventListener("readystatechange", async (event) => {
   function setupSubscription(subscription) {
     workerRegisterWrapper.classList.add("hidden");
     urlInput.value = subscription.endpoint;
-    button.disabled = false;
+    submitButton.disabled = false;
   }
 
   if (canNotificationBeEnabled()) {
     pushFormButton.classList.remove("hidden");
-    const button = pushForm.querySelector("button.bg-primary");
+    submitButton.disabled = true;
 
-    if (button) {
-      button.disabled = true;
+    const subscription = await getSubscription();
 
-      const subscription = await getSubscription();
-
-      if (subscription) {
-        setupSubscription(subscription);
-      } else {
-        workerRegister.addEventListener("click", async () => {
-          setupSubscription(await registerWorker());
-        });
-      }
+    if (subscription) {
+      setupSubscription(subscription);
+    } else {
+      workerRegister.addEventListener("click", async () => {
+        setupSubscription(await registerWorker());
+      });
     }
   }
 });
