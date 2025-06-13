@@ -74,7 +74,9 @@ document.addEventListener("readystatechange", async (event) => {
   async function registerWorker() {
     navigator.serviceWorker.register("/service-worker.js", { scope: `./` });
 
-    let subscription = await connectToWorker();
+    const registration = await refreshWorker();
+    let subscription = await getSubscription(registration);
+
     if (!subscription) {
       subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
@@ -88,6 +90,10 @@ document.addEventListener("readystatechange", async (event) => {
   }
 
   function canNotificationBeEnabled() {
+    if (!vapidKey) {
+      return false;
+    }
+
     if (!("serviceWorker" in navigator)) {
       return false;
     }
@@ -99,21 +105,23 @@ document.addEventListener("readystatechange", async (event) => {
     return true;
   }
 
-  async function connectToWorker() {
-    let registration = await navigator.serviceWorker.ready;
-    registration = await registration.update();
-
-    return await registration.pushManager.getSubscription();
+  async function refreshWorker() {
+    const registration = await navigator.serviceWorker.ready;
+    return await registration.update();
   }
 
-  async function getSubscription() {
+  async function getSubscription(registration) {
+    return await (await refreshWorker()).pushManager.getSubscription();
+  }
+
+  async function getSubscriptionWithTimeout() {
     const timeout = new Promise((resolve) => {
       setTimeout(() => {
         resolve(null);
       }, 1000);
     });
 
-    return Promise.race([connectToWorker(), timeout]);
+    return Promise.race([refreshWorker(), timeout]);
   }
 
   function setupSubscription(subscription) {
@@ -126,7 +134,7 @@ document.addEventListener("readystatechange", async (event) => {
     pushFormButton.classList.remove("hidden");
     submitButton.disabled = true;
 
-    const subscription = await getSubscription();
+    const subscription = await getSubscriptionWithTimeout();
 
     if (subscription) {
       setupSubscription(subscription);
