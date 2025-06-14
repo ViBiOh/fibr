@@ -8,7 +8,7 @@ require (
 	github.com/ViBiOh/auth/v2 v2.20.14
 	github.com/ViBiOh/exas v0.8.1
 	github.com/ViBiOh/flags v1.6.0
-	github.com/ViBiOh/httputils/v4 v4.82.0
+	github.com/ViBiOh/httputils/v4 v4.82.1
 	github.com/ViBiOh/vignet v0.0.1
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/rabbitmq/amqp091-go v1.10.0
