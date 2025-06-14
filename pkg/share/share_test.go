@@ -31,22 +31,22 @@ func TestPurgeExpiredShares(t *testing.T) {
 				shares: map[string]provider.Share{
 					"1": {
 						ID:       "1",
-						Creation: time.Date(2021, 0o5, 0o1, 12, 0o0, 0o0, 0, time.UTC),
+						Created:  time.Date(2021, 0o5, 0o1, 12, 0o0, 0o0, 0, time.UTC),
 						Duration: time.Hour,
 					},
 					"2": {
 						ID:       "2",
-						Creation: time.Date(2021, 0o5, 0o1, 12, 0o0, 0o0, 0, time.UTC),
+						Created:  time.Date(2021, 0o5, 0o1, 12, 0o0, 0o0, 0, time.UTC),
 						Duration: time.Hour * 24,
 					},
 					"22": {
 						ID:       "22",
-						Creation: time.Date(2021, 0o5, 0o1, 12, 0o0, 0o0, 0, time.UTC),
+						Created:  time.Date(2021, 0o5, 0o1, 12, 0o0, 0o0, 0, time.UTC),
 						Duration: 0,
 					},
 					"3": {
 						ID:       "3",
-						Creation: time.Date(2021, 0o5, 0o1, 12, 0o0, 0o0, 0, time.UTC),
+						Created:  time.Date(2021, 0o5, 0o1, 12, 0o0, 0o0, 0, time.UTC),
 						Duration: time.Hour,
 					},
 				},
@@ -54,12 +54,12 @@ func TestPurgeExpiredShares(t *testing.T) {
 			map[string]provider.Share{
 				"2": {
 					ID:       "2",
-					Creation: time.Date(2021, 0o5, 0o1, 12, 0o0, 0o0, 0, time.UTC),
+					Created:  time.Date(2021, 0o5, 0o1, 12, 0o0, 0o0, 0, time.UTC),
 					Duration: time.Hour * 24,
 				},
 				"22": {
 					ID:       "22",
-					Creation: time.Date(2021, 0o5, 0o1, 12, 0o0, 0o0, 0, time.UTC),
+					Created:  time.Date(2021, 0o5, 0o1, 12, 0o0, 0o0, 0, time.UTC),
 					Duration: 0,
 				},
 			},

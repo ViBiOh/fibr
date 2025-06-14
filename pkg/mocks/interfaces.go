@@ -312,10 +312,10 @@ func (mr *WebhookManagerMockRecorder) Delete(arg0, arg1 any) *gomock.Call {
 }
 
 // Find mocks base method.
-func (m *WebhookManager) Find(arg0 string, arg1 provider.Request) []provider.Webhook {
+func (m *WebhookManager) Find(arg0 string, arg1 provider.Request) provider.Webhook {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Find", arg0, arg1)
-	ret0, _ := ret[0].([]provider.Webhook)
+	ret0, _ := ret[0].(provider.Webhook)
 	return ret0
 }
 

@@ -19,11 +19,11 @@ func (s *Service) generateID() (string, error) {
 	}
 }
 
-func (s *Service) List() (output []provider.Webhook) {
+func (s *Service) List() []provider.Webhook {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
 
-	output = make([]provider.Webhook, 0, len(s.webhooks))
+	output := make([]provider.Webhook, 0, len(s.webhooks))
 
 	for _, webhook := range s.webhooks {
 		index := sort.Search(len(output), func(i int) bool {
@@ -38,19 +38,17 @@ func (s *Service) List() (output []provider.Webhook) {
 	return output
 }
 
-func (s *Service) Find(url string, request provider.Request) (output []provider.Webhook) {
+func (s *Service) Find(url string, request provider.Request) provider.Webhook {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
 
-	output = make([]provider.Webhook, 0, len(s.webhooks))
-
 	for _, webhook := range s.webhooks {
 		if webhook.URL == url && webhook.Pathname == request.Filepath() {
-			output = append(output, webhook)
+			return webhook
 		}
 	}
 
-	return output
+	return provider.Webhook{}
 }
 
 func (s *Service) Create(ctx context.Context, pathname string, recursive bool, kind provider.WebhookKind, url string, types []provider.EventType) (string, error) {

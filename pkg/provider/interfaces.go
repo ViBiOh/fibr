@@ -38,7 +38,7 @@ type ShareManager interface {
 
 type WebhookManager interface {
 	List() []Webhook
-	Find(string, Request) []Webhook
+	Find(string, Request) Webhook
 	Create(context.Context, string, bool, WebhookKind, string, []EventType) (string, error)
 	Delete(context.Context, string) error
 }

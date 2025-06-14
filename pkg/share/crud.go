@@ -59,7 +59,7 @@ func (s *Service) Create(ctx context.Context, filepath string, edit, story bool,
 			Story:    story,
 			Password: password,
 			File:     !isDir,
-			Creation: s.clock(),
+			Created:  s.clock(),
 			Duration: duration,
 		}
 

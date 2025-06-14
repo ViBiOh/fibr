@@ -4,12 +4,14 @@ import (
 	"bytes"
 	"encoding/base64"
 	"strings"
+	"time"
 )
 
 type Subscription struct {
-	Endpoint  string `json:"endpoint"`
-	PublicKey string `json:"publicKey"`
-	Auth      string `json:"auth"`
+	Created   time.Time `json:"created"`
+	Endpoint  string    `json:"endpoint"`
+	PublicKey string    `json:"publicKey"`
+	Auth      string    `json:"auth"`
 }
 
 func (s Subscription) decodedPublicKey() ([]byte, error) {
@@ -18,6 +20,10 @@ func (s Subscription) decodedPublicKey() ([]byte, error) {
 
 func (s Subscription) decodedAuth() ([]byte, error) {
 	return decodeKey(s.Auth)
+}
+
+func (s Subscription) Similar(other Subscription) bool {
+	return s.Auth == other.Auth && s.PublicKey == other.PublicKey
 }
 
 func decodeKey(key string) ([]byte, error) {

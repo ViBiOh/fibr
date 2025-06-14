@@ -16,8 +16,6 @@ func (s *Service) PubSubHandle(webhook provider.Webhook, err error) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
-	slog.LogAttrs(context.Background(), slog.LevelInfo, "Webhook's PubSub", slog.String("id", webhook.ID))
-
 	if len(webhook.URL) == 0 {
 		delete(s.webhooks, webhook.ID)
 	} else {

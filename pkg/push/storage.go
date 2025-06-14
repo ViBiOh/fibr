@@ -38,12 +38,29 @@ func (s *Service) Add(ctx context.Context, subscription Subscription) error {
 		}
 
 		for _, sub := range subscriptions {
-			if sub.Auth == subscription.Auth && sub.PublicKey == subscription.PublicKey {
+			if sub.Similar(subscription) {
 				return nil
 			}
 		}
 
 		subscriptions = append(subscriptions, subscription)
+
+		return s.save(ctx, subscriptions)
+	})
+}
+
+func (s *Service) Delete(ctx context.Context, endpoint string) error {
+	return s.exclusive.Execute(ctx, "fibr:mutex:push", exclusive.Duration, func(ctx context.Context) error {
+		subscriptions, err := s.get(ctx)
+		if err != nil {
+			return fmt.Errorf("get subscriptions: %w", err)
+		}
+
+		for index, sub := range subscriptions {
+			if sub.Endpoint == endpoint {
+				subscriptions = append(subscriptions[:index], subscriptions[index+1:]...)
+			}
+		}
 
 		return s.save(ctx, subscriptions)
 	})

@@ -86,9 +86,9 @@ document.addEventListener("readystatechange", async (event) => {
     }
 
     const webhook = await response.json();
-    if (webhook.length) {
+    if (webhook.id) {
       // submitButton.innerHTML = "Unsubscribe";
-      pushFormButton.querySelector("img").src = "/svg/push?fill=limegreen";
+      pushFormButton.querySelector("img").src = "/svg/push-ring?fill=limegreen";
     }
   }
 

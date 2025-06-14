@@ -14,7 +14,7 @@ import (
 )
 
 type Share struct {
-	Creation time.Time     `json:"creation"`
+	Created  time.Time     `json:"creation"`
 	ID       string        `json:"id"`
 	Path     string        `json:"path"`
 	RootName string        `json:"rootName"`
@@ -85,5 +85,5 @@ func (s Share) CheckPassword(ctx context.Context, authorizationHeader string, sh
 }
 
 func (s Share) IsExpired(now time.Time) bool {
-	return s.Duration != 0 && s.Creation.Add(s.Duration).Before(now)
+	return s.Duration != 0 && s.Created.Add(s.Duration).Before(now)
 }
