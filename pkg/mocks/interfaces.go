@@ -311,6 +311,20 @@ func (mr *WebhookManagerMockRecorder) Delete(arg0, arg1 any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*WebhookManager)(nil).Delete), arg0, arg1)
 }
 
+// Find mocks base method.
+func (m *WebhookManager) Find(arg0 string, arg1 provider.Request) []provider.Webhook {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Find", arg0, arg1)
+	ret0, _ := ret[0].([]provider.Webhook)
+	return ret0
+}
+
+// Find indicates an expected call of Find.
+func (mr *WebhookManagerMockRecorder) Find(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Find", reflect.TypeOf((*WebhookManager)(nil).Find), arg0, arg1)
+}
+
 // List mocks base method.
 func (m *WebhookManager) List() []provider.Webhook {
 	m.ctrl.T.Helper()

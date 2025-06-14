@@ -25,14 +25,29 @@ func (s *Service) List() (output []provider.Webhook) {
 
 	output = make([]provider.Webhook, 0, len(s.webhooks))
 
-	for _, value := range s.webhooks {
+	for _, webhook := range s.webhooks {
 		index := sort.Search(len(output), func(i int) bool {
-			return output[i].ID > value.ID
+			return output[i].ID > webhook.ID
 		})
 
-		output = append(output, value)
+		output = append(output, webhook)
 		copy(output[index+1:], output[index:])
-		output[index] = value
+		output[index] = webhook
+	}
+
+	return output
+}
+
+func (s *Service) Find(url string, request provider.Request) (output []provider.Webhook) {
+	s.mutex.RLock()
+	defer s.mutex.RUnlock()
+
+	output = make([]provider.Webhook, 0, len(s.webhooks))
+
+	for _, webhook := range s.webhooks {
+		if webhook.URL == url && webhook.Pathname == request.Filepath() {
+			output = append(output, webhook)
+		}
 	}
 
 	return output

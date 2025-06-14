@@ -71,6 +71,27 @@ document.addEventListener("readystatechange", async (event) => {
     }
   }
 
+  async function checkPush(endpoint) {
+    const response = await fetch(
+      `?push&endpoint=${encodeURIComponent(endpoint)}`,
+      {
+        method: "GET",
+        credentials: "same-origin",
+      },
+    );
+
+    if (response.status >= 400) {
+      const payload = await response.text();
+      throw new Error(`unable to register push: ${payload}`);
+    }
+
+    const webhook = await response.json();
+    if (webhook.length) {
+      // submitButton.innerHTML = "Unsubscribe";
+      pushFormButton.querySelector("img").src = "/svg/push?fill=limegreen";
+    }
+  }
+
   async function registerWorker() {
     navigator.serviceWorker.register("/service-worker.js", { scope: `./` });
 
@@ -105,16 +126,7 @@ document.addEventListener("readystatechange", async (event) => {
     return true;
   }
 
-  async function refreshWorker() {
-    const registration = await navigator.serviceWorker.ready;
-    return await registration.update();
-  }
-
-  async function getSubscription(registration) {
-    return await (await refreshWorker()).pushManager.getSubscription();
-  }
-
-  async function getSubscriptionWithTimeout() {
+  async function getRegistrationWithTimeout() {
     const timeout = new Promise((resolve) => {
       setTimeout(() => {
         resolve(null);
@@ -122,6 +134,17 @@ document.addEventListener("readystatechange", async (event) => {
     });
 
     return Promise.race([refreshWorker(), timeout]);
+  }
+
+  async function refreshWorker() {
+    const registration = await navigator.serviceWorker.ready;
+    return await registration.update();
+  }
+
+  async function getSubscription(registration) {
+    if (registration) {
+      return await registration.pushManager.getSubscription();
+    }
   }
 
   function setupSubscription(subscription) {
@@ -133,10 +156,12 @@ document.addEventListener("readystatechange", async (event) => {
     pushFormButton.classList.remove("hidden");
     submitButton.disabled = true;
 
-    const subscription = await getSubscriptionWithTimeout();
+    const registration = await getRegistrationWithTimeout();
+    const subscription = await getSubscription(registration);
 
     if (subscription && subscription.endpoint) {
       setupSubscription(subscription);
+      checkPush(subscription.endpoint);
     } else {
       workerRegisterWrapper.classList.remove("hidden");
       workerRegister.addEventListener("click", async () => {

@@ -12,7 +12,7 @@ package mocks
 import (
 	context "context"
 	io "io"
-	fs "io/fs"
+	os "os"
 	reflect "reflect"
 	time "time"
 
@@ -88,7 +88,7 @@ func (mr *StorageMockRecorder) List(ctx, name any) *gomock.Call {
 }
 
 // Mkdir mocks base method.
-func (m *Storage) Mkdir(ctx context.Context, name string, perm fs.FileMode) error {
+func (m *Storage) Mkdir(ctx context.Context, name string, perm os.FileMode) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Mkdir", ctx, name, perm)
 	ret0, _ := ret[0].(error)

@@ -18,6 +18,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/metadata"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/hash"
+	"github.com/ViBiOh/httputils/v4/pkg/httpjson"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/query"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
@@ -119,6 +120,11 @@ func (s *Service) handleDir(w http.ResponseWriter, r *http.Request, request prov
 		return s.stats(r, request, message)
 	}
 
+	if query.GetBool(r, "push") {
+		s.handleGetPush(w, r, request)
+		return renderer.Page{}, nil
+	}
+
 	items, err := s.listFiles(r, request, item)
 	if err != nil {
 		return errorReturn(request, err)
@@ -188,6 +194,10 @@ func (s *Service) listFiles(r *http.Request, request provider.Request, item abst
 	sort.Sort(provider.ByHybridSort(items))
 
 	return items, err
+}
+
+func (s *Service) handleGetPush(w http.ResponseWriter, r *http.Request, request provider.Request) {
+	httpjson.Write(r.Context(), w, http.StatusOK, s.webhook.Find(r.URL.Query().Get("endpoint"), request))
 }
 
 func (s *Service) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provider.Request, item absto.Item, items []absto.Item) {
