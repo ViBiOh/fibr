@@ -129,15 +129,21 @@ func checkWebhookForm(r *http.Request) (recursive bool, kind provider.WebhookKin
 }
 
 func (s *Service) deleteWebhook(w http.ResponseWriter, r *http.Request, request provider.Request) {
-	if !request.CanWebhook {
+	webhook := s.webhook.Get(r.FormValue("id"))
+
+	if !request.CanWebhook && webhook.Kind != provider.Push {
 		s.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
 		return
 	}
 
-	ctx := r.Context()
-	id := r.FormValue("id")
+	if len(webhook.ID) == 0 {
+		s.error(w, r, request, model.WrapNotFound(errors.New("webhook not found")))
+		return
+	}
 
-	if err := s.webhook.Delete(ctx, id); err != nil {
+	ctx := r.Context()
+
+	if err := s.webhook.Delete(ctx, webhook.ID); err != nil {
 		s.error(w, r, request, model.WrapInternal(err))
 		return
 	}
@@ -147,5 +153,10 @@ func (s *Service) deleteWebhook(w http.ResponseWriter, r *http.Request, request 
 		return
 	}
 
-	s.renderer.Redirect(w, r, fmt.Sprintf("%s?d=%s#webhook-list", request.Path, request.Display), renderer.NewSuccessMessage("Webhook with id %s successfully deleted", id))
+	if webhook.Kind == provider.Push {
+		s.renderer.Redirect(w, r, fmt.Sprintf("%s?d=%s", request.AbsoluteURL(""), request.Display), renderer.NewSuccessMessage("Push notification removed!"))
+		return
+	}
+
+	s.renderer.Redirect(w, r, fmt.Sprintf("%s?d=%s#webhook-list", request.AbsoluteURL(""), request.Display), renderer.NewSuccessMessage("Webhook with id %s successfully deleted", webhook.ID))
 }

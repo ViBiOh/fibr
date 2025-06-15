@@ -197,7 +197,7 @@ func (s *Service) listFiles(r *http.Request, request provider.Request, item abst
 }
 
 func (s *Service) handleGetPush(w http.ResponseWriter, r *http.Request, request provider.Request) {
-	httpjson.Write(r.Context(), w, http.StatusOK, s.webhook.Find(r.URL.Query().Get("endpoint"), request))
+	httpjson.Write(r.Context(), w, http.StatusOK, s.webhook.FindByURL(r.URL.Query().Get("endpoint"), request))
 }
 
 func (s *Service) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provider.Request, item absto.Item, items []absto.Item) {

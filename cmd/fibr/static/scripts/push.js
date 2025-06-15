@@ -12,6 +12,8 @@ document.addEventListener("readystatechange", async (event) => {
 
   const urlInput = document.getElementById("push-url");
   const pushFormButton = document.getElementById("push-form-button");
+  const pushFormMethod = document.getElementById("push-form-method");
+  const pushFormID = document.getElementById("push-form-id");
   const workerRegister = document.getElementById("worker-register");
   const workerRegisterWrapper = document.getElementById(
     "worker-register-wrapper",
@@ -87,7 +89,9 @@ document.addEventListener("readystatechange", async (event) => {
 
     const webhook = await response.json();
     if (webhook.id) {
-      // submitButton.innerHTML = "Unsubscribe";
+      pushFormMethod.value = "DELETE";
+      pushFormID.value = webhook.id;
+      submitButton.innerHTML = "Unsubscribe";
       pushFormButton.querySelector("img").src = "/svg/push-ring?fill=limegreen";
     }
   }

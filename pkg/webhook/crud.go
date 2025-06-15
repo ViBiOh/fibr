@@ -38,7 +38,20 @@ func (s *Service) List() []provider.Webhook {
 	return output
 }
 
-func (s *Service) Find(url string, request provider.Request) provider.Webhook {
+func (s *Service) Get(id string) provider.Webhook {
+	s.mutex.RLock()
+	defer s.mutex.RUnlock()
+
+	for _, webhook := range s.webhooks {
+		if webhook.ID == id {
+			return webhook
+		}
+	}
+
+	return provider.Webhook{}
+}
+
+func (s *Service) FindByURL(url string, request provider.Request) provider.Webhook {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
 
