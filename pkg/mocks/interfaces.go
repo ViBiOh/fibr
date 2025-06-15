@@ -312,17 +312,17 @@ func (mr *WebhookManagerMockRecorder) Delete(arg0, arg1 any) *gomock.Call {
 }
 
 // FindByURL mocks base method.
-func (m *WebhookManager) FindByURL(arg0 string, arg1 provider.Request) provider.Webhook {
+func (m *WebhookManager) FindByURL(arg0 string) []provider.Webhook {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FindByURL", arg0, arg1)
-	ret0, _ := ret[0].(provider.Webhook)
+	ret := m.ctrl.Call(m, "FindByURL", arg0)
+	ret0, _ := ret[0].([]provider.Webhook)
 	return ret0
 }
 
 // FindByURL indicates an expected call of FindByURL.
-func (mr *WebhookManagerMockRecorder) FindByURL(arg0, arg1 any) *gomock.Call {
+func (mr *WebhookManagerMockRecorder) FindByURL(arg0 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByURL", reflect.TypeOf((*WebhookManager)(nil).FindByURL), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByURL", reflect.TypeOf((*WebhookManager)(nil).FindByURL), arg0)
 }
 
 // Get mocks base method.

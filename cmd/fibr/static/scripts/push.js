@@ -73,7 +73,7 @@ document.addEventListener("readystatechange", async (event) => {
     }
   }
 
-  async function checkPush(endpoint) {
+  async function checkPush(registration, endpoint) {
     const response = await fetch(
       `?push&endpoint=${encodeURIComponent(endpoint)}`,
       {
@@ -87,12 +87,15 @@ document.addEventListener("readystatechange", async (event) => {
       throw new Error(`unable to register push: ${payload}`);
     }
 
-    const webhook = await response.json();
-    if (webhook.id) {
+    const result = await response.json();
+    if (result.id) {
       pushFormMethod.value = "DELETE";
-      pushFormID.value = webhook.id;
+      pushFormID.value = result.id;
       submitButton.innerHTML = "Unsubscribe";
       pushFormButton.querySelector("img").src = "/svg/push-ring?fill=limegreen";
+    } else if (!result.registered) {
+      await registration.unregister();
+      enableRegisterButton();
     }
   }
 
@@ -156,6 +159,14 @@ document.addEventListener("readystatechange", async (event) => {
     submitButton.disabled = false;
   }
 
+  function enableRegisterButton() {
+    workerRegisterWrapper.classList.remove("hidden");
+    workerRegister.addEventListener("click", async () => {
+      setupSubscription(await registerWorker());
+      workerRegisterWrapper.classList.add("hidden");
+    });
+  }
+
   if (canNotificationBeEnabled()) {
     pushFormButton.classList.remove("hidden");
     submitButton.disabled = true;
@@ -165,13 +176,9 @@ document.addEventListener("readystatechange", async (event) => {
 
     if (subscription && subscription.endpoint) {
       setupSubscription(subscription);
-      checkPush(subscription.endpoint);
+      checkPush(registration, subscription.endpoint);
     } else {
-      workerRegisterWrapper.classList.remove("hidden");
-      workerRegister.addEventListener("click", async () => {
-        setupSubscription(await registerWorker());
-        workerRegisterWrapper.classList.add("hidden");
-      });
+      enableRegisterButton();
     }
   }
 });

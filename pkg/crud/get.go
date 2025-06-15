@@ -197,7 +197,20 @@ func (s *Service) listFiles(r *http.Request, request provider.Request, item abst
 }
 
 func (s *Service) handleGetPush(w http.ResponseWriter, r *http.Request, request provider.Request) {
-	httpjson.Write(r.Context(), w, http.StatusOK, s.webhook.FindByURL(r.URL.Query().Get("endpoint"), request))
+	webhooks := s.webhook.FindByURL(r.URL.Query().Get("endpoint"))
+
+	var currentID string
+	for _, webhook := range webhooks {
+		if webhook.Pathname == request.Filepath() {
+			currentID = webhook.ID
+			break
+		}
+	}
+
+	httpjson.Write(r.Context(), w, http.StatusOK, map[string]any{
+		"id":         currentID,
+		"registered": len(webhooks) != 0,
+	})
 }
 
 func (s *Service) serveGeoJSON(w http.ResponseWriter, r *http.Request, request provider.Request, item absto.Item, items []absto.Item) {

@@ -51,17 +51,19 @@ func (s *Service) Get(id string) provider.Webhook {
 	return provider.Webhook{}
 }
 
-func (s *Service) FindByURL(url string, request provider.Request) provider.Webhook {
+func (s *Service) FindByURL(url string) []provider.Webhook {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
 
+	var webhooks []provider.Webhook
+
 	for _, webhook := range s.webhooks {
-		if webhook.URL == url && webhook.Pathname == request.Filepath() {
-			return webhook
+		if webhook.URL == url {
+			webhooks = append(webhooks, webhook)
 		}
 	}
 
-	return provider.Webhook{}
+	return webhooks
 }
 
 func (s *Service) Create(ctx context.Context, pathname string, recursive bool, kind provider.WebhookKind, url string, types []provider.EventType) (string, error) {
