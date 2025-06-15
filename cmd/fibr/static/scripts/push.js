@@ -93,7 +93,7 @@ document.addEventListener("readystatechange", async (event) => {
   }
 
   async function registerWorker() {
-    navigator.serviceWorker.register("/service-worker.js", { scope: `./` });
+    navigator.serviceWorker.register("/service-worker.js");
 
     const registration = await refreshWorker();
     let subscription = await getSubscription(registration);

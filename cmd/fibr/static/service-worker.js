@@ -9,7 +9,7 @@ self.addEventListener("activate", function (event) {
 self.addEventListener("push", async function (event) {
   const payload = await event.data.json();
 
-  return self.registration.showNotification("FIle BRowser", {
+  return self.registration.showNotification(payload.title, {
     icon: "/images/favicon/favicon-32x32.png",
     image: payload.image,
     body: payload.description,

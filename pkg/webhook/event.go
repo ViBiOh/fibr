@@ -185,7 +185,7 @@ func (s *Service) slackHandle(ctx context.Context, webhook provider.Webhook, eve
 
 	title := path.Base(path.Dir(event.Item.Pathname))
 	if title == "/" {
-		title = "fibr"
+		title = "FIle BRowser"
 	}
 
 	var contentURL, description string
