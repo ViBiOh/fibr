@@ -137,7 +137,7 @@ document.addEventListener("readystatechange", async (event) => {
     const timeout = new Promise((resolve) => {
       setTimeout(() => {
         resolve(null);
-      }, 1000);
+      }, 3000);
     });
 
     return Promise.race([refreshWorker(), timeout]);

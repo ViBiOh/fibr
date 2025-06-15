@@ -21,6 +21,7 @@ import (
 	"net/url"
 	"path"
 	"strconv"
+	"strings"
 	"time"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
@@ -214,8 +215,13 @@ func (s *Service) encryptContent(subscription Subscription, notification Notific
 
 	dataBuf := bytes.NewBuffer(payload)
 	dataBuf.Write([]byte("\x02"))
-	if err := fillPadding(dataBuf, recordLength-output.Len()); err != nil {
-		return nil, err
+
+	// No padding for firefox
+	// https://github.com/mozilla-services/autopush/issues/748
+	if !strings.Contains(subscription.Endpoint, "mozilla.com") {
+		if err := fillPadding(dataBuf, recordLength-output.Len()); err != nil {
+			return nil, err
+		}
 	}
 
 	ciphertext := aesgcm.Seal(nil, nonce, dataBuf.Bytes(), nil)
