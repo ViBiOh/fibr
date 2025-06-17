@@ -3,7 +3,7 @@ document.addEventListener("readystatechange", async (event) => {
     return;
   }
 
-  const pushForm = document.getElementById("push-form");
+  const pushForm = document.getElementById("push-form-form");
   if (!pushForm) {
     return;
   }
@@ -171,8 +171,17 @@ document.addEventListener("readystatechange", async (event) => {
     pushFormButton.classList.remove("hidden");
     submitButton.disabled = true;
 
+    const registrationThrobber = generateThrobber([
+      "throbber-white",
+      "padding",
+    ]);
+
+    pushForm.insertBefore(registrationThrobber, workerRegisterWrapper);
+
     const registration = await getRegistrationWithTimeout();
     const subscription = await getSubscription(registration);
+
+    pushForm.removeChild(registrationThrobber);
 
     if (subscription && subscription.endpoint) {
       setupSubscription(subscription);
