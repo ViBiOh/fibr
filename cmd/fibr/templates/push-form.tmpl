@@ -1,27 +1,29 @@
 {{ define "push-form" }}
-  <script type="text/javascript" nonce="{{ .nonce }}">
-    const vapidKey = "{{ .VapidKey }}";
-  </script>
+  {{ if .VapidKey }}
+    <script type="text/javascript" nonce="{{ .nonce }}">
+      const vapidKey = "{{ .VapidKey }}";
+    </script>
 
-  <div id="push-form" class="modal push-form">
-    <div class="modal-content">
-      <h2 class="header">Push Notification</h2>
+    <div id="push-form" class="modal push-form">
+      <div class="modal-content">
+        <h2 class="header">Push Notification</h2>
 
-      <form id="push-form-form" method="post" action="#">
-        <input type="hidden" name="id" value="" id="push-form-id" />
-        <input type="hidden" name="type" value="webhook" />
-        <input type="hidden" name="method" value="POST" id="push-form-method" />
-        <input type="hidden" name="kind" value="push" />
-        <input type="hidden" name="types" value="upload" />
-        <input type="hidden" name="recursive" value="true" />
-        <input id="push-url" type="hidden" name="url" value="" />
+        <form id="push-form-form" method="post" action="#">
+          <input type="hidden" name="id" value="" id="push-form-id" />
+          <input type="hidden" name="type" value="webhook" />
+          <input type="hidden" name="method" value="POST" id="push-form-method" />
+          <input type="hidden" name="kind" value="push" />
+          <input type="hidden" name="types" value="upload" />
+          <input type="hidden" name="recursive" value="true" />
+          <input id="push-url" type="hidden" name="url" value="" />
 
-        <p id="worker-register-wrapper" class="padding no-margin center hidden">
-          <span id="worker-register" class="button bg-grey">Register push worker</span>
-        </p>
+          <p id="worker-register-wrapper" class="padding no-margin center hidden">
+            <span id="worker-register" class="button bg-grey">Register push worker</span>
+          </p>
 
-        {{ template "form_buttons" "Subscribe" }}
-      </form>
+          {{ template "form_buttons" "Subscribe" }}
+        </form>
+      </div>
     </div>
-  </div>
+  {{ end }}
 {{ end }}
