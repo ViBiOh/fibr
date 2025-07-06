@@ -4,7 +4,7 @@ go 1.24
 
 require (
 	github.com/ViBiOh/ChatPotte v0.8.5
-	github.com/ViBiOh/absto v1.7.26
+	github.com/ViBiOh/absto v1.7.27
 	github.com/ViBiOh/auth/v2 v2.20.14
 	github.com/ViBiOh/exas v0.8.1
 	github.com/ViBiOh/flags v1.6.0
@@ -40,8 +40,8 @@ require (
 	github.com/klauspost/cpuid/v2 v2.2.11 // indirect
 	github.com/minio/crc64nvme v1.0.2 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
-	github.com/minio/minio-go/v7 v7.0.93 // indirect
-	github.com/philhofer/fwd v1.1.3-0.20240916144458-20a13a1f6b7c // indirect
+	github.com/minio/minio-go/v7 v7.0.94 // indirect
+	github.com/philhofer/fwd v1.2.0 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/redis/go-redis/extra/rediscmd/v9 v9.11.0 // indirect
 	github.com/redis/go-redis/extra/redisotel/v9 v9.11.0 // indirect
