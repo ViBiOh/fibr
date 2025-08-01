@@ -184,7 +184,13 @@ func (r Request) IsStory() bool {
 }
 
 func (r Request) AbsoluteURL(name string) string {
-	return Join("/", r.Share.ID, r.Path, name)
+	url := Join("/", r.Share.ID, r.Path, name)
+
+	if !r.Share.IsZero() && r.Share.File && !strings.HasSuffix(url, "/") {
+		url += "/"
+	}
+
+	return url
 }
 
 func (r Request) Filepath() string {
