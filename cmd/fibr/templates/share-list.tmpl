@@ -26,7 +26,7 @@
             {{ range .Shares }}
               <tr class="share-content">
                 <td>
-                  <a class="share-link" href="{{ url "/" }}{{ .ID }}{{ if .File }}?browser{{ end }}/">
+                  <a class="share-link" href="{{ url "/" }}{{ .ID }}/{{ if .File }}?browser{{ end }}">
                     <code>{{ .ID }}</code>
                   </a>
                 </td>
