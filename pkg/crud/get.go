@@ -108,6 +108,7 @@ func (s *Service) serveFile(w http.ResponseWriter, r *http.Request, item absto.I
 	defer provider.LogClose(ctx, file, "crud.serveFile", item.Pathname)
 
 	w.Header().Add("Etag", etag)
+	w.Header().Add("Content-Disposition", fmt.Sprintf("inline; filename=%s", item.Name()))
 
 	http.ServeContent(w, r, item.Name(), item.Date, file)
 	return nil
