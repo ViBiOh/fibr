@@ -47,9 +47,11 @@
         {{ end }}
 
         {{- $url := .Request.AbsoluteURL "/" }}
-        <a class="button button-icon" href="{{ url $url }}?d={{ .Request.LayoutPath $url }}" title="Back to folder">
-          <img class="icon" src="{{ url "/svg/folder-back?fill=silver" }}" alt="folder back">
-        </a>
+        {{ if not .Request.Share.File }}
+          <a class="button button-icon" href="{{ url $url }}?d={{ .Request.LayoutPath $url }}" title="Back to folder">
+            <img class="icon" src="{{ url "/svg/folder-back?fill=silver" }}" alt="folder back">
+          </a>
+        {{ end }}
       </nav>
     {{ else }}
       </span>
