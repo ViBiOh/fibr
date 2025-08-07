@@ -52,5 +52,5 @@ func NewPosition(lon, lat float64) Position {
 }
 
 func (p Position) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("[%f,%f]", p.Longitude, p.Latitude)), nil
+	return fmt.Appendf(nil, "[%f,%f]", p.Longitude, p.Latitude), nil
 }
