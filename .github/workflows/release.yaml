@@ -33,7 +33,7 @@ jobs:
       gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Setup Golang
         uses: actions/setup-go@v5
         with:
