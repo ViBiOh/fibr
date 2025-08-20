@@ -42,10 +42,6 @@ spec:
       - name: tmp
         mountPath: /tmp
     env:
-      - name: GOMAXPROCS
-        valueFrom:
-          resourceFieldRef:
-            resource: limits.cpu
       - name: GOMEMLIMIT
         valueFrom:
           resourceFieldRef:

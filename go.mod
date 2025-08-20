@@ -1,6 +1,6 @@
 module github.com/ViBiOh/fibr
 
-go 1.24
+go 1.25
 
 require (
 	github.com/ViBiOh/ChatPotte v0.8.5
@@ -18,7 +18,7 @@ require (
 	go.opentelemetry.io/otel v1.37.0
 	go.opentelemetry.io/otel/metric v1.37.0
 	go.opentelemetry.io/otel/trace v1.37.0
-	go.uber.org/mock v0.5.2
+	go.uber.org/mock v0.6.0
 	golang.org/x/crypto v0.41.0
 	golang.org/x/text v0.28.0
 )
