@@ -24,10 +24,10 @@ var (
 	WordExtensions    = map[string]bool{".doc": true, ".docx": true, ".docm": true}
 
 	// ThumbnailExtensions contains extensions of file eligible to thumbnail
-	ThumbnailExtensions = map[string]bool{".jpg": true, ".jpeg": true, ".png": true, ".gif": true, ".tiff": true, ".webp": true, ".pdf": true, ".mp4": true, ".mov": true, ".avi": true, ".ogg": true, ".mkv": true, ".heic": true}
+	ThumbnailExtensions = map[string]bool{".jpg": true, ".jpeg": true, ".png": true, ".gif": true, ".tiff": true, ".webp": true, ".dng": true, ".pdf": true, ".mp4": true, ".mov": true, ".avi": true, ".ogg": true, ".mkv": true, ".heic": true}
 
 	// VignetExtensions contains extensions of file eligible to thumbnail generation by vignet
-	VignetExtensions = map[string]bool{".jpg": true, ".jpeg": true, ".png": true, ".gif": true, ".tiff": true, ".webp": true, ".mp4": true, ".mov": true, ".avi": true, ".ogg": true, ".mkv": true, ".heic": true}
+	VignetExtensions = map[string]bool{".jpg": true, ".jpeg": true, ".png": true, ".gif": true, ".tiff": true, ".webp": true, ".dng": true, ".mp4": true, ".mov": true, ".avi": true, ".ogg": true, ".mkv": true, ".heic": true}
 )
 
 func MetadataDirectory(item absto.Item) string {
