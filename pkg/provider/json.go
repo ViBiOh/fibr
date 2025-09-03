@@ -16,7 +16,7 @@ func LoadJSON[T any](ctx context.Context, storageService absto.Storage, filename
 	reader, err = storageService.ReadFrom(ctx, filename)
 	if err != nil {
 		err = fmt.Errorf("read: %w", err)
-		return
+		return output, err
 	}
 
 	defer func() {
@@ -27,7 +27,7 @@ func LoadJSON[T any](ctx context.Context, storageService absto.Storage, filename
 		err = fmt.Errorf("decode: %w", storageService.ConvertError(err))
 	}
 
-	return
+	return output, err
 }
 
 func SaveJSON[T any](ctx context.Context, storageService absto.Storage, filename string, content T) error {

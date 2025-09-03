@@ -158,7 +158,7 @@ func (s *Service) enrichThumbnail(ctx context.Context, directoryAggregate provid
 		items[index].HasThumbnail = true
 	}
 
-	return
+	return hasThumbnail, hasStory, cover
 }
 
 func (s *Service) Download(w http.ResponseWriter, r *http.Request, request provider.Request, items []absto.Item) {
@@ -202,7 +202,7 @@ func (s *Service) zipItems(ctx context.Context, done <-chan struct{}, request pr
 
 			if !item.IsDir() {
 				if err = s.addFileToZip(ctx, zipWriter, item, relativeURL); err != nil {
-					return
+					return err
 				}
 
 				continue
@@ -211,8 +211,7 @@ func (s *Service) zipItems(ctx context.Context, done <-chan struct{}, request pr
 			var nestedItems []absto.Item
 			nestedItems, err = s.storage.List(ctx, request.SubPath(relativeURL))
 			if err != nil {
-				err = fmt.Errorf("zip nested folder `%s`: %w", relativeURL, err)
-				return
+				return fmt.Errorf("zip nested folder `%s`: %w", relativeURL, err)
 			}
 
 			if err = s.zipItems(ctx, done, request, zipWriter, nestedItems); err != nil {
@@ -254,5 +253,5 @@ func (s *Service) addFileToZip(ctx context.Context, zipWriter *zip.Writer, item 
 
 	_, err = io.CopyBuffer(writer, reader, buffer.Bytes())
 
-	return
+	return err
 }

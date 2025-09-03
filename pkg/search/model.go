@@ -36,7 +36,7 @@ func parseSearch(params url.Values, now time.Time) (output search, err error) {
 	if name := strings.TrimSpace(params.Get("name")); len(name) > 0 {
 		output.pattern, err = regexp.Compile(name)
 		if err != nil {
-			return
+			return output, err
 		}
 	}
 
@@ -46,12 +46,12 @@ func parseSearch(params url.Values, now time.Time) (output search, err error) {
 
 	output.before, err = parseDate(strings.TrimSpace(params.Get("before")))
 	if err != nil {
-		return
+		return output, err
 	}
 
 	output.after, err = parseDate(strings.TrimSpace(params.Get("after")))
 	if err != nil {
-		return
+		return output, err
 	}
 
 	if rawSince := params.Get("since"); len(rawSince) != 0 {
@@ -59,7 +59,7 @@ func parseSearch(params url.Values, now time.Time) (output search, err error) {
 
 		value, err = strconv.Atoi(rawSince)
 		if err != nil {
-			return
+			return output, err
 		}
 
 		before := computeSince(now, params.Get("sinceUnit"), value)
@@ -73,7 +73,7 @@ func parseSearch(params url.Values, now time.Time) (output search, err error) {
 	if len(rawSize) > 0 {
 		output.size, err = strconv.ParseInt(rawSize, 10, 64)
 		if err != nil {
-			return
+			return output, err
 		}
 	}
 
@@ -81,7 +81,7 @@ func parseSearch(params url.Values, now time.Time) (output search, err error) {
 	output.greaterThan = strings.TrimSpace(params.Get("sizeOrder")) == "gt"
 	output.mimes = computeMimes(params["types"])
 
-	return
+	return output, err
 }
 
 func (s search) match(item absto.Item) bool {

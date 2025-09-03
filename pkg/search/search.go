@@ -71,5 +71,5 @@ func (s Service) Files(r *http.Request, request provider.Request) (items []absto
 		return nil
 	})
 
-	return
+	return items, err
 }

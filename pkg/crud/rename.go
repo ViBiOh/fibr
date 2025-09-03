@@ -176,7 +176,7 @@ func (s *Service) checkFile(ctx context.Context, pathname string, shouldExist bo
 		}
 	}
 
-	return
+	return info, err
 }
 
 func (s *Service) updateCover(ctx context.Context, item absto.Item) error {

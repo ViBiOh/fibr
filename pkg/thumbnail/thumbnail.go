@@ -286,7 +286,7 @@ func (s Service) generateImageThumbnail(ctx context.Context, item absto.Item, pa
 		req, err = s.vignetRequest.Method(http.MethodPost).Path("?type=%s&scale=%d", itemType, size).Build(ctx, io.NopCloser(bytes.NewReader(payload)))
 		if err != nil {
 			err = fmt.Errorf("build %d: %w", size, err)
-			return
+			return err
 		}
 
 		req.ContentLength = int64(len(payload))
@@ -296,30 +296,30 @@ func (s Service) generateImageThumbnail(ctx context.Context, item absto.Item, pa
 		resp, err = request.DoWithClient(provider.SlowClient, req)
 		if err != nil {
 			err = fmt.Errorf("do %d: %w", size, err)
-			return
+			return err
 		}
 
 		if resp == nil {
 			err = fmt.Errorf("no body %d", size)
-			return
+			return err
 		}
 
 		filename := s.PathForScale(item, size)
 
 		if err = provider.WriteToStorage(ctx, s.storage, filename, resp.ContentLength, resp.Body); err != nil {
 			err = fmt.Errorf("write %d: %w", size, err)
-			return
+			return err
 		}
 
 		if err = request.DiscardBody(resp.Body); err != nil {
 			err = fmt.Errorf("close %d: %w", size, err)
-			return
+			return err
 		}
 
 		createdFiles = append(createdFiles, filename)
 	}
 
-	return
+	return err
 }
 
 func (s Service) List(w http.ResponseWriter, r *http.Request, item absto.Item, items []absto.Item) {

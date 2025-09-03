@@ -78,40 +78,40 @@ func checkWebhookForm(r *http.Request) (recursive bool, kind provider.WebhookKin
 	recursive, err = getFormBool(r.Form.Get("recursive"))
 	if err != nil {
 		err = model.WrapInvalid(err)
-		return
+		return recursive, kind, webhookURL, eventTypes, err
 	}
 
 	kind, err = provider.ParseWebhookKind(r.Form.Get("kind"))
 	if err != nil {
 		err = model.WrapInvalid(fmt.Errorf("parse kind: %w", err))
-		return
+		return recursive, kind, webhookURL, eventTypes, err
 	}
 
 	webhookURL = r.Form.Get("url")
 	if len(webhookURL) == 0 {
 		err = model.WrapInvalid(errors.New("url or token is required"))
-		return
+		return recursive, kind, webhookURL, eventTypes, err
 	}
 
 	if kind == provider.Telegram {
 		chatID := r.Form.Get("chat-id")
 		if len(chatID) == 0 {
 			err = model.WrapInvalid(errors.New("chat ID is required"))
-			return
+			return recursive, kind, webhookURL, eventTypes, err
 		}
 
 		webhookURL = generateTelegramURL(webhookURL, chatID)
 	} else {
 		if _, err = url.Parse(webhookURL); err != nil {
 			err = model.WrapInvalid(fmt.Errorf("parse url: %w", err))
-			return
+			return recursive, kind, webhookURL, eventTypes, err
 		}
 	}
 
 	rawEventTypes := r.Form["types"]
 	if len(rawEventTypes) == 0 {
 		err = model.WrapInvalid(errors.New("at least one event type has to be chosen"))
-		return
+		return recursive, kind, webhookURL, eventTypes, err
 	}
 
 	eventTypes = make([]provider.EventType, len(rawEventTypes))
@@ -120,12 +120,12 @@ func checkWebhookForm(r *http.Request) (recursive bool, kind provider.WebhookKin
 		eType, err = provider.ParseEventType(rawEventType)
 		if err != nil {
 			err = model.WrapInvalid(err)
-			return
+			return recursive, kind, webhookURL, eventTypes, err
 		}
 		eventTypes[i] = eType
 	}
 
-	return
+	return recursive, kind, webhookURL, eventTypes, err
 }
 
 func (s *Service) deleteWebhook(w http.ResponseWriter, r *http.Request, request provider.Request) {

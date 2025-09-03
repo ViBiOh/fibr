@@ -197,7 +197,7 @@ func (s *Service) extractExif(ctx context.Context, item absto.Item) (exif exas.E
 	if err != nil {
 		s.increaseExif(ctx, "error")
 		err = fmt.Errorf("fetch exif: %w", err)
-		return
+		return exif, err
 	}
 
 	exif, err = httpjson.Read[exas.Exif](resp)
@@ -205,7 +205,7 @@ func (s *Service) extractExif(ctx context.Context, item absto.Item) (exif exas.E
 		err = fmt.Errorf("read exif: %w", err)
 	}
 
-	return
+	return exif, err
 }
 
 func (s *Service) publishExifRequest(ctx context.Context, item absto.Item) error {

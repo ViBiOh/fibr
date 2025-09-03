@@ -45,16 +45,16 @@ func getUploadNameAndPath(request provider.Request, inputName string, part *mult
 	}
 
 	if err = absto.ValidPath(fileName); err != nil {
-		return
+		return fileName, filePath, err
 	}
 
 	if fileName, err = provider.SanitizeName(fileName, true); err != nil {
-		return
+		return fileName, filePath, err
 	}
 
 	filePath = request.SubPath(fileName)
 
-	return
+	return fileName, filePath, err
 }
 
 func getUploadSize(rawSize string) (int64, error) {

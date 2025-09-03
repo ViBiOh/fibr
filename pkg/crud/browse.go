@@ -74,7 +74,7 @@ func (s *Service) getFilesPreviousAndNext(ctx context.Context, item absto.Item, 
 	items, err = s.storage.List(ctx, item.Dir())
 	if err != nil {
 		slog.LogAttrs(ctx, slog.LevelError, "list neighbors files", slog.String("item", item.Pathname), slog.Any("error", err))
-		return
+		return items, previous, next
 	}
 
 	sort.Sort(provider.ByHybridSort(items))
@@ -88,5 +88,5 @@ func (s *Service) getFilesPreviousAndNext(ctx context.Context, item absto.Item, 
 		next = provider.StorageToRender(*nextItem, request)
 	}
 
-	return
+	return items, previous, next
 }

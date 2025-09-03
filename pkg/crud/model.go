@@ -30,9 +30,9 @@ func (s *Service) getCover(ctx context.Context, request provider.Request, files 
 	for _, file := range files {
 		if s.thumbnail.HasThumbnail(ctx, file, thumbnail.SmallSize) {
 			output = newCover(provider.StorageToRender(file, request), thumbnail.SmallSize)
-			return
+			return output
 		}
 	}
 
-	return
+	return output
 }
