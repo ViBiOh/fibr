@@ -39,24 +39,26 @@ func (d *GroupDebouncer[T]) Start(ctx context.Context) {
 	ticker := time.NewTicker(d.duration)
 	defer ticker.Stop()
 
-	select {
-	case <-ctx.Done():
-		d.scan(time.Time{})
-		return
+	for {
+		select {
+		case <-ctx.Done():
+			d.scan(time.Time{})
+			return
 
-	case now := <-ticker.C:
-		d.scan(now)
+		case now := <-ticker.C:
+			d.scan(now)
 
-	case input := <-d.ch:
-		bucket := d.state[input.group]
-		if bucket == nil {
-			bucket = &Bucket[T]{}
+		case input := <-d.ch:
+			bucket := d.state[input.group]
+			if bucket == nil {
+				bucket = &Bucket[T]{}
+			}
+
+			bucket.date = time.Now().Add(d.duration)
+			bucket.items = append(bucket.items, input.item)
+
+			d.state[input.group] = bucket
 		}
-
-		bucket.date = time.Now().Add(d.duration)
-		bucket.items = append(bucket.items, input.item)
-
-		d.state[input.group] = bucket
 	}
 }
 
