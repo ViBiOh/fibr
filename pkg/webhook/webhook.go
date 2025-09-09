@@ -78,7 +78,7 @@ func New(config *Config, storageService absto.Storage, meterProvider metric.Mete
 		pubsubChannel:    config.PubsubChannel,
 	}
 
-	service.debouncer = NewDebouncer[provider.Event](time.Minute*10, service.asyncPushNotification)
+	service.debouncer = NewDebouncer[provider.Event](time.Minute*30, service.asyncPushNotification)
 
 	return service
 }
