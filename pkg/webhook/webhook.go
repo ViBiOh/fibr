@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"sync"
+	"time"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/exclusive"
@@ -21,15 +22,16 @@ import (
 var webhookFilename = provider.MetadataDirectoryName + "/webhooks.json"
 
 type Service struct {
-	exclusiveService exclusive.Service
 	storage          absto.Storage
-	done             chan struct{}
-	webhooks         map[string]provider.Webhook
 	counter          metric.Int64Counter
 	redisClient      redis.Client
-	pubsubChannel    string
+	exclusiveService exclusive.Service
+	webhooks         map[string]provider.Webhook
+	debouncer        *GroupDebouncer[provider.Event]
 	rendererService  *renderer.Service
 	push             *push.Service
+	done             chan struct{}
+	pubsubChannel    string
 	hmacSecret       []byte
 	thumbnail        thumbnail.Service
 	mutex            sync.RWMutex
@@ -62,7 +64,7 @@ func New(config *Config, storageService absto.Storage, meterProvider metric.Mete
 		}
 	}
 
-	return &Service{
+	service := &Service{
 		done:             make(chan struct{}),
 		storage:          storageService,
 		rendererService:  rendererService,
@@ -75,10 +77,23 @@ func New(config *Config, storageService absto.Storage, meterProvider metric.Mete
 		redisClient:      redisClient,
 		pubsubChannel:    config.PubsubChannel,
 	}
+
+	service.debouncer = NewDebouncer[provider.Event](time.Minute*30, service.asyncPushNotification)
+
+	return service
 }
 
 func (s *Service) Done() <-chan struct{} {
-	return s.done
+	done := make(chan struct{})
+
+	go func() {
+		defer close(done)
+
+		<-s.done
+		<-s.debouncer.Done()
+	}()
+
+	return done
 }
 
 func (s *Service) Exclusive(ctx context.Context, name string, action func(ctx context.Context) error) error {
@@ -98,6 +113,8 @@ func (s *Service) Start(ctx context.Context) {
 		slog.LogAttrs(ctx, slog.LevelError, "refresh webhooks", slog.Any("error", err))
 		return
 	}
+
+	go s.debouncer.Start(ctx)
 
 	redis.SubscribeFor(ctx, s.redisClient, s.pubsubChannel, s.PubSubHandle)
 }

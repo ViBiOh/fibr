@@ -130,52 +130,65 @@ func (s *Service) discordHandle(ctx context.Context, webhook provider.Webhook, e
 	return send(ctx, webhook.ID, request.Post(webhook.URL), discord.NewDataResponse("").AddEmbed(embed))
 }
 
-func (s *Service) pushHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
-	if event.Type != provider.UploadEvent && event.Type != provider.RenameEvent && event.Type != provider.DescriptionEvent {
-		return 0, nil
+func (s *Service) asyncPushNotification(group string, events []provider.Event) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
+	defer cancel()
+
+	if len(events) == 0 {
+		return
 	}
 
-	subscription, err := s.push.Find(ctx, webhook.URL)
+	subscription, err := s.push.Find(ctx, group)
 	if err != nil {
-		return 0, fmt.Errorf("find subscription: %w", err)
-	}
-
-	title := path.Base(path.Dir(event.Item.Pathname))
-	if title == "/" {
-		title = "fibr"
-	}
-
-	var contentURL, description string
-
-	switch event.Type {
-	case provider.UploadEvent:
-		description = "💾 A file has been uploaded"
-		contentURL = event.BrowserURL()
-	case provider.RenameEvent:
-		description = "✏️ An item has been renamed"
-		contentURL = event.BrowserURL()
-	case provider.DescriptionEvent:
-		description = "💬 " + event.Metadata["description"]
-		contentURL = event.StoryURL(event.Item.ID)
+		slog.Error("Unable to find subscription", slog.String("url", group), slog.Any("error", err))
+		return
 	}
 
 	notification := push.Notification{
-		Title:       title,
-		Description: description,
-		URL:         contentURL,
+		Title: path.Base(path.Dir(events[0].Item.Pathname)),
 	}
 
-	if s.thumbnail.CanHaveThumbnail(event.Item) {
-		thumbnailURL := event.GetURL() + "?thumbnail"
+	if notification.Title == "/" {
+		notification.Title = "fibr"
+	}
 
-		if _, ok := provider.VideoExtensions[event.Item.Extension]; ok {
-			thumbnailURL += "&scale=large"
+	var uploadCount int
+
+	for _, event := range events {
+		uploadCount++
+
+		if uploadCount > 1 {
+			notification.Description = "💾 Multiples files have been uploaded"
+		} else {
+			notification.Description = "💾 A file has been uploaded"
+			notification.URL = event.BrowserURL()
 		}
 
-		notification.Image = thumbnailURL
+		if len(notification.Image) == 0 && s.thumbnail.CanHaveThumbnail(event.Item) {
+			thumbnailURL := event.GetURL() + "?thumbnail"
+
+			if _, ok := provider.VideoExtensions[event.Item.Extension]; ok {
+				thumbnailURL += "&scale=large"
+			}
+
+			notification.Image = thumbnailURL
+		}
 	}
 
-	return s.push.Notify(ctx, subscription, notification)
+	if _, err := s.push.Notify(ctx, subscription, notification); err != nil {
+		slog.Error("Unable to send push notification", slog.String("url", group), slog.Any("error", err))
+		return
+	}
+}
+
+func (s *Service) pushHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
+	switch event.Type {
+	case provider.UploadEvent:
+		s.debouncer.Send(webhook.URL, event)
+	default:
+	}
+
+	return 0, nil
 }
 
 func (s *Service) slackHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
