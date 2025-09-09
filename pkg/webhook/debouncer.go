@@ -75,7 +75,7 @@ func (d *GroupDebouncer[T]) Done() <-chan struct{} {
 
 func (d *GroupDebouncer[T]) scan(now time.Time) {
 	for group, bucket := range d.state {
-		if bucket.date.After(now) {
+		if now.IsZero() || bucket.date.Before(now) {
 			d.action(group, bucket.items)
 
 			delete(d.state, group)
