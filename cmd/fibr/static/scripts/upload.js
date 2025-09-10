@@ -234,6 +234,20 @@ async function setUploadStatus(container, messageId, content, style, title) {
 
       label.htmlFor = "overwrite-" + messageId;
       label.innerHTML = "Overwrite";
+
+      const checkboxSkip = document.createElement("input");
+      overwriteContainer.appendChild(checkboxSkip);
+
+      checkboxSkip.id = "skip-" + messageId;
+      checkboxSkip.type = "checkbox";
+      checkboxSkip.name = "skip";
+      checkboxSkip.classList.add("margin-left");
+
+      const labelSkip = document.createElement("label");
+      overwriteContainer.appendChild(labelSkip);
+
+      labelSkip.htmlFor = "skip-" + messageId;
+      labelSkip.innerHTML = "Skip";
     }
   }
 }
@@ -458,8 +472,10 @@ async function upload(event) {
         "overwrite-" + messageId,
       )?.checked;
 
-      await uploadFile(container, values.method, filename, file, overwrite);
-      await setUploadStatus(container, messageId, "✓", "success");
+      if (!document.getElementById("skip-" + messageId)?.checked) {
+        await uploadFile(container, values.method, filename, file, overwrite);
+        await setUploadStatus(container, messageId, "✓", "success");
+      }
     } catch (err) {
       sliceFileList("file", i);
       if (uploadButton) {
