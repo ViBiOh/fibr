@@ -178,8 +178,8 @@ document.addEventListener("readystatechange", async (event) => {
   }
 
   const dateTimeFormatter = new Intl.DateTimeFormat(navigator.language, {
-    dateStyle: "full",
-    timeStyle: "long",
+    dateStyle: "medium",
+    timeStyle: "short",
   });
 
   document.querySelectorAll(".date").forEach((item) => {
