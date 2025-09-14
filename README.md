@@ -273,7 +273,7 @@ Usage of fibr:
   --publicURL                         string        Public URL ${FIBR_PUBLIC_URL} (default "http://localhost:1080")
   --pushPrivateKey                    string        [push] VAPID Private Key ${FIBR_PUSH_PRIVATE_KEY}
   --pushPublicKey                     string        [push] VAPID Public Key ${FIBR_PUSH_PUBLIC_KEY}
-  --readTimeout                       duration      [server] Read Timeout ${FIBR_READ_TIMEOUT} (default 2m0s)
+  --readTimeout                       duration      [server] Read Timeout ${FIBR_READ_TIMEOUT} (default 10m0s)
   --redisAddress                      string slice  [redis] Redis Address host:port (blank to disable) ${FIBR_REDIS_ADDRESS}, as a string slice, environment variable separated by ","
   --redisDatabase                     int           [redis] Redis Database ${FIBR_REDIS_DATABASE} (default 0)
   --redisMinIdleConn                  int           [redis] Redis Minimum Idle Connections ${FIBR_REDIS_MIN_IDLE_CONN} (default 0)
@@ -312,7 +312,6 @@ Usage of fibr:
   --webhookPubSubChannel              string        [webhook] Channel name ${FIBR_WEBHOOK_PUB_SUB_CHANNEL} (default "fibr:webhooks-channel")
   --webhookSecret                     string        [webhook] Secret for HMAC Signature ${FIBR_WEBHOOK_SECRET}
   --writeTimeout                      duration      [server] Write Timeout ${FIBR_WRITE_TIMEOUT} (default 2m0s)
-
 ```
 
 # Caveats
