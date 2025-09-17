@@ -112,19 +112,6 @@ async function fetchThumbnail() {
         }
 
         const lazyImage = entry.target;
-        const parent = lazyImage.parentElement.parentElement;
-
-        const storyThrobber = generateThrobber([
-          "throbber-white",
-          "throbber-overlay",
-        ]);
-        parent.appendChild(storyThrobber);
-
-        lazyImage.addEventListener(
-          "load",
-          () => parent.removeChild(storyThrobber),
-          { once: true },
-        );
 
         if (window.webpHero) {
           const response = await fetch(lazyImage.dataset.src, {

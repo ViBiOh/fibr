@@ -201,13 +201,24 @@ func (s Service) Serve(w http.ResponseWriter, r *http.Request, item absto.Item) 
 
 	name := s.PathForScale(item, scale)
 
-	reader, err := s.storage.ReadFrom(ctx, name)
+	thumbnailItem, err := s.storage.Stat(ctx, name)
 	if err != nil {
 		if absto.IsNotExist(err) {
-			w.WriteHeader(http.StatusNoContent)
+			w.WriteHeader(http.StatusNotFound)
 			return
 		}
 
+		httperror.InternalServerError(ctx, w, err)
+		return
+	}
+
+	if thumbnailItem.Size() == 0 {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	reader, err := s.storage.ReadFrom(ctx, name)
+	if err != nil {
 		httperror.InternalServerError(ctx, w, err)
 		return
 	}
