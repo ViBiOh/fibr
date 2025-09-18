@@ -21,7 +21,7 @@ html {
 body {
   -webkit-overflow-scrolling: touch;
   background-color: var(--dark);
-  height: 100vh;
+  height: 100lvh;
 }
 
 body,
@@ -170,7 +170,7 @@ a:hover {
   align-items: flex-start;
   background-color: rgba(84, 84, 84, 0.75);
   display: none;
-  height: 100vh;
+  height: 100lvh;
   justify-content: center;
   left: 0;
   padding-top: 5rem;
