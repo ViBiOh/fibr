@@ -311,7 +311,7 @@ Usage of fibr:
   --userAgent                         string        [alcotest] User-Agent for check ${FIBR_USER_AGENT} (default "Alcotest")
   --webhookPubSubChannel              string        [webhook] Channel name ${FIBR_WEBHOOK_PUB_SUB_CHANNEL} (default "fibr:webhooks-channel")
   --webhookSecret                     string        [webhook] Secret for HMAC Signature ${FIBR_WEBHOOK_SECRET}
-  --writeTimeout                      duration      [server] Write Timeout ${FIBR_WRITE_TIMEOUT} (default 2m0s)
+  --writeTimeout                      duration      [server] Write Timeout ${FIBR_WRITE_TIMEOUT} (default 10m0s)
 ```
 
 # Caveats
