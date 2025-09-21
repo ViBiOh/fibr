@@ -145,8 +145,7 @@ func (s *Service) handleDir(w http.ResponseWriter, r *http.Request, request prov
 
 	if query.GetBool(r, "download") {
 		telemetry.SetRouteTag(ctx, "/downloads")
-		s.Download(w, r, request, items)
-		return errorReturn(request, err)
+		return errorReturn(request, s.Download(w, r, request, items))
 	}
 
 	go s.pushEvent(context.WithoutCancel(ctx), provider.NewAccessEvent(ctx, item, r))

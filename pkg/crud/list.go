@@ -161,7 +161,7 @@ func (s *Service) enrichThumbnail(ctx context.Context, directoryAggregate provid
 	return hasThumbnail, hasStory, cover
 }
 
-func (s *Service) Download(w http.ResponseWriter, r *http.Request, request provider.Request, items []absto.Item) {
+func (s *Service) Download(w http.ResponseWriter, r *http.Request, request provider.Request, items []absto.Item) error {
 	zipWriter := zip.NewWriter(w)
 
 	ctx := r.Context()
@@ -179,9 +179,7 @@ func (s *Service) Download(w http.ResponseWriter, r *http.Request, request provi
 
 	w.Header().Add("Content-Disposition", fmt.Sprintf("attachment; filename=%s.zip", filename))
 
-	if err := s.zipItems(ctx, ctx.Done(), request, zipWriter, items); err != nil {
-		s.error(w, r, request, err)
-	}
+	return s.zipItems(ctx, ctx.Done(), request, zipWriter, items)
 }
 
 func (s *Service) zipItems(ctx context.Context, done <-chan struct{}, request provider.Request, zipWriter *zip.Writer, items []absto.Item) (err error) {
