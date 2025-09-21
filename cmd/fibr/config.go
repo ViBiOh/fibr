@@ -71,7 +71,7 @@ func newConfig() configuration {
 		pprof:     pprof.Flags(fs, "pprof"),
 		health:    health.Flags(fs, ""),
 
-		server:   server.Flags(fs, "", flags.NewOverride("ReadTimeout", time.Minute*10), flags.NewOverride("WriteTimeout", time.Minute*2)),
+		server:   server.Flags(fs, "", flags.NewOverride("ReadTimeout", time.Minute*5), flags.NewOverride("WriteTimeout", time.Minute*5)),
 		owasp:    owasp.Flags(fs, "", flags.NewOverride("FrameOptions", "SAMEORIGIN"), flags.NewOverride("Csp", "default-src 'self'; base-uri 'self'; script-src 'self' 'httputils-nonce' unpkg.com/webp-hero@0.0.2/dist-cjs/ unpkg.com/leaflet@1.9.4/dist/ unpkg.com/leaflet.markercluster@1.5.1/ cdn.jsdelivr.net/npm/pdfjs-dist@5.4.149/; style-src 'self' 'httputils-nonce' unpkg.com/leaflet@1.9.4/dist/ unpkg.com/leaflet.markercluster@1.5.1/; img-src 'self' data: a.tile.openstreetmap.org b.tile.openstreetmap.org c.tile.openstreetmap.org; worker-src 'self' blob:")),
 		renderer: renderer.Flags(fs, "", flags.NewOverride("PublicURL", "http://localhost:1080"), flags.NewOverride("Title", "fibr")),
 
