@@ -21,7 +21,6 @@ html {
 body {
   -webkit-overflow-scrolling: touch;
   background-color: var(--dark);
-  height: 100lvh;
 }
 
 body,
@@ -168,9 +167,9 @@ a:hover {
 
 .modal {
   align-items: flex-start;
-  background-color: rgba(84, 84, 84, 0.75);
+  backdrop-filter: blur(1rem);
   display: none;
-  height: 100lvh;
+  height: 100vh;
   justify-content: center;
   left: 0;
   padding-top: 5rem;
