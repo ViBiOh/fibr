@@ -21,6 +21,7 @@ html {
 body {
   -webkit-overflow-scrolling: touch;
   background-color: var(--dark);
+  height: 100vh;
 }
 
 body,
