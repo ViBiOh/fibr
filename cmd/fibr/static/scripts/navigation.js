@@ -3,6 +3,7 @@
  * @param {String} src         URL of script
  * @param {String} integrity   Integrity of script
  * @param {String} crossorigin Crossorigin of script
+ * @param {String} type        Type of scripting
  * @return Promise when script is either loaded or on error
  */
 function resolveScript(src, integrity, crossorigin, type = "text/javascript") {
