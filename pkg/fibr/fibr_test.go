@@ -11,10 +11,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ViBiOh/auth/v2/pkg/argon"
-	"github.com/ViBiOh/auth/v2/pkg/auth"
-	"github.com/ViBiOh/auth/v2/pkg/ident"
-	authModel "github.com/ViBiOh/auth/v2/pkg/model"
+	"github.com/ViBiOh/auth/v3/pkg/argon"
+	authModel "github.com/ViBiOh/auth/v3/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/mocks"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	httpModel "github.com/ViBiOh/httputils/v4/pkg/model"
@@ -184,21 +182,27 @@ func TestConvertAuthenticationError(t *testing.T) {
 	}{
 		"forbidden": {
 			args{
-				err: fmt.Errorf("no secret defense: %w", auth.ErrForbidden),
+				err: fmt.Errorf("no secret defense: %w", authModel.ErrForbidden),
 			},
 			httpModel.ErrForbidden,
 		},
 		"malformed": {
 			args{
-				err: fmt.Errorf("invalid access: %w", ident.ErrMalformedAuth),
+				err: fmt.Errorf("invalid access: %w", authModel.ErrMalformedContent),
 			},
-			httpModel.ErrInvalid,
+			httpModel.ErrUnauthorized,
 		},
 		"unauthorized": {
 			args{
-				err: fmt.Errorf("invalid: %w", ident.ErrInvalidCredentials),
+				err: fmt.Errorf("invalid: %w", authModel.ErrInvalidCredentials),
 			},
 			httpModel.ErrUnauthorized,
+		},
+		"other": {
+			args{
+				err: fmt.Errorf("invalid: %w", authModel.ErrUnavailableService),
+			},
+			httpModel.ErrInvalid,
 		},
 	}
 
@@ -387,15 +391,15 @@ func TestParseRequest(t *testing.T) {
 			switch intention {
 			case "invalid auth":
 				tc.instance.login = loginMock
-				loginMock.EXPECT().IsAuthenticated(gomock.Any()).Return(nil, authModel.User{}, errors.New("invalid auth"))
+				loginMock.EXPECT().GetUser(gomock.Any(), gomock.Any()).Return(authModel.User{}, authModel.ErrInvalidCredentials)
 			case "non admin user":
 				tc.instance.login = loginMock
-				loginMock.EXPECT().IsAuthenticated(gomock.Any()).Return(nil, authModel.User{}, nil)
-				loginMock.EXPECT().IsAuthorized(gomock.Any(), gomock.Any()).Return(false)
+				loginMock.EXPECT().GetUser(gomock.Any(), gomock.Any()).Return(authModel.User{}, nil)
+				loginMock.EXPECT().IsAuthorized(gomock.Any(), gomock.Any(), gomock.Any()).Return(false)
 			case "admin user":
 				tc.instance.login = loginMock
-				loginMock.EXPECT().IsAuthenticated(gomock.Any()).Return(nil, authModel.User{}, nil)
-				loginMock.EXPECT().IsAuthorized(gomock.Any(), gomock.Any()).Return(true)
+				loginMock.EXPECT().GetUser(gomock.Any(), gomock.Any()).Return(authModel.User{}, nil)
+				loginMock.EXPECT().IsAuthorized(gomock.Any(), gomock.Any(), gomock.Any()).Return(true)
 			}
 
 			got, gotErr := tc.instance.parseRequest(tc.args.r)
@@ -413,7 +417,7 @@ func TestParseRequest(t *testing.T) {
 			}
 
 			if failed {
-				t.Errorf("parseRequest() = (%+v, `%s`), want (%+v, `%s`)", got, gotErr, tc.want, tc.wantErr)
+				t.Errorf("parseRequest() = (%#v, `%s`), want (%#v, `%s`)", got, gotErr, tc.want, tc.wantErr)
 			}
 		})
 	}

@@ -7,9 +7,8 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/ViBiOh/auth/v2/pkg/ident/basic"
-	authMiddleware "github.com/ViBiOh/auth/v2/pkg/middleware"
-	basicMemory "github.com/ViBiOh/auth/v2/pkg/store/memory"
+	"github.com/ViBiOh/auth/v3/pkg/provider/basic"
+	basicMemory "github.com/ViBiOh/auth/v3/pkg/store/memory"
 	"github.com/ViBiOh/fibr/pkg/crud"
 	"github.com/ViBiOh/fibr/pkg/fibr"
 	"github.com/ViBiOh/fibr/pkg/metadata"
@@ -141,6 +140,5 @@ func newLoginService(tracerProvider trace.TracerProvider, basicConfig *basicMemo
 		os.Exit(1)
 	}
 
-	basicProviderProvider := basic.New(basicService, "fibr")
-	return authMiddleware.New(basicService, tracerProvider, basicProviderProvider)
+	return basic.New(basicService, basic.WithRealm("fibr"))
 }

@@ -8,7 +8,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/ViBiOh/auth/v2/pkg/middleware"
+	authModel "github.com/ViBiOh/auth/v3/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/query"
@@ -87,7 +87,7 @@ func (s Service) TemplateFunc(w http.ResponseWriter, r *http.Request) (renderer.
 
 		content := map[string]any{"Request": request}
 
-		if errors.Is(err, middleware.ErrEmptyAuth) {
+		if errors.Is(err, authModel.ErrMalformedContent) {
 			s.renderer.Error(w, r, content, err, renderer.WithNoLog())
 
 			return renderer.Page{}, nil

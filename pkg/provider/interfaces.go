@@ -5,8 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/ViBiOh/auth/v2/pkg/ident"
-	"github.com/ViBiOh/auth/v2/pkg/model"
+	"github.com/ViBiOh/auth/v3/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
@@ -24,8 +23,8 @@ type Crud interface {
 }
 
 type Auth interface {
-	IsAuthenticated(*http.Request) (ident.Provider, model.User, error)
-	IsAuthorized(context.Context, string) bool
+	GetUser(context.Context, *http.Request) (model.User, error)
+	IsAuthorized(context.Context, model.User, string) bool
 }
 
 type ShareManager interface {

@@ -8,9 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ViBiOh/auth/v2/pkg/auth"
-	"github.com/ViBiOh/auth/v2/pkg/ident"
-	authModel "github.com/ViBiOh/auth/v2/pkg/model"
+	authModel "github.com/ViBiOh/auth/v3/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
@@ -83,12 +81,12 @@ func (s Service) parseRequest(r *http.Request) (provider.Request, error) {
 		return request, nil
 	}
 
-	_, user, err := s.login.IsAuthenticated(r)
+	user, err := s.login.GetUser(ctx, r)
 	if err != nil {
 		return request, convertAuthenticationError(err)
 	}
 
-	if s.login.IsAuthorized(authModel.StoreUser(ctx, user), "admin") {
+	if s.login.IsAuthorized(ctx, user, "admin") {
 		request.CanEdit = true
 		request.CanShare = true
 		request.CanWebhook = true
@@ -137,13 +135,13 @@ func (s Service) parseShare(ctx context.Context, request *provider.Request, auth
 }
 
 func convertAuthenticationError(err error) error {
-	if errors.Is(err, auth.ErrForbidden) {
+	if errors.Is(err, authModel.ErrForbidden) {
 		return model.WrapForbidden(errors.New("you're not authorized to speak to me with this terms"))
 	}
 
-	if errors.Is(err, ident.ErrMalformedAuth) {
-		return model.WrapInvalid(err)
+	if errors.Is(err, authModel.ErrMalformedContent) || errors.Is(err, authModel.ErrInvalidCredentials) {
+		return model.WrapUnauthorized(err)
 	}
 
-	return model.WrapUnauthorized(err)
+	return model.WrapInvalid(err)
 }

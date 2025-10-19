@@ -15,8 +15,7 @@ import (
 	reflect "reflect"
 	time "time"
 
-	ident "github.com/ViBiOh/auth/v2/pkg/ident"
-	model "github.com/ViBiOh/auth/v2/pkg/model"
+	model "github.com/ViBiOh/auth/v3/pkg/model"
 	provider "github.com/ViBiOh/fibr/pkg/provider"
 	renderer "github.com/ViBiOh/httputils/v4/pkg/renderer"
 	gomock "go.uber.org/mock/gomock"
@@ -133,34 +132,33 @@ func (m *Auth) EXPECT() *AuthMockRecorder {
 	return m.recorder
 }
 
-// IsAuthenticated mocks base method.
-func (m *Auth) IsAuthenticated(arg0 *http.Request) (ident.Provider, model.User, error) {
+// GetUser mocks base method.
+func (m *Auth) GetUser(arg0 context.Context, arg1 *http.Request) (model.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "IsAuthenticated", arg0)
-	ret0, _ := ret[0].(ident.Provider)
-	ret1, _ := ret[1].(model.User)
-	ret2, _ := ret[2].(error)
-	return ret0, ret1, ret2
+	ret := m.ctrl.Call(m, "GetUser", arg0, arg1)
+	ret0, _ := ret[0].(model.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
-// IsAuthenticated indicates an expected call of IsAuthenticated.
-func (mr *AuthMockRecorder) IsAuthenticated(arg0 any) *gomock.Call {
+// GetUser indicates an expected call of GetUser.
+func (mr *AuthMockRecorder) GetUser(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsAuthenticated", reflect.TypeOf((*Auth)(nil).IsAuthenticated), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUser", reflect.TypeOf((*Auth)(nil).GetUser), arg0, arg1)
 }
 
 // IsAuthorized mocks base method.
-func (m *Auth) IsAuthorized(arg0 context.Context, arg1 string) bool {
+func (m *Auth) IsAuthorized(arg0 context.Context, arg1 model.User, arg2 string) bool {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "IsAuthorized", arg0, arg1)
+	ret := m.ctrl.Call(m, "IsAuthorized", arg0, arg1, arg2)
 	ret0, _ := ret[0].(bool)
 	return ret0
 }
 
 // IsAuthorized indicates an expected call of IsAuthorized.
-func (mr *AuthMockRecorder) IsAuthorized(arg0, arg1 any) *gomock.Call {
+func (mr *AuthMockRecorder) IsAuthorized(arg0, arg1, arg2 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsAuthorized", reflect.TypeOf((*Auth)(nil).IsAuthorized), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsAuthorized", reflect.TypeOf((*Auth)(nil).IsAuthorized), arg0, arg1, arg2)
 }
 
 // ShareManager is a mock of ShareManager interface.

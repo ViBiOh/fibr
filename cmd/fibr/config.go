@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/ViBiOh/absto/pkg/absto"
-	basicMemory "github.com/ViBiOh/auth/v2/pkg/store/memory"
+	basicMemory "github.com/ViBiOh/auth/v3/pkg/store/memory"
 	"github.com/ViBiOh/fibr/pkg/crud"
 	"github.com/ViBiOh/fibr/pkg/metadata"
 	"github.com/ViBiOh/fibr/pkg/push"

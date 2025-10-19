@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
-	"github.com/ViBiOh/auth/v2/pkg/argon"
+	"github.com/ViBiOh/auth/v3/pkg/argon"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"

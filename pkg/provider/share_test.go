@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/ViBiOh/auth/v2/pkg/argon"
+	"github.com/ViBiOh/auth/v3/pkg/argon"
 )
 
 func TestCheckPassword(t *testing.T) {

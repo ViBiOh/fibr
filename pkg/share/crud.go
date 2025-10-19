@@ -7,7 +7,7 @@ import (
 	"sort"
 	"time"
 
-	"github.com/ViBiOh/auth/v2/pkg/argon"
+	"github.com/ViBiOh/auth/v3/pkg/argon"
 	"github.com/ViBiOh/fibr/pkg/exclusive"
 	"github.com/ViBiOh/fibr/pkg/provider"
 )

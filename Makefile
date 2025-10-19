@@ -55,7 +55,7 @@ init:
 	@curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap.sh" | bash -s -- "-c" "git_hooks" "coverage.sh"
 	go install "github.com/golangci/golangci-lint/cmd/golangci-lint@latest"
 	go install "github.com/tdewolff/minify/v2/cmd/minify@latest"
-	go install "github.com/ViBiOh/auth/v2/cmd/argon@latest"
+	go install "github.com/ViBiOh/auth/v3/cmd/argon@latest"
 	go install "golang.org/x/tools/cmd/goimports@latest"
 	go install "golang.org/x/tools/go/analysis/passes/fieldalignment/cmd/fieldalignment@master"
 	go install "mvdan.cc/gofumpt@latest"
