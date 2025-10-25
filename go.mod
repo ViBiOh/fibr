@@ -8,11 +8,11 @@ require (
 	github.com/ViBiOh/auth/v3 v3.0.0
 	github.com/ViBiOh/exas v0.8.1
 	github.com/ViBiOh/flags v1.6.1
-	github.com/ViBiOh/httputils/v4 v4.83.0
+	github.com/ViBiOh/httputils/v4 v4.83.1
 	github.com/ViBiOh/vignet v0.0.1
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/rabbitmq/amqp091-go v1.10.0
-	github.com/redis/go-redis/v9 v9.15.1
+	github.com/redis/go-redis/v9 v9.16.0
 	github.com/rs/xid v1.6.0
 	github.com/zeebo/xxh3 v1.0.2
 	go.opentelemetry.io/otel v1.38.0
@@ -43,10 +43,10 @@ require (
 	github.com/minio/minio-go/v7 v7.0.95 // indirect
 	github.com/philhofer/fwd v1.2.0 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
-	github.com/redis/go-redis/extra/rediscmd/v9 v9.15.1 // indirect
-	github.com/redis/go-redis/extra/redisotel/v9 v9.15.1 // indirect
-	github.com/tdewolff/minify/v2 v2.24.4 // indirect
-	github.com/tdewolff/parse/v2 v2.8.4 // indirect
+	github.com/redis/go-redis/extra/rediscmd/v9 v9.16.0 // indirect
+	github.com/redis/go-redis/extra/redisotel/v9 v9.16.0 // indirect
+	github.com/tdewolff/minify/v2 v2.24.5 // indirect
+	github.com/tdewolff/parse/v2 v2.8.5-0.20251020133559-0efcf90bef1a // indirect
 	github.com/tinylib/msgp v1.4.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.63.0 // indirect
@@ -60,8 +60,8 @@ require (
 	golang.org/x/net v0.46.0 // indirect
 	golang.org/x/sys v0.37.0 // indirect
 	golang.org/x/term v0.36.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20251014184007-4626949a642f // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20251014184007-4626949a642f // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20251022142026-3a174f9686a8 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20251022142026-3a174f9686a8 // indirect
 	google.golang.org/grpc v1.76.0 // indirect
 	google.golang.org/protobuf v1.36.10 // indirect
 )
