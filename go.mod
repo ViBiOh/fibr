@@ -8,7 +8,7 @@ require (
 	github.com/ViBiOh/auth/v3 v3.0.2
 	github.com/ViBiOh/exas v0.8.1
 	github.com/ViBiOh/flags v1.6.1
-	github.com/ViBiOh/httputils/v4 v4.83.1
+	github.com/ViBiOh/httputils/v4 v4.83.2
 	github.com/ViBiOh/vignet v0.0.1
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/rabbitmq/amqp091-go v1.10.0
@@ -60,8 +60,8 @@ require (
 	golang.org/x/net v0.46.0 // indirect
 	golang.org/x/sys v0.37.0 // indirect
 	golang.org/x/term v0.36.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20251022142026-3a174f9686a8 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20251022142026-3a174f9686a8 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20251029180050-ab9386a59fda // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20251029180050-ab9386a59fda // indirect
 	google.golang.org/grpc v1.76.0 // indirect
 	google.golang.org/protobuf v1.36.10 // indirect
 )
