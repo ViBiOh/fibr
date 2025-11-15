@@ -20,9 +20,9 @@ import (
 
 // MetadataManager is a mock of MetadataManager interface.
 type MetadataManager struct {
-	isgomock struct{}
 	ctrl     *gomock.Controller
 	recorder *MetadataManagerMockRecorder
+	isgomock struct{}
 }
 
 // MetadataManagerMockRecorder is the mock recorder for MetadataManager.

@@ -228,6 +228,12 @@ func TestParseRequest(t *testing.T) {
 		Value: "assets|list,documents/monthly|story",
 	})
 
+	guestRequest := httptest.NewRequest(http.MethodGet, "/guest", nil)
+	guestRequest.SetBasicAuth("guest", "guest")
+
+	adminRequest := httptest.NewRequest(http.MethodGet, adminPath, nil)
+	adminRequest.SetBasicAuth("admin", "admin")
+
 	type args struct {
 		r *http.Request
 	}
@@ -295,7 +301,7 @@ func TestParseRequest(t *testing.T) {
 		"non admin user": {
 			Service{},
 			args{
-				r: httptest.NewRequest(http.MethodGet, "/guest", nil),
+				r: guestRequest,
 			},
 			provider.Request{
 				Path:       "/",
@@ -310,7 +316,7 @@ func TestParseRequest(t *testing.T) {
 		"admin user": {
 			Service{},
 			args{
-				r: httptest.NewRequest(http.MethodGet, adminPath, nil),
+				r: adminRequest,
 			},
 			provider.Request{
 				Path:       "/",
@@ -376,14 +382,19 @@ func TestParseRequest(t *testing.T) {
 			switch intention {
 			case "no auth":
 				shareMock.EXPECT().Get(gomock.Any()).Return(provider.Share{})
+
 			case "admin user":
 				shareMock.EXPECT().Get(gomock.Any()).Return(provider.Share{})
+
 			case "empty cookie", "cookie value":
 				shareMock.EXPECT().Get(gomock.Any()).Return(provider.Share{})
+
 			case "invalid auth", "non admin user":
 				shareMock.EXPECT().Get(gomock.Any()).Return(provider.Share{})
+
 			case "error":
 				shareMock.EXPECT().Get(gomock.Any()).Return(passwordShare)
+
 			case "share":
 				shareMock.EXPECT().Get(gomock.Any()).Return(passwordLessShare)
 			}
@@ -391,14 +402,15 @@ func TestParseRequest(t *testing.T) {
 			switch intention {
 			case "invalid auth":
 				tc.instance.login = loginMock
-				loginMock.EXPECT().GetUser(gomock.Any(), gomock.Any()).Return(authModel.User{}, authModel.ErrInvalidCredentials)
+
 			case "non admin user":
 				tc.instance.login = loginMock
-				loginMock.EXPECT().GetUser(gomock.Any(), gomock.Any()).Return(authModel.User{}, nil)
+				loginMock.EXPECT().GetBasicUser(gomock.Any(), gomock.Any(), gomock.Any()).Return(authModel.User{}, nil)
 				loginMock.EXPECT().IsAuthorized(gomock.Any(), gomock.Any(), gomock.Any()).Return(false)
+
 			case "admin user":
 				tc.instance.login = loginMock
-				loginMock.EXPECT().GetUser(gomock.Any(), gomock.Any()).Return(authModel.User{}, nil)
+				loginMock.EXPECT().GetBasicUser(gomock.Any(), gomock.Any(), gomock.Any()).Return(authModel.User{}, nil)
 				loginMock.EXPECT().IsAuthorized(gomock.Any(), gomock.Any(), gomock.Any()).Return(true)
 			}
 
