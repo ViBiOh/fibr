@@ -81,7 +81,12 @@ func (s Service) parseRequest(r *http.Request) (provider.Request, error) {
 		return request, nil
 	}
 
-	user, err := s.login.GetUser(ctx, r)
+	login, password, ok := r.BasicAuth()
+	if !ok {
+		return request, convertAuthenticationError(authModel.ErrMalformedContent)
+	}
+
+	user, err := s.login.GetBasicUser(ctx, login, password)
 	if err != nil {
 		return request, convertAuthenticationError(err)
 	}

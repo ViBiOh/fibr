@@ -7,7 +7,6 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/ViBiOh/auth/v3/pkg/provider/basic"
 	basicMemory "github.com/ViBiOh/auth/v3/pkg/store/memory"
 	"github.com/ViBiOh/fibr/pkg/crud"
 	"github.com/ViBiOh/fibr/pkg/fibr"
@@ -23,7 +22,6 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/owasp"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 	"github.com/ViBiOh/httputils/v4/pkg/server"
-	"go.opentelemetry.io/otel/trace"
 )
 
 //go:embed templates static
@@ -105,7 +103,7 @@ func newServices(ctx context.Context, config configuration, clients clients, ada
 
 	var middlewareService provider.Auth
 	if !config.disableAuth {
-		middlewareService = newLoginService(clients.telemetry.TracerProvider(), config.basic)
+		middlewareService = newLoginService(config.basic)
 	}
 
 	output.fibr = fibr.New(crudService, output.renderer, output.share, output.webhook, middlewareService)
@@ -133,12 +131,12 @@ func (s services) Close() {
 	<-s.share.Done()
 }
 
-func newLoginService(tracerProvider trace.TracerProvider, basicConfig *basicMemory.Config) provider.Auth {
+func newLoginService(basicConfig *basicMemory.Config) provider.Auth {
 	basicService, err := basicMemory.New(basicConfig)
 	if err != nil {
 		slog.LogAttrs(context.Background(), slog.LevelError, "auth memory", slog.Any("error", err))
 		os.Exit(1)
 	}
 
-	return basic.New(basicService, basic.WithRealm("fibr"))
+	return basicService
 }

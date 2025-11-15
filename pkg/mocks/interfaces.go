@@ -23,9 +23,9 @@ import (
 
 // Crud is a mock of Crud interface.
 type Crud struct {
-	isgomock struct{}
 	ctrl     *gomock.Controller
 	recorder *CrudMockRecorder
+	isgomock struct{}
 }
 
 // CrudMockRecorder is the mock recorder for Crud.
@@ -110,9 +110,9 @@ func (mr *CrudMockRecorder) Rename(arg0, arg1, arg2 any) *gomock.Call {
 
 // Auth is a mock of Auth interface.
 type Auth struct {
-	isgomock struct{}
 	ctrl     *gomock.Controller
 	recorder *AuthMockRecorder
+	isgomock struct{}
 }
 
 // AuthMockRecorder is the mock recorder for Auth.
@@ -132,19 +132,19 @@ func (m *Auth) EXPECT() *AuthMockRecorder {
 	return m.recorder
 }
 
-// GetUser mocks base method.
-func (m *Auth) GetUser(arg0 context.Context, arg1 *http.Request) (model.User, error) {
+// GetBasicUser mocks base method.
+func (m *Auth) GetBasicUser(ctx context.Context, login, password string) (model.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetUser", arg0, arg1)
+	ret := m.ctrl.Call(m, "GetBasicUser", ctx, login, password)
 	ret0, _ := ret[0].(model.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetUser indicates an expected call of GetUser.
-func (mr *AuthMockRecorder) GetUser(arg0, arg1 any) *gomock.Call {
+// GetBasicUser indicates an expected call of GetBasicUser.
+func (mr *AuthMockRecorder) GetBasicUser(ctx, login, password any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUser", reflect.TypeOf((*Auth)(nil).GetUser), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBasicUser", reflect.TypeOf((*Auth)(nil).GetBasicUser), ctx, login, password)
 }
 
 // IsAuthorized mocks base method.
@@ -163,9 +163,9 @@ func (mr *AuthMockRecorder) IsAuthorized(arg0, arg1, arg2 any) *gomock.Call {
 
 // ShareManager is a mock of ShareManager interface.
 type ShareManager struct {
-	isgomock struct{}
 	ctrl     *gomock.Controller
 	recorder *ShareManagerMockRecorder
+	isgomock struct{}
 }
 
 // ShareManagerMockRecorder is the mock recorder for ShareManager.
@@ -258,9 +258,9 @@ func (mr *ShareManagerMockRecorder) UpdatePassword(arg0, arg1, arg2 any) *gomock
 
 // WebhookManager is a mock of WebhookManager interface.
 type WebhookManager struct {
-	isgomock struct{}
 	ctrl     *gomock.Controller
 	recorder *WebhookManagerMockRecorder
+	isgomock struct{}
 }
 
 // WebhookManagerMockRecorder is the mock recorder for WebhookManager.

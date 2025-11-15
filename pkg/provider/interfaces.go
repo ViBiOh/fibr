@@ -23,7 +23,7 @@ type Crud interface {
 }
 
 type Auth interface {
-	GetUser(context.Context, *http.Request) (model.User, error)
+	GetBasicUser(ctx context.Context, login, password string) (model.User, error)
 	IsAuthorized(context.Context, model.User, string) bool
 }
 
