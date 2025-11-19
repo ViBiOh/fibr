@@ -8,7 +8,6 @@ import (
 	"log/slog"
 	"net/http"
 	"strings"
-	"unique"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	exas "github.com/ViBiOh/exas/pkg/model"
@@ -123,36 +122,12 @@ func New(ctx context.Context, config *Config, storageService absto.Storage, mete
 		}
 	}
 
-	uniqueCache := make(map[unique.Handle[string]]struct{})
-
 	service.exifCache = cache.New(redisClient, redisKey, func(ctx context.Context, item absto.Item) (provider.Metadata, error) {
 		if item.IsDir() {
 			return provider.Metadata{}, errInvalidItemType
 		}
 
-		metadata, err := service.loadExif(ctx, item)
-
-		for index, tag := range metadata.Tags {
-			handle := unique.Make(tag)
-			uniqueCache[handle] = struct{}{}
-
-			metadata.Tags[index] = handle.Value()
-		}
-
-		for key, value := range metadata.Exif.Data {
-			switch str := value.(type) {
-			case string:
-				keyHandle := unique.Make(key)
-				uniqueCache[keyHandle] = struct{}{}
-
-				valueHandle := unique.Make(str)
-				uniqueCache[valueHandle] = struct{}{}
-
-				metadata.Exif.Data[valueHandle.Value()] = valueHandle.Value()
-			}
-		}
-
-		return metadata, err
+		return service.loadExif(ctx, item)
 	}, traceProvider).
 		WithMaxConcurrency(provider.MaxConcurrency).
 		WithClientSideCaching(ctx, "fibr_exif", provider.MaxClientSideCaching)
