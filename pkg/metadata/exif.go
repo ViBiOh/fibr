@@ -32,8 +32,9 @@ type Service struct {
 	listStorage     absto.Storage
 	exifMetric      metric.Int64Counter
 	aggregateMetric metric.Int64Counter
-	exifCache       *cache.Cache[absto.Item, provider.Metadata]
-	aggregateCache  *cache.Cache[absto.Item, provider.Aggregate]
+
+	exifCache      *cache.Cache[absto.Item, provider.Metadata]
+	aggregateCache *cache.Cache[absto.Item, provider.Aggregate]
 
 	exclusive   exclusive.Service
 	redisClient redis.Client
@@ -122,6 +123,8 @@ func New(ctx context.Context, config *Config, storageService absto.Storage, mete
 		}
 	}
 
+	uniqueCache := make(map[unique.Handle[string]]struct{})
+
 	service.exifCache = cache.New(redisClient, redisKey, func(ctx context.Context, item absto.Item) (provider.Metadata, error) {
 		if item.IsDir() {
 			return provider.Metadata{}, errInvalidItemType
@@ -130,13 +133,22 @@ func New(ctx context.Context, config *Config, storageService absto.Storage, mete
 		metadata, err := service.loadExif(ctx, item)
 
 		for index, tag := range metadata.Tags {
-			metadata.Tags[index] = unique.Make(tag).Value()
+			handle := unique.Make(tag)
+			uniqueCache[handle] = struct{}{}
+
+			metadata.Tags[index] = handle.Value()
 		}
 
 		for key, value := range metadata.Exif.Data {
-			switch value.(type) {
+			switch str := value.(type) {
 			case string:
-				metadata.Exif.Data[unique.Make(key).Value()] = unique.Make(value).Value()
+				keyHandle := unique.Make(key)
+				uniqueCache[keyHandle] = struct{}{}
+
+				valueHandle := unique.Make(str)
+				uniqueCache[valueHandle] = struct{}{}
+
+				metadata.Exif.Data[valueHandle.Value()] = valueHandle.Value()
 			}
 		}
 
