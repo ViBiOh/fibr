@@ -28,7 +28,7 @@ jobs:
     name: Datadog SBOM Generation and Upload
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Check imported libraries are secure and compliant
         id: datadog-software-composition-analysis
         uses: DataDog/datadog-sca-github-action@main
