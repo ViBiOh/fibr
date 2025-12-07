@@ -276,9 +276,7 @@ Usage of fibr:
   --readTimeout                       duration      [server] Read Timeout ${FIBR_READ_TIMEOUT} (default 10m0s)
   --redisAddress                      string slice  [redis] Redis Address host:port (blank to disable) ${FIBR_REDIS_ADDRESS}, as a string slice, environment variable separated by ","
   --redisDatabase                     int           [redis] Redis Database ${FIBR_REDIS_DATABASE} (default 0)
-  --redisMinIdleConn                  int           [redis] Redis Minimum Idle Connections ${FIBR_REDIS_MIN_IDLE_CONN} (default 0)
   --redisPassword                     string        [redis] Redis Password, if any ${FIBR_REDIS_PASSWORD}
-  --redisPoolSize                     int           [redis] Redis Pool Size (default GOMAXPROCS*10) ${FIBR_REDIS_POOL_SIZE} (default 0)
   --redisUsername                     string        [redis] Redis Username, if any ${FIBR_REDIS_USERNAME}
   --sanitizeOnStart                                 [crud] Sanitize on start ${FIBR_SANITIZE_ON_START} (default false)
   --sharePubSubChannel                string        [share] Channel name ${FIBR_SHARE_PUB_SUB_CHANNEL} (default "fibr:shares-channel")
