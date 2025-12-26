@@ -2,7 +2,7 @@ FROM rg.fr-par.scw.cloud/vibioh/scratch
 
 EXPOSE 1080
 
-HEALTHCHECK --retries=10 CMD [ "/fibr", "-url", "http://localhost:1080/health" ]
+HEALTHCHECK --retries=10 CMD [ "/fibr", "-url", "http://127.0.0.1:1080/health" ]
 ENTRYPOINT [ "/fibr" ]
 
 ARG VERSION
