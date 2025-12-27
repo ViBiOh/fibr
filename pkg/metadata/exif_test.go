@@ -46,7 +46,7 @@ func TestEnabled(t *testing.T) {
 		},
 		"enabled": {
 			Service{
-				exifRequest: request.New().URL("http://localhost"),
+				exifRequest: request.New().URL("http://127.0.0.1"),
 			},
 			true,
 		},

@@ -270,7 +270,7 @@ Usage of fibr:
   --port                              uint          [server] Listen port (0 to disable) ${FIBR_PORT} (default 1080)
   --pprofAgent                        string        [pprof] URL of the Datadog Trace Agent (e.g. http://datadog.observability:8126) ${FIBR_PPROF_AGENT}
   --pprofPort                         int           [pprof] Port of the HTTP server (0 to disable) ${FIBR_PPROF_PORT} (default 0)
-  --publicURL                         string        Public URL ${FIBR_PUBLIC_URL} (default "http://localhost:1080")
+  --publicURL                         string        Public URL ${FIBR_PUBLIC_URL} (default "http://127.0.0.1:1080")
   --pushPrivateKey                    string        [push] VAPID Private Key ${FIBR_PUSH_PRIVATE_KEY}
   --pushPublicKey                     string        [push] VAPID Public Key ${FIBR_PUSH_PUBLIC_KEY}
   --readTimeout                       duration      [server] Read Timeout ${FIBR_READ_TIMEOUT} (default 10m0s)
