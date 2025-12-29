@@ -105,17 +105,17 @@ func SanitizeName(name string, removeSlash bool) (string, error) {
 		return "", err
 	}
 
-	withoutSpaces := strings.Replace(withoutDiacritics, " ", "_", -1)
+	withoutSpaces := strings.ReplaceAll(withoutDiacritics, " ", "_")
 	withoutQuotes := quotesChar.ReplaceAllString(withoutSpaces, "_")
 	withoutSpecials := specialChars.ReplaceAllString(withoutQuotes, "")
 	withoutPathEscape := pathEscape.ReplaceAllString(withoutSpecials, "_")
 
 	sanitized := withoutPathEscape
 	if removeSlash {
-		sanitized = strings.Replace(sanitized, "/", "_", -1)
+		sanitized = strings.ReplaceAll(sanitized, "/", "_")
 	}
 
-	return strings.Replace(sanitized, "__", "_", -1), nil
+	return strings.ReplaceAll(sanitized, "__", "_"), nil
 }
 
 func SafeWrite(ctx context.Context, w io.Writer, content string) {
@@ -209,7 +209,7 @@ func Hash(value string) string {
 func RawHash(content any) string {
 	hasher := xxh3.New()
 
-	fmt.Fprintf(hasher, "%v", content)
+	_, _ = fmt.Fprintf(hasher, "%v", content)
 
 	return hex.EncodeToString(hasher.Sum(nil))
 }

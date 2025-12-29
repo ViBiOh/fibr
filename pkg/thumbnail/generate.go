@@ -10,7 +10,6 @@ import (
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
-	"github.com/ViBiOh/vignet/pkg/model"
 	vignet "github.com/ViBiOh/vignet/pkg/model"
 )
 
@@ -54,7 +53,7 @@ func (s Service) generate(ctx context.Context, item absto.Item, scale uint64) (e
 	return err
 }
 
-func (s Service) requestVignet(ctx context.Context, item absto.Item, itemType model.ItemType, scale uint64) (*http.Response, error) {
+func (s Service) requestVignet(ctx context.Context, item absto.Item, itemType vignet.ItemType, scale uint64) (*http.Response, error) {
 	outputName := s.PathForScale(item, scale)
 
 	if s.amqpClient != nil {
