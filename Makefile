@@ -64,13 +64,13 @@ init:
 .PHONY: format
 format:
 	find . -name "*.go" -exec goimports -w {} \+
-	find . -name "*.go" -exec gofumpt -w {} \+
+	find . -name "*.go" -exec gofumpt -extra -w {} \+
 
 ## style: Check lint, code styling rules. e.g. pylint, phpcs, eslint, style (java) etc ...
 .PHONY: style
 style:
 	fieldalignment -fix -test=false $(PACKAGES)
-	golangci-lint run --fix
+	golangci-lint run --fix --show-stats=false
 
 ## mocks: Generate mocks
 .PHONY: mocks

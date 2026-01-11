@@ -33,7 +33,7 @@ func (s *Service) saveUploadedFile(ctx context.Context, request provider.Request
 	return err
 }
 
-func getUploadNameAndPath(request provider.Request, inputName string, part *multipart.Part) (fileName string, filePath string, err error) {
+func getUploadNameAndPath(request provider.Request, inputName string, part *multipart.Part) (fileName, filePath string, err error) {
 	if !request.Share.IsZero() && request.Share.File {
 		return path.Base(request.Share.Path), request.Share.Path, nil
 	}

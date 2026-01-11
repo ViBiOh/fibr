@@ -66,7 +66,7 @@ func (s *Service) browse(ctx context.Context, request provider.Request, item abs
 	}), nil
 }
 
-func (s *Service) getFilesPreviousAndNext(ctx context.Context, item absto.Item, request provider.Request) (items []absto.Item, previous provider.RenderItem, next provider.RenderItem) {
+func (s *Service) getFilesPreviousAndNext(ctx context.Context, item absto.Item, request provider.Request) (items []absto.Item, previous, next provider.RenderItem) {
 	ctx, end := telemetry.StartSpan(ctx, s.tracer, "get_previous_next", trace.WithSpanKind(trace.SpanKindInternal))
 	defer end(nil)
 

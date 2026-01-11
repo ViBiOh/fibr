@@ -200,7 +200,7 @@ func NewRenameEvent(ctx context.Context, old, new absto.Item, shareableURL strin
 	}
 }
 
-func NewDescriptionEvent(ctx context.Context, item absto.Item, shareableURL string, description string, rendererService *renderer.Service) Event {
+func NewDescriptionEvent(ctx context.Context, item absto.Item, shareableURL, description string, rendererService *renderer.Service) Event {
 	if len(shareableURL) != 0 {
 		shareableURL = rendererService.PublicURL(shareableURL)
 	}

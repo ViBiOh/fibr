@@ -139,7 +139,7 @@ func (s *Service) list(ctx context.Context, request provider.Request, message re
 	return renderer.NewPage("files", http.StatusOK, content), nil
 }
 
-func (s *Service) enrichThumbnail(ctx context.Context, directoryAggregate provider.Aggregate, items []provider.RenderItem, thumbnails map[string]absto.Item) (hasThumbnail bool, hasStory bool, cover cover) {
+func (s *Service) enrichThumbnail(ctx context.Context, directoryAggregate provider.Aggregate, items []provider.RenderItem, thumbnails map[string]absto.Item) (hasThumbnail, hasStory bool, cover cover) {
 	for index, item := range items {
 		if _, ok := thumbnails[s.thumbnail.Path(item.Item)]; !ok {
 			continue

@@ -52,7 +52,7 @@ func Flags(fs *flag.FlagSet, prefix string) *Config {
 	return &config
 }
 
-func New(config *Config, storageService absto.Storage, filteredStorage absto.Storage, rendererService *renderer.Service, shareService provider.ShareManager, webhookService provider.WebhookManager, thumbnailService thumbnail.Service, exifService provider.MetadataManager, searchService search.Service, pushService *push.Service, eventProducer provider.EventProducer, tracerProvider trace.TracerProvider) (*Service, error) {
+func New(config *Config, storageService, filteredStorage absto.Storage, rendererService *renderer.Service, shareService provider.ShareManager, webhookService provider.WebhookManager, thumbnailService thumbnail.Service, exifService provider.MetadataManager, searchService search.Service, pushService *push.Service, eventProducer provider.EventProducer, tracerProvider trace.TracerProvider) (*Service, error) {
 	service := &Service{
 		chunkUpload:     config.ChunkUpload,
 		temporaryFolder: config.TemporaryFolder,
