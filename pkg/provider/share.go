@@ -2,7 +2,6 @@ package provider
 
 import (
 	"context"
-	"encoding/base64"
 	"errors"
 	"log/slog"
 	"strconv"
@@ -42,28 +41,14 @@ func (s Share) IsZero() bool {
 	return len(s.ID) == 0
 }
 
-func (s Share) CheckPassword(ctx context.Context, authorizationHeader string, shareApp ShareManager) error {
+func (s Share) CheckPassword(ctx context.Context, password string, shareApp ShareManager) error {
 	if s.Password == "" {
 		return nil
 	}
 
-	if authorizationHeader == "" {
-		return errors.New("empty authorization header")
+	if password == "" {
+		return errors.New("empty password authorization")
 	}
-
-	data, err := base64.StdEncoding.DecodeString(strings.TrimPrefix(authorizationHeader, "Basic "))
-	if err != nil {
-		return err
-	}
-
-	dataStr := string(data)
-
-	sepIndex := strings.Index(dataStr, ":")
-	if sepIndex < 0 {
-		return errors.New("invalid format for basic auth")
-	}
-
-	password := dataStr[sepIndex+1:]
 
 	switch {
 	case strings.HasPrefix(string(s.Password), "$argon2id"):

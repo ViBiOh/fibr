@@ -2,9 +2,7 @@ package provider
 
 import (
 	"context"
-	"encoding/base64"
 	"errors"
-	"fmt"
 	"testing"
 
 	"github.com/ViBiOh/auth/v3/pkg/argon"
@@ -34,30 +32,14 @@ func TestCheckPassword(t *testing.T) {
 				Password: string(password),
 			},
 			"",
-			errors.New("empty authorization header"),
-		},
-		"invalid authorization": {
-			Share{
-				ID:       "a1b2c3d4",
-				Password: string(password),
-			},
-			"invalid",
-			errors.New("illegal base64 data at input byte 4"),
-		},
-		"invalid format": {
-			Share{
-				ID:       "a1b2c3d4",
-				Password: string(password),
-			},
-			fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte("test"))),
-			errors.New("invalid format for basic auth"),
+			errors.New("empty password authorization"),
 		},
 		"invalid password": {
 			Share{
 				ID:       "a1b2c3d4",
 				Password: string(password),
 			},
-			fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte("test:password"))),
+			"password",
 			errors.New("invalid credentials"),
 		},
 		"valid": {
@@ -65,7 +47,7 @@ func TestCheckPassword(t *testing.T) {
 				ID:       "a1b2c3d4",
 				Password: string(password),
 			},
-			fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte("test:test"))),
+			"test",
 			nil,
 		},
 	}

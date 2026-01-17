@@ -2,7 +2,6 @@ package fibr
 
 import (
 	"context"
-	"encoding/base64"
 	"errors"
 	"fmt"
 	"net/http"
@@ -45,8 +44,8 @@ var (
 
 func TestParseShare(t *testing.T) {
 	type args struct {
-		request             *provider.Request
-		authorizationHeader string
+		request  *provider.Request
+		password string
 	}
 
 	cases := map[string]struct {
@@ -108,7 +107,7 @@ func TestParseShare(t *testing.T) {
 				CanShare: false,
 				Display:  provider.DefaultDisplay,
 			},
-			errors.New("empty authorization header"),
+			errors.New("empty password authorization"),
 		},
 		"valid": {
 			Service{},
@@ -119,7 +118,7 @@ func TestParseShare(t *testing.T) {
 					CanShare: false,
 					Display:  provider.DefaultDisplay,
 				},
-				authorizationHeader: fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte("admin:password"))),
+				password: "password",
 			},
 			&provider.Request{
 				Path:     "/index.html",
@@ -150,7 +149,7 @@ func TestParseShare(t *testing.T) {
 				shareMock.EXPECT().Get(gomock.Any()).Return(provider.Share{})
 			}
 
-			gotErr := tc.instance.parseShare(context.Background(), tc.args.request, tc.args.authorizationHeader)
+			gotErr := tc.instance.parseShare(context.Background(), tc.args.request, tc.args.password)
 
 			failed := false
 

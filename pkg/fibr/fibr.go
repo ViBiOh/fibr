@@ -51,7 +51,9 @@ func (s Service) parseRequest(r *http.Request) (provider.Request, error) {
 		request.Path = "/" + request.Path
 	}
 
-	if err := s.parseShare(ctx, &request, r.Header.Get("Authorization")); err != nil {
+	login, password, basicOK := r.BasicAuth()
+
+	if err := s.parseShare(ctx, &request, password); err != nil {
 		return request, model.WrapUnauthorized(err)
 	}
 
@@ -81,8 +83,7 @@ func (s Service) parseRequest(r *http.Request) (provider.Request, error) {
 		return request, nil
 	}
 
-	login, password, ok := r.BasicAuth()
-	if !ok {
+	if !basicOK {
 		return request, convertAuthenticationError(authModel.ErrMalformedContent)
 	}
 
@@ -110,13 +111,13 @@ func parsePreferences(r *http.Request) provider.Preferences {
 	return provider.ParsePreferences(cookieValue)
 }
 
-func (s Service) parseShare(ctx context.Context, request *provider.Request, authorizationHeader string) error {
+func (s Service) parseShare(ctx context.Context, request *provider.Request, password string) error {
 	share := s.share.Get(request.Filepath())
 	if share.IsZero() {
 		return nil
 	}
 
-	if err := share.CheckPassword(ctx, authorizationHeader, s.share); err != nil {
+	if err := share.CheckPassword(ctx, password, s.share); err != nil {
 		return err
 	}
 
