@@ -9,6 +9,7 @@ import (
 	"time"
 
 	authModel "github.com/ViBiOh/auth/v3/pkg/model"
+	"github.com/ViBiOh/fibr/pkg/cookie"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
@@ -20,15 +21,17 @@ type Service struct {
 	share    provider.ShareManager
 	webhook  provider.WebhookManager
 	renderer *renderer.Service
+	cookie   cookie.Service
 }
 
-func New(crudService provider.Crud, rendererService *renderer.Service, shareService provider.ShareManager, webhookService provider.WebhookManager, loginService provider.Auth) Service {
+func New(crud provider.Crud, renderer *renderer.Service, share provider.ShareManager, webhook provider.WebhookManager, login provider.Auth, cookie cookie.Service) Service {
 	return Service{
-		crud:     crudService,
-		renderer: rendererService,
-		share:    shareService,
-		webhook:  webhookService,
-		login:    loginService,
+		crud:     crud,
+		renderer: renderer,
+		share:    share,
+		webhook:  webhook,
+		login:    login,
+		cookie:   cookie,
 	}
 }
 

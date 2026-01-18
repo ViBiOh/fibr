@@ -8,6 +8,7 @@ import (
 	"os"
 
 	basicMemory "github.com/ViBiOh/auth/v3/pkg/store/memory"
+	"github.com/ViBiOh/fibr/pkg/cookie"
 	"github.com/ViBiOh/fibr/pkg/crud"
 	"github.com/ViBiOh/fibr/pkg/fibr"
 	"github.com/ViBiOh/fibr/pkg/metadata"
@@ -106,7 +107,7 @@ func newServices(ctx context.Context, config configuration, clients clients, ada
 		middlewareService = newLoginService(config.basic)
 	}
 
-	output.fibr = fibr.New(crudService, output.renderer, output.share, output.webhook, middlewareService)
+	output.fibr = fibr.New(crudService, output.renderer, output.share, output.webhook, middlewareService, cookie.New(config.cookie))
 
 	return output, nil
 }

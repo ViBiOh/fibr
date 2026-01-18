@@ -241,6 +241,8 @@ Usage of fibr:
   --authUsers                         string slice  [auth] Users credentials in the form 'id:login:password' ${FIBR_AUTH_USERS}, as a string slice, environment variable separated by "|"
   --cert                              string        [server] Certificate file ${FIBR_CERT}
   --chunkUpload                                     [crud] Use chunk upload in browser ${FIBR_CHUNK_UPLOAD} (default false)
+  --cookieHmacSecret                  string        [cookie] HMAC Secret ${FIBR_COOKIE_HMAC_SECRET}
+  --cookieJwtExpiration               duration      [cookie] JWT Expiration ${FIBR_COOKIE_JWT_EXPIRATION} (default 120h0m0s)
   --csp                               string        [owasp] Content-Security-Policy ${FIBR_CSP} (default "default-src 'self'; base-uri 'self'; script-src 'self' 'httputils-nonce' unpkg.com/webp-hero@0.0.2/dist-cjs/ unpkg.com/leaflet@1.9.4/dist/ unpkg.com/leaflet.markercluster@1.5.1/ cdn.jsdelivr.net/npm/pdfjs-dist@5.4.530/; style-src 'self' 'httputils-nonce' unpkg.com/leaflet@1.9.4/dist/ unpkg.com/leaflet.markercluster@1.5.1/; img-src 'self' data: a.tile.openstreetmap.org b.tile.openstreetmap.org c.tile.openstreetmap.org; worker-src 'self' blob:")
   --exifAmqpExchange                  string        [exif] AMQP Exchange Name ${FIBR_EXIF_AMQP_EXCHANGE} (default "fibr")
   --exifAmqpRoutingKey                string        [exif] AMQP Routing Key for exif ${FIBR_EXIF_AMQP_ROUTING_KEY} (default "exif_input")

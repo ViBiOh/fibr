@@ -7,6 +7,7 @@ import (
 
 	"github.com/ViBiOh/absto/pkg/absto"
 	basicMemory "github.com/ViBiOh/auth/v3/pkg/store/memory"
+	"github.com/ViBiOh/fibr/pkg/cookie"
 	"github.com/ViBiOh/fibr/pkg/crud"
 	"github.com/ViBiOh/fibr/pkg/metadata"
 	"github.com/ViBiOh/fibr/pkg/push"
@@ -41,6 +42,7 @@ type configuration struct {
 	renderer *renderer.Config
 
 	basic         *basicMemory.Config
+	cookie        *cookie.Config
 	absto         *absto.Config
 	storage       *storage.Config
 	redis         *redis.Config
@@ -76,6 +78,7 @@ func newConfig() configuration {
 		renderer: renderer.Flags(fs, "", flags.NewOverride("PublicURL", "http://127.0.0.1:1080"), flags.NewOverride("Title", "fibr")),
 
 		basic:         basicMemory.Flags(fs, "auth", flags.NewOverride("Profiles", []string{"1:admin"})),
+		cookie:        cookie.Flags(fs, "cookie"),
 		absto:         absto.Flags(fs, "storage"),
 		storage:       storage.Flags(fs, ""),
 		redis:         redis.Flags(fs, "redis", flags.NewOverride("Address", []string{})),
