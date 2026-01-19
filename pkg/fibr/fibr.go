@@ -15,6 +15,8 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 
+const authCookieName = "_auth"
+
 type Service struct {
 	login    provider.Auth
 	crud     provider.Crud
@@ -35,7 +37,7 @@ func New(crud provider.Crud, renderer *renderer.Service, share provider.ShareMan
 	}
 }
 
-func (s Service) parseRequest(r *http.Request) (provider.Request, error) {
+func (s Service) parseRequest(w http.ResponseWriter, r *http.Request) (provider.Request, error) {
 	ctx := r.Context()
 
 	request := provider.Request{
@@ -54,7 +56,7 @@ func (s Service) parseRequest(r *http.Request) (provider.Request, error) {
 		request.Path = "/" + request.Path
 	}
 
-	login, password, basicOK := r.BasicAuth()
+	login, password, basicOK, shouldUpdateCookie := s.getCredentials(r)
 
 	if err := s.parseShare(ctx, &request, password); err != nil {
 		return request, model.WrapUnauthorized(err)
@@ -95,6 +97,10 @@ func (s Service) parseRequest(r *http.Request) (provider.Request, error) {
 		return request, convertAuthenticationError(err)
 	}
 
+	if shouldUpdateCookie {
+		s.cookie.Set(ctx, w, authCookieName, login, password)
+	}
+
 	if s.login.IsAuthorized(ctx, user, "admin") {
 		request.CanEdit = true
 		request.CanShare = true
@@ -112,6 +118,20 @@ func parsePreferences(r *http.Request) provider.Preferences {
 	}
 
 	return provider.ParsePreferences(cookieValue)
+}
+
+func (s Service) getCredentials(r *http.Request) (string, string, bool, bool) {
+	login, password, ok := r.BasicAuth()
+	if ok {
+		return login, password, ok, true
+	}
+
+	claim, err := s.cookie.Get(r, authCookieName)
+	if err != nil {
+		return login, password, ok, false
+	}
+
+	return claim.Login, claim.Password, true, false
 }
 
 func (s Service) parseShare(ctx context.Context, request *provider.Request, password string) error {

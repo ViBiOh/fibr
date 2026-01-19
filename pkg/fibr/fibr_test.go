@@ -413,7 +413,7 @@ func TestParseRequest(t *testing.T) {
 				loginMock.EXPECT().IsAuthorized(gomock.Any(), gomock.Any(), gomock.Any()).Return(true)
 			}
 
-			got, gotErr := tc.instance.parseRequest(tc.args.r)
+			got, gotErr := tc.instance.parseRequest(httptest.NewRecorder(), tc.args.r)
 
 			failed := false
 

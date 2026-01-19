@@ -79,7 +79,7 @@ func (s Service) TemplateFunc(w http.ResponseWriter, r *http.Request) (renderer.
 		return renderer.Page{}, nil
 	}
 
-	request, err := s.parseRequest(r)
+	request, err := s.parseRequest(w, r)
 	if err != nil {
 		if errors.Is(err, model.ErrUnauthorized) {
 			w.Header().Add("WWW-Authenticate", `Basic realm="fibr" charset="UTF-8"`)
