@@ -20,13 +20,17 @@ var (
 	signValidMethods = []string{signMethod.Alg()}
 )
 
-type BasicClaim struct {
-	jwt.RegisteredClaims
-	Login    string `json:"login"`
-	Password string `json:"password"`
+type User interface {
+	GetID() string
+	GetSubject() string
 }
 
-type Service struct {
+type Claim[T User] struct {
+	Content T
+	jwt.RegisteredClaims
+}
+
+type Service[T User] struct {
 	hmacSecret    []byte
 	jwtExpiration time.Duration
 	devMode       bool
@@ -46,39 +50,39 @@ func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) *Config
 	return &config
 }
 
-func New(config *Config) Service {
-	return Service{
+func New[T User](config *Config) Service[T] {
+	return Service[T]{
 		hmacSecret:    []byte(config.hmacSecret),
 		jwtExpiration: config.jwtExpiration,
 		devMode:       os.Getenv("ENV") == "dev",
 	}
 }
 
-func (s Service) IsEnabled() bool {
+func (s Service[T]) IsEnabled() bool {
 	return len(s.hmacSecret) != 0
 }
 
-func (s Service) Get(r *http.Request, name string) (BasicClaim, error) {
-	var basic BasicClaim
+func (s Service[T]) Get(r *http.Request, name string) (Claim[T], error) {
+	var claim Claim[T]
 
 	auth, err := r.Cookie(name)
 	if err != nil {
 		if errors.Is(err, http.ErrNoCookie) {
-			return basic, model.ErrMalformedContent
+			return claim, model.ErrMalformedContent
 		}
 
-		return basic, fmt.Errorf("get auth cookie: %w", err)
+		return claim, fmt.Errorf("get auth cookie: %w", err)
 	}
 
-	if _, err = jwt.ParseWithClaims(auth.Value, &basic, s.jwtKeyFunc, jwt.WithValidMethods(signValidMethods)); err != nil {
-		return basic, fmt.Errorf("parse JWT: %w", err)
+	if _, err = jwt.ParseWithClaims(auth.Value, &claim, s.jwtKeyFunc, jwt.WithValidMethods(signValidMethods)); err != nil {
+		return claim, fmt.Errorf("parse JWT: %w", err)
 	}
 
-	return basic, nil
+	return claim, nil
 }
 
-func (s Service) Set(ctx context.Context, w http.ResponseWriter, name, login, password string) bool {
-	token := jwt.NewWithClaims(signMethod, s.newClaim(login, password))
+func (s Service[T]) Set(ctx context.Context, w http.ResponseWriter, name string, content T) bool {
+	token := jwt.NewWithClaims(signMethod, s.newClaim(content))
 
 	tokenString, err := token.SignedString(s.hmacSecret)
 	if err != nil {
@@ -90,7 +94,7 @@ func (s Service) Set(ctx context.Context, w http.ResponseWriter, name, login, pa
 	return true
 }
 
-func (s Service) Clear(w http.ResponseWriter, name string) {
+func (s Service[T]) Clear(w http.ResponseWriter, name string) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     name,
 		Value:    "",
@@ -102,28 +106,27 @@ func (s Service) Clear(w http.ResponseWriter, name string) {
 	})
 }
 
-func (s Service) jwtKeyFunc(_ *jwt.Token) (any, error) {
+func (s Service[T]) jwtKeyFunc(_ *jwt.Token) (any, error) {
 	return s.hmacSecret, nil
 }
 
-func (s Service) newClaim(login, password string) BasicClaim {
+func (s Service[T]) newClaim(content T) Claim[T] {
 	now := time.Now()
 
-	return BasicClaim{
-		Login:    login,
-		Password: password,
+	return Claim[T]{
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(now.Add(s.jwtExpiration)),
 			IssuedAt:  jwt.NewNumericDate(now),
 			NotBefore: jwt.NewNumericDate(now),
 			Issuer:    "auth",
-			Subject:   login,
-			ID:        login,
+			Subject:   content.GetSubject(),
+			ID:        content.GetID(),
 		},
+		Content: content,
 	}
 }
 
-func (s Service) setCookie(w http.ResponseWriter, name, value string) {
+func (s Service[T]) setCookie(w http.ResponseWriter, name, value string) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     name,
 		Value:    value,

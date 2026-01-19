@@ -23,10 +23,10 @@ type Service struct {
 	share    provider.ShareManager
 	webhook  provider.WebhookManager
 	renderer *renderer.Service
-	cookie   cookie.Service
+	cookie   cookie.Service[cookie.BasicContent]
 }
 
-func New(crud provider.Crud, renderer *renderer.Service, share provider.ShareManager, webhook provider.WebhookManager, login provider.Auth, cookie cookie.Service) Service {
+func New(crud provider.Crud, renderer *renderer.Service, share provider.ShareManager, webhook provider.WebhookManager, login provider.Auth, cookie cookie.Service[cookie.BasicContent]) Service {
 	return Service{
 		crud:     crud,
 		renderer: renderer,
@@ -98,7 +98,7 @@ func (s Service) parseRequest(w http.ResponseWriter, r *http.Request) (provider.
 	}
 
 	if shouldUpdateCookie {
-		s.cookie.Set(ctx, w, authCookieName, login, password)
+		s.cookie.Set(ctx, w, authCookieName, cookie.BasicContent{Login: login, Password: password})
 	}
 
 	if s.login.IsAuthorized(ctx, user, "admin") {
@@ -131,7 +131,7 @@ func (s Service) getCredentials(r *http.Request) (string, string, bool, bool) {
 		return login, password, ok, false
 	}
 
-	return claim.Login, claim.Password, true, false
+	return claim.Content.Login, claim.Content.Password, true, false
 }
 
 func (s Service) parseShare(ctx context.Context, request *provider.Request, password string) error {

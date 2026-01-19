@@ -107,7 +107,7 @@ func newServices(ctx context.Context, config configuration, clients clients, ada
 		middlewareService = newLoginService(config.basic)
 	}
 
-	output.fibr = fibr.New(crudService, output.renderer, output.share, output.webhook, middlewareService, cookie.New(config.cookie))
+	output.fibr = fibr.New(crudService, output.renderer, output.share, output.webhook, middlewareService, cookie.New[cookie.BasicContent](config.cookie))
 
 	return output, nil
 }
