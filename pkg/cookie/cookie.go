@@ -12,6 +12,7 @@ import (
 	"github.com/ViBiOh/auth/v3/pkg/model"
 	"github.com/ViBiOh/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/httperror"
+	"github.com/ViBiOh/httputils/v4/pkg/id"
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -20,17 +21,16 @@ var (
 	signValidMethods = []string{signMethod.Alg()}
 )
 
-type User interface {
-	GetID() string
+type ClaimUser interface {
 	GetSubject() string
 }
 
-type Claim[T User] struct {
+type Claim[T ClaimUser] struct {
 	Content T
 	jwt.RegisteredClaims
 }
 
-type Service[T User] struct {
+type Service[T ClaimUser] struct {
 	hmacSecret    []byte
 	jwtExpiration time.Duration
 	devMode       bool
@@ -50,7 +50,7 @@ func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) *Config
 	return &config
 }
 
-func New[T User](config *Config) Service[T] {
+func New[T ClaimUser](config *Config) Service[T] {
 	return Service[T]{
 		hmacSecret:    []byte(config.hmacSecret),
 		jwtExpiration: config.jwtExpiration,
@@ -115,12 +115,12 @@ func (s Service[T]) newClaim(content T) Claim[T] {
 
 	return Claim[T]{
 		RegisteredClaims: jwt.RegisteredClaims{
+			ID:        id.New(),
+			Subject:   content.GetSubject(),
 			ExpiresAt: jwt.NewNumericDate(now.Add(s.jwtExpiration)),
 			IssuedAt:  jwt.NewNumericDate(now),
 			NotBefore: jwt.NewNumericDate(now),
 			Issuer:    "auth",
-			Subject:   content.GetSubject(),
-			ID:        content.GetID(),
 		},
 		Content: content,
 	}

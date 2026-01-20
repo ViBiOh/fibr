@@ -40,9 +40,6 @@ services:
   rabbit:
     image: rabbitmq:3-alpine
 
-  image:
-    image: h2non/imaginary
-
   exas:
     image: vibioh/exas
     environment:
@@ -83,6 +80,5 @@ services:
       - /vignet
     depends_on:
       - rabbit
-      - image
     user: "${DATA_USER_ID}"
     read_only: true
