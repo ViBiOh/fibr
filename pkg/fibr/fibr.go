@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ViBiOh/auth/v3/pkg/cookie"
 	authModel "github.com/ViBiOh/auth/v3/pkg/model"
-	"github.com/ViBiOh/fibr/pkg/cookie"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"

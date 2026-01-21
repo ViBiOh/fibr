@@ -7,8 +7,8 @@ import (
 	"log/slog"
 	"os"
 
+	"github.com/ViBiOh/auth/v3/pkg/cookie"
 	basicMemory "github.com/ViBiOh/auth/v3/pkg/store/memory"
-	"github.com/ViBiOh/fibr/pkg/cookie"
 	"github.com/ViBiOh/fibr/pkg/crud"
 	"github.com/ViBiOh/fibr/pkg/fibr"
 	"github.com/ViBiOh/fibr/pkg/metadata"
