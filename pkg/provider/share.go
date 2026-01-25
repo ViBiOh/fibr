@@ -74,10 +74,18 @@ func (s Share) IsExpired(now time.Time) bool {
 	return s.Duration != 0 && s.Created.Add(s.Duration).Before(now)
 }
 
-// from https://github.com/kubernetes/kubernetes/blob/4925c6bea44efd05082cbe03d02409e0e7201252/staging/src/k8s.io/apimachinery/pkg/util/duration/duration.go
-func (s Share) HumanDuration() string {
-	d := s.Duration
+func (s Share) RemainingDuration() string {
+	now := time.Now()
 
+	if s.IsExpired(now) {
+		return ""
+	}
+
+	return HumanDuration(s.Created.Add(s.Duration).Sub(now))
+}
+
+// from https://github.com/kubernetes/kubernetes/blob/4925c6bea44efd05082cbe03d02409e0e7201252/staging/src/k8s.io/apimachinery/pkg/util/duration/duration.go
+func HumanDuration(d time.Duration) string {
 	// Allow deviation no more than 2 seconds(excluded) to tolerate machine time
 	// inconsistence, it can be considered as almost now.
 	if seconds := int(d.Seconds()); seconds < -1 {
