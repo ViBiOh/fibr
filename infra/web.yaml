@@ -25,11 +25,11 @@ spec:
     nameOverride: fibr
     image:
       name: rg.fr-par.scw.cloud/vibioh/fibr
-      tag: "202601310816" # {"$imagepolicy": "default:flux-fibr-web:tag"}
+      tag: "202601311617" # {"$imagepolicy": "default:flux-fibr-web:tag"}
     labels:
       tags.datadoghq.com/env: "production"
       tags.datadoghq.com/service: "fibr"
-      tags.datadoghq.com/version: "202601310816" # {"$imagepolicy": "default:flux-fibr-web:tag"}
+      tags.datadoghq.com/version: "202601311617" # {"$imagepolicy": "default:flux-fibr-web:tag"}
     volumes:
       - name: data
         persistentVolumeClaim:
