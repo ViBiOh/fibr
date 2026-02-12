@@ -1,6 +1,6 @@
 module github.com/ViBiOh/fibr
 
-go 1.25
+go 1.26
 
 require (
 	github.com/ViBiOh/ChatPotte v0.9.0
