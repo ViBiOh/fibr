@@ -3,6 +3,7 @@ package search
 import (
 	"net/url"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -142,11 +143,8 @@ func (s search) matchTags(metadata provider.Metadata) bool {
 	for _, tag := range s.tags {
 		var found bool
 
-		for _, itemTag := range metadata.Tags {
-			if itemTag == tag {
-				found = true
-				break
-			}
+		if slices.Contains(metadata.Tags, tag) {
+			found = true
 		}
 
 		if !found {
