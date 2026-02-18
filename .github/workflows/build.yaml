@@ -43,7 +43,7 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v9
         with:
-          version: v2.9
+          version: latest
           install-only: true
       - name: Build
         run: |
