@@ -17,7 +17,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"math/big"
 	"net/url"
 	"path"
 	"strconv"
@@ -29,7 +28,7 @@ import (
 	"github.com/ViBiOh/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/hash"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/hkdf"
 )
 
@@ -260,7 +259,12 @@ func (s *Service) generateJWT(subscription Subscription, duration time.Duration)
 		"sub": "mailto:bob@vibioh.fr",
 	})
 
-	jwtString, err := token.SignedString(s.getPrivateKey())
+	privateKey, err := s.getPrivateKey()
+	if err != nil {
+		return "", fmt.Errorf("get private key: %w", err)
+	}
+
+	jwtString, err := token.SignedString(privateKey)
 	if err != nil {
 		return "", fmt.Errorf("sign with private key: %w", err)
 	}
@@ -268,26 +272,8 @@ func (s *Service) generateJWT(subscription Subscription, duration time.Duration)
 	return "vapid t=" + jwtString + ", k=" + s.publicKey, nil
 }
 
-func (s *Service) getPrivateKey() *ecdsa.PrivateKey {
+func (s *Service) getPrivateKey() (*ecdsa.PrivateKey, error) {
 	curve := elliptic.P256()
 
-	px, py := curve.ScalarMult(
-		curve.Params().Gx,
-		curve.Params().Gy,
-		s.privateKey,
-	)
-
-	pubKey := ecdsa.PublicKey{
-		Curve: curve,
-		X:     px,
-		Y:     py,
-	}
-
-	d := &big.Int{}
-	d.SetBytes(s.privateKey)
-
-	return &ecdsa.PrivateKey{
-		PublicKey: pubKey,
-		D:         d,
-	}
+	return ecdsa.ParseRawPrivateKey(curve, s.privateKey)
 }

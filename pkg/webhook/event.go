@@ -44,7 +44,7 @@ func (s *Service) EventConsumer(ctx context.Context, event provider.Event) {
 			statusCode, err = s.telegramHandle(ctx, webhook, event)
 
 		case provider.Push:
-			statusCode, err = s.pushHandle(ctx, webhook, event)
+			statusCode, err = s.pushHandle(webhook, event)
 
 		default:
 			slog.LogAttrs(ctx, slog.LevelWarn, "unknown kind for webhook", slog.String("kind", webhook.Kind.String()))
@@ -181,7 +181,7 @@ func (s *Service) asyncPushNotification(group string, events []provider.Event) {
 	}
 }
 
-func (s *Service) pushHandle(ctx context.Context, webhook provider.Webhook, event provider.Event) (int, error) {
+func (s *Service) pushHandle(webhook provider.Webhook, event provider.Event) (int, error) {
 	switch event.Type {
 	case provider.UploadEvent:
 		s.debouncer.Send(webhook.URL, event)
@@ -257,13 +257,13 @@ func (s *Service) eventText(event provider.Event) string {
 
 func (s *Service) accessEvent(event provider.Event) string {
 	content := strings.Builder{}
-	content.WriteString(fmt.Sprintf("💻 Someone connected to Fibr from %s at %s", s.rendererService.PublicURL(event.URL), event.Time.Format(time.RFC3339)))
+	fmt.Fprintf(&content, "💻 Someone connected to Fibr from %s at %s", s.rendererService.PublicURL(event.URL), event.Time.Format(time.RFC3339))
 
 	if len(event.Metadata) > 0 {
 		content.WriteString("\n```\n")
 
 		for key, value := range event.Metadata {
-			content.WriteString(fmt.Sprintf("%s: %s\n", key, value))
+			fmt.Fprintf(&content, "%s: %s\n", key, value)
 		}
 
 		content.WriteString("```")
