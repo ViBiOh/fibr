@@ -1,7 +1,7 @@
 github.com/ViBiOh/ChatPotte v0.9.0 h1:jNVJq2Av+aFkHLRGDVI7tFY4EqIx2z8pJhUjYAnsNs4=
 github.com/ViBiOh/ChatPotte v0.9.0/go.mod h1:8K3pom+hdURMXqJzh64JbdCYj8Zj8XG55GzXkeFh83Q=
-github.com/ViBiOh/absto v1.7.29 h1:dzXdGhb+Ckvw+T0eYsgF7cEPol0qJNjCB11wVm1OYME=
-github.com/ViBiOh/absto v1.7.29/go.mod h1:GTwWUDvFLdZoI3PNJJwSEKZWdj1rBbmfwn0OkI0hNhw=
+github.com/ViBiOh/absto v1.7.30 h1:Rcnk79SylTDhU1M8viKNapz2Xeatk6rqKBGYDDLxN1E=
+github.com/ViBiOh/absto v1.7.30/go.mod h1:o1OBzQ9izvdZ1swILy+ZAtZINKLbh4pZtQEW66KxqAw=
 github.com/ViBiOh/auth/v3 v3.9.0 h1:3+6cuJiZY5ydq41NybPy1THsUupL7dVKvk9m8Vkak2c=
 github.com/ViBiOh/auth/v3 v3.9.0/go.mod h1:EpaE42VxghVAtnESbhJ02Gbc/wgCIeGofOe6Al85Htc=
 github.com/ViBiOh/exas v0.8.1 h1:bXrWK99ze7MLMfjD+pp/NHngOSkR1eqcCVWlNNxLT/M=
@@ -51,8 +51,8 @@ github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 h1:iCEnooe7Ulw
 github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761/go.mod h1:5TJZWKEWniPve33vlWYSoGYefn3gLQRzjfDlhSJ9ZKM=
 github.com/jackc/pgx/v5 v5.8.0 h1:TYPDoleBBme0xGSAX3/+NujXXtpZn9HBONkQC7IEZSo=
 github.com/jackc/pgx/v5 v5.8.0/go.mod h1:QVeDInX2m9VyzvNeiCJVjCkNFqzsNb43204HshNSZKw=
-github.com/klauspost/compress v1.18.3 h1:9PJRvfbmTabkOX8moIpXPbMMbYN60bWImDDU7L+/6zw=
-github.com/klauspost/compress v1.18.3/go.mod h1:R0h/fSBs8DE4ENlcrlib3PsXS61voFxhIs2DeRhCvJ4=
+github.com/klauspost/compress v1.18.4 h1:RPhnKRAQ4Fh8zU2FY/6ZFDwTVTxgJ/EMydqSTzE9a2c=
+github.com/klauspost/compress v1.18.4/go.mod h1:R0h/fSBs8DE4ENlcrlib3PsXS61voFxhIs2DeRhCvJ4=
 github.com/klauspost/cpuid/v2 v2.0.1/go.mod h1:FInQzS24/EEf25PyTYn52gqo7WaD8xa0213Md/qVLRg=
 github.com/klauspost/cpuid/v2 v2.3.0 h1:S4CRMLnYUhGeDFDqkGriYKdfoFlDnMtqTiI/sFzhA9Y=
 github.com/klauspost/cpuid/v2 v2.3.0/go.mod h1:hqwkgyIinND0mEev00jJYCxPNVRVXFQeu1XKlok6oO0=
