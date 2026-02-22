@@ -255,7 +255,7 @@ async function setUploadStatus(container, messageId, content, style, title) {
 let uploadFile;
 let aborter;
 
-const chunkSize = 1024 * 1024;
+const chunkSize = 2 * 1024 * 1024;
 let currentUpload = {};
 
 /**
