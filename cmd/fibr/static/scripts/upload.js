@@ -303,9 +303,8 @@ async function uploadFileByChunks(
 
     const formData = new FormData();
     formData.append("method", method);
-    formData.append("filename", filename);
     formData.append("overwrite", overwrite);
-    formData.append("file", currentUpload.chunks[i].content);
+    formData.append("file", currentUpload.chunks[i].content, filename);
 
     const response = await fetch("", {
       method: "POST",
@@ -372,10 +371,9 @@ async function uploadFileByXHR(container, method, filename, file, overwrite) {
 
   const formData = new FormData();
   formData.append("method", method);
-  formData.append("filename", filename);
   formData.append("size", file.size);
   formData.append("overwrite", overwrite);
-  formData.append("file", file);
+  formData.append("file", file, filename);
 
   return new Promise((resolve, reject) => {
     let xhr = new XMLHttpRequest();

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"mime"
 	"mime/multipart"
 	"net/http"
 	"strconv"
@@ -121,7 +122,14 @@ func (s *Service) handleMultipart(w http.ResponseWriter, r *http.Request, reques
 		return
 	}
 
-	fileName, filePath, err := getUploadNameAndPath(request, values["filename"], file)
+	var inputFilename string
+	if _, disposition, err := mime.ParseMediaType(r.Header.Get("Content-Disposition")); err == nil && disposition["filename"] != "" {
+		inputFilename = disposition["filename"]
+	} else {
+		inputFilename = values["filename"]
+	}
+
+	fileName, filePath, err := getUploadNameAndPath(request, inputFilename, file)
 	if err != nil {
 		s.error(w, r, request, model.WrapInvalid(fmt.Errorf("get upload name: %w", err)))
 		return
