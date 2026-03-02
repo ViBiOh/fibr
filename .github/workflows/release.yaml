@@ -44,7 +44,7 @@ jobs:
       - name: GPG
         id: import_gpg
         if: ${{ env.gpg_private_key != '' }}
-        uses: crazy-max/ghaction-import-gpg@v6
+        uses: crazy-max/ghaction-import-gpg@v7
         with:
           gpg_private_key: ${{ env.gpg_private_key }}
           passphrase: ${{ secrets.GPG_PASSPHRASE }}
