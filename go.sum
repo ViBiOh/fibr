@@ -1,7 +1,7 @@
 github.com/ViBiOh/ChatPotte v0.10.1 h1:C0OkG2CEToYx+aSJ6KVkl3kpYL3Axzlm0dGHzJ3iakw=
 github.com/ViBiOh/ChatPotte v0.10.1/go.mod h1:dYn28Rd/ICxkQ1yWT405vEsMvDttgWD/196tr0RNVpk=
-github.com/ViBiOh/absto v1.7.30 h1:Rcnk79SylTDhU1M8viKNapz2Xeatk6rqKBGYDDLxN1E=
-github.com/ViBiOh/absto v1.7.30/go.mod h1:o1OBzQ9izvdZ1swILy+ZAtZINKLbh4pZtQEW66KxqAw=
+github.com/ViBiOh/absto v1.7.31 h1:4Wzq6QsQFegcvft3SkQyu7NpYKCTApgopgsWeMhokrs=
+github.com/ViBiOh/absto v1.7.31/go.mod h1:8aahs8Uemyqg32BakDv+opXlWAfAmWY9+GClpj34hhU=
 github.com/ViBiOh/auth/v3 v3.9.1 h1:MVTxXBTivYD7VOqOF6uflCS4enl3azMvKm8FX83T66w=
 github.com/ViBiOh/auth/v3 v3.9.1/go.mod h1:Si2fDhtItgusFz/oQ/m0N1QCW9Q/KAoy2guM/D9lPWE=
 github.com/ViBiOh/exas v0.8.1 h1:bXrWK99ze7MLMfjD+pp/NHngOSkR1eqcCVWlNNxLT/M=
@@ -66,8 +66,8 @@ github.com/minio/crc64nvme v1.1.1 h1:8dwx/Pz49suywbO+auHCBpCtlW1OfpcLN7wYgVR6wAI
 github.com/minio/crc64nvme v1.1.1/go.mod h1:eVfm2fAzLlxMdUGc0EEBGSMmPwmXD5XiNRpnu9J3bvg=
 github.com/minio/md5-simd v1.1.2 h1:Gdi1DZK69+ZVMoNHRXJyNcxrMA4dSxoYHZSQbirFg34=
 github.com/minio/md5-simd v1.1.2/go.mod h1:MzdKDxYpY2BT9XQFocsiZf/NKVtR7nkE4RoEpN+20RM=
-github.com/minio/minio-go/v7 v7.0.98 h1:MeAVKjLVz+XJ28zFcuYyImNSAh8Mq725uNW4beRisi0=
-github.com/minio/minio-go/v7 v7.0.98/go.mod h1:cY0Y+W7yozf0mdIclrttzo1Iiu7mEf9y7nk2uXqMOvM=
+github.com/minio/minio-go/v7 v7.0.99 h1:2vH/byrwUkIpFQFOilvTfaUpvAX3fEFhEzO+DR3DlCE=
+github.com/minio/minio-go/v7 v7.0.99/go.mod h1:EtGNKtlX20iL2yaYnxEigaIvj0G0GwSDnifnG8ClIdw=
 github.com/philhofer/fwd v1.2.0 h1:e6DnBTl7vGY+Gz322/ASL4Gyp1FspeMvx1RNDoToZuM=
 github.com/philhofer/fwd v1.2.0/go.mod h1:RqIHx9QI14HlwKwm98g9Re5prTQ6LdeRQn+gXJFxsJM=
 github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 h1:Jamvg5psRIccs7FGNTlIRMkT8wgtp5eCXdBlqhYGL6U=
