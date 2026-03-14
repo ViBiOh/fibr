@@ -37,8 +37,8 @@ func newClients(ctx context.Context, config configuration) (clients, error) {
 	service, version, env := output.telemetry.GetServiceVersionAndEnv()
 	output.pprof = pprof.New(config.pprof, service, version, env)
 
-	logger.AddOpenTelemetryToDefaultLogger(output.telemetry)
-	request.AddOpenTelemetryToDefaultClient(output.telemetry.MeterProvider(), output.telemetry.TracerProvider())
+	telemetry.AddOpenTelemetryToDefaultLogger(output.telemetry)
+	request.SetDefaultClient(telemetry.AddOpenTelemetryToClient(request.GetDefaultClient(), output.telemetry.MeterProvider(), output.telemetry.TracerProvider()))
 
 	output.health = health.New(ctx, config.health)
 
