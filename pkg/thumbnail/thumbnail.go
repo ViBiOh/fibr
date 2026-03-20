@@ -261,7 +261,7 @@ func (s Service) Save(w http.ResponseWriter, r *http.Request, fibrRequest provid
 
 	if err := s.generateImageThumbnail(ctx, item, payload); err != nil {
 		s.increaseMetric(ctx, itemType.String(), "error")
-		httperror.InternalServerError(ctx, w, err)
+		httperror.InternalServerError(ctx, w, fmt.Errorf("generate thumbnail for `%s`: %w", item.Name(), err))
 		return
 	}
 
@@ -296,8 +296,7 @@ func (s Service) generateImageThumbnail(ctx context.Context, item absto.Item, pa
 
 		req, err = s.vignetRequest.Method(http.MethodPost).Path("?type=%s&scale=%d", itemType, size).Build(ctx, io.NopCloser(bytes.NewReader(payload)))
 		if err != nil {
-			err = fmt.Errorf("build %d: %w", size, err)
-			return err
+			return fmt.Errorf("build %d: %w", size, err)
 		}
 
 		req.ContentLength = int64(len(payload))
@@ -306,25 +305,21 @@ func (s Service) generateImageThumbnail(ctx context.Context, item absto.Item, pa
 
 		resp, err = request.DoWithClient(provider.SlowClient, req)
 		if err != nil {
-			err = fmt.Errorf("do %d: %w", size, err)
-			return err
+			return fmt.Errorf("do for size %d: %w", size, err)
 		}
 
 		if resp == nil {
-			err = fmt.Errorf("no body %d", size)
-			return err
+			return fmt.Errorf("no body for size %d", size)
 		}
 
 		filename := s.PathForScale(item, size)
 
 		if err = provider.WriteToStorage(ctx, s.storage, filename, resp.ContentLength, resp.Body); err != nil {
-			err = fmt.Errorf("write %d: %w", size, err)
-			return err
+			return fmt.Errorf("write for size %d: %w", size, err)
 		}
 
 		if err = request.DiscardBody(resp.Body); err != nil {
-			err = fmt.Errorf("close %d: %w", size, err)
-			return err
+			return fmt.Errorf("close for size %d: %w", size, err)
 		}
 
 		createdFiles = append(createdFiles, filename)
