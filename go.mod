@@ -5,7 +5,7 @@ go 1.26
 require (
 	github.com/ViBiOh/ChatPotte v0.10.1
 	github.com/ViBiOh/absto v1.7.31
-	github.com/ViBiOh/auth/v3 v3.9.1
+	github.com/ViBiOh/auth/v3 v3.10.0
 	github.com/ViBiOh/exas v0.8.1
 	github.com/ViBiOh/flags v1.6.1
 	github.com/ViBiOh/httputils/v4 v4.85.0
@@ -60,7 +60,7 @@ require (
 	go.uber.org/atomic v1.11.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/net v0.52.0 // indirect
-	golang.org/x/oauth2 v0.35.0 // indirect
+	golang.org/x/oauth2 v0.36.0 // indirect
 	golang.org/x/sys v0.42.0 // indirect
 	golang.org/x/term v0.41.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20260311181403-84a4fc48630c // indirect
