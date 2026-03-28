@@ -260,6 +260,10 @@ func (s Service) Save(w http.ResponseWriter, r *http.Request, fibrRequest provid
 	itemType := typeOfItem(item)
 
 	if err := s.generateImageThumbnail(ctx, item, payload); err != nil {
+		if errors.Is(err, context.Canceled) {
+			return
+		}
+
 		s.increaseMetric(ctx, itemType.String(), "error")
 		httperror.InternalServerError(ctx, w, fmt.Errorf("generate thumbnail for `%s`: %w", item.Name(), err))
 		return
