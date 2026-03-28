@@ -283,6 +283,7 @@ Usage of fibr:
   --sanitizeOnStart                                 [crud] Sanitize on start ${FIBR_SANITIZE_ON_START} (default false)
   --sharePubSubChannel                string        [share] Channel name ${FIBR_SHARE_PUB_SUB_CHANNEL} (default "fibr:shares-channel")
   --shutdownTimeout                   duration      [server] Shutdown Timeout ${FIBR_SHUTDOWN_TIMEOUT} (default 10s)
+  --staticPaths                       string slice  Paths served from static FS ${FIBR_STATIC_PATHS}, as a string slice, environment variable separated by "," (default [/robots.txt, /service-worker.js, /browserconfig.xml, /favicon.ico])
   --storageFileSystemDirectory        /data         [storage] Path to directory. Default is dynamic. /data on a server and Current Working Directory in a terminal. ${FIBR_STORAGE_FILE_SYSTEM_DIRECTORY} (default /Users/macbook/code/fibr)
   --storageObjectAccessKey            string        [storage] Storage Object Access Key ${FIBR_STORAGE_OBJECT_ACCESS_KEY}
   --storageObjectBucket               string        [storage] Storage Object Bucket ${FIBR_STORAGE_OBJECT_BUCKET}
