@@ -22,5 +22,5 @@ VOLUME /tmp
 COPY wait_${TARGETOS}_${TARGETARCH} /wait
 
 COPY mime.types /etc/mime.types
-COPY ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+COPY cacert.pem /etc/ssl/cert.pem
 COPY release/fibr_${TARGETOS}_${TARGETARCH} /fibr
