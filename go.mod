@@ -8,10 +8,10 @@ require (
 	github.com/ViBiOh/auth/v3 v3.11.1
 	github.com/ViBiOh/exas v0.8.1
 	github.com/ViBiOh/flags v1.6.1
-	github.com/ViBiOh/httputils/v4 v4.86.1
+	github.com/ViBiOh/httputils/v4 v4.86.2
 	github.com/ViBiOh/vignet v0.0.1
 	github.com/golang-jwt/jwt/v5 v5.3.1
-	github.com/rabbitmq/amqp091-go v1.10.0
+	github.com/rabbitmq/amqp091-go v1.11.0
 	github.com/redis/go-redis/v9 v9.18.0
 	github.com/rs/xid v1.6.0
 	github.com/zeebo/xxh3 v1.1.0
@@ -34,7 +34,7 @@ require (
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/google/uuid v1.6.0 // indirect
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.28.0 // indirect
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.29.0 // indirect
 	github.com/klauspost/compress v1.18.5 // indirect
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
 	github.com/klauspost/crc32 v1.3.0 // indirect
@@ -46,7 +46,7 @@ require (
 	github.com/redis/go-redis/extra/rediscmd/v9 v9.18.0 // indirect
 	github.com/redis/go-redis/extra/redisotel/v9 v9.18.0 // indirect
 	github.com/tdewolff/minify/v2 v2.24.12 // indirect
-	github.com/tdewolff/parse/v2 v2.8.11 // indirect
+	github.com/tdewolff/parse/v2 v2.8.12 // indirect
 	github.com/tinylib/msgp v1.6.3 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.68.0 // indirect
@@ -63,8 +63,8 @@ require (
 	golang.org/x/oauth2 v0.36.0 // indirect
 	golang.org/x/sys v0.43.0 // indirect
 	golang.org/x/term v0.42.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20260406210006-6f92a3bedf2d // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260406210006-6f92a3bedf2d // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20260420184626-e10c466a9529 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260420184626-e10c466a9529 // indirect
 	google.golang.org/grpc v1.80.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 )
