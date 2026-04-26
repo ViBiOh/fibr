@@ -52,7 +52,7 @@ app: init dev
 ## init: Bootstrap your application. e.g. fetch some data files, make some API calls, request user input etc...
 .PHONY: init
 init:
-	@curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap.sh" | bash -s -- "-c" "git_hooks" "coverage.sh"
+	@curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap.sh" | bash -s -- "-c" "coverage.sh"
 	go install "github.com/tdewolff/minify/v2/cmd/minify@latest"
 	go install "github.com/ViBiOh/auth/v3/cmd/argon@latest"
 	go install "golang.org/x/tools/cmd/goimports@latest"
