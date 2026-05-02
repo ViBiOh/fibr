@@ -4,7 +4,7 @@ go 1.26
 
 require (
 	github.com/ViBiOh/ChatPotte v0.10.1
-	github.com/ViBiOh/absto v1.7.32
+	github.com/ViBiOh/absto v1.7.33
 	github.com/ViBiOh/auth/v3 v3.11.1
 	github.com/ViBiOh/exas v0.8.1
 	github.com/ViBiOh/flags v1.6.1
@@ -46,7 +46,7 @@ require (
 	github.com/redis/go-redis/extra/redisotel/v9 v9.19.0 // indirect
 	github.com/tdewolff/minify/v2 v2.24.13 // indirect
 	github.com/tdewolff/parse/v2 v2.8.12 // indirect
-	github.com/tinylib/msgp v1.6.3 // indirect
+	github.com/tinylib/msgp v1.6.4 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.68.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/runtime v0.68.0 // indirect

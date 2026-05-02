@@ -1,7 +1,7 @@
 github.com/ViBiOh/ChatPotte v0.10.1 h1:C0OkG2CEToYx+aSJ6KVkl3kpYL3Axzlm0dGHzJ3iakw=
 github.com/ViBiOh/ChatPotte v0.10.1/go.mod h1:dYn28Rd/ICxkQ1yWT405vEsMvDttgWD/196tr0RNVpk=
-github.com/ViBiOh/absto v1.7.32 h1:ITOwNfQ0O31n1LbKVAE/2KGUmawgjOPlYwIE5oh8cHY=
-github.com/ViBiOh/absto v1.7.32/go.mod h1:DmmzhxsgWY2/ojyopcuR1a+CuiPFEdweUY9QcmoH/m0=
+github.com/ViBiOh/absto v1.7.33 h1:Y6lLhNyiZqJmjWARu5vD6K4rjrGEV8bKkYE29LpY5eE=
+github.com/ViBiOh/absto v1.7.33/go.mod h1:jfUlIb1J/nPBmglcd1uhYgQmv7hiqSrVHLyMjP01fnY=
 github.com/ViBiOh/auth/v3 v3.11.1 h1:bsEfw5b8BQkI3qJkjKldx/V8M2b2JgP2dc0NH9Id348=
 github.com/ViBiOh/auth/v3 v3.11.1/go.mod h1:9WgU7mDbWSr3aePtPanKfCK2lz037CtTmmKxz1zjx0Y=
 github.com/ViBiOh/exas v0.8.1 h1:bXrWK99ze7MLMfjD+pp/NHngOSkR1eqcCVWlNNxLT/M=
@@ -91,8 +91,8 @@ github.com/tdewolff/parse/v2 v2.8.12/go.mod h1:Hwlni2tiVNKyzR1o6nUs4FOF07URA+JLB
 github.com/tdewolff/test v1.0.11/go.mod h1:XPuWBzvdUzhCuxWO1ojpXsyzsA5bFoS3tO/Q3kFuTG8=
 github.com/tdewolff/test v1.0.12 h1:7F21DqIajswxuche0geHdrUZRCWE4oko4b7bcmkkrxk=
 github.com/tdewolff/test v1.0.12/go.mod h1:XPuWBzvdUzhCuxWO1ojpXsyzsA5bFoS3tO/Q3kFuTG8=
-github.com/tinylib/msgp v1.6.3 h1:bCSxiTz386UTgyT1i0MSCvdbWjVW+8sG3PjkGsZQt4s=
-github.com/tinylib/msgp v1.6.3/go.mod h1:RSp0LW9oSxFut3KzESt5Voq4GVWyS+PSulT77roAqEA=
+github.com/tinylib/msgp v1.6.4 h1:mOwYbyYDLPj35mkA2BjjYejgJk9BuHxDdvRnb6v2ZcQ=
+github.com/tinylib/msgp v1.6.4/go.mod h1:RSp0LW9oSxFut3KzESt5Voq4GVWyS+PSulT77roAqEA=
 github.com/zeebo/assert v1.3.1 h1:vukIABvugfNMZMQO1ABsyQDJDTVQbn+LWSMy1ol1h6A=
 github.com/zeebo/assert v1.3.1/go.mod h1:Pq9JiuJQpG8JLJdtkwrJESF0Foym2/D9XMU5ciN/wJ0=
 github.com/zeebo/xxh3 v1.1.0 h1:s7DLGDK45Dyfg7++yxI0khrfwq9661w9EN78eP/UZVs=
