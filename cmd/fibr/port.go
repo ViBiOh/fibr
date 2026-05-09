@@ -11,7 +11,8 @@ func newPort(clients clients, services services) http.Handler {
 
 	services.renderer.RegisterMux(mux, services.fibr.TemplateFunc)
 
-	return httputils.Handler(mux, clients.health,
+	return httputils.Handler(
+		mux, clients.health,
 		clients.telemetry.Middleware("http"),
 		services.owasp.Middleware,
 	)
