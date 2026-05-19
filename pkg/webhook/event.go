@@ -19,14 +19,9 @@ import (
 )
 
 func (s *Service) EventConsumer(ctx context.Context, event provider.Event) {
-	s.mutex.RLock()
-	defer s.mutex.RUnlock()
+	matching := s.matchingWebhooks(event)
 
-	for _, webhook := range s.webhooks {
-		if !webhook.Match(event) {
-			continue
-		}
-
+	for _, webhook := range matching {
 		var statusCode int
 		var err error
 
@@ -58,13 +53,27 @@ func (s *Service) EventConsumer(ctx context.Context, event provider.Event) {
 	}
 
 	if event.Type == provider.DeleteEvent {
-		// Fire a goroutine to release the mutex lock
 		go func() {
 			if err := s.deleteItem(ctx, event.Item); err != nil {
 				slog.LogAttrs(ctx, slog.LevelError, "delete webhooks for item", slog.Any("error", err))
 			}
 		}()
 	}
+}
+
+func (s *Service) matchingWebhooks(event provider.Event) []provider.Webhook {
+	s.mutex.RLock()
+	defer s.mutex.RUnlock()
+
+	var matching []provider.Webhook
+
+	for _, webhook := range s.webhooks {
+		if webhook.Match(event) {
+			matching = append(matching, webhook)
+		}
+	}
+
+	return matching
 }
 
 func send(ctx context.Context, id string, req request.Request, payload any) (int, error) {

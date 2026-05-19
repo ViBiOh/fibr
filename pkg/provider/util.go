@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -98,6 +99,7 @@ func SanitizeName(name string, removeSlash bool) (string, error) {
 	}
 
 	transformer := transformerPool.Get().(transform.Transformer)
+	transformer.Reset()
 	defer transformerPool.Put(transformer)
 
 	withoutDiacritics, _, err := transform.String(transformer, withoutLigatures)
@@ -209,7 +211,9 @@ func Hash(value string) string {
 func RawHash(content any) string {
 	hasher := xxh3.New()
 
-	_, _ = fmt.Fprintf(hasher, "%v", content)
+	if err := json.NewEncoder(hasher).Encode(content); err != nil {
+		_, _ = fmt.Fprintf(hasher, "%v", content)
+	}
 
 	return hex.EncodeToString(hasher.Sum(nil))
 }

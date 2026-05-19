@@ -48,28 +48,33 @@ func (s Service) Files(r *http.Request, request provider.Request) (items []absto
 		return nil, httpModel.WrapInvalid(err)
 	}
 
-	hasTags := criterions.hasTags()
-
 	err = s.storage.Walk(ctx, request.Filepath(), func(item absto.Item) error {
-		if item.IsDir() || !criterions.match(item) {
-			return nil
+		if !item.IsDir() && criterions.match(item) {
+			items = append(items, item)
 		}
-
-		if hasTags {
-			metadata, err := s.exif.GetMetadataFor(ctx, item)
-			if err != nil {
-				slog.LogAttrs(ctx, slog.LevelError, "get metadata", slog.String("item", item.Pathname), slog.Any("error", err))
-			}
-
-			if !criterions.matchTags(metadata) {
-				return nil
-			}
-		}
-
-		items = append(items, item)
 
 		return nil
 	})
+	if err != nil {
+		return nil, err
+	}
+
+	if criterions.hasTags() {
+		metadatas, metaErr := s.exif.GetAllMetadataFor(ctx, items...)
+		if metaErr != nil {
+			slog.LogAttrs(ctx, slog.LevelError, "get all metadata", slog.Any("error", metaErr))
+		}
+
+		filtered := items[:0]
+
+		for _, item := range items {
+			if criterions.matchTags(metadatas[item.ID]) {
+				filtered = append(filtered, item)
+			}
+		}
+
+		items = filtered
+	}
 
 	return items, err
 }

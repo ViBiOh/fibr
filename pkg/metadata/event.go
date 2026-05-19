@@ -56,7 +56,7 @@ func (s *Service) Rename(ctx context.Context, old, new absto.Item) error {
 	}
 
 	if err := s.redisClient.Delete(ctx, redisKey(old)); err != nil {
-		return fmt.Errorf("cache: %s", err)
+		return fmt.Errorf("cache: %w", err)
 	}
 
 	return nil
@@ -166,7 +166,7 @@ func (s *Service) delete(ctx context.Context, item absto.Item) error {
 	}
 
 	if err := s.redisClient.Delete(ctx, redisKey(item)); err != nil {
-		return fmt.Errorf("cache: %s", err)
+		return fmt.Errorf("cache: %w", err)
 	}
 
 	if !item.IsDir() {

@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode"
+	"unicode/utf8"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 )
@@ -19,7 +21,26 @@ func IgnoreNotExistsErr[K comparable](_ context.Context, _ K, err error) error {
 }
 
 func lowerString(first, second string) bool {
-	return strings.Compare(strings.ToLower(first), strings.ToLower(second)) < 0
+	for i, j := 0, 0; i < len(first) && j < len(second); {
+		rf, fw := rune(first[i]), 1
+		if rf >= utf8.RuneSelf {
+			rf, fw = utf8.DecodeRuneInString(first[i:])
+		}
+
+		rs, sw := rune(second[j]), 1
+		if rs >= utf8.RuneSelf {
+			rs, sw = utf8.DecodeRuneInString(second[j:])
+		}
+
+		if lf, ls := unicode.ToLower(rf), unicode.ToLower(rs); lf != ls {
+			return lf < ls
+		}
+
+		i += fw
+		j += sw
+	}
+
+	return len(first) < len(second)
 }
 
 func greaterTime(first, second time.Time) bool {

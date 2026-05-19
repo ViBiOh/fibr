@@ -36,6 +36,7 @@ func (s *Service) uploadChunk(w http.ResponseWriter, r *http.Request, request pr
 	var writer *os.File
 	writer, err := os.OpenFile(tempFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, absto.RegularFilePerm)
 	if err != nil {
+		s.error(w, r, request, model.WrapInternal(err))
 		return
 	}
 

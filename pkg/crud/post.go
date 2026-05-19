@@ -142,13 +142,10 @@ func (s *Service) handleMultipart(w http.ResponseWriter, r *http.Request, reques
 		}
 	}
 
-	var size int64
-	if rawSize := values["size"]; len(rawSize) == 0 {
-		size, err = getUploadSize(rawSize)
-		if err != nil {
-			s.error(w, r, request, model.WrapInvalid(fmt.Errorf("get upload size `%s`: %w", rawSize, err)))
-			return
-		}
+	size, err := getUploadSize(values["size"])
+	if err != nil {
+		s.error(w, r, request, model.WrapInvalid(fmt.Errorf("get upload size `%s`: %w", values["size"], err)))
+		return
 	}
 
 	if len(r.Header.Get("X-Chunk-Upload")) != 0 {
@@ -156,6 +153,7 @@ func (s *Service) handleMultipart(w http.ResponseWriter, r *http.Request, reques
 			chunkNumberValue, err := strconv.ParseUint(chunkNumber, 10, 64)
 			if err != nil {
 				s.error(w, r, request, model.WrapInvalid(fmt.Errorf("parse chunk number: %w", err)))
+				return
 			}
 
 			chunkNumber = fmt.Sprintf("%010d", chunkNumberValue)

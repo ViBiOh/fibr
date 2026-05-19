@@ -113,25 +113,30 @@ func (s *Service) aggregate(ctx context.Context, item absto.Item) error {
 }
 
 func (s *Service) computeAndSaveAggregate(ctx context.Context, dir absto.Item) error {
+	previousAggregate, _ := s.GetAggregateFor(ctx, dir)
+
+	var fileItems []absto.Item
+
+	err := s.storage.Walk(ctx, dir.Pathname, func(item absto.Item) error {
+		if item.Pathname != dir.Pathname && !item.IsDir() {
+			fileItems = append(fileItems, item)
+		}
+
+		return nil
+	})
+	if err != nil {
+		return fmt.Errorf("aggregate: %w", err)
+	}
+
+	metadatas, err := s.GetAllMetadataFor(ctx, fileItems...)
+	if err != nil {
+		return fmt.Errorf("load exif data: %w", err)
+	}
+
 	directoryAggregate := newAggregate()
 	var minDate, maxDate time.Time
 
-	previousAggregate, _ := s.GetAggregateFor(ctx, dir)
-
-	err := s.storage.Walk(ctx, dir.Pathname, func(item absto.Item) error {
-		if item.Pathname == dir.Pathname {
-			return nil
-		}
-
-		exifData, err := s.GetMetadataFor(ctx, item)
-		if err != nil {
-			if absto.IsNotExist(err) {
-				return nil
-			}
-
-			return fmt.Errorf("load exif data: %w", err)
-		}
-
+	for _, exifData := range metadatas {
 		if !exifData.Date.IsZero() {
 			minDate, maxDate = aggregateDate(minDate, maxDate, exifData.Date)
 		}
@@ -139,11 +144,6 @@ func (s *Service) computeAndSaveAggregate(ctx context.Context, dir absto.Item) e
 		if exifData.Geocode.HasAddress() {
 			directoryAggregate.ingest(exifData.Geocode)
 		}
-
-		return nil
-	})
-	if err != nil {
-		return fmt.Errorf("aggregate: %w", err)
 	}
 
 	return s.SaveAggregateFor(ctx, dir, provider.Aggregate{

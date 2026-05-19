@@ -284,7 +284,7 @@ func NewEventBus(size uint64, meterProvider metric.MeterProvider, tracerProvider
 	var counter metric.Int64Counter
 
 	if meterProvider != nil {
-		meter := meterProvider.Meter("github.com/ViBiOh/fibr/pkr/provider")
+		meter := meterProvider.Meter("github.com/ViBiOh/fibr/pkg/provider")
 
 		var err error
 
@@ -316,13 +316,6 @@ func (e EventBus) Done() <-chan struct{} {
 }
 
 func (e EventBus) Push(ctx context.Context, event Event) {
-	select {
-	case <-e.closed:
-		e.increaseMetric(ctx, event, "refused")
-		slog.ErrorContext(ctx, "bus is closed")
-	default:
-	}
-
 	select {
 	case <-e.closed:
 		e.increaseMetric(ctx, event, "refused")

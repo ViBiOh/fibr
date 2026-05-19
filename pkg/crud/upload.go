@@ -58,12 +58,13 @@ func getUploadNameAndPath(request provider.Request, inputName string, part *mult
 }
 
 func getUploadSize(rawSize string) (int64, error) {
-	var size int64 = -1
+	if len(rawSize) == 0 {
+		return -1, nil
+	}
 
-	if len(rawSize) > 0 {
-		if size, err := strconv.ParseInt(rawSize, 10, 64); err != nil {
-			return size, fmt.Errorf("parse filesize: %w", err)
-		}
+	size, err := strconv.ParseInt(rawSize, 10, 64)
+	if err != nil {
+		return -1, fmt.Errorf("parse filesize: %w", err)
 	}
 
 	return size, nil
