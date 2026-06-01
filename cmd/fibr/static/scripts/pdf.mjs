@@ -1,7 +1,7 @@
-import * as pdfjs from "https://cdn.jsdelivr.net/npm/pdfjs-dist@5.7.284/+esm";
+import * as pdfjs from "https://cdn.jsdelivr.net/npm/pdfjs-dist@6.0.227/+esm";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  "https://cdn.jsdelivr.net/npm/pdfjs-dist@5.7.284/build/pdf.worker.min.mjs",
+  "https://cdn.jsdelivr.net/npm/pdfjs-dist@6.0.227/build/pdf.worker.min.mjs",
   import.meta.url,
 ).toString();
 
