@@ -252,7 +252,7 @@ func NewRestartEvent(ctx context.Context, item absto.Item, subset string) Event 
 func NewAccessEvent(ctx context.Context, item absto.Item, r *http.Request) Event {
 	metadata := make(map[string]string)
 	for key, values := range r.Header {
-		if strings.EqualFold(key, "Authorization") {
+		if strings.EqualFold(key, "Authorization") || strings.EqualFold(key, "Cookie") {
 			continue
 		}
 

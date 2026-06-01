@@ -30,7 +30,8 @@ async function getPageThumbnail(url, onBlob) {
     return;
   }
 
-  const doc = await pdfjs.getDocument(await response.arrayBuffer()).promise;
+  const doc = await pdfjs.getDocument({ data: await response.arrayBuffer() })
+    .promise;
   const page = await doc.getPage(1);
 
   const viewport = page.getViewport({ scale: 1 });
