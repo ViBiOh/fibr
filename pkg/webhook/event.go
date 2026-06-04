@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ViBiOh/ChatPotte/discord"
-	"github.com/ViBiOh/ChatPotte/slack"
+	"codeberg.org/ViBiOh/ChatPotte/discord"
+	"codeberg.org/ViBiOh/ChatPotte/slack"
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/push"
