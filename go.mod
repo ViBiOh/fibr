@@ -11,7 +11,7 @@ require (
 	github.com/ViBiOh/httputils/v4 v4.87.2
 	github.com/ViBiOh/vignet v0.0.1
 	github.com/golang-jwt/jwt/v5 v5.3.1
-	github.com/rabbitmq/amqp091-go v1.11.0
+	github.com/rabbitmq/amqp091-go v1.12.0
 	github.com/redis/go-redis/v9 v9.20.1
 	github.com/rs/xid v1.6.0
 	github.com/zeebo/xxh3 v1.1.0
