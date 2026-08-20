@@ -63,13 +63,13 @@ init:
 ## format: Format code. e.g Prettier (js), format (golang)
 .PHONY: format
 format:
-	find . -name "*.go" -exec goimports -w {} \+
-	find . -name "*.go" -exec gofumpt -extra -w {} \+
+	find . -name "*.go" -exec go tool "golang.org/x/tools/cmd/goimports" -w {} \+
+	find . -name "*.go" -exec go tool "mvdan.cc/gofumpt" -extra -w {} \+
 
 ## style: Check lint, code styling rules. e.g. pylint, phpcs, eslint, style (java) etc ...
 .PHONY: style
 style:
-	fieldalignment -fix -test=false $(PACKAGES)
+	go tool "golang.org/x/tools/go/analysis/passes/fieldalignment/cmd/fieldalignment" -fix -test=false $(PACKAGES)
 	golangci-lint run --fix --show-stats=false --allow-parallel-runners
 
 ## mocks: Generate mocks
@@ -78,7 +78,7 @@ mocks:
 	go install "go.uber.org/mock/mockgen@latest"
 	find . -name "mocks" -type d -exec rm -r "{}" \+
 	go generate -run mockgen $(PACKAGES)
-	fieldalignment -fix -test=false $(PACKAGES) || true
+	go tool "golang.org/x/tools/go/analysis/passes/fieldalignment/cmd/fieldalignment" -fix -test=false $(PACKAGES) || true
 
 ## test: Shortcut to launch all the test tasks (unit, functional and integration).
 .PHONY: test
