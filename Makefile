@@ -55,9 +55,6 @@ init:
 	@curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap.sh" | bash -s -- "-c" "coverage.sh"
 	go install "github.com/tdewolff/minify/v2/cmd/minify@latest"
 	go install "github.com/ViBiOh/auth/v3/cmd/argon@latest"
-	go install "golang.org/x/tools/cmd/goimports@latest"
-	go install "golang.org/x/tools/go/analysis/passes/fieldalignment/cmd/fieldalignment@master"
-	go install "mvdan.cc/gofumpt@latest"
 	go mod tidy
 
 ## format: Format code. e.g Prettier (js), format (golang)
@@ -75,9 +72,8 @@ style:
 ## mocks: Generate mocks
 .PHONY: mocks
 mocks:
-	go install "go.uber.org/mock/mockgen@latest"
 	find . -name "mocks" -type d -exec rm -r "{}" \+
-	go generate -run mockgen $(PACKAGES)
+	go generate -run 'go tool "go.uber.org/mock/mockgen"' $(PACKAGES)
 	go tool "golang.org/x/tools/go/analysis/passes/fieldalignment/cmd/fieldalignment" -fix -test=false $(PACKAGES) || true
 
 ## test: Shortcut to launch all the test tasks (unit, functional and integration).
