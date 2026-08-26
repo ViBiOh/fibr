@@ -53,8 +53,6 @@ app: init dev
 .PHONY: init
 init:
 	@curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap.sh" | bash -s -- "-c" "coverage.sh"
-	go install "github.com/tdewolff/minify/v2/cmd/minify@latest"
-	go install "github.com/ViBiOh/auth/v3/cmd/argon@latest"
 	go mod tidy
 
 ## format: Format code. e.g Prettier (js), format (golang)
@@ -96,15 +94,15 @@ build:
 .PHONY: build-web
 build-web:
 	rm -f "cmd/fibr/static/scripts/index.min.js" "cmd/fibr/static/styles/main.min.css"
-	minify --bundle --all --recursive --output "cmd/fibr/static/scripts/index.min.js" "cmd/fibr/static/scripts/"*.js
-	minify --bundle --all --recursive --output "cmd/fibr/static/styles/main.min.css" "cmd/fibr/static/styles/"
+	go tool "github.com/tdewolff/minify/v2/cmd/minify" --bundle --all --recursive --output "cmd/fibr/static/scripts/index.min.js" "cmd/fibr/static/scripts/"*.js
+	go tool "github.com/tdewolff/minify/v2/cmd/minify" --bundle --all --recursive --output "cmd/fibr/static/styles/main.min.css" "cmd/fibr/static/styles/"
 
 ## run: Locally run the application, e.g. node index.js, python -m myapp, go run myapp etc ...
 .PHONY: run
 run:
 	$(MAIN_RUNNER) \
 		-ignorePattern ".git|node_modules" \
-		-authUsers "1:admin:`argon password`"
+		-authUsers "1:admin:`go tool 'github.com/ViBiOh/auth/v3/cmd/argon' password`"
 
 ## config: Create local configuration
 .PHONY: config
