@@ -116,6 +116,10 @@
       align-items: center;
     }
 
+    .camera {
+      max-width: 10rem;
+    }
+
     .desc-input {
       font-size: 1.6rem;
       min-height: 15rem;
@@ -211,22 +215,22 @@
               </p>
             {{ end }}
 
-            {{ if index .Exif.Data "Model" }}
+            {{- if index .Exif.Data "Model" -}}
               <p class="context">
                 <img class="icon margin-right-half" src="{{ url "/svg/camera?fill=%23000000" }}" alt="camera">
-                {{ index .Exif.Data "Model" }}
+                <span class="ellipsis camera" title="{{- index .Exif.Data "Model" -}}">{{- index .Exif.Data "Model" -}}</span>
 
-                {{ if index .Exif.Data "FocalLength" }}
+                {{- if index .Exif.Data "FocalLength" -}}
                   <img class="icon margin-left-half margin-right-half" src="{{ url "/svg/lens?fill=%23000000" }}" alt="lens">
-                  {{ index .Exif.Data "FocalLength" }}
-                {{ end }}
+                  {{- index .Exif.Data "FocalLength" -}}
+                {{- end -}}
 
-                {{ if index .Exif.Data "Aperture" }}
+                {{- if index .Exif.Data "Aperture" -}}
                   <img class="icon margin-left-half margin-right-half" src="{{ url "/svg/aperture?fill=%23000000" }}" alt="aperture">
-                  f/{{ index .Exif.Data "Aperture" }}
-                {{ end }}
+                  f/{{- index .Exif.Data "Aperture" -}}
+                {{- end -}}
               </p>
-            {{ end }}
+            {{- end -}}
 
             {{ if .Exif.Description }}
               {{ $lines := splitLines .Exif.Description }}
