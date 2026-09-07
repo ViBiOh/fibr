@@ -83,7 +83,6 @@
     .description-content {
       margin-bottom: 0;
       margin-top: 0;
-      max-width: calc(100% - var(--icon-size) - 2rem{{ if .Request.CanEdit }} - var(--icon-size) - 2rem{{ end }});
     }
 
     .margin-top {
@@ -99,11 +98,7 @@
     }
 
     .margin-button {
-      margin-right: 4.5rem;
-    }
-
-    .margin-button-double {
-      margin-right: 8.5rem;
+      max-width: calc(100% - var(--icon-size) - 2rem{{ if .Request.CanEdit }} - var(--icon-size) - 2rem{{ end }});
     }
 
     .margin-left-half {
@@ -221,7 +216,7 @@
             {{ end }}
 
             {{- if index .Exif.Data "Model" -}}
-              <p class="context {{ if not .Exif.Description }}{{ if $root.Request.CanEdit }}margin-button-double{{ else }}margin-button{{ end }}{{ end }}">
+              <p class="context{{ if not .Exif.Description }} margin-button{{ end }}">
                 <img class="icon margin-right-half" src="{{ url "/svg/camera?fill=%23000000" }}" alt="camera">
                 <span class="ellipsis" title="{{- index .Exif.Data "Model" -}}">{{- index .Exif.Data "Model" -}}</span>
 
@@ -242,7 +237,7 @@
               {{ $linesLen := add (len $lines) -1 }}
 
               {{ range $i, $value := $lines }}
-                <p class="description-content {{ if eq $i 0 }}margin-top{{ end }}{{ if eq $linesLen $i }} margin-bottom{{ end }}">{{ . }}</p>
+                <p class="description-content margin-button {{ if eq $i 0 }}margin-top{{ end }}{{ if eq $linesLen $i }} margin-bottom{{ end }}">{{ . }}</p>
               {{ end }}
             {{ end }}
 
