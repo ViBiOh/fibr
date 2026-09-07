@@ -98,6 +98,14 @@
       margin-right: 0.5rem;
     }
 
+    .margin-button {
+      margin-right: 4.5rem;
+    }
+
+    .margin-button-double {
+      margin-right: 8.5rem;
+    }
+
     .margin-left-half {
       margin-left: 0.5rem;
     }
@@ -112,12 +120,9 @@
     }
 
     .context {
-      display: flex;
       align-items: center;
-    }
-
-    .camera {
-      max-width: 11rem;
+      display: flex;
+      white-space: nowrap;
     }
 
     .desc-input {
@@ -216,18 +221,18 @@
             {{ end }}
 
             {{- if index .Exif.Data "Model" -}}
-              <p class="context">
+              <p class="context {{ if not .Exif.Description }}{{ if $root.Request.CanEdit }}margin-button-double{{ else }}margin-button{{ end }}{{ end }}">
                 <img class="icon margin-right-half" src="{{ url "/svg/camera?fill=%23000000" }}" alt="camera">
-                <span class="ellipsis camera" title="{{- index .Exif.Data "Model" -}}">{{- index .Exif.Data "Model" -}}</span>
+                <span class="ellipsis" title="{{- index .Exif.Data "Model" -}}">{{- index .Exif.Data "Model" -}}</span>
 
                 {{- if index .Exif.Data "FocalLength" -}}
                   <img class="icon margin-left-half margin-right-half" src="{{ url "/svg/lens?fill=%23000000" }}" alt="lens">
-                  {{- index .Exif.Data "FocalLength" -}}
+                  <span>{{- index .Exif.Data "FocalLength" -}}</span>
                 {{- end -}}
 
                 {{- if index .Exif.Data "Aperture" -}}
                   <img class="icon margin-left-half margin-right-half" src="{{ url "/svg/aperture?fill=%23000000" }}" alt="aperture">
-                  f/{{- index .Exif.Data "Aperture" -}}
+                  <span>f/{{- index .Exif.Data "Aperture" -}}</span>
                 {{- end -}}
               </p>
             {{- end -}}
