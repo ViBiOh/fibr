@@ -336,7 +336,13 @@ func (e EventBus) Start(ctx context.Context, storageService absto.Storage, renam
 	}()
 
 	for event := range e.bus {
-		ctx, end := telemetry.StartSpan(context.Background(), e.tracer, "event", trace.WithAttributes(attribute.String("type", event.Type.String())), trace.WithLinks(event.TraceLink))
+		ctx := context.Background()
+
+		if event.Type == StartEvent {
+			ctx = telemetry.NoTrace(ctx)
+		}
+
+		ctx, end := telemetry.StartSpan(ctx, e.tracer, "event", trace.WithAttributes(attribute.String("type", event.Type.String())), trace.WithLinks(event.TraceLink))
 
 		if event.Type == RenameEvent && event.Item.IsDir() {
 			RenameDirectory(ctx, storageService, renamers, event.Item, *event.New)
