@@ -11,6 +11,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/exclusive"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/flags"
+	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
 )
 
 type Renamer interface {
@@ -57,7 +58,7 @@ func (s Service) Start(ctx context.Context) {
 	defer close(s.done)
 
 	if err := s.exclusive.Execute(ctx, "fibr:mutex:start", time.Hour, func(ctx context.Context) error {
-		return s.start(ctx)
+		return s.start(telemetry.NoTrace(ctx))
 	}); err != nil {
 		slog.LogAttrs(ctx, slog.LevelError, "start", slog.Any("error", err))
 	}
