@@ -175,7 +175,7 @@ func NewUploadEvent(ctx context.Context, request Request, item absto.Item, share
 		Time:         time.Now(),
 		Type:         UploadEvent,
 		Item:         item,
-		TraceLink:    trace.LinkFromContext(ctx),
+		TraceLink:    linkFromContext(ctx),
 		URL:          rendererService.PublicURL(request.AbsoluteURL(item.Name())),
 		ShareableURL: shareableURL,
 		Metadata: map[string]string{
@@ -193,7 +193,7 @@ func NewRenameEvent(ctx context.Context, old, new absto.Item, shareableURL strin
 		Time:         time.Now(),
 		Type:         RenameEvent,
 		Item:         old,
-		TraceLink:    trace.LinkFromContext(ctx),
+		TraceLink:    linkFromContext(ctx),
 		New:          &new,
 		URL:          rendererService.PublicURL(new.Pathname),
 		ShareableURL: shareableURL,
@@ -209,7 +209,7 @@ func NewDescriptionEvent(ctx context.Context, item absto.Item, shareableURL, des
 		Time:         time.Now(),
 		Type:         DescriptionEvent,
 		Item:         item,
-		TraceLink:    trace.LinkFromContext(ctx),
+		TraceLink:    linkFromContext(ctx),
 		URL:          rendererService.PublicURL(item.Pathname),
 		ShareableURL: shareableURL,
 		Metadata: map[string]string{
@@ -223,7 +223,7 @@ func NewDeleteEvent(ctx context.Context, request Request, item absto.Item, rende
 		Time:      time.Now(),
 		Type:      DeleteEvent,
 		Item:      item,
-		TraceLink: trace.LinkFromContext(ctx),
+		TraceLink: linkFromContext(ctx),
 		URL:       rendererService.PublicURL(request.AbsoluteURL("")),
 	}
 }
@@ -233,7 +233,7 @@ func NewStartEvent(ctx context.Context, item absto.Item) Event {
 		Time:      time.Now(),
 		Type:      StartEvent,
 		Item:      item,
-		TraceLink: trace.LinkFromContext(ctx),
+		TraceLink: linkFromContext(ctx),
 	}
 }
 
@@ -242,7 +242,7 @@ func NewRestartEvent(ctx context.Context, item absto.Item, subset string) Event 
 		Time:      time.Now(),
 		Type:      StartEvent,
 		Item:      item,
-		TraceLink: trace.LinkFromContext(ctx),
+		TraceLink: linkFromContext(ctx),
 		Metadata: map[string]string{
 			"force": subset,
 		},
@@ -266,10 +266,18 @@ func NewAccessEvent(ctx context.Context, item absto.Item, r *http.Request) Event
 		Time:      time.Now(),
 		Type:      AccessEvent,
 		Item:      item,
-		TraceLink: trace.LinkFromContext(ctx),
+		TraceLink: linkFromContext(ctx),
 		Metadata:  metadata,
 		URL:       r.URL.String(),
 	}
+}
+
+func linkFromContext(ctx context.Context) trace.Link {
+	if telemetry.IsNoTrace(ctx) {
+		return trace.Link{}
+	}
+
+	return trace.LinkFromContext(ctx)
 }
 
 type EventBus struct {
