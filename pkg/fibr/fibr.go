@@ -122,13 +122,10 @@ func parsePreferences(r *http.Request) provider.Preferences {
 
 func (s Service) getCredentials(r *http.Request) (string, string, bool, bool) {
 	login, password, ok := r.BasicAuth()
-	if ok {
-		return login, password, ok, true
-	}
-
 	claim, err := s.cookie.Get(r, authCookieName)
-	if err != nil {
-		return login, password, ok, false
+
+	if ok {
+		return login, password, ok, err != nil || (claim.Content.Login != login || claim.Content.Password != password)
 	}
 
 	return claim.Content.Login, claim.Content.Password, true, false
