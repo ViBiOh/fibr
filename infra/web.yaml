@@ -94,7 +94,7 @@ spec:
       enabled: false
     ingress:
       enabled: true
-      compress: true
+      compress: false
       tls:
         enabled: true
       hosts:
