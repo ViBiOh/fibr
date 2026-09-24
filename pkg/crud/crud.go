@@ -3,6 +3,7 @@ package crud
 import (
 	"errors"
 	"flag"
+	"log/slog"
 	"net/http"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
@@ -12,6 +13,7 @@ import (
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
+	httpRequest "github.com/ViBiOh/httputils/v4/pkg/request"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -76,5 +78,9 @@ func New(config *Config, storageService, filteredStorage absto.Storage, renderer
 }
 
 func (s *Service) error(w http.ResponseWriter, r *http.Request, request provider.Request, err error) {
+	if err := httpRequest.DiscardBody(r.Body); err != nil {
+		slog.LogAttrs(r.Context(), slog.LevelError, "discard body", slog.Any("error", err))
+	}
+
 	s.renderer.Error(w, r, map[string]any{"Request": request}, err)
 }
