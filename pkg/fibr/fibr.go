@@ -128,7 +128,7 @@ func (s Service) getCredentials(r *http.Request) (string, string, bool, bool) {
 		return login, password, ok, err != nil || (claim.Content.Login != login || claim.Content.Password != password)
 	}
 
-	return claim.Content.Login, claim.Content.Password, true, false
+	return claim.Content.Login, claim.Content.Password, ok, false
 }
 
 func (s Service) parseShare(ctx context.Context, request *provider.Request, password string) error {
