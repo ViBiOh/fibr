@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"path"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -63,8 +64,8 @@ var (
 func Join(parts ...string) string {
 	pathname := path.Join(parts...)
 
-	for i := len(parts) - 1; i >= 0; i-- {
-		if part := parts[i]; len(part) != 0 {
+	for _, part := range slices.Backward(parts) {
+		if len(part) != 0 {
 			if strings.HasSuffix(part, "/") && !strings.HasSuffix(pathname, "/") {
 				pathname += "/"
 			}
