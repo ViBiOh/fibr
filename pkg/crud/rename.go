@@ -2,7 +2,6 @@ package crud
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -31,7 +30,7 @@ func (s *Service) DoRename(ctx context.Context, oldPath, newPath string, oldItem
 
 func parseRenameParams(r *http.Request, request provider.Request) (string, string, string, string, bool, error) {
 	oldName, err := checkFormName(r, "name")
-	if err != nil && !errors.Is(err, ErrEmptyName) {
+	if err != nil {
 		return "", "", "", "", false, err
 	}
 
@@ -54,7 +53,11 @@ func parseRenameParams(r *http.Request, request provider.Request) (string, strin
 		return "", "", "", "", false, err
 	}
 
-	oldPath := request.SubPath(oldName)
+	oldPath, err := childPath(request, oldName)
+	if err != nil {
+		return "", "", "", "", false, err
+	}
+
 	newPath := provider.GetPathname(newFolder, newName, request.Share)
 
 	return oldPath, newPath, newFolder, newName, cover, nil

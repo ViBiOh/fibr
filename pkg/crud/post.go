@@ -204,14 +204,20 @@ func (s *Service) handlePostDescription(w http.ResponseWriter, r *http.Request, 
 	}
 
 	name, err := checkFormName(r, "name")
-	if err != nil && !errors.Is(err, ErrEmptyName) {
+	if err != nil {
+		s.error(w, r, request, err)
+		return
+	}
+
+	pathname, err := childPath(request, name)
+	if err != nil {
 		s.error(w, r, request, err)
 		return
 	}
 
 	ctx := r.Context()
 
-	item, err := s.storage.Stat(ctx, request.SubPath(name))
+	item, err := s.storage.Stat(ctx, pathname)
 	if err != nil {
 		s.error(w, r, request, err)
 		return

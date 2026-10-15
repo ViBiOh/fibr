@@ -1,8 +1,10 @@
 package provider
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
+	"path"
 	"strconv"
 	"strings"
 
@@ -21,6 +23,8 @@ var (
 	LayoutPathsCookieName = "layout_paths"
 
 	preferencesPathSeparator = "|"
+
+	ErrOutOfScope = errors.New("path is outside of the requested directory")
 )
 
 func ParseDisplay(input string) Display {
@@ -199,6 +203,19 @@ func (r Request) Filepath() string {
 
 func (r Request) SubPath(name string) string {
 	return Join(r.Share.Path, r.Path, name)
+}
+
+func (r Request) ChildPath(name string) (string, error) {
+	pathname := r.SubPath(name)
+
+	base := path.Clean(Join(r.Share.Path, r.Path))
+	cleaned := path.Clean(pathname)
+
+	if cleaned == base || !strings.HasPrefix(cleaned, Dirname(base)) || IsMetadataPath(cleaned) {
+		return "", ErrOutOfScope
+	}
+
+	return pathname, nil
 }
 
 func (r Request) LayoutPath(path string) Display {

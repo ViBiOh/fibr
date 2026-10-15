@@ -29,7 +29,8 @@ func main() {
 	go services.Start(adapters, clients.health.DoneCtx(), clients.health.EndCtx())
 	defer services.Close()
 
-	port := newPort(clients, services)
+	port, err := newPort(clients, services)
+	logger.FatalfOnErr(ctx, err, "port")
 
 	go services.server.Start(clients.health.EndCtx(), port)
 

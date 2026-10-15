@@ -3,7 +3,6 @@ package thumbnail
 import (
 	"context"
 	"fmt"
-	"io"
 	"log/slog"
 	"net/http"
 	"net/url"
@@ -19,14 +18,16 @@ func (s Service) HasStream(ctx context.Context, item absto.Item) bool {
 	return err == nil
 }
 
-func (s Service) handleVignetResponse(ctx context.Context, err error, body io.ReadCloser) error {
+func (s Service) handleVignetResponse(ctx context.Context, err error, resp *http.Response) error {
 	if err != nil {
 		s.increaseMetric(ctx, "stream", "error")
 		return fmt.Errorf("send request: %w", err)
 	}
 
-	if err := request.DiscardBody(body); err != nil {
-		return fmt.Errorf("discard body: %w", err)
+	if resp != nil {
+		if err := request.DiscardBody(resp.Body); err != nil {
+			return fmt.Errorf("discard body: %w", err)
+		}
 	}
 
 	return nil
@@ -85,19 +86,19 @@ func (s Service) generateStream(ctx context.Context, item absto.Item) error {
 	s.increaseMetric(ctx, "stream", "request")
 
 	resp, err := s.vignetRequest.Method(http.MethodPut).Path("%s?output=%s", input, url.QueryEscape(output)).Send(ctx, nil)
-	return s.handleVignetResponse(ctx, err, resp.Body)
+	return s.handleVignetResponse(ctx, err, resp)
 }
 
 func (s Service) renameStream(ctx context.Context, old, new absto.Item) error {
 	s.increaseMetric(ctx, "stream", "rename")
 
 	resp, err := s.vignetRequest.Method(http.MethodPatch).Path("%s?to=%s&type=%s", getStreamPath(old), url.QueryEscape(getStreamPath(new)), typeOfItem(old)).Send(ctx, nil)
-	return s.handleVignetResponse(ctx, err, resp.Body)
+	return s.handleVignetResponse(ctx, err, resp)
 }
 
 func (s Service) deleteStream(ctx context.Context, item absto.Item) error {
 	s.increaseMetric(ctx, "stream", "delete")
 
 	resp, err := s.vignetRequest.Method(http.MethodDelete).Path("%s?type=%s", getStreamPath(item), typeOfItem(item)).Send(ctx, nil)
-	return s.handleVignetResponse(ctx, err, resp.Body)
+	return s.handleVignetResponse(ctx, err, resp)
 }

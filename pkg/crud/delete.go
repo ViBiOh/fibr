@@ -18,14 +18,19 @@ func (s *Service) Delete(w http.ResponseWriter, r *http.Request, request provide
 	}
 
 	name, err := checkFormName(r, "name")
-	if err != nil && !errors.Is(err, ErrEmptyName) {
+	if err != nil {
+		s.error(w, r, request, err)
+		return
+	}
+
+	pathname, err := childPath(request, name)
+	if err != nil {
 		s.error(w, r, request, err)
 		return
 	}
 
 	ctx := r.Context()
 
-	pathname := request.SubPath(name)
 	info, err := s.storage.Stat(ctx, pathname)
 	if err != nil {
 		s.error(w, r, request, model.WrapNotFound(err))

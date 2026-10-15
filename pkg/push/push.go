@@ -116,7 +116,7 @@ func (s *Service) Notify(ctx context.Context, subscription Subscription, notific
 		return 0, fmt.Errorf("generate jwt: %w", err)
 	}
 
-	res, err := request.Post(subscription.Endpoint).
+	resp, err := request.Post(subscription.Endpoint).
 		Header("TTL", defaultTTL).
 		Header("Content-Type", "application/octet-stream").
 		Header("Content-Length", strconv.Itoa(len(encrypted))).
@@ -126,7 +126,19 @@ func (s *Service) Notify(ctx context.Context, subscription Subscription, notific
 		Header("Topic", hash.String(path.Dir(notification.URL))).
 		Send(ctx, io.NopCloser(bytes.NewBuffer(encrypted)))
 
-	return res.StatusCode, err
+	var status int
+
+	if resp != nil {
+		status = resp.StatusCode
+
+		if err == nil {
+			if discardErr := request.DiscardBody(resp.Body); discardErr != nil {
+				err = errors.Join(err, discardErr)
+			}
+		}
+	}
+
+	return status, err
 }
 
 func (s *Service) encryptContent(subscription Subscription, notification Notification) ([]byte, error) {
