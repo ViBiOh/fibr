@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"mime"
 	"net/http"
 	"path"
 	"regexp"
@@ -200,6 +201,14 @@ func WriteToStorage(ctx context.Context, storageService absto.Storage, output st
 	}
 
 	return err
+}
+
+func ContentDisposition(disposition, filename string) string {
+	if value := mime.FormatMediaType(disposition, map[string]string{"filename": filename}); len(value) != 0 {
+		return value
+	}
+
+	return disposition
 }
 
 func EtagMatch(w http.ResponseWriter, r *http.Request, hash string) (etag string, match bool) {

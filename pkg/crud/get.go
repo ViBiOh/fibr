@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"mime"
 	"net/http"
 	"path"
 	"path/filepath"
@@ -26,6 +27,8 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 )
+
+const sandboxPolicy = "sandbox"
 
 func (s *Service) getWithMessage(w http.ResponseWriter, r *http.Request, request provider.Request, message renderer.Message) (renderer.Page, error) {
 	ctx := r.Context()
@@ -108,10 +111,30 @@ func (s *Service) serveFile(w http.ResponseWriter, r *http.Request, item absto.I
 	defer provider.LogClose(ctx, file, "crud.serveFile", item.Pathname)
 
 	w.Header().Add("Etag", etag)
-	w.Header().Add("Content-Disposition", fmt.Sprintf("inline; filename=%s", item.Name()))
+	w.Header().Add("Content-Disposition", provider.ContentDisposition("inline", item.Name()))
+
+	if !isPassiveContent(item.Name()) {
+		w.Header().Add("Content-Security-Policy", sandboxPolicy)
+	}
 
 	http.ServeContent(w, r, item.Name(), item.Date, file)
 	return nil
+}
+
+func isPassiveContent(filename string) bool {
+	contentType, _, err := mime.ParseMediaType(mime.TypeByExtension(filepath.Ext(filename)))
+	if err != nil {
+		return false
+	}
+
+	switch contentType {
+	case "image/svg+xml":
+		return false
+	case "application/pdf":
+		return true
+	}
+
+	return strings.HasPrefix(contentType, "image/") || strings.HasPrefix(contentType, "video/") || strings.HasPrefix(contentType, "audio/")
 }
 
 func (s *Service) handleDir(w http.ResponseWriter, r *http.Request, request provider.Request, item absto.Item, message renderer.Message) (renderer.Page, error) {

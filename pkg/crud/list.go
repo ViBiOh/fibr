@@ -177,7 +177,7 @@ func (s *Service) Download(w http.ResponseWriter, r *http.Request, request provi
 		filename = path.Base(path.Join(request.Share.RootName, request.Path))
 	}
 
-	w.Header().Add("Content-Disposition", fmt.Sprintf("attachment; filename=%s.zip", filename))
+	w.Header().Add("Content-Disposition", provider.ContentDisposition("attachment", filename+".zip"))
 
 	return s.zipItems(ctx, ctx.Done(), request, zipWriter, items)
 }

@@ -78,18 +78,12 @@ func (s *Service) Exclusive(ctx context.Context, name string, duration time.Dura
 }
 
 func (s *Service) Get(requestPath string) provider.Share {
-	cleanPath := strings.TrimPrefix(requestPath, "/")
+	id, _, _ := strings.Cut(strings.TrimPrefix(requestPath, "/"), "/")
 
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
 
-	for key, share := range s.shares {
-		if strings.HasPrefix(cleanPath, key) {
-			return share
-		}
-	}
-
-	return provider.Share{}
+	return s.shares[id]
 }
 
 func (s *Service) Start(ctx context.Context) {
