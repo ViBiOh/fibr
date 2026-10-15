@@ -1,13 +1,17 @@
 package crud
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"net/url"
+	"path"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
+	"github.com/ViBiOh/fibr/pkg/push"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
@@ -53,6 +57,13 @@ func (s *Service) createWebhook(w http.ResponseWriter, r *http.Request, request 
 		return
 	}
 
+	if kind == provider.Push {
+		if err = s.checkPushSubscription(ctx, webhookURL); err != nil {
+			s.error(w, r, request, err)
+			return
+		}
+	}
+
 	id, err := s.webhook.Create(ctx, info.Pathname, recursive, kind, webhookURL, eventTypes)
 	if err != nil {
 		s.error(w, r, request, model.WrapInternal(err))
@@ -72,6 +83,38 @@ func (s *Service) createWebhook(w http.ResponseWriter, r *http.Request, request 
 	}
 
 	s.renderer.Redirect(w, r, fmt.Sprintf("%s?d=%s#webhook-list", request.AbsoluteURL(""), request.Display), renderer.NewSuccessMessage("Webhook successfully created with ID: %s", id))
+}
+
+func (s *Service) checkPushSubscription(ctx context.Context, endpoint string) error {
+	if s.pushService == nil {
+		return model.WrapInvalid(ErrPushDisabled)
+	}
+
+	if _, err := s.pushService.Find(ctx, endpoint); err != nil {
+		if errors.Is(err, push.ErrNotFound) {
+			return model.WrapInvalid(errors.New("push subscription is not registered"))
+		}
+
+		return model.WrapInternal(err)
+	}
+
+	return nil
+}
+
+func ownsPushWebhook(r *http.Request, request provider.Request, webhook provider.Webhook) bool {
+	return webhook.Kind == provider.Push &&
+		path.Clean(webhook.Pathname) == path.Clean(request.Filepath()) &&
+		r.FormValue("url") == webhook.URL
+}
+
+func (s *Service) removeOrphanSubscription(ctx context.Context, endpoint string) {
+	if s.pushService == nil || len(s.webhook.FindByURL(endpoint)) != 0 {
+		return
+	}
+
+	if err := s.pushService.Delete(ctx, endpoint); err != nil {
+		slog.LogAttrs(ctx, slog.LevelError, "delete push subscription", slog.Any("error", err))
+	}
 }
 
 func checkWebhookForm(r *http.Request) (recursive bool, kind provider.WebhookKind, webhookURL string, eventTypes []provider.EventType, err error) {
@@ -141,11 +184,20 @@ func (s *Service) deleteWebhook(w http.ResponseWriter, r *http.Request, request 
 		return
 	}
 
+	if !request.CanWebhook && !ownsPushWebhook(r, request, webhook) {
+		s.error(w, r, request, model.WrapForbidden(ErrNotAuthorized))
+		return
+	}
+
 	ctx := r.Context()
 
 	if err := s.webhook.Delete(ctx, webhook.ID); err != nil {
 		s.error(w, r, request, model.WrapInternal(err))
 		return
+	}
+
+	if webhook.Kind == provider.Push {
+		s.removeOrphanSubscription(ctx, webhook.URL)
 	}
 
 	if r.Header.Get("Accept") == "text/plain" {

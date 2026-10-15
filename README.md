@@ -135,6 +135,8 @@ npm install web-push -g
 web-push generate-vapid-keys
 ```
 
+Anyone who can browse a directory, including visitors of a password-less share, can subscribe to its upload notifications. To prevent the server from being used to send requests to arbitrary hosts, a subscription endpoint is accepted only if it is an `https` URL on the default port whose host matches [`pushAllowedHosts`](#usage). The default covers the push services of Chrome, Edge, Firefox and Safari. Add your own entries (exact host, or `*.suffix`) for another push service such as a self-hosted UnifiedPush server, or use `*` to accept any `https` host. The number of stored subscriptions is capped by `pushMaxSubscriptions`.
+
 ### Users
 
 You can start `fibr` with no user, with the `-noAuth` option. Although available, I don't recommend using it in public Internet. Anybody has access to the _root folder_ for viewing, uploading, deleting or sharing content with anybody.
@@ -273,6 +275,8 @@ Usage of fibr:
   --pprofAgent                        string        [pprof] URL of the Datadog Trace Agent (e.g. http://datadog.observability:8126) ${FIBR_PPROF_AGENT}
   --pprofPort                         int           [pprof] Port of the HTTP server (0 to disable) ${FIBR_PPROF_PORT} (default 0)
   --publicURL                         string        Public URL ${FIBR_PUBLIC_URL} (default "http://127.0.0.1:1080")
+  --pushAllowedHosts                  string slice  [push] Hosts of push services allowed as subscription endpoint, exact name or *.suffix, * allows any host ${FIBR_PUSH_ALLOWED_HOSTS}, as a string slice, environment variable separated by "," (default [fcm.googleapis.com, *.push.services.mozilla.com, *.push.apple.com, *.notify.windows.com])
+  --pushMaxSubscriptions              int           [push] Maximum number of stored push subscriptions, 0 for no limit ${FIBR_PUSH_MAX_SUBSCRIPTIONS} (default 100)
   --pushPrivateKey                    string        [push] VAPID Private Key ${FIBR_PUSH_PRIVATE_KEY}
   --pushPublicKey                     string        [push] VAPID Public Key ${FIBR_PUSH_PUBLIC_KEY}
   --readTimeout                       duration      [server] Read Timeout ${FIBR_READ_TIMEOUT} (default 10m0s)

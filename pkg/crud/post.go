@@ -64,7 +64,13 @@ func (s *Service) Post(w http.ResponseWriter, r *http.Request, request provider.
 	}
 
 	if query.GetBool(r, "push") {
+		if s.pushService == nil {
+			s.error(w, r, request, model.WrapNotFound(ErrPushDisabled))
+			return
+		}
+
 		s.pushService.Handle(w, r)
+
 		return
 	}
 

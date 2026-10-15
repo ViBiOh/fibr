@@ -33,10 +33,11 @@ import (
 )
 
 const (
-	defaultTTL    = "259200" // 3 days
-	jwtDuration   = time.Hour * 4
-	saltSize      = 16
-	maxRecordSize = uint32(4096)
+	defaultTTL              = "259200" // 3 days
+	jwtDuration             = time.Hour * 4
+	saltSize                = 16
+	maxRecordSize           = uint32(4096)
+	defaultMaxSubscriptions = 100
 )
 
 var (
@@ -51,15 +52,19 @@ var (
 )
 
 type Service struct {
-	exclusive  exclusive.Service
-	storage    absto.Storage
-	publicKey  string
-	privateKey []byte
+	exclusive        exclusive.Service
+	storage          absto.Storage
+	publicKey        string
+	allowedHosts     []string
+	privateKey       []byte
+	maxSubscriptions int
 }
 
 type Config struct {
-	publicKey  string
-	privateKey string
+	publicKey        string
+	privateKey       string
+	allowedHosts     []string
+	maxSubscriptions int
 }
 
 func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) *Config {
@@ -67,6 +72,8 @@ func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) *Config
 
 	flags.New("PublicKey", "VAPID Public Key").Prefix(prefix).DocPrefix("push").StringVar(fs, &config.publicKey, "", overrides)
 	flags.New("PrivateKey", "VAPID Private Key").Prefix(prefix).DocPrefix("push").StringVar(fs, &config.privateKey, "", overrides)
+	flags.New("AllowedHosts", "Hosts of push services allowed as subscription endpoint, exact name or *.suffix, * allows any host").Prefix(prefix).DocPrefix("push").StringSliceVar(fs, &config.allowedHosts, DefaultAllowedHosts, overrides)
+	flags.New("MaxSubscriptions", "Maximum number of stored push subscriptions, 0 for no limit").Prefix(prefix).DocPrefix("push").IntVar(fs, &config.maxSubscriptions, defaultMaxSubscriptions, overrides)
 
 	return &config
 }
@@ -82,10 +89,12 @@ func New(config *Config, storageService absto.Storage, exclusiveService exclusiv
 	}
 
 	return &Service{
-		publicKey:  config.publicKey,
-		privateKey: privateKey,
-		storage:    storageService,
-		exclusive:  exclusiveService,
+		publicKey:        config.publicKey,
+		privateKey:       privateKey,
+		storage:          storageService,
+		exclusive:        exclusiveService,
+		allowedHosts:     config.allowedHosts,
+		maxSubscriptions: config.maxSubscriptions,
 	}, nil
 }
 
@@ -104,6 +113,10 @@ func (s *Service) Notify(ctx context.Context, subscription Subscription, notific
 
 	if len(subscription.Auth) == 0 || len(subscription.PublicKey) == 0 {
 		return 0, ErrNoEncryptionPossible
+	}
+
+	if err := s.checkEndpoint(subscription.Endpoint); err != nil {
+		return 0, err
 	}
 
 	encrypted, err := s.encryptContent(subscription, notification)

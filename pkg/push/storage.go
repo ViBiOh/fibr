@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/exclusive"
@@ -11,8 +12,9 @@ import (
 )
 
 var (
-	subscriptionsFilename = provider.MetadataDirectoryName + "/subscriptions.json"
-	ErrNotFound           = errors.New("subscription not found")
+	subscriptionsFilename   = provider.MetadataDirectoryName + "/subscriptions.json"
+	ErrNotFound             = errors.New("subscription not found")
+	ErrTooManySubscriptions = errors.New("too many push subscriptions")
 )
 
 func (s *Service) Find(ctx context.Context, url string) (Subscription, error) {
@@ -43,6 +45,10 @@ func (s *Service) Add(ctx context.Context, subscription Subscription) error {
 			}
 		}
 
+		if s.maxSubscriptions > 0 && len(subscriptions) >= s.maxSubscriptions {
+			return ErrTooManySubscriptions
+		}
+
 		subscriptions = append(subscriptions, subscription)
 
 		return s.save(ctx, subscriptions)
@@ -56,13 +62,15 @@ func (s *Service) Delete(ctx context.Context, endpoint string) error {
 			return fmt.Errorf("get subscriptions: %w", err)
 		}
 
-		for index, sub := range subscriptions {
-			if sub.Endpoint == endpoint {
-				subscriptions = append(subscriptions[:index], subscriptions[index+1:]...)
-			}
+		remaining := slices.DeleteFunc(slices.Clone(subscriptions), func(sub Subscription) bool {
+			return sub.Endpoint == endpoint
+		})
+
+		if len(remaining) == len(subscriptions) {
+			return nil
 		}
 
-		return s.save(ctx, subscriptions)
+		return s.save(ctx, remaining)
 	})
 }
 

@@ -22,6 +22,7 @@ var (
 	ErrEmptyName      = errors.New("name is empty")
 	ErrEmptyFolder    = errors.New("folder is empty")
 	ErrAbsoluteFolder = errors.New("folder has to be absolute")
+	ErrPushDisabled   = errors.New("push notifications are not enabled")
 )
 
 type Service struct {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"net/http"
 	"net/url"
 	"path"
 	"strconv"
@@ -143,7 +144,7 @@ func (s *Service) asyncPushNotification(group string, events []provider.Event) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
 
-	if len(events) == 0 {
+	if len(events) == 0 || s.push == nil {
 		return
 	}
 
@@ -184,9 +185,27 @@ func (s *Service) asyncPushNotification(group string, events []provider.Event) {
 		}
 	}
 
-	if _, err := s.push.Notify(ctx, subscription, notification); err != nil {
+	status, err := s.push.Notify(ctx, subscription, notification)
+	if status == http.StatusGone || status == http.StatusNotFound {
+		s.dropSubscription(ctx, group)
+		return
+	}
+
+	if err != nil {
 		slog.Error("Unable to send push notification", slog.String("url", group), slog.Any("error", err))
 		return
+	}
+}
+
+func (s *Service) dropSubscription(ctx context.Context, endpoint string) {
+	if err := s.push.Delete(ctx, endpoint); err != nil {
+		slog.Error("Unable to delete expired push subscription", slog.Any("error", err))
+	}
+
+	for _, webhook := range s.FindByURL(endpoint) {
+		if err := s.Delete(ctx, webhook.ID); err != nil {
+			slog.Error("Unable to delete webhook of expired push subscription", slog.String("id", webhook.ID), slog.Any("error", err))
+		}
 	}
 }
 
