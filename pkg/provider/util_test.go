@@ -7,6 +7,8 @@ import (
 )
 
 func TestSanitizeName(t *testing.T) {
+	t.Parallel()
+
 	cases := map[string]struct {
 		name        string
 		removeSlash bool
@@ -65,6 +67,8 @@ func TestSanitizeName(t *testing.T) {
 
 	for intention, tc := range cases {
 		t.Run(intention, func(t *testing.T) {
+			t.Parallel()
+
 			result, err := SanitizeName(tc.name, tc.removeSlash)
 
 			failed := false
@@ -87,6 +91,8 @@ func TestSanitizeName(t *testing.T) {
 }
 
 func TestSafeWrite(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		writer  io.Writer
 		content string
@@ -105,6 +111,8 @@ func TestSafeWrite(t *testing.T) {
 
 	for intention, tc := range cases {
 		t.Run(intention, func(t *testing.T) {
+			t.Parallel()
+
 			SafeWrite(context.Background(), tc.args.writer, tc.args.content)
 		})
 	}

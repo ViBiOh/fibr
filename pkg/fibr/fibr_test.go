@@ -43,6 +43,8 @@ var (
 )
 
 func TestParseShare(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		request  *provider.Request
 		password string
@@ -133,6 +135,8 @@ func TestParseShare(t *testing.T) {
 
 	for intention, tc := range cases {
 		t.Run(intention, func(t *testing.T) {
+			t.Parallel()
+
 			ctrl := gomock.NewController(t)
 
 			shareMock := mocks.NewShareManager(ctrl)
@@ -171,6 +175,8 @@ func TestParseShare(t *testing.T) {
 }
 
 func TestConvertAuthenticationError(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		err error
 	}
@@ -207,6 +213,8 @@ func TestConvertAuthenticationError(t *testing.T) {
 
 	for intention, tc := range cases {
 		t.Run(intention, func(t *testing.T) {
+			t.Parallel()
+
 			if got := convertAuthenticationError(tc.args.err); !errors.Is(got, tc.want) {
 				t.Errorf("convertAuthenticationError() = `%s`, want `%s`", got, tc.want)
 			}
@@ -215,6 +223,8 @@ func TestConvertAuthenticationError(t *testing.T) {
 }
 
 func TestParseRequest(t *testing.T) {
+	t.Parallel()
+
 	adminRequestWithEmptyCookie := httptest.NewRequest(http.MethodGet, adminPath, nil)
 	adminRequestWithEmptyCookie.AddCookie(&http.Cookie{
 		Name:  provider.LayoutPathsCookieName,
@@ -367,6 +377,8 @@ func TestParseRequest(t *testing.T) {
 
 	for intention, tc := range cases {
 		t.Run(intention, func(t *testing.T) {
+			t.Parallel()
+
 			ctrl := gomock.NewController(t)
 
 			crudMock := mocks.NewCrud(ctrl)

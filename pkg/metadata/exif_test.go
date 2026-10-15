@@ -9,6 +9,8 @@ import (
 )
 
 func TestFlags(t *testing.T) {
+	t.Parallel()
+
 	cases := map[string]struct {
 		want string
 	}{
@@ -19,6 +21,8 @@ func TestFlags(t *testing.T) {
 
 	for intention, tc := range cases {
 		t.Run(intention, func(t *testing.T) {
+			t.Parallel()
+
 			fs := flag.NewFlagSet(intention, flag.ContinueOnError)
 			Flags(fs, "")
 
@@ -36,6 +40,8 @@ func TestFlags(t *testing.T) {
 }
 
 func TestEnabled(t *testing.T) {
+	t.Parallel()
+
 	cases := map[string]struct {
 		instance Service
 		want     bool
@@ -54,6 +60,8 @@ func TestEnabled(t *testing.T) {
 
 	for intention, tc := range cases {
 		t.Run(intention, func(t *testing.T) {
+			t.Parallel()
+
 			if got := tc.instance.enabled(); got != tc.want {
 				t.Errorf("Enabled() = %t, want %t", got, tc.want)
 			}

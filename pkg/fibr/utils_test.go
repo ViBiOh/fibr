@@ -7,6 +7,8 @@ import (
 )
 
 func TestIsMethodAllowed(t *testing.T) {
+	t.Parallel()
+
 	cases := map[string]struct {
 		input *http.Request
 		want  bool
@@ -23,6 +25,8 @@ func TestIsMethodAllowed(t *testing.T) {
 
 	for intention, tc := range cases {
 		t.Run(intention, func(t *testing.T) {
+			t.Parallel()
+
 			if result := isMethodAllowed(tc.input); result != tc.want {
 				t.Errorf("isMethodAllowed(%#v) = %#v, want %#v", tc.input, result, tc.want)
 			}

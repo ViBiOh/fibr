@@ -20,6 +20,8 @@ var (
 )
 
 func TestGetPreviousAndNext(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		file  absto.Item
 		files []absto.Item
@@ -69,6 +71,8 @@ func TestGetPreviousAndNext(t *testing.T) {
 
 	for intention, tc := range cases {
 		t.Run(intention, func(t *testing.T) {
+			t.Parallel()
+
 			if gotPrevious, gotNext := getPreviousAndNext(tc.args.file, tc.args.files); !reflect.DeepEqual(gotPrevious, tc.wantPrevious) || !reflect.DeepEqual(gotNext, tc.wantNext) {
 				t.Errorf("getPreviousAndNext() = (%v, %v), want (%v, %v)", gotPrevious, gotNext, tc.wantPrevious, tc.wantNext)
 			}
@@ -77,6 +81,8 @@ func TestGetPreviousAndNext(t *testing.T) {
 }
 
 func TestCheckFormName(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		r        *http.Request
 		formName string
@@ -127,6 +133,8 @@ func TestCheckFormName(t *testing.T) {
 
 	for intention, tc := range cases {
 		t.Run(intention, func(t *testing.T) {
+			t.Parallel()
+
 			got, gotErr := checkFormName(tc.args.r, tc.args.formName)
 
 			failed := false
@@ -149,6 +157,8 @@ func TestCheckFormName(t *testing.T) {
 }
 
 func TestCheckFolderName(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		folderName string
 	}
@@ -183,6 +193,8 @@ func TestCheckFolderName(t *testing.T) {
 
 	for intention, tc := range cases {
 		t.Run(intention, func(t *testing.T) {
+			t.Parallel()
+
 			got, gotErr := checkFolderName(tc.args.folderName)
 
 			failed := false
@@ -205,6 +217,8 @@ func TestCheckFolderName(t *testing.T) {
 }
 
 func TestGetPathParts(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		request provider.Request
 	}
@@ -233,6 +247,8 @@ func TestGetPathParts(t *testing.T) {
 
 	for intention, tc := range cases {
 		t.Run(intention, func(t *testing.T) {
+			t.Parallel()
+
 			if got := getPathParts(tc.args.request); !reflect.DeepEqual(got, tc.want) {
 				t.Errorf("getPathParts() = %v, want %v", got, tc.want)
 			}

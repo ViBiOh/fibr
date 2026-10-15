@@ -9,6 +9,8 @@ import (
 )
 
 func TestBestSharePath(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		pathname string
 	}
@@ -43,6 +45,8 @@ func TestBestSharePath(t *testing.T) {
 
 	for intention, tc := range cases {
 		t.Run(intention, func(t *testing.T) {
+			t.Parallel()
+
 			ctrl := gomock.NewController(t)
 
 			mockShare := mocks.NewShareManager(ctrl)

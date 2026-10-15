@@ -11,6 +11,8 @@ import (
 )
 
 func TestCanHaveThumbnail(t *testing.T) {
+	t.Parallel()
+
 	cases := map[string]struct {
 		instance Service
 		input    absto.Item
@@ -49,6 +51,8 @@ func TestCanHaveThumbnail(t *testing.T) {
 
 	for intention, tc := range cases {
 		t.Run(intention, func(t *testing.T) {
+			t.Parallel()
+
 			if result := tc.instance.CanHaveThumbnail(tc.input); result != tc.want {
 				t.Errorf("CanHaveThumbnail() = %t, want %t", result, tc.want)
 			}
@@ -57,6 +61,8 @@ func TestCanHaveThumbnail(t *testing.T) {
 }
 
 func TestHasThumbnail(t *testing.T) {
+	t.Parallel()
+
 	cases := map[string]struct {
 		instance Service
 		input    absto.Item
@@ -81,6 +87,8 @@ func TestHasThumbnail(t *testing.T) {
 
 	for intention, tc := range cases {
 		t.Run(intention, func(t *testing.T) {
+			t.Parallel()
+
 			ctrl := gomock.NewController(t)
 
 			mockStorage := mocks.NewStorage(ctrl)
@@ -102,6 +110,8 @@ func TestHasThumbnail(t *testing.T) {
 }
 
 func TestPathForScale(t *testing.T) {
+	t.Parallel()
+
 	cases := map[string]struct {
 		instance Service
 		input    absto.Item
@@ -119,6 +129,8 @@ func TestPathForScale(t *testing.T) {
 
 	for intention, tc := range cases {
 		t.Run(intention, func(t *testing.T) {
+			t.Parallel()
+
 			if result := tc.instance.PathForScale(tc.input, SmallSize); result != tc.want {
 				t.Errorf("PathForScale() = %s, want %s", result, tc.want)
 			}
@@ -127,6 +139,8 @@ func TestPathForScale(t *testing.T) {
 }
 
 func TestGetStreamPath(t *testing.T) {
+	t.Parallel()
+
 	cases := map[string]struct {
 		input absto.Item
 		want  string
@@ -142,6 +156,8 @@ func TestGetStreamPath(t *testing.T) {
 
 	for intention, tc := range cases {
 		t.Run(intention, func(t *testing.T) {
+			t.Parallel()
+
 			if result := getStreamPath(tc.input); result != tc.want {
 				t.Errorf("getStreamPath() = %s, want %s", result, tc.want)
 			}

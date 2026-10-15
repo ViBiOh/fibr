@@ -9,6 +9,8 @@ import (
 )
 
 func TestCheckPassword(t *testing.T) {
+	t.Parallel()
+
 	password, err := argon.GenerateFromPassword("test")
 	if err != nil {
 		t.Errorf("create argon password: %s", err)
@@ -54,6 +56,8 @@ func TestCheckPassword(t *testing.T) {
 
 	for intention, tc := range cases {
 		t.Run(intention, func(t *testing.T) {
+			t.Parallel()
+
 			err := tc.share.CheckPassword(context.Background(), tc.header, nil)
 
 			failed := false

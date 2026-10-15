@@ -7,6 +7,8 @@ import (
 )
 
 func TestMatchSize(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		item absto.Item
 	}
@@ -60,6 +62,8 @@ func TestMatchSize(t *testing.T) {
 
 	for intention, tc := range cases {
 		t.Run(intention, func(t *testing.T) {
+			t.Parallel()
+
 			if got := tc.instance.matchSize(tc.args.item); got != tc.want {
 				t.Errorf("MatchSize() = %t, want %t", got, tc.want)
 			}

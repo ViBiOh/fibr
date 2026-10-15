@@ -7,6 +7,8 @@ import (
 )
 
 func TestGetExifPath(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		item absto.Item
 	}
@@ -37,6 +39,8 @@ func TestGetExifPath(t *testing.T) {
 
 	for intention, tc := range cases {
 		t.Run(intention, func(t *testing.T) {
+			t.Parallel()
+
 			if got := Path(tc.args.item); got != tc.want {
 				t.Errorf("getExifPath() = `%s`, want `%s`", got, tc.want)
 			}
