@@ -104,11 +104,7 @@ func (s *Service) Start(ctx context.Context) {
 
 	purgeCron := s.cron.Each(time.Hour).OnError(func(ctx context.Context, err error) {
 		slog.LogAttrs(ctx, slog.LevelError, "purge shares", slog.Any("error", err))
-	}).OnSignal(syscall.SIGUSR1)
-
-	if s.redisClient.Enabled() {
-		purgeCron.Exclusive(s, "purge", exclusive.Duration)
-	}
+	}).OnSignal(syscall.SIGUSR1).Exclusive(s, "purge", exclusive.Duration)
 
 	purgeCron.Start(ctx, s.cleanShares)
 

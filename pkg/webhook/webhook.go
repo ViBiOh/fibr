@@ -98,7 +98,10 @@ func (s *Service) Done() <-chan struct{} {
 
 func (s *Service) Exclusive(ctx context.Context, name string, action func(ctx context.Context) error) error {
 	return s.exclusiveService.Execute(ctx, "fibr:mutex:"+name, exclusive.Duration, func(ctx context.Context) error {
-		if err := s.loadWebhooks(ctx); err != nil {
+		s.mutex.Lock()
+		defer s.mutex.Unlock()
+
+		if err := s.refresh(ctx); err != nil {
 			return fmt.Errorf("refresh webhooks: %w", err)
 		}
 
@@ -123,6 +126,10 @@ func (s *Service) loadWebhooks(ctx context.Context) error {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
+	return s.refresh(ctx)
+}
+
+func (s *Service) refresh(ctx context.Context) error {
 	if webhooks, err := provider.LoadJSON[map[string]provider.Webhook](ctx, s.storage, webhookFilename); err != nil {
 		if !absto.IsNotExist(err) {
 			return err

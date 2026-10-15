@@ -2,6 +2,7 @@ package provider
 
 import (
 	"path/filepath"
+	"strings"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 )
@@ -37,4 +38,8 @@ func MetadataDirectory(item absto.Item) string {
 	}
 
 	return Dirname(MetadataDirectoryName + pathname)
+}
+
+func IsMetadataPath(pathname string) bool {
+	return pathname == MetadataDirectoryName || strings.HasPrefix(pathname, MetadataDirectoryName+"/")
 }

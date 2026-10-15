@@ -326,43 +326,72 @@ func (e EventBus) Done() <-chan struct{} {
 func (e EventBus) Push(ctx context.Context, event Event) {
 	select {
 	case <-e.closed:
-		e.increaseMetric(ctx, event, "refused")
-		slog.ErrorContext(ctx, "bus is closed")
+		e.refuse(ctx, event)
+		return
+	default:
+	}
+
+	select {
+	case <-e.closed:
+		e.refuse(ctx, event)
 	case e.bus <- event:
 		e.increaseMetric(ctx, event, "push")
 	}
 }
 
+func (e EventBus) refuse(ctx context.Context, event Event) {
+	e.increaseMetric(ctx, event, "refused")
+	slog.ErrorContext(ctx, "bus is closed")
+}
+
 func (e EventBus) Start(ctx context.Context, storageService absto.Storage, renamers []Renamer, consumers ...EventConsumer) {
 	defer close(e.done)
 
-	go func() {
-		defer close(e.bus)
-		defer close(e.closed)
+	for {
+		select {
+		case event := <-e.bus:
+			e.handle(event, storageService, renamers, consumers)
 
-		<-ctx.Done()
-	}()
+		case <-ctx.Done():
+			close(e.closed)
+			e.drain(storageService, renamers, consumers)
 
-	for event := range e.bus {
-		ctx := context.Background()
-
-		if event.Type == StartEvent {
-			ctx = telemetry.NoTrace(ctx)
+			return
 		}
-
-		ctx, end := telemetry.StartSpan(ctx, e.tracer, "event", trace.WithAttributes(attribute.String("type", event.Type.String())), trace.WithLinks(event.TraceLink))
-
-		if event.Type == RenameEvent && event.Item.IsDir() {
-			RenameDirectory(ctx, storageService, renamers, event.Item, *event.New)
-		}
-
-		for _, consumer := range consumers {
-			consumer(ctx, event)
-		}
-
-		end(nil)
-		e.increaseMetric(ctx, event, "done")
 	}
+}
+
+func (e EventBus) drain(storageService absto.Storage, renamers []Renamer, consumers []EventConsumer) {
+	for {
+		select {
+		case event := <-e.bus:
+			e.handle(event, storageService, renamers, consumers)
+
+		default:
+			return
+		}
+	}
+}
+
+func (e EventBus) handle(event Event, storageService absto.Storage, renamers []Renamer, consumers []EventConsumer) {
+	ctx := context.Background()
+
+	if event.Type == StartEvent {
+		ctx = telemetry.NoTrace(ctx)
+	}
+
+	ctx, end := telemetry.StartSpan(ctx, e.tracer, "event", trace.WithAttributes(attribute.String("type", event.Type.String())), trace.WithLinks(event.TraceLink))
+
+	if event.Type == RenameEvent && event.Item.IsDir() {
+		RenameDirectory(ctx, storageService, renamers, event.Item, *event.New)
+	}
+
+	for _, consumer := range consumers {
+		consumer(ctx, event)
+	}
+
+	end(nil)
+	e.increaseMetric(ctx, event, "done")
 }
 
 func RenameDirectory(ctx context.Context, storageService absto.Storage, renamers []Renamer, old, new absto.Item) {

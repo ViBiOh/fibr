@@ -147,7 +147,12 @@ func getNewFolder(r *http.Request) (string, error) {
 		return "", err
 	}
 
-	return provider.SanitizeName(newFolder, false)
+	sanitized, err := provider.SanitizeName(newFolder, false)
+	if err != nil {
+		return "", model.WrapInvalid(err)
+	}
+
+	return sanitized, nil
 }
 
 func getNewName(r *http.Request) (string, error) {
@@ -156,7 +161,12 @@ func getNewName(r *http.Request) (string, error) {
 		return "", err
 	}
 
-	return provider.SanitizeName(newName, true)
+	sanitized, err := provider.SanitizeName(newName, true)
+	if err != nil {
+		return "", model.WrapInvalid(err)
+	}
+
+	return sanitized, nil
 }
 
 func (s *Service) checkFile(ctx context.Context, pathname string, shouldExist bool) (info absto.Item, err error) {

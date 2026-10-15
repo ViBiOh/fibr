@@ -96,6 +96,10 @@ func (s Service) TemplateFunc(w http.ResponseWriter, r *http.Request) (renderer.
 		return renderer.NewPage("", 0, content), err
 	}
 
+	if provider.IsMetadataPath(request.Filepath()) {
+		return renderer.NewPage("", 0, map[string]any{"Request": request}), model.WrapNotFound(errors.New("not found"))
+	}
+
 	switch r.Method {
 	case http.MethodGet:
 		return s.crud.Get(w, r, request)

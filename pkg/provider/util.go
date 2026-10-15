@@ -59,6 +59,8 @@ var (
 	}
 
 	SlowClient = request.CreateClient(5*time.Minute, request.NoRedirection)
+
+	ErrInvalidName = errors.New("name is empty or a dot once sanitized")
 )
 
 func Join(parts ...string) string {
@@ -118,7 +120,13 @@ func SanitizeName(name string, removeSlash bool) (string, error) {
 		sanitized = strings.ReplaceAll(sanitized, "/", "_")
 	}
 
-	return strings.ReplaceAll(sanitized, "__", "_"), nil
+	sanitized = strings.ReplaceAll(sanitized, "__", "_")
+
+	if sanitized == "" || sanitized == "." {
+		return "", ErrInvalidName
+	}
+
+	return sanitized, nil
 }
 
 func SafeWrite(ctx context.Context, w io.Writer, content string) {
@@ -182,6 +190,10 @@ func WriteToStorage(ctx context.Context, storageService absto.Storage, output st
 
 	err = storageService.WriteTo(ctx, output, reader, absto.WriteOpts{Size: size})
 	if err != nil {
+		if info, statErr := storageService.Stat(ctx, output); statErr == nil && info.IsDir() {
+			return err
+		}
+
 		if removeErr := storageService.RemoveAll(ctx, output); removeErr != nil {
 			err = errors.Join(err, fmt.Errorf("remove: %w", removeErr))
 		}

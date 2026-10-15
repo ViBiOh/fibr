@@ -13,11 +13,23 @@ func TestSanitizeName(t *testing.T) {
 		want        string
 		wantErr     error
 	}{
-		"should work with empty name": {
+		"should fail with empty name": {
 			"",
 			true,
 			"",
-			nil,
+			ErrInvalidName,
+		},
+		"should fail with only unsupported chars": {
+			"日本語",
+			true,
+			"",
+			ErrInvalidName,
+		},
+		"should fail with a dot": {
+			".",
+			true,
+			"",
+			ErrInvalidName,
 		},
 		"should replace space by underscore": {
 			"fibr is a file browser",
@@ -94,6 +106,32 @@ func TestSafeWrite(t *testing.T) {
 	for intention, tc := range cases {
 		t.Run(intention, func(t *testing.T) {
 			SafeWrite(context.Background(), tc.args.writer, tc.args.content)
+		})
+	}
+}
+
+func TestIsMetadataPath(t *testing.T) {
+	t.Parallel()
+
+	cases := map[string]struct {
+		pathname string
+		want     bool
+	}{
+		"root":                {"/", false},
+		"metadata directory":  {"/.fibr", true},
+		"metadata file":       {"/.fibr/webhooks.json", true},
+		"nested metadata":     {"/.fibr/photos/abc.json", true},
+		"sibling with prefix": {"/.fibrary/file.txt", false},
+		"nested same name":    {"/photos/.fibr/file.txt", false},
+	}
+
+	for intention, testCase := range cases {
+		t.Run(intention, func(t *testing.T) {
+			t.Parallel()
+
+			if got := IsMetadataPath(testCase.pathname); got != testCase.want {
+				t.Errorf("IsMetadataPath(`%s`) = %t, want %t", testCase.pathname, got, testCase.want)
+			}
 		})
 	}
 }

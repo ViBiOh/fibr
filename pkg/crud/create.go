@@ -31,7 +31,7 @@ func (s *Service) Create(w http.ResponseWriter, r *http.Request, request provide
 
 	name, err = provider.SanitizeName(name, false)
 	if err != nil {
-		s.error(w, r, request, model.WrapInternal(err))
+		s.error(w, r, request, model.WrapInvalid(err))
 		return
 	}
 
@@ -59,7 +59,7 @@ func (s *Service) CreateSavedSearch(w http.ResponseWriter, r *http.Request, requ
 
 	name, err = provider.SanitizeName(name, false)
 	if err != nil {
-		s.error(w, r, request, model.WrapInternal(err))
+		s.error(w, r, request, model.WrapInvalid(err))
 		return
 	}
 
