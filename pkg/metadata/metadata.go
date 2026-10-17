@@ -3,7 +3,6 @@ package metadata
 import (
 	"context"
 	"fmt"
-	"log/slog"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/exclusive"
@@ -18,7 +17,7 @@ func (s *Service) Update(ctx context.Context, item absto.Item, opts ...provider.
 
 		metadata, err := s.GetMetadataFor(ctx, item)
 		if err != nil && !absto.IsNotExist(err) {
-			slog.LogAttrs(ctx, slog.LevelError, "load metadata", slog.String("item", item.Pathname), slog.Any("error", err))
+			return fmt.Errorf("get metadata: %w", err)
 		}
 
 		for _, opt := range opts {

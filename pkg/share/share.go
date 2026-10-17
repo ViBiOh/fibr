@@ -65,7 +65,15 @@ func (s *Service) Done() <-chan struct{} {
 }
 
 func (s *Service) Exclusive(ctx context.Context, name string, duration time.Duration, action func(ctx context.Context) error) (bool, error) {
-	return s.exclusive.Try(ctx, "fibr:mutex:"+name, duration, func(ctx context.Context) error {
+	return s.exclusive.Try(ctx, "fibr:mutex:"+name, duration, s.exclusiveRefresh(action))
+}
+
+func (s *Service) execute(ctx context.Context, name string, duration time.Duration, action func(ctx context.Context) error) error {
+	return s.exclusive.Execute(ctx, "fibr:mutex:"+name, duration, s.exclusiveRefresh(action))
+}
+
+func (s *Service) exclusiveRefresh(action func(context.Context) error) func(ctx context.Context) error {
+	return func(ctx context.Context) error {
 		s.mutex.Lock()
 		defer s.mutex.Unlock()
 
@@ -74,7 +82,7 @@ func (s *Service) Exclusive(ctx context.Context, name string, duration time.Dura
 		}
 
 		return action(ctx)
-	})
+	}
 }
 
 func (s *Service) Get(requestPath string) provider.Share {

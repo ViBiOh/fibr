@@ -84,6 +84,8 @@ func (s *Service) mergeChunk(w http.ResponseWriter, r *http.Request, request pro
 		return
 	}
 
+	defer provider.LogClose(ctx, file, "crud.mergeChunk", tempFile)
+
 	if err = provider.WriteToStorage(ctx, s.storage, filePath, size, file); err != nil {
 		s.error(w, r, request, model.WrapInternal(err))
 		return

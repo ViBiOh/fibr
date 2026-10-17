@@ -44,7 +44,7 @@ func (s *Service) List() (output []provider.Share) {
 func (s *Service) Create(ctx context.Context, filepath string, edit, story bool, password string, isDir bool, duration time.Duration) (string, error) {
 	var id string
 
-	_, err := s.Exclusive(ctx, "create", exclusive.Duration, func(ctx context.Context) error {
+	return id, s.execute(ctx, "create", exclusive.Duration, func(ctx context.Context) error {
 		var err error
 		id, err = s.generateID()
 		if err != nil {
@@ -75,12 +75,10 @@ func (s *Service) Create(ctx context.Context, filepath string, edit, story bool,
 
 		return nil
 	})
-
-	return id, err
 }
 
 func (s *Service) UpdatePassword(ctx context.Context, id, password string) error {
-	_, err := s.Exclusive(ctx, id, exclusive.Duration, func(_ context.Context) error {
+	return s.execute(ctx, id, exclusive.Duration, func(_ context.Context) error {
 		hashed, err := argon.GenerateFromPassword(password)
 		if err != nil {
 			return fmt.Errorf("hash password: %w", err)
@@ -100,16 +98,12 @@ func (s *Service) UpdatePassword(ctx context.Context, id, password string) error
 
 		return nil
 	})
-
-	return err
 }
 
 func (s *Service) Delete(ctx context.Context, id string) error {
-	_, err := s.Exclusive(ctx, id, exclusive.Duration, func(_ context.Context) error {
+	return s.execute(ctx, id, exclusive.Duration, func(_ context.Context) error {
 		return s.delete(ctx, id)
 	})
-
-	return err
 }
 
 func (s *Service) delete(ctx context.Context, id string) error {

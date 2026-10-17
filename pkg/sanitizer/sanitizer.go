@@ -65,8 +65,8 @@ func (s Service) Start(ctx context.Context) {
 }
 
 func (s Service) start(ctx context.Context) error {
-	slog.InfoContext(ctx, "Starting startup check...")
-	defer slog.InfoContext(ctx, "Ending startup check.")
+	slog.InfoContext(ctx, "Starting sanitizer...")
+	defer slog.InfoContext(ctx, "Ending sanitizer.")
 
 	done := ctx.Done()
 
@@ -75,7 +75,7 @@ func (s Service) start(ctx context.Context) error {
 	err := s.storage.Walk(ctx, "", func(item absto.Item) error {
 		select {
 		case <-done:
-			return errors.New("server is shutting down")
+			return errors.New("context done")
 		default:
 		}
 
@@ -89,15 +89,12 @@ func (s Service) start(ctx context.Context) error {
 
 		return nil
 	})
-	if err != nil {
-		return err
-	}
 
 	for _, directory := range directories {
 		s.pushEvent(ctx, provider.NewStartEvent(ctx, directory))
 	}
 
-	return nil
+	return err
 }
 
 func (s Service) sanitizeName(ctx context.Context, item absto.Item) absto.Item {

@@ -25,7 +25,7 @@ func (s *Service) EventConsumer(ctx context.Context, e provider.Event) {
 }
 
 func (s *Service) renameItem(ctx context.Context, old, new absto.Item) error {
-	_, err := s.Exclusive(ctx, old.ID, exclusive.Duration, func(ctx context.Context) error {
+	return s.execute(ctx, old.ID, exclusive.Duration, func(ctx context.Context) error {
 		for id, share := range s.shares {
 			if strings.HasPrefix(share.Path, old.Pathname) {
 				share.Path = strings.Replace(share.Path, old.Pathname, new.Pathname, 1)
@@ -39,12 +39,10 @@ func (s *Service) renameItem(ctx context.Context, old, new absto.Item) error {
 
 		return provider.SaveJSON(ctx, s.storage, shareFilename, s.shares)
 	})
-
-	return err
 }
 
 func (s *Service) deleteItem(ctx context.Context, item absto.Item) error {
-	_, err := s.Exclusive(ctx, item.ID, exclusive.Duration, func(_ context.Context) error {
+	return s.execute(ctx, item.ID, exclusive.Duration, func(_ context.Context) error {
 		for id, share := range s.shares {
 			if strings.HasPrefix(share.Path, item.Pathname) {
 				if err := s.delete(ctx, id); err != nil {
@@ -55,6 +53,4 @@ func (s *Service) deleteItem(ctx context.Context, item absto.Item) error {
 
 		return nil
 	})
-
-	return err
 }

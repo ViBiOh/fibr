@@ -119,7 +119,6 @@ func (s services) Start(adapters adapters, doneCtx, endCtx context.Context) {
 
 	go s.webhook.Start(endCtx)
 	go s.share.Start(endCtx)
-
 	go s.eventBus.Start(endCtx, adapters.storage, []provider.Renamer{s.thumbnail.Rename, s.metadata.Rename}, s.share.EventConsumer, s.thumbnail.EventConsumer, s.metadata.EventConsumer, s.webhook.EventConsumer)
 }
 
@@ -128,6 +127,7 @@ func (s services) Close() {
 	<-s.amqpExif.Done()
 	<-s.sanitizer.Done()
 
+	<-s.eventBus.Done()
 	<-s.webhook.Done()
 	<-s.share.Done()
 }

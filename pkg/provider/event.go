@@ -12,6 +12,7 @@ import (
 	"time"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
+	"github.com/ViBiOh/httputils/v4/pkg/recoverer"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
 	"go.opentelemetry.io/otel/attribute"
@@ -376,11 +377,14 @@ func (e EventBus) drain(storageService absto.Storage, renamers []Renamer, consum
 func (e EventBus) handle(event Event, storageService absto.Storage, renamers []Renamer, consumers []EventConsumer) {
 	ctx := context.Background()
 
+	defer recoverer.Logger()
+
 	if event.Type == StartEvent {
 		ctx = telemetry.NoTrace(ctx)
 	}
 
 	ctx, end := telemetry.StartSpan(ctx, e.tracer, "event", trace.WithAttributes(attribute.String("type", event.Type.String())), trace.WithLinks(event.TraceLink))
+	defer end(nil)
 
 	if event.Type == RenameEvent && event.Item.IsDir() {
 		RenameDirectory(ctx, storageService, renamers, event.Item, *event.New)
@@ -390,7 +394,6 @@ func (e EventBus) handle(event Event, storageService absto.Storage, renamers []R
 		consumer(ctx, event)
 	}
 
-	end(nil)
 	e.increaseMetric(ctx, event, "done")
 }
 
