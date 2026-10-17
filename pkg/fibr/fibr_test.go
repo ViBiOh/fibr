@@ -10,8 +10,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ViBiOh/auth/v3/pkg/argon"
-	authModel "github.com/ViBiOh/auth/v3/pkg/model"
+	"codeberg.org/ViBiOh/auth/v3/pkg/argon"
+	authModel "codeberg.org/ViBiOh/auth/v3/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/mocks"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	httpModel "github.com/ViBiOh/httputils/v4/pkg/model"

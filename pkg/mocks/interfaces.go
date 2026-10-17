@@ -15,7 +15,7 @@ import (
 	reflect "reflect"
 	time "time"
 
-	model "github.com/ViBiOh/auth/v3/pkg/model"
+	model "codeberg.org/ViBiOh/auth/v3/pkg/model"
 	provider "github.com/ViBiOh/fibr/pkg/provider"
 	renderer "github.com/ViBiOh/httputils/v4/pkg/renderer"
 	gomock "go.uber.org/mock/gomock"

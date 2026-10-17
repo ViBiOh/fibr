@@ -5,7 +5,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/ViBiOh/auth/v3/pkg/argon"
+	"codeberg.org/ViBiOh/auth/v3/pkg/argon"
 )
 
 func TestCheckPassword(t *testing.T) {

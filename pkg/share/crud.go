@@ -7,7 +7,7 @@ import (
 	"sort"
 	"time"
 
-	"github.com/ViBiOh/auth/v3/pkg/argon"
+	"codeberg.org/ViBiOh/auth/v3/pkg/argon"
 	"github.com/ViBiOh/fibr/pkg/exclusive"
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
@@ -84,7 +84,11 @@ func (s *Service) UpdatePassword(ctx context.Context, id, password string) error
 			return fmt.Errorf("hash password: %w", err)
 		}
 
-		share := s.shares[id]
+		share, ok := s.shares[id]
+		if !ok {
+			return fmt.Errorf("unknown share `%s`", id)
+		}
+
 		share.Password = hashed
 		s.shares[id] = share
 

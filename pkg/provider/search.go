@@ -7,5 +7,5 @@ type Search struct {
 }
 
 func (s Search) IsZero() bool {
-	return len(s.Name) != 0
+	return len(s.Name) == 0
 }

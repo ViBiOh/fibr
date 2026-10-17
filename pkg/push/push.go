@@ -55,6 +55,7 @@ type Service struct {
 	exclusive        exclusive.Service
 	storage          absto.Storage
 	publicKey        string
+	mailTo           string
 	allowedHosts     []string
 	privateKey       []byte
 	maxSubscriptions int
@@ -63,6 +64,7 @@ type Service struct {
 type Config struct {
 	publicKey        string
 	privateKey       string
+	mailTo           string
 	allowedHosts     []string
 	maxSubscriptions int
 }
@@ -72,6 +74,7 @@ func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) *Config
 
 	flags.New("PublicKey", "VAPID Public Key").Prefix(prefix).DocPrefix("push").StringVar(fs, &config.publicKey, "", overrides)
 	flags.New("PrivateKey", "VAPID Private Key").Prefix(prefix).DocPrefix("push").StringVar(fs, &config.privateKey, "", overrides)
+	flags.New("MailTo", "VAPID Mailto").Prefix(prefix).DocPrefix("push").StringVar(fs, &config.mailTo, "", overrides)
 	flags.New("AllowedHosts", "Hosts of push services allowed as subscription endpoint, exact name or *.suffix, * allows any host").Prefix(prefix).DocPrefix("push").StringSliceVar(fs, &config.allowedHosts, DefaultAllowedHosts, overrides)
 	flags.New("MaxSubscriptions", "Maximum number of stored push subscriptions, 0 for no limit").Prefix(prefix).DocPrefix("push").IntVar(fs, &config.maxSubscriptions, defaultMaxSubscriptions, overrides)
 
@@ -91,6 +94,7 @@ func New(config *Config, storageService absto.Storage, exclusiveService exclusiv
 	return &Service{
 		publicKey:        config.publicKey,
 		privateKey:       privateKey,
+		mailTo:           config.mailTo,
 		storage:          storageService,
 		exclusive:        exclusiveService,
 		allowedHosts:     config.allowedHosts,
@@ -281,7 +285,7 @@ func (s *Service) generateJWT(subscription Subscription, duration time.Duration)
 	token := jwt.NewWithClaims(jwt.SigningMethodES256, jwt.MapClaims{
 		"aud": parsedEndpoint.Scheme + "://" + parsedEndpoint.Host,
 		"exp": time.Now().Add(duration).Unix(),
-		"sub": "mailto:bob@vibioh.fr",
+		"sub": "mailto:" + s.mailTo,
 	})
 
 	privateKey, err := s.getPrivateKey()

@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ViBiOh/auth/v3/pkg/argon"
+	"codeberg.org/ViBiOh/auth/v3/pkg/argon"
 	"golang.org/x/crypto/bcrypt"
 )
 

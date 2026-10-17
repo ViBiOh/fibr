@@ -243,8 +243,9 @@ Usage of fibr:
   --authUsers                         string slice  [auth] Users credentials in the form 'id:login:password' ${FIBR_AUTH_USERS}, as a string slice, environment variable separated by "|"
   --cert                              string        [server] Certificate file ${FIBR_CERT}
   --chunkUpload                                     [crud] Use chunk upload in browser ${FIBR_CHUNK_UPLOAD} (default false)
-  --cookieHmacSecret                  string        [cookie] HMAC Secret ${FIBR_COOKIE_HMAC_SECRET}
-  --cookieJwtExpiration               duration      [cookie] JWT Expiration ${FIBR_COOKIE_JWT_EXPIRATION} (default 120h0m0s)
+  --cookieDevMode                                   [cookie] Disable Secure flag on cookie ${FIBR_COOKIE_DEV_MODE} (default false)
+  --cookieExpiration                  duration      [cookie] Cookie Expiration ${FIBR_COOKIE_EXPIRATION} (default 120h0m0s)
+  --cookieSecret                      string        [cookie] Secret for encrypting cookies, required to enable them, 32 random bytes or more recommended ${FIBR_COOKIE_SECRET}
   --csp                               string        [owasp] Content-Security-Policy ${FIBR_CSP} (default "default-src 'self'; base-uri 'self'; script-src 'self' 'httputils-nonce' 'wasm-unsafe-eval' unpkg.com/webp-hero@0.0.2/dist-cjs/ unpkg.com/leaflet@1.9.4/dist/ unpkg.com/leaflet.markercluster@1.5.1/ cdn.jsdelivr.net/npm/pdfjs-dist@6.4.299/; style-src 'self' 'httputils-nonce' unpkg.com/leaflet@1.9.4/dist/ unpkg.com/leaflet.markercluster@1.5.1/; img-src 'self' data: a.tile.openstreetmap.org b.tile.openstreetmap.org c.tile.openstreetmap.org; worker-src 'self' blob:")
   --exifAmqpExchange                  string        [exif] AMQP Exchange Name ${FIBR_EXIF_AMQP_EXCHANGE} (default "fibr")
   --exifAmqpRoutingKey                string        [exif] AMQP Routing Key for exif ${FIBR_EXIF_AMQP_ROUTING_KEY} (default "exif_input")
@@ -276,6 +277,7 @@ Usage of fibr:
   --pprofPort                         int           [pprof] Port of the HTTP server (0 to disable) ${FIBR_PPROF_PORT} (default 0)
   --publicURL                         string        Public URL ${FIBR_PUBLIC_URL} (default "http://127.0.0.1:1080")
   --pushAllowedHosts                  string slice  [push] Hosts of push services allowed as subscription endpoint, exact name or *.suffix, * allows any host ${FIBR_PUSH_ALLOWED_HOSTS}, as a string slice, environment variable separated by "," (default [fcm.googleapis.com, *.push.services.mozilla.com, *.push.apple.com, *.notify.windows.com])
+  --pushMailTo                        string        [push] VAPID Mailto ${FIBR_PUSH_MAIL_TO}
   --pushMaxSubscriptions              int           [push] Maximum number of stored push subscriptions, 0 for no limit ${FIBR_PUSH_MAX_SUBSCRIPTIONS} (default 100)
   --pushPrivateKey                    string        [push] VAPID Private Key ${FIBR_PUSH_PRIVATE_KEY}
   --pushPublicKey                     string        [push] VAPID Public Key ${FIBR_PUSH_PUBLIC_KEY}

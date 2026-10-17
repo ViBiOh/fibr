@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/ViBiOh/auth/v3/pkg/model"
+	"codeberg.org/ViBiOh/auth/v3/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 )
 

@@ -4,8 +4,8 @@ go 1.27.0
 
 require (
 	codeberg.org/ViBiOh/ChatPotte v0.11.0
+	codeberg.org/ViBiOh/auth/v3 v3.13.0
 	github.com/ViBiOh/absto v1.7.37
-	github.com/ViBiOh/auth/v3 v3.11.1
 	github.com/ViBiOh/exas v0.8.1
 	github.com/ViBiOh/flags v1.6.1
 	github.com/ViBiOh/httputils/v4 v4.89.2
@@ -25,6 +25,7 @@ require (
 )
 
 require (
+	github.com/ViBiOh/auth/v3 v3.11.1 // indirect
 	github.com/cenkalti/backoff/v5 v5.0.3 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/djherbis/atime v1.1.0 // indirect
@@ -64,7 +65,7 @@ require (
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	golang.org/x/mod v0.41.0 // indirect
 	golang.org/x/net v0.60.0 // indirect
-	golang.org/x/oauth2 v0.36.0 // indirect
+	golang.org/x/oauth2 v0.37.0 // indirect
 	golang.org/x/sync v0.24.0 // indirect
 	golang.org/x/sys v0.49.0 // indirect
 	golang.org/x/telemetry v0.0.0-20260924152758-ed294f943157 // indirect
@@ -76,7 +77,7 @@ require (
 	google.golang.org/protobuf v1.36.12 // indirect
 	gopkg.in/ini.v1 v1.67.3 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	mvdan.cc/gofumpt v0.11.0 // indirect
+	mvdan.cc/gofumpt v0.12.0 // indirect
 )
 
 tool (
