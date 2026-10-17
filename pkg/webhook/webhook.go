@@ -3,15 +3,14 @@ package webhook
 import (
 	"context"
 	"flag"
-	"fmt"
 	"log/slog"
-	"sync"
 	"time"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/exclusive"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/fibr/pkg/push"
+	"github.com/ViBiOh/fibr/pkg/registry"
 	"github.com/ViBiOh/fibr/pkg/thumbnail"
 	"github.com/ViBiOh/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/redis"
@@ -22,19 +21,16 @@ import (
 var webhookFilename = provider.MetadataDirectoryName + "/webhooks.json"
 
 type Service struct {
-	storage          absto.Storage
-	counter          metric.Int64Counter
-	redisClient      redis.Client
-	exclusiveService exclusive.Service
-	webhooks         map[string]provider.Webhook
-	debouncer        *GroupDebouncer[provider.Event]
-	rendererService  *renderer.Service
-	push             *push.Service
-	done             chan struct{}
-	pubsubChannel    string
-	hmacSecret       []byte
-	thumbnail        thumbnail.Service
-	mutex            sync.RWMutex
+	counter         metric.Int64Counter
+	redisClient     redis.Client
+	webhooks        *registry.Registry[provider.Webhook]
+	debouncer       *GroupDebouncer[provider.Event]
+	rendererService *renderer.Service
+	push            *push.Service
+	done            chan struct{}
+	pubsubChannel   string
+	hmacSecret      []byte
+	thumbnail       thumbnail.Service
 }
 
 type Config struct {
@@ -65,17 +61,15 @@ func New(config *Config, storageService absto.Storage, meterProvider metric.Mete
 	}
 
 	service := &Service{
-		done:             make(chan struct{}),
-		storage:          storageService,
-		rendererService:  rendererService,
-		thumbnail:        thumbnailService,
-		push:             pushService,
-		exclusiveService: exclusiveApp,
-		webhooks:         make(map[string]provider.Webhook),
-		counter:          counter,
-		hmacSecret:       []byte(config.HmacSecret),
-		redisClient:      redisClient,
-		pubsubChannel:    config.PubsubChannel,
+		done:            make(chan struct{}),
+		rendererService: rendererService,
+		thumbnail:       thumbnailService,
+		push:            pushService,
+		webhooks:        registry.New[provider.Webhook](storageService, exclusiveApp, redisClient, webhookFilename, config.PubsubChannel),
+		counter:         counter,
+		hmacSecret:      []byte(config.HmacSecret),
+		redisClient:     redisClient,
+		pubsubChannel:   config.PubsubChannel,
 	}
 
 	service.debouncer = NewDebouncer(time.Minute*30, service.asyncPushNotification)
@@ -96,23 +90,10 @@ func (s *Service) Done() <-chan struct{} {
 	return done
 }
 
-func (s *Service) Exclusive(ctx context.Context, name string, action func(ctx context.Context) error) error {
-	return s.exclusiveService.Execute(ctx, "fibr:mutex:"+name, exclusive.Duration, func(ctx context.Context) error {
-		s.mutex.Lock()
-		defer s.mutex.Unlock()
-
-		if err := s.refresh(ctx); err != nil {
-			return fmt.Errorf("refresh webhooks: %w", err)
-		}
-
-		return action(ctx)
-	})
-}
-
 func (s *Service) Start(ctx context.Context) {
 	defer close(s.done)
 
-	if err := s.loadWebhooks(ctx); err != nil {
+	if err := s.webhooks.Load(ctx); err != nil {
 		slog.LogAttrs(ctx, slog.LevelError, "refresh webhooks", slog.Any("error", err))
 		return
 	}
@@ -120,29 +101,4 @@ func (s *Service) Start(ctx context.Context) {
 	go s.debouncer.Start(ctx)
 
 	redis.SubscribeFor(ctx, s.redisClient, s.pubsubChannel, s.PubSubHandle)
-}
-
-func (s *Service) loadWebhooks(ctx context.Context) error {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
-
-	return s.refresh(ctx)
-}
-
-func (s *Service) refresh(ctx context.Context) error {
-	if webhooks, err := provider.LoadJSON[map[string]provider.Webhook](ctx, s.storage, webhookFilename); err != nil {
-		if !absto.IsNotExist(err) {
-			return err
-		}
-
-		if err := s.storage.Mkdir(ctx, provider.MetadataDirectoryName, absto.DirectoryPerm); err != nil {
-			return fmt.Errorf("create dir: %w", err)
-		}
-
-		return provider.SaveJSON(ctx, s.storage, webhookFilename, &s.webhooks)
-	} else {
-		s.webhooks = webhooks
-	}
-
-	return nil
 }

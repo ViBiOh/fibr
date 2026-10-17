@@ -2,12 +2,10 @@ package share
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"strings"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
-	"github.com/ViBiOh/fibr/pkg/exclusive"
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
@@ -25,32 +23,34 @@ func (s *Service) EventConsumer(ctx context.Context, e provider.Event) {
 }
 
 func (s *Service) renameItem(ctx context.Context, old, new absto.Item) error {
-	return s.execute(ctx, old.ID, exclusive.Duration, func(ctx context.Context) error {
-		for id, share := range s.shares {
+	return s.shares.Update(ctx, func(shares map[string]provider.Share) ([]provider.Share, error) {
+		var renamed []provider.Share
+
+		for id, share := range shares {
 			if strings.HasPrefix(share.Path, old.Pathname) {
 				share.Path = strings.Replace(share.Path, old.Pathname, new.Pathname, 1)
-				s.shares[id] = share
+				shares[id] = share
 
-				if err := s.redisClient.PublishJSON(ctx, s.pubsubChannel, share); err != nil {
-					return fmt.Errorf("publish share rename: %w", err)
-				}
+				renamed = append(renamed, share)
 			}
 		}
 
-		return provider.SaveJSON(ctx, s.storage, shareFilename, s.shares)
+		return renamed, nil
 	})
 }
 
 func (s *Service) deleteItem(ctx context.Context, item absto.Item) error {
-	return s.execute(ctx, item.ID, exclusive.Duration, func(_ context.Context) error {
-		for id, share := range s.shares {
+	return s.shares.Update(ctx, func(shares map[string]provider.Share) ([]provider.Share, error) {
+		var deleted []provider.Share
+
+		for id, share := range shares {
 			if strings.HasPrefix(share.Path, item.Pathname) {
-				if err := s.delete(ctx, id); err != nil {
-					return fmt.Errorf("delete share `%s`: %w", id, err)
-				}
+				delete(shares, id)
+
+				deleted = append(deleted, provider.Share{ID: id})
 			}
 		}
 
-		return nil
+		return deleted, nil
 	})
 }

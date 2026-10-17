@@ -8,27 +8,25 @@ import (
 	"time"
 
 	"codeberg.org/ViBiOh/auth/v3/pkg/argon"
-	"github.com/ViBiOh/fibr/pkg/exclusive"
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
-func (s *Service) generateID() (string, error) {
+func generateID(shares map[string]provider.Share) string {
 	for {
 		idSha := provider.Hash(provider.Identifier())[:8]
 
-		if _, ok := s.shares[idSha]; !ok {
-			return idSha, nil
+		if _, ok := shares[idSha]; !ok {
+			return idSha
 		}
 	}
 }
 
-func (s *Service) List() (output []provider.Share) {
-	s.mutex.RLock()
-	defer s.mutex.RUnlock()
+func (s *Service) List() []provider.Share {
+	shares := s.shares.Items()
 
-	output = make([]provider.Share, 0, len(s.shares))
+	output := make([]provider.Share, 0, len(shares))
 
-	for _, value := range s.shares {
+	for _, value := range shares {
 		index := sort.Search(len(output), func(i int) bool {
 			return output[i].ID > value.ID
 		})
@@ -44,12 +42,8 @@ func (s *Service) List() (output []provider.Share) {
 func (s *Service) Create(ctx context.Context, filepath string, edit, story bool, password string, isDir bool, duration time.Duration) (string, error) {
 	var id string
 
-	return id, s.execute(ctx, "create", exclusive.Duration, func(ctx context.Context) error {
-		var err error
-		id, err = s.generateID()
-		if err != nil {
-			return fmt.Errorf("generate id: %w", err)
-		}
+	err := s.shares.Update(ctx, func(shares map[string]provider.Share) ([]provider.Share, error) {
+		id = generateID(shares)
 
 		share := provider.Share{
 			ID:       id,
@@ -63,63 +57,37 @@ func (s *Service) Create(ctx context.Context, filepath string, edit, story bool,
 			Duration: duration,
 		}
 
-		s.shares[id] = share
+		shares[id] = share
 
-		if err = provider.SaveJSON(ctx, s.storage, shareFilename, s.shares); err != nil {
-			return fmt.Errorf("save shares: %w", err)
-		}
-
-		if err = s.redisClient.PublishJSON(ctx, s.pubsubChannel, share); err != nil {
-			return fmt.Errorf("publish share creation: %w", err)
-		}
-
-		return nil
+		return []provider.Share{share}, nil
 	})
+
+	return id, err
 }
 
 func (s *Service) UpdatePassword(ctx context.Context, id, password string) error {
-	return s.execute(ctx, id, exclusive.Duration, func(_ context.Context) error {
-		hashed, err := argon.GenerateFromPassword(password)
-		if err != nil {
-			return fmt.Errorf("hash password: %w", err)
-		}
+	hashed, err := argon.GenerateFromPassword(password)
+	if err != nil {
+		return fmt.Errorf("hash password: %w", err)
+	}
 
-		share, ok := s.shares[id]
+	return s.shares.Update(ctx, func(shares map[string]provider.Share) ([]provider.Share, error) {
+		share, ok := shares[id]
 		if !ok {
-			return fmt.Errorf("unknown share `%s`", id)
+			return nil, fmt.Errorf("unknown share `%s`", id)
 		}
 
 		share.Password = hashed
-		s.shares[id] = share
+		shares[id] = share
 
-		if err := provider.SaveJSON(ctx, s.storage, shareFilename, s.shares); err != nil {
-			return fmt.Errorf("save shares: %w", err)
-		}
-
-		if err := s.redisClient.PublishJSON(ctx, s.pubsubChannel, share); err != nil {
-			return fmt.Errorf("publish share deletion: %w", err)
-		}
-
-		return nil
+		return []provider.Share{share}, nil
 	})
 }
 
 func (s *Service) Delete(ctx context.Context, id string) error {
-	return s.execute(ctx, id, exclusive.Duration, func(_ context.Context) error {
-		return s.delete(ctx, id)
+	return s.shares.Update(ctx, func(shares map[string]provider.Share) ([]provider.Share, error) {
+		delete(shares, id)
+
+		return []provider.Share{{ID: id}}, nil
 	})
-}
-
-func (s *Service) delete(ctx context.Context, id string) error {
-	delete(s.shares, id)
-
-	if err := provider.SaveJSON(ctx, s.storage, shareFilename, s.shares); err != nil {
-		return fmt.Errorf("save shares: %w", err)
-	}
-
-	if err := s.redisClient.PublishJSON(ctx, s.pubsubChannel, provider.Share{ID: id}); err != nil {
-		return fmt.Errorf("publish share deletion: %w", err)
-	}
-
-	return nil
 }

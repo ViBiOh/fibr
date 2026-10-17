@@ -13,12 +13,11 @@ func (s *Service) PubSubHandle(webhook provider.Webhook, err error) {
 		return
 	}
 
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
-
-	if len(webhook.URL) == 0 {
-		delete(s.webhooks, webhook.ID)
-	} else {
-		s.webhooks[webhook.ID] = webhook
-	}
+	s.webhooks.Patch(func(webhooks map[string]provider.Webhook) {
+		if len(webhook.URL) == 0 {
+			delete(webhooks, webhook.ID)
+		} else {
+			webhooks[webhook.ID] = webhook
+		}
+	})
 }

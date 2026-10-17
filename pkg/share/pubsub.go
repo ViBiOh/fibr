@@ -13,12 +13,11 @@ func (s *Service) PubSubHandle(share provider.Share, err error) {
 		return
 	}
 
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
-
-	if share.Created.IsZero() {
-		delete(s.shares, share.ID)
-	} else {
-		s.shares[share.ID] = share
-	}
+	s.shares.Patch(func(shares map[string]provider.Share) {
+		if share.Created.IsZero() {
+			delete(shares, share.ID)
+		} else {
+			shares[share.ID] = share
+		}
+	})
 }

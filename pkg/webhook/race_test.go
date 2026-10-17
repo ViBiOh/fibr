@@ -6,30 +6,13 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/ViBiOh/absto/pkg/filesystem"
-	"github.com/ViBiOh/fibr/pkg/exclusive"
-	"github.com/ViBiOh/fibr/pkg/mocks"
 	"github.com/ViBiOh/fibr/pkg/provider"
-	"go.uber.org/mock/gomock"
 )
 
 func TestConcurrentMutationAndRead(t *testing.T) {
 	t.Parallel()
 
-	storage, err := filesystem.New(t.TempDir())
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	redisClient := mocks.NewRedisClient(gomock.NewController(t))
-	redisClient.EXPECT().PublishJSON(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
-
-	instance := &Service{
-		storage:          storage,
-		redisClient:      redisClient,
-		exclusiveService: exclusive.New(nil),
-		webhooks:         make(map[string]provider.Webhook),
-	}
+	instance, _, _ := newTestService(t)
 
 	ctx := context.Background()
 

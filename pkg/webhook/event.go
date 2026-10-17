@@ -63,12 +63,9 @@ func (s *Service) EventConsumer(ctx context.Context, event provider.Event) {
 }
 
 func (s *Service) matchingWebhooks(event provider.Event) []provider.Webhook {
-	s.mutex.RLock()
-	defer s.mutex.RUnlock()
-
 	var matching []provider.Webhook
 
-	for _, webhook := range s.webhooks {
+	for _, webhook := range s.webhooks.Items() {
 		if webhook.Match(event) {
 			matching = append(matching, webhook)
 		}
@@ -301,15 +298,17 @@ func (s *Service) accessEvent(event provider.Event) string {
 }
 
 func (s *Service) deleteItem(ctx context.Context, item absto.Item) error {
-	return s.Exclusive(ctx, item.ID, func(_ context.Context) error {
-		for id, webhook := range s.webhooks {
+	return s.webhooks.Update(ctx, func(webhooks map[string]provider.Webhook) ([]provider.Webhook, error) {
+		var deleted []provider.Webhook
+
+		for id, webhook := range webhooks {
 			if webhook.Pathname == item.Pathname {
-				if err := s.delete(ctx, id); err != nil {
-					return fmt.Errorf("delete webhook `%s`: %w", id, err)
-				}
+				delete(webhooks, id)
+
+				deleted = append(deleted, provider.Webhook{ID: id})
 			}
 		}
 
-		return nil
+		return deleted, nil
 	})
 }

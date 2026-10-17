@@ -2,30 +2,28 @@ package webhook
 
 import (
 	"context"
-	"fmt"
 	"sort"
 	"time"
 
 	"github.com/ViBiOh/fibr/pkg/provider"
 )
 
-func (s *Service) generateID() (string, error) {
+func generateID(webhooks map[string]provider.Webhook) string {
 	for {
 		idSha := provider.Hash(provider.Identifier())[:8]
 
-		if _, ok := s.webhooks[idSha]; !ok {
-			return idSha, nil
+		if _, ok := webhooks[idSha]; !ok {
+			return idSha
 		}
 	}
 }
 
 func (s *Service) List() []provider.Webhook {
-	s.mutex.RLock()
-	defer s.mutex.RUnlock()
+	webhooks := s.webhooks.Items()
 
-	output := make([]provider.Webhook, 0, len(s.webhooks))
+	output := make([]provider.Webhook, 0, len(webhooks))
 
-	for _, webhook := range s.webhooks {
+	for _, webhook := range webhooks {
 		index := sort.Search(len(output), func(i int) bool {
 			return output[i].ID > webhook.ID
 		})
@@ -39,10 +37,7 @@ func (s *Service) List() []provider.Webhook {
 }
 
 func (s *Service) Get(id string) provider.Webhook {
-	s.mutex.RLock()
-	defer s.mutex.RUnlock()
-
-	for _, webhook := range s.webhooks {
+	for _, webhook := range s.webhooks.Items() {
 		if webhook.ID == id {
 			return webhook
 		}
@@ -52,12 +47,9 @@ func (s *Service) Get(id string) provider.Webhook {
 }
 
 func (s *Service) FindByURL(url string) []provider.Webhook {
-	s.mutex.RLock()
-	defer s.mutex.RUnlock()
-
 	var webhooks []provider.Webhook
 
-	for _, webhook := range s.webhooks {
+	for _, webhook := range s.webhooks.Items() {
 		if webhook.URL == url {
 			webhooks = append(webhooks, webhook)
 		}
@@ -69,14 +61,9 @@ func (s *Service) FindByURL(url string) []provider.Webhook {
 func (s *Service) Create(ctx context.Context, pathname string, recursive bool, kind provider.WebhookKind, url string, types []provider.EventType) (string, error) {
 	var id string
 
-	return id, s.Exclusive(ctx, "create", func(ctx context.Context) (err error) {
-		id, err = s.generateID()
-		if err != nil {
-			return fmt.Errorf("generate id: %w", err)
-		}
-
+	err := s.webhooks.Update(ctx, func(webhooks map[string]provider.Webhook) ([]provider.Webhook, error) {
 		webhook := provider.Webhook{
-			ID:        id,
+			ID:        generateID(webhooks),
 			Pathname:  pathname,
 			Recursive: recursive,
 			Kind:      kind,
@@ -85,43 +72,27 @@ func (s *Service) Create(ctx context.Context, pathname string, recursive bool, k
 			Created:   time.Now(),
 		}
 
-		for existingID, existing := range s.webhooks {
+		for existingID, existing := range webhooks {
 			if webhook.Similar(existing) {
 				id = existingID
-				return nil
+
+				return nil, nil
 			}
 		}
 
-		s.webhooks[id] = webhook
+		id = webhook.ID
+		webhooks[id] = webhook
 
-		if err = provider.SaveJSON(ctx, s.storage, webhookFilename, s.webhooks); err != nil {
-			return fmt.Errorf("save webhooks: %w", err)
-		}
-
-		if err = s.redisClient.PublishJSON(ctx, s.pubsubChannel, webhook); err != nil {
-			return fmt.Errorf("publish webhook creation: %w", err)
-		}
-
-		return nil
+		return []provider.Webhook{webhook}, nil
 	})
+
+	return id, err
 }
 
 func (s *Service) Delete(ctx context.Context, id string) error {
-	return s.Exclusive(ctx, id, func(_ context.Context) error {
-		return s.delete(ctx, id)
+	return s.webhooks.Update(ctx, func(webhooks map[string]provider.Webhook) ([]provider.Webhook, error) {
+		delete(webhooks, id)
+
+		return []provider.Webhook{{ID: id}}, nil
 	})
-}
-
-func (s *Service) delete(ctx context.Context, id string) error {
-	delete(s.webhooks, id)
-
-	if err := provider.SaveJSON(ctx, s.storage, webhookFilename, s.webhooks); err != nil {
-		return fmt.Errorf("save webhooks: %w", err)
-	}
-
-	if err := s.redisClient.PublishJSON(ctx, s.pubsubChannel, provider.Webhook{ID: id}); err != nil {
-		return fmt.Errorf("publish webhook deletion: %w", err)
-	}
-
-	return nil
 }

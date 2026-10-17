@@ -45,5 +45,14 @@ func SaveJSON[T any](ctx context.Context, storageService absto.Storage, filename
 		done <- errors.Join(err, writer.Close())
 	}()
 
-	return errors.Join(storageService.WriteTo(ctx, filename, reader, absto.WriteOpts{}), <-done)
+	if err := storageService.WriteTo(ctx, filename, reader, absto.WriteOpts{}); err != nil {
+		_ = reader.Close()
+
+		for range done {
+		}
+
+		return err
+	}
+
+	return <-done
 }
