@@ -25,7 +25,6 @@ require (
 )
 
 require (
-	github.com/ViBiOh/auth/v3 v3.11.1 // indirect
 	github.com/cenkalti/backoff/v5 v5.0.3 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/djherbis/atime v1.1.0 // indirect
@@ -81,7 +80,7 @@ require (
 )
 
 tool (
-	github.com/ViBiOh/auth/v3/cmd/argon
+	codeberg.org/ViBiOh/auth/v3/cmd/argon
 	github.com/tdewolff/minify/v2/cmd/minify
 	go.uber.org/mock/mockgen
 	golang.org/x/tools/cmd/goimports
