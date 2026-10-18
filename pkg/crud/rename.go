@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"path"
 	"strings"
 
 	absto "github.com/ViBiOh/absto/pkg/model"
@@ -81,8 +82,8 @@ func (s *Service) Rename(w http.ResponseWriter, r *http.Request, request provide
 	var oldItem absto.Item
 	var newItem absto.Item
 
-	if !strings.EqualFold(oldPath, newPath) {
-		if _, err := s.checkFile(ctx, newPath, false); err != nil {
+	if oldPath != newPath {
+		if err = s.checkTarget(ctx, oldPath, newPath); err != nil {
 			s.error(w, r, request, err)
 			return
 		}
@@ -170,6 +171,32 @@ func getNewName(r *http.Request) (string, error) {
 	}
 
 	return sanitized, nil
+}
+
+func (s *Service) checkTarget(ctx context.Context, oldPath, newPath string) error {
+	if !strings.EqualFold(oldPath, newPath) {
+		_, err := s.checkFile(ctx, newPath, false)
+		return err
+	}
+
+	// On a case insensitive filesystem, the new path already resolves to the item being renamed,
+	// so only the exact name found in the directory listing proves that another item is in the way.
+	trimmed := strings.TrimSuffix(newPath, "/")
+
+	items, err := s.storage.List(ctx, provider.Dirname(path.Dir(trimmed)))
+	if err != nil {
+		return model.WrapInternal(err)
+	}
+
+	name := path.Base(trimmed)
+
+	for _, item := range items {
+		if item.Name() == name {
+			return model.WrapInvalid(fmt.Errorf("`%s` already exist", newPath))
+		}
+	}
+
+	return nil
 }
 
 func (s *Service) checkFile(ctx context.Context, pathname string, shouldExist bool) (info absto.Item, err error) {
