@@ -102,7 +102,7 @@ build-web:
 run:
 	$(MAIN_RUNNER) \
 		-ignorePattern ".git|node_modules" \
-		-authUsers "1:admin:`go tool 'github.com/ViBiOh/auth/v3/cmd/argon' password`"
+		-authUsers "1:admin:`go tool 'codeberg.org/ViBiOh/auth/v3/cmd/argon' password`"
 
 ## config: Create local configuration
 .PHONY: config
