@@ -4,7 +4,7 @@ go 1.27.0
 
 require (
 	codeberg.org/ViBiOh/ChatPotte v0.11.0
-	codeberg.org/ViBiOh/auth/v3 v3.13.0
+	codeberg.org/ViBiOh/auth/v3 v3.13.1
 	github.com/ViBiOh/absto v1.7.37
 	github.com/ViBiOh/exas v0.8.1
 	github.com/ViBiOh/flags v1.6.1

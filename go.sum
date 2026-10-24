@@ -1,7 +1,7 @@
 codeberg.org/ViBiOh/ChatPotte v0.11.0 h1:CMpzCpVnws5cw4EeUnRsxpl3DAadeHW2eanV9J+eO1Y=
 codeberg.org/ViBiOh/ChatPotte v0.11.0/go.mod h1:qnrgBjAnueYC2kKwW6Niig4hRxf+ljOqSAXJ91dro5Q=
-codeberg.org/ViBiOh/auth/v3 v3.13.0 h1:Bv4grgsI5GU7Fp/YsUCjcy6t2D6dXfelIj4cEowgfxw=
-codeberg.org/ViBiOh/auth/v3 v3.13.0/go.mod h1:z3V4NiOpJCSgMEIJa3KoFIyu+f+bdoS7iYLE2eXRtLA=
+codeberg.org/ViBiOh/auth/v3 v3.13.1 h1:ruDTMiHpvmooDjJbyAdicizMEFthCjeu0tI8JOCeNHI=
+codeberg.org/ViBiOh/auth/v3 v3.13.1/go.mod h1:+oV3H7wnLxqFj+gb9zGLGJusc5kfiaVfl18VvX0mbe8=
 filippo.io/edwards25519 v1.1.0 h1:FNf4tywRC1HmFuKW5xopWpigGjJKiJSV0Cqo0cJWDaA=
 filippo.io/edwards25519 v1.1.0/go.mod h1:BxyFTGdWcka3PhytdK4V28tE5sGfRvvvRV7EaN4VDT4=
 github.com/ViBiOh/absto v1.7.37 h1:5Kunmi5JZsfOifqtFo9W7WQeFEc6fbe3kuc97Dyybkg=
