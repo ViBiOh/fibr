@@ -15,9 +15,7 @@ const maxSubscriptionBodySize = 8 << 10
 func (s *Service) Handle(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	r.Body = http.MaxBytesReader(w, r.Body, maxSubscriptionBodySize)
-
-	subscription, err := httpjson.Parse[Subscription](r)
+	subscription, err := httpjson.Parse[Subscription](r, maxSubscriptionBodySize)
 	if err != nil {
 		httperror.BadRequest(ctx, w, err)
 		return

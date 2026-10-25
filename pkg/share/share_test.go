@@ -58,7 +58,7 @@ func newTestService(t *testing.T, shares ...provider.Share) (*Service, absto.Sto
 			seed[share.ID] = share
 		}
 
-		require.NoError(t, storage.Mkdir(t.Context(), provider.MetadataDirectoryName, absto.DirectoryPerm))
+		require.NoError(t, storage.Mkdir(t.Context(), provider.MetadataDirectoryName))
 		require.NoError(t, provider.SaveJSON(t.Context(), storage, shareFilename, seed))
 	}
 

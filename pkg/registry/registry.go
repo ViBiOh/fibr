@@ -125,7 +125,7 @@ func (r *Registry[T]) read(ctx context.Context) (map[string]T, error) {
 		return nil, err
 	}
 
-	if err = r.storage.Mkdir(ctx, provider.MetadataDirectoryName, absto.DirectoryPerm); err != nil {
+	if err = r.storage.Mkdir(ctx, provider.MetadataDirectoryName); err != nil {
 		return nil, fmt.Errorf("create dir: %w", err)
 	}
 

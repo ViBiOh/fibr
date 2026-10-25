@@ -120,7 +120,7 @@ func TestCreatePushWebhook(t *testing.T) {
 			}
 
 			if tc.wantCreate {
-				webhookMock.EXPECT().Create(gomock.Any(), "/photos/", true, provider.Push, pushEndpoint, []provider.EventType{provider.UploadEvent}).Return("webhook-id", nil)
+				webhookMock.EXPECT().Create(gomock.Any(), "/photos", true, provider.Push, pushEndpoint, []provider.EventType{provider.UploadEvent}).Return("webhook-id", nil)
 			}
 
 			recorder := httptest.NewRecorder()

@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"path"
 
-	absto "github.com/ViBiOh/absto/pkg/model"
 	"github.com/ViBiOh/fibr/pkg/provider"
 	"github.com/ViBiOh/httputils/v4/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/renderer"
@@ -37,7 +36,7 @@ func (s *Service) Create(w http.ResponseWriter, r *http.Request, request provide
 
 	pathname := request.SubPath(name)
 
-	if err = s.storage.Mkdir(ctx, pathname, absto.DirectoryPerm); err != nil {
+	if err = s.storage.Mkdir(ctx, pathname); err != nil {
 		s.error(w, r, request, model.WrapInternal(err))
 		return
 	}

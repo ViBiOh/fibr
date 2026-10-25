@@ -135,7 +135,7 @@ func TestLoad(t *testing.T) {
 		t.Parallel()
 
 		storage := newStorage(t)
-		require.NoError(t, storage.Mkdir(t.Context(), provider.MetadataDirectoryName, absto.DirectoryPerm))
+		require.NoError(t, storage.Mkdir(t.Context(), provider.MetadataDirectoryName))
 		require.NoError(t, provider.SaveJSON(t.Context(), storage, testFilename, map[string]item{"a": {ID: "a", Value: "1"}}))
 
 		instance, _ := newRegistry(t, storage, exclusive.New(nil))

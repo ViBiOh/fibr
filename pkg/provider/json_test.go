@@ -88,15 +88,6 @@ func TestSaveJSON(t *testing.T) {
 		assert.ErrorIs(t, err, errWrite)
 	})
 
-	t.Run("directory does not exist", func(t *testing.T) {
-		t.Parallel()
-
-		err := saveWithTimeout(t, storage, "/missing/content.json", map[string]string{"first": "1"})
-
-		assert.Error(t, err)
-		assert.NoDirExists(t, filepath.Join(root, "missing"))
-	})
-
 	t.Run("content that can't be encoded", func(t *testing.T) {
 		t.Parallel()
 

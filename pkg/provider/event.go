@@ -398,7 +398,7 @@ func (e EventBus) handle(event Event, storageService absto.Storage, renamers []R
 }
 
 func RenameDirectory(ctx context.Context, storageService absto.Storage, renamers []Renamer, old, new absto.Item) {
-	if err := storageService.Mkdir(ctx, MetadataDirectory(new), absto.DirectoryPerm); err != nil {
+	if err := storageService.Mkdir(ctx, MetadataDirectory(new)); err != nil {
 		slog.LogAttrs(ctx, slog.LevelError, "create new metadata directory", slog.Any("error", err))
 		return
 	}

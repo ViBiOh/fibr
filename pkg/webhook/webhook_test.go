@@ -58,7 +58,7 @@ func newTestService(t *testing.T, webhooks ...provider.Webhook) (*Service, absto
 			seed[webhook.ID] = webhook
 		}
 
-		require.NoError(t, storage.Mkdir(t.Context(), provider.MetadataDirectoryName, absto.DirectoryPerm))
+		require.NoError(t, storage.Mkdir(t.Context(), provider.MetadataDirectoryName))
 		require.NoError(t, provider.SaveJSON(t.Context(), storage, webhookFilename, seed))
 	}
 

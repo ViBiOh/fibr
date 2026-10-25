@@ -12,7 +12,6 @@ package mocks
 import (
 	context "context"
 	io "io"
-	os "os"
 	reflect "reflect"
 	time "time"
 
@@ -58,20 +57,6 @@ func (mr *StorageMockRecorder) ConvertError(err any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ConvertError", reflect.TypeOf((*Storage)(nil).ConvertError), err)
 }
 
-// Enabled mocks base method.
-func (m *Storage) Enabled() bool {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Enabled")
-	ret0, _ := ret[0].(bool)
-	return ret0
-}
-
-// Enabled indicates an expected call of Enabled.
-func (mr *StorageMockRecorder) Enabled() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Enabled", reflect.TypeOf((*Storage)(nil).Enabled))
-}
-
 // List mocks base method.
 func (m *Storage) List(ctx context.Context, name string) ([]model.Item, error) {
 	m.ctrl.T.Helper()
@@ -88,17 +73,17 @@ func (mr *StorageMockRecorder) List(ctx, name any) *gomock.Call {
 }
 
 // Mkdir mocks base method.
-func (m *Storage) Mkdir(ctx context.Context, name string, perm os.FileMode) error {
+func (m *Storage) Mkdir(ctx context.Context, name string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Mkdir", ctx, name, perm)
+	ret := m.ctrl.Call(m, "Mkdir", ctx, name)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Mkdir indicates an expected call of Mkdir.
-func (mr *StorageMockRecorder) Mkdir(ctx, name, perm any) *gomock.Call {
+func (mr *StorageMockRecorder) Mkdir(ctx, name any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Mkdir", reflect.TypeOf((*Storage)(nil).Mkdir), ctx, name, perm)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Mkdir", reflect.TypeOf((*Storage)(nil).Mkdir), ctx, name)
 }
 
 // Name mocks base method.
@@ -113,20 +98,6 @@ func (m *Storage) Name() string {
 func (mr *StorageMockRecorder) Name() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Name", reflect.TypeOf((*Storage)(nil).Name))
-}
-
-// Path mocks base method.
-func (m *Storage) Path(name string) string {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Path", name)
-	ret0, _ := ret[0].(string)
-	return ret0
-}
-
-// Path indicates an expected call of Path.
-func (mr *StorageMockRecorder) Path(name any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Path", reflect.TypeOf((*Storage)(nil).Path), name)
 }
 
 // ReadFrom mocks base method.
@@ -216,17 +187,17 @@ func (mr *StorageMockRecorder) Walk(ctx, name, walkFn any) *gomock.Call {
 }
 
 // WithIgnoreFn mocks base method.
-func (m *Storage) WithIgnoreFn(ignoreFn func(model.Item) bool) model.Storage {
+func (m *Storage) WithIgnoreFn(arg0 func(model.Item) bool) model.Storage {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "WithIgnoreFn", ignoreFn)
+	ret := m.ctrl.Call(m, "WithIgnoreFn", arg0)
 	ret0, _ := ret[0].(model.Storage)
 	return ret0
 }
 
 // WithIgnoreFn indicates an expected call of WithIgnoreFn.
-func (mr *StorageMockRecorder) WithIgnoreFn(ignoreFn any) *gomock.Call {
+func (mr *StorageMockRecorder) WithIgnoreFn(arg0 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WithIgnoreFn", reflect.TypeOf((*Storage)(nil).WithIgnoreFn), ignoreFn)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WithIgnoreFn", reflect.TypeOf((*Storage)(nil).WithIgnoreFn), arg0)
 }
 
 // WriteTo mocks base method.

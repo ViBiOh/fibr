@@ -3,12 +3,12 @@ module github.com/ViBiOh/fibr
 go 1.27.0
 
 require (
-	codeberg.org/ViBiOh/ChatPotte v0.11.0
+	codeberg.org/ViBiOh/ChatPotte v0.11.1
 	codeberg.org/ViBiOh/auth/v3 v3.13.1
-	github.com/ViBiOh/absto v1.7.37
+	github.com/ViBiOh/absto v1.8.0
 	github.com/ViBiOh/exas v0.8.1
 	github.com/ViBiOh/flags v1.6.1
-	github.com/ViBiOh/httputils/v4 v4.90.0
+	github.com/ViBiOh/httputils/v4 v4.90.1
 	github.com/ViBiOh/vignet v0.0.1
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/rabbitmq/amqp091-go v1.16.0
@@ -41,14 +41,14 @@ require (
 	github.com/klauspost/crc32 v1.3.0 // indirect
 	github.com/minio/crc64nvme v1.1.1 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
-	github.com/minio/minio-go/v7 v7.3.0 // indirect
+	github.com/minio/minio-go/v7 v7.4.1 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/philhofer/fwd v1.2.0 // indirect
 	github.com/redis/go-redis/extra/rediscmd/v9 v9.23.0 // indirect
 	github.com/redis/go-redis/extra/redisotel/v9 v9.23.0 // indirect
 	github.com/tdewolff/argp v0.0.0-20260913163208-9b59948ed567 // indirect
-	github.com/tdewolff/minify/v2 v2.24.21 // indirect
-	github.com/tdewolff/parse/v2 v2.8.18 // indirect
+	github.com/tdewolff/minify/v2 v2.24.23 // indirect
+	github.com/tdewolff/parse/v2 v2.8.20 // indirect
 	github.com/tinylib/msgp v1.6.5 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.72.0 // indirect
@@ -70,8 +70,8 @@ require (
 	golang.org/x/telemetry v0.0.0-20261009151841-97e8ea77aa2a // indirect
 	golang.org/x/term v0.47.0 // indirect
 	golang.org/x/tools v0.52.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20261012220534-4341edf3f941 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20261012220534-4341edf3f941 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20261019180522-ce908d29299b // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20261019180522-ce908d29299b // indirect
 	google.golang.org/grpc v1.84.0 // indirect
 	google.golang.org/protobuf v1.36.12 // indirect
 	gopkg.in/ini.v1 v1.67.3 // indirect

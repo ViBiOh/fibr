@@ -105,7 +105,7 @@ func (s Service) save(ctx context.Context, item absto.Item, content Searches) er
 			return fmt.Errorf("check directory `%s` existence: %w", dirname, err)
 		}
 
-		if err = s.storage.Mkdir(ctx, dirname, absto.DirectoryPerm); err != nil {
+		if err = s.storage.Mkdir(ctx, dirname); err != nil {
 			return fmt.Errorf("create directory `%s`: %w", dirname, err)
 		}
 	}
