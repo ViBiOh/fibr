@@ -22,6 +22,7 @@ func main() {
 
 	adapters, err := newAdapters(config, clients)
 	logger.FatalfOnErr(ctx, err, "adapters")
+	defer adapters.Close()
 
 	services, err := newServices(clients.health.EndCtx(), config, clients, adapters)
 	logger.FatalfOnErr(ctx, err, "services")

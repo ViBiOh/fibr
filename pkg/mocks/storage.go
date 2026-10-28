@@ -43,6 +43,20 @@ func (m *Storage) EXPECT() *StorageMockRecorder {
 	return m.recorder
 }
 
+// Close mocks base method.
+func (m *Storage) Close() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Close")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Close indicates an expected call of Close.
+func (mr *StorageMockRecorder) Close() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*Storage)(nil).Close))
+}
+
 // ConvertError mocks base method.
 func (m *Storage) ConvertError(err error) error {
 	m.ctrl.T.Helper()
@@ -55,6 +69,20 @@ func (m *Storage) ConvertError(err error) error {
 func (mr *StorageMockRecorder) ConvertError(err any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ConvertError", reflect.TypeOf((*Storage)(nil).ConvertError), err)
+}
+
+// Enabled mocks base method.
+func (m *Storage) Enabled() bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Enabled")
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// Enabled indicates an expected call of Enabled.
+func (mr *StorageMockRecorder) Enabled() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Enabled", reflect.TypeOf((*Storage)(nil).Enabled))
 }
 
 // List mocks base method.
@@ -98,6 +126,20 @@ func (m *Storage) Name() string {
 func (mr *StorageMockRecorder) Name() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Name", reflect.TypeOf((*Storage)(nil).Name))
+}
+
+// Path mocks base method.
+func (m *Storage) Path(arg0 string) string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Path", arg0)
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// Path indicates an expected call of Path.
+func (mr *StorageMockRecorder) Path(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Path", reflect.TypeOf((*Storage)(nil).Path), arg0)
 }
 
 // ReadFrom mocks base method.
