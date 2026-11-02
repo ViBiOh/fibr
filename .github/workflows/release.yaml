@@ -14,9 +14,9 @@ permissions:
   security-events: none
 
 on:
-  release:
-    types:
-      - released
+  push:
+    tags:
+      - "*"
 
 env:
   SCRIPTS_NO_INTERACTIVE: "true"
