@@ -63,15 +63,15 @@ type Config struct {
 func Flags(fs *flag.FlagSet, prefix string) *Config {
 	var config Config
 
-	flags.New("URL", "Exif Tool URL (exas)").Prefix(prefix).DocPrefix("exif").StringVar(fs, &config.ExifURL, "http://exas:1080", nil)
-	flags.New("User", "Exif Tool URL Basic User").Prefix(prefix).DocPrefix("exif").StringVar(fs, &config.ExifUser, "", nil)
-	flags.New("Password", "Exif Tool URL Basic Password").Prefix(prefix).DocPrefix("exif").StringVar(fs, &config.ExifPass, "", nil)
+	flags.New("URL", "Exif Tool URL (exas)").Prefix(prefix).DocPrefix("exif").FlagVar(fs, &config.ExifURL, "http://exas:1080", nil)
+	flags.New("User", "Exif Tool URL Basic User").Prefix(prefix).DocPrefix("exif").FlagVar(fs, &config.ExifUser, "", nil)
+	flags.New("Password", "Exif Tool URL Basic Password").Prefix(prefix).DocPrefix("exif").FlagVar(fs, &config.ExifPass, "", nil)
 
-	flags.New("DirectAccess", "Use Exas with direct access to filesystem (no large file upload, send a GET request, Basic Auth recommended)").Prefix(prefix).DocPrefix("exif").BoolVar(fs, &config.DirectAccess, false, nil)
-	flags.New("MaxSize", "Max file size (in bytes) for extracting exif (0 to no limit). Not used if DirectAccess enabled.").Prefix(prefix).DocPrefix("exif").Int64Var(fs, &config.MaxSize, 1024*1024*200, nil)
+	flags.New("DirectAccess", "Use Exas with direct access to filesystem (no large file upload, send a GET request, Basic Auth recommended)").Prefix(prefix).DocPrefix("exif").FlagVar(fs, &config.DirectAccess, false, nil)
+	flags.New("MaxSize", "Max file size (in bytes) for extracting exif (0 to no limit). Not used if DirectAccess enabled.").Prefix(prefix).DocPrefix("exif").FlagVar(fs, &config.MaxSize, 1024*1024*200, nil)
 
-	flags.New("AmqpExchange", "AMQP Exchange Name").Prefix(prefix).DocPrefix("exif").StringVar(fs, &config.AmqpExchange, "fibr", nil)
-	flags.New("AmqpRoutingKey", "AMQP Routing Key for exif").Prefix(prefix).DocPrefix("exif").StringVar(fs, &config.AmqpRoutingKey, "exif_input", nil)
+	flags.New("AmqpExchange", "AMQP Exchange Name").Prefix(prefix).DocPrefix("exif").FlagVar(fs, &config.AmqpExchange, "fibr", nil)
+	flags.New("AmqpRoutingKey", "AMQP Routing Key for exif").Prefix(prefix).DocPrefix("exif").FlagVar(fs, &config.AmqpRoutingKey, "exif_input", nil)
 
 	return &config
 }

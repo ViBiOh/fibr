@@ -95,8 +95,8 @@ func newConfig() configuration {
 		push:      push.Flags(fs, "push"),
 	}
 
-	flags.New("NoAuth", "Disable basic authentification").DocPrefix("auth").BoolVar(fs, &config.disableAuth, false, nil)
-	flags.New("NoStorageTrace", "Disable tracing for storage").DocPrefix("storage").BoolVar(fs, &config.disableStorageTracing, false, nil)
+	flags.New("NoAuth", "Disable basic authentification").DocPrefix("auth").FlagVar(fs, &config.disableAuth, false, nil)
+	flags.New("NoStorageTrace", "Disable tracing for storage").DocPrefix("storage").FlagVar(fs, &config.disableStorageTracing, false, nil)
 
 	_ = fs.Parse(os.Args[1:])
 

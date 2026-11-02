@@ -38,7 +38,7 @@ type Config struct {
 func Flags(fs *flag.FlagSet, prefix string) *Config {
 	var config Config
 
-	flags.New("PubSubChannel", "Channel name").Prefix(prefix).DocPrefix("share").StringVar(fs, &config.PubsubChannel, "fibr:shares-channel", nil)
+	flags.New("PubSubChannel", "Channel name").Prefix(prefix).DocPrefix("share").FlagVar(fs, &config.PubsubChannel, "fibr:shares-channel", nil)
 
 	return &config
 }

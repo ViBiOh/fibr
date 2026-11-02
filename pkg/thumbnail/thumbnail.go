@@ -77,19 +77,19 @@ type Config struct {
 func Flags(fs *flag.FlagSet, prefix string) *Config {
 	var config Config
 
-	flags.New("URL", "Vignet Thumbnail URL").Prefix(prefix).DocPrefix("thumbnail").StringVar(fs, &config.VignetURL, "http://vignet:1080", nil)
-	flags.New("User", "Vignet Thumbnail Basic Auth User").Prefix(prefix).DocPrefix("thumbnail").StringVar(fs, &config.VignetUser, "", nil)
-	flags.New("Password", "Vignet Thumbnail Basic Auth Password").Prefix(prefix).DocPrefix("thumbnail").StringVar(fs, &config.VignetPass, "", nil)
+	flags.New("URL", "Vignet Thumbnail URL").Prefix(prefix).DocPrefix("thumbnail").FlagVar(fs, &config.VignetURL, "http://vignet:1080", nil)
+	flags.New("User", "Vignet Thumbnail Basic Auth User").Prefix(prefix).DocPrefix("thumbnail").FlagVar(fs, &config.VignetUser, "", nil)
+	flags.New("Password", "Vignet Thumbnail Basic Auth Password").Prefix(prefix).DocPrefix("thumbnail").FlagVar(fs, &config.VignetPass, "", nil)
 
-	flags.New("DirectAccess", "Use Vignet with direct access to filesystem (no large file upload, send a GET request, Basic Auth recommended)").Prefix(prefix).DocPrefix("thumbnail").BoolVar(fs, &config.DirectAccess, false, nil)
-	flags.New("MaxSize", "Maximum file size (in bytes) for generating thumbnail (0 to no limit). Not used if DirectAccess enabled.").Prefix(prefix).DocPrefix("thumbnail").Int64Var(fs, &config.MaxSize, 1024*1024*200, nil)
-	flags.New("MinBitrate", "Minimal video bitrate (in bits per second) to generate a streamable version (in HLS), if DirectAccess enabled").Prefix(prefix).DocPrefix("thumbnail").Uint64Var(fs, &config.MinBitrate, 80*1000*1000, nil)
+	flags.New("DirectAccess", "Use Vignet with direct access to filesystem (no large file upload, send a GET request, Basic Auth recommended)").Prefix(prefix).DocPrefix("thumbnail").FlagVar(fs, &config.DirectAccess, false, nil)
+	flags.New("MaxSize", "Maximum file size (in bytes) for generating thumbnail (0 to no limit). Not used if DirectAccess enabled.").Prefix(prefix).DocPrefix("thumbnail").FlagVar(fs, &config.MaxSize, 1024*1024*200, nil)
+	flags.New("MinBitrate", "Minimal video bitrate (in bits per second) to generate a streamable version (in HLS), if DirectAccess enabled").Prefix(prefix).DocPrefix("thumbnail").FlagVar(fs, &config.MinBitrate, 80*1000*1000, nil)
 
-	flags.New("AmqpExchange", "AMQP Exchange Name").Prefix(prefix).DocPrefix("thumbnail").StringVar(fs, &config.AmqpExchange, "fibr", nil)
-	flags.New("AmqpStreamRoutingKey", "AMQP Routing Key for stream").Prefix(prefix).DocPrefix("thumbnail").StringVar(fs, &config.AmqpStreamRoutingKey, "stream", nil)
-	flags.New("AmqpThumbnailRoutingKey", "AMQP Routing Key for thumbnail").Prefix(prefix).DocPrefix("thumbnail").StringVar(fs, &config.AmqpThumbnailRoutingKey, "thumbnail", nil)
+	flags.New("AmqpExchange", "AMQP Exchange Name").Prefix(prefix).DocPrefix("thumbnail").FlagVar(fs, &config.AmqpExchange, "fibr", nil)
+	flags.New("AmqpStreamRoutingKey", "AMQP Routing Key for stream").Prefix(prefix).DocPrefix("thumbnail").FlagVar(fs, &config.AmqpStreamRoutingKey, "stream", nil)
+	flags.New("AmqpThumbnailRoutingKey", "AMQP Routing Key for thumbnail").Prefix(prefix).DocPrefix("thumbnail").FlagVar(fs, &config.AmqpThumbnailRoutingKey, "thumbnail", nil)
 
-	flags.New("LargeSize", "Size of large thumbnail for story display (thumbnail are always squared). 0 to disable").Prefix(prefix).DocPrefix("thumbnail").Uint64Var(fs, &config.LargeSize, 800, nil)
+	flags.New("LargeSize", "Size of large thumbnail for story display (thumbnail are always squared). 0 to disable").Prefix(prefix).DocPrefix("thumbnail").FlagVar(fs, &config.LargeSize, 800, nil)
 
 	return &config
 }

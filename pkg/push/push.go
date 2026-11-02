@@ -72,11 +72,11 @@ type Config struct {
 func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) *Config {
 	var config Config
 
-	flags.New("PublicKey", "VAPID Public Key").Prefix(prefix).DocPrefix("push").StringVar(fs, &config.publicKey, "", overrides)
-	flags.New("PrivateKey", "VAPID Private Key").Prefix(prefix).DocPrefix("push").StringVar(fs, &config.privateKey, "", overrides)
-	flags.New("MailTo", "VAPID Mailto").Prefix(prefix).DocPrefix("push").StringVar(fs, &config.mailTo, "", overrides)
-	flags.New("AllowedHosts", "Hosts of push services allowed as subscription endpoint, exact name or *.suffix, * allows any host").Prefix(prefix).DocPrefix("push").StringSliceVar(fs, &config.allowedHosts, DefaultAllowedHosts, overrides)
-	flags.New("MaxSubscriptions", "Maximum number of stored push subscriptions, 0 for no limit").Prefix(prefix).DocPrefix("push").IntVar(fs, &config.maxSubscriptions, defaultMaxSubscriptions, overrides)
+	flags.New("PublicKey", "VAPID Public Key").Prefix(prefix).DocPrefix("push").FlagVar(fs, &config.publicKey, "", overrides)
+	flags.New("PrivateKey", "VAPID Private Key").Prefix(prefix).DocPrefix("push").FlagVar(fs, &config.privateKey, "", overrides)
+	flags.New("MailTo", "VAPID Mailto").Prefix(prefix).DocPrefix("push").FlagVar(fs, &config.mailTo, "", overrides)
+	flags.New("AllowedHosts", "Hosts of push services allowed as subscription endpoint, exact name or *.suffix, * allows any host").Prefix(prefix).DocPrefix("push").FlagVar(fs, &config.allowedHosts, DefaultAllowedHosts, overrides)
+	flags.New("MaxSubscriptions", "Maximum number of stored push subscriptions, 0 for no limit").Prefix(prefix).DocPrefix("push").FlagVar(fs, &config.maxSubscriptions, defaultMaxSubscriptions, overrides)
 
 	return &config
 }

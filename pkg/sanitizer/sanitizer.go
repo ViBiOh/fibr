@@ -34,7 +34,7 @@ type Config struct {
 func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) *Config {
 	var config Config
 
-	flags.New("SanitizeOnStart", "Sanitize on start").Prefix(prefix).DocPrefix("crud").BoolVar(fs, &config.SanitizeOnStart, false, nil)
+	flags.New("SanitizeOnStart", "Sanitize on start").Prefix(prefix).DocPrefix("crud").FlagVar(fs, &config.SanitizeOnStart, false, nil)
 
 	return &config
 }
