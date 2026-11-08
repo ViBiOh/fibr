@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/hex"
-	"encoding/json"
+	"encoding/json/v2"
 	"errors"
 	"fmt"
 	"io"
@@ -233,7 +233,7 @@ func Hash(value string) string {
 func RawHash(content any) string {
 	hasher := xxh3.New()
 
-	if err := json.NewEncoder(hasher).Encode(content); err != nil {
+	if err := json.MarshalWrite(hasher, content); err != nil {
 		_, _ = fmt.Fprintf(hasher, "%v", content)
 	}
 

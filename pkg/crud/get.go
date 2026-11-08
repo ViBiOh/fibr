@@ -2,7 +2,8 @@ package crud
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
+	json "encoding/json/v2"
 	"fmt"
 	"io"
 	"log/slog"
@@ -286,7 +287,8 @@ func (s *Service) generateGeoJSON(ctx context.Context, w io.Writer, request prov
 	sort.Sort(provider.ByID(items))
 
 	var commaNeeded bool
-	encoder := json.NewEncoder(w)
+
+	encoder := jsontext.NewEncoder(w)
 
 	provider.SafeWrite(ctx, w, `{"type":"FeatureCollection","features":[`)
 
@@ -319,7 +321,7 @@ func (s *Service) generateGeoJSON(ctx context.Context, w io.Writer, request prov
 		feature.Properties["url"] = request.RelativeURL(item)
 		feature.Properties["date"] = exif.Date.Format(time.RFC850)
 
-		if err := encoder.Encode(feature); err != nil {
+		if err := json.MarshalEncode(encoder, feature); err != nil {
 			slog.LogAttrs(ctx, slog.LevelError, "encode feature", slog.String("item", item.Pathname), slog.Any("error", err))
 		}
 	}

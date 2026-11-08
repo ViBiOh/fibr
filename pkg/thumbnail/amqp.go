@@ -2,7 +2,7 @@ package thumbnail
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/v2"
 	"fmt"
 
 	absto "github.com/ViBiOh/absto/pkg/model"

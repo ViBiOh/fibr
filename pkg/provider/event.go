@@ -1,9 +1,7 @@
 package provider
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -54,23 +52,14 @@ func (et EventType) String() string {
 	return eventTypeValues[et]
 }
 
-func (et EventType) MarshalJSON() ([]byte, error) {
-	buffer := bytes.NewBufferString(`"`)
-	buffer.WriteString(et.String())
-	buffer.WriteString(`"`)
-	return buffer.Bytes(), nil
+func (et EventType) MarshalText() ([]byte, error) {
+	return []byte(et.String()), nil
 }
 
-func (et *EventType) UnmarshalJSON(b []byte) error {
-	var strValue string
-	err := json.Unmarshal(b, &strValue)
+func (et *EventType) UnmarshalText(b []byte) error {
+	value, err := ParseEventType(string(b))
 	if err != nil {
-		return fmt.Errorf("unmarshal event type: %w", err)
-	}
-
-	value, err := ParseEventType(strValue)
-	if err != nil {
-		return fmt.Errorf("parse event type: %w", err)
+		return fmt.Errorf("parse even type: %w", err)
 	}
 
 	*et = value

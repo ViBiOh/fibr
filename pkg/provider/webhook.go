@@ -1,8 +1,6 @@
 package provider
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"slices"
 	"strings"
@@ -37,26 +35,17 @@ func (r WebhookKind) String() string {
 	return WebhookKindValues[r]
 }
 
-func (r WebhookKind) MarshalJSON() ([]byte, error) {
-	buffer := bytes.NewBufferString(`"`)
-	buffer.WriteString(r.String())
-	buffer.WriteString(`"`)
-	return buffer.Bytes(), nil
+func (wk WebhookKind) MarshalText() ([]byte, error) {
+	return []byte(wk.String()), nil
 }
 
-func (r *WebhookKind) UnmarshalJSON(b []byte) error {
-	var strValue string
-	err := json.Unmarshal(b, &strValue)
+func (wk *WebhookKind) UnmarshalText(b []byte) error {
+	value, err := ParseWebhookKind(string(b))
 	if err != nil {
-		return fmt.Errorf("unmarshal event type: %w", err)
+		return fmt.Errorf("parse webhook kind: %w", err)
 	}
 
-	value, err := ParseWebhookKind(strValue)
-	if err != nil {
-		return fmt.Errorf("parse event type: %w", err)
-	}
-
-	*r = value
+	*wk = value
 	return nil
 }
 

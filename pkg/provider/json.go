@@ -2,7 +2,8 @@ package provider
 
 import (
 	"context"
-	"encoding/json"
+	jsonv1 "encoding/json"
+	"encoding/json/v2"
 	"errors"
 	"fmt"
 	"io"
@@ -23,7 +24,7 @@ func LoadJSON[T any](ctx context.Context, storageService absto.Storage, filename
 		err = errors.Join(err, reader.Close())
 	}()
 
-	if err = json.NewDecoder(reader).Decode(&output); err != nil {
+	if err = json.UnmarshalRead(reader, &output, jsonv1.FormatDurationAsNano(true), json.FormatNilMapAsNull(true), json.FormatNilSliceAsNull(true)); err != nil {
 		err = fmt.Errorf("decode: %w", storageService.ConvertError(err))
 	}
 
@@ -38,7 +39,7 @@ func SaveJSON[T any](ctx context.Context, storageService absto.Storage, filename
 		defer close(done)
 		var err error
 
-		if jsonErr := json.NewEncoder(writer).Encode(content); jsonErr != nil {
+		if jsonErr := json.MarshalWrite(writer, content, jsonv1.FormatDurationAsNano(true), json.FormatNilMapAsNull(true), json.FormatNilSliceAsNull(true)); jsonErr != nil {
 			err = fmt.Errorf("encode: %w", jsonErr)
 		}
 
