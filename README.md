@@ -222,7 +222,6 @@ Be careful when using the CLI, if someone list the processes on the system, they
 
 ```bash
 Usage of fibr:
-  --address                           string        [server] Listen address ${FIBR_ADDRESS}
   --amqpExifExchange                  string        [amqpExif] Exchange name ${FIBR_AMQP_EXIF_EXCHANGE} (default "fibr")
   --amqpExifExclusive                               [amqpExif] Queue exclusive mode (for fanout exchange) ${FIBR_AMQP_EXIF_EXCLUSIVE} (default false)
   --amqpExifInactiveTimeout           duration      [amqpExif] When inactive during the given timeout, stop listening ${FIBR_AMQP_EXIF_INACTIVE_TIMEOUT} (default 0s)
@@ -241,7 +240,6 @@ Usage of fibr:
   --amqpURI                           string        [amqp] Address in the form amqps?://<user>:<password>@<address>:<port>/<vhost> ${FIBR_AMQP_URI}
   --authProfiles                      string slice  [auth] Users profiles in the form 'id:profile1|profile2' ${FIBR_AUTH_PROFILES}, as a string slice, environment variable separated by "," (default [1:admin])
   --authUsers                         string slice  [auth] Users credentials in the form 'id:login:password' ${FIBR_AUTH_USERS}, as a string slice, environment variable separated by "|"
-  --cert                              string        [server] Certificate file ${FIBR_CERT}
   --chunkUpload                                     [crud] Use chunk upload in browser ${FIBR_CHUNK_UPLOAD} (default false)
   --cookieDevMode                                   [cookie] Disable Secure flag on cookie ${FIBR_COOKIE_DEV_MODE} (default false)
   --cookieExpiration                  duration      [cookie] Cookie Expiration ${FIBR_COOKIE_EXPIRATION} (default 120h0m0s)
@@ -254,25 +252,21 @@ Usage of fibr:
   --exifPassword                      string        [exif] Exif Tool URL Basic Password ${FIBR_EXIF_PASSWORD}
   --exifURL                           string        [exif] Exif Tool URL (exas) ${FIBR_EXIF_URL} (default "http://exas:1080")
   --exifUser                          string        [exif] Exif Tool URL Basic User ${FIBR_EXIF_USER}
-  --extension                         string        Go Template Extension ${FIBR_EXTENSION} (default "tmpl")
+  --extension                         string        Go Template Extension ${FIBR_EXTENSION} (default "gotmpl")
   --frameOptions                      string        [owasp] X-Frame-Options ${FIBR_FRAME_OPTIONS} (default "SAMEORIGIN")
   --graceDuration                     duration      [http] Grace duration when signal received ${FIBR_GRACE_DURATION} (default 30s)
   --hsts                                            [owasp] Indicate Strict Transport Security ${FIBR_HSTS} (default true)
-  --idleTimeout                       duration      [server] Idle Timeout ${FIBR_IDLE_TIMEOUT} (default 2m0s)
   --ignorePattern                     string        [crud] Ignore pattern when listing files or directory ${FIBR_IGNORE_PATTERN}
-  --key                               string        [server] Key file ${FIBR_KEY}
   --loggerJson                                      [logger] Log format as JSON ${FIBR_LOGGER_JSON} (default false)
   --loggerLevel                       string        [logger] Logger level ${FIBR_LOGGER_LEVEL} (default "INFO")
   --loggerLevelKey                    string        [logger] Key for level in JSON ${FIBR_LOGGER_LEVEL_KEY} (default "level")
   --loggerMessageKey                  string        [logger] Key for message in JSON ${FIBR_LOGGER_MESSAGE_KEY} (default "msg")
   --loggerTimeKey                     string        [logger] Key for timestamp in JSON ${FIBR_LOGGER_TIME_KEY} (default "time")
   --minify                                          Minify HTML ${FIBR_MINIFY} (default true)
-  --name                              string        [server] Name ${FIBR_NAME} (default "http")
   --noAuth                                          [auth] Disable basic authentification ${FIBR_NO_AUTH} (default false)
   --noStorageTrace                                  [storage] Disable tracing for storage ${FIBR_NO_STORAGE_TRACE} (default false)
   --okStatus                          int           [http] Healthy HTTP Status code ${FIBR_OK_STATUS} (default 204)
   --pathPrefix                        string        Root Path Prefix ${FIBR_PATH_PREFIX}
-  --port                              uint          [server] Listen port (0 to disable) ${FIBR_PORT} (default 1080)
   --pprofAgent                        string        [pprof] URL of the Datadog Trace Agent (e.g. http://datadog.observability:8126) ${FIBR_PPROF_AGENT}
   --pprofPort                         int           [pprof] Port of the HTTP server (0 to disable) ${FIBR_PPROF_PORT} (default 0)
   --publicURL                         string        Public URL ${FIBR_PUBLIC_URL} (default "http://127.0.0.1:1080")
@@ -281,14 +275,21 @@ Usage of fibr:
   --pushMaxSubscriptions              int           [push] Maximum number of stored push subscriptions, 0 for no limit ${FIBR_PUSH_MAX_SUBSCRIPTIONS} (default 100)
   --pushPrivateKey                    string        [push] VAPID Private Key ${FIBR_PUSH_PRIVATE_KEY}
   --pushPublicKey                     string        [push] VAPID Public Key ${FIBR_PUSH_PUBLIC_KEY}
-  --readTimeout                       duration      [server] Read Timeout ${FIBR_READ_TIMEOUT} (default 10m0s)
   --redisAddress                      string slice  [redis] Redis Address host:port (blank to disable) ${FIBR_REDIS_ADDRESS}, as a string slice, environment variable separated by ","
   --redisDatabase                     int           [redis] Redis Database ${FIBR_REDIS_DATABASE} (default 0)
   --redisPassword                     string        [redis] Redis Password, if any ${FIBR_REDIS_PASSWORD}
   --redisUsername                     string        [redis] Redis Username, if any ${FIBR_REDIS_USERNAME}
   --sanitizeOnStart                                 [crud] Sanitize on start ${FIBR_SANITIZE_ON_START} (default false)
+  --serverAddress                     string        [server] Listen address ${FIBR_SERVER_ADDRESS}
+  --serverCert                        string        [server] Certificate file ${FIBR_SERVER_CERT}
+  --serverIdleTimeout                 duration      [server] Idle Timeout ${FIBR_SERVER_IDLE_TIMEOUT} (default 2m0s)
+  --serverKey                         string        [server] Key file ${FIBR_SERVER_KEY}
+  --serverName                        string        [server] Name ${FIBR_SERVER_NAME} (default "http")
+  --serverPort                        uint          [server] Listen port (0 to disable) ${FIBR_SERVER_PORT} (default 1080)
+  --serverReadTimeout                 duration      [server] Read Timeout ${FIBR_SERVER_READ_TIMEOUT} (default 10m0s)
+  --serverShutdownTimeout             duration      [server] Shutdown Timeout ${FIBR_SERVER_SHUTDOWN_TIMEOUT} (default 10s)
+  --serverWriteTimeout                duration      [server] Write Timeout ${FIBR_SERVER_WRITE_TIMEOUT} (default 10m0s)
   --sharePubSubChannel                string        [share] Channel name ${FIBR_SHARE_PUB_SUB_CHANNEL} (default "fibr:shares-channel")
-  --shutdownTimeout                   duration      [server] Shutdown Timeout ${FIBR_SHUTDOWN_TIMEOUT} (default 10s)
   --staticPaths                       string slice  Paths served from static FS ${FIBR_STATIC_PATHS}, as a string slice, environment variable separated by "," (default [/robots.txt, /service-worker.js, /browserconfig.xml, /favicon.ico])
   --storageFileSystemDirectory        /data         [storage] Path to directory. Default is dynamic. /data on a server and Current Working Directory in a terminal. ${FIBR_STORAGE_FILE_SYSTEM_DIRECTORY} (default ${PWD})
   --storageObjectAccessKey            string        [storage] Storage Object Access Key ${FIBR_STORAGE_OBJECT_ACCESS_KEY}
@@ -318,7 +319,6 @@ Usage of fibr:
   --userAgent                         string        [alcotest] User-Agent for check ${FIBR_USER_AGENT} (default "Alcotest")
   --webhookPubSubChannel              string        [webhook] Channel name ${FIBR_WEBHOOK_PUB_SUB_CHANNEL} (default "fibr:webhooks-channel")
   --webhookSecret                     string        [webhook] Secret for HMAC Signature ${FIBR_WEBHOOK_SECRET}
-  --writeTimeout                      duration      [server] Write Timeout ${FIBR_WRITE_TIMEOUT} (default 10m0s)
 ```
 
 # Caveats
