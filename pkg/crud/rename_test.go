@@ -43,8 +43,8 @@ func newRenameService(t *testing.T, files ...string) (*Service, string, chan pro
 	require.NoError(t, flagSet.Parse(nil))
 
 	rendererService, err := renderer.New(t.Context(), config, fstest.MapFS{
-		"static/robots.txt":    {Data: []byte("")},
-		"templates/empty.tmpl": {Data: []byte(`{{ define "empty" }}{{ end }}`)},
+		"static/robots.txt":      {Data: []byte("")},
+		"templates/empty.gotmpl": {Data: []byte(`{{ define "empty" }}{{ end }}`)},
 	}, nil, nil, nil)
 	require.NoError(t, err)
 
